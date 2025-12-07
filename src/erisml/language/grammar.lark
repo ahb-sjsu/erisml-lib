@@ -1,0 +1,48 @@
+?start: model
+
+model: environment_block agent_block+ norms_block? dynamics_block?
+
+environment_block: "environment" CNAME "{" env_body "}"
+env_body: objects_decl state_decl env_dynamics_decl?
+
+objects_decl: "objects:" CNAME ("," CNAME)* ";"
+state_decl: "state:" state_var_decl*
+state_var_decl: CNAME ":" type_expr ";"
+
+type_expr: base_type
+         | CNAME "->" base_type
+base_type: "bool" | "int" | "real" | "(" type_expr "," type_expr ")"
+
+agent_block: "agent" CNAME "{" agent_body "}"
+agent_body: capabilities_decl beliefs_decl? intents_decl? constraints_decl?
+
+capabilities_decl: "capabilities:" CNAME* ";"
+beliefs_decl: "beliefs:" CNAME* ";"
+intents_decl: "intents:" CNAME* ";"
+constraints_decl: "constraints:" CNAME* ";"
+
+norms_block: "norms" CNAME "{" norm_rule* "}"
+norm_rule: prohibition_rule
+         | obligation_rule
+         | sanction_rule
+
+prohibition_rule: "prohibition:" expr ";"
+obligation_rule: "obligation:" expr ";"
+sanction_rule: "sanction:" expr ";"
+
+dynamics_block: "dynamics" "{" joint_action_decl reward_decl "}"
+joint_action_decl: "joint_action" "{" joint_term+ "}"
+joint_term: CNAME "." CNAME "->" "cost" NUMBER ";"
+reward_decl: "reward" "{" reward_term+ "}"
+reward_term: CNAME ":" expr ";"
+
+?expr: CNAME
+     | expr "==" expr
+     | expr "&&" expr
+     | expr "||" expr
+     | "(" expr ")"
+
+%import common.CNAME
+%import common.NUMBER
+%import common.WS
+%ignore WS
