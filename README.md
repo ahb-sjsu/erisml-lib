@@ -5,11 +5,11 @@ operating in pervasive computing environments (homes, hospitals, campuses,
 factories, vehicles, etc.).
 
 ErisML provides a single, machine-interpretable and human-legible representation of 
-**(i) environment state and dynamics
-**(ii) agents and their capabilities and beliefs
-**(iii) intents and utilities
-**(iv) norms (permissions, obligations, prohibitions, sanctions)
-**(v) multi-agent strategic interaction
+**(i) environment state and dynamics**(
+**(ii) agents and their capabilities and beliefs**(
+**(iii) intents and utilities**(
+**(iv) norms (permissions, obligations, prohibitions, sanctions)**(
+**(v) multi-agent strategic interaction**(
 
 We define a concrete syntax, a formal grammar, denotational semantics, and
 an execution model that treats norms as first-class constraints on action, 
