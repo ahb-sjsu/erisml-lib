@@ -16,7 +16,7 @@ We use small fake EthicalFactsBuilder implementations to verify that:
 from __future__ import annotations
 
 from dataclasses import dataclass
-from typing import Any, Dict, List
+from typing import List
 
 import pytest
 

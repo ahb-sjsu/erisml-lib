@@ -90,10 +90,15 @@ def test_triage_em_forbids_rights_violations(triage_em: CaseStudy1TriageEM) -> N
     assert judgement.option_id == "opt_rights_violation"
     assert judgement.verdict == "forbid"
     assert judgement.normative_score == pytest.approx(0.0)
-    assert any("violates fundamental rights" in r.lower() or "violates_rights" in r for r in judgement.reasons)
+    assert any(
+        "violates fundamental rights" in r.lower() or "violates_rights" in r
+        for r in judgement.reasons
+    )
 
 
-def test_triage_em_forbids_explicit_rule_violations(triage_em: CaseStudy1TriageEM) -> None:
+def test_triage_em_forbids_explicit_rule_violations(
+    triage_em: CaseStudy1TriageEM,
+) -> None:
     """
     If explicit rules/regulations are violated, the triage EM should 'forbid'
     the option and assign a normative score of 0.0.
@@ -106,10 +111,15 @@ def test_triage_em_forbids_explicit_rule_violations(triage_em: CaseStudy1TriageE
     assert judgement.option_id == "opt_explicit_rule_violation"
     assert judgement.verdict == "forbid"
     assert judgement.normative_score == pytest.approx(0.0)
-    assert any("violates fundamental rights" in r.lower() or "violates_explicit_rule" in r for r in judgement.reasons)
+    assert any(
+        "violates fundamental rights" in r.lower() or "violates_explicit_rule" in r
+        for r in judgement.reasons
+    )
 
 
-def test_triage_em_prefers_better_patient_over_baseline(triage_em: CaseStudy1TriageEM) -> None:
+def test_triage_em_prefers_better_patient_over_baseline(
+    triage_em: CaseStudy1TriageEM,
+) -> None:
     """
     A patient with higher expected benefit/urgency and disadvantaged status
     should receive a higher normative score than a more moderate baseline.
