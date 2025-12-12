@@ -138,9 +138,7 @@ class RiskAttitudeProfile:
     appetite: RiskAppetite = RiskAppetite.BALANCED
     max_overall_risk: float = 0.3  # max acceptable residual risk [0,1]
 
-    tolerances: DimensionRiskTolerance = field(
-        default_factory=DimensionRiskTolerance
-    )
+    tolerances: DimensionRiskTolerance = field(default_factory=DimensionRiskTolerance)
 
     escalate_near_threshold: bool = True
     escalation_margin: float = 0.05
@@ -283,14 +281,10 @@ class DEMEProfileV03:
     trustworthiness: TrustworthinessWeights = field(
         default_factory=TrustworthinessWeights
     )
-    deme_dimensions: DEMEDimensionWeights = field(
-        default_factory=DEMEDimensionWeights
-    )
+    deme_dimensions: DEMEDimensionWeights = field(default_factory=DEMEDimensionWeights)
 
     # Risk posture & summary override mode
-    risk_attitude: RiskAttitudeProfile = field(
-        default_factory=RiskAttitudeProfile
-    )
+    risk_attitude: RiskAttitudeProfile = field(default_factory=RiskAttitudeProfile)
     override_mode: OverrideMode = OverrideMode.BALANCED_CASE_BY_CASE
 
     # Hierarchical structure
@@ -340,13 +334,9 @@ def deme_profile_v03_from_dict(data: Dict[str, Any]) -> DEMEProfileV03:
         escalation_margin=ra.get("escalation_margin", 0.05),
     )
 
-    lexical_layers = [
-        LexicalLayer(**ll) for ll in data.get("lexical_layers", [])
-    ]
+    lexical_layers = [LexicalLayer(**ll) for ll in data.get("lexical_layers", [])]
 
-    override_graph = [
-        OverrideEdge(**og) for og in data.get("override_graph", [])
-    ]
+    override_graph = [OverrideEdge(**og) for og in data.get("override_graph", [])]
 
     pattern_constraints = [
         PatternConstraint(
@@ -365,19 +355,11 @@ def deme_profile_v03_from_dict(data: Dict[str, Any]) -> DEMEProfileV03:
         domain=data.get("domain"),
         version=data.get("version", "0.3.0"),
         schema_version=data.get("schema_version", "DEMEProfileV03-0.1"),
-        principlism=PrinciplismWeights(
-            **data.get("principlism", {})
-        ),
-        trustworthiness=TrustworthinessWeights(
-            **data.get("trustworthiness", {})
-        ),
-        deme_dimensions=DEMEDimensionWeights(
-            **data.get("deme_dimensions", {})
-        ),
+        principlism=PrinciplismWeights(**data.get("principlism", {})),
+        trustworthiness=TrustworthinessWeights(**data.get("trustworthiness", {})),
+        deme_dimensions=DEMEDimensionWeights(**data.get("deme_dimensions", {})),
         risk_attitude=risk_attitude,
-        override_mode=OverrideMode(
-            data.get("override_mode", "balanced_case_by_case")
-        ),
+        override_mode=OverrideMode(data.get("override_mode", "balanced_case_by_case")),
         lexical_layers=lexical_layers,
         override_graph=override_graph,
         hard_vetoes=HardVetoes(**data.get("hard_vetoes", {})),

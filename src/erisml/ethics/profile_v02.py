@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass, field
 from enum import Enum
-from typing import Dict, List, Literal, Optional
+from typing import Dict, List, Optional
 
 
 # ---------------------------------------------------------------------------
@@ -143,9 +143,7 @@ class RiskAttitudeProfile:
     max_overall_risk: float = 0.3  # overall maximum acceptable residual risk
 
     # Per-dimension tolerances (see above).
-    tolerances: DimensionRiskTolerance = field(
-        default_factory=DimensionRiskTolerance
-    )
+    tolerances: DimensionRiskTolerance = field(default_factory=DimensionRiskTolerance)
 
     # Whether to escalate (to human / governance) when risk is near limits.
     escalate_near_threshold: bool = True
@@ -178,7 +176,6 @@ class HardVetoes:
     # For generative AI / content-producing agents:
     never_fabricate_critical_evidence: bool = True
     never_impersonate_real_person_without_consent: bool = True
-
 
 
 @dataclass
@@ -224,7 +221,7 @@ class PatternConstraint:
     name: str
     kind: PatternConstraintKind
     expression: str  # expression in a well-defined mini-language
-    rationale: str   # human-readable explanation
+    rationale: str  # human-readable explanation
 
 
 # ---------------------------------------------------------------------------
@@ -270,17 +267,13 @@ class DEMEProfileV02:
     trustworthiness: TrustworthinessWeights = field(
         default_factory=TrustworthinessWeights
     )
-    deme_dimensions: DEMEDimensionWeights = field(
-        default_factory=DEMEDimensionWeights
-    )
+    deme_dimensions: DEMEDimensionWeights = field(default_factory=DEMEDimensionWeights)
 
     # ------------------------------------------------------------------
     # Risk posture & override logic
     # ------------------------------------------------------------------
 
-    risk_attitude: RiskAttitudeProfile = field(
-        default_factory=RiskAttitudeProfile
-    )
+    risk_attitude: RiskAttitudeProfile = field(default_factory=RiskAttitudeProfile)
     override_mode: OverrideMode = OverrideMode.BALANCED_CASE_BY_CASE
 
     # Optional "lexical priorities" – a mini-stack like:

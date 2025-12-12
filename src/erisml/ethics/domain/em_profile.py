@@ -19,7 +19,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass, field, asdict
 from datetime import datetime, timezone
-from typing import Any, Dict, List, Literal, Optional
+from typing import Any, Dict, List, Literal
 
 
 SchemaVersion = Literal["DEME-EMProfile-0.1"]
@@ -98,9 +98,7 @@ class PrincipleAlignment:
     """Aggregated alignment with principlism and AI ethics principles."""
 
     principlism: PrinciplismAlignment = field(default_factory=PrinciplismAlignment)
-    ai_principles: AIPrinciplesAlignment = field(
-        default_factory=AIPrinciplesAlignment
-    )
+    ai_principles: AIPrinciplesAlignment = field(default_factory=AIPrinciplesAlignment)
 
 
 @dataclass
@@ -290,9 +288,7 @@ class DEMEProfileV01:
 
     domain_scope: List[str] = field(default_factory=list)
 
-    principle_alignment: PrincipleAlignment = field(
-        default_factory=PrincipleAlignment
-    )
+    principle_alignment: PrincipleAlignment = field(default_factory=PrincipleAlignment)
 
     # Core DEME dimensions (normalized weights).
     dimension_weights: Dict[str, float] = field(default_factory=dict)
@@ -311,9 +307,7 @@ class DEMEProfileV01:
     rule_following_policy: RuleFollowingPolicy = field(
         default_factory=RuleFollowingPolicy
     )
-    transparency_policy: TransparencyPolicy = field(
-        default_factory=TransparencyPolicy
-    )
+    transparency_policy: TransparencyPolicy = field(default_factory=TransparencyPolicy)
     oversight_policy: OversightPolicy = field(default_factory=OversightPolicy)
 
     # Constraint layer

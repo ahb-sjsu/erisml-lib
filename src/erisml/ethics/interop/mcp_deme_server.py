@@ -21,7 +21,6 @@ from __future__ import annotations
 
 import json
 import os
-from dataclasses import asdict
 from pathlib import Path
 from typing import Any, Dict, List
 
@@ -58,9 +57,7 @@ mcp = FastMCP("ErisML DEME Ethics Server")
 # ---------------------------------------------------------------------------
 
 _DEME_PROFILE_CACHE: Dict[str, DEMEProfileV03] = {}
-_DEME_PROFILE_DIR = Path(
-    os.environ.get("DEME_PROFILES_DIR", "./deme_profiles")
-)
+_DEME_PROFILE_DIR = Path(os.environ.get("DEME_PROFILES_DIR", "./deme_profiles"))
 
 
 def _load_profile(profile_id: str) -> DEMEProfileV03:
@@ -75,9 +72,7 @@ def _load_profile(profile_id: str) -> DEMEProfileV03:
 
     path = _DEME_PROFILE_DIR / f"{profile_id}.json"
     if not path.exists():
-        raise FileNotFoundError(
-            f"DEME profile '{profile_id}' not found at {path}"
-        )
+        raise FileNotFoundError(f"DEME profile '{profile_id}' not found at {path}")
 
     data = json.loads(path.read_text(encoding="utf-8"))
     profile = deme_profile_v03_from_dict(data)
@@ -88,9 +83,7 @@ def _load_profile(profile_id: str) -> DEMEProfileV03:
 def _list_profile_files() -> List[Path]:
     if not _DEME_PROFILE_DIR.exists():
         return []
-    return sorted(
-        p for p in _DEME_PROFILE_DIR.glob("*.json") if p.is_file()
-    )
+    return sorted(p for p in _DEME_PROFILE_DIR.glob("*.json") if p.is_file())
 
 
 # ---------------------------------------------------------------------------
@@ -177,9 +170,7 @@ def evaluate_options(
         judgements.append(j_triage)
         judgements.append(j_rights)
 
-    return {
-        "judgements": [ethical_judgement_to_dict(j) for j in judgements]
-    }
+    return {"judgements": [ethical_judgement_to_dict(j) for j in judgements]}
 
 
 @mcp.tool()
