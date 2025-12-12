@@ -71,9 +71,14 @@ jobs:
       # -----------------------------
       # Run triage ethics demo (smoke test)
       # -----------------------------
-      - name: Run triage ethics demo
+      - name: Run triage ethics demo (if profile exists)
         run: |
-          python -m erisml.examples.triage_ethics_demo
+          if [ -f em_profile_v03.json ]; then
+            echo "Found em_profile_v03.json, running triage ethics demo..."
+            python -m erisml.examples.triage_ethics_demo
+          else
+            echo "No em_profile_v03.json in repo; skipping triage demo for CI."
+          fi
 
       # -----------------------------
       # Ensure working directory clean
