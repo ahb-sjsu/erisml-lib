@@ -48,21 +48,26 @@ ErisML has two tightly-related layers:
 
 2. **DEME (Democratically Governed Ethics Modules)** — ethics-only decision layer
 
-   - A structured **`EthicalFacts`** abstraction that captures ethically-salient
+   - A structured `EthicalFacts` abstraction that captures ethically-salient
      context (consequences, rights/duties, fairness, autonomy, privacy,
      societal/environmental impact, procedural legitimacy, epistemic status).
-   - Pluggable **`EthicsModule`** implementations that perform **purely normative**
+   - Pluggable `EthicsModule` implementations that perform **purely normative**
      reasoning over `EthicalFacts` (never raw domain data).
    - A **democratic governance** layer that aggregates multiple
      `EthicalJudgement` outputs using configurable stakeholder weights, hard
      vetoes, and lexical priority layers.
    - A **DEME profile** format (`DEMEProfileV03`) for versioned governance
-     configurations (e.g., `hospital_service_robot_v1`).
+     configurations (e.g., `hospital_service_robot_v1` or `Jain-1`).
    - A **narrative CLI** that elicits stakeholder values via scenarios and
      produces DEME profiles.
    - A **MCP server** (`erisml.ethics.interop.mcp_deme_server`) so any
-     MCP-compatible agent can call DEME tools (`deme.list_profiles`,
-     `deme.evaluate_options`, `deme.govern_decision`).
+     MCP-compatible agent can call DEME tools:
+       - `deme.list_profiles`
+       - `deme.evaluate_options`
+       - `deme.govern_decision`
+   - A cross-cutting **Geneva baseline EM** (`GenevaBaselineEM`) intended as a
+     “Geneva convention” style base module for rights, non-discrimination,
+     autonomy/consent, privacy, societal impact, and epistemic caution.
 
 Together, ErisML + DEME support **norm-governed, ethics-aware agents** that can
 be inspected, audited, and configured by multiple stakeholders.
@@ -76,12 +81,12 @@ This repository contains a production-style Python library with:
 - **Project layout & tooling**
   - Modern `src/` layout and `pyproject.toml`
   - GitHub Actions CI using:
-    - **Python 3.12** (via `actions/setup-python@v5`)
-    - **Black 24.4.2** for formatting checks
-    - **Ruff** for linting
-    - **Taplo** for TOML validation
-    - **Pytest** for tests
-    - A **DEME smoke test** that runs the triage ethics demo
+    - Python 3.12 (via `actions/setup-python@v5`)
+    - Black 24.4.2 for formatting checks
+    - Ruff for linting
+    - Taplo for TOML validation
+    - Pytest for tests
+    - A DEME smoke test that runs the triage ethics demo
 
 - **Core ErisML implementation**
   - Language grammar (Lark)
@@ -94,7 +99,7 @@ This repository contains a production-style Python library with:
   - PDDL/Tarski adapter stub for planning
 
 - **Ethics / DEME subsystem**
-  - Structured **`EthicalFacts`** and ethical dimensions:
+  - Structured `EthicalFacts` and ethical dimensions:
     - Consequences and welfare
     - Rights and duties
     - Justice and fairness
@@ -104,23 +109,31 @@ This repository contains a production-style Python library with:
     - Virtue and care
     - Procedural legitimacy
     - Epistemic status (confidence, known-unknowns, data quality)
-  - **`EthicalJudgement`** and **`EthicsModule`** interface
+  - `EthicalJudgement` and `EthicsModule` interface
   - Governance configuration and aggregation:
     - `GovernanceConfiguration` / `DEMEProfileV03`
     - `DecisionOutcome` and helpers (e.g., `select_option`)
     - Stakeholder weights, hard vetoes, lexical priority layers, tie-breaking
+    - Support for base EMs (`base_em_ids`, `base_em_enforcement`) such as
+      Geneva-style baselines
   - Example modules:
-    - **Case Study 1 triage module** (`CaseStudy1TriageEM`)
-    - A small **rights-first** EM
+    - Case Study 1 triage module (`CaseStudy1TriageEM`)
+    - Rights-first EM (`RightsFirstEM`)
+    - Geneva baseline EM (`GenevaBaselineEM`) as a cross-cutting,
+      “Geneva convention” style base EM
     - Additional simple EMs for safety, fairness, etc. (in progress)
 
 - **Executable examples**
-  - **TinyHome** norm-gated environment
-  - **Triage ethics demo** combining multiple EMs under governance
-  - Experimental **ethical dialogue CLI** that interactively builds
-    DEME profiles from narrative scenarios
+  - TinyHome norm-gated environment
+  - Triage ethics demo (`erisml.examples.triage_ethics_demo`) combining:
+    - Domain-specific triage EM (`CaseStudy1TriageEM`)
+    - Rights/consent EM (`RightsFirstEM`)
+    - Geneva baseline EM (`GenevaBaselineEM`) configured as a base EM in
+      `DEMEProfileV03` with hard-veto semantics
+  - Ethical dialogue CLI that interactively builds DEME profiles from
+    narrative scenarios (see `scripts/ethical_dialogue_cli_v03.py`)
 
-- A basic test suite
+- A basic test suite under `tests/`
 
 ---
 
@@ -148,37 +161,129 @@ On macOS / Linux, the equivalent would be:
 
     pytest
 
-This will run the core test suite **and** the DEME smoke test.
+This will run the core test suite and the DEME smoke test.
+
+---
+
+## Running Checks and Tests Locally
+
+To reproduce (most of) what CI does on your machine:
+
+1. **Install dev dependencies**
+
+       pip install -e ".[dev]"
+
+2. **Run the Python test suite**
+
+   From the repo root:
+
+       pytest
+
+   To run only the DEME-related tests:
+
+       pytest -k ethics
+       pytest -k triage
+
+3. **Run Ruff (linting)**
+
+       ruff check src tests
+
+4. **Run Black (formatting check)**
+
+       black --check src tests
+
+   To auto-format instead:
+
+       black src tests
+
+5. **Run Taplo (TOML validation)**
+
+   Depending on your Taplo version:
+
+       taplo fmt --check
+   or
+
+       taplo check
+
+6. **One-shot “CI-ish” run**
+
+       ruff check src tests
+       black --check src tests
+       taplo fmt --check
+       pytest
 
 ---
 
 ## Running the DEME Triage Demo
 
 The DEME triage demo shows how multiple Ethics Modules and a governance
-configuration interact to produce an ethically-justified decision.
+configuration interact to produce an ethically-justified decision, including
+a Geneva-style base EM.
 
-Typical usage (exact paths/scripts may vary slightly depending on how you install):
+### 1. Create a DEME profile via the dialogue CLI
 
-    # From repo root, inside your virtualenv
-    pytest -k triage  # run only the triage-related tests
+From the repo root:
 
-or, if you have a convenience script:
+    cd scripts
 
-    python -m erisml.examples.triage_demo
+    python ethical_dialogue_cli_v03.py ^
+      --config ethical_dialogue_questions.yaml ^
+      --output deme_profile_v03.json
 
-This will:
+On macOS / Linux, drop the `^` line continuations as usual:
 
-1. Construct `EthicalFacts` for a small set of triage options.  
-2. Evaluate them via multiple EMs (e.g., triage, fairness, rights-first).  
-3. Run the governance layer to select a recommended option and log the rationale.
+    cd scripts
+    python ethical_dialogue_cli_v03.py \
+      --config ethical_dialogue_questions.yaml \
+      --output deme_profile_v03.json
+
+This walks you through a narrative questionnaire and writes a
+`deme_profile_v03.json` profile (e.g., `Jain-1`).
+
+Copy or symlink that profile into the directory where you’ll run the demo
+(often the repo root):
+
+    cp deme_profile_v03.json ..
+    cd ..
+
+You should now have `deme_profile_v03.json` in the project root.
+
+### 2. Run the triage ethics demo
+
+From the repo root:
+
+    python -m erisml.examples.triage_ethics_demo
+
+The demo will:
+
+1. Load `deme_profile_v03.json` as a `DEMEProfileV03` (including any configured
+   `base_em_ids` such as `"geneva_baseline"`).
+2. Construct `EthicalFacts` for three triage options:
+   - `allocate_to_patient_A`: critical chest-pain patient, most disadvantaged.  
+   - `allocate_to_patient_B`: moderately ill but more stable patient.  
+   - `allocate_to_patient_C`: rights-violating / discriminatory option.
+3. Instantiate Ethics Modules:
+   - `CaseStudy1TriageEM` (domain-specific triage EM)  
+   - `RightsFirstEM` (rights/consent / explicit rules)  
+   - `GenevaBaselineEM` (Geneva-style baseline, added via `base_em_ids`)
+4. Evaluate all options with all EMs, logging per-EM verdicts and scores.
+5. Aggregate via the DEME governance layer (respecting base-EM hard vetoes).
+6. Print:
+   - Per-option per-EM judgements  
+   - Governance aggregate per option  
+   - The final selected option and rationale  
+   - Which options were forbidden, and by which EM(s) and veto rules  
+
+This demo is the canonical example of the current DEME `EthicalFacts` schema
+wired to a fully-configured `DEMEProfileV03` with base EMs.
 
 ---
 
 ## DEME MCP Server (Experimental)
 
-The DEME subsystem can also be exposed as an **MCP server**:
+The DEME subsystem can be exposed as an MCP server:
 
-    MCP Server ID: erisml.ethics.interop.mcp_deme_server
+- MCP Server ID: `erisml.ethics.interop.mcp_deme_server`
 
 It provides (at minimum) the following MCP tools:
 
@@ -186,11 +291,11 @@ It provides (at minimum) the following MCP tools:
 - `deme.evaluate_options` — run Ethics Modules on candidate options given
   their `EthicalFacts`  
 - `deme.govern_decision` — aggregate EM outputs and select an option under a
-  chosen profile
+  chosen profile  
 
-Any MCP-compatible client (e.g., agent frameworks, IDE copilots, or custom
-agents) can use this server to add ethical oversight to planning and action
-selection. See the `erisml/ethics/interop/` directory and examples for details.
+Any MCP-compatible client (agent frameworks, IDE copilots, or custom agents)
+can use this server to add ethical oversight to planning and action selection.
+See `erisml/ethics/interop/` and the examples for details.
 
 ---
 
@@ -199,8 +304,8 @@ selection. See the `erisml/ethics/interop/` directory and examples for details.
 ErisML’s DEME subsystem is designed so that **any stakeholder** can plug in their
 own ethical perspective as a small, testable module.
 
-An EM is just a Python object that implements the `EthicsModule` protocol (or
-subclasses `BaseEthicsModule`) and **only looks at `EthicalFacts`**, never at raw
+An EM is a Python object that implements the `EthicsModule` protocol (or
+subclasses `BaseEthicsModule`) and only looks at `EthicalFacts`, never at raw
 domain data (ICD codes, sensor traces, etc.).
 
 ### 1. Basic structure
@@ -270,12 +375,12 @@ A minimal EM looks like this:
                 metadata=metadata,
             )
 
-From there, you can:
+From there you can:
 
 - Add additional features (e.g., use `facts.epistemic_status` to downweight
   low-confidence scenarios).  
-- Compose multiple EMs and wire them into a `GovernanceConfiguration` / DEME
-  profile.  
+- Compose multiple EMs and wire them into a `GovernanceConfiguration` /
+  `DEMEProfileV03` profile.  
 - Write unit tests to ensure your EM behaves as intended over important
   corner cases.
 
@@ -296,7 +401,7 @@ From there, you can:
 
 In many deployments:
 
-- ErisML provides the **normative environment model** and **constraint gate**.  
+- ErisML provides the normative environment model and constraint gate.  
 - Domain services convert raw state/plan information into `EthicalFacts`.  
 - DEME evaluates candidate options and recommends (or vetoes) actions.  
 
@@ -306,36 +411,36 @@ In many deployments:
 
 This project is distributed under the **AGI-HPC Responsible AI License v1.0 (DRAFT)**.
 
-Very short summary (non-legal, see `LICENSE` for full text):
+Very short summary (non-legal, see `LICENSE.txt` for full text):
 
-- ✅ You **may** use, modify, and distribute the software for **non-commercial
+- You may use, modify, and distribute the software for **non-commercial
   research, teaching, and academic work**, subject to attribution and inclusion
   of the license.
-- 🚫 **Commercial use** and **autonomous deployment in high-risk domains**
+- **Commercial use** and **autonomous deployment in high-risk domains**
   (e.g., vehicles, healthcare, critical infrastructure, financial systems,
   defense, large-scale platforms) are **not granted by default** and require a
   separate written agreement or explicit written permission from the Licensor.
-- ✅ If you use ErisML/DEME in autonomous or AGI-like systems, you must implement
+- If you use ErisML/DEME in autonomous or AGI-like systems, you must implement
   **Safety and Governance Controls**, including:
   - Explicit normative constraints / environment modeling (e.g., ErisML or
     equivalent),
   - Pluralistic, auditable ethical decision modules (e.g., DEME-style EMs),
   - Logging and audit trails with tamper-evident protections,
   - Safe fallback behaviors and reasonable testing.
-- 🚫 You **must not** use the software to build:
+- You must not use the software to build:
   - Weapons systems designed primarily to harm or destroy,
   - Coercive surveillance or systems aimed at suppressing fundamental rights,
   - Systems that intentionally or recklessly cause serious harm or large-scale
     rights violations.
-- ✅ Attribution is required. A suitable notice is:
+- Attribution is required. A suitable notice is:
 
-  > “This project incorporates components from the AGI-HPC architecture  
-  > (Andrew H. Bond et al., San José State University), used under the  
-  > AGI-HPC Responsible AI License v1.0.”
+      This project incorporates components from the AGI-HPC architecture
+      (Andrew H. Bond et al., San José State University), used under the
+      AGI-HPC Responsible AI License v1.0.
 
-For full details, **this README is not legal advice** — please see the
-[`LICENSE`](./LICENSE) file and consult legal counsel before adopting this
-license for production or commercial use.
+For full details, this README is not legal advice — please see the
+`LICENSE.txt` file and consult legal counsel before adopting this license for
+production or commercial use.
 
 ---
 
