@@ -1,6 +1,11 @@
+# DEME 3.0: Tensorial Ethics for Complex Multi-Agent Systems
+## Future Research Directions Using Higher-Order Tensors
+
+---
+
 ## Executive Summary
 
-**Tensors open powerful extensions for DEME 3.0+**
+**YES — Tensors open powerful extensions for DEME 3.0+**
 
 Moving from vectors (DEME 2.0) to tensors (DEME 3.0) would enable:
 1. **Multi-party harm distribution** (who bears costs vs who benefits?)
