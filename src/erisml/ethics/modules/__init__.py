@@ -5,6 +5,7 @@ Ethics modules (EMs) for ErisML.
 from .base import EthicsModule, BaseEthicsModule
 from .triage_em import CaseStudy1TriageEM, RightsFirstEM
 from .geneva_base_em import GenevaBaseEM, GenevaBaselineEM
+from .greek_tragedy_tragic_conflict_em import TragicConflictEM  # noqa
 
 # Registry for looking up EM implementations by identifier.
 #
