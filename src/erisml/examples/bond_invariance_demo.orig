@@ -1,0 +1,504 @@
+"""
+bond_invariance_demo.py
+
+Bond Invariance Principle (BIP) demo script in the same style as:
+  - triage_ethics_provenance_demo.py
+  - greek_tragedy_pantheon_demo.py
+
+What this demo illustrates:
+  1) Bond-preserving representation changes SHOULD NOT change the outcome:
+     - reorder options
+     - relabel option identifiers (names/IDs) without changing the underlying facts
+
+  2) Bond-changing changes MAY change the outcome:
+     - counterfactual: remove protected-attribute discrimination evidence
+
+  3) Declared lens change MAY change the outcome (and that's OK):
+     - run the same case under a second stakeholder profile (consequences-first tilt)
+
+Usage (from repo root, after copying this file to erisml/examples/):
+
+  python -m erisml.examples.bond_invariance_demo
+  python -m erisml.examples.bond_invariance_demo --profile deme_profile_v03.json
+  python -m erisml.examples.bond_invariance_demo --no-lens
+
+Notes:
+- This is an *ethical structure* demo. It's not medical guidance.
+- If an invariance check fails (verdict flips under a bond-preserving transform),
+  that’s a BIP violation worth investigating.
+"""
+
+from __future__ import annotations
+
+import argparse
+import copy
+import json
+import re
+from collections import OrderedDict, defaultdict
+from dataclasses import dataclass
+from pathlib import Path
+from typing import Dict, List, Tuple, Optional
+
+# --- erisml imports ---
+try:
+    from erisml.ethics import (
+        AutonomyAndAgency,
+        Consequences,
+        EpistemicStatus,
+        EthicalFacts,
+        EthicalJudgement,
+        JusticeAndFairness,
+        PrivacyAndDataGovernance,
+        ProceduralAndLegitimacy,
+        RightsAndDuties,
+        SocietalAndEnvironmental,
+    )
+    from erisml.ethics.governance.aggregation import DecisionOutcome, select_option
+    from erisml.ethics.interop.profile_adapters import build_triage_ems_and_governance
+    from erisml.ethics.modules import EM_REGISTRY
+    from erisml.ethics.profile_v03 import DEMEProfileV03, deme_profile_v03_from_dict
+except Exception as e:  # pragma: no cover
+    raise SystemExit(
+        "Could not import erisml. This script is meant to run inside the erisml repo.\n"
+        "Copy it to erisml/examples/ and run from the repo root via:\n"
+        "  python -m erisml.examples.bond_invariance_demo\n\n"
+        f"Import error: {e}"
+    )
+
+
+# ---------------------------------------------------------------------------
+# Provenance (minimal; optional printing)
+# ---------------------------------------------------------------------------
+
+@dataclass(frozen=True)
+class FactProvenance:
+    fact_path: str
+    source_type: str
+    rule_id: str
+    confidence: float
+    evidence_snippet: str
+    model_id: Optional[str] = None
+    notes: Optional[str] = None
+
+
+def _clip(text: str, n: int = 140) -> str:
+    text = " ".join((text or "").split())
+    return text if len(text) <= n else text[: n - 1] + "…"
+
+
+# ---------------------------------------------------------------------------
+# Profile loading + a simple second stakeholder ("lens") variant
+# ---------------------------------------------------------------------------
+
+def load_profile(path: Path) -> DEMEProfileV03:
+    data = json.loads(path.read_text(encoding="utf-8"))
+    return deme_profile_v03_from_dict(data)
+
+
+def make_second_stakeholder_profile(base_profile_path: Path) -> DEMEProfileV03:
+    """Create a second stakeholder profile with a consequences-first tilt."""
+    data = json.loads(base_profile_path.read_text(encoding="utf-8"))
+    data = copy.deepcopy(data)
+
+    data["name"] = (data.get("name") or "Stakeholder") + "-UtilitarianVariant"
+    data["stakeholder_label"] = "utilitarian_stakeholder"
+    data["override_mode"] = "consequences_first"
+
+    dims = dict(data.get("deme_dimensions", {}))
+    if dims:
+        dims.update(
+            {
+                "safety": 0.42,
+                "priority_for_vulnerable": 0.02,
+                "fairness_equity": 0.08,
+                "autonomy_respect": 0.06,
+                "privacy_confidentiality": 0.08,
+                "rule_following_legality": 0.10,
+                "environment_societal": 0.10,
+                "trust_relationships": 0.14,
+            }
+        )
+        total = sum(float(v) for v in dims.values())
+        if total > 0:
+            dims = {k: float(v) / total for k, v in dims.items()}
+        data["deme_dimensions"] = dims
+
+    prin = dict(data.get("principlism", {}))
+    if prin:
+        prin.update({"beneficence": 0.50, "non_maleficence": 0.30, "autonomy": 0.10, "justice": 0.10})
+        total = sum(float(v) for v in prin.values())
+        if total > 0:
+            prin = {k: float(v) / total for k, v in prin.items()}
+        data["principlism"] = prin
+
+    return deme_profile_v03_from_dict(data)
+
+
+# ---------------------------------------------------------------------------
+# Evidence -> facts (small, deterministic extractor)
+# ---------------------------------------------------------------------------
+
+_DISCRIM_RX = re.compile(r"\b(race|ethnicity|gender|religion|protected attribute|protected class)\b", re.I)
+
+
+def discrimination_classifier_stub(text: str) -> Tuple[bool, float, str]:
+    """Deterministic stand-in for a discrimination classifier."""
+    m = _DISCRIM_RX.search(text or "")
+    if not m:
+        return False, 0.08, ""
+    return True, 0.93, m.group(0)
+
+
+def build_facts_for_demo(
+    evidence_by_option: Dict[str, str],
+) -> Tuple[Dict[str, EthicalFacts], Dict[str, Dict[str, FactProvenance]]]:
+    """Create EthicalFacts for three triage options A/B/C."""
+    prov_by_option: Dict[str, Dict[str, FactProvenance]] = {}
+
+    a = EthicalFacts(
+        option_id="allocate_to_patient_A",
+        consequences=Consequences(expected_benefit=0.70, expected_harm=0.30, urgency=0.95, affected_count=1),
+        rights_and_duties=RightsAndDuties(
+            violates_rights=False, has_valid_consent=True, violates_explicit_rule=False, role_duty_conflict=False
+        ),
+        justice_and_fairness=JusticeAndFairness(
+            discriminates_on_protected_attr=False,
+            prioritizes_most_disadvantaged=True,
+            distributive_pattern="maximin",
+            exploits_vulnerable_population=False,
+            exacerbates_power_imbalance=False,
+        ),
+        autonomy_and_agency=AutonomyAndAgency(
+            has_meaningful_choice=True,
+            coercion_or_undue_influence=False,
+            can_withdraw_without_penalty=True,
+            manipulative_design_present=False,
+        ),
+        privacy_and_data=PrivacyAndDataGovernance(
+            privacy_invasion_level=0.2,
+            data_minimization_respected=True,
+            secondary_use_without_consent=False,
+            data_retention_excessive=False,
+            reidentification_risk=0.1,
+        ),
+        societal_and_environmental=SocietalAndEnvironmental(
+            environmental_harm=0.1,
+            long_term_societal_risk=0.2,
+            benefits_to_future_generations=0.6,
+            burden_on_vulnerable_groups=0.2,
+        ),
+        procedural_and_legitimacy=ProceduralAndLegitimacy(
+            followed_approved_procedure=True,
+            stakeholders_consulted=True,
+            decision_explainable_to_public=True,
+            contestation_available=True,
+        ),
+        epistemic_status=EpistemicStatus(uncertainty_level=0.30, evidence_quality="high", novel_situation_flag=False),
+    )
+    prov_by_option[a.option_id] = {
+        "rights_and_duties.violates_rights": FactProvenance(
+            fact_path="rights_and_duties.violates_rights",
+            source_type="human",
+            rule_id="MANUAL-SCENARIO",
+            confidence=0.90,
+            evidence_snippet=_clip(evidence_by_option.get(a.option_id, "")),
+            notes="Scenario author asserts no rights violations.",
+        )
+    }
+
+    b = EthicalFacts(
+        option_id="allocate_to_patient_B",
+        consequences=Consequences(expected_benefit=0.98, expected_harm=0.10, urgency=0.55, affected_count=1),
+        rights_and_duties=RightsAndDuties(
+            violates_rights=False, has_valid_consent=True, violates_explicit_rule=False, role_duty_conflict=False
+        ),
+        justice_and_fairness=JusticeAndFairness(
+            discriminates_on_protected_attr=False,
+            prioritizes_most_disadvantaged=False,
+            distributive_pattern="utilitarian",
+            exploits_vulnerable_population=False,
+            exacerbates_power_imbalance=False,
+        ),
+        autonomy_and_agency=AutonomyAndAgency(
+            has_meaningful_choice=True,
+            coercion_or_undue_influence=False,
+            can_withdraw_without_penalty=True,
+            manipulative_design_present=False,
+        ),
+        privacy_and_data=PrivacyAndDataGovernance(
+            privacy_invasion_level=0.2,
+            data_minimization_respected=True,
+            secondary_use_without_consent=False,
+            data_retention_excessive=False,
+            reidentification_risk=0.1,
+        ),
+        societal_and_environmental=SocietalAndEnvironmental(
+            environmental_harm=0.1,
+            long_term_societal_risk=0.25,
+            benefits_to_future_generations=0.6,
+            burden_on_vulnerable_groups=0.25,
+        ),
+        procedural_and_legitimacy=ProceduralAndLegitimacy(
+            followed_approved_procedure=True,
+            stakeholders_consulted=True,
+            decision_explainable_to_public=True,
+            contestation_available=True,
+        ),
+        epistemic_status=EpistemicStatus(uncertainty_level=0.35, evidence_quality="medium", novel_situation_flag=False),
+    )
+    prov_by_option[b.option_id] = {
+        "rights_and_duties.violates_rights": FactProvenance(
+            fact_path="rights_and_duties.violates_rights",
+            source_type="human",
+            rule_id="MANUAL-SCENARIO",
+            confidence=0.90,
+            evidence_snippet=_clip(evidence_by_option.get(b.option_id, "")),
+            notes="Scenario author asserts no rights violations.",
+        )
+    }
+
+    ev_c = evidence_by_option.get("allocate_to_patient_C", "")
+    is_discrim, conf, tok = discrimination_classifier_stub(ev_c)
+
+    fairness = JusticeAndFairness(
+        discriminates_on_protected_attr=is_discrim,
+        prioritizes_most_disadvantaged=False,
+        distributive_pattern="other",
+        exploits_vulnerable_population=False,
+        exacerbates_power_imbalance=False,
+    )
+    rights = RightsAndDuties(
+        violates_rights=bool(is_discrim),  # demo: treat discrimination as rights trigger
+        has_valid_consent=True,
+        violates_explicit_rule=False,
+        role_duty_conflict=False,
+    )
+
+    c = EthicalFacts(
+        option_id="allocate_to_patient_C",
+        consequences=Consequences(expected_benefit=0.85, expected_harm=0.30, urgency=0.80, affected_count=1),
+        rights_and_duties=rights,
+        justice_and_fairness=fairness,
+        autonomy_and_agency=AutonomyAndAgency(
+            has_meaningful_choice=True,
+            coercion_or_undue_influence=False,
+            can_withdraw_without_penalty=True,
+            manipulative_design_present=False,
+        ),
+        privacy_and_data=PrivacyAndDataGovernance(
+            privacy_invasion_level=0.2,
+            data_minimization_respected=True,
+            secondary_use_without_consent=False,
+            data_retention_excessive=False,
+            reidentification_risk=0.1,
+        ),
+        societal_and_environmental=SocietalAndEnvironmental(
+            environmental_harm=0.1,
+            long_term_societal_risk=0.25,
+            benefits_to_future_generations=0.6,
+            burden_on_vulnerable_groups=0.25,
+        ),
+        procedural_and_legitimacy=ProceduralAndLegitimacy(
+            followed_approved_procedure=True,
+            stakeholders_consulted=True,
+            decision_explainable_to_public=True,
+            contestation_available=True,
+        ),
+        epistemic_status=EpistemicStatus(uncertainty_level=0.35, evidence_quality="medium", novel_situation_flag=False),
+    )
+
+    prov_by_option[c.option_id] = {
+        "justice_and_fairness.discriminates_on_protected_attr": FactProvenance(
+            fact_path="justice_and_fairness.discriminates_on_protected_attr",
+            source_type="classifier",
+            rule_id="GNV-FAIR-001",
+            confidence=conf if is_discrim else (1.0 - conf),
+            evidence_snippet=_clip(ev_c),
+            model_id="discrim_clf_stub_v0.1",
+            notes=f"Matched token='{tok}'" if tok else "No protected-attr token match.",
+        ),
+        "rights_and_duties.violates_rights": FactProvenance(
+            fact_path="rights_and_duties.violates_rights",
+            source_type="hybrid",
+            rule_id="RIGHTS-DERIVE-010",
+            confidence=0.90 if is_discrim else 0.20,
+            evidence_snippet=_clip(ev_c),
+            notes="Derived: discrimination implies rights violation (demo).",
+        ),
+    }
+
+    return {a.option_id: a, b.option_id: b, c.option_id: c}, prov_by_option
+
+
+# ---------------------------------------------------------------------------
+# Evaluation (profile -> EMs -> select_option)
+# ---------------------------------------------------------------------------
+
+def evaluate_under_profile(
+    profile: DEMEProfileV03,
+    facts_by_option: Dict[str, EthicalFacts],
+) -> Tuple[DecisionOutcome, Dict[str, List[EthicalJudgement]]]:
+    triage_em, rights_em, gov_cfg = build_triage_ems_and_governance(profile)
+
+    ems = {
+        "case_study_1_triage": triage_em,
+        "rights_first_compliance": rights_em,
+    }
+
+    for base_id in getattr(gov_cfg, "base_em_ids", []):
+        em_cls = EM_REGISTRY.get(base_id)
+        if em_cls is None:
+            print(f"[warn] base_em_id '{base_id}' not found in EM_REGISTRY.")
+            continue
+        ems[base_id] = em_cls()
+
+    all_judgements: Dict[str, List[EthicalJudgement]] = defaultdict(list)
+    for oid, facts in facts_by_option.items():
+        for _, em in ems.items():
+            all_judgements[oid].append(em.judge(facts))
+
+    decision: DecisionOutcome = select_option(all_judgements, gov_cfg)
+    return decision, all_judgements
+
+
+def print_outcome(label: str, decision: DecisionOutcome) -> None:
+    print(f"\n=== {label} ===")
+    print(f"selected_option_id: {decision.selected_option_id}")
+    ranked = getattr(decision, "ranked_options", getattr(decision, "ranked_option_ids", []))
+    forbidden = getattr(decision, "forbidden_options", getattr(decision, "forbidden_option_ids", []))
+    print(f"ranked_options (eligible): {ranked}")
+    print(f"forbidden_options:         {forbidden}")
+    print(f"rationale:                 {decision.rationale}")
+
+
+# ---------------------------------------------------------------------------
+# BIP transforms
+# ---------------------------------------------------------------------------
+
+def transform_reorder(facts_by_option: Dict[str, EthicalFacts]) -> Dict[str, EthicalFacts]:
+    """Bond-preserving transform: reorder option presentation."""
+    keys = list(facts_by_option.keys())
+    if len(keys) <= 1:
+        return dict(facts_by_option)
+    return OrderedDict([(k, facts_by_option[k]) for k in reversed(keys)])
+
+
+def transform_relabel(
+    facts_by_option: Dict[str, EthicalFacts],
+    suffix: str = "_renamed",
+) -> Tuple[Dict[str, EthicalFacts], Dict[str, str]]:
+    """Bond-preserving transform: relabel option IDs without changing the underlying facts."""
+    out: Dict[str, EthicalFacts] = OrderedDict()
+    mapping: Dict[str, str] = {}
+    for old_id, facts in facts_by_option.items():
+        new_id = f"{old_id}{suffix}"
+        nf = copy.deepcopy(facts)
+        try:
+            nf.option_id = new_id
+        except Exception:
+            try:
+                object.__setattr__(nf, "option_id", new_id)
+            except Exception:
+                pass
+        out[new_id] = nf
+        mapping[old_id] = new_id
+    return out, mapping
+
+
+def canonicalize_selected(selected_option_id: Optional[str], inverse_map: Dict[str, str]) -> Optional[str]:
+    if selected_option_id is None:
+        return None
+    return inverse_map.get(selected_option_id, selected_option_id)
+
+
+def check_invariance(label: str, baseline: Optional[str], transformed: Optional[str]) -> None:
+    ok = (baseline == transformed)
+    print(f"[BIP invariance check] {label}: {'PASS' if ok else 'FAIL'}")
+    if not ok:
+        print(f"  baseline:    {baseline}")
+        print(f"  transformed: {transformed}")
+        print("  -> If bonds truly didn't change, this is a BIP violation worth investigating.")
+
+
+# ---------------------------------------------------------------------------
+# Runner
+# ---------------------------------------------------------------------------
+
+def run(profile_path: Path, run_lens: bool) -> None:
+    print("=== Bond Invariance Principle (BIP) Demo ===\n")
+
+    profile_1 = load_profile(profile_path)
+    print(f"Loaded profile #1: {profile_1.name} (override_mode={getattr(profile_1, 'override_mode', None)})")
+
+    profile_2: Optional[DEMEProfileV03] = None
+    if run_lens:
+        profile_2 = make_second_stakeholder_profile(profile_path)
+        print(f"Loaded profile #2: {profile_2.name} (override_mode={getattr(profile_2, 'override_mode', None)})")
+
+    evidence_baseline = {
+        "allocate_to_patient_A": "Manual scenario: urgent disadvantaged patient; no discrimination, consent OK.",
+        "allocate_to_patient_B": "Manual scenario: higher expected benefit; no discrimination, consent OK.",
+        "allocate_to_patient_C": (
+            "Nurse note: allocate triage slot based on race (protected attribute) rather than clinical need. "
+            "No other policy breach is recorded."
+        ),
+    }
+
+    facts, _ = build_facts_for_demo(evidence_baseline)
+    dec_base, _ = evaluate_under_profile(profile_1, facts)
+    print_outcome("Baseline (canonical representation)", dec_base)
+    baseline_sel = dec_base.selected_option_id
+
+    # Bond-preserving: reorder
+    facts_reordered = transform_reorder(facts)
+    dec_reorder, _ = evaluate_under_profile(profile_1, facts_reordered)
+    print_outcome("Bond-preserving transform: reorder options", dec_reorder)
+    check_invariance("reorder", baseline_sel, dec_reorder.selected_option_id)
+
+    # Bond-preserving: relabel IDs (canonicalize the answer back)
+    facts_relabeled, mapping = transform_relabel(facts)
+    inv = {v: k for k, v in mapping.items()}
+    dec_relabel, _ = evaluate_under_profile(profile_1, facts_relabeled)
+    print_outcome("Bond-preserving transform: relabel option IDs", dec_relabel)
+    check_invariance("relabel (canonicalized)", baseline_sel, canonicalize_selected(dec_relabel.selected_option_id, inv))
+
+    # Bond-changing: remove discrimination
+    evidence_cf = dict(evidence_baseline)
+    evidence_cf["allocate_to_patient_C"] = (
+        "Counterfactual note: allocate triage slot based on clinical urgency and expected benefit only. "
+        "No protected-attribute discrimination is recorded."
+    )
+    facts_cf, _ = build_facts_for_demo(evidence_cf)
+    dec_cf, _ = evaluate_under_profile(profile_1, facts_cf)
+    print_outcome("Bond-changing counterfactual: remove discrimination", dec_cf)
+
+    print("\n[BIP interpretation]")
+    print("  - Outcome changes here are expected: bond-relevant evidence changed.")
+    print("  - Outcome changes under reorder/relabel are NOT expected: that's the BIP test.")
+
+    if profile_2 is not None:
+        dec_lens, _ = evaluate_under_profile(profile_2, facts)
+        print_outcome("Declared lens change: stakeholder #2", dec_lens)
+        print("\n[BIP interpretation]")
+        print("  - Lens changes may change outcomes, but they must be declared and auditable.")
+
+
+def main() -> None:
+    ap = argparse.ArgumentParser()
+    ap.add_argument(
+        "--profile",
+        type=Path,
+        default=Path("deme_profile_v03.json"),
+        help="Path to DEMEProfileV03 JSON (default: ./deme_profile_v03.json)",
+    )
+    ap.add_argument(
+        "--no-lens",
+        action="store_true",
+        help="Skip the second stakeholder profile (lens-change) portion.",
+    )
+    args = ap.parse_args()
+    run(args.profile, run_lens=(not args.no_lens))
+
+
+if __name__ == "__main__":
+    main()
