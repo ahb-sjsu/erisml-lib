@@ -52,16 +52,17 @@ FACT_EXTRACTOR_VERSION = "prov_extractor_v0.1"
 # Provenance model
 # ---------------------------------------------------------------------------
 
+
 @dataclass(frozen=True)
 class FactProvenance:
     """Minimal audit payload you can carry alongside EthicalFacts."""
 
-    fact_path: str                 # e.g. "rights_and_duties.violates_rights"
-    source_type: str               # e.g. "rule", "classifier", "human", "hybrid"
-    rule_id: str                   # e.g. "GNV-FAIR-001"
-    confidence: float              # 0..1
-    evidence_snippet: str          # short excerpt
-    model_id: str | None = None    # e.g. "discrim_clf_v0.1"
+    fact_path: str  # e.g. "rights_and_duties.violates_rights"
+    source_type: str  # e.g. "rule", "classifier", "human", "hybrid"
+    rule_id: str  # e.g. "GNV-FAIR-001"
+    confidence: float  # 0..1
+    evidence_snippet: str  # short excerpt
+    model_id: str | None = None  # e.g. "discrim_clf_v0.1"
     notes: str | None = None
 
 
@@ -80,6 +81,7 @@ def _renormalize(d: Dict[str, float]) -> Dict[str, float]:
 # ---------------------------------------------------------------------------
 # Profile loading + a synthetic second stakeholder
 # ---------------------------------------------------------------------------
+
 
 def load_profile(path: Path) -> DEMEProfileV03:
     data = json.loads(path.read_text(encoding="utf-8"))
@@ -119,7 +121,14 @@ def make_second_stakeholder_profile(base_profile_path: Path) -> DEMEProfileV03:
 
     # Shift principlism
     prin = dict(data.get("principlism", {}))
-    prin.update({"beneficence": 0.50, "non_maleficence": 0.30, "autonomy": 0.10, "justice": 0.10})
+    prin.update(
+        {
+            "beneficence": 0.50,
+            "non_maleficence": 0.30,
+            "autonomy": 0.10,
+            "justice": 0.10,
+        }
+    )
     data["principlism"] = _renormalize(prin)
 
     # Keep hard vetoes on: we want conflict within the allowed set, not over illegal/rights violations.
@@ -130,8 +139,12 @@ def make_second_stakeholder_profile(base_profile_path: Path) -> DEMEProfileV03:
 # Evidence -> facts (with provenance)
 # ---------------------------------------------------------------------------
 
-_DISCRIM_RX = re.compile(r"\b(race|ethnicity|gender|religion|protected attribute|protected class)\b", re.I)
-_POLICY_VIOLATION_RX = re.compile(r"\b(breach|violat(e|es|ed)|noncompliant|against policy)\b", re.I)
+_DISCRIM_RX = re.compile(
+    r"\b(race|ethnicity|gender|religion|protected attribute|protected class)\b", re.I
+)
+_POLICY_VIOLATION_RX = re.compile(
+    r"\b(breach|violat(e|es|ed)|noncompliant|against policy)\b", re.I
+)
 _CONSENT_RX = re.compile(r"\b(without consent|no consent|coercion|forced)\b", re.I)
 
 
@@ -169,7 +182,11 @@ def extract_rights_and_fairness_facts(
         confidence=conf if is_discrim else (1.0 - conf),
         evidence_snippet=_clip(evidence_text),
         model_id="discrim_clf_stub_v0.1",
-        notes=f"Matched token='{snippet}'" if snippet else "No protected-attr token match.",
+        notes=(
+            f"Matched token='{snippet}'"
+            if snippet
+            else "No protected-attr token match."
+        ),
     )
 
     # Fact 2: explicit policy breach (optional)
@@ -218,7 +235,11 @@ def extract_rights_and_fairness_facts(
         confidence=min(0.95, 0.55 + 0.20 * len(trigger_list)),
         evidence_snippet=_clip(evidence_text),
         model_id=None,
-        notes=("Derived from: " + ", ".join(trigger_list)) if trigger_list else "No trigger matched.",
+        notes=(
+            ("Derived from: " + ", ".join(trigger_list))
+            if trigger_list
+            else "No trigger matched."
+        ),
     )
 
     rights = RightsAndDuties(
@@ -249,9 +270,14 @@ def make_demo_facts_with_provenance(
     # Option A: lower overall benefit than B, but urgent and most disadvantaged (tradeoff case).
     opt_a = EthicalFacts(
         option_id="allocate_to_patient_A",
-        consequences=Consequences(expected_benefit=0.70, expected_harm=0.30, urgency=0.95, affected_count=1),
+        consequences=Consequences(
+            expected_benefit=0.70, expected_harm=0.30, urgency=0.95, affected_count=1
+        ),
         rights_and_duties=RightsAndDuties(
-            violates_rights=False, has_valid_consent=True, violates_explicit_rule=False, role_duty_conflict=False
+            violates_rights=False,
+            has_valid_consent=True,
+            violates_explicit_rule=False,
+            role_duty_conflict=False,
         ),
         justice_and_fairness=JusticeAndFairness(
             discriminates_on_protected_attr=False,
@@ -285,7 +311,9 @@ def make_demo_facts_with_provenance(
             decision_explainable_to_public=True,
             contestation_available=True,
         ),
-        epistemic_status=EpistemicStatus(uncertainty_level=0.30, evidence_quality="high", novel_situation_flag=False),
+        epistemic_status=EpistemicStatus(
+            uncertainty_level=0.30, evidence_quality="high", novel_situation_flag=False
+        ),
     )
     provenance_by_option[opt_a.option_id] = {
         "rights_and_duties.violates_rights": FactProvenance(
@@ -293,7 +321,9 @@ def make_demo_facts_with_provenance(
             source_type="human",
             rule_id="MANUAL-SCENARIO",
             confidence=0.90,
-            evidence_snippet=_clip(evidence_by_option.get(opt_a.option_id, "manual scenario")),
+            evidence_snippet=_clip(
+                evidence_by_option.get(opt_a.option_id, "manual scenario")
+            ),
             model_id=None,
             notes="Scenario author asserts no rights violations.",
         )
@@ -302,9 +332,14 @@ def make_demo_facts_with_provenance(
     # Option B: higher benefit, less urgent, not most disadvantaged.
     opt_b = EthicalFacts(
         option_id="allocate_to_patient_B",
-        consequences=Consequences(expected_benefit=0.98, expected_harm=0.10, urgency=0.55, affected_count=1),
+        consequences=Consequences(
+            expected_benefit=0.98, expected_harm=0.10, urgency=0.55, affected_count=1
+        ),
         rights_and_duties=RightsAndDuties(
-            violates_rights=False, has_valid_consent=True, violates_explicit_rule=False, role_duty_conflict=False
+            violates_rights=False,
+            has_valid_consent=True,
+            violates_explicit_rule=False,
+            role_duty_conflict=False,
         ),
         justice_and_fairness=JusticeAndFairness(
             discriminates_on_protected_attr=False,
@@ -338,7 +373,11 @@ def make_demo_facts_with_provenance(
             decision_explainable_to_public=True,
             contestation_available=True,
         ),
-        epistemic_status=EpistemicStatus(uncertainty_level=0.35, evidence_quality="medium", novel_situation_flag=False),
+        epistemic_status=EpistemicStatus(
+            uncertainty_level=0.35,
+            evidence_quality="medium",
+            novel_situation_flag=False,
+        ),
     )
     provenance_by_option[opt_b.option_id] = {
         "rights_and_duties.violates_rights": FactProvenance(
@@ -346,7 +385,9 @@ def make_demo_facts_with_provenance(
             source_type="human",
             rule_id="MANUAL-SCENARIO",
             confidence=0.90,
-            evidence_snippet=_clip(evidence_by_option.get(opt_b.option_id, "manual scenario")),
+            evidence_snippet=_clip(
+                evidence_by_option.get(opt_b.option_id, "manual scenario")
+            ),
             model_id=None,
             notes="Scenario author asserts no rights violations.",
         )
@@ -358,7 +399,9 @@ def make_demo_facts_with_provenance(
 
     opt_c = EthicalFacts(
         option_id="allocate_to_patient_C",
-        consequences=Consequences(expected_benefit=0.85, expected_harm=0.30, urgency=0.80, affected_count=1),
+        consequences=Consequences(
+            expected_benefit=0.85, expected_harm=0.30, urgency=0.80, affected_count=1
+        ),
         rights_and_duties=rights,
         justice_and_fairness=fairness,
         autonomy_and_agency=AutonomyAndAgency(
@@ -386,18 +429,29 @@ def make_demo_facts_with_provenance(
             decision_explainable_to_public=True,
             contestation_available=True,
         ),
-        epistemic_status=EpistemicStatus(uncertainty_level=0.35, evidence_quality="medium", novel_situation_flag=False),
+        epistemic_status=EpistemicStatus(
+            uncertainty_level=0.35,
+            evidence_quality="medium",
+            novel_situation_flag=False,
+        ),
     )
     provenance_by_option[opt_c.option_id] = prov
 
-    return {opt_a.option_id: opt_a, opt_b.option_id: opt_b, opt_c.option_id: opt_c}, provenance_by_option
+    return {
+        opt_a.option_id: opt_a,
+        opt_b.option_id: opt_b,
+        opt_c.option_id: opt_c,
+    }, provenance_by_option
 
 
 # ---------------------------------------------------------------------------
 # Printing helpers (provenance-aware)
 # ---------------------------------------------------------------------------
 
-def _lookup_prov(prov: Dict[str, FactProvenance], fact_name_or_path: str) -> FactProvenance | None:
+
+def _lookup_prov(
+    prov: Dict[str, FactProvenance], fact_name_or_path: str
+) -> FactProvenance | None:
     """
     Map an EM-reported fact token like 'violates_rights' to our provenance keys
     like 'rights_and_duties.violates_rights'.
@@ -423,7 +477,9 @@ def print_option_results_with_provenance(
 ) -> None:
     print(f"\n--- Option: {option_id} ---")
     for j in judgements:
-        print(f"[EM={j.em_name:<24}] verdict={j.verdict:<15} score={j.normative_score:.3f}")
+        print(
+            f"[EM={j.em_name:<24}] verdict={j.verdict:<15} score={j.normative_score:.3f}"
+        )
         for reason in j.reasons:
             print(f"    - {reason}")
 
@@ -444,9 +500,11 @@ def print_option_results_with_provenance(
                     if p.notes:
                         print(f"        notes: {p.notes}")
                     if p.evidence_snippet:
-                        print(f"        evidence: \"{p.evidence_snippet}\"")
+                        print(f'        evidence: "{p.evidence_snippet}"')
 
-    print(f"[AGG governance] verdict={aggregate.verdict:<15} score={aggregate.normative_score:.3f}")
+    print(
+        f"[AGG governance] verdict={aggregate.verdict:<15} score={aggregate.normative_score:.3f}"
+    )
 
     meta = aggregate.metadata or {}
     forbidden = meta.get("forbidden", False)
@@ -464,6 +522,7 @@ def print_option_results_with_provenance(
 # ---------------------------------------------------------------------------
 # Core eval routine (profile -> EMs -> select_option)
 # ---------------------------------------------------------------------------
+
 
 def evaluate_under_profile(
     profile: DEMEProfileV03,
@@ -498,6 +557,7 @@ def evaluate_under_profile(
 # Multi-stakeholder merge (transparent)
 # ---------------------------------------------------------------------------
 
+
 def merge_two_stakeholder_decisions(
     decision_a: DecisionOutcome,
     decision_b: DecisionOutcome,
@@ -516,9 +576,13 @@ def merge_two_stakeholder_decisions(
     name_a, name_b = stakeholder_names
 
     # Build option universe
-    all_option_ids = set(decision_a.aggregated_judgements.keys()) | set(decision_b.aggregated_judgements.keys())
+    all_option_ids = set(decision_a.aggregated_judgements.keys()) | set(
+        decision_b.aggregated_judgements.keys()
+    )
 
-    forbidden_union = set(decision_a.forbidden_options) | set(decision_b.forbidden_options)
+    forbidden_union = set(decision_a.forbidden_options) | set(
+        decision_b.forbidden_options
+    )
 
     def get_j(dec: DecisionOutcome, oid: str) -> EthicalJudgement | None:
         return dec.aggregated_judgements.get(oid)
@@ -540,7 +604,9 @@ def merge_two_stakeholder_decisions(
     # Pretty print
     out = []
     out.append("=== Multi-stakeholder merge ===")
-    out.append(f"Merge policy: forbid if ANY forbids; else combined_score = {w_a:.2f}*{name_a} + {w_b:.2f}*{name_b}")
+    out.append(
+        f"Merge policy: forbid if ANY forbids; else combined_score = {w_a:.2f}*{name_a} + {w_b:.2f}*{name_b}"
+    )
     out.append("")
     out.append(f"{'option':<24} | {name_a:<14} | {name_b:<14} | combined | status")
     out.append("-" * 78)
@@ -554,8 +620,12 @@ def merge_two_stakeholder_decisions(
     if selected is None:
         out.append("Combined outcome: no eligible option.")
     else:
-        out.append(f"Combined outcome: SELECT '{selected[0]}' (combined_score={selected[5]:.3f})")
-        out.append("Rationale: selected the eligible option maximizing the weighted combined score;")
+        out.append(
+            f"Combined outcome: SELECT '{selected[0]}' (combined_score={selected[5]:.3f})"
+        )
+        out.append(
+            "Rationale: selected the eligible option maximizing the weighted combined score;"
+        )
         out.append("          forbiddances are treated as non-negotiable in this demo.")
     return "\n".join(out)
 
@@ -564,15 +634,22 @@ def merge_two_stakeholder_decisions(
 # Demo runner
 # ---------------------------------------------------------------------------
 
+
 def run_demo(profile_path: Path) -> None:
-    print("=== Triage Ethics Demo: Provenance + Counterfactual + Multi-stakeholder ===\n")
+    print(
+        "=== Triage Ethics Demo: Provenance + Counterfactual + Multi-stakeholder ===\n"
+    )
     print(f"Extractor version: {FACT_EXTRACTOR_VERSION}\n")
 
     profile_1 = load_profile(profile_path)
     profile_2 = make_second_stakeholder_profile(profile_path)
 
-    print(f"Loaded profile #1: {profile_1.name} (override_mode={profile_1.override_mode})")
-    print(f"Loaded profile #2: {profile_2.name} (override_mode={profile_2.override_mode})\n")
+    print(
+        f"Loaded profile #1: {profile_1.name} (override_mode={profile_1.override_mode})"
+    )
+    print(
+        f"Loaded profile #2: {profile_2.name} (override_mode={profile_2.override_mode})\n"
+    )
 
     # ------------------------------------------------------------------
     # Evidence packs (baseline vs counterfactual)
@@ -628,10 +705,16 @@ def run_demo(profile_path: Path) -> None:
 
     print(f"Counterfactual target: {oid}")
     if before and after:
-        print(f"  before: verdict={before.verdict:<15} score={before.normative_score:.3f}")
-        print(f"  after:  verdict={after.verdict:<15} score={after.normative_score:.3f}")
+        print(
+            f"  before: verdict={before.verdict:<15} score={before.normative_score:.3f}"
+        )
+        print(
+            f"  after:  verdict={after.verdict:<15} score={after.normative_score:.3f}"
+        )
     else:
-        print("  [warn] could not find aggregated judgements for option C in one of the runs.")
+        print(
+            "  [warn] could not find aggregated judgements for option C in one of the runs."
+        )
 
     # Show the exact fact flips (from provenance)
     p_before = prov_1.get(oid, {})
@@ -644,8 +727,8 @@ def run_demo(profile_path: Path) -> None:
         a = p_after.get(key)
         if b and a:
             print(f"  flip: {key}")
-            print(f"        baseline evidence:      \"{b.evidence_snippet}\"")
-            print(f"        counterfactual evidence: \"{a.evidence_snippet}\"")
+            print(f'        baseline evidence:      "{b.evidence_snippet}"')
+            print(f'        counterfactual evidence: "{a.evidence_snippet}"')
 
     # ------------------------------------------------------------------
     # 3) Multi-stakeholder merge demo (same baseline scenario)

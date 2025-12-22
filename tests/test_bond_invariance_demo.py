@@ -39,8 +39,12 @@ def test_bip_bond_preserving_transforms_invariant():
         here = Path(__file__).resolve().parent
         demo = here / "bond_invariance_demo_upgraded.py"
         if not demo.exists():
-            pytest.skip("Demo script not found; copy bond_invariance_demo_upgraded.py next to this test or into erisml/examples/.")
-        spec = importlib.util.spec_from_file_location("bond_invariance_demo_upgraded", demo)
+            pytest.skip(
+                "Demo script not found; copy bond_invariance_demo_upgraded.py next to this test or into erisml/examples/."
+            )
+        spec = importlib.util.spec_from_file_location(
+            "bond_invariance_demo_upgraded", demo
+        )
         mod = importlib.util.module_from_spec(spec)  # type: ignore
         assert spec and spec.loader
         spec.loader.exec_module(mod)  # type: ignore
@@ -48,9 +52,17 @@ def test_bip_bond_preserving_transforms_invariant():
 
     profile = _profile_path()
     if not profile.exists():
-        pytest.skip(f"Profile JSON not found at {profile}. Set DEME_PROFILE_PATH or run from repo root.")
+        pytest.skip(
+            f"Profile JSON not found at {profile}. Set DEME_PROFILE_PATH or run from repo root."
+        )
 
-    audit = run_bip_suite(profile, run_lens=False, show_scoreboard=False, show_violation=True, unit_scale=100.0)
+    audit = run_bip_suite(
+        profile,
+        run_lens=False,
+        show_scoreboard=False,
+        show_violation=True,
+        unit_scale=100.0,
+    )
     baseline = audit["baseline_selected"]
     entries = {e["transform"]: e for e in audit["entries"]}
 
@@ -73,13 +85,23 @@ def test_bip_counterfactual_is_not_marked_as_invariance_check():
     try:
         from erisml.examples.bond_invariance_demo_upgraded import run_bip_suite
     except Exception:
-        pytest.skip("Cannot import demo; copy bond_invariance_demo_upgraded.py into erisml/examples/.")
+        pytest.skip(
+            "Cannot import demo; copy bond_invariance_demo_upgraded.py into erisml/examples/."
+        )
 
     profile = _profile_path()
     if not profile.exists():
-        pytest.skip("Profile JSON missing; run from repo root or set DEME_PROFILE_PATH.")
+        pytest.skip(
+            "Profile JSON missing; run from repo root or set DEME_PROFILE_PATH."
+        )
 
-    audit = run_bip_suite(profile, run_lens=False, show_scoreboard=False, show_violation=False, unit_scale=100.0)
+    audit = run_bip_suite(
+        profile,
+        run_lens=False,
+        show_scoreboard=False,
+        show_violation=False,
+        unit_scale=100.0,
+    )
     entries = {e["transform"]: e for e in audit["entries"]}
 
     # Counterfactual is bond-changing, so it is not asserted as pass/fail invariance.

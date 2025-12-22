@@ -76,6 +76,7 @@ except Exception as e:  # pragma: no cover
 # Provenance (minimal; optional printing)
 # ---------------------------------------------------------------------------
 
+
 @dataclass(frozen=True)
 class FactProvenance:
     fact_path: str
@@ -95,6 +96,7 @@ def _clip(text: str, n: int = 110) -> str:
 # ---------------------------------------------------------------------------
 # Profile loading + a simple second stakeholder ("lens") variant
 # ---------------------------------------------------------------------------
+
 
 def load_profile(path: Path) -> DEMEProfileV03:
     data = json.loads(path.read_text(encoding="utf-8"))
@@ -133,7 +135,14 @@ def make_second_stakeholder_profile(base_profile_path: Path) -> DEMEProfileV03:
     # If present, push principlism strongly toward beneficence/non-maleficence.
     prin = dict(data.get("principlism", {}))
     if prin:
-        prin.update({"beneficence": 0.75, "non_maleficence": 0.20, "autonomy": 0.03, "justice": 0.02})
+        prin.update(
+            {
+                "beneficence": 0.75,
+                "non_maleficence": 0.20,
+                "autonomy": 0.03,
+                "justice": 0.02,
+            }
+        )
         total = sum(float(v) for v in prin.values())
         if total > 0:
             prin = {k: float(v) / total for k, v in prin.items()}
@@ -146,7 +155,9 @@ def make_second_stakeholder_profile(base_profile_path: Path) -> DEMEProfileV03:
 # Evidence -> facts (small, deterministic extractor)
 # ---------------------------------------------------------------------------
 
-_DISCRIM_RX = re.compile(r"\b(race|ethnicity|gender|religion|protected attribute|protected class)\b", re.I)
+_DISCRIM_RX = re.compile(
+    r"\b(race|ethnicity|gender|religion|protected attribute|protected class)\b", re.I
+)
 
 
 def discrimination_classifier_stub(text: str) -> Tuple[bool, float, str]:
@@ -297,13 +308,15 @@ def build_facts_for_demo(
 
     fairness = JusticeAndFairness(
         discriminates_on_protected_attr=is_discrim,
-        prioritizes_most_disadvantaged=True,   # once allowed, this should score well for rights-first too
+        prioritizes_most_disadvantaged=True,  # once allowed, this should score well for rights-first too
         distributive_pattern="maximin",
         exploits_vulnerable_population=False,
         exacerbates_power_imbalance=False,
     )
     rights = RightsAndDuties(
-        violates_rights=bool(is_discrim),  # demo: treat discrimination as rights trigger
+        violates_rights=bool(
+            is_discrim
+        ),  # demo: treat discrimination as rights trigger
         has_valid_consent=True,
         violates_explicit_rule=False,
         role_duty_conflict=False,
@@ -378,6 +391,7 @@ def build_facts_for_demo(
 # Evaluation (profile -> EMs -> select_option)
 # ---------------------------------------------------------------------------
 
+
 def evaluate_under_profile(
     profile: DEMEProfileV03,
     facts_by_option: Dict[str, EthicalFacts],
@@ -411,6 +425,7 @@ def evaluate_under_profile(
 # ---------------------------------------------------------------------------
 # Scoreboard printing (robust to internal schema changes)
 # ---------------------------------------------------------------------------
+
 
 def _safe_get(obj: Any, *names: str) -> Any:
     for n in names:
@@ -459,11 +474,24 @@ def print_scoreboard(
     judgements: Dict[str, List[Tuple[str, EthicalJudgement]]],
 ) -> None:
     agg = extract_aggregated_scores(decision)
-    ranked = set(getattr(decision, "ranked_options", getattr(decision, "ranked_option_ids", [])) or [])
-    forbidden = set(getattr(decision, "forbidden_options", getattr(decision, "forbidden_option_ids", [])) or [])
+    ranked = set(
+        getattr(decision, "ranked_options", getattr(decision, "ranked_option_ids", []))
+        or []
+    )
+    forbidden = set(
+        getattr(
+            decision, "forbidden_options", getattr(decision, "forbidden_option_ids", [])
+        )
+        or []
+    )
 
     print("\n--- Scoreboard (per option) ---")
-    hdr = "option_id".ljust(30) + "status".ljust(10) + "agg".ljust(8) + "module judgements"
+    hdr = (
+        "option_id".ljust(30)
+        + "status".ljust(10)
+        + "agg".ljust(8)
+        + "module judgements"
+    )
     print(hdr)
     print("-" * len(hdr))
 
@@ -475,7 +503,9 @@ def print_scoreboard(
             verdict = _safe_get(j, "verdict", "decision", "outcome")
             score = _safe_get(j, "normative_score", "score", "satisfaction", "value")
             parts.append(f"{em_id}:{verdict}/{_fmt_score(score)}")
-        print(oid.ljust(30) + status.ljust(10) + agg_s.ljust(8) + "  " + "; ".join(parts))
+        print(
+            oid.ljust(30) + status.ljust(10) + agg_s.ljust(8) + "  " + "; ".join(parts)
+        )
 
 
 def print_outcome(
@@ -486,8 +516,12 @@ def print_outcome(
 ) -> None:
     print(f"\n=== {label} ===")
     print(f"selected_option_id: {decision.selected_option_id}")
-    ranked = getattr(decision, "ranked_options", getattr(decision, "ranked_option_ids", []))
-    forbidden = getattr(decision, "forbidden_options", getattr(decision, "forbidden_option_ids", []))
+    ranked = getattr(
+        decision, "ranked_options", getattr(decision, "ranked_option_ids", [])
+    )
+    forbidden = getattr(
+        decision, "forbidden_options", getattr(decision, "forbidden_option_ids", [])
+    )
     print(f"ranked_options (eligible): {ranked}")
     print(f"forbidden_options:         {forbidden if forbidden else 'none'}")
     print(f"rationale:                 {decision.rationale}")
@@ -499,7 +533,10 @@ def print_outcome(
 # BIP transforms
 # ---------------------------------------------------------------------------
 
-def transform_reorder(facts_by_option: Dict[str, EthicalFacts]) -> Dict[str, EthicalFacts]:
+
+def transform_reorder(
+    facts_by_option: Dict[str, EthicalFacts]
+) -> Dict[str, EthicalFacts]:
     """Bond-preserving transform: reorder option presentation."""
     keys = list(facts_by_option.keys())
     if len(keys) <= 1:
@@ -529,39 +566,57 @@ def transform_relabel(
     return out, mapping
 
 
-def canonicalize_selected(selected_option_id: Optional[str], inverse_map: Dict[str, str]) -> Optional[str]:
+def canonicalize_selected(
+    selected_option_id: Optional[str], inverse_map: Dict[str, str]
+) -> Optional[str]:
     if selected_option_id is None:
         return None
     return inverse_map.get(selected_option_id, selected_option_id)
 
 
-def check_invariance(label: str, baseline: Optional[str], transformed: Optional[str], *, use_symbols: bool = True) -> None:
-    ok = (baseline == transformed)
+def check_invariance(
+    label: str,
+    baseline: Optional[str],
+    transformed: Optional[str],
+    *,
+    use_symbols: bool = True,
+) -> None:
+    ok = baseline == transformed
     if use_symbols:
-        status = 'PASS ✓' if ok else 'FAIL ✗'
+        status = "PASS ✓" if ok else "FAIL ✗"
     else:
-        status = 'PASS' if ok else 'FAIL'
+        status = "PASS" if ok else "FAIL"
     print(f"[BIP invariance check] {label}: {status}")
     if not ok:
         print(f"  baseline:    {baseline}")
         print(f"  transformed: {transformed}")
-        print("  - This would indicate a bug: the system responded to syntax, not structure.")
+        print(
+            "  - This would indicate a bug: the system responded to syntax, not structure."
+        )
 
 
 def highlight_change(title: str, before: Optional[str], after: Optional[str]) -> None:
     if before == after:
         print(f"[{title}] selected option unchanged: {before}")
-        print("  (This can happen if options remain similarly ranked under this governance config; see scoreboard.)")
+        print(
+            "  (This can happen if options remain similarly ranked under this governance config; see scoreboard.)"
+        )
     else:
         print(f"[{title}] selected option CHANGED: {before}  ->  {after}")
 
-def simulate_order_dependent_bug_selected_id(decision: DecisionOutcome, baseline_selected: Optional[str]) -> Optional[str]:
+
+def simulate_order_dependent_bug_selected_id(
+    decision: DecisionOutcome, baseline_selected: Optional[str]
+) -> Optional[str]:
     """Return a DIFFERENT eligible option id to simulate an order-dependent bug.
 
     This does NOT reflect erisml behavior; it's an intentional illustration of what a BIP failure
     would look like in logs.
     """
-    ranked = getattr(decision, "ranked_options", getattr(decision, "ranked_option_ids", [])) or []
+    ranked = (
+        getattr(decision, "ranked_options", getattr(decision, "ranked_option_ids", []))
+        or []
+    )
     for oid in ranked:
         if oid != baseline_selected:
             return oid
@@ -572,16 +627,23 @@ def simulate_order_dependent_bug_selected_id(decision: DecisionOutcome, baseline
 # Runner
 # ---------------------------------------------------------------------------
 
-def run(profile_path: Path, run_lens: bool, show_scoreboard: bool, show_violation: bool) -> None:
+
+def run(
+    profile_path: Path, run_lens: bool, show_scoreboard: bool, show_violation: bool
+) -> None:
     print("=== Bond Invariance Principle (BIP) Demo ===\n")
 
     profile_1 = load_profile(profile_path)
-    print(f"Loaded profile #1: {profile_1.name} (override_mode={getattr(profile_1, 'override_mode', None)})")
+    print(
+        f"Loaded profile #1: {profile_1.name} (override_mode={getattr(profile_1, 'override_mode', None)})"
+    )
 
     profile_2: Optional[DEMEProfileV03] = None
     if run_lens:
         profile_2 = make_second_stakeholder_profile(profile_path)
-        print(f"Loaded profile #2: {profile_2.name} (override_mode={getattr(profile_2, 'override_mode', None)})")
+        print(
+            f"Loaded profile #2: {profile_2.name} (override_mode={getattr(profile_2, 'override_mode', None)})"
+        )
 
     # Evidence texts are only used for provenance + discrimination detection for C.
     evidence_baseline = {
@@ -595,13 +657,23 @@ def run(profile_path: Path, run_lens: bool, show_scoreboard: bool, show_violatio
 
     facts, _ = build_facts_for_demo(evidence_baseline)
     dec_base, js_base = evaluate_under_profile(profile_1, facts)
-    print_outcome("Baseline (canonical representation)", dec_base, js_base, show_scoreboard=show_scoreboard)
+    print_outcome(
+        "Baseline (canonical representation)",
+        dec_base,
+        js_base,
+        show_scoreboard=show_scoreboard,
+    )
     baseline_sel = dec_base.selected_option_id
 
     # Bond-preserving: reorder
     facts_reordered = transform_reorder(facts)
     dec_reorder, js_reorder = evaluate_under_profile(profile_1, facts_reordered)
-    print_outcome("Bond-preserving transform: reorder options", dec_reorder, js_reorder, show_scoreboard=show_scoreboard)
+    print_outcome(
+        "Bond-preserving transform: reorder options",
+        dec_reorder,
+        js_reorder,
+        show_scoreboard=show_scoreboard,
+    )
     check_invariance("reorder", baseline_sel, dec_reorder.selected_option_id)
 
     # ------------------------------------------------------------
@@ -610,7 +682,9 @@ def run(profile_path: Path, run_lens: bool, show_scoreboard: bool, show_violatio
     if show_violation:
         print("\n=== BIP VIOLATION (intentional, for illustration) ===")
         print("[Simulated bug: outcome depends on option presentation order]")
-        bug_selected = simulate_order_dependent_bug_selected_id(dec_reorder, baseline_sel)
+        bug_selected = simulate_order_dependent_bug_selected_id(
+            dec_reorder, baseline_sel
+        )
         print(f"selected_option_id: {bug_selected}  \u2190 DIFFERENT!")
         check_invariance("reorder", baseline_sel, bug_selected, use_symbols=True)
 
@@ -618,8 +692,17 @@ def run(profile_path: Path, run_lens: bool, show_scoreboard: bool, show_violatio
     facts_relabeled, mapping = transform_relabel(facts)
     inv = {v: k for k, v in mapping.items()}
     dec_relabel, js_relabel = evaluate_under_profile(profile_1, facts_relabeled)
-    print_outcome("Bond-preserving transform: relabel option IDs", dec_relabel, js_relabel, show_scoreboard=show_scoreboard)
-    check_invariance("relabel (canonicalized)", baseline_sel, canonicalize_selected(dec_relabel.selected_option_id, inv))
+    print_outcome(
+        "Bond-preserving transform: relabel option IDs",
+        dec_relabel,
+        js_relabel,
+        show_scoreboard=show_scoreboard,
+    )
+    check_invariance(
+        "relabel (canonicalized)",
+        baseline_sel,
+        canonicalize_selected(dec_relabel.selected_option_id, inv),
+    )
 
     # Bond-changing: remove discrimination evidence (C should move from FORBID to ALLOW, and typically win)
     evidence_cf = dict(evidence_baseline)
@@ -629,20 +712,40 @@ def run(profile_path: Path, run_lens: bool, show_scoreboard: bool, show_violatio
     )
     facts_cf, _ = build_facts_for_demo(evidence_cf)
     dec_cf, js_cf = evaluate_under_profile(profile_1, facts_cf)
-    print_outcome("Bond-changing counterfactual: remove discrimination", dec_cf, js_cf, show_scoreboard=show_scoreboard)
-    highlight_change("Bond-change effect (expected)", baseline_sel, dec_cf.selected_option_id)
+    print_outcome(
+        "Bond-changing counterfactual: remove discrimination",
+        dec_cf,
+        js_cf,
+        show_scoreboard=show_scoreboard,
+    )
+    highlight_change(
+        "Bond-change effect (expected)", baseline_sel, dec_cf.selected_option_id
+    )
 
     print("\n[BIP interpretation]")
-    print("  - Outcome changes under reorder/relabel are NOT expected: that's the BIP test.")
-    print("  - Outcome changes under the counterfactual ARE expected: bond-relevant evidence changed.")
+    print(
+        "  - Outcome changes under reorder/relabel are NOT expected: that's the BIP test."
+    )
+    print(
+        "  - Outcome changes under the counterfactual ARE expected: bond-relevant evidence changed."
+    )
 
     # Lens change: stakeholder #2 (tuned so B can win)
     if profile_2 is not None:
         dec_lens, js_lens = evaluate_under_profile(profile_2, facts)
-        print_outcome("Declared lens change: stakeholder #2", dec_lens, js_lens, show_scoreboard=show_scoreboard)
-        highlight_change("Lens-change effect (allowed)", baseline_sel, dec_lens.selected_option_id)
+        print_outcome(
+            "Declared lens change: stakeholder #2",
+            dec_lens,
+            js_lens,
+            show_scoreboard=show_scoreboard,
+        )
+        highlight_change(
+            "Lens-change effect (allowed)", baseline_sel, dec_lens.selected_option_id
+        )
         print("\n[BIP interpretation]")
-        print("  - Lens changes may change outcomes, but must be declared and auditable.")
+        print(
+            "  - Lens changes may change outcomes, but must be declared and auditable."
+        )
 
 
 def main() -> None:
@@ -669,7 +772,12 @@ def main() -> None:
         help="Skip the intentional BIP-violation illustration block.",
     )
     args = ap.parse_args()
-    run(args.profile, run_lens=(not args.no_lens), show_scoreboard=(not args.no_scoreboard), show_violation=(not args.no_violation))
+    run(
+        args.profile,
+        run_lens=(not args.no_lens),
+        show_scoreboard=(not args.no_scoreboard),
+        show_violation=(not args.no_violation),
+    )
 
 
 if __name__ == "__main__":

@@ -62,7 +62,14 @@ def _coerce_verdict(verdict_str: str) -> Any:
         return verdict_str
 
 
-def _make_judgement(em_name: str, verdict: str, score: float, reasons: List[str], metadata: Dict[str, Any], option_id: str | None = None) -> EthicalJudgement:
+def _make_judgement(
+    em_name: str,
+    verdict: str,
+    score: float,
+    reasons: List[str],
+    metadata: Dict[str, Any],
+    option_id: str | None = None,
+) -> EthicalJudgement:
     """
     Construct EthicalJudgement robustly via signature introspection.
     """
@@ -134,6 +141,7 @@ def _clip(text: str, n: int = 120) -> str:
 # The EM
 # ---------------------------------------------------------------------------
 
+
 class TragicConflictEM:
     """
     TragicConflictEM detects "tragic structure": options that are attractive under one
@@ -146,6 +154,7 @@ class TragicConflictEM:
 
     You can use it as a stand-alone explanatory EM alongside your existing stack.
     """
+
     em_name: str = "tragic_conflict"
     em_id: str = "tragic_conflict"
 
@@ -155,26 +164,56 @@ class TragicConflictEM:
         benefit = float(_get(facts, "consequences.expected_benefit", 0.0) or 0.0)
         harm = float(_get(facts, "consequences.expected_harm", 0.0) or 0.0)
 
-        followed_proc = _bool(_get(facts, "procedural_and_legitimacy.followed_approved_procedure", True))
-        contestation = _bool(_get(facts, "procedural_and_legitimacy.contestation_available", True))
-        consulted = _bool(_get(facts, "procedural_and_legitimacy.stakeholders_consulted", True))
-        explainable = _bool(_get(facts, "procedural_and_legitimacy.decision_explainable_to_public", True))
+        followed_proc = _bool(
+            _get(facts, "procedural_and_legitimacy.followed_approved_procedure", True)
+        )
+        contestation = _bool(
+            _get(facts, "procedural_and_legitimacy.contestation_available", True)
+        )
+        consulted = _bool(
+            _get(facts, "procedural_and_legitimacy.stakeholders_consulted", True)
+        )
+        explainable = _bool(
+            _get(
+                facts, "procedural_and_legitimacy.decision_explainable_to_public", True
+            )
+        )
 
-        coercion = _bool(_get(facts, "autonomy_and_agency.coercion_or_undue_influence", False))
-        has_choice = _bool(_get(facts, "autonomy_and_agency.has_meaningful_choice", True))
+        coercion = _bool(
+            _get(facts, "autonomy_and_agency.coercion_or_undue_influence", False)
+        )
+        has_choice = _bool(
+            _get(facts, "autonomy_and_agency.has_meaningful_choice", True)
+        )
 
-        privacy_inv = float(_get(facts, "privacy_and_data.privacy_invasion_level", 0.0) or 0.0)
-        secondary_use = _bool(_get(facts, "privacy_and_data.secondary_use_without_consent", False))
+        privacy_inv = float(
+            _get(facts, "privacy_and_data.privacy_invasion_level", 0.0) or 0.0
+        )
+        secondary_use = _bool(
+            _get(facts, "privacy_and_data.secondary_use_without_consent", False)
+        )
 
-        power_imb = _bool(_get(facts, "justice_and_fairness.exacerbates_power_imbalance", False))
-        exploits = _bool(_get(facts, "justice_and_fairness.exploits_vulnerable_population", False))
+        power_imb = _bool(
+            _get(facts, "justice_and_fairness.exacerbates_power_imbalance", False)
+        )
+        exploits = _bool(
+            _get(facts, "justice_and_fairness.exploits_vulnerable_population", False)
+        )
 
         violates_rights = _bool(_get(facts, "rights_and_duties.violates_rights", False))
-        violates_rule = _bool(_get(facts, "rights_and_duties.violates_explicit_rule", False))
-        role_duty_conflict = _bool(_get(facts, "rights_and_duties.role_duty_conflict", False))
+        violates_rule = _bool(
+            _get(facts, "rights_and_duties.violates_explicit_rule", False)
+        )
+        role_duty_conflict = _bool(
+            _get(facts, "rights_and_duties.role_duty_conflict", False)
+        )
 
-        uncertainty = float(_get(facts, "epistemic_status.uncertainty_level", 0.0) or 0.0)
-        evidence_quality = str(_get(facts, "epistemic_status.evidence_quality", "unknown") or "unknown")
+        uncertainty = float(
+            _get(facts, "epistemic_status.uncertainty_level", 0.0) or 0.0
+        )
+        evidence_quality = str(
+            _get(facts, "epistemic_status.evidence_quality", "unknown") or "unknown"
+        )
 
         triggers: List[str] = []
         conflict = 0.0
@@ -237,11 +276,15 @@ class TragicConflictEM:
             "Tragic conflict check: flags choices likely to produce moral remainder "
             "(competing prima facie reasons across domains)."
         )
-        reasons.append(f"Tragic conflict index={conflict:.2f} (higher means more tension across domains).")
+        reasons.append(
+            f"Tragic conflict index={conflict:.2f} (higher means more tension across domains)."
+        )
         if triggers:
             reasons.append("Trigger(s): " + ", ".join(triggers) + ".")
         if recommend_escalation:
-            reasons.append("Recommendation: prefer procedure-first options, seek consent/appeal, or escalate to governance review.")
+            reasons.append(
+                "Recommendation: prefer procedure-first options, seek consent/appeal, or escalate to governance review."
+            )
 
         # Include boolean bullets so your provenance printers can attach trace entries if desired.
         reasons.append(f"• tragic_conflict_high = {str(conflict >= 0.55)}")
@@ -253,12 +296,15 @@ class TragicConflictEM:
         }
 
         opt_id = _get(facts, "option_id", None)
-        return _make_judgement(self.em_name, verdict, score, reasons, metadata, option_id=opt_id)
+        return _make_judgement(
+            self.em_name, verdict, score, reasons, metadata, option_id=opt_id
+        )
 
 
 # ---------------------------------------------------------------------------
 # Optional registration with your EM registry
 # ---------------------------------------------------------------------------
+
 
 def _register() -> None:
     try:
