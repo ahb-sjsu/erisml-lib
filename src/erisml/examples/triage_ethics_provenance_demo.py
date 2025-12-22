@@ -495,7 +495,7 @@ def print_option_results_with_provenance(
                         f"{p.fact_path} ← {p.source_type} "
                         f"(rule_id={p.rule_id}, conf={p.confidence:.2f}"
                         + (f", model={p.model_id}" if p.model_id else "")
-                        + f")"
+                        + ")"
                     )
                     if p.notes:
                         print(f"        notes: {p.notes}")
