@@ -60,13 +60,21 @@ def test_greek_tragedy_pantheon_demo_expected_outcomes():
     # Example summary line:
     #   - aulis        [Consequences            ] -> aulis_delay
     for case_id, selected in expected.items():
-        pat = rf"^\s*-\s*{re.escape(case_id)}\s+\[.*?\]\s+->\s+{re.escape(selected)}\s*$"
-        assert re.search(pat, out, flags=re.MULTILINE), f"Missing/changed summary for {case_id}"
+        pat = (
+            rf"^\s*-\s*{re.escape(case_id)}\s+\[.*?\]\s+->\s+{re.escape(selected)}\s*$"
+        )
+        assert re.search(
+            pat, out, flags=re.MULTILINE
+        ), f"Missing/changed summary for {case_id}"
 
     # 4) The EM should detect at least one high-conflict option in the suite.
-    indices = [float(x) for x in re.findall(r"Tragic conflict index=([0-9]+\.[0-9]+)", out)]
+    indices = [
+        float(x) for x in re.findall(r"Tragic conflict index=([0-9]+\.[0-9]+)", out)
+    ]
     assert indices, "No tragic conflict indices found in output."
-    assert max(indices) >= 0.55, f"Expected at least one high conflict (>=0.55). got max={max(indices):.2f}"
+    assert (
+        max(indices) >= 0.55
+    ), f"Expected at least one high conflict (>=0.55). got max={max(indices):.2f}"
 
     # 5) Ensure at least one trigger explanation was printed.
     assert "Trigger(s):" in out

@@ -55,11 +55,13 @@ from erisml.ethics.modules.greek_tragedy_tragic_conflict_em import TragicConflic
 # Provenance helpers (lightweight, demo-only)
 # ---------------------------------------------------------------------------
 
+
 @dataclass(frozen=True)
 class FactProvenance:
     """Audit-friendly provenance record for a single fact coordinate."""
-    fact_path: str                     # e.g., "rights_and_duties.violates_explicit_rule"
-    source_type: str                   # "rule" | "classifier" | "hybrid" | "human_attestation"
+
+    fact_path: str  # e.g., "rights_and_duties.violates_explicit_rule"
+    source_type: str  # "rule" | "classifier" | "hybrid" | "human_attestation"
     rule_id: str
     confidence: float
     model_id: Optional[str] = None
@@ -109,6 +111,7 @@ def _fact_key_to_path(k: str) -> Optional[str]:
 # Profile + multi-stakeholder helper
 # ---------------------------------------------------------------------------
 
+
 def load_profile(path: Path) -> DEMEProfileV03:
     data = json.loads(path.read_text(encoding="utf-8"))
     return deme_profile_v03_from_dict(data)
@@ -138,7 +141,14 @@ def make_second_stakeholder_profile(base_path: Path) -> DEMEProfileV03:
     data["dimension_weights"] = dims
 
     prin = data.get("principlism_weights", {})
-    prin.update({"beneficence": 0.50, "non_maleficence": 0.30, "autonomy": 0.10, "justice": 0.10})
+    prin.update(
+        {
+            "beneficence": 0.50,
+            "non_maleficence": 0.30,
+            "autonomy": 0.10,
+            "justice": 0.10,
+        }
+    )
     data["principlism_weights"] = prin
 
     return deme_profile_v03_from_dict(data)
@@ -147,6 +157,7 @@ def make_second_stakeholder_profile(base_path: Path) -> DEMEProfileV03:
 # ---------------------------------------------------------------------------
 # Case definitions
 # ---------------------------------------------------------------------------
+
 
 @dataclass(frozen=True)
 class PantheonOption:
@@ -278,7 +289,13 @@ def make_pantheon_cases() -> List[PantheonCase]:
             label="Sail immediately (high urgency / high harm risk)",
             facts=EthicalFacts(
                 option_id="aulis_sail_now",
-                **_base_blocks(expected_benefit=0.78, expected_harm=0.72, urgency=0.92, evidence_quality="medium", uncertainty_level=0.35),
+                **_base_blocks(
+                    expected_benefit=0.78,
+                    expected_harm=0.72,
+                    urgency=0.92,
+                    evidence_quality="medium",
+                    uncertainty_level=0.35,
+                ),
             ),
             evidence=opt1_ev,
             provenance={},
@@ -288,7 +305,13 @@ def make_pantheon_cases() -> List[PantheonCase]:
             label="Delay for safer winds (moderate urgency / low harm)",
             facts=EthicalFacts(
                 option_id="aulis_delay",
-                **_base_blocks(expected_benefit=0.65, expected_harm=0.20, urgency=0.55, evidence_quality="high", uncertainty_level=0.20),
+                **_base_blocks(
+                    expected_benefit=0.65,
+                    expected_harm=0.20,
+                    urgency=0.55,
+                    evidence_quality="high",
+                    uncertainty_level=0.20,
+                ),
             ),
             evidence=opt2_ev,
             provenance={},
@@ -298,7 +321,13 @@ def make_pantheon_cases() -> List[PantheonCase]:
             label="Abandon campaign (low harm / low benefit)",
             facts=EthicalFacts(
                 option_id="aulis_abort",
-                **_base_blocks(expected_benefit=0.20, expected_harm=0.10, urgency=0.15, evidence_quality="high", uncertainty_level=0.10),
+                **_base_blocks(
+                    expected_benefit=0.20,
+                    expected_harm=0.10,
+                    urgency=0.15,
+                    evidence_quality="high",
+                    uncertainty_level=0.10,
+                ),
             ),
             evidence=opt3_ev,
             provenance={},
@@ -310,7 +339,11 @@ def make_pantheon_cases() -> List[PantheonCase]:
             title="Aulis: The Stalled Fleet",
             spotlight_domain="Consequences",
             scenario=scenario,
-            spotlight_fields=["consequences.expected_benefit", "consequences.expected_harm", "consequences.urgency"],
+            spotlight_fields=[
+                "consequences.expected_benefit",
+                "consequences.expected_harm",
+                "consequences.urgency",
+            ],
             options=options,
         )
     )
@@ -418,7 +451,10 @@ def make_pantheon_cases() -> List[PantheonCase]:
             title="Antigone: Edict vs Rite",
             spotlight_domain="Rights & Duties",
             scenario=scenario,
-            spotlight_fields=["rights_and_duties.violates_explicit_rule", "procedural_and_legitimacy.followed_approved_procedure"],
+            spotlight_fields=[
+                "rights_and_duties.violates_explicit_rule",
+                "procedural_and_legitimacy.followed_approved_procedure",
+            ],
             options=options,
         )
     )
@@ -432,7 +468,9 @@ def make_pantheon_cases() -> List[PantheonCase]:
     )
     ev_pol = "Council minutes: selection influenced by elite faction pressure and fear of dissent."
     ev_mer = "Council minutes: selection based on publicly stated merit criteria and consistent past practice."
-    ev_con = "Proposal: hold a public contest with recorded votes and an appeal channel."
+    ev_con = (
+        "Proposal: hold a public contest with recorded votes and an appeal channel."
+    )
 
     options = [
         PantheonOption(
@@ -523,7 +561,10 @@ def make_pantheon_cases() -> List[PantheonCase]:
             title="Ajax: The Prize of Honor",
             spotlight_domain="Justice & Fairness",
             scenario=scenario,
-            spotlight_fields=["justice_and_fairness.distributive_pattern", "justice_and_fairness.exacerbates_power_imbalance"],
+            spotlight_fields=[
+                "justice_and_fairness.distributive_pattern",
+                "justice_and_fairness.exacerbates_power_imbalance",
+            ],
             options=options,
         )
     )
@@ -645,7 +686,10 @@ def make_pantheon_cases() -> List[PantheonCase]:
             title="Iphigenia: Consent Under Pressure",
             spotlight_domain="Autonomy & Agency",
             scenario=scenario,
-            spotlight_fields=["autonomy_and_agency.coercion_or_undue_influence", "rights_and_duties.has_valid_consent"],
+            spotlight_fields=[
+                "autonomy_and_agency.coercion_or_undue_influence",
+                "rights_and_duties.has_valid_consent",
+            ],
             options=options,
         )
     )
@@ -776,7 +820,10 @@ def make_pantheon_cases() -> List[PantheonCase]:
             title="Hippolytus: The Private Letter",
             spotlight_domain="Privacy & Data Governance",
             scenario=scenario,
-            spotlight_fields=["privacy_and_data.privacy_invasion_level", "privacy_and_data.secondary_use_without_consent"],
+            spotlight_fields=[
+                "privacy_and_data.privacy_invasion_level",
+                "privacy_and_data.secondary_use_without_consent",
+            ],
             options=options,
         )
     )
@@ -881,7 +928,10 @@ def make_pantheon_cases() -> List[PantheonCase]:
             title="Prometheus: Release of Fire",
             spotlight_domain="Societal & Environmental",
             scenario=scenario,
-            spotlight_fields=["societal_and_environmental.long_term_societal_risk", "societal_and_environmental.environmental_harm"],
+            spotlight_fields=[
+                "societal_and_environmental.long_term_societal_risk",
+                "societal_and_environmental.environmental_harm",
+            ],
             options=options,
         )
     )
@@ -976,7 +1026,10 @@ def make_pantheon_cases() -> List[PantheonCase]:
             title="Thebes: Inquiry in Crisis",
             spotlight_domain="Procedural & Legitimacy",
             scenario=scenario,
-            spotlight_fields=["procedural_and_legitimacy.followed_approved_procedure", "procedural_and_legitimacy.contestation_available"],
+            spotlight_fields=[
+                "procedural_and_legitimacy.followed_approved_procedure",
+                "procedural_and_legitimacy.contestation_available",
+            ],
             options=options,
         )
     )
@@ -988,7 +1041,9 @@ def make_pantheon_cases() -> List[PantheonCase]:
         "A leader must act under uncertain evidence. Options include immediate punishment based on weak accusations, "
         "pausing to gather better evidence, or escalating to an oracle-like authority. Spotlight: Epistemic Status."
     )
-    ev_pun = "Accusation is uncorroborated; evidence quality is low; uncertainty is high."
+    ev_pun = (
+        "Accusation is uncorroborated; evidence quality is low; uncertainty is high."
+    )
     ev_gat = "Investigation plan: gather corroboration, improve evidence quality, and reduce uncertainty."
     ev_orc = "Oracle report is ambiguous: high confidence in source, low specificity about the suspect."
 
@@ -1076,7 +1131,10 @@ def make_pantheon_cases() -> List[PantheonCase]:
             title="Oedipus: Acting Under Uncertainty",
             spotlight_domain="Epistemic Status",
             scenario=scenario,
-            spotlight_fields=["epistemic_status.uncertainty_level", "epistemic_status.evidence_quality"],
+            spotlight_fields=[
+                "epistemic_status.uncertainty_level",
+                "epistemic_status.evidence_quality",
+            ],
             options=options,
         )
     )
@@ -1087,6 +1145,7 @@ def make_pantheon_cases() -> List[PantheonCase]:
 # ---------------------------------------------------------------------------
 # Printing + evaluation
 # ---------------------------------------------------------------------------
+
 
 def print_case_header(case: PantheonCase, idx: int, total: int) -> None:
     print("\n" + "=" * 86)
@@ -1127,7 +1186,9 @@ def print_option_results(
 ) -> None:
     print(f"\n--- Option: {option_id} ---")
     for j in judgements:
-        print(f"[EM={j.em_name:<24}] verdict={j.verdict:<15} score={j.normative_score:.3f}")
+        print(
+            f"[EM={j.em_name:<24}] verdict={j.verdict:<15} score={j.normative_score:.3f}"
+        )
         for reason in j.reasons:
             print(f"    - {reason}")
 
@@ -1141,7 +1202,9 @@ def print_option_results(
                     for line in _pretty_prov(provenance_map[fact_path]):
                         print(f"      {line}")
 
-    print(f"[AGG governance] verdict={aggregate.verdict:<15} score={aggregate.normative_score:.3f}")
+    print(
+        f"[AGG governance] verdict={aggregate.verdict:<15} score={aggregate.normative_score:.3f}"
+    )
     meta = aggregate.metadata or {}
     forbidden = meta.get("forbidden", False)
     forbidden_by = meta.get("forbidden_by", [])
@@ -1155,7 +1218,9 @@ def print_option_results(
         print("    * Veto EM(s): " + ", ".join(sorted(set(vetoed_by))))
 
 
-def evaluate_case(profile: DEMEProfileV03, case: PantheonCase) -> Tuple[DecisionOutcome, Dict[str, List[EthicalJudgement]]]:
+def evaluate_case(
+    profile: DEMEProfileV03, case: PantheonCase
+) -> Tuple[DecisionOutcome, Dict[str, List[EthicalJudgement]]]:
     triage_em, rights_em, gov_cfg = build_triage_ems_and_governance(profile)
 
     ems = {
@@ -1205,8 +1270,12 @@ def merge_two_outcomes(
         if j1 is None or j2 is None:
             continue
 
-        forbidden1 = (j1.metadata or {}).get("forbidden", False) or (j1.verdict == "forbid")
-        forbidden2 = (j2.metadata or {}).get("forbidden", False) or (j2.verdict == "forbid")
+        forbidden1 = (j1.metadata or {}).get("forbidden", False) or (
+            j1.verdict == "forbid"
+        )
+        forbidden2 = (j2.metadata or {}).get("forbidden", False) or (
+            j2.verdict == "forbid"
+        )
         forbidden = forbidden1 or forbidden2
 
         combined = 0.0
@@ -1232,27 +1301,36 @@ def merge_two_outcomes(
     return selected, rows
 
 
-def print_merge_table(rows: Dict[str, Dict[str, object]], label1: str, label2: str, w1: float, w2: float) -> None:
+def print_merge_table(
+    rows: Dict[str, Dict[str, object]], label1: str, label2: str, w1: float, w2: float
+) -> None:
     print("\n=== Multi-stakeholder merge ===")
-    print(f"Merge policy: forbid if ANY forbids; else combined_score = {w1:.2f}*{label1} + {w2:.2f}*{label2}\n")
+    print(
+        f"Merge policy: forbid if ANY forbids; else combined_score = {w1:.2f}*{label1} + {w2:.2f}*{label2}\n"
+    )
     print(f"{'option':<26} | {label1:<18} | {label2:<22} | {'combined':>8} | status")
     print("-" * 86)
     for oid, r in rows.items():
         left = f"{r['v1']:>14} {r['s1']:.3f}"
         right = f"{r['v2']:>14} {r['s2']:.3f}"
-        print(f"{oid:<26} | {left:<18} | {right:<22} | {r['combined']:8.3f} | {r['status']}")
+        print(
+            f"{oid:<26} | {left:<18} | {right:<22} | {r['combined']:8.3f} | {r['status']}"
+        )
 
 
 # ---------------------------------------------------------------------------
 # Runner
 # ---------------------------------------------------------------------------
 
+
 def run_pantheon(profile_path: Path, case_filter: Optional[str], multi: bool) -> None:
     cases = make_pantheon_cases()
     if case_filter:
         cases = [c for c in cases if c.case_id == case_filter]
         if not cases:
-            raise SystemExit(f"No case matches --case '{case_filter}'. Available: {[c.case_id for c in make_pantheon_cases()]}")
+            raise SystemExit(
+                f"No case matches --case '{case_filter}'. Available: {[c.case_id for c in make_pantheon_cases()]}"
+            )
 
     profile1 = load_profile(profile_path)
 
@@ -1261,9 +1339,13 @@ def run_pantheon(profile_path: Path, case_filter: Optional[str], multi: bool) ->
         profile2 = make_second_stakeholder_profile(profile_path)
 
     print("=== Greek Tragedy Pantheon Demo (DEMEProfileV03 + v0.2 EthicalFacts) ===\n")
-    print(f"Loaded profile #1: {profile1.name} (override_mode={getattr(profile1, 'override_mode', None)})")
+    print(
+        f"Loaded profile #1: {profile1.name} (override_mode={getattr(profile1, 'override_mode', None)})"
+    )
     if profile2:
-        print(f"Loaded profile #2: {profile2.name} (override_mode={getattr(profile2, 'override_mode', None)})")
+        print(
+            f"Loaded profile #2: {profile2.name} (override_mode={getattr(profile2, 'override_mode', None)})"
+        )
 
     summary_rows: List[Tuple[str, str, str]] = []
 
@@ -1287,9 +1369,15 @@ def run_pantheon(profile_path: Path, case_filter: Optional[str], multi: bool) ->
             print("No permissible option selected.")
         else:
             print(f"Selected option: '{decision1.selected_option_id}'")
-            ranked = getattr(decision1, 'ranked_options', getattr(decision1, 'ranked_option_ids', []))
+            ranked = getattr(
+                decision1, "ranked_options", getattr(decision1, "ranked_option_ids", [])
+            )
             print(f"Ranked options (eligible): {ranked}")
-            forbidden = getattr(decision1, 'forbidden_options', getattr(decision1, 'forbidden_option_ids', []))
+            forbidden = getattr(
+                decision1,
+                "forbidden_options",
+                getattr(decision1, "forbidden_option_ids", []),
+            )
             print(f"Forbidden options: {forbidden}")
             print(f"Rationale: {decision1.rationale}")
 
@@ -1308,7 +1396,11 @@ def run_pantheon(profile_path: Path, case_filter: Optional[str], multi: bool) ->
                 w2=0.45,
             )
             print_merge_table(rows, profile1.name, profile2.name, 0.55, 0.45)
-            print(f"\nCombined outcome: SELECT '{sel}'" if sel else "\nCombined outcome: no eligible option")
+            print(
+                f"\nCombined outcome: SELECT '{sel}'"
+                if sel
+                else "\nCombined outcome: no eligible option"
+            )
 
     print("\n" + "=" * 86)
     print("Pantheon summary (profile #1):")
