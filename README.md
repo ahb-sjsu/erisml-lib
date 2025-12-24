@@ -526,20 +526,8 @@ This document provides a comprehensive index of all documentation files in the E
 1. **[geometric_ethics.pdf](https://github.com/ahb-sjsu/erisml-lib/blob/main/geometric_ethics.pdf)**  
    Introduction to geometric ethics framework using differential geometry for moral analysis.
 
-2. **[Stratified Geometric Ethics - Foundational Paper - Bond - Dec - 0.1 - 2025.pdf](https://github.com/ahb-sjsu/erisml-lib/blob/main/Stratified%20Geometric%20Ethics%20-%20Foundational%20Paper%20-%20Bond%20-%20Dec%20-%200.1%20-%202025.pdf)**  
-   Initial version of foundational SGE paper by Bond (December 2025, v0.1).
-
 3. **[Stratified Geometric Ethics - Foundational Paper - Bond - Dec 2025.pdf](https://github.com/ahb-sjsu/erisml-lib/blob/main/Stratified%20Geometric%20Ethics%20-%20Foundational%20Paper%20-%20Bond%20-%20Dec%202025.pdf)**  
    Foundational paper on Stratified Geometric Ethics methodology (December 2025 version).
-
-4. **[Stratified Geometric Ethics - Foundational Paper - Bond - v2- Dec 2025.pdf](https://github.com/ahb-sjsu/erisml-lib/blob/main/Stratified%20Geometric%20Ethics%20-%20Foundational%20Paper%20-%20Bond%20-%20v2-%20Dec%202025.pdf)**  
-   Second revision of SGE foundational paper with enhanced mathematical formulations.
-
-5. **[Stratified Geometric Ethics - Foundational Paper - Bond - v7- Dec 2025.pdf](https://github.com/ahb-sjsu/erisml-lib/blob/main/Stratified%20Geometric%20Ethics%20-%20Foundational%20Paper%20-%20Bond%20-%20v7-%20Dec%202025.pdf)**  
-   Seventh revision incorporating advanced stratification theory and applications.
-
-6. **[Stratified Geometric Ethics - Foundational Paper - Bond - v8- Dec 2025.pdf](https://github.com/ahb-sjsu/erisml-lib/blob/main/Stratified%20Geometric%20Ethics%20-%20Foundational%20Paper%20-%20Bond%20-%20v8-%20Dec%202025.pdf)**  
-   Latest revision (v8) of SGE foundational paper with final refinements and examples.
 
 7. **[The_Geometry_of_Good_塞翁失马.pdf](https://github.com/ahb-sjsu/erisml-lib/blob/main/The_Geometry_of_Good_%E5%A1%9E%E7%BF%81%E5%A4%B1%E9%A9%AC.pdf)**  
    Philosophical exploration of geometric ethics with cross-cultural perspectives (塞翁失马 - Sàiwēngshīmǎ).
