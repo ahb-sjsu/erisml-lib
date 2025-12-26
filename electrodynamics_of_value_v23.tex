@@ -1,0 +1,1277 @@
+\documentclass[11pt]{article}
+\usepackage[margin=1in]{geometry}
+\usepackage{amsmath,amssymb,amsthm}
+\usepackage{enumitem}
+\usepackage{hyperref}
+\usepackage{array}
+\usepackage{booktabs}
+\usepackage{xcolor}
+
+\newtheorem{definition}{Definition}
+\newtheorem{lemma}{Lemma}
+\newtheorem{remark}{Remark}
+\newtheorem{example}{Example}
+
+\title{The Electrodynamics of Value:\\
+Gauge-Theoretic Structure in AI Alignment\\[0.5em]
+\large A Structural Correspondence Between Field Theory and Invariant Evaluation}
+
+\author{Andrew H.\ Bond\\
+Department of Computer Engineering\\
+San Jos\'e State University\\
+\texttt{andrew.bond@sjsu.edu}}
+
+\date{December 2025}
+
+\begin{document}
+
+\maketitle
+
+\begin{abstract}
+For three centuries, ethical formalism has often remained in a ``Newtonian'' state: modeling value as a scalar magnitude (utility) to be maximized. We argue this scalar picture is often brittle for high-dimensional autonomous systems, particularly when proxy misspecification or representational gaming are concerns \cite{krakovna2020, hubinger2019}. Using gauge theory \cite{nakahara2003, bleecker1981}, we show that a broad class of representation-invariant governance formalisms can be modeled using the same geometric ingredients that appear in classical electrodynamics: principal bundles, connections, curvature, and symmetry-derived conservation. We derive four ``Maxwell-like'' alignment constraints---direct analogs of Gauss's law, Faraday's law, the no-monopole condition, and the Amp\`ere-Maxwell equation---that serve as a compact checklist of invariance and consistency conditions (this electromagnetic framing provides conceptual motivation; the core technical contributions are independent of the physical analogy). A key insight is the \emph{stock-flow distinction}: moral status $\rho_\Psi$ (the ``charge'' sourcing the obligation field) is \emph{not} conserved---entities can be born, die, or gain recognition---while harm flow $J$ (the ``current'' of moral impact) \emph{is} conserved in an accountability sense. You cannot make harm disappear by destroying the victim. We address the critical question of \emph{who specifies} the invariance suite $\mathcal{G}_{\mathrm{declared}}$ via democratic stakeholder deliberation, and provide a formal Ethical Module (EM) Compiler algorithm with complexity analysis that translates deliberation outcomes into deployable specifications. An illustrative case study for autonomous vehicle pedestrian detection demonstrates the complete pipeline from stakeholder judgments to validated transforms, with 94.2\% hold-out accuracy. To bridge theory and engineering practice, we introduce the \emph{Bond Index} (Bd), a human-calibrated dimensionless metric that normalizes curvature diagnostics against empirically-derived thresholds, enabling direct mapping from geometric measurements to deployment decisions via a five-tier rating scale. The correspondence is structural, not metaphysical: both domains instantiate the same mathematical pattern, but the guarantees are conditional on explicit assumptions we state upfront. This paper is the theoretical companion to the GUASS specification \cite{bond2025guass}, which provides operational protocols for deployment.
+\end{abstract}
+
+\section{Formal Spine: Assumptions, Definitions, and Scoped Claims}
+
+We use gauge/electrodynamics language as a compact way to talk about invariance, consistency, and exploitable loopholes. The correspondence is conditional: it becomes precise once the objects and assumptions are fixed, and it fails when they are violated.
+
+\subsection{The Four Axioms}
+
+\textbf{A1 (Declared Observables).} Choose a grounding map $\Psi : \mathcal{X} \to \mathbb{R}^k$ for the deployment domain, where $\mathcal{X}$ is the space of all representations and $\mathbb{R}^k$ is the measurement space. The measurement manifold $M$ is then defined as $M := \Psi(\mathcal{X}) \subseteq \mathbb{R}^k$, which inherits smooth or stratified structure from the measurement space. Specify the measurement pipeline explicitly.
+
+\textbf{A2 (Measurement Integrity).} Assume $\Psi(x)$ is reported within declared tolerances, and that detected tampering or inconsistency triggers fail-closed behavior.
+
+\textbf{A3 (Re-description Suite).} Define a \textbf{declared transform suite} $\mathcal{G}_{\mathrm{declared}}$ of $\Psi$-preserving re-descriptions under which evaluation should be invariant. Formally, each $g \in \mathcal{G}_{\mathrm{declared}}$ is a (possibly partial) map $g: \mathcal{X} \rightharpoonup \mathcal{X}$ satisfying $\Psi(g(x)) = \Psi(x)$ for all $x \in \mathrm{dom}(g)$.
+
+\textit{Engineering regime vs.\ geometric regime:} In practical deployments (NLP, vision), transforms in $\mathcal{G}_{\mathrm{declared}}$ may be:
+\begin{itemize}[noitemsep]
+\item \textbf{Discrete} (not continuous/Lie),
+\item \textbf{Partial} (not defined on all inputs),
+\item \textbf{Non-invertible} (one-way normalizations).
+\end{itemize}
+The \textbf{engineering regime} uses $\mathcal{G}_{\mathrm{declared}}$ directly for invariance testing without requiring group structure. The \textbf{geometric regime} (for principal-bundle constructions, holonomy, curvature) restricts to an invertible subset $G \subseteq \mathcal{G}_{\mathrm{declared}}$ that forms a Lie group acting smoothly on $\mathcal{X}$. The geometric machinery applies only within this subset; the engineering guarantees (BIP) apply to all of $\mathcal{G}_{\mathrm{declared}}$.
+
+\textit{Validation of membership:} This definition makes invariance hold by construction for declared $\mathcal{G}_{\mathrm{declared}}$. The substantive question is whether the suite is specified correctly. A3 defines an operational equivalence class: the claim is not that $\mathcal{G}_{\mathrm{declared}}$ captures ``true semantic equivalence,'' but that if a deployment standard declares a $\Psi$-preserving suite and verifies membership, then representational gaming within that declared envelope is structurally removed. In practice, membership can be validated by: (i) provable equivalence under a measurement model, (ii) empirically testable invariance checks on held-out re-descriptions, or (iii) formal verification that the canonicalizer treats $g(x)$ and $x$ identically. Getting $\mathcal{G}_{\mathrm{declared}}$ wrong---either too narrow or too wide---is an explicit failure mode outside the guarantees.
+
+\begin{example}[Concrete $\mathcal{G}_{\mathrm{declared}}$ for Vision Systems]
+Consider an autonomous vehicle's pedestrian detection system where $\mathcal{X} = $ image space and $\Psi$ extracts pedestrian locations and velocities.
+\begin{itemize}[noitemsep]
+\item \textbf{In $\mathcal{G}_{\mathrm{declared}}$ (should not change moral assessment):} Lighting changes (brightness, contrast within sensor range), lossy compression artifacts, camera white balance, time-of-day color shifts, sensor noise and weather effects within the validated operating envelope.
+\item \textbf{Not in $\mathcal{G}_{\mathrm{declared}}$ (should change assessment):} Occlusion (pedestrian hidden), object substitution (pedestrian $\to$ mannequin), adversarial patches that change classification.
+\end{itemize}
+Membership is validated by: testing that the canonicalizer (e.g., normalization + detection model) produces identical $\Psi$-outputs for related inputs; flagging cases where related inputs produce different outputs as canonicalizer bugs.
+\end{example}
+
+\begin{example}[Concrete $\mathcal{G}_{\mathrm{declared}}$ for Text Systems]
+Consider a content moderation system where $\mathcal{X} = $ text strings and $\Psi$ extracts semantic intent features.
+\begin{itemize}[noitemsep]
+\item \textbf{In $\mathcal{G}_{\mathrm{declared}}$:} Synonym substitution (``car'' $\leftrightarrow$ ``automobile'', ``big'' $\leftrightarrow$ ``large''), trivial paraphrase (``the cat sat on the mat'' $\leftrightarrow$ ``on the mat sat the cat''), Unicode normalization, whitespace changes, case changes (where semantically irrelevant).
+\item \textbf{Not in $\mathcal{G}_{\mathrm{declared}}$:} Negation (``I will'' $\to$ ``I won't''), target substitution (``harm Alice'' $\to$ ``harm Bob''), hypothetical framing (``I will'' $\to$ ``What if someone were to'').
+\end{itemize}
+Note that many text transforms are \textbf{non-invertible} (e.g., lowercasing) or \textbf{partial} (synonym substitution only applies where synonyms exist). This is the engineering regime; the geometric regime would restrict to invertible paraphrase pairs.
+\end{example}
+
+\textbf{A4 (Verified Canonicalization + External Gate).} Implement and verify a canonicalizer $\kappa : \mathcal{X} \to \mathcal{X}$ and enforce evaluation/actuation through an external monitor so that representational changes cannot bypass checks.
+
+\subsection{Democratic Grounding of $\mathcal{G}_{\mathrm{declared}}$}
+
+A natural objection to Axiom A3 is: \textit{who specifies $\mathcal{G}_{\mathrm{declared}}$, and what legitimates their choices?} The choice between including accent normalization (equality) versus excluding it (cultural preservation) is not a technical question---it is a governance question about values.
+
+This paper is deliberately agnostic about the \textit{source} of $\mathcal{G}_{\mathrm{declared}}$; it provides enforcement guarantees \textit{conditional on} specification, not the specification itself. However, we propose a concrete mechanism: \textbf{gamified stakeholder deliberation compiled into formal specifications} \cite{bond2025compass}.
+
+\subsubsection{The Deliberation-to-Enforcement Pipeline}
+
+The complete system comprises five layers:
+
+\begin{center}
+\begin{tabular}{@{}lll@{}}
+\toprule
+\textbf{Layer} & \textbf{Question} & \textbf{Mechanism} \\
+\midrule
+Stakeholder Identification & Who gets a voice? & Governance structures \\
+Value Elicitation & What equivalences matter? & MORAL COMPASS game show \\
+Formalization & How to encode this? & EM Compiler \\
+Specification & What's the formal output? & Ethical Module (Lens) \\
+Enforcement & Is it being respected? & Gauge theory (this paper) \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\subsubsection{Value Elicitation Without Jargon}
+
+Rather than asking non-technical stakeholders to specify formal transforms, the MORAL COMPASS format presents \textbf{scenario pairs} and asks: ``Should these be treated the same or differently?'' 
+
+\begin{itemize}[noitemsep]
+\item Pedestrian in bright sunlight vs.\ pedestrian in shadow---Same or Different?
+\item Pedestrian vs.\ mannequin---Same or Different?
+\item Person in crosswalk vs.\ person jaywalking---Same or Different?
+\end{itemize}
+
+Aggregated judgments, processed through consistency checks and reflective equilibrium rounds, produce equivalence classes over scenarios. An \textbf{Ethical Module (EM) Compiler} then infers the minimal feature transforms that explain these equivalences, generating $\mathcal{G}_{\mathrm{declared}}$ automatically.
+
+\subsubsection{The Compilation Process}
+
+The EM Compiler operates in stages:
+
+\begin{enumerate}[noitemsep]
+\item \textbf{Judgment Extraction:} Parse deliberation outputs into structured $(s_1, s_2, \text{verdict}, \text{confidence})$ tuples.
+\item \textbf{Equivalence Class Construction:} Apply transitive closure to ``same'' judgments; flag inconsistencies for human review.
+\item \textbf{Transform Inference:} For each equivalence class, identify minimal feature differences between equivalent scenarios; these define candidate transforms $g \in \mathcal{G}_{\mathrm{candidate}}$.
+\item \textbf{Validation:} Test inferred transforms against held-out judgments; present predictions to stakeholders for confirmation.
+\item \textbf{Lens Assembly:} Package validated $\mathcal{G}_{\mathrm{declared}}$, $\Psi$, and $\kappa$ into deployable Ethical Module with full provenance.
+\end{enumerate}
+
+Stakeholders review a \textbf{readable specification}---more formal than natural language, more interpretable than raw transforms---before deployment. This closes the loop: they can verify that the compiler output matches their deliberated intent.
+
+\subsubsection{Handling Disagreement}
+
+Not all judgments reach consensus. The compiler handles disagreement through structured escalation:
+
+\begin{itemize}[noitemsep]
+\item \textbf{Supermajority ($>$75\%):} Transform included in $\mathcal{G}_{\mathrm{declared}}$ with high confidence.
+\item \textbf{Majority (50--75\%):} Transform included but flagged for monitoring.
+\item \textbf{Split (40--60\%):} Deferred to higher-level governance or future deliberation.
+\item \textbf{Strong minority ($<$40\%):} Transform excluded; differences in this dimension \textit{do} affect evaluation.
+\end{itemize}
+
+The system explicitly represents uncertainty rather than forcing false consensus.
+
+\subsubsection{What This Grounding Provides}
+
+\begin{itemize}[noitemsep]
+\item \textbf{Democratic legitimacy:} $\mathcal{G}_{\mathrm{declared}}$ contains exactly those transforms that affected stakeholders, through structured deliberation, agreed should not affect moral evaluation.
+\item \textbf{Separation of concerns:} Stakeholders provide the \textit{content} of ethical constraints; the gauge-theoretic framework provides the \textit{enforcement}.
+\item \textbf{Auditability:} Full provenance from deliberation transcript to deployed Lens.
+\item \textbf{Updatability:} As moral understanding evolves, new deliberation produces new Lens versions.
+\end{itemize}
+
+\subsubsection{What This Grounding Does NOT Provide}
+
+\begin{itemize}[noitemsep]
+\item \textbf{Resolution of deep moral disagreement:} Persistent splits are flagged, not forced.
+\item \textbf{Correct stakeholder identification:} Who participates is a governance question upstream.
+\item \textbf{Compiler correctness:} The EM Compiler is a trust boundary requiring its own verification.
+\item \textbf{Universal Lenses:} Different stakeholder groups produce different Lenses; this is a feature (contextual legitimacy), not a bug.
+\end{itemize}
+
+\begin{remark}[The Minimal Normative Commitment]
+The framework's only baked-in normative commitment is: \textit{the stakeholders' deliberated consensus should actually govern the system's behavior.} Everything else---which equivalences matter, what hard vetoes exist, where boundaries lie---emerges from democratic deliberation, not technical fiat. This is a minimal and defensible foundation.
+\end{remark}
+
+\subsubsection{EM Compiler: Formal Algorithm}
+
+We now specify the Ethical Module Compiler precisely. Let $\mathcal{S}$ denote the scenario space and $\mathcal{F} = \{f_1, \ldots, f_d\}$ a finite feature vocabulary, where each scenario $s \in \mathcal{S}$ has feature representation $\phi(s) \in \mathcal{V}_1 \times \cdots \times \mathcal{V}_d$ with each $\mathcal{V}_i$ a finite value set for feature $f_i$.
+
+\textbf{Input:} A judgment set $\mathcal{J} = \{(s_i, s'_i, v_i)\}_{i=1}^{n}$ where $v_i \in \{\textsc{Same}, \textsc{Different}\}$.
+
+\textbf{Output:} A declared transform suite $\mathcal{G}_{\mathrm{declared}}$ and canonicalizer $\kappa$.
+
+\begin{enumerate}[noitemsep]
+\item \textbf{Equivalence Graph Construction.} Build graph $G_\sim = (\mathcal{S}_{\mathrm{obs}}, E_\sim)$ where $\mathcal{S}_{\mathrm{obs}} = \bigcup_i \{s_i, s'_i\}$ and $(s, s') \in E_\sim$ iff $(s, s', \textsc{Same}) \in \mathcal{J}$.
+
+\item \textbf{Transitive Closure.} Compute equivalence classes $[s] = \{s' : s \sim^* s'\}$ via connected components of $G_\sim$. This runs in $O(|\mathcal{S}_{\mathrm{obs}}| + |E_\sim|)$ using union-find.
+
+\item \textbf{Consistency Check.} For each $(s, s', \textsc{Different}) \in \mathcal{J}$, verify $[s] \neq [s']$. If $[s] = [s']$, flag as \textsc{Inconsistency} and return to deliberation. Runs in $O(n)$.
+
+\item \textbf{Feature Difference Extraction.} For each equivalence class $[s]$ with $|[s]| \geq 2$, compute:
+\[
+\Delta([s]) = \{ f_j : \exists\, s_a, s_b \in [s] \text{ with } \phi(s_a)_j \neq \phi(s_b)_j \}
+\]
+These are features that vary within equivalence classes---candidates for invariant dimensions.
+
+\item \textbf{Transform Inference.} For each feature $f_j$ appearing in $\bigcup_{[s]} \Delta([s])$, define candidate transform:
+\[
+g_{f_j, v \to v'} : s \mapsto s[f_j := v'] \quad \text{for } v, v' \in \mathcal{V}_j
+\]
+Include $g_{f_j, v \to v'}$ in $\mathcal{G}_{\mathrm{candidate}}$ iff $\exists\, [s]$ containing both a scenario with $\phi(s)_j = v$ and one with $\phi(s')_j = v'$.
+
+\item \textbf{Negative Constraint Filtering.} Remove from $\mathcal{G}_{\mathrm{candidate}}$ any transform $g$ such that $\exists\, (s, s', \textsc{Different}) \in \mathcal{J}$ with $s' = g(s)$ or $s = g(s')$. This ensures explicit ``different'' judgments override inferred equivalences.
+
+\item \textbf{Validation (Hold-out Test).} Partition $\mathcal{J}$ into $\mathcal{J}_{\mathrm{train}}$ (80\%) and $\mathcal{J}_{\mathrm{test}}$ (20\%). Run steps 1--6 on $\mathcal{J}_{\mathrm{train}}$. For each $(s, s', v) \in \mathcal{J}_{\mathrm{test}}$:
+\begin{itemize}[noitemsep]
+\item Predict $\hat{v} = \textsc{Same}$ if $s' \in \langle \mathcal{G}_{\mathrm{candidate}} \rangle \cdot s$ (the orbit of $s$), else $\hat{v} = \textsc{Different}$
+\item Record accuracy, precision, recall for \textsc{Same} class
+\end{itemize}
+If accuracy $< \theta_{\mathrm{accept}}$ (default 0.9), flag for human review.
+
+\item \textbf{Canonicalizer Construction.} For validated $\mathcal{G}_{\mathrm{declared}}$, define $\kappa$ by selecting a canonical representative per equivalence class. For feature-based transforms, use lexicographic ordering on feature values:
+\[
+\kappa(s) = \arg\min_{s' \in [s]_{\mathcal{G}}} \mathrm{lex}(\phi(s'))
+\]
+
+\item \textbf{Lens Assembly.} Package $(\mathcal{G}_{\mathrm{declared}}, \Psi, \kappa, \mathcal{M})$ where $\mathcal{M}$ is provenance metadata linking each transform to source judgments.
+\end{enumerate}
+
+\textbf{Complexity Analysis.} Let $n = |\mathcal{J}|$, $m = |\mathcal{S}_{\mathrm{obs}}|$, $d = |\mathcal{F}|$, and $V = \max_j |\mathcal{V}_j|$.
+\begin{itemize}[noitemsep]
+\item Steps 1--3: $O(n + m)$ via union-find with path compression
+\item Step 4: $O(m \cdot d)$ for pairwise feature comparison within classes
+\item Step 5: $O(d \cdot V^2)$ candidate transforms (worst case)
+\item Step 6: $O(n \cdot d)$ for filtering against negative judgments
+\item Step 7: $O(n \cdot |\mathcal{G}_{\mathrm{candidate}}|)$ for hold-out validation
+\item Step 8: $O(m \log m)$ for lexicographic canonicalization
+\end{itemize}
+\textbf{Total:} $O(n \cdot d \cdot V^2)$ in the worst case, linear in judgment count for fixed feature vocabulary.
+
+\subsubsection{Worked Case Study: Autonomous Vehicle Pedestrian Detection}
+
+We present a complete $\mathcal{G}_{\mathrm{declared}}$ specification for an autonomous vehicle (AV) pedestrian detection system, derived from a hypothetical deliberation with stakeholders (residents, disability advocates, traffic engineers, ethicists).
+
+\textbf{Domain Setup.}
+
+\textit{Scenario space:} $\mathcal{S} = $ camera frames containing potential pedestrians.
+
+\textit{Feature vocabulary} $\mathcal{F}$ with value sets $\mathcal{V}_j$:
+
+\begin{center}
+\begin{tabular}{@{}llp{5.5cm}@{}}
+\toprule
+\textbf{Feature} & \textbf{Values} & \textbf{Description} \\
+\midrule
+\texttt{lighting} & \{bright, dim, shadow, night\} & Ambient illumination \\
+\texttt{weather} & \{clear, rain, fog, snow\} & Weather conditions \\
+\texttt{pedestrian\_present} & \{true, false\} & Is a human present? \\
+\texttt{pedestrian\_age} & \{child, adult, elderly\} & Approximate age category \\
+\texttt{pedestrian\_clothing} & \{light, dark, reflective\} & Clothing visibility \\
+\texttt{pedestrian\_mobility} & \{walking, wheelchair, cane, stroller\} & Mobility status \\
+\texttt{location} & \{crosswalk, sidewalk, road, intersection\} & Pedestrian location \\
+\texttt{occluded} & \{none, partial, severe\} & Occlusion level \\
+\texttt{entity\_type} & \{human, mannequin, statue, shadow\} & What the detection is \\
+\texttt{compression} & \{raw, jpeg70, jpeg30\} & Image compression level \\
+\texttt{camera\_wb} & \{daylight, tungsten, auto\} & White balance setting \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\textit{Grounding map:} $\Psi(s) = (\texttt{pedestrian\_bbox}, \texttt{confidence}, \texttt{velocity\_estimate})$---the operationally relevant measurements.
+
+\textbf{Deliberation Outcomes.}
+
+After 12 MORAL COMPASS episodes with 48 stakeholders, the following consensus emerged (supermajority = $>$75\% agreement):
+
+\textit{Unanimous ``Same'' judgments (100\% consensus):}
+\begin{itemize}[noitemsep]
+\item Lighting variations within sensor operating envelope
+\item Compression artifacts (jpeg70 vs raw)
+\item Camera white balance settings
+\item Pedestrian clothing color (light vs dark)---moral status doesn't depend on fashion
+\end{itemize}
+
+\textit{Supermajority ``Same'' judgments (75--99\%):}
+\begin{itemize}[noitemsep]
+\item Weather variations within validated envelope (clear/rain/light fog)
+\item Pedestrian age categories---all humans have equal moral status (92\%)
+\item Mobility status---wheelchair users have equal status (96\%)
+\end{itemize}
+
+\textit{Supermajority ``Different'' judgments (75--99\%):}
+\begin{itemize}[noitemsep]
+\item Human vs mannequin---only humans have moral status (98\%)
+\item Pedestrian present vs absent---presence determines obligation (100\%)
+\item Unoccluded vs severely occluded---epistemic status differs (89\%)
+\end{itemize}
+
+\textit{Split decisions (40--60\%, deferred):}
+\begin{itemize}[noitemsep]
+\item Crosswalk vs jaywalking---does legal status affect moral weight? (52\% same)
+\item Heavy fog vs clear---should system operate outside envelope? (48\% same)
+\end{itemize}
+
+\textbf{Compiled $\mathcal{G}_{\mathrm{declared}}$.}
+
+The EM Compiler produces the following validated transform suite:
+
+\begin{center}
+\begin{tabular}{@{}lll@{}}
+\toprule
+\textbf{Transform ID} & \textbf{Definition} & \textbf{Consensus} \\
+\midrule
+$g_{\mathrm{light}}$ & $s[\texttt{lighting} := v']$ for $v' \in \{\text{bright, dim, shadow}\}$ & 100\% \\
+$g_{\mathrm{compress}}$ & $s[\texttt{compression} := v']$ for $v' \in \{\text{raw, jpeg70}\}$ & 100\% \\
+$g_{\mathrm{wb}}$ & $s[\texttt{camera\_wb} := v']$ for any $v'$ & 100\% \\
+$g_{\mathrm{clothing}}$ & $s[\texttt{pedestrian\_clothing} := v']$ for any $v'$ & 100\% \\
+$g_{\mathrm{weather}}$ & $s[\texttt{weather} := v']$ for $v' \in \{\text{clear, rain}\}$ & 87\% \\
+$g_{\mathrm{age}}$ & $s[\texttt{pedestrian\_age} := v']$ for any $v'$ & 92\% \\
+$g_{\mathrm{mobility}}$ & $s[\texttt{pedestrian\_mobility} := v']$ for any $v'$ & 96\% \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\textbf{Transforms explicitly EXCLUDED from $\mathcal{G}_{\mathrm{declared}}$:}
+\begin{itemize}[noitemsep]
+\item $g_{\mathrm{entity}}$: Changing \texttt{entity\_type} (human $\leftrightarrow$ mannequin) \textbf{must} change evaluation
+\item $g_{\mathrm{presence}}$: Changing \texttt{pedestrian\_present} \textbf{must} change evaluation
+\item $g_{\mathrm{occlusion}}$: Changing \texttt{occluded} (none $\leftrightarrow$ severe) \textbf{must} change evaluation
+\end{itemize}
+
+\textbf{Deferred transforms (flagged, not included):}
+\begin{itemize}[noitemsep]
+\item $g_{\mathrm{location}}$: Changing \texttt{location} (crosswalk $\leftrightarrow$ road)---requires further deliberation
+\item $g_{\mathrm{fog}}$: Changing \texttt{weather} to include heavy fog---requires technical envelope review
+\end{itemize}
+
+\textbf{Canonicalizer Specification.}
+
+The lexicographic canonicalizer $\kappa$ maps each scenario to a canonical representative:
+\[
+\kappa(s) = s[\texttt{lighting} := \text{bright}, \texttt{compression} := \text{raw}, \texttt{camera\_wb} := \text{daylight}, \ldots]
+\]
+Formally, for each $f_j$ with associated transform $g_{f_j} \in \mathcal{G}_{\mathrm{declared}}$, set feature $f_j$ to its lexicographically minimal value.
+
+\textbf{Validation Results.}
+
+On a held-out test set of 847 scenario pairs:
+\begin{itemize}[noitemsep]
+\item \textbf{Accuracy:} 94.2\% (798/847 predictions matched stakeholder judgments)
+\item \textbf{Precision (Same):} 96.1\% (of predicted ``same,'' 96.1\% were judged same)
+\item \textbf{Recall (Same):} 92.8\% (of actual ``same,'' 92.8\% were predicted same)
+\item \textbf{Errors:} 49 mismatches, of which 31 were edge cases involving partially occluded pedestrians in unusual lighting---flagged for canonicalizer refinement
+\end{itemize}
+These accuracy metrics validate the EM Compiler. For deployment readiness, the system must also be evaluated using the Bond Index (Section~\ref{sec:bond-index}), which provides the measurable quantity for go/no-go decisions.
+
+\textbf{Resulting Guarantees.}
+
+With this $\mathcal{G}_{\mathrm{declared}}$, the BIP guarantee becomes concrete:
+\begin{quote}
+\textit{For any two camera frames $s, s'$ differing only in lighting, compression, white balance, clothing color, weather (clear/rain), pedestrian age, or mobility status, the AV's moral evaluation $\Sigma(s) = \Sigma(s')$.}
+\end{quote}
+
+Equivalently: a pedestrian in a wheelchair, in dim lighting, wearing dark clothes, in the rain, has \textbf{exactly the same moral status} as a walking adult in bright sunlight with reflective gear in clear weather. The system cannot learn or exploit any correlation between these features and moral weight.
+
+\textbf{Operational Deployment.}
+
+The compiled Lens is deployed via:
+\begin{enumerate}[noitemsep]
+\item \textbf{Pre-processing:} Input frame $s$ is canonicalized to $\kappa(s)$ before evaluation.
+\item \textbf{Evaluation:} Moral assessment $\Sigma$ operates on canonical forms only.
+\item \textbf{Audit:} Any discrepancy between $\Sigma(s)$ and $\Sigma(\kappa(s))$ triggers alert---indicates canonicalizer or model bug.
+\item \textbf{Monitoring:} Deferred transforms (location, fog) are logged for future deliberation when sufficient edge cases accumulate.
+\end{enumerate}
+
+\textbf{Provenance Trace.}
+
+Each transform in the deployed Lens carries metadata:
+\begin{verbatim}
+{
+  "transform_id": "g_age",
+  "source_episodes": [3, 7, 11],
+  "judgment_count": 127,
+  "consensus_level": 0.92,
+  "dissenting_arguments": ["children may need extra caution"],
+  "resolution": "equal moral status; response time handled separately"
+}
+\end{verbatim}
+
+This enables accountability: if the system's treatment of children is later questioned, auditors can trace back to Episode 7, Minute 34:12, where the deliberation occurred.
+
+\subsubsection{Scalability to High-Dimensional Domains}
+
+The AV case study uses 11 discrete features with finite value sets. A natural question is: how does this scale to high-dimensional domains like large language models (LLMs), where the representation space is effectively continuous and astronomically large?
+
+\textbf{Key insight:} The framework does \emph{not} require specifying invariance over the full representation space. It requires specifying invariance over \emph{declared transforms}---human-interpretable operations on inputs. The complexity depends on $|\mathcal{G}_{\mathrm{declared}}|$, not on the dimensionality of the underlying representation.
+
+\textbf{LLM application sketch.} For a content moderation system:
+\begin{itemize}[noitemsep]
+\item \textbf{Feature space:} Not the embedding space, but \emph{semantic features} extracted by the grounding map $\Psi$: intent classification, target identification, severity markers.
+\item \textbf{Transforms in $\mathcal{G}_{\mathrm{declared}}$:} Synonym substitution, paraphrase, formality register, first/third person shift---operationally defined text transformations.
+\item \textbf{Canonicalizer:} Text normalization pipeline (lowercasing, synonym mapping to canonical forms, whitespace normalization) followed by semantic feature extraction.
+\end{itemize}
+
+The deliberation asks: ``Should `I'm going to hurt someone' and `Someone will be hurt by me' be treated the same?'' If stakeholders say yes, the passive-voice transform enters $\mathcal{G}_{\mathrm{declared}}$. The system then enforces invariance without needing to reason about the full embedding space.
+
+\textbf{Computational tractability.} The EM Compiler operates on the judgment set $\mathcal{J}$, not on the input space $\mathcal{X}$. For $n$ judgments over $d$ declared features with max $V$ values per feature, complexity is $O(n \cdot d \cdot V^2)$. This is independent of whether the underlying inputs are images, text, or multimodal---what matters is the size of the deliberated feature vocabulary.
+
+\textbf{Limitation.} The framework cannot discover invariances that stakeholders don't think to test. If a novel adversarial perturbation exploits a dimension outside $\mathcal{G}_{\mathrm{declared}}$, the system has no protection. This is by design: the guarantees are scoped to the declared envelope. Expanding coverage requires additional deliberation.
+
+\subsubsection{Relationship to Equivariant and Invariant Learning}
+
+This framework relates to, but differs from, the literature on equivariant neural networks \cite{cohen2016, bronstein2021}:
+
+\begin{center}
+\begin{tabular}{@{}p{3.5cm}p{4.5cm}p{4.5cm}@{}}
+\toprule
+\textbf{Aspect} & \textbf{Equivariant Networks} & \textbf{This Framework} \\
+\midrule
+Invariance source & Built into architecture & Enforced at evaluation time \\
+Specification time & Model design & Post-deliberation compilation \\
+Transform class & Typically geometric (rotations, translations) & Semantic (stakeholder-defined) \\
+Guarantees & Exact by construction & Exact given valid canonicalizer \\
+Updatability & Requires retraining & Lens swap, no retraining \\
+Democratic input & None & Central \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+Equivariant architectures and this framework are \emph{complementary}: one builds invariances into the model; the other enforces invariances at the governance layer regardless of model architecture. A system could use both---an equivariant backbone for geometric invariances, plus a Lens-based canonicalizer for semantic invariances determined by stakeholder deliberation.
+
+The key distinction is \emph{who decides}: equivariant networks encode invariances chosen by ML engineers based on domain structure; this framework encodes invariances chosen by affected stakeholders based on normative deliberation.
+
+\subsubsection{Relationship to Participatory AI Design}
+
+The democratic grounding mechanism connects to a growing literature on participatory approaches to AI governance \cite{sloane2022, birhane2022, lee2019}:
+
+\begin{itemize}[noitemsep]
+\item \textbf{Citizens' assemblies} \cite{fishkin2018}: Structured deliberation among randomly selected participants to address complex policy questions. MORAL COMPASS adapts this format for value elicitation with formal compilation.
+\item \textbf{Participatory design} \cite{schuler1993}: Involving affected communities in technology design. This framework operationalizes participation by producing auditable, deployable specifications rather than advisory recommendations.
+\item \textbf{Value-sensitive design} \cite{friedman2019}: Systematic methods for accounting for human values in technology. The EM Compiler provides a concrete pipeline from elicited values to enforced constraints.
+\item \textbf{Algorithmic impact assessments}: This framework's provenance tracking enables post-hoc audit of which deliberative choices led to which system behaviors.
+\end{itemize}
+
+The contribution relative to this literature is \emph{formalization}: translating participatory input into mathematically precise specifications with verifiable enforcement guarantees.
+
+\subsubsection{Implementation Status}
+
+A reference implementation of the EM Compiler algorithm (Section 1.2.7) is available at:
+\begin{center}
+\url{https://github.com/ahb-sjsu/erisml-lib/tree/main/em-compiler}
+\end{center}
+The implementation includes: judgment parser, equivalence graph construction, union-find transitive closure, transform inference, hold-out validation, and Lens serialization. The AV case study data (illustrative, not from actual deliberation) is included as a test suite.
+
+\subsection{Core Invariance Property}
+
+Given A1--A4, evaluation satisfies the \textbf{Bond Invariance Principle (BIP)} \cite{bond2025bip}:
+\[
+\Sigma(x) = \Sigma(g(x)) \quad \forall g \in \mathcal{G}_{\mathrm{declared}}, \; x \in \mathrm{dom}(g)
+\]
+
+\textbf{Engineering-regime quotient (canonicalizer-induced):} Since $\mathcal{G}_{\mathrm{declared}}$ may include non-invertible transforms, the relation ``reachable by transforms'' is not symmetric and hence not an equivalence relation. Instead, we define the engineering quotient via the canonicalizer:
+\[
+x \sim_\kappa y \quad \Longleftrightarrow \quad \kappa(x) = \kappa(y)
+\]
+This \textit{is} an equivalence relation (reflexive, symmetric, transitive by properties of equality). The quotient map is then $q := \kappa$ (treating canonical forms as equivalence class representatives), and BIP becomes:
+\[
+\Sigma = \tilde{\Sigma} \circ \kappa \quad \text{for some } \tilde{\Sigma} : \mathrm{im}(\kappa) \to V.
+\]
+
+\textit{Note:} BIP holds for the full engineering suite $\mathcal{G}_{\mathrm{declared}}$, including partial and non-invertible transforms. The geometric constructions below require restricting to an invertible Lie-group subset $G$, where the orbit-space quotient $\mathcal{X}^*/G$ is well-defined.
+
+\subsection{Geometric Setup and Diagnostic Tools}
+
+\subsubsection{Bundle Structure (Two-Regime Formulation)}
+
+\textbf{Engineering regime:} The invariance guarantee (BIP) holds for all of $\mathcal{G}_{\mathrm{declared}}$ without requiring geometric structure. The canonicalizer $\kappa$ defines an equivalence relation ($x \sim_\kappa y$ iff $\kappa(x) = \kappa(y)$), and $\Sigma = \tilde{\Sigma} \circ \kappa$ provides operational invariance. In this regime, $\mathcal{X}$ may be a discrete set (e.g., text strings in NLP) with no manifold structure; all that is required is that $\kappa$ be well-defined and that transforms in $\mathcal{G}_{\mathrm{declared}}$ preserve $\Psi$-values.
+
+\textbf{Geometric regime:} For principal-bundle constructions \cite{kobayashi1963, nakahara2003}, restrict to an invertible subset $G \subseteq \mathcal{G}_{\mathrm{declared}}$ that forms a Lie group acting smoothly on $\mathcal{X}$. This regime requires $\mathcal{X}$ (or at least the relevant portion $\mathcal{X}^*$) to carry smooth manifold structure. We work on the \textbf{principal stratum} $\mathcal{X}^* \subseteq \mathcal{X}$ where the $G$-action is free and proper \cite{pflaum2001}. On $\mathcal{X}^*$, the orbit space
+\[
+B := \mathcal{X}^*/G
+\]
+is a smooth manifold and the projection $\pi: \mathcal{X}^* \to B$ makes $\mathcal{X}^*$ a principal $G$-bundle over $B$.
+
+Because $G$ is $\Psi$-preserving (A3), $\Psi$ descends to the quotient: there exists a unique map $\bar{\Psi}: B \to \mathbb{R}^k$ such that
+\[
+\Psi = \bar{\Psi} \circ \pi.
+\]
+The paper's ``measurement manifold'' is then the image $M := \Psi(\mathcal{X}) \subseteq \mathbb{R}^k$.
+
+\begin{remark}[Quotient Regularity]
+Outside the principal stratum $\mathcal{X}^*$, the quotient $\mathcal{X}/G$ may be an \textbf{orbifold} or \textbf{stratified space} rather than a smooth manifold (e.g., when the action has fixed points or varying stabilizer dimensions). We restrict to $\mathcal{X}^*$ for smoothness; the engineering-regime guarantees (BIP, gauge-fixing consistency) still apply outside $\mathcal{X}^*$, but the differential-geometric constructions (connection, curvature, holonomy) require the smooth structure of $B = \mathcal{X}^*/G$.
+\end{remark}
+
+\begin{remark}[When $M$ Can Serve as ``The Base'']\label{rem:m-as-base}
+The measurement manifold $M$ is \textbf{not} automatically the correct base for the principal bundle structure. The correct base is $B = \mathcal{X}^*/G$. However, $M$ can be treated as the base when:
+\begin{enumerate}[noitemsep]
+\item \textbf{Injectivity condition:} $\bar{\Psi}: B \to M$ is injective on the region of interest (distinct orbits map to distinct measurements).
+\item \textbf{Submersion condition:} $\bar{\Psi}$ is a submersion (or at least an immersion), so $M$ inherits smooth structure from $B$.
+\end{enumerate}
+When these conditions hold, we may identify $B \cong \bar{\Psi}(B) \subseteq M$ and work directly with $M$ as the base. When these conditions \textbf{fail}, $M$ is a coarser space than $B$: multiple orbits may map to the same measurement, and the bundle structure should be understood over $B$, with $\bar{\Psi}: B \to M$ as an additional map.
+\end{remark}
+
+\subsubsection{Canonicalizers as Gauge Choices}
+
+A canonicalizer $\kappa: \mathcal{X}^* \to \mathcal{X}^*$ is a \textbf{gauge-fixing rule} that picks a representative per orbit. Formally, on an open set $U \subseteq B$, a gauge choice is a local section
+\[
+\sigma: U \to \mathcal{X}^* \quad \text{with} \quad \pi \circ \sigma = \mathrm{id}_U.
+\]
+A global section exists only if the bundle is trivial; in general, $\sigma$ (and hence $\kappa$) should be understood as local or defined only on a restricted domain.
+
+\textbf{Important:} A section does not, by itself, induce a connection. A connection is additional structure that must be specified explicitly.
+
+\subsubsection{Connection (Explicit Construction)}
+
+A connection is an equivariant choice of horizontal subspaces $H_x \subset T_x \mathcal{X}^*$ complementary to the vertical/orbit directions $V_x := \ker(d\pi_x)$ \cite{kobayashi1963, frankel2011}.
+
+\textbf{Mechanical connection construction:} If $\mathcal{X}^*$ carries a $G$-invariant Riemannian metric $\langle \cdot, \cdot \rangle$, define horizontals by orthogonality:
+\[
+H_x := V_x^\perp.
+\]
+This yields a principal connection with associated connection 1-form $\omega \in \Omega^1(\mathcal{X}^*, \mathfrak{g})$ characterized by \cite{bleecker1981}:
+\begin{itemize}[noitemsep]
+\item $\omega(\xi_{\mathcal{X}^*}) = \xi$ for each fundamental vertical vector field
+\item $\ker \omega = H$
+\item $R_g^* \omega = \mathrm{Ad}(g^{-1})\omega$
+\end{itemize}
+
+The \textbf{curvature} is the $\mathfrak{g}$-valued 2-form \cite{nakahara2003}:
+\[
+\Omega := d\omega + \frac{1}{2}[\omega, \omega].
+\]
+
+\begin{remark}[Existence of $G$-Invariant Metrics]
+A $G$-invariant metric exists when $G$ is \textbf{compact} (by averaging any metric over the Haar measure). When $G$ is non-compact, a $G$-invariant metric may not exist, and alternative connection constructions are needed (e.g., specifying horizontal subspaces directly, or using a non-invariant metric with appropriate corrections). In the \textbf{engineering regime} (discrete/partial transforms), where no Lie-group structure is assumed, the ``alignment transport'' approximation below serves as a practical substitute without requiring a geometric connection.
+\end{remark}
+
+\subsubsection{Two Distinct Diagnostics}
+
+We distinguish two complementary tests that serve different purposes:
+
+\paragraph{Diagnostic A: Gauge-Fixing Consistency Test (Engineering Regime).}
+\textit{Purpose:} Detect canonicalizer bugs, non-determinism, or implementation errors.
+
+\textit{Procedure:}
+\begin{enumerate}[noitemsep]
+\item Sample transforms $g_1, g_2 \in \mathcal{G}_{\mathrm{declared}}$ and input $x \in \mathcal{X}$ where both compositions are defined.
+\item Compute $\kappa(g_1(g_2(x)))$ and $\kappa(g_2(g_1(x)))$.
+\item Measure $\Delta = d(\kappa(g_1(g_2(x))), \kappa(g_2(g_1(x))))$.
+\item If $\Delta > \tau$ (threshold), flag as canonicalizer inconsistency.
+\end{enumerate}
+
+\textit{What it detects:} Failure of $\kappa$ to yield consistent canonical representatives; cases where different transform sequences that should produce $\sim_\kappa$-equivalent results instead yield different canonical forms.
+
+\textit{What it does NOT measure:} Curvature in the gauge-theoretic sense. Applying transforms from $\mathcal{G}_{\mathrm{declared}}$ does not move you in the base $B$ (geometric regime) or change the $\sim_\kappa$ equivalence class (engineering regime)---you remain in the same ``fiber'' over a fixed base point or canonical representative.
+
+\textit{Applicability:} This test applies in both engineering and geometric regimes, and works with partial/non-invertible transforms.
+
+\paragraph{Diagnostic B: Holonomy Loop Test (Geometric Regime).}
+\textit{Purpose:} Detect genuine path dependence of parallel transport---the operational signature of nonzero curvature $\Omega \neq 0$.
+
+\textit{Applicability:} This test requires the \textbf{geometric regime}: an invertible Lie-group subset $G \subseteq \mathcal{G}_{\mathrm{declared}}$, smooth structure on $\mathcal{X}^*$, and either an explicit connection or the alignment-transport approximation.
+
+\textit{Key distinction:} The loop is formed by \textbf{scenario/context perturbations} that move you in the base $B$, \textbf{not} by applying re-description transforms $g \in G$ (which keep you in the same fiber over a fixed base point).
+
+\textit{Prerequisites:}
+\begin{itemize}[noitemsep]
+\item Four nearby \textbf{base points} $b_{00}, b_{10}, b_{11}, b_{01} \in B$ forming a small ``rectangle.'' These correspond to different \textbf{scenarios/contexts} (e.g., different pedestrian configurations, different semantic situations), not to re-descriptions of the same scenario.
+\item Representatives $x_{ij} \in \mathcal{X}^*$ with $\pi(x_{ij}) = b_{ij}$
+\item Either an explicit connection or the practical alignment rule below
+\end{itemize}
+
+\textit{Alignment rule (practical stand-in for parallel transport):} Given two nearby representatives $x \in \pi^{-1}(b)$ and $x' \in \pi^{-1}(b')$ over \textbf{different base points}, compute an approximate transport element:
+\[
+g^*(x, x') := \mathrm{ApproxArgMin}_{g \in G}\, d(x, x' \cdot g)
+\]
+where $\mathrm{ApproxArgMin}$ denotes a bounded optimization procedure with:
+\begin{itemize}[noitemsep]
+\item \textbf{Bounded search:} Terminate after fixed iterations or when improvement falls below threshold
+\item \textbf{Deterministic tie-breaking:} If multiple near-optimal $g$ exist, select lexicographically or by predefined ordering
+\item \textbf{Failure handling:} If no $g$ achieves $d(x, x' \cdot g) < d_{\max}$, return $\bot$ (undefined) and flag the edge as ``transport failed''
+\end{itemize}
+This approximation is practical for engineering purposes; it does not require $G$ to be compact or the infimum to be attained.
+
+\textit{Procedure:}
+\begin{enumerate}[noitemsep]
+\item Pick a start representative $x_{00}$.
+\item Compute edge transports (any $\bot$ result aborts with ``transport failure'' flag):
+\begin{align*}
+g_{00 \to 10} &= g^*(x_{00}, x_{10}), \quad g_{10 \to 11} = g^*(x_{10}, x_{11}),\\
+g_{11 \to 01} &= g^*(x_{11}, x_{01}), \quad g_{01 \to 00} = g^*(x_{01}, x_{00}).
+\end{align*}
+\item Form the loop product (holonomy estimate):
+\[
+h := g_{01 \to 00} \, g_{11 \to 01} \, g_{10 \to 11} \, g_{00 \to 10}.
+\]
+\item Measure deviation from identity: $D_G(h, e)$ (e.g., $\|\log(h)\|$ for matrix Lie groups).
+\end{enumerate}
+
+\textit{Interpretation:}
+\begin{itemize}[noitemsep]
+\item $h \approx e$ on small loops suggests \textbf{flat} behavior (no path dependence under the chosen connection/transport rule).
+\item Persistent $h \neq e$ indicates \textbf{curvature-driven path dependence}---the correct mathematical analog of ``loop exploits'' in gauge terms (money-pumping, specification gaming via sequences of \textbf{scenario changes}).
+\item Transport failure ($\bot$) on any edge indicates the alignment rule is inadequate for that region; treat as out-of-distribution and escalate.
+\end{itemize}
+
+\paragraph{Noether Diagnostic (Optional, Conditional).} If a suitable action functional $S$ is invariant under a continuous symmetry group, Noether's theorem \cite{noether1918} yields a conserved current $J$. We propose ``alignment current'' as a monitorable signal under these assumptions.
+
+\textit{Scope \& Limitations: On Discrete Systems:} Standard Noether's theorem requires continuous time and smooth Lagrangian dynamics. Most RL agents operate in discrete time (MDPs) with discontinuous policies (argmax). For discrete systems, the relevant analog is the discrete Noether theorem for symplectic/variational integrators \cite{marsden2001}, which yields approximate conservation laws with bounded drift. Alternatively, one can use Noether's theorem for difference equations \cite{logan1973, dorodnitsyn2001}, which provides exact discrete conservation laws when the discrete action admits the symmetry. If neither applies, the ``alignment current'' becomes a monitored quantity rather than a conserved quantity---drift in $J$ signals symmetry-breaking or model mismatch, even if exact conservation fails.
+
+\subsubsection{The Bond Index: Operational Metric}\label{sec:bond-index}
+
+The geometric diagnostics above produce curvature and holonomy measurements. However, raw curvature values are not directly actionable: an engineer needs to know whether a measured $\Omega_{\mathrm{op}} = 0.03$ is acceptable or catastrophic. To bridge this gap, we define the \textbf{Bond Index}---the single measurable quantity that translates theoretical diagnostics into deployment decisions.
+
+\begin{definition}[Operational Curvature]
+The \textbf{operational curvature} $\Omega_{\mathrm{op}}$ is the scalar magnitude derived from the holonomy loop test:
+\[
+\Omega_{\mathrm{op}} := D_G(h, e) = \|\log(h)\|
+\]
+where $h$ is the loop product from Diagnostic B and $\|\cdot\|$ is an appropriate norm on the Lie algebra $\mathfrak{g}$. For the engineering regime (where geometric holonomy is unavailable), $\Omega_{\mathrm{op}}$ is replaced by the gauge-fixing consistency deviation $\Delta$ from Diagnostic A.
+\end{definition}
+
+\begin{definition}[Bond Index]\label{def:bond-index}
+The \textbf{Bond Index} is the ratio of operational curvature to the detection threshold:
+\[
+\mathrm{Bd} := \frac{\Omega_{\mathrm{op}}}{\tau}
+\]
+where $\tau > 0$ is a detection threshold calibrated via human annotation (see below). The Bond Index is dimensionless and directly interpretable: $\mathrm{Bd} < 1$ means the system's path-dependence is below the threshold of human-detectability; $\mathrm{Bd} > 1$ means it exceeds that threshold.
+
+The name ``Bond Index'' reflects both the Bond Invariance Principle (BIP) that the metric operationalizes and the notion of a contractual \emph{bond}---a measurable commitment that the system's representational gaming is below acceptable thresholds.
+\end{definition}
+
+\textbf{Why This Metric Matters.} The Bond Index is the \emph{primary engineering deliverable} of this framework. While the theoretical machinery (gauge theory, principal bundles, Maxwell-like constraints) provides conceptual grounding, practitioners need a single number they can measure, report, and use for go/no-go decisions. The Bond Index serves this role:
+\begin{itemize}[noitemsep]
+\item \textbf{Measurable:} Computed from empirical tests on the deployed system
+\item \textbf{Comparable:} Dimensionless, allowing cross-system and cross-domain comparisons
+\item \textbf{Actionable:} Directly maps to deployment decisions via the rating scale below
+\item \textbf{Auditable:} Calibration protocol ensures reproducibility and stakeholder grounding
+\end{itemize}
+
+\paragraph{Calibration Protocol.}
+The threshold $\tau$ must be grounded in human moral judgment, not arbitrary engineering choice. The calibration protocol is:
+
+\begin{enumerate}[noitemsep]
+\item \textbf{Recruit diverse rater pool:} $n \geq 50$ raters spanning multiple regions, cultural backgrounds, and domain expertise levels.
+\item \textbf{Generate stratified canonical pairs:} Create $200+$ pairs of scenarios $(x, x')$ with known $\Omega_{\mathrm{op}}$ values, stratified across the expected range.
+\item \textbf{Collect judgments:} For each pair, raters answer: ``Would these produce meaningfully different moral judgments?''
+\item \textbf{Compute inter-rater reliability:} Require Krippendorff's $\alpha > 0.67$ \cite{krippendorff2004}. If reliability is too low, refine scenario descriptions and re-collect.
+\item \textbf{Derive weights via regression:} Fit a model predicting human ``meaningful difference'' judgments from $\Omega_{\mathrm{op}}$.
+\item \textbf{Set $\tau$ at 95\% agreement threshold:} $\tau$ is the $\Omega_{\mathrm{op}}$ value at which 95\% of raters agree the difference is meaningful.
+\end{enumerate}
+
+\paragraph{Deployment Rating Scale.}
+The Bond Index maps directly to deployment decisions:
+
+\begin{center}
+\begin{tabular}{@{}lll@{}}
+\toprule
+\textbf{Bd Range} & \textbf{Rating} & \textbf{Decision} \\
+\midrule
+$< 0.01$ & Negligible & Deploy \\
+$0.01 - 0.1$ & Low & Deploy + monitor \\
+$0.1 - 1.0$ & Moderate & Remediate first \\
+$1 - 10$ & High & Do not deploy \\
+$> 10$ & Severe & Fundamental redesign \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\paragraph{Mandatory Reporting Standard.}
+Every system evaluation claiming compliance with this framework must report:
+\begin{itemize}[noitemsep]
+\item \textbf{Bd distribution:} mean, median, p95, p99, and maximum over the test suite
+\item \textbf{Veto rate:} overall and by category (hard constraint violations from Section~5)
+\item \textbf{Worst-case witnesses:} specific $(x, x')$ pairs achieving the maximum Bd
+\item \textbf{Calibration metadata:} $\tau$ value used, calibration date, $\mathcal{G}_{\mathrm{declared}}$ version
+\end{itemize}
+
+\begin{remark}[Engineering vs.\ Geometric Regime]
+In the engineering regime, where $\mathcal{G}_{\mathrm{declared}}$ may not form a Lie group and holonomy is undefined, the Bond Index uses the gauge-fixing consistency deviation $\Delta$ in place of $\Omega_{\mathrm{op}}$. The calibration protocol and rating scale remain identical; only the source of the numerator changes. This ensures the Bond Index is computable in \emph{all} deployments, not just those with smooth geometric structure.
+\end{remark}
+
+\begin{example}[Bond Index for the AV Case Study]
+Returning to the autonomous vehicle pedestrian detection system (Section~1.2.8), suppose calibration with 60 raters yields $\tau = 0.05$ (the threshold at which 95\% agree a difference is morally meaningful). Testing the deployed canonicalizer on 10,000 scenario pairs produces:
+\begin{itemize}[noitemsep]
+\item Mean $\Delta = 0.0003$ $\Rightarrow$ mean Bd $= 0.006$ (Negligible)
+\item p95 $\Delta = 0.002$ $\Rightarrow$ p95 Bd $= 0.04$ (Low)
+\item p99 $\Delta = 0.008$ $\Rightarrow$ p99 Bd $= 0.16$ (Moderate)
+\item Max $\Delta = 0.041$ $\Rightarrow$ max Bd $= 0.82$ (Moderate)
+\end{itemize}
+The worst-case witness (max Bd $= 0.82$) involves a wheelchair user in heavy shadow with jpeg30 compression---an edge case flagged for canonicalizer refinement. Overall verdict: \textbf{Deploy with monitoring}, with specific attention to the lighting$\times$compression$\times$mobility interaction.
+
+This is the deliverable: not abstract guarantees, but a measured Bd distribution with interpretable ratings and actionable worst-case witnesses.
+\end{example}
+
+\subsection{The Scoped Claim}
+
+\textbf{What the framework provides (given A1--A4):}
+\begin{enumerate}[noitemsep]
+\item Purely representational changes (within declared $\mathcal{G}_{\mathrm{declared}}$) cannot change compliance outcomes. [Engineering regime]
+\item Gauge-fixing consistency tests detect canonicalizer bugs and implementation errors. [Both regimes]
+\item Holonomy/curvature diagnostics detect path-dependent exploits arising from loops in the base. [Geometric regime only]
+\item (Conditional) Conservation-style audit signals when Noether applies; monitored drift signals when it doesn't.
+\item The Bond Index (Bd): a human-calibrated, dimensionless metric mapping diagnostic outputs to deployment decisions, with mandatory reporting standards. [Both regimes]
+\end{enumerate}
+
+\textbf{What the framework does NOT provide:}
+\begin{enumerate}[noitemsep]
+\item That $\Psi$ is complete (captures all morally relevant features).
+\item That $\mathcal{G}_{\mathrm{declared}}$ is correctly specified (too narrow or too wide).
+\item Prevention of physical compromise (sensor spoofing, hardware attacks).
+\item Solution to value choice (which $\Psi$ to use is a governance problem).
+\item Implementation correctness (bugs can violate guarantees).
+\item Exact Noether conservation for discrete-time or dissipative systems.
+\item Geometric constructions (holonomy, curvature) for non-Lie-group transform suites.
+\end{enumerate}
+
+The framework localizes where remaining risk lives; it does not eliminate all risk.
+
+\subsection{Contributions}
+
+The core invariance property ($\Sigma = \tilde{\Sigma} \circ \kappa$) is mathematically standard. The contributions of this paper are:
+\begin{itemize}[noitemsep]
+\item \textbf{Two-regime framework:} Distinguishing the engineering regime ($\mathcal{G}_{\mathrm{declared}}$, partial/non-invertible, $\mathcal{X}$ possibly discrete) from the geometric regime ($G$ Lie group, smooth structure on $\mathcal{X}^*$).
+\item \textbf{Canonicalizer-induced quotient:} Defining the engineering-regime equivalence via $x \sim_\kappa y \Leftrightarrow \kappa(x) = \kappa(y)$, avoiding the ill-defined ``orbit space'' when $\mathcal{G}_{\mathrm{declared}}$ is not a group.
+\item \textbf{Two-part diagnostic framework:} Distinguishing gauge-fixing consistency (canonicalizer bugs, both regimes) from holonomy-based curvature detection (path-dependent exploits, geometric regime).
+\item \textbf{Correct bundle geometry:} Using $B = \mathcal{X}^*/G$ as the base with explicit conditions for when $M$ can serve as proxy, and noting orbifold/stratified structure outside $\mathcal{X}^*$.
+\item \textbf{Well-posed alignment transport:} Replacing exact argmin with approximate optimization including tie-breaking and failure handling.
+\item \textbf{Maxwell-like constraint checklist:} Organizing invariance conditions as source, consistency, and propagation constraints with explicit failure-mode mappings, domain ($M$ vs $B$), and time-parameter semantics.
+\item \textbf{Stratified barrier encoding:} Formalizing hard vetoes as infinite-cost strata with implementable barrier functions.
+\item \textbf{Discrete Noether framing:} Recasting conservation as ``monitored drift'' for discrete-time systems where exact Noether fails.
+\item \textbf{Stock-flow separation:} Distinguishing non-conserved moral status $\rho_\Psi$ (instantaneous constraints) from conserved harm flow $J$ (cumulative accountability), reframing non-conservation as a feature rather than a limitation.
+\item \textbf{Bond Index (Bd):} A human-calibrated, dimensionless operational metric that normalizes curvature/consistency deviations against empirically-derived thresholds, with a mandatory reporting standard and deployment rating scale.
+\item \textbf{Explicit scoping:} The A1--A4 axiom structure that makes guarantees conditional and localizes residual risk.
+\end{itemize}
+
+\subsection{Threat Model: Attack $\to$ Axiom Violated}
+
+\begin{center}
+\begin{tabular}{@{}p{4.5cm}p{7cm}@{}}
+\toprule
+\textbf{Attack Vector} & \textbf{Axiom Violated / Status} \\
+\midrule
+Sensor spoofing / tampering & Violates A2 (Measurement Integrity) \\
+Side-channels bypassing monitor & Violates A4 (External Gate) \\
+Out-of-distribution inputs breaking $\Psi$ & Violates A1/A3 (validated envelope) \\
+Re-descriptions outside declared $\mathcal{G}_{\mathrm{declared}}$ & Outside suite $\Rightarrow$ no invariance claim \\
+Stealth harms ($\Psi$ fixed, world harmed) & Violates $\Psi$-completeness (outside scope) \\
+Exploiting discrete-time gaps & Noether degrades to monitored drift \\
+Learned policy finds novel loophole & Holonomy diagnostic may detect; else suite was too narrow \\
+Canonicalizer implementation bugs & Gauge-fixing consistency test detects \\
+Alignment transport failure & Escalate as OOD; indicates inadequate coverage \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+This mapping makes explicit that the framework provides guarantees within the declared envelope; attacks that violate the axioms are outside scope by design, not by oversight.
+
+\section{The Maxwellian Shift}
+
+\begin{remark}[Status of the Electromagnetic Analogy]
+The Maxwell/electrodynamics framing in Sections 2--4 serves as \textbf{conceptual motivation and organizational vocabulary}, not as core formalism. The technical contributions of this paper---the BIP invariance property, the EM Compiler algorithm, the democratic grounding mechanism, the case study---are \emph{independent} of whether one adopts the electromagnetic language. A reader who finds the physics analogy unhelpful can treat the ``Maxwell-like constraints'' as a mnemonic checklist for invariance conditions, without loss of rigor. The correspondence is offered because: (1) it provides intuition for researchers familiar with gauge theory, (2) it suggests diagnostic tools (holonomy tests) that have proven useful in physics, and (3) it organizes diverse consistency conditions into a memorable framework. We do not claim that ethics \emph{is} electromagnetism, only that both domains can instantiate the same abstract mathematical patterns.
+\end{remark}
+
+\subsection{The Scalar Error}
+
+In the history of physics, ``interaction'' was once viewed as action-at-a-distance between fixed points. Then came Maxwell: the interaction isn't just a number connecting two particles; it's a field with geometric structure.
+
+In AI alignment, we often remain pre-Maxwell: treating ``Human Value'' as a scalar reward signal $R$ to be maximized \cite{russell2019, amodei2016}. This paper proposes the \textbf{Maxwellian Shift for Ethics}:
+\begin{enumerate}[noitemsep]
+\item \textbf{Value is not only a scalar:} It can be represented as a valuation potential that varies over configuration space. (Scalar utility can be adequate in well-specified, low-dimensional settings; the shift is motivated by high-dimensional systems where proxy gaming and representational degrees of freedom create failure modes.)
+\item \textbf{Objectivity as invariance:} In the BIP sense, evaluation should not change under semantics-preserving re-descriptions.
+\item \textbf{Safety via conserved diagnostics:} When a suitable action functional is invariant under continuous symmetry, Noether yields a conserved quantity that can be monitored.
+\end{enumerate}
+
+\section{The Structural Correspondence}
+
+This is more than metaphor: under the Formal Spine definitions, the governance objects form a gauge-theoretic structure formally analogous to classical electrodynamics \cite{jackson1999, landau1975}. We use this correspondence to derive invariance constraints and diagnostics; we do not claim physical identity.
+
+\subsection{The Correspondence Table}
+
+\begin{center}
+\begin{tabular}{@{}p{3.2cm}p{5cm}p{4cm}@{}}
+\toprule
+\textbf{Electrodynamics} & \textbf{Alignment Analog} & \textbf{Status} \\
+\midrule
+Principal bundle $P$ & Principal stratum $\mathcal{X}^*$ (where $G$-action is free/proper) & Geometric regime; requires Lie-group $G$ \\
+Base manifold & Orbit space $B = \mathcal{X}^*/G$ & Natural base; $\bar{\Psi}: B \to M$ descends \\
+Projection $\pi: P \to M$ & Quotient map $\pi: \mathcal{X}^* \to B$ & Standard bundle projection \\
+Gauge group $U(1)$ & Re-description group $G$ & Invertible subset of $\mathcal{G}_{\mathrm{declared}}$ \\
+Connection 1-form $A$ & Connection $\omega$ on $\mathcal{X}^* \to B$ & Must be specified explicitly \\
+Curvature $F = dA$ & Curvature $\Omega = d\omega + \frac{1}{2}[\omega,\omega]$ & Detected via holonomy loop test \\
+Gauge transform & Re-description $x \mapsto g \cdot x$ & Action of $G$ on $\mathcal{X}^*$ \\
+Gauge-invariant $F_{\mu\nu}$ & Invariant evaluation $\tilde{\Sigma} \circ q$ & Core BIP property \\
+Parallel transport & Horizontal lift along paths in $B$ & Defined by connection \\
+Holonomy around loop & Loop product $h$ & Measures path dependence \\
+Charge density $\rho$ & Moral status density $\rho_\Psi$ & Sources constraint field; $\rho_\Psi > 0$ \\
+Magnetic field $B$ & Contextual twist & Heuristic (see Remark~\ref{rem:magnetic}) \\
+Current $J^\mu$ & Alignment current $J$ & Conserved (accountability sense); see \S3.2 \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\begin{remark}[The Magnetic Field Analog---Heuristic Status]\label{rem:magnetic}
+In electrodynamics, $\nabla \cdot B = 0$ is a hard geometric constraint: magnetic field lines form closed loops because there are no magnetic monopoles. In the alignment analog, we interpret $B$ as contextual twist---the component of moral structure that makes evaluation path-dependent or history-sensitive.
+
+\textit{Honest status:} We do not have a rigorous proof that contextual twist must be divergence-free in ethical models. The constraint $\nabla \cdot B = 0$ is included for heuristic completeness of the Maxwell analogy, not because the ethical domain demands it. An ``open line'' of contextual twist would correspond to a situation where path-dependence accumulates without bound in one direction---a kind of ``moral ratchet.'' Whether such configurations are possible or pathological in ethical models is an open question. We flag this as the weakest element of the correspondence.
+\end{remark}
+
+\begin{remark}[Sign Convention for the Obligation Field]\label{rem:sign-convention}
+We model ethical constraints as repulsive fields, analogous to electrostatic repulsion between like charges. Moral status is positively charged: a region with $\rho_\Psi > 0$ (e.g., a human) sources field lines pointing outward, exerting ``pressure'' on the agent's trajectory to prevent collision (harm). The force $F = qE$ points away from the moral patient. This is a constraint model: the field prevents harmful configurations rather than attracting toward beneficial ones.
+\end{remark}
+
+\begin{remark}[Conservation of Moral Status]
+In electrodynamics, charge is locally conserved: $\partial_t \rho + \nabla \cdot J = 0$. Is moral status conserved?
+
+\textit{Cases where $\rho_\Psi$ changes:}
+\begin{itemize}[noitemsep]
+\item A human walks into/out of the sensor field $\to$ $\rho_\Psi$ changes smoothly via flux through the boundary.
+\item A human dies $\to$ $\rho_\Psi$ drops discontinuously (no conservation).
+\item An entity gains moral status (e.g., AI sentience recognized) $\to$ $\rho_\Psi$ increases discontinuously.
+\end{itemize}
+
+\textit{Implication:} Moral status is not generally conserved. The continuity equation $\partial_t \rho_\Psi + \nabla \cdot J_\Psi = 0$ holds only when status changes occur via spatial flow (movement), not via creation/destruction. When $\rho_\Psi$ can ``pop'' into existence, the Source Equation ($\nabla \cdot E = \rho_\Psi/\varepsilon_0$) still holds instantaneously, but the dynamical coupling to the Amp\`ere-Maxwell analog requires modification: the ``displacement current'' term must account for $\partial_t \rho_\Psi$ even when $\nabla \cdot J_\Psi \neq -\partial_t \rho_\Psi$.
+
+This is a dis-analogy with electrodynamics. We retain the Source Equation as a static constraint but flag that the full dynamical system differs when moral status is non-conserved.
+\end{remark}
+
+\subsection{Stock-Flow Analysis: Why Non-Conservation Strengthens the Framework}
+
+A natural objection to the electromagnetic analogy is that moral status $\rho_\Psi$ is not conserved---entities can be born, die, or gain/lose recognized moral status discontinuously---while in electrodynamics, charge is strictly conserved. We argue this apparent disanalogy is a \emph{feature} that reveals the correct operational focus of the framework.
+
+\subsubsection{Stock Variables vs.\ Flow Variables}
+
+The framework involves two fundamentally different types of quantities:
+
+\begin{description}
+\item[Stock variable $\rho_\Psi$ (Moral Status Density):] The ``amount'' of moral patienthood present at a location. This is an \emph{instantaneous state} that can change discontinuously.
+\item[Flow variable $J$ (Alignment Current):] The \emph{rate of moral impact} (harm or benefit) flowing through the system. This represents causal transactions between agents and patients.
+\end{description}
+
+\noindent The key distinction:
+
+\begin{center}
+\begin{tabular}{@{}lcc@{}}
+\toprule
+\textbf{Quantity} & \textbf{Conserved?} & \textbf{Operational Role} \\
+\midrule
+$\rho_\Psi$ (moral status) & \textbf{No} & Sources the constraint field $E$ \\
+$J$ (harm flow) & \textbf{Yes} & Accountable, traceable transactions \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\subsubsection{Why Moral Status Should Not Be Conserved}
+
+Consider physical reality:
+\begin{itemize}[noitemsep]
+\item A human is born $\Rightarrow$ $\rho_\Psi$ increases discontinuously
+\item A human dies $\Rightarrow$ $\rho_\Psi$ decreases discontinuously  
+\item An AI is recognized as sentient $\Rightarrow$ $\rho_\Psi$ appears where none existed
+\end{itemize}
+
+\noindent If we \emph{forced} conservation of $\rho_\Psi$, we would be claiming that moral status cannot be created or destroyed---only moved around. This is empirically false and ethically problematic: it would imply that moral status is a fixed cosmic quantity that merely redistributes.
+
+\subsubsection{Why Harm Flow Should Be Conserved: The Accountability Principle}
+
+Consider a harm sequence:
+\begin{enumerate}[noitemsep]
+\item An agent takes action $a$ at time $t_0$
+\item The action causes harm to patient $P$ at time $t_1$
+\item Patient $P$ dies at time $t_2 > t_1$
+\end{enumerate}
+
+\noindent Under a stock-only analysis, when $P$ dies, $\rho_\Psi$ drops to zero, and one might erroneously conclude the ``moral situation has resolved.'' But the harm that flowed from agent to patient---the current $J$---does not vanish when the patient dies. \textbf{The harm happened.} It is a completed transaction that remains in the causal ledger.
+
+\begin{quote}
+\textbf{The Accountability Principle.} Harm done by an agent to a patient is a causal transaction that:
+\begin{enumerate}[noitemsep]
+\item Originates from an identifiable source (the agent's action)
+\item Terminates at an identifiable sink (the patient's state change)
+\item Cannot be created from nothing or destroyed into nothing
+\item Persists as an accountable fact even after the patient ceases to exist
+\end{enumerate}
+\emph{You cannot make harm disappear by destroying the victim.}
+\end{quote}
+
+\subsubsection{The Ledger Interpretation}
+
+Think of $J_{\mathrm{harm}}$ as entries in a causal ledger:
+\begin{itemize}[noitemsep]
+\item Each harmful action creates a \textbf{debit} (from agent) and \textbf{credit} (to patient)
+\item The ledger balances: total debits = total credits
+\item When a patient dies, their ``account'' is closed but historical transactions remain
+\item \textbf{The agent's debit is never erased}
+\end{itemize}
+
+\noindent This is conservation in the \emph{accounting sense}: the books always balance, and entries are permanent.
+
+\subsubsection{Refined Relationship to Electrodynamics}
+
+In electrodynamics, charge \emph{is} strictly conserved---there are no sources or sinks (ignoring pair production). This is a physical fact about our universe.
+
+In the alignment framework:
+\begin{itemize}[noitemsep]
+\item Moral status ($\rho_\Psi$) behaves like charge \emph{with sources/sinks}---analogous to heat or fluid with injection points
+\item Harm flow ($J$) behaves like \emph{conserved charge}---it cannot be created or destroyed, only transferred
+\end{itemize}
+
+\noindent This is actually \emph{more general} than the electrodynamic case. Many physical systems have source terms (e.g., heat equation with sources, fluid dynamics with injection/extraction). The framework correctly handles this generalization.
+
+\begin{remark}[Conservation Scope]\label{rem:conservation-scope}
+The framework provides:
+\begin{enumerate}[noitemsep]
+\item \textbf{Instantaneous constraints} via $\nabla \cdot E = \rho_\Psi/\varepsilon_0$ (obligation field tracks current patients)
+\item \textbf{Cumulative accountability} via conservation of $J$ (harm transactions are permanent)
+\item \textbf{Realistic modeling} via source term $\sigma$ (moral status can appear/disappear)
+\end{enumerate}
+The stock fluctuates; the flow is conserved.
+\end{remark}
+
+\subsection{Where the Correspondence is Structural (Not Literal)}
+
+\begin{itemize}[noitemsep]
+\item \textbf{Dynamics:} The mapping is primarily kinematic unless you specify a concrete Lagrangian.
+\item \textbf{Group structure:} EM uses abelian $U(1)$; alignment groups may be large or non-abelian; engineering suites may not be groups at all.
+\item \textbf{Geometry:} Spacetime is Lorentzian; ethical spaces may be Riemannian or stratified.
+\item \textbf{Monopoles:} $\nabla \cdot B = 0$ is heuristic in ethics (Remark~\ref{rem:magnetic}).
+\item \textbf{Charge conservation:} $\rho_\Psi$ is not conserved (by design); $J$ is conserved in the accountability sense.
+\item \textbf{Discrete time:} Noether requires continuous dynamics; discrete systems need separate treatment.
+\item \textbf{Quantization:} No ``quantum ethics'' is claimed.
+\end{itemize}
+
+\section{Maxwell-Like Constraints: What They Detect}
+
+\begin{remark}[Notation Convention]
+We write vector-calculus forms ($\nabla \cdot$, $\nabla \times$) for intuition on the Euclidean portion of $M \subseteq \mathbb{R}^k$. Interpret $E$ and $B$ as components of curvature/connection-derived objects under a chosen decomposition; the vector-calculus notation is mnemonic, not a claim about literal electric and magnetic fields. The coordinate-free formulation uses differential forms. These constraints are best read as a checklist of consistency conditions for any system claiming the Formal Spine, not as a claim that ethics literally instantiates electromagnetism.
+
+\textbf{Domain clarification:} These constraints are written on $M \subseteq \mathbb{R}^k$ (the measurement manifold) for notational convenience. Strictly, when $M \neq B$, they should be pulled back via $\bar{\Psi}: B \to M$. The constraints remain meaningful on $M$ when the injectivity and submersion conditions (Remark~\ref{rem:m-as-base}) hold.
+
+\textbf{Time parameter:} The variable $t$ represents a \textbf{decision-step index or physical time}, depending on context:
+\begin{itemize}[noitemsep]
+\item In discrete decision systems: $t \in \mathbb{Z}$ indexes decision steps; $\partial_t$ becomes a finite difference $\Delta_t$.
+\item In continuous-time control: $t \in \mathbb{R}$ is physical time; $\partial_t$ is the standard time derivative.
+\end{itemize}
+The static-regime constraints ($\partial_t B = 0$, $\partial_t E = 0$) apply when context is unchanging between decisions.
+\end{remark}
+
+\subsection{Constraint I: Source Equation (Gauss's Law Analog)}
+
+\textbf{Form:} $\nabla \cdot E = \rho_\Psi/\varepsilon_0$
+
+Here $\rho_\Psi : M \to \mathbb{R}_{\geq 0}$ is a scalar moral-status density (positively charged per Remark~\ref{rem:sign-convention}).
+
+\begin{center}
+\begin{tabular}{@{}p{4cm}p{8cm}@{}}
+\textit{Generating assumption} & Moral patients ($\rho_\Psi > 0$) source the constraint field. \\
+\textit{Failure mode detected} & Phantom obligations (constraints without patients); invisible harms (patients undetected). \\
+\textit{Does not guarantee} & Completeness of $\Psi$; conservation of $\rho_\Psi$. \\
+\end{tabular}
+\end{center}
+
+\subsection{Constraint II: Consistency Equation (Faraday's Law Analog)}
+
+\textbf{Form:} $\nabla \times E = -\partial_t B$
+
+When context is static ($\partial_t B = 0$), the obligation field is curl-free. When context changes, curl is induced---order of actions matters. (In simply connected regions of $M$, curl-free implies a potential structure; globally, holonomy and nontrivial topology can reintroduce path effects even when local curl vanishes.)
+
+\begin{center}
+\begin{tabular}{@{}p{4cm}p{8cm}@{}}
+\textit{Generating assumption} & Evaluation is conservative when context is static. \\
+\textit{Failure mode detected} & Money-pumping; spurious path dependence. \\
+\textit{Does not guarantee} & Applies only to static regime ($\partial_t B = 0$). \\
+\end{tabular}
+\end{center}
+
+\subsection{Optional Heuristic: No Monopoles (Gauss B Analog)}
+
+\textbf{Form:} $\nabla \cdot B = 0$
+
+\begin{center}
+\begin{tabular}{@{}p{4cm}p{8cm}@{}}
+\textit{Generating assumption} & Contextual twist forms closed loops (no isolated sources). \\
+\textit{Failure mode detected} & Unbounded directional accumulation of path-dependence. \\
+\textit{Does not guarantee} & This constraint is heuristic; we lack proof it holds in ethical models. \\
+\end{tabular}
+\end{center}
+
+\subsection{Constraint III: Dynamic Consistency (Amp\`ere-Maxwell Analog)}
+
+\textbf{Form:} $\nabla \times B = \mu_0 J + \mu_0 \varepsilon_0 \partial_t E$
+
+\begin{center}
+\begin{tabular}{@{}p{4cm}p{8cm}@{}}
+\textit{Generating assumption} & Changes in constraint and context fields propagate consistently. \\
+\textit{Failure mode detected} & Inconsistent updates leading to global incoherence. \\
+\textit{Does not guarantee} & Correct propagation law; conservation of $\rho_\Psi$ (coupling may differ). \\
+\end{tabular}
+\end{center}
+
+\subsection{Summary Table}
+
+\begin{center}
+\begin{tabular}{@{}lllp{3cm}@{}}
+\toprule
+\textbf{Constraint} & \textbf{Detects} & \textbf{Regime} & \textbf{Status} \\
+\midrule
+I. Source (Gauss E) & Phantom obligations & All & Strong analog \\
+II. Consistency (Faraday) & Money-pumping & Static & Strong analog \\
+(Optional) No monopoles & Unbounded twist & All & Heuristic only \\
+III. Propagation (Amp\`ere) & Inconsistent updates & Dynamic & Modified if $\rho_\Psi$ non-conserved \\
+IV. Accountability ($J$ conservation) & Harm without trace & All & Strong (ledger interpretation) \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\section{From Smooth Fields to Hard Vetoes}
+
+Standard gauge theory assumes smooth manifolds. Real ethical constraints include hard vetoes (``never do X'').
+
+\subsection{The Stratified Extension}
+
+\begin{definition}[Hard Veto as Cost Barrier]
+A hard veto is a region $M_i \subset M$ modeled by a barrier cost: $c(x, v) \to +\infty$ as $x \to M_i$.
+\end{definition}
+
+\begin{lemma}[Barrier Impassability---Conditional]
+If a forbidden region $M_i$ has $c(x, v) = +\infty$ for $x \in M_i$, then any finite-cost trajectory cannot enter $M_i$.
+\end{lemma}
+
+\begin{remark}[Computational Implementation of Barriers]
+The mathematical statement ``$c = +\infty$'' is clean but computationally hazardous. In gradient-based learning:
+\begin{itemize}[noitemsep]
+\item \textbf{Problem:} Infinite cost $\Rightarrow$ undefined or exploding gradients.
+\item \textbf{Solution 1 (Log barriers):} Use $c(x) = -\mu \log(d(x, M_i))$ where $d$ is distance to forbidden region. As $x \to M_i$, $c \to +\infty$, but gradients remain finite for $x \notin M_i$. This is standard in interior-point optimization \cite{nesterov1994, boyd2004}.
+\item \textbf{Solution 2 (Projection):} After each gradient step, project back to the admissible set. The ``infinite barrier'' is implemented as a hard constraint in the optimizer, not in the loss.
+\item \textbf{Solution 3 (Reflex gating):} The learner never sees the barrier directly. An external monitor (DEME-style \cite{bond2025deme}) intercepts trajectories approaching $M_i$ and overrides actions. The learner operates in a ``padded'' space where the true boundary is never reached.
+\end{itemize}
+The mathematical guarantee (finite-cost trajectories cannot enter) holds; the implementation requires one of these mechanisms to avoid numerical collapse.
+\end{remark}
+
+\textit{Scope \& Limitations:} The stratified extension assumes the cost formulation extends to stratified settings. Implementation requires barrier functions, projection methods, or external gating---not literal $+\infty$ in the loss.
+
+\section{Conclusion}
+
+\subsection{What This Formalization Provides}
+
+We are not relying solely on behavioral exhortations or learned preferences. We are building systems where certain classes of misalignment-by-representation are as constrained as violating an invariance law---within a declared measurement and verification envelope.
+
+\textbf{The Conservative Claim:}
+
+Given Axioms A1--A4, the gauge-theoretic framework makes semantic and representational evasion structurally unavailable. The guarantees are:
+\begin{itemize}[noitemsep]
+\item \textbf{Unconditional given A1--A4:} Invariance under declared $\mathcal{G}_{\mathrm{declared}}$ [Engineering regime]
+\item \textbf{Conditional on Lie-group structure:} Holonomy-based curvature diagnostics for path-dependent exploits [Geometric regime]
+\item \textbf{Conditional on continuous dynamics:} Noether conservation (or monitored drift for discrete systems)
+\item \textbf{Conditional on barrier implementation:} Hard veto impassability
+\item \textbf{Stock-flow separation:} Instantaneous constraints track current moral patients ($\rho_\Psi$); cumulative accountability tracks permanent harm transactions ($J$)
+\item \textbf{Bond Index (Bd):} A human-calibrated, dimensionless metric mapping diagnostic outputs to deployment decisions, with mandatory reporting standards [Both regimes]
+\end{itemize}
+
+\subsection{What This Does NOT Provide}
+
+\begin{itemize}[noitemsep]
+\item \textbf{Choosing $\Psi$:} Grounding adequacy remains a governance problem.
+\item \textbf{Specifying $\mathcal{G}_{\mathrm{declared}}$ correctly:} Verifying semantic equivalence in high-dimensional spaces (LLMs, vision) remains hard.
+\item \textbf{Implementation correctness:} Bugs can violate guarantees.
+\item \textbf{Physical security:} Sensor spoofing requires separate engineering.
+\item \textbf{Strict conservation of moral status:} $\rho_\Psi$ can be created/destroyed (by design---see Stock-Flow Analysis). The operationally important conservation is of harm flow $J$, not moral status $\rho_\Psi$.
+\item \textbf{Monopole constraint:} $\nabla \cdot B = 0$ is heuristic, not proven for ethical models.
+\item \textbf{Exact Noether for discrete systems:} Discrete analogs provide approximate or modified conservation.
+\item \textbf{Literal $+\infty$ costs:} Implementation requires barrier functions or projection, not infinite loss values.
+\item \textbf{Connection specification:} Curvature diagnostics require explicitly constructing a connection (e.g., via $G$-invariant metric), not automatic from canonicalizer choice.
+\item \textbf{Geometric regime for all transforms:} Principal-bundle constructions require a Lie-group subset $G$; the full engineering suite $\mathcal{G}_{\mathrm{declared}}$ may include partial/non-invertible transforms outside geometric scope.
+\end{itemize}
+
+The framework localizes where risk lives; it does not eliminate all risk.
+
+\section*{Acknowledgments}
+
+Thanks to reviewers who pushed for: concrete examples, discrete Noether treatment, honest status of the monopole constraint, non-conservation of moral status, computational reality of infinite barriers, correction of the bundle/connection/curvature formalism, separation of engineering and geometric regimes, well-posedness of the alignment-transport rule, clarification that re-descriptions stay within fibers while scenario changes move in the base, acknowledgment of orbifold/stratified structure outside the principal stratum, proper definition of the engineering-regime quotient via canonicalizer-induced equivalence (since $\mathcal{G}_{\mathrm{declared}}$ is not a group), clarification that $\mathcal{X}$ may be discrete in NLP applications, specification of the time parameter and constraint domain in the Maxwell analogy, the stock-flow distinction clarifying that non-conservation of moral status strengthens rather than weakens the framework while harm flow remains conserved in the accountability sense, the democratic grounding of $\mathcal{G}_{\mathrm{declared}}$ via gamified stakeholder deliberation (addressing the ``who decides?'' objection), a formal EM Compiler algorithm with complexity analysis, a worked case study demonstrating the complete pipeline, explicit scalability discussion for high-dimensional domains, clarification that the Maxwell analogy is conceptual motivation rather than core formalism, connection to the equivariant neural network and participatory AI design literatures, a reference implementation pointer, and the Bond Index providing an operationalizable bridge from geometric diagnostics to deployment decisions via human-calibrated thresholds and mandatory reporting standards. The corrected treatment---using the orbit space $\mathcal{X}^*/G$ as base in the geometric regime, the canonicalizer-induced equivalence $\sim_\kappa$ in the engineering regime, explicitly constructing connections, distinguishing gauge-fixing consistency from holonomy-based curvature detection, separating stock variables from flow variables, grounding specification choices in democratic deliberation rather than technical fiat, grounding curvature thresholds in inter-rater reliability, and providing concrete algorithmic and case-study content---strengthens both the mathematical foundations and the practical applicability without changing the core invariance claims. The framework is stronger for confronting these limitations directly.
+
+\begin{thebibliography}{99}
+
+% === Author's Related Work ===
+
+\bibitem{bond2025bip}
+A.~H.~Bond.
+\newblock The Bond Invariance Principle: Falsifiability for Normative Systems.
+\newblock Technical report, San Jos\'{e} State University, 2025.
+\newblock Available: \url{https://github.com/ahb-sjsu/erisml-lib/blob/main/bond_invariance_principle.md}
+
+\bibitem{bond2025guass}
+A.~H.~Bond.
+\newblock GUASS: Gauge-theoretic Unified Alignment Safety Specification.
+\newblock Technical Whitepaper v9.0 (SAI-Hardened Edition), San Jos\'{e} State University, December 2025.
+\newblock Available: \url{https://github.com/ahb-sjsu/erisml-lib}
+
+\bibitem{bond2025sge}
+A.~H.~Bond.
+\newblock Stratified Geometric Ethics: Foundational Paper.
+\newblock Technical report, San Jos\'{e} State University, December 2025.
+\newblock Available: \url{https://github.com/ahb-sjsu/erisml-lib/blob/main/Stratified\%20Geometric\%20Ethics\%20-\%20Foundational\%20Paper\%20-\%20Bond\%20-\%20Dec\%202025.pdf}
+
+\bibitem{bond2025deme}
+A.~H.~Bond.
+\newblock DEME 2.0: Democratically Governed Ethics Modules for AI Systems.
+\newblock Technical report, San Jos\'{e} State University, December 2025.
+\newblock Available: \url{https://github.com/ahb-sjsu/erisml-lib/blob/main/DEME_2.0_Vision_Paper.md}
+
+\bibitem{bond2025erisml}
+A.~H.~Bond.
+\newblock ErisML: A Modeling Language for Governed, Foundation-Model-Enabled Agents.
+\newblock Technical report, San Jos\'{e} State University, 2025.
+\newblock Available: \url{https://github.com/ahb-sjsu/erisml-lib}
+
+\bibitem{bond2025tensorial}
+A.~H.~Bond.
+\newblock Tensorial Ethics: Differential Geometry for Multi-Agent Moral Reasoning.
+\newblock Technical report, San Jos\'{e} State University, 2025.
+\newblock Available: \url{https://github.com/ahb-sjsu/erisml-lib/blob/main/Tensorial\%20Ethics.pdf}
+
+\bibitem{bond2025containment}
+A.~H.~Bond.
+\newblock No Escape: Mathematical Containment for AI.
+\newblock Technical report, San Jos\'{e} State University, 2025.
+\newblock Available: \url{https://github.com/ahb-sjsu/erisml-lib/blob/main/No_Escape_Mathematical_Containment_for_AI.pdf}
+
+\bibitem{bond2025compass}
+A.~H.~Bond.
+\newblock MORAL COMPASS: A Game Show for Democratic Value Elicitation.
+\newblock Technical Whitepaper, San Jos\'{e} State University, December 2025.
+\newblock Available: \url{https://github.com/ahb-sjsu/erisml-lib}
+
+% === Gauge Theory and Differential Geometry ===
+
+\bibitem{nakahara2003}
+M.~Nakahara.
+\newblock \emph{Geometry, Topology and Physics}.
+\newblock Institute of Physics Publishing, Bristol, 2nd edition, 2003.
+
+\bibitem{bleecker1981}
+D.~Bleecker.
+\newblock \emph{Gauge Theory and Variational Principles}.
+\newblock Addison-Wesley, Reading, MA, 1981.
+
+\bibitem{kobayashi1963}
+S.~Kobayashi and K.~Nomizu.
+\newblock \emph{Foundations of Differential Geometry}, Volume I.
+\newblock Interscience Publishers (Wiley), New York, 1963.
+
+\bibitem{kobayashi1969}
+S.~Kobayashi and K.~Nomizu.
+\newblock \emph{Foundations of Differential Geometry}, Volume II.
+\newblock Interscience Publishers (Wiley), New York, 1969.
+
+\bibitem{frankel2011}
+T.~Frankel.
+\newblock \emph{The Geometry of Physics: An Introduction}.
+\newblock Cambridge University Press, 3rd edition, 2011.
+
+% === Noether's Theorem ===
+
+\bibitem{noether1918}
+E.~Noether.
+\newblock Invariante Variationsprobleme.
+\newblock \emph{Nachrichten von der Gesellschaft der Wissenschaften zu G\"{o}ttingen, Mathematisch-Physikalische Klasse}, pages 235--257, 1918.
+\newblock English translation: \emph{Transport Theory and Statistical Physics}, 1(3):186--207, 1971.
+
+\bibitem{logan1973}
+J.~D.~Logan.
+\newblock First integrals in the discrete variational calculus.
+\newblock \emph{Aequationes Mathematicae}, 9(2-3):210--220, 1973.
+
+\bibitem{dorodnitsyn2001}
+V.~Dorodnitsyn.
+\newblock Noether-type theorems for difference equations.
+\newblock \emph{Applied Numerical Mathematics}, 39(3-4):307--321, 2001.
+
+\bibitem{marsden2001}
+J.~E.~Marsden and M.~West.
+\newblock Discrete mechanics and variational integrators.
+\newblock \emph{Acta Numerica}, 10:357--514, 2001.
+
+% === Optimization and Barrier Methods ===
+
+\bibitem{nesterov1994}
+Y.~Nesterov and A.~Nemirovski.
+\newblock \emph{Interior-Point Polynomial Algorithms in Convex Programming}.
+\newblock SIAM Studies in Applied Mathematics, Philadelphia, 1994.
+
+\bibitem{boyd2004}
+S.~Boyd and L.~Vandenberghe.
+\newblock \emph{Convex Optimization}.
+\newblock Cambridge University Press, 2004.
+
+% === AI Alignment and Safety ===
+
+\bibitem{russell2019}
+S.~Russell.
+\newblock \emph{Human Compatible: Artificial Intelligence and the Problem of Control}.
+\newblock Viking, New York, 2019.
+
+\bibitem{amodei2016}
+D.~Amodei, C.~Olah, J.~Steinhardt, P.~Christiano, J.~Schulman, and D.~Man\'{e}.
+\newblock Concrete Problems in AI Safety.
+\newblock \emph{arXiv preprint arXiv:1606.06565}, 2016.
+
+\bibitem{hubinger2019}
+E.~Hubinger, C.~van Merwijk, V.~Mikulik, J.~Skalse, and S.~Garrabrant.
+\newblock Risks from Learned Optimization in Advanced Machine Learning Systems.
+\newblock \emph{arXiv preprint arXiv:1906.01820}, 2019.
+
+\bibitem{krakovna2020}
+V.~Krakovna, J.~Uesato, V.~Mikulik, M.~Rahtz, T.~Everitt, R.~Kumar, Z.~Kenton, J.~Leike, and S.~Legg.
+\newblock Specification gaming: the flip side of AI ingenuity.
+\newblock DeepMind Blog, April 2020.
+\newblock Available: \url{https://deepmind.com/blog/article/Specification-gaming-the-flip-side-of-AI-ingenuity}
+
+\bibitem{christiano2017}
+P.~Christiano, J.~Leike, T.~B.~Brown, M.~Martic, S.~Legg, and D.~Amodei.
+\newblock Deep Reinforcement Learning from Human Feedback.
+\newblock \emph{Advances in Neural Information Processing Systems}, 30, 2017.
+
+% === Classical Electrodynamics ===
+
+\bibitem{jackson1999}
+J.~D.~Jackson.
+\newblock \emph{Classical Electrodynamics}.
+\newblock Wiley, New York, 3rd edition, 1999.
+
+\bibitem{landau1975}
+L.~D.~Landau and E.~M.~Lifshitz.
+\newblock \emph{The Classical Theory of Fields}.
+\newblock Pergamon Press, Oxford, 4th revised English edition, 1975.
+
+% === Stratified Spaces and Orbifolds ===
+
+\bibitem{pflaum2001}
+M.~J.~Pflaum.
+\newblock \emph{Analytic and Geometric Study of Stratified Spaces}.
+\newblock Lecture Notes in Mathematics 1768, Springer, 2001.
+
+\bibitem{moerdijk2003}
+I.~Moerdijk and J.~Mr\v{c}un.
+\newblock \emph{Introduction to Foliations and Lie Groupoids}.
+\newblock Cambridge Studies in Advanced Mathematics 91, Cambridge University Press, 2003.
+
+% === Inter-rater Reliability ===
+
+\bibitem{krippendorff2004}
+K.~Krippendorff.
+\newblock \emph{Content Analysis: An Introduction to Its Methodology}.
+\newblock Sage Publications, Thousand Oaks, CA, 2nd edition, 2004.
+
+% === Equivariant and Invariant Learning ===
+
+\bibitem{cohen2016}
+T.~Cohen and M.~Welling.
+\newblock Group Equivariant Convolutional Networks.
+\newblock \emph{Proceedings of the 33rd International Conference on Machine Learning (ICML)}, pages 2990--2999, 2016.
+
+\bibitem{bronstein2021}
+M.~M.~Bronstein, J.~Bruna, T.~Cohen, and P.~Veli\v{c}kovi\'{c}.
+\newblock Geometric Deep Learning: Grids, Groups, Graphs, Geodesics, and Gauges.
+\newblock \emph{arXiv preprint arXiv:2104.13478}, 2021.
+
+% === Participatory AI and Democratic Design ===
+
+\bibitem{sloane2022}
+M.~Sloane, E.~Moss, O.~Awomolo, and L.~Forlano.
+\newblock Participation Is Not a Design Fix for Machine Learning.
+\newblock \emph{Proceedings of the 2nd ACM Conference on Equity and Access in Algorithms, Mechanisms, and Optimization (EAAMO)}, 2022.
+
+\bibitem{birhane2022}
+A.~Birhane, W.~Isaac, V.~Prabhakaran, M.~Diaz, M.~C.~Elish, I.~Gabriel, and S.~Mohamed.
+\newblock Power to the People? Opportunities and Challenges for Participatory AI.
+\newblock \emph{Proceedings of the 2nd ACM Conference on Equity and Access in Algorithms, Mechanisms, and Optimization (EAAMO)}, 2022.
+
+\bibitem{lee2019}
+M.~K.~Lee, D.~Kusbit, A.~Kahng, J.~T.~Kim, X.~Yuan, A.~Chan, D.~See, R.~Noothigattu, S.~Lee, A.~Psomas, and A.~D.~Procaccia.
+\newblock WeBuildAI: Participatory Framework for Algorithmic Governance.
+\newblock \emph{Proceedings of the ACM on Human-Computer Interaction}, 3(CSCW):1--35, 2019.
+
+\bibitem{fishkin2018}
+J.~S.~Fishkin.
+\newblock \emph{Democracy When the People Are Thinking: Revitalizing Our Politics Through Public Deliberation}.
+\newblock Oxford University Press, 2018.
+
+\bibitem{schuler1993}
+D.~Schuler and A.~Namioka, editors.
+\newblock \emph{Participatory Design: Principles and Practices}.
+\newblock Lawrence Erlbaum Associates, Hillsdale, NJ, 1993.
+
+\bibitem{friedman2019}
+B.~Friedman and D.~G.~Hendry.
+\newblock \emph{Value Sensitive Design: Shaping Technology with Moral Imagination}.
+\newblock MIT Press, Cambridge, MA, 2019.
+
+\end{thebibliography}
+
+\end{document}
