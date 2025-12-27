@@ -132,11 +132,6 @@ DEME ETHICAL DIMENSION SENSITIVITY
 📖 **Docs**: [HPC Evaluation Guide](https://github.com/ahb-sjsu/erisml-lib/blob/main/src/erisml/examples/llm-eval/README.md)
 
 ---
-## Q&A
-
-[REVIEWER_RESPONSES](https://github.com/ahb-sjsu/erisml-lib/blob/main/REVIEWER_RESPONSES.md)
-
----
 
 *The Bond Index is the deliverable. Everything else is infrastructure.*
 
