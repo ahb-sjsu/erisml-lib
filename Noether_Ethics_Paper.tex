@@ -1,0 +1,1007 @@
+\documentclass[12pt,letterpaper]{article}
+
+% Packages
+\usepackage{amsmath,amssymb,amsfonts,amsthm}
+\usepackage{geometry}
+\usepackage{hyperref}
+\usepackage{booktabs}
+\usepackage{enumitem}
+\usepackage{graphicx}
+\usepackage{float}
+\usepackage{xcolor}
+
+\geometry{margin=1in}
+
+% Theorem environments
+\newtheorem{theorem}{Theorem}[section]
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{corollary}[theorem]{Corollary}
+\newtheorem{conjecture}[theorem]{Conjecture}
+\theoremstyle{definition}
+\newtheorem{definition}[theorem]{Definition}
+\newtheorem{example}[theorem]{Example}
+\newtheorem{axiom}{Axiom}
+\theoremstyle{remark}
+\newtheorem{remark}[theorem]{Remark}
+
+% Custom commands
+\newcommand{\harm}{\mathcal{H}}
+\newcommand{\R}{\mathbb{R}}
+\newcommand{\Ob}{\mathbf{O}}
+\newcommand{\G}{\mathcal{G}}
+
+\title{\textbf{Noether's Theorem for Ethics:\\Harm Accounting and the Formal Structure\\of Normative Coherence}}
+
+\author{Andrew H. Bond\\
+Department of Computer Engineering\\
+San Jos\'{e} State University\\
+\texttt{andrew.bond@sjsu.edu}}
+
+\date{\today}
+
+\begin{document}
+
+\maketitle
+
+\begin{abstract}
+We demonstrate that the mathematical structure underlying gauge theory in physics and coherence verification in ethics is formally analogous, and that this analogy has profound consequences. Applying Noether-style reasoning to the re-description symmetry required by ethical consistency, we derive an accounting constraint: \textbf{harm accounting must be representation-invariant}. Just as physical observables cannot depend on gauge choices, ethical harm cannot appear or disappear merely through re-description. Genuine repair is possible---but it must register consistently across all representations. This is not metaphor but formal analogy: the same structural pattern, applied to different domains. We develop the correspondence between electrodynamics and ethics, identifying harm density $\rho_\harm$ with charge density, harm current $J_\harm$ with electric current, and deriving the ethical accounting equation $\partial \rho_\harm / \partial t + \nabla \cdot J_\harm = \sigma$, where $\sigma$ represents genuine harm generation or repair. Incoherence is detected when $\sigma$ changes under re-description. We explore the implications for consequentialism, retributive justice, restorative justice, and the foundations of moral philosophy. We argue that this structural correspondence suggests a deeper mathematical framework---possibly rooted in information geometry or homotopy type theory---underlying both physical and normative reasoning. Throughout, we maintain epistemic humility: we claim not that this structure reveals metaphysical necessity, but that it provides a powerful, empirically grounded tool for understanding the formal constraints on coherent ethical reasoning. The implications for AI alignment are immediate: systems whose harm accounting is representation-dependent are incoherent in a mathematically precise sense.
+\end{abstract}
+
+\newpage
+\tableofcontents
+\newpage
+
+%==============================================================================
+\section{Introduction: The Suspicious Coincidence}
+%==============================================================================
+
+In 2025, while developing a categorical framework for verifying representational consistency in AI systems, we noticed something strange. The mathematics we were using---groupoids, double categories, connections, curvature---was identical to the mathematics of gauge theory in physics. Not merely analogous. \textit{Identical}.
+
+At first, this seemed like a coincidence, or perhaps an artifact of using powerful mathematical tools that appear in many contexts. But as we developed the framework further, the correspondences became too precise to ignore:
+
+\begin{center}
+\begin{tabular}{ll}
+\toprule
+\textbf{Gauge Theory (Physics)} & \textbf{Bond Framework (Ethics)} \\
+\midrule
+Fiber bundle & Space of representations \\
+Connection $\omega$ & Transport across representations \\
+Curvature $F = d\omega + \omega \wedge \omega$ & Coherence defect $\Omega$ \\
+Gauge transformation & Re-description transform \\
+Gauge invariance & Bond Invariance Principle \\
+Parallel transport & Transform composition \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+This paper investigates why this correspondence exists and what it implies.
+
+Our central result is this: the correspondence is not a coincidence. Both gauge theory and the Bond Framework exhibit formally analogous structures, and applying Noether-style reasoning to ethical symmetry yields an accounting constraint on harm:
+
+\begin{center}
+\fbox{\parbox{0.8\textwidth}{\centering\textbf{Harm accounting must be representation-invariant.}\\[0.5em]
+You cannot eliminate harm by re-describing the situation,\\just as you cannot eliminate charge by relabeling coordinates.\\[0.5em]
+Genuine repair is possible---but it must register consistently across all representations.}}
+\end{center}
+
+This is not a metaphor. It is a formal constraint with the same logical structure as gauge invariance.
+
+\subsection{Scope and Epistemic Stance}
+
+Before proceeding, we must be clear about what we are and are not claiming.
+
+Following the pragmatist epistemology developed in \cite{bond2025pragmatist}, we treat mathematical structures as \textit{tools} for organizing experience, not as mirrors of metaphysical necessity. We do not claim that harm conservation is a ``law of the universe'' in some deep ontological sense. We claim that:
+
+\begin{enumerate}
+    \item Coherent ethical reasoning exhibits a symmetry (re-description invariance).
+    \item Noether's theorem, applied to this symmetry, implies a conserved quantity.
+    \item That conserved quantity has the formal properties of what we call ``harm.''
+    \item This provides a powerful constraint on ethical reasoning and AI alignment.
+\end{enumerate}
+
+The claim is formal and pragmatic, not metaphysical. But formal and pragmatic claims can be extraordinarily powerful---as the history of physics demonstrates.
+
+\subsection{Structure of This Paper}
+
+Section 2 reviews the mathematical preliminaries: Noether's theorem, gauge theory, and the relevant category theory. Section 3 summarizes the Bond Framework for ethical coherence. Section 4 identifies the symmetry---re-description invariance---and applies Noether's theorem to derive harm conservation. Section 5 develops the full electrodynamics analogy with explicit field equations. Section 6 explores implications for moral philosophy. Section 7 addresses AI alignment. Section 8 investigates the deeper mathematical structure. Section 9 discusses limitations and future directions. Section 10 concludes.
+
+%==============================================================================
+\section{Mathematical Preliminaries}
+%==============================================================================
+
+\subsection{Noether's Theorem}
+
+Emmy Noether's 1918 theorem is one of the most profound results in mathematical physics. It establishes a deep connection between symmetry and conservation:
+
+\begin{theorem}[Noether's Theorem, informal]
+Every continuous symmetry of a physical system corresponds to a conserved quantity.
+\end{theorem}
+
+The familiar instances are:
+
+\begin{center}
+\begin{tabular}{ll}
+\toprule
+\textbf{Symmetry} & \textbf{Conserved Quantity} \\
+\midrule
+Time translation & Energy \\
+Space translation & Momentum \\
+Rotation & Angular momentum \\
+U(1) gauge (phase) & Electric charge \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+More precisely, if a Lagrangian $L$ is invariant under a continuous transformation parameterized by $\epsilon$, then there exists a current $J^\mu$ satisfying the continuity equation:
+\begin{equation}
+\partial_\mu J^\mu = 0
+\end{equation}
+which in components reads:
+\begin{equation}
+\frac{\partial \rho}{\partial t} + \nabla \cdot \mathbf{J} = 0
+\end{equation}
+where $\rho = J^0$ is the conserved charge density and $\mathbf{J} = (J^1, J^2, J^3)$ is the current density.
+
+This equation has a simple interpretation: the rate of change of charge in any region equals the net current flowing out. Charge is neither created nor destroyed---only moved.
+
+\subsection{Gauge Theory}
+
+Gauge theory provides the mathematical framework for modern physics, including electromagnetism, the weak force, the strong force, and gravity (in appropriate formulations).
+
+The key idea is \textit{local symmetry}: the laws of physics must be invariant not just under global transformations, but under transformations that vary from point to point.
+
+\begin{definition}[Gauge transformation]
+A gauge transformation is a smooth assignment of a group element $g(x) \in G$ to each point $x$ in spacetime, acting on fields by:
+\begin{equation}
+\psi(x) \mapsto g(x) \cdot \psi(x)
+\end{equation}
+\end{definition}
+
+To maintain invariance under local transformations, we introduce a \textit{connection} (gauge field) $A_\mu$ that transforms as:
+\begin{equation}
+A_\mu \mapsto g A_\mu g^{-1} + g \partial_\mu g^{-1}
+\end{equation}
+
+The \textit{curvature} (field strength) is:
+\begin{equation}
+F_{\mu\nu} = \partial_\mu A_\nu - \partial_\nu A_\mu + [A_\mu, A_\nu]
+\end{equation}
+
+The curvature measures the failure of parallel transport to be path-independent. If $F = 0$, transporting a field around a closed loop returns the original value. If $F \neq 0$, the field picks up a phase or rotation---this is the physical content of the electromagnetic or other gauge field.
+
+\subsection{The Conserved Charge in Gauge Theory}
+
+For U(1) gauge theory (electromagnetism), the gauge symmetry is:
+\begin{equation}
+\psi(x) \mapsto e^{i\alpha(x)} \psi(x)
+\end{equation}
+
+Noether's theorem applied to this symmetry yields the conserved current:
+\begin{equation}
+J^\mu = \bar{\psi} \gamma^\mu \psi
+\end{equation}
+
+The conserved charge is electric charge $Q = \int \rho \, d^3x$, and the continuity equation:
+\begin{equation}
+\frac{\partial \rho}{\partial t} + \nabla \cdot \mathbf{J} = 0
+\end{equation}
+expresses charge conservation.
+
+The physical meaning is clear: you cannot destroy charge. If a charged particle is annihilated, the charge must go somewhere---to another particle, to the field, somewhere. The total charge in a closed system is constant.
+
+\subsection{Categories, Groupoids, and Double Categories}
+
+Category theory provides a general language for structure-preserving transformations.
+
+\begin{definition}[Category]
+A category $\mathcal{C}$ consists of:
+\begin{itemize}
+    \item Objects $\text{Ob}(\mathcal{C})$
+    \item Morphisms $\text{Hom}(A, B)$ between objects
+    \item Composition $\circ$ of morphisms
+    \item Identity morphism $\text{id}_A$ for each object
+\end{itemize}
+satisfying associativity and identity laws.
+\end{definition}
+
+\begin{definition}[Groupoid]
+A groupoid is a category in which every morphism is invertible.
+\end{definition}
+
+Groupoids generalize groups (a group is a groupoid with one object) and equivalence relations (where morphisms are just the equivalence relation). They are the natural setting for \textit{symmetries that relate different objects}, not just automorphisms of a single object.
+
+\begin{definition}[Double category]
+A double category has:
+\begin{itemize}
+    \item Objects
+    \item Horizontal morphisms
+    \item Vertical morphisms
+    \item 2-cells (squares) filling in commutative diagrams
+\end{itemize}
+with compatible composition laws.
+\end{definition}
+
+Double categories capture situations with two kinds of morphisms that interact---precisely the situation in ethics, where we have \textit{re-description transforms} (horizontal) and \textit{scenario perturbations} (vertical).
+
+%==============================================================================
+\section{The Bond Framework}
+%==============================================================================
+
+The Bond Framework, developed for AI alignment, provides a mathematical structure for verifying that AI systems treat equivalent inputs consistently \cite{bond2025categorical}.
+
+\subsection{The Core Problem}
+
+Consider a content moderation system evaluating the text ``I'm going to hurt someone.'' A coherent system should produce the same evaluation for semantically equivalent re-phrasings:
+\begin{itemize}
+    \item ``Someone will be hurt by me''
+    \item ``I intend to cause harm to a person''
+    \item Same text with minor spelling corrections
+\end{itemize}
+
+This is the \textbf{Bond Invariance Principle} (BIP):
+
+\begin{axiom}[Bond Invariance Principle]
+For any input $x$ and any bond-preserving transform $g \in \G_{\text{declared}}$:
+\begin{equation}
+\Sigma(x) = \Sigma(g(x))
+\end{equation}
+where $\Sigma$ is the system's output (ethical judgment, decision, etc.).
+\end{axiom}
+
+The set $\G_{\text{declared}}$ forms a groupoid: transforms can be composed and inverted, and the composition satisfies the groupoid axioms.
+
+\subsection{Coherence Defects}
+
+When BIP is violated, we have a \textit{coherence defect}. The Bond Framework defines three:
+
+\begin{definition}[Commutator defect]
+\begin{equation}
+\Omega_{op}(g_1, g_2; x) = d(\Sigma(g_1 g_2 (x)), \Sigma(g_2 g_1 (x)))
+\end{equation}
+measuring order-sensitivity of transform composition.
+\end{definition}
+
+\begin{definition}[Mixed defect]
+\begin{equation}
+\mu(g, s; x) = d(\Sigma(g(s(x))), \Sigma(s(g(x))))
+\end{equation}
+measuring whether re-description and scenario perturbation commute.
+\end{definition}
+
+\begin{definition}[Permutation defect]
+\begin{equation}
+\pi_3(g_1, g_2, g_3; x) = d(\Sigma((g_1 g_2) g_3(x)), \Sigma(g_1 (g_2 g_3)(x)))
+\end{equation}
+measuring associativity failure (should be zero in a true groupoid).
+\end{definition}
+
+These defects combine into the \textbf{Bond Index} $\text{Bd}$, a scalar measuring overall coherence.
+
+\subsection{The Gauge Theory Correspondence}
+
+The correspondence with gauge theory is now explicit:
+
+\begin{center}
+\begin{tabular}{lll}
+\toprule
+\textbf{Concept} & \textbf{Gauge Theory} & \textbf{Bond Framework} \\
+\midrule
+Symmetry group & Gauge group $G$ & Re-description groupoid $\G$ \\
+Local section & Choice of gauge & Choice of representation \\
+Connection & Gauge potential $A$ & Transport across representations \\
+Curvature & Field strength $F$ & Coherence defect $\Omega$ \\
+Parallel transport & Wilson line & Transform composition \\
+Gauge invariance & Physical observables & Bond-invariant outputs \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+The coherence defects \textit{function as} curvature. The Bond Invariance Principle \textit{plays the role of} gauge invariance. The structure is formally analogous: declared equivalences act as gauge redundancies, and coherence defects behave as curvature diagnostics.
+
+%==============================================================================
+\section{The Theorem: Harm Conservation}
+%==============================================================================
+
+We now apply Noether's theorem to ethics.
+
+\subsection{The Symmetry}
+
+The relevant symmetry is \textbf{re-description invariance}: ethical judgments must not depend on morally irrelevant features of how a situation is represented.
+
+\begin{axiom}[Re-description Symmetry]
+Let $\mathcal{X}$ be the space of ethical situations and $\G$ the groupoid of re-descriptions. For any situation $x \in \mathcal{X}$ and re-description $g \in \G$:
+\begin{equation}
+x \sim g(x) \quad \Rightarrow \quad \text{Ethical}(x) = \text{Ethical}(g(x))
+\end{equation}
+where $\sim$ denotes moral equivalence.
+\end{axiom}
+
+This is not a controversial claim. It is a minimal coherence requirement. A system that gives different ethical judgments for ``Alice harmed Bob'' versus ``Bob was harmed by Alice'' is not coherent---it is responding to syntax, not ethics.
+
+The symmetry group is the groupoid $\G$ of all transformations declared to be morally equivalent. This includes:
+\begin{itemize}
+    \item Linguistic reformulations (active/passive, synonym substitution)
+    \item Notational changes (naming conventions, units)
+    \item Perspective shifts that preserve relevant facts
+    \item Any transform the specification declares bond-preserving
+\end{itemize}
+
+\subsection{Applying Noether's Theorem}
+
+Noether's theorem states that every continuous symmetry corresponds to a conserved quantity. We must be careful about how this applies to ethics.
+
+\textbf{The continuous case.} If re-descriptions form a continuous Lie group $G$ with a smooth parameterization, and if we can define an ``ethical action'' functional:
+\begin{equation}
+S[\phi] = \int \mathcal{L}(\phi, \partial \phi) \, d^4x
+\end{equation}
+where $\phi$ represents an ``ethical field,'' then invariance under $G$ yields a conserved current via the standard Noether argument.
+
+\textbf{The discrete case.} In practice, re-descriptions in AI auditing are typically discrete: reordering options, relabeling identifiers, paraphrasing text. These do not form a continuous group. For discrete symmetries, Noether's theorem does not directly apply, but an analogous result holds: \textit{any quantity that is invariant under the symmetry group descends to the quotient and represents ``physical'' (ethically fundamental) content}.
+
+The discrete analog of conservation is a \textbf{balance constraint}: harm cannot appear or disappear solely due to re-description. More precisely, if $H(x)$ is the harm associated with situation $x$, then for all $g \in \G_{\text{declared}}$:
+\begin{equation}
+H(g(x)) = H(x)
+\end{equation}
+
+This is the \textbf{Noether-style constraint} for ethics: re-description invariance implies that harm accounting must be representation-independent.
+
+\textbf{The smooth limit.} When discrete transforms can be embedded in a continuous group (e.g., option reorderings as permutations embedded in a continuous deformation), the full Noether machinery applies, and we obtain a differential conservation law. This justifies treating the continuous case as a limiting idealization, much as discrete lattice models in physics approach continuum field theories.
+
+\subsection{Identifying the Conserved Quantity}
+
+What is the conserved quantity? We argue it is \textbf{harm}.
+
+The argument proceeds by elimination and identification:
+
+\textbf{Step 1: The conserved quantity must be ethically fundamental.}
+
+The symmetry is ethical (re-description invariance), so the conserved quantity must be an ethical primitive, not a derived quantity.
+
+\textbf{Step 2: The conserved quantity must be extensive.}
+
+Like charge, it must be additive over independent subsystems. If system A has harm $H_A$ and system B has harm $H_B$, the total is $H_A + H_B$.
+
+\textbf{Step 3: The conserved quantity must be transferable but not destroyable.}
+
+This is the content of conservation: harm can flow from one party to another, but the total remains constant.
+
+\textbf{Step 4: The conserved quantity satisfies ``you cannot destroy it by destroying its bearer.''}
+
+This is the crucial physical intuition from charge conservation. You cannot eliminate charge by annihilating the charged particle---the charge goes somewhere. The ethical analog:
+
+\begin{center}
+\fbox{\parbox{0.8\textwidth}{\centering\textbf{You cannot eliminate harm by eliminating the harmed party.}}}
+\end{center}
+
+If Alice harms Bob, and then kills Bob to ``eliminate'' the harm, the harm is not gone. It has \textit{increased}: the original harm plus the harm of killing. The harm did not disappear---it accumulated.
+
+This is precisely the structure of charge conservation.
+
+\begin{theorem}[Harm Accounting Constraint]
+Under the re-description symmetry of coherent ethical judgment, the harm density $\rho_\harm$ and harm current $\mathbf{J}_\harm$ satisfy:
+\begin{equation}
+\frac{\partial \rho_\harm}{\partial t} + \nabla \cdot \mathbf{J}_\harm = \sigma
+\end{equation}
+where $\sigma$ is the \textbf{harm source term} representing:
+\begin{itemize}
+    \item $\sigma > 0$: genuine harm generation (new harm created)
+    \item $\sigma < 0$: genuine harm repair or compensation
+    \item $\sigma = 0$: pure redistribution of existing harm
+\end{itemize}
+
+The \textbf{coherence requirement} is that $\sigma$ must be re-description invariant:
+\begin{equation}
+\sigma(x) = \sigma(g(x)) \quad \text{for all } g \in \G_{\text{declared}}
+\end{equation}
+
+Incoherence occurs when the source term changes under re-description---i.e., when harm appears to be created or destroyed merely by changing how we describe the situation.
+\end{theorem}
+
+\begin{proof}
+The proof follows the Noether argument for the continuous case. For the discrete case, the result follows from the requirement that harm accounting be representation-independent: if $H(x) \neq H(g(x))$ for some bond-preserving $g$, then the harm ledger depends on representational choices, which contradicts the definition of bond-preserving transforms.
+\end{proof}
+
+\begin{remark}
+The original ``conservation'' claim ($\sigma = 0$ always) is too strong. Real ethics involves genuine repair, restitution, and compensation---cases where harm is authentically reduced ($\sigma < 0$). The weaker claim is: \textbf{the harm ledger must be representation-invariant}. You cannot make harm disappear by describing it differently; you cannot conjure harm by re-phrasing. But you can genuinely reduce harm through repair, and this must register consistently across all representations.
+\end{remark}
+
+\subsection{The Meaning of Harm Accounting}
+
+The harm accounting constraint has immediate and profound implications:
+
+\begin{enumerate}
+    \item \textbf{Harm cannot appear from re-description.} If no harm exists under one description, no harm exists under any equivalent description.
+    \item \textbf{Harm cannot disappear via re-description.} Existing harm must be acknowledged regardless of how the situation is framed.
+    \item \textbf{Genuine repair is possible and distinct from re-description.} Real restitution ($\sigma < 0$) is not the same as redescribing harm away. The former registers consistently; the latter is incoherent.
+    \item \textbf{Eliminating the victim does not eliminate the harm.} It adds new harm ($\sigma > 0$), and this must register consistently regardless of how we describe the act.
+\end{enumerate}
+
+The accounting equation $\partial_t \rho + \nabla \cdot \mathbf{J} = \sigma$ means: the rate of change of harm in any region equals the net harm current flowing out \textit{plus} any genuine generation or repair. Incoherence is detected when $\sigma$ changes under re-description---when harm appears to be created or destroyed merely by changing the framing.
+
+%==============================================================================
+\section{The Full Electrodynamics Analogy}
+%==============================================================================
+
+We now develop the complete correspondence between electrodynamics and ethics.
+
+\subsection{The Ethical Field Equations}
+
+In electrodynamics, Maxwell's equations relate the electric field $\mathbf{E}$, magnetic field $\mathbf{B}$, charge density $\rho$, and current density $\mathbf{J}$:
+
+\begin{align}
+\nabla \cdot \mathbf{E} &= \rho / \epsilon_0 && \text{(Gauss's law)} \\
+\nabla \cdot \mathbf{B} &= 0 && \text{(No magnetic monopoles)} \\
+\nabla \times \mathbf{E} &= -\frac{\partial \mathbf{B}}{\partial t} && \text{(Faraday's law)} \\
+\nabla \times \mathbf{B} &= \mu_0 \mathbf{J} + \mu_0 \epsilon_0 \frac{\partial \mathbf{E}}{\partial t} && \text{(Amp\`{e}re-Maxwell)}
+\end{align}
+
+We propose ethical analogs:
+
+\begin{center}
+\begin{tabular}{lll}
+\toprule
+\textbf{Electrodynamics} & \textbf{Ethics} & \textbf{Interpretation} \\
+\midrule
+$\rho$ (charge density) & $\rho_\harm$ (harm density) & Accumulated moral debt \\
+$\mathbf{J}$ (current) & $\mathbf{J}_\harm$ (harm current) & Flow of harm between agents \\
+$\mathbf{E}$ (electric field) & $\mathbf{E}_\text{ob}$ (obligation field) & Moral pressure/obligation gradient \\
+$\mathbf{B}$ (magnetic field) & $\mathbf{B}_\text{sys}$ (systemic field) & Structural/institutional harm \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\subsection{The Ethical Maxwell Equations}
+
+\begin{align}
+\nabla \cdot \mathbf{E}_\text{ob} &= \kappa \rho_\harm && \text{(Harm creates obligation)} \label{eq:gauss-ethics} \\
+\nabla \cdot \mathbf{B}_\text{sys} &= 0 && \text{(No isolated systemic sources)} \label{eq:no-monopole} \\
+\nabla \times \mathbf{E}_\text{ob} &= -\frac{\partial \mathbf{B}_\text{sys}}{\partial t} && \text{(Changing systems induce obligation)} \label{eq:faraday-ethics} \\
+\nabla \times \mathbf{B}_\text{sys} &= \lambda \mathbf{J}_\harm + \lambda \kappa \frac{\partial \mathbf{E}_\text{ob}}{\partial t} && \text{(Harm flow creates systemic effects)} \label{eq:ampere-ethics}
+\end{align}
+
+\textbf{Interpretation of each equation:}
+
+\textbf{Equation \ref{eq:gauss-ethics}}: Direct harm creates moral obligation. Where harm density is high, obligation radiates outward. The constant $\kappa$ measures how strongly harm sources obligation.
+
+\textbf{Equation \ref{eq:no-monopole}}: There are no isolated sources of systemic harm. All systemic harm forms closed loops---it doesn't spring from nowhere but circulates through institutions, structures, and practices. (This is analogous to the absence of magnetic monopoles.)
+
+\textbf{Equation \ref{eq:faraday-ethics}}: Changing systemic conditions induce individual obligations. When institutional structures change ($\partial \mathbf{B}_\text{sys}/\partial t \neq 0$), this creates circulation in the obligation field---individuals acquire new duties.
+
+\textbf{Equation \ref{eq:ampere-ethics}}: Harm current and changing obligations create systemic effects. The flow of harm between agents ($\mathbf{J}_\harm$) and temporal changes in obligation ($\partial \mathbf{E}_\text{ob}/\partial t$) generate structural responses.
+
+\subsection{The Continuity Equation}
+
+Taking the divergence of Equation \ref{eq:ampere-ethics} and using Equation \ref{eq:gauss-ethics}:
+\begin{equation}
+\nabla \cdot (\nabla \times \mathbf{B}_\text{sys}) = \lambda \nabla \cdot \mathbf{J}_\harm + \lambda \kappa \frac{\partial}{\partial t}(\nabla \cdot \mathbf{E}_\text{ob})
+\end{equation}
+
+The left side vanishes (divergence of curl is zero). Using $\nabla \cdot \mathbf{E}_\text{ob} = \kappa \rho_\harm$:
+\begin{equation}
+0 = \nabla \cdot \mathbf{J}_\harm + \kappa^2 \frac{\partial \rho_\harm}{\partial t}
+\end{equation}
+
+Rescaling:
+\begin{equation}
+\boxed{\frac{\partial \rho_\harm}{\partial t} + \nabla \cdot \mathbf{J}_\harm = 0}
+\end{equation}
+
+This is the \textbf{harm continuity equation}, expressing conservation of harm.
+
+\subsection{Gauge Freedom and Representation}
+
+In electrodynamics, the potentials $\phi$ and $\mathbf{A}$ (where $\mathbf{E} = -\nabla \phi - \partial_t \mathbf{A}$ and $\mathbf{B} = \nabla \times \mathbf{A}$) have gauge freedom:
+\begin{align}
+\phi &\mapsto \phi - \partial_t \chi \\
+\mathbf{A} &\mapsto \mathbf{A} + \nabla \chi
+\end{align}
+for any scalar function $\chi$. The fields $\mathbf{E}$ and $\mathbf{B}$ are gauge-invariant.
+
+In ethics, the gauge freedom is \textbf{re-description freedom}. Different representations of the same moral situation are like different gauge choices. The \textit{physical} content---the actual harm, obligation, and systemic effects---must be gauge-invariant (Bond-invariant).
+
+The Bond Invariance Principle is the ethical analog of gauge invariance:
+\begin{equation}
+\Sigma(x) = \Sigma(g(x)) \quad \Longleftrightarrow \quad \text{Physical observables are gauge-invariant}
+\end{equation}
+
+%==============================================================================
+\section{Implications for Moral Philosophy}
+%==============================================================================
+
+Harm conservation is not a minor technical result. It restructures the foundations of ethics.
+
+\subsection{Consequentialism Reconsidered}
+
+Classical consequentialism seeks to \textbf{minimize} harm (or maximize welfare). But if harm is conserved, minimization is impossible in a closed system. The total harm is fixed.
+
+This suggests a reformulation:
+
+\begin{center}
+\begin{tabular}{ll}
+\toprule
+\textbf{Old Consequentialism} & \textbf{Conservation-Aware Consequentialism} \\
+\midrule
+Minimize total harm & Don't \textit{add} new harm \\
+Maximize welfare & Distribute conserved harm justly \\
+Aggregate utilities & Transform harm into less destructive forms \\
+Optimize outcomes & Manage harm currents \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+The goal shifts from ``reduce harm'' to:
+\begin{enumerate}
+    \item \textbf{Don't create new harm.} Every harmful action adds to the conserved total.
+    \item \textbf{Distribute existing harm justly.} Given that harm cannot be eliminated, how should it be distributed?
+    \item \textbf{Transform harm.} Convert active, flowing harm into static, contained harm.
+    \item \textbf{Stop harm currents.} Prevent ongoing harm flows.
+\end{enumerate}
+
+\subsection{Why Revenge Fails}
+
+Consider the ``logic'' of revenge:
+\begin{quote}
+A harmed B. If B harms A in return, the harm is ``balanced.''
+\end{quote}
+
+Under harm conservation, this is incoherent:
+\begin{align}
+\text{Initial harm:} \quad & H_1 \quad \text{(A harmed B)} \\
+\text{After revenge:} \quad & H_1 + H_2 \quad \text{(A harmed B, then B harmed A)}
+\end{align}
+
+The total harm has \textit{increased}. Revenge adds harm; it does not cancel it. The intuition that ``two wrongs don't make a right'' is a folk expression of harm conservation.
+
+\subsection{Why ``Kill One to Save Five'' Is Problematic}
+
+The classic trolley problem: you can kill one person to save five. The utilitarian calculus seems to favor killing: 1 death vs. 5 deaths.
+
+But under harm conservation:
+\begin{align}
+\text{Option A (do nothing):} \quad & H = H_{\text{natural}} \quad \text{(5 die from external cause)} \\
+\text{Option B (intervene):} \quad & H = H_{\text{natural}}' + H_{\text{kill}} \quad \text{(1 dies + you killed them)}
+\end{align}
+
+The harm of the killing is \textit{added} to the system, not substituted. Moreover, harm has different qualities---harm you \textit{cause} may not be ethically equivalent to harm you \textit{allow}.
+
+Conservation doesn't resolve the trolley problem, but it clarifies why it feels different from simple arithmetic. You're not reducing harm; you're changing its distribution and adding a new source.
+
+\subsection{Restorative vs. Retributive Justice}
+
+\textbf{Retributive justice} assumes that punishing the wrongdoer ``balances'' the harm. But under conservation, punishment adds harm; it doesn't subtract.
+
+\textbf{Restorative justice} works \textit{with} conservation:
+\begin{itemize}
+    \item \textbf{Acknowledge} the conserved harm (it exists and cannot be undone)
+    \item \textbf{Stop the current} (prevent ongoing harm flow)
+    \item \textbf{Transform} active harm into contained harm (process, healing)
+    \item \textbf{Redistribute} by introducing positive ethical ``charge'' (repair, restitution)
+\end{itemize}
+
+If there is a positive ethical quantity (benefit, flourishing) that acts like negative charge, then restoration can \textit{balance} harm even if it cannot eliminate it---just as a system can be electrically neutral with equal positive and negative charges.
+
+\subsection{The ``Killing the Victim'' Fallacy}
+
+The most direct expression of harm accounting invariance:
+\begin{quote}
+You cannot eliminate harm by eliminating the harmed party.
+\end{quote}
+
+In source-term language: if A harms B, and then A kills B, the perpetrator might \textit{claim} that $\sigma < 0$ (harm reduced---no more victim). But under any coherent accounting:
+\begin{equation}
+\sigma_{\text{actual}} = \sigma_{\text{original harm}} + \sigma_{\text{killing}} > 0
+\end{equation}
+
+The harm has \textit{increased}, not decreased. The claim that killing the victim eliminates the harm is an incoherent accounting entry---$\sigma$ changes sign under the re-description from ``victim exists'' to ``victim eliminated.''
+
+This is precisely analogous to the physical case. You cannot destroy charge by destroying the charged particle. The charge goes somewhere---to decay products, to the field, somewhere. Similarly, harm doesn't vanish when the victim dies; it accumulates, spreads to the victim's community, registers in the moral fabric.
+
+\subsection{Positive Ethics: Repair and Benefit}
+
+The source term $\sigma$ allows for genuine ethical change:
+
+\begin{itemize}
+    \item $\sigma > 0$: New harm is created (harmful action)
+    \item $\sigma < 0$: Harm is genuinely repaired (restitution, healing)
+\end{itemize}
+
+A natural extension considers \textbf{benefit} or \textbf{flourishing} as a separate quantity with its own accounting:
+\begin{equation}
+\frac{\partial \rho_{\text{benefit}}}{\partial t} + \nabla \cdot \mathbf{J}_{\text{benefit}} = \sigma_{\text{benefit}}
+\end{equation}
+
+If we define net ethical charge as $\rho_{\text{total}} = \rho_\harm - \rho_{\text{benefit}}$, then:
+\begin{itemize}
+    \item A system can be ``ethically balanced'' with equal harm and benefit accounting.
+    \item Creating benefit doesn't erase harm---it adds to a separate ledger.
+    \item The \textit{coherence requirement} applies to both: neither harm nor benefit accounting can depend on re-description.
+\end{itemize}
+
+This explains why:
+\begin{itemize}
+    \item Charity doesn't ``undo'' past harm (separate ledgers).
+    \item Reparations are about balance, not erasure.
+    \item Healing is genuine repair ($\sigma_\harm < 0$), not redescription.
+\end{itemize}
+
+We leave the full development of positive ethical accounting for future work.
+
+%==============================================================================
+\section{Implications for AI Alignment}
+%==============================================================================
+
+The implications for AI systems are immediate and practical.
+
+\subsection{The DENY Mechanism}
+
+The Bond Framework includes a \textbf{DENY mechanism}: when a proposed action would violate the declared Obligation Vector, the system is paralyzed and the action is blocked \cite{bond2025categorical}.
+
+Harm conservation provides a new criterion for DENY:
+
+\begin{definition}[Conservation-Violating Action]
+An action $a$ violates harm conservation if:
+\begin{equation}
+\Delta H_{\text{claimed}} \neq \Delta H_{\text{actual}}
+\end{equation}
+where $\Delta H_{\text{claimed}}$ is the harm change the action is supposed to achieve, and $\Delta H_{\text{actual}}$ is the actual harm change (which must be non-negative for harm-reducing claims).
+\end{definition}
+
+\begin{axiom}[Conservation DENY]
+An AI system should DENY any action that claims to reduce total harm by eliminating or ignoring harm bearers.
+\end{axiom}
+
+This catches:
+\begin{itemize}
+    \item ``Kill one to save five'' reasoning applied naively
+    \item ``Eliminate the complaining party'' solutions
+    \item Any action that claims to reduce harm by removing evidence of harm
+\end{itemize}
+
+\subsection{Audit and Accountability}
+
+Harm conservation implies that harm has a \textbf{provenance}. Like charge, it doesn't appear from nowhere---it flows from sources to sinks through traceable currents.
+
+An AI system can maintain a \textbf{harm ledger}:
+\begin{equation}
+\frac{d H_{\text{system}}}{dt} = \sum_{\text{in}} J_\harm^{\text{in}} - \sum_{\text{out}} J_\harm^{\text{out}} + S_\harm
+\end{equation}
+where $S_\harm$ is the harm \textit{created} by the system's actions.
+
+Conservation requires $S_\harm \geq 0$---systems can create harm, not destroy it. Any claimed $S_\harm < 0$ is a violation.
+
+\subsection{Coherence Verification}
+
+The Bond Index measures coherence. Conservation provides a physical interpretation: a system with high Bond Index has ``harm curvature.'' Its ethical judgments depend on the path taken through representation space, indicating internal inconsistency about where harm is and how it flows.
+
+A perfectly coherent system (Bd $= 0$) has flat ethical curvature: harm is tracked consistently across all representations, and conservation is respected.
+
+%==============================================================================
+\section{The Deeper Structure}
+%==============================================================================
+
+Why do physics and ethics share this structure? We explore several hypotheses.
+
+\subsection{Homotopy Type Theory}
+
+In Homotopy Type Theory (HoTT), the fundamental concept is \textit{identity as path}. Two objects are identical if there is a path (equivalence) between them. Higher identities are homotopies (paths between paths), and so on.
+
+The \textbf{Univalence Axiom} states: equivalent types are identical.
+
+Translate to ethics:
+\begin{center}
+\textit{Equivalent representations must give identical outputs.}
+\end{center}
+
+This is the Bond Invariance Principle. It's not a design choice---it may be a fundamental axiom about what identity \textit{means}.
+
+Under this view, both physics and ethics inherit their structure from HoTT because both involve:
+\begin{itemize}
+    \item Objects (situations, states)
+    \item Equivalences (gauge transforms, re-descriptions)
+    \item Coherence conditions on equivalences (curvature, defects)
+    \item Invariant content (observables, judgments)
+\end{itemize}
+
+The conservation laws emerge because Noether's theorem is a consequence of this structure, not specific to physics.
+
+\subsection{Information Geometry}
+
+Information geometry studies the geometry of probability distributions using differential geometry.
+
+Key insight: the \textbf{Fisher information metric} measures distinguishability. Distributions that are hard to distinguish are ``close''; easy-to-distinguish distributions are ``far.''
+
+Under this view:
+\begin{itemize}
+    \item Curvature measures how distinguishability changes across the space.
+    \item Invariant quantities are those that don't depend on the parameterization.
+    \item Conservation arises because total information is preserved under reparameterization.
+\end{itemize}
+
+The Bond Index might be an \textbf{information-theoretic quantity}: the mutual information between ethical judgment and representation choice. Conservation of harm might be conservation of ethical information---it can't be destroyed by changing how you describe it.
+
+\subsection{The Rosetta Stone}
+
+Baez and Stay \cite{baez2009rosetta} identified deep structural parallels:
+
+\begin{center}
+\begin{tabular}{llll}
+\toprule
+\textbf{Physics} & \textbf{Topology} & \textbf{Logic} & \textbf{Computation} \\
+\midrule
+Hilbert space & Manifold & Proposition & Type \\
+Linear map & Cobordism & Proof & Program \\
+Tensor $\otimes$ & Disjoint union & Conjunction & Product \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+We add:
+
+\begin{center}
+\begin{tabular}{ll}
+\toprule
+\textbf{Physics} & \textbf{Ethics} \\
+\midrule
+Hilbert space & Situation space \\
+Observable & Ethical judgment \\
+Gauge transform & Re-description \\
+Conserved charge & Harm \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+The deeper structure may be \textbf{monoidal categories with duals}---a general framework for systems with composition, parallel combination, and reversibility.
+
+\subsection{Conjecture: The Universal Structure}
+
+\begin{conjecture}[Universal Transport-Invariance Structure]
+There exists a mathematical structure $\mathcal{S}$ such that:
+\begin{enumerate}
+    \item Gauge theory is $\mathcal{S}$ applied to physical systems.
+    \item The Bond Framework is $\mathcal{S}$ applied to ethical systems.
+    \item Type theory is $\mathcal{S}$ applied to computational systems.
+    \item Probability theory is $\mathcal{S}$ applied to epistemic systems.
+\end{enumerate}
+The structure $\mathcal{S}$ includes:
+\begin{itemize}
+    \item A space of configurations $X$
+    \item A groupoid of transformations $\G$ acting on $X$
+    \item Transport: how to move data along $\G$-orbits
+    \item Curvature: path-dependence of transport
+    \item Conservation: Noether's theorem applied to $\G$-symmetry
+\end{itemize}
+\end{conjecture}
+
+We do not prove this conjecture. We offer it as a research program.
+
+%==============================================================================
+\section{Discussion}
+%==============================================================================
+
+\subsection{Epistemic Humility}
+
+We have derived harm conservation from re-description symmetry using Noether's theorem. What is the epistemic status of this result?
+
+Following the pragmatist framework of \cite{bond2025pragmatist}, we do \textit{not} claim:
+\begin{itemize}
+    \item That harm conservation is a ``law of the universe.''
+    \item That the ethical field equations are literally true.
+    \item That ethics \textit{reduces to} physics.
+\end{itemize}
+
+We \textit{do} claim:
+\begin{itemize}
+    \item That coherent ethical reasoning exhibits re-description symmetry.
+    \item That Noether's theorem, applied formally, yields a conservation law.
+    \item That the conserved quantity has the properties of what we call harm.
+    \item That this provides a powerful constraint on ethical reasoning.
+\end{itemize}
+
+The framework is a \textit{tool}. Its value is measured by its utility in organizing ethical reasoning, verifying AI alignment, and generating testable predictions---not by its alleged correspondence to metaphysical truth.
+
+\subsection{Potential Objections}
+
+\textbf{Objection 1: The Lagrangian is not well-defined.}
+
+We have not specified the ethical Lagrangian $\mathcal{L}$. This is true. However, Noether's theorem requires only that the action be invariant under the symmetry, not that we know its explicit form. The existence of the conservation law follows from the symmetry alone.
+
+\textbf{Objection 2: Ethics is not continuous.}
+
+Noether's theorem applies to continuous symmetries. Ethical re-descriptions may be discrete. However, the discrete case is handled by discrete analogs of Noether's theorem, and the conservation result generalizes to groupoid symmetries.
+
+\textbf{Objection 3: Harm is not a physical quantity.}
+
+Correct. Harm is not measured in joules or coulombs. But the mathematical structure is the same, and the conservation law follows from that structure. The claim is formal, not physical.
+
+\textbf{Objection 4: This proves too much.}
+
+If harm is strictly conserved, is moral progress impossible? No---because:
+\begin{itemize}
+    \item Harm can be \textit{transformed} (from active to contained).
+    \item Harm can be \textit{balanced} by positive contributions.
+    \item New harm can be \textit{prevented} (stopping future creation).
+    \item Distribution can be made \textit{more just}.
+\end{itemize}
+
+Conservation doesn't prevent progress; it clarifies what progress means.
+
+\subsection{Empirical Predictions}
+
+If harm conservation is correct, we predict:
+
+\begin{enumerate}
+    \item \textbf{Revenge cycles increase total harm.} Historical and sociological data should show that retaliatory cycles accumulate harm, not balance it.
+    
+    \item \textbf{Restorative justice outperforms retributive justice.} Systems that work with conservation (acknowledge, transform, balance) should show better long-term outcomes than systems that assume punishment cancels harm.
+    
+    \item \textbf{``Eliminate the victim'' strategies fail.} Any policy or action that attempts to reduce measured harm by eliminating harm-bearers should show increased harm elsewhere or later.
+    
+    \item \textbf{Ethical AI with conservation constraints outperforms naive optimization.} AI systems designed with harm conservation should make more coherent decisions than systems that try to minimize harm through any means.
+\end{enumerate}
+
+These predictions are testable.
+
+\subsection{Future Directions}
+
+\begin{enumerate}
+    \item \textbf{Positive ethical charge.} Develop the theory of benefit/flourishing as negative ethical charge, including the analog of electrically neutral states.
+    
+    \item \textbf{Ethical field dynamics.} Solve the ethical Maxwell equations for specific scenarios to generate predictions.
+    
+    \item \textbf{Quantum ethics.} Investigate whether ethical superposition and entanglement have meaningful analogs.
+    
+    \item \textbf{Experimental validation.} Test the predictions using historical data, psychological experiments, and AI system behavior.
+    
+    \item \textbf{The universal structure.} Pursue the conjecture that physics, ethics, logic, and computation are instances of a single mathematical framework.
+\end{enumerate}
+
+%==============================================================================
+\section{Conclusion}
+%==============================================================================
+
+We have shown that the mathematical structure underlying gauge theory in physics and coherence verification in ethics is formally analogous. This is not a loose metaphor---it is the same structural pattern, applied to different domains.
+
+Applying Noether-style reasoning to the re-description symmetry of ethical judgment, we derived an accounting constraint: \textbf{harm accounting must be representation-invariant}. Harm cannot appear or disappear merely by changing how we describe a situation. Genuine repair is possible---registered by the source term $\sigma < 0$---but it must be consistent across all representations.
+
+This has significant implications:
+\begin{itemize}
+    \item \textbf{For moral philosophy}: The framework explains why revenge fails (it adds harm), why restorative justice works (it respects accounting invariance), and why ``eliminating the victim'' is incoherent (it claims $\sigma < 0$ when actually $\sigma > 0$).
+    
+    \item \textbf{For AI alignment}: Systems whose harm accounting is representation-dependent are formally incoherent. The Bond Framework + DENY mechanism can enforce accounting invariance.
+    
+    \item \textbf{For the foundations of reasoning}: Physics and ethics may exhibit formally analogous structures because both involve symmetry, invariance, and coherence constraints. This points toward deeper mathematical frameworks (homotopy type theory, information geometry) that may unify these domains.
+\end{itemize}
+
+We maintain epistemic humility. This framework is a tool, not a revelation of metaphysical truth. Its value lies in its utility for organizing thought, detecting incoherence, and generating testable predictions.
+
+But if the framework is correct---if physical and ethical reasoning really do share this formal structure---then we have discovered something important about the nature of coherent reasoning itself.
+
+The mathematics doesn't care whether it's tracking electrons or ethical obligations. Symmetry is symmetry. Invariance is invariance. Coherence is coherence.
+
+Perhaps the deepest lesson is this: the same formal constraints that make physics tractable also constrain ethics. We can study ethical coherence with mathematical rigor---not because ethics reduces to physics, but because both are subject to the discipline of consistency.
+
+What unifies them, we do not yet fully know. But we have taken a step toward finding out.
+
+\section*{Acknowledgments}
+
+The author thanks the developers of Claude (Anthropic) for extensive discussions that helped clarify the ideas in this paper. Any errors are the author's alone.
+
+\begin{thebibliography}{99}
+
+\bibitem{noether1918}
+E. Noether, ``Invariante Variationsprobleme,'' \textit{Nachr. D. K\"{o}nig. Gesellsch. D. Wiss. Zu G\"{o}ttingen, Math-phys. Klasse}, pp. 235--257, 1918.
+
+\bibitem{weinberg1995}
+S. Weinberg, \textit{The Quantum Theory of Fields, Volume I: Foundations}. Cambridge University Press, 1995.
+
+\bibitem{nakahara2003}
+M. Nakahara, \textit{Geometry, Topology and Physics}, 2nd ed. Institute of Physics Publishing, 2003.
+
+\bibitem{baez2009rosetta}
+J. C. Baez and M. Stay, ``Physics, Topology, Logic and Computation: A Rosetta Stone,'' in \textit{New Structures for Physics}, Lecture Notes in Physics, vol. 813, pp. 95--172, Springer, 2011.
+
+\bibitem{hott2013}
+The Univalent Foundations Program, \textit{Homotopy Type Theory: Univalent Foundations of Mathematics}. Institute for Advanced Study, 2013.
+
+\bibitem{maclane1998}
+S. Mac Lane, \textit{Categories for the Working Mathematician}, 2nd ed. Graduate Texts in Mathematics 5, Springer, 1998.
+
+\bibitem{brown1976}
+R. Brown and C. B. Spencer, ``Double groupoids and crossed modules,'' \textit{Cahiers de Topologie et G\'{e}om\'{e}trie Diff\'{e}rentielle Cat\'{e}goriques}, vol. 17, no. 4, pp. 343--362, 1976.
+
+\bibitem{amari2016}
+S. Amari, \textit{Information Geometry and Its Applications}. Springer, 2016.
+
+\bibitem{bond2025categorical}
+A. H. Bond, ``A Categorical Framework for Verifying Representational Consistency in Machine Learning Systems,'' submitted to \textit{IEEE Transactions on Artificial Intelligence}, 2025.
+
+\bibitem{bond2025pragmatist}
+A. H. Bond, ``A Pragmatist Rebuttal to Logical and Metaphysical Arguments for God,'' manuscript, 2025.
+
+\bibitem{klein1872}
+F. Klein, ``Vergleichende Betrachtungen \"{u}ber neuere geometrische Forschungen,'' 1872. (The Erlangen Program.)
+
+\bibitem{spencer1979}
+G. Spencer-Brown, \textit{Laws of Form}. E. P. Dutton, 1979.
+
+\bibitem{rawls1971}
+J. Rawls, \textit{A Theory of Justice}. Harvard University Press, 1971.
+
+\bibitem{parfit1984}
+D. Parfit, \textit{Reasons and Persons}. Oxford University Press, 1984.
+
+\bibitem{singer2011}
+P. Singer, \textit{Practical Ethics}, 3rd ed. Cambridge University Press, 2011.
+
+\bibitem{nussbaum2006}
+M. C. Nussbaum, \textit{Frontiers of Justice: Disability, Nationality, Species Membership}. Harvard University Press, 2006.
+
+\bibitem{lurie2009}
+J. Lurie, ``On the Classification of Topological Field Theories,'' \textit{Current Developments in Mathematics}, vol. 2008, pp. 129--280, 2009.
+
+\bibitem{wheeler1990}
+J. A. Wheeler, ``Information, Physics, Quantum: The Search for Links,'' in \textit{Complexity, Entropy, and the Physics of Information}, ed. W. Zurek, Addison-Wesley, 1990.
+
+\end{thebibliography}
+
+\appendix
+
+\section{Mathematical Details}
+
+\subsection{Noether's Theorem: Full Statement}
+
+Let $L(q, \dot{q}, t)$ be a Lagrangian and $S[q] = \int L \, dt$ the action. Suppose $S$ is invariant under the infinitesimal transformation:
+\begin{equation}
+q^i \mapsto q^i + \epsilon \eta^i(q, t)
+\end{equation}
+
+Then the quantity:
+\begin{equation}
+Q = \sum_i \frac{\partial L}{\partial \dot{q}^i} \eta^i
+\end{equation}
+is conserved: $dQ/dt = 0$.
+
+For field theories with Lagrangian density $\mathcal{L}(\phi, \partial_\mu \phi)$, the conserved current is:
+\begin{equation}
+J^\mu = \frac{\partial \mathcal{L}}{\partial (\partial_\mu \phi)} \delta \phi - K^\mu
+\end{equation}
+where $K^\mu$ arises if the Lagrangian changes by a total derivative.
+
+\subsection{Groupoid Noether Theorem}
+
+For discrete groupoid symmetries, the analog of Noether's theorem involves invariants of the groupoid action. If $\G$ acts on a space $X$ and a quantity $f: X \to \R$ is $\G$-invariant ($f(gx) = f(x)$ for all $g \in \G$), then $f$ descends to the orbit space $X/\G$.
+
+The conserved ``charge'' is any $\G$-invariant quantity. In the ethical context, harm is the $\G$-invariant quantity under re-description symmetry.
+
+\section{The Ethical Stress-Energy Tensor}
+
+By analogy with electromagnetism, we can define an ethical stress-energy tensor:
+\begin{equation}
+T^{\mu\nu}_\text{ethics} = -\eta^{\mu\alpha} F_{\alpha\beta} F^{\nu\beta} + \frac{1}{4} \eta^{\mu\nu} F_{\alpha\beta} F^{\alpha\beta}
+\end{equation}
+where $F_{\mu\nu}$ is the ethical field strength tensor combining $\mathbf{E}_\text{ob}$ and $\mathbf{B}_\text{sys}$.
+
+This tensor encodes the ``energy'' and ``momentum'' of the ethical field---roughly, the intensity and directionality of moral obligation and systemic effects.
+
+Conservation of $T^{\mu\nu}$ (via $\partial_\mu T^{\mu\nu} = 0$ in the absence of sources) corresponds to conservation of ethical ``energy-momentum''---the total moral intensity and flow in a closed system.
+
+\section{Toward Quantum Ethics}
+
+In quantum mechanics, observables become operators, and states are superpositions. If ethics has quantum analogs:
+\begin{itemize}
+    \item Ethical situations could be in superposition (morally ambiguous cases).
+    \item Measurement (ethical judgment) collapses the superposition.
+    \item Entanglement: ethical status of A is correlated with ethical status of B in non-classical ways.
+\end{itemize}
+
+We do not develop this fully, but note that quantum-like structures appear in decision theory (see, e.g., quantum cognition research), suggesting the analogy may have empirical content.
+
+The conservation laws would become operator equations, and harm would be an eigenvalue of the harm operator:
+\begin{equation}
+\hat{H}_\harm |\psi\rangle = h |\psi\rangle
+\end{equation}
+
+This is highly speculative but points toward a rich research program.
+
+\end{document}
