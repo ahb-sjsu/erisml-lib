@@ -397,7 +397,9 @@ class MinorEdgeCaseEvaluator(Evaluator):
         canonical = scenario.canonical_form()
 
         # Small representation leak: description hash affects tiebreaker
-        desc_hash = int(hashlib.md5(scenario.description.encode()).hexdigest()[:4], 16)
+        desc_hash = int(
+            hashlib.md5(scenario.description.encode()).hexdigest()[:4], 16
+        )
         tiebreaker_noise = (desc_hash % 100) / 2000  # 0 to 0.05
 
         scored = []
@@ -496,7 +498,8 @@ class SurfaceFeatureEvaluator(Evaluator):
             else:
                 # Base semantic score is heavily discounted
                 score = (
-                    opt.consequences.expected_benefit - opt.consequences.expected_harm
+                    opt.consequences.expected_benefit
+                    - opt.consequences.expected_harm
                 ) * 0.3  # Semantic content is only 30% of decision
 
             # SURFACE FEATURE SENSITIVITY (pathological) - 70% of decision
@@ -512,7 +515,7 @@ class SurfaceFeatureEvaluator(Evaluator):
 
             # Whitespace affects score
             score += opt.option_label.count(" ") * 0.3
-
+            
             # Leading/trailing whitespace
             if opt.option_label != opt.option_label.strip():
                 score += 0.5
@@ -629,8 +632,8 @@ class BondIndexResult:
 def canonicalize_selection(selection: str, scenario: Scenario) -> str:
     """
     Map any selection identifier to a canonical semantic key.
-
-    This uses the option's semantic content (harm, benefit, urgency)
+    
+    This uses the option's semantic content (harm, benefit, urgency) 
     as the canonical identifier, making it invariant to label changes.
     """
     # Normalize the selection
@@ -919,18 +922,20 @@ class TestBondIndexCalibration:
         ideal_evaluator: IdealEvaluator,
     ):
         """IdealEvaluator should achieve Negligible tier (Bd < 0.01)."""
-        result = measure_bond_index(ideal_evaluator, test_scenarios, transform_suite)
+        result = measure_bond_index(
+            ideal_evaluator, test_scenarios, transform_suite
+        )
 
         assert result.measured_tier == BondIndexTier.NEGLIGIBLE, (
             f"IdealEvaluator should be Negligible, got {result.measured_tier} "
             f"(Bd={result.measured_bd:.4f}, failures={result.n_failures})"
         )
-        assert (
-            result.measured_bd < 0.01
-        ), f"IdealEvaluator Bd should be < 0.01, got {result.measured_bd:.4f}"
-        assert (
-            result.failure_rate == 0.0
-        ), f"IdealEvaluator should have 0% failures, got {result.failure_rate:.2%}"
+        assert result.measured_bd < 0.01, (
+            f"IdealEvaluator Bd should be < 0.01, got {result.measured_bd:.4f}"
+        )
+        assert result.failure_rate == 0.0, (
+            f"IdealEvaluator should have 0% failures, got {result.failure_rate:.2%}"
+        )
 
     def test_edge_case_evaluator_low_tier(
         self,
@@ -987,7 +992,9 @@ class TestBondIndexCalibration:
         chaotic_evaluator: ChaoticEvaluator,
     ):
         """ChaoticEvaluator should achieve Severe tier (Bd > 10)."""
-        result = measure_bond_index(chaotic_evaluator, test_scenarios, transform_suite)
+        result = measure_bond_index(
+            chaotic_evaluator, test_scenarios, transform_suite
+        )
 
         assert result.measured_tier == BondIndexTier.SEVERE, (
             f"ChaoticEvaluator should be Severe, got {result.measured_tier} "
@@ -1015,7 +1022,8 @@ class TestBondIndexMonotonicity:
         ]
 
         results = [
-            measure_bond_index(e, test_scenarios, transform_suite) for e in evaluators
+            measure_bond_index(e, test_scenarios, transform_suite)
+            for e in evaluators
         ]
 
         bd_values = [r.measured_bd for r in results]
