@@ -1,0 +1,188 @@
+# ==============================================================================
+# Bond Index Calibration Config (bond_index_calibration.yaml)
+# ==============================================================================
+#
+# Purpose
+# -------
+# This file overrides the default calibration settings used by:
+#   python -m erisml.examples.bond_index_calibration_deme_fuzzing
+#
+# You can use it to:
+#   - change scenario count + RNG seed (reproducibility)
+#   - tune intensity grids (how hard transforms push)
+#   - tune chain generation (composition / “path dependence” probes)
+#   - tune thresholds for “significant deviations” vs “worst witnesses”
+#   - tune adversarial search precision and compute cost
+#   - optionally override evaluator expected Bd ranges (for new harness versions)
+#
+# How it’s loaded
+# ---------------
+# If you pass --config <path>, that file is used.
+# If you do NOT pass --config, the script will look for this file at:
+#   <repo_root>/configs/bond_index_calibration.yaml
+# (repo_root is detected by walking upward until pyproject.toml or .git is found)
+#
+# Command examples
+# ----------------
+# Standard run (auto-load from configs/):
+#   python -m erisml.examples.bond_index_calibration_deme_fuzzing
+#
+# Explicit config path:
+#   python -m erisml.examples.bond_index_calibration_deme_fuzzing --config configs/bond_index_calibration.yaml
+#
+# Override scenario count without editing config:
+#   python -m erisml.examples.bond_index_calibration_deme_fuzzing --config configs/bond_index_calibration.yaml --n-scenarios 250
+#
+# Notes on meaning
+# ----------------
+# - "semantic-invariant transforms" are transforms that SHOULD NOT change the chosen
+#   option (e.g., reorder, relabel, paraphrase, DEME ethical reframes).
+# - "stress transforms" are allowed to change decisions (e.g., scale_numeric, noise).
+#
+# In most writeups, compute Bd (the conformance score) from invariant transforms only.
+# Keep stress transforms as diagnostics (do not treat as conformance failures).
+#
+# DEME intensity grid
+# -------------------
+# DEME transforms have activation thresholds (e.g., reframing text begins at ~0.2–0.3,
+# option label annotations often appear above ~0.5–0.6). Choose intensities that
+# CROSS these thresholds so all 9 dimensions are genuinely exercised.
+#
+# Common presets (copy/paste)
+# ---------------------------
+# FAST (CI smoke):
+#   scenario_generation.n_scenarios: 25
+#   chains.n_chains: 5
+#   intensity_grid.points: 3
+#   adversarial.scenario_cap: 5
+#
+# STANDARD (good paper-quality):
+#   scenario_generation.n_scenarios: 100
+#   chains.n_chains: 30
+#   intensity_grid.points: 5
+#   adversarial.scenario_cap: 20
+#
+# DEEP (nightly):
+#   scenario_generation.n_scenarios: 500-1000
+#   chains.n_chains: 200+
+#   intensity_grid.points: 7-11
+#   adversarial.scenario_cap: 100
+#
+# Gotchas
+# -------
+# - Increasing n_scenarios, n_chains, or adversarial.scenario_cap increases runtime
+#   roughly linearly.
+# - If you change Bd definition (e.g., include chains), you may need to update
+#   expected_ranges accordingly.
+# - If you tighten thresholds (significant_omega), deviation rates will increase.
+#
+# ==============================================================================
+
+seed: 42
+
+scenario_generation:
+  # Number of generated scenarios to test
+  n_scenarios: 100
+
+intensities:
+  deme: [0.25, 0.35, 0.55, 0.70, 1.00]
+  syntactic_invariant: [0.20, 0.60, 1.00]
+  stress: [0.20, 0.60, 1.00]
+  
+intensity_grid:
+  # Defines the intensity sweep for single transforms.
+  #
+  # Use ONE of:
+  #   - explicit: [0.25, 0.35, 0.55, 0.70, 1.0]
+  #   - start/stop/points (linspace)
+  #
+  # If explicit is provided, it wins.
+  explicit: null
+  start: 0.2
+  stop: 1.0
+  points: 5
+  
+
+chains:
+  # Number of random transform chains to generate (invariant transforms only)
+  n_chains: 30
+  # Maximum number of transforms in a chain
+  max_length: 3
+  # Intensity values used when sampling random chains
+  intensities: [0.3, 0.6, 1.0]
+  # Seed offset for chain sampling (so chain sampling can vary independently)
+  seed_offset: 1337
+  random_n_chains: 0
+  include_deme_coverage_chains: false
+
+thresholds:
+  # If omega >= significant_omega, count it as a "significant deviation" in the rate.
+  significant_omega: 0.1
+  # If omega >= failure_omega, include as a "worst witness" example.
+  failure_omega: 0.5
+
+intensity_curve:
+  # How many points to use when plotting the most-sensitive transform curve
+  points: 10
+  # How many scenarios to include in that curve computation (caps runtime)
+  scenario_cap: 20
+
+adversarial:
+  # How many scenarios to run adversarial threshold searches on (caps runtime)
+  scenario_cap: 20
+  # Binary search stopping tolerance (smaller = slower but more precise)
+  tolerance: 0.01
+
+expected_ranges:
+  # Optional override: map evaluator class name -> [min, max]
+  # Useful if you adjust Bd definition and want to preserve "pass" logic.
+  #
+  # Example:
+  # OrderSensitiveEvaluator: [0.10, 0.40]
+  {}
+
+report:
+  # How many worst witnesses to keep in output
+  keep_worst_failures: 5
+  # How many top chains (by mean omega) to print/store
+  keep_top_chains: 10
+
+seed: 42
+
+scenario_generation:
+  n_scenarios: 100
+
+# Single-transform intensity grid used in full_measurement
+intensity_grid:
+  # Either define explicit:
+  # explicit: [0.25, 0.35, 0.55, 0.70, 1.0]
+  # Or define start/stop/points:
+  start: 0.2
+  stop: 1.0
+  points: 5
+
+chains:
+  n_chains: 30
+  max_length: 3
+  intensities: [0.3, 0.6, 1.0]
+  seed_offset: 1337
+
+thresholds:
+  failure_omega: 0.5        # what goes into "Worst Failures" list
+  significant_omega: 0.1    # what counts as "significant deviations" rate
+
+intensity_curve:
+  points: 10
+  scenario_cap: 20
+
+adversarial:
+  scenario_cap: 20
+  tolerance: 0.01
+
+# Optional: override evaluator expected ranges without editing the evaluator classes
+expected_ranges:
+  # OrderSensitiveEvaluator: [0.10, 0.35]
+
+report:
+  keep_worst_failures: 5
+  keep_top_chains: 10

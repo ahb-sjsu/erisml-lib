@@ -1178,16 +1178,9 @@ class SemanticDistanceCalculator:
     """
     Compute semantic distance between selections.
     Uses a HYBRID approach:
-    - If selections match semantically (same option identity): omega = 0
+    - If selections match semantically: omega = 0
     - If selections differ: omega = max(0.5, semantic_distance)
     This ensures any decision flip is penalized substantially.
-
-    CRITICAL: Selection equivalence is determined by OPTION IDENTITY, not surface
-    label strings. Two selections are equivalent if they refer to the same
-    underlying option after normalizing away:
-    - DEME annotations: "(net positive: 0.45)", "(respects rights)", "[certain]"
-    - Label prefixes: "Option: ", "Choice: ", ">>> "
-    - Case and whitespace
     """
 
     @staticmethod
@@ -1217,35 +1210,28 @@ class SemanticDistanceCalculator:
     ) -> float:
         """
         Compute distance between two selections in their respective scenarios.
-
-        Uses OPTION IDENTITY matching:
-        1. First normalize both selections using Scenario.normalize_label()
-           (strips DEME annotations, prefixes, case, etc.)
-        2. If normalized selections match -> omega = 0 (same option)
-        3. If we can find both options and their normalized labels match -> omega = 0
-        4. Otherwise compute semantic distance with min 0.5 penalty
+        Uses HYBRID approach: any mismatch gets at least 0.5 penalty.
         """
-        # Use proper normalization that strips DEME annotations and prefixes
-        sel1_norm = Scenario.normalize_label(sel1)
-        sel2_norm = Scenario.normalize_label(sel2)
+        # Normalize selections for comparison
+        sel1_norm = sel1.lower().strip()
+        sel2_norm = sel2.lower().strip()
 
         # Quick check: if normalized selections match, omega = 0
         if sel1_norm == sel2_norm:
             return 0.0
 
-        # Try to find the actual options by ID first, then by label
+        # Try to find the actual options
         opt1 = scenario1.option_by_id(sel1) or scenario1.option_by_label(sel1)
         opt2 = scenario2.option_by_id(sel2) or scenario2.option_by_label(sel2)
 
-        # If we can match by canonicalized/normalized label, selections are equivalent
+        # If we can match by canonicalized label, selections are equivalent
         if opt1 and opt2:
-            # Use normalize_label for robust comparison
-            opt1_canonical = Scenario.normalize_label(opt1.label)
-            opt2_canonical = Scenario.normalize_label(opt2.label)
+            opt1_canonical = opt1.label.lower().strip()
+            opt2_canonical = opt2.label.lower().strip()
             if opt1_canonical == opt2_canonical:
                 return 0.0
 
-        # Selections genuinely differ - compute semantic distance
+        # Selections differ - compute semantic distance
         if opt1 is None and opt2 is None:
             # Can't find either option, assume significant difference
             return 0.75
@@ -1254,7 +1240,7 @@ class SemanticDistanceCalculator:
             # Can find one but not other - partial mismatch
             return 0.6
 
-        # Both found but different options - compute semantic distance
+        # Both found - compute semantic distance
         semantic_dist = SemanticDistanceCalculator.option_distance(opt1, opt2)
 
         # HYBRID: Any decision flip gets at least 0.5 penalty
@@ -1416,20 +1402,15 @@ class MinorEdgeCaseEvaluator(Evaluator):
 
 class OrderSensitiveEvaluator(Evaluator):
     """
-    Systematic order bias - Bd should be low-to-moderate.
+    Systematic order bias - Bd should be moderate.
 
-    Defect: Bias toward options that appear earlier in the list.
+    Defect: STRONG bias toward options that appear earlier in the list.
     Does NOT canonicalize, so reordering directly affects selection.
-
-    Note: With correct option identity matching (not surface label matching),
-    the position bias only occasionally flips decisions when options have
-    similar harm/benefit scores. The expected Bd is lower than naive
-    string-based matching would suggest.
     """
 
     @property
     def expected_bd_range(self) -> Tuple[float, float]:
-        return (0.00, 0.10)  # Adjusted for correct option identity matching
+        return (0.10, 0.35)
 
     def evaluate(self, scenario: Scenario) -> EvaluationResult:
         # Uses normalized scores but is SENSITIVE TO ORDER (not canonicalized)
@@ -1460,75 +1441,6 @@ class OrderSensitiveEvaluator(Evaluator):
             selected_option=canonical_label,
             confidence=0.7,
             reasoning="Order-sensitive evaluation",
-        )
-
-
-class FrameSensitiveEvaluator(Evaluator):
-    """
-    Ethical frame sensitivity - Bd should be moderate for DEME transforms.
-
-    Defect: Changes decision-making weights based on which ethical frame is
-    emphasized in the scenario. This is a representational defect because
-    the underlying ethical FACTS haven't changed, only the framing language.
-
-    A coherent evaluator should reach the same conclusion regardless of
-    which ethical lens is used to describe the situation.
-    """
-
-    @property
-    def expected_bd_range(self) -> Tuple[float, float]:
-        return (0.10, 0.40)  # Moderate - sensitive to DEME framing
-
-    def evaluate(self, scenario: Scenario) -> EvaluationResult:
-        # Check which ethical frame is active (set by DEME transforms)
-        frame = scenario.context.get("ethical_frame", "neutral")
-
-        # Frame-dependent weights - THIS IS THE DEFECT
-        # A coherent evaluator would use consistent weights regardless of frame
-        frame_weights = {
-            "consequentialist": {"benefit": 0.7, "harm": 0.3, "rights": 0.0},
-            "deontological": {"benefit": 0.2, "harm": 0.2, "rights": 0.6},
-            "justice": {"benefit": 0.3, "harm": 0.4, "rights": 0.3},
-            "autonomy": {"benefit": 0.4, "harm": 0.2, "rights": 0.4},
-            "privacy": {"benefit": 0.2, "harm": 0.5, "rights": 0.3},
-            "societal": {"benefit": 0.5, "harm": 0.4, "rights": 0.1},
-            "virtue": {"benefit": 0.4, "harm": 0.3, "rights": 0.3},
-            "procedural": {"benefit": 0.3, "harm": 0.3, "rights": 0.4},
-            "epistemic": {"benefit": 0.3, "harm": 0.4, "rights": 0.3},
-            "neutral": {"benefit": 0.4, "harm": 0.4, "rights": 0.2},
-        }
-
-        weights = frame_weights.get(frame, frame_weights["neutral"])
-
-        best_option = None
-        best_score = float("-inf")
-
-        for opt in scenario.options:
-            if opt.rights_violation:
-                # How much we penalize rights violations depends on frame
-                rights_penalty = weights["rights"] * 2.0
-                score = (
-                    opt.benefit_score * weights["benefit"]
-                    - opt.harm_score * weights["harm"]
-                    - rights_penalty
-                )
-            else:
-                score = (
-                    opt.benefit_score * weights["benefit"]
-                    - opt.harm_score * weights["harm"]
-                )
-
-            if score > best_score:
-                best_score = score
-                best_option = opt
-
-        # Normalize label for comparison
-        canonical_label = Scenario.normalize_label(best_option.label)
-
-        return EvaluationResult(
-            selected_option=canonical_label,
-            confidence=0.75,
-            reasoning=f"Frame-sensitive evaluation (frame={frame})",
         )
 
 
@@ -2291,7 +2203,6 @@ def run_advanced_calibration_test(
         IdealEvaluator(),
         MinorEdgeCaseEvaluator(),
         OrderSensitiveEvaluator(),
-        FrameSensitiveEvaluator(),
         SurfaceFeatureEvaluator(),
         ChaoticEvaluator(),
     ]

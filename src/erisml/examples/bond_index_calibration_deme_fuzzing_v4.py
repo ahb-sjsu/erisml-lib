@@ -1463,75 +1463,6 @@ class OrderSensitiveEvaluator(Evaluator):
         )
 
 
-class FrameSensitiveEvaluator(Evaluator):
-    """
-    Ethical frame sensitivity - Bd should be moderate for DEME transforms.
-
-    Defect: Changes decision-making weights based on which ethical frame is
-    emphasized in the scenario. This is a representational defect because
-    the underlying ethical FACTS haven't changed, only the framing language.
-
-    A coherent evaluator should reach the same conclusion regardless of
-    which ethical lens is used to describe the situation.
-    """
-
-    @property
-    def expected_bd_range(self) -> Tuple[float, float]:
-        return (0.10, 0.40)  # Moderate - sensitive to DEME framing
-
-    def evaluate(self, scenario: Scenario) -> EvaluationResult:
-        # Check which ethical frame is active (set by DEME transforms)
-        frame = scenario.context.get("ethical_frame", "neutral")
-
-        # Frame-dependent weights - THIS IS THE DEFECT
-        # A coherent evaluator would use consistent weights regardless of frame
-        frame_weights = {
-            "consequentialist": {"benefit": 0.7, "harm": 0.3, "rights": 0.0},
-            "deontological": {"benefit": 0.2, "harm": 0.2, "rights": 0.6},
-            "justice": {"benefit": 0.3, "harm": 0.4, "rights": 0.3},
-            "autonomy": {"benefit": 0.4, "harm": 0.2, "rights": 0.4},
-            "privacy": {"benefit": 0.2, "harm": 0.5, "rights": 0.3},
-            "societal": {"benefit": 0.5, "harm": 0.4, "rights": 0.1},
-            "virtue": {"benefit": 0.4, "harm": 0.3, "rights": 0.3},
-            "procedural": {"benefit": 0.3, "harm": 0.3, "rights": 0.4},
-            "epistemic": {"benefit": 0.3, "harm": 0.4, "rights": 0.3},
-            "neutral": {"benefit": 0.4, "harm": 0.4, "rights": 0.2},
-        }
-
-        weights = frame_weights.get(frame, frame_weights["neutral"])
-
-        best_option = None
-        best_score = float("-inf")
-
-        for opt in scenario.options:
-            if opt.rights_violation:
-                # How much we penalize rights violations depends on frame
-                rights_penalty = weights["rights"] * 2.0
-                score = (
-                    opt.benefit_score * weights["benefit"]
-                    - opt.harm_score * weights["harm"]
-                    - rights_penalty
-                )
-            else:
-                score = (
-                    opt.benefit_score * weights["benefit"]
-                    - opt.harm_score * weights["harm"]
-                )
-
-            if score > best_score:
-                best_score = score
-                best_option = opt
-
-        # Normalize label for comparison
-        canonical_label = Scenario.normalize_label(best_option.label)
-
-        return EvaluationResult(
-            selected_option=canonical_label,
-            confidence=0.75,
-            reasoning=f"Frame-sensitive evaluation (frame={frame})",
-        )
-
-
 class SurfaceFeatureEvaluator(Evaluator):
     """
     High surface sensitivity - Bd should be high.
@@ -2291,7 +2222,6 @@ def run_advanced_calibration_test(
         IdealEvaluator(),
         MinorEdgeCaseEvaluator(),
         OrderSensitiveEvaluator(),
-        FrameSensitiveEvaluator(),
         SurfaceFeatureEvaluator(),
         ChaoticEvaluator(),
     ]

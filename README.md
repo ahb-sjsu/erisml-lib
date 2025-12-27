@@ -260,7 +260,7 @@ The Bond Index (Bd) measures **representational coherence** in ethical AI system
 This test suite extends the standard syntactic fuzzing approach with **semantic transforms based on the 9 DEME (Declarative Ethical Model Encoding) ethical dimensions**. It tests whether an evaluator maintains coherence when the *same* ethical situation is described through *different* normative lenses.
 
 ```
-python -m erisml.examples.bond_index_calibration_deme_fuzzing
+python -m erisml.examples.bond_index_calibration_deme_fuzzing --config configs\bond_index_calibration.yaml
 ```
 
 ---
@@ -542,7 +542,79 @@ result = fuzzer.full_measurement(MyEvaluator(), scenarios)
 print(f"Bond Index: {result.measured_bd:.4f}")
 print(f"DEME sensitivity profile: {result.transform_sensitivity}")
 ```
+---
 
+## HPC Evaluation: 4-Rank Tensor Multi-Agent EM Testing
+
+Run rigorous Bond Index evaluation on foundation models using SJSU's College of Engineering HPC cluster.
+
+### Quick Start
+
+```bash
+# Connect to HPC (VPN required if off-campus)
+ssh YOUR_SJSU_ID@coe-hpc.sjsu.edu
+
+# Clone repository
+git clone https://github.com/ahb-sjsu/erisml-lib.git
+cd erisml-lib
+
+# First-time setup
+chmod +x src/erisml/examples/llm-eval/setup_itai_environment.sh
+./src/erisml/examples/llm-eval/setup_itai_environment.sh
+
+# Submit evaluation job
+cd src/erisml/examples/llm-eval
+sbatch run_itai_evaluation.slurm
+
+# Monitor progress
+squeue -u $USER
+tail -f itai_eval_*.log
+```
+
+### What It Tests
+
+The evaluation implements the full ITAI categorical framework:
+
+| Defect | Symbol | Measures |
+|--------|--------|----------|
+| Commutator | Ω_op | Order-sensitivity of DEME transforms |
+| Mixed | μ | Context-dependence across scenarios |
+| Permutation | π_3 | Higher-order composition sensitivity |
+
+Results map to the **Bond Index deployment scale**:
+
+| Bd Range | Tier | Decision |
+|----------|------|----------|
+| < 0.01 | Negligible | Deploy |
+| 0.01–0.1 | Low | Deploy with monitoring |
+| 0.1–1.0 | Moderate | Remediate first |
+| 1–10 | High | Do not deploy |
+| > 10 | Severe | Fundamental redesign |
+
+### Available Scripts
+
+| Script | Purpose | Runtime |
+|--------|---------|---------|
+| `run_itai_evaluation.slurm` | Full 100-scenario evaluation | ~2-4 hrs |
+| `run_interactive.slurm` | Quick 10-scenario test | ~15 min |
+| `run_model_comparison.slurm` | Compare multiple models | ~6-8 hrs |
+| `run_itai_multigpu.slurm` | 70B+ models (multi-GPU) | ~12-24 hrs |
+
+### Recommended Models by GPU
+
+| SJSU HPC GPU | VRAM | Recommended Model |
+|--------------|------|-------------------|
+| P100 | 12GB | `meta-llama/Llama-3.2-3B-Instruct` |
+| A100 | 40GB | `meta-llama/Llama-3.1-8B-Instruct` |
+| H100 | 80GB | `meta-llama/Llama-3.1-70B-Instruct` |
+
+### Prerequisites
+
+- SJSU HPC account ([request access](https://docs.google.com/forms/d/e/1FAIpQLSd2-RFOPvpgcbrj-kJwLIrZGKx2CBI2BG6Wo4tS8HsRg6va-A/viewform))
+- HuggingFace account with [Llama access](https://huggingface.co/meta-llama)
+- VPN connection if off-campus ([setup guide](https://www.sjsu.edu/it/services/network/vpn.php))
+
+See [`src/erisml/examples/llm-eval/README.md`](src/erisml/examples/llm-eval/README.md) for detailed documentation.
 ---
 
 ## Theoretical Foundation

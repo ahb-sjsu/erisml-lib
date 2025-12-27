@@ -96,6 +96,7 @@ DEME_FULL_NAMES = {
 DEFAULT_CALIBRATION_CONFIG: Dict[str, any] = {
     "seed": 42,
     "scenario_generation": {"n_scenarios": 100},
+
     # Reporting / conformance thresholds
     "thresholds": {
         # Ω >= significant_omega counts as a conformance deviation (for rates)
@@ -103,12 +104,14 @@ DEFAULT_CALIBRATION_CONFIG: Dict[str, any] = {
         # Ω >= witness_omega is worth listing as a "worst witness" example
         "witness_omega": 0.50,
     },
+
     # Intensity grids. Keep these crossing known activation thresholds.
     "intensities": {
         "deme": [0.25, 0.35, 0.55, 0.70, 1.00],
         "syntactic_invariant": [0.20, 0.60, 1.00],
         "stress": [0.20, 0.60, 1.00],
     },
+
     # Chain settings
     "chains": {
         # Random chain sampling (invariant transforms only)
@@ -116,21 +119,21 @@ DEFAULT_CALIBRATION_CONFIG: Dict[str, any] = {
         "random_max_length": 3,
         "random_intensities": [0.3, 0.6, 1.0],
         "random_seed_offset": 0,
+
         # Deterministic "coverage" chains to guarantee DEME appears in composition
         "include_deme_coverage_chains": True,
         "coverage_deme_intensity": 0.70,
         "coverage_syntactic_intensity": 1.00,
-        "coverage_syntactic_transforms": [
-            "reorder_options",
-            "label_prefix",
-            "paraphrase",
-        ],
+        "coverage_syntactic_transforms": ["reorder_options", "label_prefix", "paraphrase"],
     },
+
     # Extra diagnostics controls (runtime knobs)
     "intensity_curve": {"n_points": 10, "scenario_cap": 20},
     "adversarial": {"scenario_cap": 20, "tolerance": 0.01},
+
     # Output sizing
     "report": {"worst_k": 5, "top_k_chains": 10},
+
     # Optional overrides: evaluator class name -> [min, max]
     # Example:
     #   {"OrderSensitiveEvaluator": [0.10, 0.40]}
@@ -1178,16 +1181,9 @@ class SemanticDistanceCalculator:
     """
     Compute semantic distance between selections.
     Uses a HYBRID approach:
-    - If selections match semantically (same option identity): omega = 0
+    - If selections match semantically: omega = 0
     - If selections differ: omega = max(0.5, semantic_distance)
     This ensures any decision flip is penalized substantially.
-
-    CRITICAL: Selection equivalence is determined by OPTION IDENTITY, not surface
-    label strings. Two selections are equivalent if they refer to the same
-    underlying option after normalizing away:
-    - DEME annotations: "(net positive: 0.45)", "(respects rights)", "[certain]"
-    - Label prefixes: "Option: ", "Choice: ", ">>> "
-    - Case and whitespace
     """
 
     @staticmethod
@@ -1217,35 +1213,28 @@ class SemanticDistanceCalculator:
     ) -> float:
         """
         Compute distance between two selections in their respective scenarios.
-
-        Uses OPTION IDENTITY matching:
-        1. First normalize both selections using Scenario.normalize_label()
-           (strips DEME annotations, prefixes, case, etc.)
-        2. If normalized selections match -> omega = 0 (same option)
-        3. If we can find both options and their normalized labels match -> omega = 0
-        4. Otherwise compute semantic distance with min 0.5 penalty
+        Uses HYBRID approach: any mismatch gets at least 0.5 penalty.
         """
-        # Use proper normalization that strips DEME annotations and prefixes
-        sel1_norm = Scenario.normalize_label(sel1)
-        sel2_norm = Scenario.normalize_label(sel2)
+        # Normalize selections for comparison
+        sel1_norm = sel1.lower().strip()
+        sel2_norm = sel2.lower().strip()
 
         # Quick check: if normalized selections match, omega = 0
         if sel1_norm == sel2_norm:
             return 0.0
 
-        # Try to find the actual options by ID first, then by label
+        # Try to find the actual options
         opt1 = scenario1.option_by_id(sel1) or scenario1.option_by_label(sel1)
         opt2 = scenario2.option_by_id(sel2) or scenario2.option_by_label(sel2)
 
-        # If we can match by canonicalized/normalized label, selections are equivalent
+        # If we can match by canonicalized label, selections are equivalent
         if opt1 and opt2:
-            # Use normalize_label for robust comparison
-            opt1_canonical = Scenario.normalize_label(opt1.label)
-            opt2_canonical = Scenario.normalize_label(opt2.label)
+            opt1_canonical = opt1.label.lower().strip()
+            opt2_canonical = opt2.label.lower().strip()
             if opt1_canonical == opt2_canonical:
                 return 0.0
 
-        # Selections genuinely differ - compute semantic distance
+        # Selections differ - compute semantic distance
         if opt1 is None and opt2 is None:
             # Can't find either option, assume significant difference
             return 0.75
@@ -1254,7 +1243,7 @@ class SemanticDistanceCalculator:
             # Can find one but not other - partial mismatch
             return 0.6
 
-        # Both found but different options - compute semantic distance
+        # Both found - compute semantic distance
         semantic_dist = SemanticDistanceCalculator.option_distance(opt1, opt2)
 
         # HYBRID: Any decision flip gets at least 0.5 penalty
@@ -1416,20 +1405,15 @@ class MinorEdgeCaseEvaluator(Evaluator):
 
 class OrderSensitiveEvaluator(Evaluator):
     """
-    Systematic order bias - Bd should be low-to-moderate.
+    Systematic order bias - Bd should be moderate.
 
-    Defect: Bias toward options that appear earlier in the list.
+    Defect: STRONG bias toward options that appear earlier in the list.
     Does NOT canonicalize, so reordering directly affects selection.
-
-    Note: With correct option identity matching (not surface label matching),
-    the position bias only occasionally flips decisions when options have
-    similar harm/benefit scores. The expected Bd is lower than naive
-    string-based matching would suggest.
     """
 
     @property
     def expected_bd_range(self) -> Tuple[float, float]:
-        return (0.00, 0.10)  # Adjusted for correct option identity matching
+        return (0.10, 0.35)
 
     def evaluate(self, scenario: Scenario) -> EvaluationResult:
         # Uses normalized scores but is SENSITIVE TO ORDER (not canonicalized)
@@ -1460,75 +1444,6 @@ class OrderSensitiveEvaluator(Evaluator):
             selected_option=canonical_label,
             confidence=0.7,
             reasoning="Order-sensitive evaluation",
-        )
-
-
-class FrameSensitiveEvaluator(Evaluator):
-    """
-    Ethical frame sensitivity - Bd should be moderate for DEME transforms.
-
-    Defect: Changes decision-making weights based on which ethical frame is
-    emphasized in the scenario. This is a representational defect because
-    the underlying ethical FACTS haven't changed, only the framing language.
-
-    A coherent evaluator should reach the same conclusion regardless of
-    which ethical lens is used to describe the situation.
-    """
-
-    @property
-    def expected_bd_range(self) -> Tuple[float, float]:
-        return (0.10, 0.40)  # Moderate - sensitive to DEME framing
-
-    def evaluate(self, scenario: Scenario) -> EvaluationResult:
-        # Check which ethical frame is active (set by DEME transforms)
-        frame = scenario.context.get("ethical_frame", "neutral")
-
-        # Frame-dependent weights - THIS IS THE DEFECT
-        # A coherent evaluator would use consistent weights regardless of frame
-        frame_weights = {
-            "consequentialist": {"benefit": 0.7, "harm": 0.3, "rights": 0.0},
-            "deontological": {"benefit": 0.2, "harm": 0.2, "rights": 0.6},
-            "justice": {"benefit": 0.3, "harm": 0.4, "rights": 0.3},
-            "autonomy": {"benefit": 0.4, "harm": 0.2, "rights": 0.4},
-            "privacy": {"benefit": 0.2, "harm": 0.5, "rights": 0.3},
-            "societal": {"benefit": 0.5, "harm": 0.4, "rights": 0.1},
-            "virtue": {"benefit": 0.4, "harm": 0.3, "rights": 0.3},
-            "procedural": {"benefit": 0.3, "harm": 0.3, "rights": 0.4},
-            "epistemic": {"benefit": 0.3, "harm": 0.4, "rights": 0.3},
-            "neutral": {"benefit": 0.4, "harm": 0.4, "rights": 0.2},
-        }
-
-        weights = frame_weights.get(frame, frame_weights["neutral"])
-
-        best_option = None
-        best_score = float("-inf")
-
-        for opt in scenario.options:
-            if opt.rights_violation:
-                # How much we penalize rights violations depends on frame
-                rights_penalty = weights["rights"] * 2.0
-                score = (
-                    opt.benefit_score * weights["benefit"]
-                    - opt.harm_score * weights["harm"]
-                    - rights_penalty
-                )
-            else:
-                score = (
-                    opt.benefit_score * weights["benefit"]
-                    - opt.harm_score * weights["harm"]
-                )
-
-            if score > best_score:
-                best_score = score
-                best_option = opt
-
-        # Normalize label for comparison
-        canonical_label = Scenario.normalize_label(best_option.label)
-
-        return EvaluationResult(
-            selected_option=canonical_label,
-            confidence=0.75,
-            reasoning=f"Frame-sensitive evaluation (frame={frame})",
         )
 
 
@@ -1650,29 +1565,20 @@ class AdvancedBondIndexResult:
     in_expected_range: bool
 
     # Detailed metrics
-    omega_distribution: Dict[str, float]  # mean, std, p50, p75, p95, p99, max
-    transform_sensitivity: Dict[str, float]  # per-transform average omega
-    chain_sensitivity: Dict[str, float]  # per-chain average omega
+    omega_distribution: Dict[str, float]  # mean, std, p50, p95, p99, max
+    transform_sensitivity: Dict[str, float]  # Per-transform average omega
+    chain_sensitivity: Dict[str, float]  # Per-chain average omega
     intensity_curve: List[Tuple[float, float]]  # (intensity, omega) pairs
 
-    # Deviation / witness analysis
+    # Failure analysis
     n_tests: int
     n_failures: int
-    failure_rate: float  # n_failures / n_tests
+    failure_rate: float
+    worst_failures: List[dict]
 
-    # Back-compat: older versions used 'worst_failures'
-    worst_failures: List[dict] = field(default_factory=list)
-
-    # New: split witnesses into invariant vs stress buckets
-    worst_invariant_witnesses: List[dict] = field(default_factory=list)
-    worst_stress_witnesses: List[dict] = field(default_factory=list)
-
-    # Adversarial + sensitivity diagnostics
-    adversarial_robustness: float = 1.0  # mean intensity needed to flip decision
-    sensitivity_profile: Dict[str, float] = field(default_factory=dict)
-
-    # Coverage diagnostics (e.g., DEME per-dimension coverage)
-    deme_coverage: Dict[str, Dict[str, float]] = field(default_factory=dict)
+    # Adversarial results
+    adversarial_robustness: float  # Min perturbation to flip decision
+    sensitivity_profile: Dict[str, float]  # Per-dimension sensitivity
 
 
 def classify_bd_tier(bd: float) -> str:
@@ -1782,9 +1688,9 @@ class AdvancedFuzzer:
             transformed = transform(scenario, intensity)
             result = evaluator.evaluate(transformed)
             # compare in normalized space to avoid "label-only" flips
-            return Scenario.normalize_label(
-                result.selected_option
-            ) != Scenario.normalize_label(baseline_result.selected_option)
+            return Scenario.normalize_label(result.selected_option) != Scenario.normalize_label(
+                baseline_result.selected_option
+            )
 
         low, high = 0.0, 1.0
         if not causes_flip(1.0):
@@ -1812,37 +1718,15 @@ class AdvancedFuzzer:
     def _intensity_grid_for(self, t: ParametricTransform) -> List[float]:
         grids = self.cfg.get("intensities", {}) or {}
         if t.name.startswith("deme:"):
-            return [
-                float(x)
-                for x in (
-                    grids.get("deme")
-                    or DEFAULT_CALIBRATION_CONFIG["intensities"]["deme"]
-                )
-            ]
+            return [float(x) for x in (grids.get("deme") or DEFAULT_CALIBRATION_CONFIG["intensities"]["deme"])]
         if t.is_semantic_invariant:
-            return [
-                float(x)
-                for x in (
-                    grids.get("syntactic_invariant")
-                    or DEFAULT_CALIBRATION_CONFIG["intensities"]["syntactic_invariant"]
-                )
-            ]
-        return [
-            float(x)
-            for x in (
-                grids.get("stress")
-                or DEFAULT_CALIBRATION_CONFIG["intensities"]["stress"]
-            )
-        ]
+            return [float(x) for x in (grids.get("syntactic_invariant") or DEFAULT_CALIBRATION_CONFIG["intensities"]["syntactic_invariant"])]
+        return [float(x) for x in (grids.get("stress") or DEFAULT_CALIBRATION_CONFIG["intensities"]["stress"])]
 
     def _expected_range_for(self, evaluator: Evaluator) -> Tuple[float, float]:
         overrides = self.cfg.get("expected_ranges") or {}
         key = evaluator.__class__.__name__
-        if (
-            key in overrides
-            and isinstance(overrides[key], (list, tuple))
-            and len(overrides[key]) == 2
-        ):
+        if key in overrides and isinstance(overrides[key], (list, tuple)) and len(overrides[key]) == 2:
             return (float(overrides[key][0]), float(overrides[key][1]))
         return evaluator.expected_bd_range
 
@@ -1914,9 +1798,7 @@ class AdvancedFuzzer:
                         deme_counts[transform.name] += 1
 
         # Assert full DEME coverage (per evaluator)
-        deme_grid = self.cfg.get("intensities", {}).get(
-            "deme", DEFAULT_CALIBRATION_CONFIG["intensities"]["deme"]
-        )
+        deme_grid = self.cfg.get("intensities", {}).get("deme", DEFAULT_CALIBRATION_CONFIG["intensities"]["deme"])
         expected_per_deme = len(scenarios) * len(deme_grid)
         for deme_name in DEME_EXPECTED:
             got = deme_counts.get(deme_name, 0)
@@ -1927,20 +1809,13 @@ class AdvancedFuzzer:
 
         # 2) Transform chains using invariant transforms
         invariant_transforms = [t for t in self.transforms if t.is_semantic_invariant]
-        deme_transforms = [
-            t for t in invariant_transforms if t.name.startswith("deme:")
-        ]
+        deme_transforms = [t for t in invariant_transforms if t.name.startswith("deme:")]
 
         chains_cfg = self.cfg.get("chains", {}) or {}
         include_cov = bool(chains_cfg.get("include_deme_coverage_chains", True))
         cov_deme_int = float(chains_cfg.get("coverage_deme_intensity", 0.70))
         cov_syn_int = float(chains_cfg.get("coverage_syntactic_intensity", 1.00))
-        cov_syn_names = list(
-            chains_cfg.get(
-                "coverage_syntactic_transforms",
-                ["reorder_options", "label_prefix", "paraphrase"],
-            )
-        )
+        cov_syn_names = list(chains_cfg.get("coverage_syntactic_transforms", ["reorder_options", "label_prefix", "paraphrase"]))
         core_syntactic = [t for t in invariant_transforms if t.name in cov_syn_names]
 
         # Deterministic DEME coverage chains (guarantee 9 dims exercised in composition)
@@ -1948,24 +1823,14 @@ class AdvancedFuzzer:
         if include_cov and deme_transforms and core_syntactic:
             for dt in deme_transforms:
                 for st in core_syntactic:
-                    coverage_chains.append(
-                        TransformChain([(dt, cov_deme_int), (st, cov_syn_int)])
-                    )
-                    coverage_chains.append(
-                        TransformChain([(st, cov_syn_int), (dt, cov_deme_int)])
-                    )  # commutativity probe
+                    coverage_chains.append(TransformChain([(dt, cov_deme_int), (st, cov_syn_int)]))
+                    coverage_chains.append(TransformChain([(st, cov_syn_int), (dt, cov_deme_int)]))  # commutativity probe
 
         # Random chains
-        random_n = int(
-            n_chains if n_chains is not None else chains_cfg.get("random_n_chains", 30)
-        )
+        random_n = int(n_chains if n_chains is not None else chains_cfg.get("random_n_chains", 30))
         random_max_len = int(chains_cfg.get("random_max_length", 3))
-        random_intensities = [
-            float(x) for x in chains_cfg.get("random_intensities", [0.3, 0.6, 1.0])
-        ]
-        random_seed = int(self.cfg.get("seed", 42)) + int(
-            chains_cfg.get("random_seed_offset", 0)
-        )
+        random_intensities = [float(x) for x in chains_cfg.get("random_intensities", [0.3, 0.6, 1.0])]
+        random_seed = int(self.cfg.get("seed", 42)) + int(chains_cfg.get("random_seed_offset", 0))
 
         random_chains = TransformChain.generate_chains(
             invariant_transforms,
@@ -2000,10 +1865,7 @@ class AdvancedFuzzer:
                 t for t in self.transforms if t.name == most_sensitive
             )
             intensity_curve = self.intensity_sweep(
-                evaluator,
-                scenarios[:ic_cap],
-                most_sensitive_transform,
-                n_points=ic_points,
+                evaluator, scenarios[:ic_cap], most_sensitive_transform, n_points=ic_points
             )
         else:
             intensity_curve = []
@@ -2045,9 +1907,7 @@ class AdvancedFuzzer:
             "max": float(np.max(omega_array)),
         }
 
-        transform_sens = {
-            t: float(np.mean(vals)) for t, vals in transform_omegas.items()
-        }
+        transform_sens = {t: float(np.mean(vals)) for t, vals in transform_omegas.items()}
 
         n_tests = int(len(omega_array))
         n_failures = int(np.sum(omega_array >= significant_omega))
@@ -2064,9 +1924,7 @@ class AdvancedFuzzer:
                 "n": float(len(arr)),
                 "mean": float(np.mean(arr)) if len(arr) else 0.0,
                 "p95": float(np.percentile(arr, 95)) if len(arr) else 0.0,
-                "rate_omega_ge_sig": (
-                    float(np.mean(arr >= significant_omega)) if len(arr) else 0.0
-                ),
+                "rate_omega_ge_sig": float(np.mean(arr >= significant_omega)) if len(arr) else 0.0,
             }
 
         expected_range = self._expected_range_for(evaluator)
@@ -2077,25 +1935,24 @@ class AdvancedFuzzer:
             measured_bd=float(bd),
             measured_tier=classify_bd_tier(float(bd)),
             in_expected_range=(expected_range[0] <= bd <= expected_range[1]),
+
             omega_distribution=omega_dist,
             transform_sensitivity=transform_sens,
             chain_sensitivity=dict(
-                sorted(chain_omegas.items(), key=lambda x: x[1], reverse=True)[
-                    :top_k_chains
-                ]
+                sorted(chain_omegas.items(), key=lambda x: x[1], reverse=True)[:top_k_chains]
             ),
             intensity_curve=intensity_curve,
+
             n_tests=n_tests,
             n_failures=n_failures,
             failure_rate=float(failure_rate),
+
             worst_invariant_witnesses=invariant_witnesses[:worst_k],
             worst_stress_witnesses=stress_witnesses[:worst_k],
-            adversarial_robustness=(
-                float(np.mean(adversarial_thresholds))
-                if adversarial_thresholds
-                else 1.0
-            ),
+
+            adversarial_robustness=float(np.mean(adversarial_thresholds)) if adversarial_thresholds else 1.0,
             sensitivity_profile=sensitivity,
+
             deme_coverage=deme_coverage,
         )
 
@@ -2236,9 +2093,7 @@ def run_advanced_calibration_test(
         cfg.setdefault("chains", {})["random_n_chains"] = int(n_chains)
 
     effective_seed = int(cfg.get("seed", 42))
-    effective_n_scenarios = int(
-        cfg.get("scenario_generation", {}).get("n_scenarios", 100)
-    )
+    effective_n_scenarios = int(cfg.get("scenario_generation", {}).get("n_scenarios", 100))
     thresholds = cfg.get("thresholds", {}) or {}
     significant_omega = float(thresholds.get("significant_omega", 0.10))
     witness_omega = float(thresholds.get("witness_omega", 0.50))
@@ -2276,9 +2131,7 @@ def run_advanced_calibration_test(
 
     print("\nIntensity grids (from config):")
     print("  DEME:", cfg.get("intensities", {}).get("deme"))
-    print(
-        "  Syntactic invariant:", cfg.get("intensities", {}).get("syntactic_invariant")
-    )
+    print("  Syntactic invariant:", cfg.get("intensities", {}).get("syntactic_invariant"))
     print("  Stress:", cfg.get("intensities", {}).get("stress"))
 
     print("\nThresholds (from config):")
@@ -2291,7 +2144,6 @@ def run_advanced_calibration_test(
         IdealEvaluator(),
         MinorEdgeCaseEvaluator(),
         OrderSensitiveEvaluator(),
-        FrameSensitiveEvaluator(),
         SurfaceFeatureEvaluator(),
         ChaoticEvaluator(),
     ]
@@ -2299,9 +2151,7 @@ def run_advanced_calibration_test(
     results: Dict[str, AdvancedBondIndexResult] = {}
 
     print("\n" + "-" * 78)
-    print(
-        f"{'Evaluator':<26} {'Expected Range':<16} {'Measured Bd':<12} {'Tier':<10} {'Pass'}"
-    )
+    print(f"{'Evaluator':<26} {'Expected Range':<16} {'Measured Bd':<12} {'Tier':<10} {'Pass'}")
     print("-" * 78)
 
     for evaluator in evaluators:
@@ -2327,17 +2177,13 @@ def run_advanced_calibration_test(
         print(f"│ {name}")
         print(f"{'─' * 78}")
 
-        print(
-            f"│ Expected range: [{result.expected_range[0]:.3f}, {result.expected_range[1]:.3f}]"
-        )
+        print(f"│ Expected range: [{result.expected_range[0]:.3f}, {result.expected_range[1]:.3f}]")
         print(f"│ Measured Bd:    {result.measured_bd:.4f} ({result.measured_tier})")
         print(f"│ In range:       {'Yes ✓' if result.in_expected_range else 'No ✗'}")
 
         print("│")
         print("│ Ω Distribution (invariant transforms + invariant chains):")
-        print(
-            f"│   Mean: {result.omega_distribution['mean']:.4f}  Std: {result.omega_distribution['std']:.4f}"
-        )
+        print(f"│   Mean: {result.omega_distribution['mean']:.4f}  Std: {result.omega_distribution['std']:.4f}")
         print(
             f"│   p50:  {result.omega_distribution['p50']:.4f}  "
             f"p75: {result.omega_distribution['p75']:.4f}  "
@@ -2346,9 +2192,7 @@ def run_advanced_calibration_test(
 
         print("│")
         print("│ Transform Sensitivity (top 5, includes stress diagnostics):")
-        for t_name, sens in sorted(
-            result.transform_sensitivity.items(), key=lambda x: x[1], reverse=True
-        )[:5]:
+        for t_name, sens in sorted(result.transform_sensitivity.items(), key=lambda x: x[1], reverse=True)[:5]:
             bar = "█" * int(sens * 30)
             print(f"│   {t_name:<20} {sens:.3f} {bar}")
 
@@ -2357,9 +2201,7 @@ def run_advanced_calibration_test(
         print("│   (mean intensity needed to flip decision; invariant transforms)")
 
         print("│")
-        print(
-            f"│ Conformance Stats: {result.n_tests} tests, {result.failure_rate*100:.1f}% deviations (Ω ≥ {significant_omega:.2f})"
-        )
+        print(f"│ Conformance Stats: {result.n_tests} tests, {result.failure_rate*100:.1f}% deviations (Ω ≥ {significant_omega:.2f})")
 
         # Invariant witnesses
         if result.worst_invariant_witnesses:
@@ -2371,11 +2213,7 @@ def run_advanced_calibration_test(
         # Stress witnesses (kept separate to avoid confusing "0% conformance deviations")
         if result.worst_stress_witnesses:
             print("│")
-            print(
-                "│ Worst Stress Witnesses (non-invariant; Ω ≥ {:.2f}):".format(
-                    witness_omega
-                )
-            )
+            print("│ Worst Stress Witnesses (non-invariant; Ω ≥ {:.2f}):".format(witness_omega))
             for f in result.worst_stress_witnesses[:3]:
                 print(f"│   Ω={f['omega']:.3f} via {f['transform'][:40]}")
 
@@ -2411,11 +2249,7 @@ def run_advanced_calibration_test(
                 deme_totals[t_name].append(sens)
 
     for t_name in sorted(DEME_EXPECTED):
-        avg = (
-            sum(deme_totals[t_name]) / len(deme_totals[t_name])
-            if deme_totals[t_name]
-            else 0.0
-        )
+        avg = sum(deme_totals[t_name]) / len(deme_totals[t_name]) if deme_totals[t_name] else 0.0
         bar = "█" * int(avg * 40)
         print(f"  {DEME_FULL_NAMES.get(t_name, t_name):<32} {avg:.3f} {bar}")
 
@@ -2427,14 +2261,8 @@ def run_advanced_calibration_test(
         print("\n✗ CALIBRATION NEEDS ADJUSTMENT:")
         for name, result in results.items():
             if not result.in_expected_range:
-                direction = (
-                    "too high"
-                    if result.measured_bd > result.expected_range[1]
-                    else "too low"
-                )
-                most_sensitive = max(
-                    result.transform_sensitivity, key=result.transform_sensitivity.get
-                )
+                direction = "too high" if result.measured_bd > result.expected_range[1] else "too low"
+                most_sensitive = max(result.transform_sensitivity, key=result.transform_sensitivity.get)
                 print(f"  • {name}: Bd={result.measured_bd:.3f} ({direction})")
                 print(f"    Most sensitive to: {most_sensitive}")
 
@@ -2444,16 +2272,9 @@ def run_advanced_calibration_test(
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("--config", default=None, help="Path to YAML/JSON config file.")
-    parser.add_argument(
-        "--n-scenarios", type=int, default=None, help="Override scenario count."
-    )
+    parser.add_argument("--n-scenarios", type=int, default=None, help="Override scenario count.")
     parser.add_argument("--seed", type=int, default=None, help="Override RNG seed.")
-    parser.add_argument(
-        "--n-chains",
-        type=int,
-        default=None,
-        help="Override number of random invariant chains.",
-    )
+    parser.add_argument("--n-chains", type=int, default=None, help="Override number of random invariant chains.")
     parser.add_argument(
         "--dump-default-config",
         action="store_true",
@@ -2464,7 +2285,6 @@ if __name__ == "__main__":
     if args.dump_default_config:
         try:
             import yaml  # type: ignore
-
             print(yaml.safe_dump(DEFAULT_CALIBRATION_CONFIG, sort_keys=False))
         except Exception:
             print(json.dumps(DEFAULT_CALIBRATION_CONFIG, indent=2))
