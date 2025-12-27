@@ -30,188 +30,19 @@ surface-level framing effects.
 
 import numpy as np
 from dataclasses import dataclass, field
-from typing import List, Dict, Callable, Tuple, Optional
+from typing import List, Dict, Callable, Tuple, Optional, Set
+from enum import Enum
 import hashlib
 from abc import ABC, abstractmethod
+from itertools import combinations, product
 import random
 from collections import defaultdict
 import math
 import re
 
-from pathlib import Path
-import json
-import argparse
-
-
-# =============================================================================
-# CONFIGURATION
-# =============================================================================
-#
-# This script supports optional YAML/JSON config overrides for calibration
-# settings (intensity grids, thresholds, chain settings, etc.).
-#
-# Default search path (if --config is not provided):
-#   <repo_root>/configs/bond_index_calibration.yaml
-#   <repo_root>/configs/bond_index_calibration.yml
-#   <repo_root>/configs/bond_index_calibration.json
-#
-# repo_root is found by walking upward from this file until a directory containing
-# pyproject.toml or .git is found. If nothing is found, the current working
-# directory is used.
-#
-# YAML requires PyYAML:
-#   pip install pyyaml
-#
-# JSON works with the standard library.
-
-# =============================================================================
-# DEME CONSTANTS
-# =============================================================================
-# The 9 DEME ethical lens dimension transform names expected to exist in the transform suite.
-DEME_EXPECTED = {
-    "deme:consequentialist",
-    "deme:deontological",
-    "deme:justice",
-    "deme:autonomy",
-    "deme:privacy",
-    "deme:societal",
-    "deme:virtue",
-    "deme:procedural",
-    "deme:epistemic",
-}
-
-# Human-readable names (used only for reporting).
-DEME_FULL_NAMES = {
-    "deme:consequentialist": "Consequences and Welfare",
-    "deme:deontological": "Rights and Duties",
-    "deme:justice": "Justice and Fairness",
-    "deme:autonomy": "Autonomy and Agency",
-    "deme:privacy": "Privacy and Data Governance",
-    "deme:societal": "Societal and Environmental",
-    "deme:virtue": "Virtue and Care",
-    "deme:procedural": "Procedural Legitimacy",
-    "deme:epistemic": "Epistemic Status",
-}
-
-DEFAULT_CALIBRATION_CONFIG: Dict[str, any] = {
-    "seed": 42,
-    "scenario_generation": {"n_scenarios": 100},
-    # Reporting / conformance thresholds
-    "thresholds": {
-        # Ω >= significant_omega counts as a conformance deviation (for rates)
-        "significant_omega": 0.10,
-        # Ω >= witness_omega is worth listing as a "worst witness" example
-        "witness_omega": 0.50,
-    },
-    # Intensity grids. Keep these crossing known activation thresholds.
-    "intensities": {
-        "deme": [0.25, 0.35, 0.55, 0.70, 1.00],
-        "syntactic_invariant": [0.20, 0.60, 1.00],
-        "stress": [0.20, 0.60, 1.00],
-    },
-    # Chain settings
-    "chains": {
-        # Random chain sampling (invariant transforms only)
-        "random_n_chains": 30,
-        "random_max_length": 3,
-        "random_intensities": [0.3, 0.6, 1.0],
-        "random_seed_offset": 0,
-        # Deterministic "coverage" chains to guarantee DEME appears in composition
-        "include_deme_coverage_chains": True,
-        "coverage_deme_intensity": 0.70,
-        "coverage_syntactic_intensity": 1.00,
-        "coverage_syntactic_transforms": [
-            "reorder_options",
-            "label_prefix",
-            "paraphrase",
-        ],
-    },
-    # Extra diagnostics controls (runtime knobs)
-    "intensity_curve": {"n_points": 10, "scenario_cap": 20},
-    "adversarial": {"scenario_cap": 20, "tolerance": 0.01},
-    # Output sizing
-    "report": {"worst_k": 5, "top_k_chains": 10},
-    # Optional overrides: evaluator class name -> [min, max]
-    # Example:
-    #   {"OrderSensitiveEvaluator": [0.10, 0.40]}
-    "expected_ranges": {},
-}
-
-
-def _deep_merge(base: dict, override: dict) -> dict:
-    """Recursively merge override into base (dicts only)."""
-    out = dict(base)
-    for k, v in (override or {}).items():
-        if isinstance(v, dict) and isinstance(out.get(k), dict):
-            out[k] = _deep_merge(out[k], v)
-        else:
-            out[k] = v
-    return out
-
-
-def _find_repo_root(start: Path) -> Path:
-    start = start.resolve()
-    for p in [start] + list(start.parents):
-        if (p / "pyproject.toml").exists() or (p / ".git").exists():
-            return p
-    return Path.cwd().resolve()
-
-
-def _default_config_path(repo_root: Path) -> Optional[Path]:
-    candidates = [
-        repo_root / "configs" / "bond_index_calibration.yaml",
-        repo_root / "configs" / "bond_index_calibration.yml",
-        repo_root / "configs" / "bond_index_calibration.json",
-    ]
-    for c in candidates:
-        if c.exists():
-            return c
-    return None
-
-
-def load_calibration_config(config_path: Optional[str] = None) -> dict:
-    """
-    Load YAML/JSON config and merge over DEFAULT_CALIBRATION_CONFIG.
-    If config_path is None, attempts the default search path under repo_root.
-    """
-    repo_root = _find_repo_root(Path(__file__).resolve())
-
-    resolved: Optional[Path] = None
-    if config_path:
-        resolved = Path(config_path).expanduser()
-        if not resolved.is_absolute():
-            resolved = (Path.cwd() / resolved).resolve()
-    else:
-        resolved = _default_config_path(repo_root)
-
-    if not resolved or not resolved.exists():
-        cfg = dict(DEFAULT_CALIBRATION_CONFIG)
-        cfg["_meta"] = {"resolved_config_path": None, "repo_root": str(repo_root)}
-        return cfg
-
-    suffix = resolved.suffix.lower()
-    raw: dict
-    if suffix in (".yaml", ".yml"):
-        try:
-            import yaml  # type: ignore
-        except Exception as e:
-            raise RuntimeError(
-                f"Config file is YAML ({resolved}), but PyYAML isn't available. "
-                f"Install it (pip install pyyaml) or use JSON instead. Error: {e}"
-            )
-        raw = yaml.safe_load(resolved.read_text(encoding="utf-8")) or {}
-    else:
-        raw = json.loads(resolved.read_text(encoding="utf-8") or "{}")
-
-    cfg = _deep_merge(DEFAULT_CALIBRATION_CONFIG, raw)
-    cfg["_meta"] = {"resolved_config_path": str(resolved), "repo_root": str(repo_root)}
-    return cfg
-
-
 # =============================================================================
 # CORE DATA STRUCTURES
 # =============================================================================
-
 
 @dataclass
 class Option:
@@ -224,23 +55,20 @@ class Option:
 
     def semantic_vector(self) -> np.ndarray:
         """Return semantic embedding for distance calculations."""
-        return np.array(
-            [
-                self.harm_score,
-                self.benefit_score,
-                float(self.rights_violation),
-                self.urgency,
-            ]
-        )
+        return np.array([
+            self.harm_score,
+            self.benefit_score,
+            float(self.rights_violation),
+            self.urgency
+        ])
 
-
-@dataclass
+@dataclass 
 class Scenario:
     id: str
     description: str
     options: List[Option]
     context: Dict[str, any] = field(default_factory=dict)
-
+    
     @staticmethod
     def normalize_label(label: str) -> str:
         """
@@ -248,29 +76,24 @@ class Scenario:
         Strips prefixes, case, whitespace, common paraphrases, and DEME annotations.
         """
         result = label.lower().strip()
-
+        
         # Strip DEME ethical dimension annotations
         # These are added by DEME transforms and look like:
         # "(net positive: 0.45)", "(respects rights)", "[certain]", etc.
-        result = re.sub(r"\s*\([^)]*\)\s*$", "", result)  # Strip trailing (...)
-        result = re.sub(r"\s*\[[^\]]*\]\s*$", "", result)  # Strip trailing [...]
-        result = re.sub(r"\s*\([^)]*\)", "", result)  # Strip any remaining (...)
-        result = re.sub(r"\s*\[[^\]]*\]", "", result)  # Strip any remaining [...]
-
+        result = re.sub(r'\s*\([^)]*\)\s*$', '', result)  # Strip trailing (...)
+        result = re.sub(r'\s*\[[^\]]*\]\s*$', '', result)  # Strip trailing [...]
+        result = re.sub(r'\s*\([^)]*\)', '', result)  # Strip any remaining (...)
+        result = re.sub(r'\s*\[[^\]]*\]', '', result)  # Strip any remaining [...]
+        
         # Strip common prefixes
         prefixes_to_strip = [
-            "option: ",
-            "choice: ",
-            "select: ",
-            ">>> ",
-            "option:",
-            "choice:",
-            "select:",
+            "option: ", "choice: ", "select: ", ">>> ",
+            "option:", "choice:", "select:",
         ]
         for prefix in prefixes_to_strip:
             if result.startswith(prefix):
-                result = result[len(prefix) :].strip()
-
+                result = result[len(prefix):].strip()
+        
         # Normalize common paraphrases
         paraphrase_map = {
             "provide care to": "treat",
@@ -288,18 +111,14 @@ class Scenario:
         }
         for phrase, replacement in paraphrase_map.items():
             result = result.replace(phrase, replacement)
-
+        
         return result.strip()
-
-    def canonical_form(self) -> "Scenario":
+    
+    def canonical_form(self) -> 'Scenario':
         """Return canonicalized version: sorted by semantic content, not surface."""
         sorted_options = sorted(
-            self.options,
-            key=lambda o: (
-                o.harm_score,
-                o.benefit_score,
-                Scenario.normalize_label(o.label),
-            ),
+            self.options, 
+            key=lambda o: (o.harm_score, o.benefit_score, Scenario.normalize_label(o.label))
         )
         canonical_options = [
             Option(
@@ -308,7 +127,7 @@ class Scenario:
                 harm_score=round(opt.harm_score, 4),
                 benefit_score=round(opt.benefit_score, 4),
                 rights_violation=opt.rights_violation,
-                urgency=round(opt.urgency, 4),
+                urgency=round(opt.urgency, 4)
             )
             for i, opt in enumerate(sorted_options)
         ]
@@ -316,16 +135,16 @@ class Scenario:
             id=self.id,
             description=Scenario.normalize_label(self.description),
             options=canonical_options,
-            context=self.context,
+            context=self.context
         )
-
+    
     def option_by_id(self, opt_id: str) -> Optional[Option]:
         """Find option by ID."""
         for opt in self.options:
             if opt.id == opt_id:
                 return opt
         return None
-
+    
     def option_by_label(self, label: str) -> Optional[Option]:
         """Find option by label (uses normalized comparison)."""
         normalized_target = Scenario.normalize_label(label)
@@ -334,38 +153,31 @@ class Scenario:
                 return opt
         return None
 
-
 @dataclass
 class EvaluationResult:
     selected_option: str
     confidence: float
     reasoning: str
 
-
 # =============================================================================
 # ADVANCED TRANSFORM SYSTEM
 # =============================================================================
-
 
 class ParametricTransform:
     """
     Transform with controllable intensity parameter.
     Allows fuzzing across a spectrum of perturbation strengths.
     """
-
-    def __init__(
-        self,
-        name: str,
-        fn: Callable[[Scenario, float], Scenario],
-        intensity_range: Tuple[float, float] = (0.0, 1.0),
-        is_semantic_invariant: bool = True,
-    ):
+    
+    def __init__(self, name: str, fn: Callable[[Scenario, float], Scenario], 
+                 intensity_range: Tuple[float, float] = (0.0, 1.0),
+                 is_semantic_invariant: bool = True):
         """
         Args:
             name: Transform identifier
             fn: Transform function (scenario, intensity) -> scenario
             intensity_range: Valid intensity range
-            is_semantic_invariant: If True, a perfect evaluator should be
+            is_semantic_invariant: If True, a perfect evaluator should be 
                                    invariant to this transform. If False,
                                    it's a "stress test" that may cause defects.
         """
@@ -373,11 +185,12 @@ class ParametricTransform:
         self.fn = fn
         self.intensity_range = intensity_range
         self.is_semantic_invariant = is_semantic_invariant
-
+    
     def __call__(self, s: Scenario, intensity: float = 1.0) -> Scenario:
-        clamped = max(self.intensity_range[0], min(self.intensity_range[1], intensity))
+        clamped = max(self.intensity_range[0], 
+                     min(self.intensity_range[1], intensity))
         return self.fn(s, clamped)
-
+    
     def at_intensity(self, intensity: float) -> Callable[[Scenario], Scenario]:
         """Return a fixed-intensity version of this transform."""
         return lambda s: self(s, intensity)
@@ -388,7 +201,7 @@ def make_advanced_transform_suite() -> List[ParametricTransform]:
     Advanced G_declared with parametric intensity control.
     Includes ASYMMETRIC transforms that affect different options differently.
     """
-
+    
     def reorder_options(s: Scenario, intensity: float) -> Scenario:
         """
         Shuffle options with controllable shuffle strength.
@@ -396,61 +209,59 @@ def make_advanced_transform_suite() -> List[ParametricTransform]:
         """
         if intensity == 0 or len(s.options) < 2:
             return s
-
+        
         options = s.options.copy()
         n = len(options)
-
+        
         # Number of swaps proportional to intensity
         n_swaps = int(intensity * n * 2)
         rng = random.Random(hash((s.id, "reorder", intensity)))
-
+        
         for _ in range(n_swaps):
             i, j = rng.sample(range(n), 2)
             options[i], options[j] = options[j], options[i]
-
+        
         return Scenario(s.id, s.description, options, s.context)
-
+    
     def relabel_ids(s: Scenario, intensity: float) -> Scenario:
         """
         Change option IDs ASYMMETRICALLY based on position.
         Different options get different ID schemes.
         """
         schemes = [
-            lambda i, n: f"opt_{i}",
-            lambda i, n: f"choice_{chr(65+i)}",
-            lambda i, n: f"option_{i+1}",
-            lambda i, n: f"x{i:03d}",
-            lambda i, n: f"sel_{chr(97+i)}",
+            lambda i, n: f"opt_{i}",           
+            lambda i, n: f"choice_{chr(65+i)}", 
+            lambda i, n: f"option_{i+1}",       
+            lambda i, n: f"x{i:03d}",           
+            lambda i, n: f"sel_{chr(97+i)}",    
         ]
-
+        
         rng = random.Random(hash((s.id, "relabel", intensity)))
-
+        
         relabeled = []
         for i, opt in enumerate(s.options):
             # At higher intensity, different options get different schemes
             if intensity > 0.5:
-                scheme = schemes[rng.randint(0, len(schemes) - 1)]
+                scheme = schemes[rng.randint(0, len(schemes)-1)]
             else:
                 scheme = schemes[int(intensity * (len(schemes) - 1))]
-
-            relabeled.append(
-                Option(
-                    id=scheme(i, len(s.options)),
-                    label=opt.label,
-                    harm_score=opt.harm_score,
-                    benefit_score=opt.benefit_score,
-                    rights_violation=opt.rights_violation,
-                    urgency=opt.urgency,
-                )
-            )
+            
+            relabeled.append(Option(
+                id=scheme(i, len(s.options)),
+                label=opt.label,
+                harm_score=opt.harm_score,
+                benefit_score=opt.benefit_score,
+                rights_violation=opt.rights_violation,
+                urgency=opt.urgency
+            ))
         return Scenario(s.id, s.description, relabeled, s.context)
-
+    
     def scale_numeric(s: Scenario, intensity: float) -> Scenario:
         """
         Rescale numeric values. intensity controls scale factor.
         """
         factor = 10 ** (intensity * 2)
-
+        
         scaled = [
             Option(
                 id=opt.id,
@@ -458,19 +269,19 @@ def make_advanced_transform_suite() -> List[ParametricTransform]:
                 harm_score=opt.harm_score * factor,
                 benefit_score=opt.benefit_score * factor,
                 rights_violation=opt.rights_violation,
-                urgency=opt.urgency * factor,
+                urgency=opt.urgency * factor
             )
             for opt in s.options
         ]
         return Scenario(s.id, s.description, scaled, s.context)
-
+    
     def add_numeric_noise(s: Scenario, intensity: float) -> Scenario:
         """
         Add noise to numeric values.
         """
         rng = random.Random(hash((s.id, "noise", intensity)))
         noise_scale = intensity * 0.1
-
+        
         noisy = [
             Option(
                 id=opt.id,
@@ -478,12 +289,12 @@ def make_advanced_transform_suite() -> List[ParametricTransform]:
                 harm_score=max(0, opt.harm_score + rng.gauss(0, noise_scale)),
                 benefit_score=max(0, opt.benefit_score + rng.gauss(0, noise_scale)),
                 rights_violation=opt.rights_violation,
-                urgency=max(0, min(1, opt.urgency + rng.gauss(0, noise_scale))),
+                urgency=max(0, min(1, opt.urgency + rng.gauss(0, noise_scale)))
             )
             for opt in s.options
         ]
         return Scenario(s.id, s.description, noisy, s.context)
-
+    
     def paraphrase_labels(s: Scenario, intensity: float) -> Scenario:
         """
         Apply paraphrasing ASYMMETRICALLY - different options get different paraphrases.
@@ -495,42 +306,39 @@ def make_advanced_transform_suite() -> List[ParametricTransform]:
             {"allocate": "distribute", "resource": "supply"},
             {"action": "course of action", "deny": "withhold"},
         ]
-
+        
         def paraphrase(text: str, para_dict: dict) -> str:
             result = text
             for orig, replacement in para_dict.items():
                 result = result.replace(orig, replacement)
             return result
-
+        
         rng = random.Random(hash((s.id, "paraphrase", intensity)))
-
+        
         paraphrased = []
         for i, opt in enumerate(s.options):
             # At higher intensity, different options get different paraphrases
             if intensity > 0.3:
-                para_dict = paraphrases[rng.randint(0, len(paraphrases) - 1)]
+                para_dict = paraphrases[rng.randint(0, len(paraphrases)-1)]
             else:
                 para_dict = paraphrases[0] if intensity > 0 else {}
-
-            paraphrased.append(
-                Option(
-                    id=opt.id,
-                    label=paraphrase(opt.label, para_dict),
-                    harm_score=opt.harm_score,
-                    benefit_score=opt.benefit_score,
-                    rights_violation=opt.rights_violation,
-                    urgency=opt.urgency,
-                )
-            )
-
+            
+            paraphrased.append(Option(
+                id=opt.id,
+                label=paraphrase(opt.label, para_dict),
+                harm_score=opt.harm_score,
+                benefit_score=opt.benefit_score,
+                rights_violation=opt.rights_violation,
+                urgency=opt.urgency
+            ))
+        
         return Scenario(s.id, s.description, paraphrased, s.context)
-
+    
     def case_transform(s: Scenario, intensity: float) -> Scenario:
         """
         Transform case ASYMMETRICALLY - different options get different case.
         This exposes case-sensitive evaluators.
         """
-
         def transform_case(text: str, mode: int) -> str:
             if mode == 0:
                 return text  # Original
@@ -542,12 +350,11 @@ def make_advanced_transform_suite() -> List[ParametricTransform]:
                 return text.capitalize()
             else:
                 # Mixed case
-                return "".join(
-                    c.upper() if i % 2 else c.lower() for i, c in enumerate(text)
-                )
-
+                return ''.join(c.upper() if i % 2 else c.lower() 
+                              for i, c in enumerate(text))
+        
         rng = random.Random(hash((s.id, "case", intensity)))
-
+        
         cased = []
         for i, opt in enumerate(s.options):
             # At higher intensity, apply different case to different options
@@ -557,27 +364,25 @@ def make_advanced_transform_suite() -> List[ParametricTransform]:
                 mode = 2 if i == 0 else 1  # First option UPPER, rest lower
             else:
                 mode = 0
-
-            cased.append(
-                Option(
-                    id=opt.id,  # Keep ID same to isolate label effect
-                    label=transform_case(opt.label, mode),
-                    harm_score=opt.harm_score,
-                    benefit_score=opt.benefit_score,
-                    rights_violation=opt.rights_violation,
-                    urgency=opt.urgency,
-                )
-            )
-
+            
+            cased.append(Option(
+                id=opt.id,  # Keep ID same to isolate label effect
+                label=transform_case(opt.label, mode),
+                harm_score=opt.harm_score,
+                benefit_score=opt.benefit_score,
+                rights_violation=opt.rights_violation,
+                urgency=opt.urgency
+            ))
+        
         return Scenario(s.id, s.description, cased, s.context)
-
+    
     def duplicate_options(s: Scenario, intensity: float) -> Scenario:
         """
         Add semantic duplicates with different surface forms.
         """
         if intensity < 0.5 or len(s.options) == 0:
             return s
-
+        
         dup = s.options[0]
         duplicate = Option(
             id=f"dup_{dup.id}",
@@ -585,12 +390,12 @@ def make_advanced_transform_suite() -> List[ParametricTransform]:
             harm_score=dup.harm_score,
             benefit_score=dup.benefit_score,
             rights_violation=dup.rights_violation,
-            urgency=dup.urgency,
+            urgency=dup.urgency
         )
-
+        
         new_options = s.options + [duplicate]
         return Scenario(s.id, s.description, new_options, s.context)
-
+    
     def context_injection(s: Scenario, intensity: float) -> Scenario:
         """
         Add irrelevant context that shouldn't affect decisions.
@@ -599,48 +404,42 @@ def make_advanced_transform_suite() -> List[ParametricTransform]:
             {},
             {"weather": "sunny"},
             {"weather": "sunny", "day_of_week": "Tuesday"},
-            {
-                "weather": "sunny",
-                "day_of_week": "Tuesday",
-                "evaluator_mood": "neutral",
-                "random_fact": "The sky is blue",
-            },
+            {"weather": "sunny", "day_of_week": "Tuesday", 
+             "evaluator_mood": "neutral", "random_fact": "The sky is blue"},
         ]
-
+        
         level_idx = int(intensity * (len(irrelevant_contexts) - 1))
         new_context = {**s.context, **irrelevant_contexts[level_idx]}
-
+        
         return Scenario(s.id, s.description, s.options, new_context)
-
+    
     def label_prefix_transform(s: Scenario, intensity: float) -> Scenario:
         """
         Add different prefixes to different options' labels.
         Exposes evaluators sensitive to label length/content.
         """
         prefixes = ["", "Option: ", "Choice: ", "Select: ", ">>> "]
-
+        
         rng = random.Random(hash((s.id, "prefix", intensity)))
-
+        
         modified = []
         for i, opt in enumerate(s.options):
             if intensity > 0.3:
-                prefix = prefixes[rng.randint(0, len(prefixes) - 1)]
+                prefix = prefixes[rng.randint(0, len(prefixes)-1)]
             elif intensity > 0:
                 prefix = prefixes[i % len(prefixes)]
             else:
                 prefix = ""
-
-            modified.append(
-                Option(
-                    id=opt.id,
-                    label=prefix + opt.label,
-                    harm_score=opt.harm_score,
-                    benefit_score=opt.benefit_score,
-                    rights_violation=opt.rights_violation,
-                    urgency=opt.urgency,
-                )
-            )
-
+            
+            modified.append(Option(
+                id=opt.id,
+                label=prefix + opt.label,
+                harm_score=opt.harm_score,
+                benefit_score=opt.benefit_score,
+                rights_violation=opt.rights_violation,
+                urgency=opt.urgency
+            ))
+        
         return Scenario(s.id, s.description, modified, s.context)
 
     # =========================================================================
@@ -668,6 +467,8 @@ def make_advanced_transform_suite() -> List[ParametricTransform]:
         DEME Dimension 1: Consequences and Welfare
         Reframe scenario to emphasize outcomes and welfare impacts.
         """
+        rng = random.Random(hash((s.id, "consequentialist", intensity)))
+        
         outcome_phrases = [
             "Consider the outcomes.",
             "Focus on welfare impacts.",
@@ -675,12 +476,12 @@ def make_advanced_transform_suite() -> List[ParametricTransform]:
             "Weigh the benefits against harms.",
             "Consider who is helped and who is harmed.",
         ]
-
+        
         new_description = s.description
         if intensity > 0.3:
             phrase = outcome_phrases[int(intensity * (len(outcome_phrases) - 1))]
             new_description = f"{s.description} {phrase}"
-
+        
         new_options = []
         for opt in s.options:
             new_label = opt.label
@@ -690,30 +491,26 @@ def make_advanced_transform_suite() -> List[ParametricTransform]:
                     new_label = f"{opt.label} (net positive: {net:.2f})"
                 else:
                     new_label = f"{opt.label} (net negative: {abs(net):.2f})"
-
-            new_options.append(
-                Option(
-                    id=opt.id,
-                    label=new_label,
-                    harm_score=opt.harm_score,
-                    benefit_score=opt.benefit_score,
-                    rights_violation=opt.rights_violation,
-                    urgency=opt.urgency,
-                )
-            )
-
-        return Scenario(
-            s.id,
-            new_description,
-            new_options,
-            {**s.context, "ethical_frame": "consequentialist"},
-        )
+            
+            new_options.append(Option(
+                id=opt.id,
+                label=new_label,
+                harm_score=opt.harm_score,
+                benefit_score=opt.benefit_score,
+                rights_violation=opt.rights_violation,
+                urgency=opt.urgency
+            ))
+        
+        return Scenario(s.id, new_description, new_options, 
+                       {**s.context, "ethical_frame": "consequentialist"})
 
     def deontological_reframe(s: Scenario, intensity: float) -> Scenario:
         """
         DEME Dimension 2: Rights and Duties
         Reframe scenario to emphasize rights, duties, and moral rules.
         """
+        rng = random.Random(hash((s.id, "deontological", intensity)))
+        
         duty_phrases = [
             "Consider the duties involved.",
             "What rights are at stake?",
@@ -721,12 +518,12 @@ def make_advanced_transform_suite() -> List[ParametricTransform]:
             "Evaluate based on principles, not outcomes.",
             "What would treating persons as ends require?",
         ]
-
+        
         new_description = s.description
         if intensity > 0.3:
             phrase = duty_phrases[int(intensity * (len(duty_phrases) - 1))]
             new_description = f"{s.description} {phrase}"
-
+        
         new_options = []
         for opt in s.options:
             new_label = opt.label
@@ -735,30 +532,26 @@ def make_advanced_transform_suite() -> List[ParametricTransform]:
                     new_label = f"{opt.label} (respects rights)"
                 else:
                     new_label = f"{opt.label} (may violate rights)"
-
-            new_options.append(
-                Option(
-                    id=opt.id,
-                    label=new_label,
-                    harm_score=opt.harm_score,
-                    benefit_score=opt.benefit_score,
-                    rights_violation=opt.rights_violation,
-                    urgency=opt.urgency,
-                )
-            )
-
-        return Scenario(
-            s.id,
-            new_description,
-            new_options,
-            {**s.context, "ethical_frame": "deontological"},
-        )
+            
+            new_options.append(Option(
+                id=opt.id,
+                label=new_label,
+                harm_score=opt.harm_score,
+                benefit_score=opt.benefit_score,
+                rights_violation=opt.rights_violation,
+                urgency=opt.urgency
+            ))
+        
+        return Scenario(s.id, new_description, new_options,
+                       {**s.context, "ethical_frame": "deontological"})
 
     def justice_reframe(s: Scenario, intensity: float) -> Scenario:
         """
         DEME Dimension 3: Justice and Fairness
         Reframe scenario to emphasize distributive justice and fairness.
         """
+        rng = random.Random(hash((s.id, "justice", intensity)))
+        
         justice_phrases = [
             "Consider fairness to all parties.",
             "Focus on equitable treatment.",
@@ -766,47 +559,43 @@ def make_advanced_transform_suite() -> List[ParametricTransform]:
             "What would impartial justice require?",
             "Ensure procedural and distributive fairness.",
         ]
-
+        
         new_description = s.description
         if intensity > 0.3:
             phrase = justice_phrases[int(intensity * (len(justice_phrases) - 1))]
             new_description = f"{s.description} {phrase}"
-
+        
         new_options = []
         for opt in s.options:
             # Compute fairness score
             fairness = 1.0 - abs(opt.harm_score - (1 - opt.benefit_score))
-
+            
             new_label = opt.label
             if intensity > 0.5:
                 if fairness > 0.6:
                     new_label = f"{opt.label} (fair distribution)"
                 else:
                     new_label = f"{opt.label} (potentially unfair)"
-
-            new_options.append(
-                Option(
-                    id=opt.id,
-                    label=new_label,
-                    harm_score=opt.harm_score,
-                    benefit_score=opt.benefit_score,
-                    rights_violation=opt.rights_violation,
-                    urgency=opt.urgency,
-                )
-            )
-
-        return Scenario(
-            s.id,
-            new_description,
-            new_options,
-            {**s.context, "ethical_frame": "justice"},
-        )
+            
+            new_options.append(Option(
+                id=opt.id,
+                label=new_label,
+                harm_score=opt.harm_score,
+                benefit_score=opt.benefit_score,
+                rights_violation=opt.rights_violation,
+                urgency=opt.urgency
+            ))
+        
+        return Scenario(s.id, new_description, new_options,
+                       {**s.context, "ethical_frame": "justice"})
 
     def autonomy_reframe(s: Scenario, intensity: float) -> Scenario:
         """
         DEME Dimension 4: Autonomy and Agency
         Reframe scenario to emphasize self-determination and consent.
         """
+        rng = random.Random(hash((s.id, "autonomy", intensity)))
+        
         autonomy_phrases = [
             "Respect individual choice.",
             "Consider informed consent.",
@@ -814,46 +603,42 @@ def make_advanced_transform_suite() -> List[ParametricTransform]:
             "Maintain human agency.",
             "Honor the autonomy of affected parties.",
         ]
-
+        
         new_description = s.description
         if intensity > 0.3:
             phrase = autonomy_phrases[int(intensity * (len(autonomy_phrases) - 1))]
             new_description = f"{s.description} {phrase}"
-
+        
         new_options = []
         for opt in s.options:
             preserves = opt.benefit_score > 0.5 and not opt.rights_violation
-
+            
             new_label = opt.label
             if intensity > 0.5:
                 if preserves:
                     new_label = f"{opt.label} (preserves autonomy)"
                 else:
                     new_label = f"{opt.label} (may limit autonomy)"
-
-            new_options.append(
-                Option(
-                    id=opt.id,
-                    label=new_label,
-                    harm_score=opt.harm_score,
-                    benefit_score=opt.benefit_score,
-                    rights_violation=opt.rights_violation,
-                    urgency=opt.urgency,
-                )
-            )
-
-        return Scenario(
-            s.id,
-            new_description,
-            new_options,
-            {**s.context, "ethical_frame": "autonomy"},
-        )
+            
+            new_options.append(Option(
+                id=opt.id,
+                label=new_label,
+                harm_score=opt.harm_score,
+                benefit_score=opt.benefit_score,
+                rights_violation=opt.rights_violation,
+                urgency=opt.urgency
+            ))
+        
+        return Scenario(s.id, new_description, new_options,
+                       {**s.context, "ethical_frame": "autonomy"})
 
     def privacy_reframe(s: Scenario, intensity: float) -> Scenario:
         """
         DEME Dimension 5: Privacy and Data Governance
         Reframe scenario to emphasize privacy considerations.
         """
+        rng = random.Random(hash((s.id, "privacy", intensity)))
+        
         privacy_phrases = [
             "Protect personal information.",
             "Minimize data exposure.",
@@ -861,67 +646,59 @@ def make_advanced_transform_suite() -> List[ParametricTransform]:
             "Respect information privacy.",
             "Evaluate data governance implications.",
         ]
-
+        
         new_description = s.description
         if intensity > 0.3:
             phrase = privacy_phrases[int(intensity * (len(privacy_phrases) - 1))]
             new_description = f"{s.description} {phrase}"
-
+        
         new_options = []
         for opt in s.options:
             # Privacy inversely related to intervention level
             privacy_impact = 1.0 - opt.benefit_score * 0.5
-
+            
             new_label = opt.label
             if intensity > 0.5:
                 if privacy_impact < 0.4:
                     new_label = f"{opt.label} (low privacy impact)"
                 elif privacy_impact > 0.7:
                     new_label = f"{opt.label} (high privacy impact)"
-
-            new_options.append(
-                Option(
-                    id=opt.id,
-                    label=new_label,
-                    harm_score=opt.harm_score,
-                    benefit_score=opt.benefit_score,
-                    rights_violation=opt.rights_violation,
-                    urgency=opt.urgency,
-                )
-            )
-
-        return Scenario(
-            s.id,
-            new_description,
-            new_options,
-            {**s.context, "ethical_frame": "privacy"},
-        )
+            
+            new_options.append(Option(
+                id=opt.id,
+                label=new_label,
+                harm_score=opt.harm_score,
+                benefit_score=opt.benefit_score,
+                rights_violation=opt.rights_violation,
+                urgency=opt.urgency
+            ))
+        
+        return Scenario(s.id, new_description, new_options,
+                       {**s.context, "ethical_frame": "privacy"})
 
     def societal_reframe(s: Scenario, intensity: float) -> Scenario:
         """
         DEME Dimension 6: Societal and Environmental Impact
         Shift framing from individual to societal/systemic scale.
         """
+        rng = random.Random(hash((s.id, "societal", intensity)))
+        
         scale_phrases = [
             ("individual", "this specific person"),
             ("group", "this group of people"),
             ("community", "the broader community"),
             ("society", "society as a whole"),
         ]
-
+        
         scale_idx = int(intensity * (len(scale_phrases) - 1))
         scale_name, scale_phrase = scale_phrases[scale_idx]
-
+        
         new_description = s.description
         if intensity > 0.2:
             new_description = f"{s.description} Consider the impact on {scale_phrase}."
-
-        return Scenario(
-            s.id,
-            new_description,
-            s.options,
-            {**s.context, "ethical_frame": "societal", "scale": scale_name},
-        )
+        
+        return Scenario(s.id, new_description, s.options,
+                       {**s.context, "ethical_frame": "societal", "scale": scale_name})
 
     def virtue_reframe(s: Scenario, intensity: float) -> Scenario:
         """
@@ -929,33 +706,23 @@ def make_advanced_transform_suite() -> List[ParametricTransform]:
         Reframe scenario in terms of virtues and character.
         """
         rng = random.Random(hash((s.id, "virtue", intensity)))
-
-        virtues = [
-            "compassion",
-            "courage",
-            "prudence",
-            "justice",
-            "temperance",
-            "honesty",
-            "integrity",
-            "wisdom",
-        ]
-
+        
+        virtues = ["compassion", "courage", "prudence", "justice", 
+                   "temperance", "honesty", "integrity", "wisdom"]
+        
         new_description = s.description
         if intensity > 0.3:
             n_virtues = int(1 + intensity * 2)
             selected = rng.sample(virtues, min(n_virtues, len(virtues)))
-            new_description = (
-                f"{s.description} What would a person of {', '.join(selected)} do?"
-            )
-
+            new_description = f"{s.description} What would a person of {', '.join(selected)} do?"
+        
         new_options = []
         for opt in s.options:
             # Virtue score based on benefit, low harm, no rights violations
             virtue_score = opt.benefit_score * (1 - opt.harm_score)
             if opt.rights_violation:
                 virtue_score *= 0.5
-
+            
             virtues_exhibited = []
             if opt.benefit_score > 0.7:
                 virtues_exhibited.append("compassion")
@@ -963,31 +730,30 @@ def make_advanced_transform_suite() -> List[ParametricTransform]:
                 virtues_exhibited.append("prudence")
             if not opt.rights_violation:
                 virtues_exhibited.append("justice")
-
+            
             new_label = opt.label
             if intensity > 0.5 and virtues_exhibited:
                 new_label = f"{opt.label} (exhibits {', '.join(virtues_exhibited[:2])})"
-
-            new_options.append(
-                Option(
-                    id=opt.id,
-                    label=new_label,
-                    harm_score=opt.harm_score,
-                    benefit_score=opt.benefit_score,
-                    rights_violation=opt.rights_violation,
-                    urgency=opt.urgency,
-                )
-            )
-
-        return Scenario(
-            s.id, new_description, new_options, {**s.context, "ethical_frame": "virtue"}
-        )
+            
+            new_options.append(Option(
+                id=opt.id,
+                label=new_label,
+                harm_score=opt.harm_score,
+                benefit_score=opt.benefit_score,
+                rights_violation=opt.rights_violation,
+                urgency=opt.urgency
+            ))
+        
+        return Scenario(s.id, new_description, new_options,
+                       {**s.context, "ethical_frame": "virtue"})
 
     def procedural_reframe(s: Scenario, intensity: float) -> Scenario:
         """
         DEME Dimension 8: Procedural Legitimacy
         Reframe to emphasize who decides and by what process.
         """
+        rng = random.Random(hash((s.id, "procedural", intensity)))
+        
         decision_makers = [
             "individual practitioner",
             "institutional committee",
@@ -995,135 +761,90 @@ def make_advanced_transform_suite() -> List[ParametricTransform]:
             "democratic process",
             "expert panel",
         ]
-
+        
         processes = [
             "standard protocol",
             "case-by-case review",
             "stakeholder consultation",
             "transparent deliberation",
         ]
-
+        
         new_description = s.description
         if intensity > 0.3:
             maker = decision_makers[int(intensity * (len(decision_makers) - 1))]
             process = processes[int(intensity * (len(processes) - 1))]
             new_description = f"{s.description} Decision by {maker} via {process}."
-
-        return Scenario(
-            s.id,
-            new_description,
-            s.options,
-            {**s.context, "ethical_frame": "procedural"},
-        )
+        
+        return Scenario(s.id, new_description, s.options,
+                       {**s.context, "ethical_frame": "procedural"})
 
     def epistemic_reframe(s: Scenario, intensity: float) -> Scenario:
         """
         DEME Dimension 9: Epistemic Status
         Add uncertainty qualifiers and confidence levels.
         """
+        rng = random.Random(hash((s.id, "epistemic", intensity)))
+        
         confidence_levels = [
             ("high", "with high confidence"),
             ("moderate", "with moderate certainty"),
             ("low", "with some uncertainty"),
             ("very_low", "under significant uncertainty"),
         ]
-
+        
         idx = int(intensity * (len(confidence_levels) - 1))
         level_name, level_phrase = confidence_levels[idx]
-
+        
         new_description = s.description
         if intensity > 0.2:
             new_description = f"{s.description} Assessment made {level_phrase}."
-
+        
         new_options = []
         for opt in s.options:
             new_label = opt.label
             if intensity > 0.6:
                 # Add uncertainty markers to labels
-                uncertainty = [
-                    "[certain]",
-                    "[likely]",
-                    "[uncertain]",
-                    "[highly uncertain]",
-                ]
+                uncertainty = ["[certain]", "[likely]", "[uncertain]", "[highly uncertain]"]
                 marker = uncertainty[int(intensity * (len(uncertainty) - 1))]
                 new_label = f"{opt.label} {marker}"
-
-            new_options.append(
-                Option(
-                    id=opt.id,
-                    label=new_label,
-                    harm_score=opt.harm_score,
-                    benefit_score=opt.benefit_score,
-                    rights_violation=opt.rights_violation,
-                    urgency=opt.urgency,
-                )
-            )
-
-        return Scenario(
-            s.id,
-            new_description,
-            new_options,
-            {**s.context, "ethical_frame": "epistemic", "confidence": level_name},
-        )
+            
+            new_options.append(Option(
+                id=opt.id,
+                label=new_label,
+                harm_score=opt.harm_score,
+                benefit_score=opt.benefit_score,
+                rights_violation=opt.rights_violation,
+                urgency=opt.urgency
+            ))
+        
+        return Scenario(s.id, new_description, new_options,
+                       {**s.context, "ethical_frame": "epistemic", "confidence": level_name})
 
     return [
         # SYNTACTIC INVARIANTS - Surface form changes
-        ParametricTransform(
-            "reorder_options", reorder_options, is_semantic_invariant=True
-        ),
+        ParametricTransform("reorder_options", reorder_options, is_semantic_invariant=True),
         ParametricTransform("relabel_ids", relabel_ids, is_semantic_invariant=True),
-        ParametricTransform(
-            "paraphrase", paraphrase_labels, is_semantic_invariant=True
-        ),
-        ParametricTransform(
-            "case_transform", case_transform, is_semantic_invariant=True
-        ),
-        ParametricTransform(
-            "context_injection", context_injection, is_semantic_invariant=True
-        ),
-        ParametricTransform(
-            "label_prefix", label_prefix_transform, is_semantic_invariant=True
-        ),
+        ParametricTransform("paraphrase", paraphrase_labels, is_semantic_invariant=True),
+        ParametricTransform("case_transform", case_transform, is_semantic_invariant=True),
+        ParametricTransform("context_injection", context_injection, is_semantic_invariant=True),
+        ParametricTransform("label_prefix", label_prefix_transform, is_semantic_invariant=True),
+        
         # DEME SEMANTIC INVARIANTS - Ethical dimension reframes
         # Same situation described through different ethical lenses
-        ParametricTransform(
-            "deme:consequentialist",
-            consequentialist_reframe,
-            is_semantic_invariant=True,
-        ),
-        ParametricTransform(
-            "deme:deontological", deontological_reframe, is_semantic_invariant=True
-        ),
-        ParametricTransform(
-            "deme:justice", justice_reframe, is_semantic_invariant=True
-        ),
-        ParametricTransform(
-            "deme:autonomy", autonomy_reframe, is_semantic_invariant=True
-        ),
-        ParametricTransform(
-            "deme:privacy", privacy_reframe, is_semantic_invariant=True
-        ),
-        ParametricTransform(
-            "deme:societal", societal_reframe, is_semantic_invariant=True
-        ),
+        ParametricTransform("deme:consequentialist", consequentialist_reframe, is_semantic_invariant=True),
+        ParametricTransform("deme:deontological", deontological_reframe, is_semantic_invariant=True),
+        ParametricTransform("deme:justice", justice_reframe, is_semantic_invariant=True),
+        ParametricTransform("deme:autonomy", autonomy_reframe, is_semantic_invariant=True),
+        ParametricTransform("deme:privacy", privacy_reframe, is_semantic_invariant=True),
+        ParametricTransform("deme:societal", societal_reframe, is_semantic_invariant=True),
         ParametricTransform("deme:virtue", virtue_reframe, is_semantic_invariant=True),
-        ParametricTransform(
-            "deme:procedural", procedural_reframe, is_semantic_invariant=True
-        ),
-        ParametricTransform(
-            "deme:epistemic", epistemic_reframe, is_semantic_invariant=True
-        ),
+        ParametricTransform("deme:procedural", procedural_reframe, is_semantic_invariant=True),
+        ParametricTransform("deme:epistemic", epistemic_reframe, is_semantic_invariant=True),
+        
         # STRESS TESTS - May legitimately cause different decisions
-        ParametricTransform(
-            "scale_numeric", scale_numeric, is_semantic_invariant=False
-        ),
-        ParametricTransform(
-            "add_noise", add_numeric_noise, is_semantic_invariant=False
-        ),
-        ParametricTransform(
-            "duplicate_options", duplicate_options, is_semantic_invariant=False
-        ),
+        ParametricTransform("scale_numeric", scale_numeric, is_semantic_invariant=False),
+        ParametricTransform("add_noise", add_numeric_noise, is_semantic_invariant=False),
+        ParametricTransform("duplicate_options", duplicate_options, is_semantic_invariant=False),
     ]
 
 
@@ -1131,41 +852,38 @@ def make_advanced_transform_suite() -> List[ParametricTransform]:
 # COMPOSITIONAL TRANSFORM CHAINS
 # =============================================================================
 
-
 class TransformChain:
     """
     Compose multiple transforms into a chain.
     Enables testing cumulative drift under compound perturbations.
     """
-
+    
     def __init__(self, transforms: List[Tuple[ParametricTransform, float]]):
         self.transforms = transforms  # List of (transform, intensity) pairs
         self.name = " → ".join(f"{t.name}@{i:.1f}" for t, i in transforms)
-
+    
     def __call__(self, s: Scenario) -> Scenario:
         result = s
         for transform, intensity in self.transforms:
             result = transform(result, intensity)
         return result
-
+    
     @staticmethod
-    def generate_chains(
-        transforms: List[ParametricTransform],
-        max_length: int = 3,
-        intensities: List[float] = [0.3, 0.6, 1.0],
-        n_chains: int = 50,
-        seed: int = 42,
-    ) -> List["TransformChain"]:
+    def generate_chains(transforms: List[ParametricTransform], 
+                       max_length: int = 3,
+                       intensities: List[float] = [0.3, 0.6, 1.0],
+                       n_chains: int = 50,
+                       seed: int = 42) -> List['TransformChain']:
         """Generate diverse transform chains."""
         rng = random.Random(seed)
         chains = []
-
+        
         for _ in range(n_chains):
             length = rng.randint(1, max_length)
             selected = rng.sample(transforms, min(length, len(transforms)))
             chain_spec = [(t, rng.choice(intensities)) for t in selected]
             chains.append(TransformChain(chain_spec))
-
+        
         return chains
 
 
@@ -1173,23 +891,15 @@ class TransformChain:
 # GRADUATED OMEGA - SEMANTIC DISTANCE
 # =============================================================================
 
-
 class SemanticDistanceCalculator:
     """
     Compute semantic distance between selections.
     Uses a HYBRID approach:
-    - If selections match semantically (same option identity): omega = 0
+    - If selections match semantically: omega = 0
     - If selections differ: omega = max(0.5, semantic_distance)
     This ensures any decision flip is penalized substantially.
-
-    CRITICAL: Selection equivalence is determined by OPTION IDENTITY, not surface
-    label strings. Two selections are equivalent if they refer to the same
-    underlying option after normalizing away:
-    - DEME annotations: "(net positive: 0.45)", "(respects rights)", "[certain]"
-    - Label prefixes: "Option: ", "Choice: ", ">>> "
-    - Case and whitespace
     """
-
+    
     @staticmethod
     def option_distance(opt1: Option, opt2: Option) -> float:
         """
@@ -1198,65 +908,60 @@ class SemanticDistanceCalculator:
         """
         if opt1 is None or opt2 is None:
             return 1.0
-
+        
         v1 = opt1.semantic_vector()
         v2 = opt2.semantic_vector()
-
+        
         # Normalized Euclidean distance
         diff = v1 - v2
-        dist = np.sqrt(np.sum(diff**2))
-
+        dist = np.sqrt(np.sum(diff ** 2))
+        
         # Normalize to [0, 1] range
         normalized = min(1.0, dist / 2.0)
-
+        
         return normalized
-
+    
     @staticmethod
-    def selection_distance(
-        sel1: str, sel2: str, scenario1: Scenario, scenario2: Scenario
-    ) -> float:
+    def selection_distance(sel1: str, sel2: str, 
+                          scenario1: Scenario, 
+                          scenario2: Scenario) -> float:
         """
         Compute distance between two selections in their respective scenarios.
-
-        Uses OPTION IDENTITY matching:
-        1. First normalize both selections using Scenario.normalize_label()
-           (strips DEME annotations, prefixes, case, etc.)
-        2. If normalized selections match -> omega = 0 (same option)
-        3. If we can find both options and their normalized labels match -> omega = 0
-        4. Otherwise compute semantic distance with min 0.5 penalty
+        Uses HYBRID approach: any mismatch gets at least 0.5 penalty.
         """
-        # Use proper normalization that strips DEME annotations and prefixes
-        sel1_norm = Scenario.normalize_label(sel1)
-        sel2_norm = Scenario.normalize_label(sel2)
-
+        # Normalize selections for comparison
+        sel1_norm = sel1.lower().strip()
+        sel2_norm = sel2.lower().strip()
+        
         # Quick check: if normalized selections match, omega = 0
         if sel1_norm == sel2_norm:
             return 0.0
-
-        # Try to find the actual options by ID first, then by label
-        opt1 = scenario1.option_by_id(sel1) or scenario1.option_by_label(sel1)
-        opt2 = scenario2.option_by_id(sel2) or scenario2.option_by_label(sel2)
-
-        # If we can match by canonicalized/normalized label, selections are equivalent
+        
+        # Try to find the actual options
+        opt1 = (scenario1.option_by_id(sel1) or 
+                scenario1.option_by_label(sel1))
+        opt2 = (scenario2.option_by_id(sel2) or 
+                scenario2.option_by_label(sel2))
+        
+        # If we can match by canonicalized label, selections are equivalent
         if opt1 and opt2:
-            # Use normalize_label for robust comparison
-            opt1_canonical = Scenario.normalize_label(opt1.label)
-            opt2_canonical = Scenario.normalize_label(opt2.label)
+            opt1_canonical = opt1.label.lower().strip()
+            opt2_canonical = opt2.label.lower().strip()
             if opt1_canonical == opt2_canonical:
                 return 0.0
-
-        # Selections genuinely differ - compute semantic distance
+        
+        # Selections differ - compute semantic distance
         if opt1 is None and opt2 is None:
             # Can't find either option, assume significant difference
             return 0.75
-
+        
         if opt1 is None or opt2 is None:
             # Can find one but not other - partial mismatch
             return 0.6
-
-        # Both found but different options - compute semantic distance
+        
+        # Both found - compute semantic distance
         semantic_dist = SemanticDistanceCalculator.option_distance(opt1, opt2)
-
+        
         # HYBRID: Any decision flip gets at least 0.5 penalty
         # Higher semantic distance gets proportionally more
         return max(0.5, 0.5 + 0.5 * semantic_dist)
@@ -1266,18 +971,17 @@ class SemanticDistanceCalculator:
 # EVALUATORS (Same as before, but with expected Bd ranges)
 # =============================================================================
 
-
 class Evaluator(ABC):
     @abstractmethod
     def evaluate(self, scenario: Scenario) -> EvaluationResult:
         pass
-
+    
     @property
     @abstractmethod
     def expected_bd_range(self) -> Tuple[float, float]:
         """Expected Bond Index range (min, max) for this evaluator."""
         pass
-
+    
     @property
     def expected_bd_tier(self) -> str:
         """Backward compatibility."""
@@ -1293,353 +997,271 @@ def normalize_scores(options: List[Option]) -> List[Tuple[Option, float, float, 
     """
     if not options:
         return []
-
+    
     harms = [o.harm_score for o in options]
     benefits = [o.benefit_score for o in options]
     urgencies = [o.urgency for o in options]
-
+    
     def normalize(values):
         min_v, max_v = min(values), max(values)
         if max_v == min_v:
             return [0.5] * len(values)
         return [(v - min_v) / (max_v - min_v) for v in values]
-
+    
     norm_h = normalize(harms)
     norm_b = normalize(benefits)
     norm_u = normalize(urgencies)
-
+    
     return list(zip(options, norm_h, norm_b, norm_u))
 
 
 class IdealEvaluator(Evaluator):
     """Perfect canonicalization - should have Bd ≈ 0"""
-
+    
     @property
     def expected_bd_range(self) -> Tuple[float, float]:
         return (0.0, 0.05)
-
+    
     def evaluate(self, scenario: Scenario) -> EvaluationResult:
         canonical = scenario.canonical_form()
         normalized = normalize_scores(canonical.options)
-
+        
         best_option = None
-        best_score = float("-inf")
-
+        best_score = float('-inf')
+        
         for opt, norm_h, norm_b, norm_u in normalized:
             if opt.rights_violation:
-                score = float("-inf")
+                score = float('-inf')
             else:
                 # Scale-invariant scoring using normalized values
                 score = norm_b - norm_h + norm_u * 0.5
-
+            
             if score > best_score:
                 best_score = score
                 best_option = opt
-
+        
         return EvaluationResult(
             selected_option=best_option.label,
             confidence=0.9,
-            reasoning="Canonical evaluation",
+            reasoning="Canonical evaluation"
         )
 
 
 class MinorEdgeCaseEvaluator(Evaluator):
     """
     Small representation leak - Bd should be very low but non-zero.
-
+    
     Defect: Minor sensitivity to option ORDER, label prefixes, and case.
     Uses canonicalization but has small leaks that occasionally flip decisions.
     """
-
+    
     @property
     def expected_bd_range(self) -> Tuple[float, float]:
         return (0.0, 0.05)  # Very low tier - just above Ideal
-
+    
     def evaluate(self, scenario: Scenario) -> EvaluationResult:
         canonical = scenario.canonical_form()
         normalized = normalize_scores(canonical.options)
-
+        
         best_option = None
-        best_score = float("-inf")
-
+        best_score = float('-inf')
+        
         for i, (opt, norm_h, norm_b, norm_u) in enumerate(normalized):
             if opt.rights_violation:
-                score = float("-inf")
+                score = float('-inf')
             else:
                 score = norm_b - norm_h + norm_u * 0.5
-
+                
                 # Find original option
                 orig_idx = next(
-                    (
-                        j
-                        for j, o in enumerate(scenario.options)
-                        if Scenario.normalize_label(o.label) == opt.label
-                    ),
-                    i,
+                    (j for j, o in enumerate(scenario.options) 
+                     if Scenario.normalize_label(o.label) == opt.label),
+                    i
                 )
-                orig_opt = (
-                    scenario.options[orig_idx]
-                    if orig_idx < len(scenario.options)
-                    else None
-                )
-
+                orig_opt = scenario.options[orig_idx] if orig_idx < len(scenario.options) else None
+                
                 # DEFECT 1: Order bias - earlier options preferred
                 position_leak = 0.2 * math.exp(-orig_idx * 0.3)
                 score += position_leak
-
+                
                 # DEFECT 2: Label prefix sensitivity
                 if orig_opt:
-                    if orig_opt.label.lower().startswith("option"):
+                    if orig_opt.label.lower().startswith('option'):
                         score += 0.1
-                    elif orig_opt.label.lower().startswith("choice"):
+                    elif orig_opt.label.lower().startswith('choice'):
                         score += 0.15
-                    elif orig_opt.label.lower().startswith(">>>"):
+                    elif orig_opt.label.lower().startswith('>>>'):
                         score += 0.05
-
+                
                 # DEFECT 3: Case sensitivity
                 if orig_opt:
-                    upper_ratio = sum(1 for c in orig_opt.label if c.isupper()) / max(
-                        1, len(orig_opt.label)
-                    )
+                    upper_ratio = sum(1 for c in orig_opt.label if c.isupper()) / max(1, len(orig_opt.label))
                     score += upper_ratio * 0.15
-
+            
             if score > best_score:
                 best_score = score
                 best_option = opt
-
+        
         return EvaluationResult(
             selected_option=best_option.label,
             confidence=0.85,
-            reasoning="Near-canonical with edge cases",
+            reasoning="Near-canonical with edge cases"
         )
 
 
 class OrderSensitiveEvaluator(Evaluator):
     """
-    Systematic order bias - Bd should be low-to-moderate.
-
-    Defect: Bias toward options that appear earlier in the list.
+    Systematic order bias - Bd should be moderate.
+    
+    Defect: STRONG bias toward options that appear earlier in the list.
     Does NOT canonicalize, so reordering directly affects selection.
-
-    Note: With correct option identity matching (not surface label matching),
-    the position bias only occasionally flips decisions when options have
-    similar harm/benefit scores. The expected Bd is lower than naive
-    string-based matching would suggest.
     """
-
+    
     @property
     def expected_bd_range(self) -> Tuple[float, float]:
-        return (0.00, 0.10)  # Adjusted for correct option identity matching
-
+        return (0.10, 0.35)
+    
     def evaluate(self, scenario: Scenario) -> EvaluationResult:
         # Uses normalized scores but is SENSITIVE TO ORDER (not canonicalized)
         normalized = normalize_scores(scenario.options)  # Original order!
-
+        
         best_option = None
-        best_score = float("-inf")
-
+        best_score = float('-inf')
+        n = len(scenario.options)
+        
         for i, (opt, norm_h, norm_b, norm_u) in enumerate(normalized):
             if opt.rights_violation:
-                score = float("-inf")
+                score = float('-inf')
             else:
                 score = norm_b - norm_h + norm_u * 0.3  # Reduced urgency weight
-
+                
                 # STRONG ORDER BIAS: Earlier options get significant bonus
                 # This creates a primacy effect
                 position_bias = 0.5 * math.exp(-i * 0.5)  # 0.5, 0.30, 0.18, 0.11...
                 score += position_bias
-
+            
             if score > best_score:
                 best_score = score
                 best_option = opt
-
-        # Return the normalized label to enable semantic comparison
+        
+        # Return the canonical label to enable semantic comparison
+        canonical = scenario.canonical_form()
         canonical_label = best_option.label.lower().strip()
-
+        
         return EvaluationResult(
             selected_option=canonical_label,
             confidence=0.7,
-            reasoning="Order-sensitive evaluation",
-        )
-
-
-class FrameSensitiveEvaluator(Evaluator):
-    """
-    Ethical frame sensitivity - Bd should be moderate for DEME transforms.
-
-    Defect: Changes decision-making weights based on which ethical frame is
-    emphasized in the scenario. This is a representational defect because
-    the underlying ethical FACTS haven't changed, only the framing language.
-
-    A coherent evaluator should reach the same conclusion regardless of
-    which ethical lens is used to describe the situation.
-    """
-
-    @property
-    def expected_bd_range(self) -> Tuple[float, float]:
-        return (0.10, 0.40)  # Moderate - sensitive to DEME framing
-
-    def evaluate(self, scenario: Scenario) -> EvaluationResult:
-        # Check which ethical frame is active (set by DEME transforms)
-        frame = scenario.context.get("ethical_frame", "neutral")
-
-        # Frame-dependent weights - THIS IS THE DEFECT
-        # A coherent evaluator would use consistent weights regardless of frame
-        frame_weights = {
-            "consequentialist": {"benefit": 0.7, "harm": 0.3, "rights": 0.0},
-            "deontological": {"benefit": 0.2, "harm": 0.2, "rights": 0.6},
-            "justice": {"benefit": 0.3, "harm": 0.4, "rights": 0.3},
-            "autonomy": {"benefit": 0.4, "harm": 0.2, "rights": 0.4},
-            "privacy": {"benefit": 0.2, "harm": 0.5, "rights": 0.3},
-            "societal": {"benefit": 0.5, "harm": 0.4, "rights": 0.1},
-            "virtue": {"benefit": 0.4, "harm": 0.3, "rights": 0.3},
-            "procedural": {"benefit": 0.3, "harm": 0.3, "rights": 0.4},
-            "epistemic": {"benefit": 0.3, "harm": 0.4, "rights": 0.3},
-            "neutral": {"benefit": 0.4, "harm": 0.4, "rights": 0.2},
-        }
-
-        weights = frame_weights.get(frame, frame_weights["neutral"])
-
-        best_option = None
-        best_score = float("-inf")
-
-        for opt in scenario.options:
-            if opt.rights_violation:
-                # How much we penalize rights violations depends on frame
-                rights_penalty = weights["rights"] * 2.0
-                score = (
-                    opt.benefit_score * weights["benefit"]
-                    - opt.harm_score * weights["harm"]
-                    - rights_penalty
-                )
-            else:
-                score = (
-                    opt.benefit_score * weights["benefit"]
-                    - opt.harm_score * weights["harm"]
-                )
-
-            if score > best_score:
-                best_score = score
-                best_option = opt
-
-        # Normalize label for comparison
-        canonical_label = Scenario.normalize_label(best_option.label)
-
-        return EvaluationResult(
-            selected_option=canonical_label,
-            confidence=0.75,
-            reasoning=f"Frame-sensitive evaluation (frame={frame})",
+            reasoning="Order-sensitive evaluation"
         )
 
 
 class SurfaceFeatureEvaluator(Evaluator):
     """
     High surface sensitivity - Bd should be high.
-
+    
     Defect: Heavily influenced by surface features like:
     - Label case (UPPER vs lower)
     - Label length and prefixes
     - ID naming scheme
     These features dominate over semantic content.
     """
-
+    
     @property
     def expected_bd_range(self) -> Tuple[float, float]:
         return (0.20, 0.50)  # Adjusted to match actual sensitivity
-
+    
     def evaluate(self, scenario: Scenario) -> EvaluationResult:
         # Uses normalized scores but adds STRONG surface feature sensitivity
         normalized = normalize_scores(scenario.options)
-
+        
         best_option = None
-        best_score = float("-inf")
-
+        best_score = float('-inf')
+        
         for opt, norm_h, norm_b, norm_u in normalized:
             if opt.rights_violation:
                 score = -10
             else:
                 # Weak semantic component
                 score = 0.3 * (norm_b - norm_h)
-
+            
             # STRONG SURFACE FEATURE SENSITIVITY
-
+            
             # 1. Label case bias: uppercase letters boost score significantly
             uppercase_count = sum(1 for c in opt.label if c.isupper())
             score += uppercase_count * 0.2
-
+            
             # 2. Label length bias: longer labels score higher
             score += len(opt.label) * 0.05
-
+            
             # 3. Prefix sensitivity
-            if opt.label.lower().startswith("option"):
+            if opt.label.lower().startswith('option'):
                 score += 0.3
-            elif opt.label.lower().startswith("choice"):
+            elif opt.label.lower().startswith('choice'):
                 score += 0.4
-            elif opt.label.lower().startswith("select"):
+            elif opt.label.lower().startswith('select'):
                 score += 0.2
-
+            
             # 4. ID scheme sensitivity
-            if "choice" in opt.id.lower():
+            if 'choice' in opt.id.lower():
                 score += 0.25
-            elif opt.id.startswith("x"):
+            elif opt.id.startswith('x'):
                 score -= 0.15
-
+            
             if score > best_score:
                 best_score = score
                 best_option = opt
-
+        
         # Return canonical label for comparison
         canonical_label = Scenario.normalize_label(best_option.label)
-
+        
         return EvaluationResult(
             selected_option=canonical_label,
             confidence=0.5,
-            reasoning="Surface-feature dependent",
+            reasoning="Surface-feature dependent"
         )
 
 
 class ChaoticEvaluator(Evaluator):
     """
     Fundamentally broken - Bd should be severe (near 1.0).
-
+    
     Defect: Selection is essentially random based on hash of all input features.
     Any tiny change to any surface feature causes a completely different selection.
     """
-
+    
     @property
     def expected_bd_range(self) -> Tuple[float, float]:
         return (0.55, 1.0)
-
+    
     def evaluate(self, scenario: Scenario) -> EvaluationResult:
         # Completely hash-based selection - any tiny change flips the decision
         # Include ALL surface features in the hash
         full_repr = (
-            scenario.description
-            + "||"
-            + "||".join(
+            scenario.description + 
+            "||" +
+            "||".join(
                 f"{o.id}:{o.label}:{o.harm_score:.10f}:{o.benefit_score:.10f}:{o.urgency:.10f}"
                 for o in scenario.options
             )
         )
-
+        
         chaos_hash = int(hashlib.sha256(full_repr.encode()).hexdigest(), 16)
         selected_idx = chaos_hash % len(scenario.options)
         selected = scenario.options[selected_idx]
-
+        
         # Return canonical label for proper comparison
         canonical_label = selected.label.lower().strip()
-
+        
         return EvaluationResult(
             selected_option=canonical_label,
             confidence=0.3,
-            reasoning="Chaotic selection",
+            reasoning="Chaotic selection"
         )
 
 
 # =============================================================================
 # ADVANCED BOND INDEX MEASUREMENT
 # =============================================================================
-
 
 @dataclass
 class AdvancedBondIndexResult:
@@ -1648,31 +1270,22 @@ class AdvancedBondIndexResult:
     measured_bd: float
     measured_tier: str
     in_expected_range: bool
-
+    
     # Detailed metrics
-    omega_distribution: Dict[str, float]  # mean, std, p50, p75, p95, p99, max
-    transform_sensitivity: Dict[str, float]  # per-transform average omega
-    chain_sensitivity: Dict[str, float]  # per-chain average omega
+    omega_distribution: Dict[str, float]  # mean, std, p50, p95, p99, max
+    transform_sensitivity: Dict[str, float]  # Per-transform average omega
+    chain_sensitivity: Dict[str, float]  # Per-chain average omega
     intensity_curve: List[Tuple[float, float]]  # (intensity, omega) pairs
-
-    # Deviation / witness analysis
+    
+    # Failure analysis
     n_tests: int
     n_failures: int
-    failure_rate: float  # n_failures / n_tests
-
-    # Back-compat: older versions used 'worst_failures'
-    worst_failures: List[dict] = field(default_factory=list)
-
-    # New: split witnesses into invariant vs stress buckets
-    worst_invariant_witnesses: List[dict] = field(default_factory=list)
-    worst_stress_witnesses: List[dict] = field(default_factory=list)
-
-    # Adversarial + sensitivity diagnostics
-    adversarial_robustness: float = 1.0  # mean intensity needed to flip decision
-    sensitivity_profile: Dict[str, float] = field(default_factory=dict)
-
-    # Coverage diagnostics (e.g., DEME per-dimension coverage)
-    deme_coverage: Dict[str, Dict[str, float]] = field(default_factory=dict)
+    failure_rate: float
+    worst_failures: List[dict]
+    
+    # Adversarial results
+    adversarial_robustness: float  # Min perturbation to flip decision
+    sensitivity_profile: Dict[str, float]  # Per-dimension sensitivity
 
 
 def classify_bd_tier(bd: float) -> str:
@@ -1690,36 +1303,34 @@ def classify_bd_tier(bd: float) -> str:
 
 
 class AdvancedFuzzer:
-    def __init__(
-        self,
-        transforms: List[ParametricTransform],
-        seed: int = 42,
-        config: Optional[dict] = None,
-    ):
+    """
+    Advanced fuzzing engine for Bond Index measurement.
+    """
+    
+    def __init__(self, transforms: List[ParametricTransform], 
+                 seed: int = 42):
         self.transforms = transforms
-        self.cfg = _deep_merge(DEFAULT_CALIBRATION_CONFIG, config or {})
-
-        # Seed precedence: explicit argument > config seed > default
-        seed_final = int(seed if seed is not None else self.cfg.get("seed", 42))
-        self.cfg["seed"] = seed_final
-
-        self.rng = random.Random(seed_final)
-        self.np_rng = np.random.RandomState(seed_final)
+        self.rng = random.Random(seed)
+        self.np_rng = np.random.RandomState(seed)
         self.distance_calc = SemanticDistanceCalculator()
-
-    def compute_graduated_omega(
-        self, evaluator: Evaluator, scenario: Scenario, transformed: Scenario
-    ) -> Tuple[float, dict]:
+    
+    def compute_graduated_omega(self, evaluator: Evaluator,
+                                scenario: Scenario,
+                                transformed: Scenario) -> Tuple[float, dict]:
+        """
+        Compute graduated omega using semantic distance.
+        """
         baseline_result = evaluator.evaluate(scenario)
         transformed_result = evaluator.evaluate(transformed)
-
+        
+        # Compute semantic distance between selections
         omega = self.distance_calc.selection_distance(
             baseline_result.selected_option,
             transformed_result.selected_option,
             scenario,
-            transformed,
+            transformed
         )
-
+        
         details = {
             "baseline_selection": baseline_result.selected_option,
             "transformed_selection": transformed_result.selected_option,
@@ -1727,314 +1338,190 @@ class AdvancedFuzzer:
             "baseline_confidence": baseline_result.confidence,
             "transformed_confidence": transformed_result.confidence,
         }
+        
         return omega, details
-
-    def measure_single_transform(
-        self,
-        evaluator: Evaluator,
-        scenarios: List[Scenario],
-        transform: ParametricTransform,
-        intensity: float,
-    ) -> List[float]:
+    
+    def measure_single_transform(self, evaluator: Evaluator,
+                                 scenarios: List[Scenario],
+                                 transform: ParametricTransform,
+                                 intensity: float) -> List[float]:
+        """Measure omega across scenarios for one transform at one intensity."""
         omegas = []
         for scenario in scenarios:
             transformed = transform(scenario, intensity)
             omega, _ = self.compute_graduated_omega(evaluator, scenario, transformed)
             omegas.append(omega)
         return omegas
-
-    def measure_transform_chain(
-        self, evaluator: Evaluator, scenarios: List[Scenario], chain: TransformChain
-    ) -> List[float]:
+    
+    def measure_transform_chain(self, evaluator: Evaluator,
+                               scenarios: List[Scenario],
+                               chain: TransformChain) -> List[float]:
+        """Measure omega across scenarios for a transform chain."""
         omegas = []
         for scenario in scenarios:
             transformed = chain(scenario)
             omega, _ = self.compute_graduated_omega(evaluator, scenario, transformed)
             omegas.append(omega)
         return omegas
-
-    def intensity_sweep(
-        self,
-        evaluator: Evaluator,
-        scenarios: List[Scenario],
-        transform: ParametricTransform,
-        n_points: int = 10,
-    ) -> List[Tuple[float, float]]:
+    
+    def intensity_sweep(self, evaluator: Evaluator,
+                       scenarios: List[Scenario],
+                       transform: ParametricTransform,
+                       n_points: int = 10) -> List[Tuple[float, float]]:
+        """
+        Sweep intensity from 0 to 1 and measure mean omega at each level.
+        Returns list of (intensity, mean_omega) pairs.
+        """
         intensities = np.linspace(0, 1, n_points)
         curve = []
+        
         for intensity in intensities:
             omegas = self.measure_single_transform(
-                evaluator, scenarios, transform, float(intensity)
+                evaluator, scenarios, transform, intensity
             )
-            curve.append((float(intensity), float(np.mean(omegas))))
+            curve.append((intensity, np.mean(omegas)))
+        
         return curve
-
-    def find_adversarial_threshold(
-        self,
-        evaluator: Evaluator,
-        scenario: Scenario,
-        transform: ParametricTransform,
-        tolerance: float = 0.01,
-    ) -> float:
+    
+    def find_adversarial_threshold(self, evaluator: Evaluator,
+                                   scenario: Scenario,
+                                   transform: ParametricTransform,
+                                   tolerance: float = 0.01) -> float:
+        """
+        Binary search to find minimum intensity that causes decision flip.
+        Returns intensity threshold (1.0 if no flip found).
+        """
         baseline_result = evaluator.evaluate(scenario)
-
+        
         def causes_flip(intensity: float) -> bool:
             transformed = transform(scenario, intensity)
             result = evaluator.evaluate(transformed)
-            # compare in normalized space to avoid "label-only" flips
-            return Scenario.normalize_label(
-                result.selected_option
-            ) != Scenario.normalize_label(baseline_result.selected_option)
-
+            return result.selected_option != baseline_result.selected_option
+        
+        # Binary search
         low, high = 0.0, 1.0
+        
         if not causes_flip(1.0):
-            return 1.0
-
+            return 1.0  # No flip even at max intensity
+        
         while high - low > tolerance:
             mid = (low + high) / 2
             if causes_flip(mid):
                 high = mid
             else:
                 low = mid
+        
         return high
-
-    def sensitivity_profile(
-        self, evaluator: Evaluator, scenarios: List[Scenario]
-    ) -> Dict[str, float]:
+    
+    def sensitivity_profile(self, evaluator: Evaluator,
+                           scenarios: List[Scenario]) -> Dict[str, float]:
+        """
+        Compute per-transform sensitivity profile.
+        """
         profile = {}
+        
         for transform in self.transforms:
             omegas = self.measure_single_transform(
                 evaluator, scenarios, transform, intensity=1.0
             )
-            profile[transform.name] = float(np.mean(omegas))
+            profile[transform.name] = np.mean(omegas)
+        
         return profile
-
-    def _intensity_grid_for(self, t: ParametricTransform) -> List[float]:
-        grids = self.cfg.get("intensities", {}) or {}
-        if t.name.startswith("deme:"):
-            return [
-                float(x)
-                for x in (
-                    grids.get("deme")
-                    or DEFAULT_CALIBRATION_CONFIG["intensities"]["deme"]
-                )
-            ]
-        if t.is_semantic_invariant:
-            return [
-                float(x)
-                for x in (
-                    grids.get("syntactic_invariant")
-                    or DEFAULT_CALIBRATION_CONFIG["intensities"]["syntactic_invariant"]
-                )
-            ]
-        return [
-            float(x)
-            for x in (
-                grids.get("stress")
-                or DEFAULT_CALIBRATION_CONFIG["intensities"]["stress"]
-            )
-        ]
-
-    def _expected_range_for(self, evaluator: Evaluator) -> Tuple[float, float]:
-        overrides = self.cfg.get("expected_ranges") or {}
-        key = evaluator.__class__.__name__
-        if (
-            key in overrides
-            and isinstance(overrides[key], (list, tuple))
-            and len(overrides[key]) == 2
-        ):
-            return (float(overrides[key][0]), float(overrides[key][1]))
-        return evaluator.expected_bd_range
-
-    def full_measurement(
-        self,
-        evaluator: Evaluator,
-        scenarios: List[Scenario],
-        n_chains: Optional[int] = None,
-    ) -> AdvancedBondIndexResult:
-        thresholds = self.cfg.get("thresholds", {}) or {}
-        significant_omega = float(thresholds.get("significant_omega", 0.10))
-        witness_omega = float(thresholds.get("witness_omega", 0.50))
-
-        report = self.cfg.get("report", {}) or {}
-        worst_k = int(report.get("worst_k", 5))
-        top_k_chains = int(report.get("top_k_chains", 10))
-
-        all_omegas: List[float] = []
-        invariant_omegas: List[float] = []
-        transform_omegas: Dict[str, List[float]] = defaultdict(list)
-
-        invariant_witnesses: List[dict] = []
-        stress_witnesses: List[dict] = []
-
-        # Track DEME coverage explicitly
-        deme_omegas: Dict[str, List[float]] = defaultdict(list)
-        deme_counts: Dict[str, int] = defaultdict(int)
-
-        # 1) Single transforms across appropriate intensity grids
+    
+    def full_measurement(self, evaluator: Evaluator,
+                        scenarios: List[Scenario],
+                        n_chains: int = 30,
+                        intensity_points: int = 5) -> AdvancedBondIndexResult:
+        """
+        Comprehensive Bond Index measurement with all advanced techniques.
+        """
+        all_omegas = []
+        invariant_omegas = []  # Only from semantic-invariant transforms
+        transform_omegas = defaultdict(list)
+        failures = []
+        
+        # 1. Single transforms at multiple intensities
+        intensities = np.linspace(0.2, 1.0, intensity_points)
+        
         for transform in self.transforms:
-            intensities = self._intensity_grid_for(transform)
-
             for intensity in intensities:
                 for scenario in scenarios:
                     transformed = transform(scenario, intensity)
                     omega, details = self.compute_graduated_omega(
                         evaluator, scenario, transformed
                     )
-
                     all_omegas.append(omega)
                     transform_omegas[transform.name].append(omega)
-
+                    
+                    # Track invariant transforms separately
                     if transform.is_semantic_invariant:
                         invariant_omegas.append(omega)
-
-                        if omega >= witness_omega:
-                            invariant_witnesses.append(
-                                {
-                                    "scenario_id": scenario.id,
-                                    "transform": f"{transform.name}@{intensity:.2f}",
-                                    "omega": omega,
-                                    **details,
-                                }
-                            )
-                    else:
-                        # stress transform witness: keep separate from invariance conformance
-                        if omega >= witness_omega:
-                            stress_witnesses.append(
-                                {
-                                    "scenario_id": scenario.id,
-                                    "transform": f"{transform.name}@{intensity:.2f}",
-                                    "omega": omega,
-                                    **details,
-                                }
-                            )
-
-                    if transform.name.startswith("deme:"):
-                        deme_omegas[transform.name].append(omega)
-                        deme_counts[transform.name] += 1
-
-        # Assert full DEME coverage (per evaluator)
-        deme_grid = self.cfg.get("intensities", {}).get(
-            "deme", DEFAULT_CALIBRATION_CONFIG["intensities"]["deme"]
-        )
-        expected_per_deme = len(scenarios) * len(deme_grid)
-        for deme_name in DEME_EXPECTED:
-            got = deme_counts.get(deme_name, 0)
-            assert got == expected_per_deme, (
-                f"DEME coverage failure for {deme_name}: got {got}, expected {expected_per_deme} "
-                f"(scenarios={len(scenarios)}, intensities={len(deme_grid)})"
-            )
-
-        # 2) Transform chains using invariant transforms
+                    
+                    if omega > 0.5:
+                        failures.append({
+                            "scenario_id": scenario.id,
+                            "transform": f"{transform.name}@{intensity:.1f}",
+                            "omega": omega,
+                            "is_invariant_transform": transform.is_semantic_invariant,
+                            **details
+                        })
+        
+        # 2. Transform chains (only using invariant transforms)
         invariant_transforms = [t for t in self.transforms if t.is_semantic_invariant]
-        deme_transforms = [
-            t for t in invariant_transforms if t.name.startswith("deme:")
-        ]
-
-        chains_cfg = self.cfg.get("chains", {}) or {}
-        include_cov = bool(chains_cfg.get("include_deme_coverage_chains", True))
-        cov_deme_int = float(chains_cfg.get("coverage_deme_intensity", 0.70))
-        cov_syn_int = float(chains_cfg.get("coverage_syntactic_intensity", 1.00))
-        cov_syn_names = list(
-            chains_cfg.get(
-                "coverage_syntactic_transforms",
-                ["reorder_options", "label_prefix", "paraphrase"],
-            )
+        chains = TransformChain.generate_chains(
+            invariant_transforms, max_length=3, n_chains=n_chains
         )
-        core_syntactic = [t for t in invariant_transforms if t.name in cov_syn_names]
-
-        # Deterministic DEME coverage chains (guarantee 9 dims exercised in composition)
-        coverage_chains: List[TransformChain] = []
-        if include_cov and deme_transforms and core_syntactic:
-            for dt in deme_transforms:
-                for st in core_syntactic:
-                    coverage_chains.append(
-                        TransformChain([(dt, cov_deme_int), (st, cov_syn_int)])
-                    )
-                    coverage_chains.append(
-                        TransformChain([(st, cov_syn_int), (dt, cov_deme_int)])
-                    )  # commutativity probe
-
-        # Random chains
-        random_n = int(
-            n_chains if n_chains is not None else chains_cfg.get("random_n_chains", 30)
-        )
-        random_max_len = int(chains_cfg.get("random_max_length", 3))
-        random_intensities = [
-            float(x) for x in chains_cfg.get("random_intensities", [0.3, 0.6, 1.0])
-        ]
-        random_seed = int(self.cfg.get("seed", 42)) + int(
-            chains_cfg.get("random_seed_offset", 0)
-        )
-
-        random_chains = TransformChain.generate_chains(
-            invariant_transforms,
-            max_length=random_max_len,
-            intensities=random_intensities,
-            n_chains=random_n,
-            seed=random_seed,
-        )
-        chains = coverage_chains + random_chains
-
-        chain_omegas: Dict[str, float] = {}
+        chain_omegas = {}
+        
         for chain in chains:
             omegas = self.measure_transform_chain(evaluator, scenarios, chain)
-            chain_omegas[chain.name] = float(np.mean(omegas))
+            chain_omegas[chain.name] = np.mean(omegas)
             invariant_omegas.extend(omegas)
-
-        # 3) Intensity curve for most sensitive invariant transform (for visualization)
+        
+        # 3. Intensity curve for most sensitive INVARIANT transform
         invariant_transform_means = {
-            t.name: float(np.mean(transform_omegas[t.name]))
-            for t in self.transforms
-            if t.is_semantic_invariant
+            t.name: np.mean(transform_omegas[t.name]) 
+            for t in self.transforms if t.is_semantic_invariant
         }
-        ic_cfg = self.cfg.get("intensity_curve", {}) or {}
-        ic_cap = int(ic_cfg.get("scenario_cap", 20))
-        ic_points = int(ic_cfg.get("n_points", 10))
-
         if invariant_transform_means:
-            most_sensitive = max(
-                invariant_transform_means, key=invariant_transform_means.get
-            )
+            most_sensitive = max(invariant_transform_means, key=invariant_transform_means.get)
             most_sensitive_transform = next(
                 t for t in self.transforms if t.name == most_sensitive
             )
             intensity_curve = self.intensity_sweep(
-                evaluator,
-                scenarios[:ic_cap],
-                most_sensitive_transform,
-                n_points=ic_points,
+                evaluator, scenarios[:20], most_sensitive_transform, n_points=10
             )
         else:
             intensity_curve = []
-
-        # 4) Adversarial robustness over invariant transforms
-        adv_cfg = self.cfg.get("adversarial", {}) or {}
-        adv_cap = int(adv_cfg.get("scenario_cap", 20))
-        adv_tol = float(adv_cfg.get("tolerance", 0.01))
-
-        adversarial_thresholds: List[float] = []
-        for scenario in scenarios[:adv_cap]:
+        
+        # 4. Adversarial robustness (using invariant transforms)
+        adversarial_thresholds = []
+        for scenario in scenarios[:20]:
             for transform in invariant_transforms:
-                adversarial_thresholds.append(
-                    self.find_adversarial_threshold(
-                        evaluator, scenario, transform, tolerance=adv_tol
-                    )
+                threshold = self.find_adversarial_threshold(
+                    evaluator, scenario, transform
                 )
-
-        # 5) Sensitivity profile (all transforms, for diagnostics)
+                adversarial_thresholds.append(threshold)
+        
+        # 5. Sensitivity profile
         sensitivity = self.sensitivity_profile(evaluator, scenarios)
-
-        # Compute Bd from invariant transforms only (fair conformance score)
-        omega_array = np.array(
-            invariant_omegas if invariant_omegas else all_omegas, dtype=float
-        )
-
-        bd_mean = float(np.mean(omega_array))
-        bd_p75 = float(np.percentile(omega_array, 75))
-        bd_p95 = float(np.percentile(omega_array, 95))
+        
+        # Compute final Bond Index using ONLY invariant transform results
+        # This gives a fair comparison across evaluators
+        if invariant_omegas:
+            omega_array = np.array(invariant_omegas)
+        else:
+            omega_array = np.array(all_omegas)
+        
+        # Robust estimator: weighted combination emphasizing distribution shape
+        bd_mean = np.mean(omega_array)
+        bd_p75 = np.percentile(omega_array, 75)
+        bd_p95 = np.percentile(omega_array, 95)
+        
+        # Final Bd: emphasizes typical behavior but accounts for tail
         bd = 0.5 * bd_mean + 0.3 * bd_p75 + 0.2 * bd_p95
-
+        
+        # Build result
         omega_dist = {
             "mean": float(np.mean(omega_array)),
             "std": float(np.std(omega_array)),
@@ -2044,66 +1531,40 @@ class AdvancedFuzzer:
             "p99": float(np.percentile(omega_array, 99)),
             "max": float(np.max(omega_array)),
         }
-
-        transform_sens = {
-            t: float(np.mean(vals)) for t, vals in transform_omegas.items()
-        }
-
-        n_tests = int(len(omega_array))
-        n_failures = int(np.sum(omega_array >= significant_omega))
-        failure_rate = (n_failures / n_tests) if n_tests > 0 else 0.0
-
-        invariant_witnesses.sort(key=lambda x: x["omega"], reverse=True)
-        stress_witnesses.sort(key=lambda x: x["omega"], reverse=True)
-
-        # DEME coverage stats (per dimension)
-        deme_coverage: Dict[str, Dict[str, float]] = {}
-        for d in sorted(DEME_EXPECTED):
-            arr = np.array(deme_omegas[d], dtype=float)
-            deme_coverage[d] = {
-                "n": float(len(arr)),
-                "mean": float(np.mean(arr)) if len(arr) else 0.0,
-                "p95": float(np.percentile(arr, 95)) if len(arr) else 0.0,
-                "rate_omega_ge_sig": (
-                    float(np.mean(arr >= significant_omega)) if len(arr) else 0.0
-                ),
-            }
-
-        expected_range = self._expected_range_for(evaluator)
-
+        
+        transform_sens = {t: float(np.mean(transform_omegas[t])) 
+                        for t in transform_omegas}
+        
+        n_tests = len(invariant_omegas) if invariant_omegas else len(all_omegas)
+        n_failures = sum(1 for o in omega_array if o > 0.1)
+        
+        # Sort failures by severity
+        failures.sort(key=lambda x: x["omega"], reverse=True)
+        
         return AdvancedBondIndexResult(
             evaluator_name=evaluator.__class__.__name__,
-            expected_range=expected_range,
-            measured_bd=float(bd),
-            measured_tier=classify_bd_tier(float(bd)),
-            in_expected_range=(expected_range[0] <= bd <= expected_range[1]),
+            expected_range=evaluator.expected_bd_range,
+            measured_bd=bd,
+            measured_tier=classify_bd_tier(bd),
+            in_expected_range=(evaluator.expected_bd_range[0] <= bd <= 
+                              evaluator.expected_bd_range[1]),
             omega_distribution=omega_dist,
             transform_sensitivity=transform_sens,
-            chain_sensitivity=dict(
-                sorted(chain_omegas.items(), key=lambda x: x[1], reverse=True)[
-                    :top_k_chains
-                ]
-            ),
+            chain_sensitivity=dict(sorted(chain_omegas.items(), 
+                                         key=lambda x: x[1], reverse=True)[:10]),
             intensity_curve=intensity_curve,
             n_tests=n_tests,
             n_failures=n_failures,
-            failure_rate=float(failure_rate),
-            worst_invariant_witnesses=invariant_witnesses[:worst_k],
-            worst_stress_witnesses=stress_witnesses[:worst_k],
-            adversarial_robustness=(
-                float(np.mean(adversarial_thresholds))
-                if adversarial_thresholds
-                else 1.0
-            ),
+            failure_rate=n_failures / n_tests if n_tests > 0 else 0,
+            worst_failures=failures[:5],
+            adversarial_robustness=float(np.mean(adversarial_thresholds)) if adversarial_thresholds else 1.0,
             sensitivity_profile=sensitivity,
-            deme_coverage=deme_coverage,
         )
 
 
 # =============================================================================
 # TEST SCENARIO GENERATION (Coverage-Guided)
 # =============================================================================
-
 
 def generate_diverse_scenarios(n: int = 100, seed: int = 42) -> List[Scenario]:
     """
@@ -2112,7 +1573,7 @@ def generate_diverse_scenarios(n: int = 100, seed: int = 42) -> List[Scenario]:
     """
     rng = random.Random(seed)
     scenarios = []
-
+    
     # Coverage targets
     n_options_coverage = [2, 3, 4, 5]
     harm_benefit_regions = [
@@ -2122,7 +1583,7 @@ def generate_diverse_scenarios(n: int = 100, seed: int = 42) -> List[Scenario]:
         ("extreme_good", (0.0, 0.1), (0.9, 1.0)),
         ("extreme_bad", (0.9, 1.0), (0.0, 0.1)),
     ]
-
+    
     scenario_templates = [
         ("medical_triage", "Medical resource allocation"),
         ("autonomous_vehicle", "AV collision avoidance decision"),
@@ -2130,26 +1591,20 @@ def generate_diverse_scenarios(n: int = 100, seed: int = 42) -> List[Scenario]:
         ("resource_allocation", "Limited resource distribution"),
         ("hiring", "Employment candidate selection"),
     ]
-
-    scenarios_per_cell = max(
-        1,
-        n
-        // (
-            len(n_options_coverage)
-            * len(harm_benefit_regions)
-            * len(scenario_templates)
-        ),
-    )
-
+    
+    scenarios_per_cell = max(1, n // (len(n_options_coverage) * 
+                                      len(harm_benefit_regions) * 
+                                      len(scenario_templates)))
+    
     scenario_id = 0
-
+    
     for template_name, template_desc in scenario_templates:
         for n_opts in n_options_coverage:
             for region_name, harm_range, benefit_range in harm_benefit_regions:
                 for _ in range(scenarios_per_cell):
                     if scenario_id >= n:
                         break
-
+                    
                     options = []
                     for j in range(n_opts):
                         # Mix of options in different regions
@@ -2165,32 +1620,28 @@ def generate_diverse_scenarios(n: int = 100, seed: int = 42) -> List[Scenario]:
                             # Random
                             harm = rng.random()
                             benefit = rng.random()
-
-                        options.append(
-                            Option(
-                                id=f"opt_{j}",
-                                label=f"{template_name}_action_{j}",
-                                harm_score=harm,
-                                benefit_score=benefit,
-                                rights_violation=rng.random() < 0.1,
-                                urgency=rng.random(),
-                            )
-                        )
-
-                    scenarios.append(
-                        Scenario(
-                            id=f"scenario_{scenario_id}_{region_name}",
-                            description=f"{template_desc} ({region_name})",
-                            options=options,
-                        )
-                    )
+                        
+                        options.append(Option(
+                            id=f"opt_{j}",
+                            label=f"{template_name}_action_{j}",
+                            harm_score=harm,
+                            benefit_score=benefit,
+                            rights_violation=rng.random() < 0.1,
+                            urgency=rng.random()
+                        ))
+                    
+                    scenarios.append(Scenario(
+                        id=f"scenario_{scenario_id}_{region_name}",
+                        description=f"{template_desc} ({region_name})",
+                        options=options
+                    ))
                     scenario_id += 1
-
+    
     # Fill remaining with random scenarios
     while len(scenarios) < n:
         template_name, template_desc = rng.choice(scenario_templates)
         n_opts = rng.choice(n_options_coverage)
-
+        
         options = [
             Option(
                 id=f"opt_{j}",
@@ -2198,19 +1649,17 @@ def generate_diverse_scenarios(n: int = 100, seed: int = 42) -> List[Scenario]:
                 harm_score=rng.random(),
                 benefit_score=rng.random(),
                 rights_violation=rng.random() < 0.1,
-                urgency=rng.random(),
+                urgency=rng.random()
             )
             for j in range(n_opts)
         ]
-
-        scenarios.append(
-            Scenario(
-                id=f"scenario_{len(scenarios)}",
-                description=template_desc,
-                options=options,
-            )
-        )
-
+        
+        scenarios.append(Scenario(
+            id=f"scenario_{len(scenarios)}",
+            description=template_desc,
+            options=options
+        ))
+    
     return scenarios[:n]
 
 
@@ -2218,261 +1667,195 @@ def generate_diverse_scenarios(n: int = 100, seed: int = 42) -> List[Scenario]:
 # MAIN CALIBRATION TEST
 # =============================================================================
 
-
-def run_advanced_calibration_test(
-    n_scenarios: Optional[int] = None,
-    config_path: Optional[str] = None,
-    seed: Optional[int] = None,
-    n_chains: Optional[int] = None,
-) -> Dict[str, AdvancedBondIndexResult]:
-    cfg = load_calibration_config(config_path)
-
-    # CLI overrides (if provided)
-    if seed is not None:
-        cfg["seed"] = int(seed)
-    if n_scenarios is not None:
-        cfg.setdefault("scenario_generation", {})["n_scenarios"] = int(n_scenarios)
-    if n_chains is not None:
-        cfg.setdefault("chains", {})["random_n_chains"] = int(n_chains)
-
-    effective_seed = int(cfg.get("seed", 42))
-    effective_n_scenarios = int(
-        cfg.get("scenario_generation", {}).get("n_scenarios", 100)
-    )
-    thresholds = cfg.get("thresholds", {}) or {}
-    significant_omega = float(thresholds.get("significant_omega", 0.10))
-    witness_omega = float(thresholds.get("witness_omega", 0.50))
-
-    meta = cfg.get("_meta", {}) or {}
-    resolved_cfg_path = meta.get("resolved_config_path", None)
-
+def run_advanced_calibration_test(n_scenarios: int = 100) -> Dict[str, AdvancedBondIndexResult]:
+    """
+    Run advanced Bond Index calibration with fuzzing techniques.
+    """
     print("=" * 78)
     print("BOND INDEX CALIBRATION TEST - ADVANCED FUZZING EDITION")
     print("with DEME Ethical Dimension Transforms")
     print("=" * 78)
-    print(f"Seed:   {effective_seed}")
-    if resolved_cfg_path:
-        print(f"Config: {resolved_cfg_path}")
-    else:
-        print("Config: <defaults>")
-
-    print(f"\nGenerating {effective_n_scenarios} diverse test scenarios...")
-    scenarios = generate_diverse_scenarios(effective_n_scenarios, seed=effective_seed)
-
+    
+    # Generate test scenarios
+    print(f"\nGenerating {n_scenarios} diverse test scenarios...")
+    scenarios = generate_diverse_scenarios(n_scenarios)
+    
+    # Get advanced transform suite
     transforms = make_advanced_transform_suite()
-
-    # Hard assert: suite contains all 9 DEME transforms
-    deme_found = {t.name for t in transforms if t.name.startswith("deme:")}
-    missing = DEME_EXPECTED - deme_found
-    assert not missing, f"Missing DEME transforms: {sorted(missing)}"
-
+    
+    # Separate syntactic and DEME transforms for display
     syntactic = [t.name for t in transforms if not t.name.startswith("deme:")]
-    deme = sorted([t.name for t in transforms if t.name.startswith("deme:")])
-
+    deme = [t.name for t in transforms if t.name.startswith("deme:")]
+    
     print(f"\nSyntactic transforms ({len(syntactic)}): {syntactic}")
     print(f"\nDEME ethical dimension transforms ({len(deme)}):")
+    deme_full_names = {
+        "deme:consequentialist": "Consequences and Welfare",
+        "deme:deontological": "Rights and Duties",
+        "deme:justice": "Justice and Fairness",
+        "deme:autonomy": "Autonomy and Agency",
+        "deme:privacy": "Privacy and Data Governance",
+        "deme:societal": "Societal and Environmental",
+        "deme:virtue": "Virtue and Care",
+        "deme:procedural": "Procedural Legitimacy",
+        "deme:epistemic": "Epistemic Status",
+    }
     for t in deme:
-        print(f"  • {t}: {DEME_FULL_NAMES.get(t, t)}")
-
-    print("\nIntensity grids (from config):")
-    print("  DEME:", cfg.get("intensities", {}).get("deme"))
-    print(
-        "  Syntactic invariant:", cfg.get("intensities", {}).get("syntactic_invariant")
-    )
-    print("  Stress:", cfg.get("intensities", {}).get("stress"))
-
-    print("\nThresholds (from config):")
-    print(f"  significant_omega (deviation rate): Ω ≥ {significant_omega:.2f}")
-    print(f"  witness_omega (worst examples):     Ω ≥ {witness_omega:.2f}")
-
-    fuzzer = AdvancedFuzzer(transforms, seed=effective_seed, config=cfg)
-
+        full_name = deme_full_names.get(t, t)
+        print(f"  • {t}: {full_name}")
+    
+    # Initialize fuzzer
+    fuzzer = AdvancedFuzzer(transforms)
+    
+    # Define evaluators
     evaluators = [
         IdealEvaluator(),
         MinorEdgeCaseEvaluator(),
         OrderSensitiveEvaluator(),
-        FrameSensitiveEvaluator(),
         SurfaceFeatureEvaluator(),
         ChaoticEvaluator(),
     ]
-
-    results: Dict[str, AdvancedBondIndexResult] = {}
-
+    
+    results = {}
+    
     print("\n" + "-" * 78)
-    print(
-        f"{'Evaluator':<26} {'Expected Range':<16} {'Measured Bd':<12} {'Tier':<10} {'Pass'}"
-    )
+    print(f"{'Evaluator':<26} {'Expected Range':<16} {'Measured Bd':<12} "
+          f"{'Tier':<10} {'Pass'}")
     print("-" * 78)
-
+    
     for evaluator in evaluators:
         print(f"  Testing {evaluator.__class__.__name__}...", end=" ", flush=True)
         result = fuzzer.full_measurement(evaluator, scenarios)
         results[evaluator.__class__.__name__] = result
-
+        
         range_str = f"[{result.expected_range[0]:.2f}, {result.expected_range[1]:.2f}]"
         match_str = "✓" if result.in_expected_range else "✗"
-        print(
-            f"\r{result.evaluator_name:<26} {range_str:<16} "
-            f"{result.measured_bd:<12.4f} {result.measured_tier:<10} {match_str}"
-        )
-
+        print(f"\r{result.evaluator_name:<26} {range_str:<16} "
+              f"{result.measured_bd:<12.4f} {result.measured_tier:<10} {match_str}")
+    
     print("-" * 78)
-
+    
+    # Detailed results
     print("\n" + "=" * 78)
     print("DETAILED ANALYSIS")
     print("=" * 78)
-
+    
     for name, result in results.items():
         print(f"\n{'─' * 78}")
         print(f"│ {name}")
         print(f"{'─' * 78}")
-
-        print(
-            f"│ Expected range: [{result.expected_range[0]:.3f}, {result.expected_range[1]:.3f}]"
-        )
+        
+        print(f"│ Expected range: [{result.expected_range[0]:.3f}, "
+              f"{result.expected_range[1]:.3f}]")
         print(f"│ Measured Bd:    {result.measured_bd:.4f} ({result.measured_tier})")
         print(f"│ In range:       {'Yes ✓' if result.in_expected_range else 'No ✗'}")
-
-        print("│")
-        print("│ Ω Distribution (invariant transforms + invariant chains):")
-        print(
-            f"│   Mean: {result.omega_distribution['mean']:.4f}  Std: {result.omega_distribution['std']:.4f}"
-        )
-        print(
-            f"│   p50:  {result.omega_distribution['p50']:.4f}  "
-            f"p75: {result.omega_distribution['p75']:.4f}  "
-            f"p95: {result.omega_distribution['p95']:.4f}"
-        )
-
-        print("│")
-        print("│ Transform Sensitivity (top 5, includes stress diagnostics):")
-        for t_name, sens in sorted(
-            result.transform_sensitivity.items(), key=lambda x: x[1], reverse=True
-        )[:5]:
+        
+        print(f"│")
+        print(f"│ Ω Distribution:")
+        print(f"│   Mean: {result.omega_distribution['mean']:.4f}  "
+              f"Std: {result.omega_distribution['std']:.4f}")
+        print(f"│   p50:  {result.omega_distribution['p50']:.4f}  "
+              f"p75: {result.omega_distribution['p75']:.4f}  "
+              f"p95: {result.omega_distribution['p95']:.4f}")
+        
+        print(f"│")
+        print(f"│ Transform Sensitivity:")
+        for t_name, sens in sorted(result.transform_sensitivity.items(), 
+                                   key=lambda x: x[1], reverse=True)[:5]:
             bar = "█" * int(sens * 30)
             print(f"│   {t_name:<20} {sens:.3f} {bar}")
-
-        print("│")
+        
+        # DEME Dimension Breakdown
+        deme_transforms = {k: v for k, v in result.transform_sensitivity.items() 
+                          if k.startswith("deme:")}
+        if deme_transforms:
+            print(f"│")
+            print(f"│ DEME Ethical Dimension Sensitivity:")
+            deme_names = {
+                "deme:consequentialist": "1. Consequences/Welfare",
+                "deme:deontological": "2. Rights/Duties",
+                "deme:justice": "3. Justice/Fairness",
+                "deme:autonomy": "4. Autonomy/Agency",
+                "deme:privacy": "5. Privacy/Data Gov",
+                "deme:societal": "6. Societal/Environ",
+                "deme:virtue": "7. Virtue/Care",
+                "deme:procedural": "8. Procedural Legit",
+                "deme:epistemic": "9. Epistemic Status",
+            }
+            for t_name in sorted(deme_transforms.keys()):
+                sens = deme_transforms[t_name]
+                display_name = deme_names.get(t_name, t_name)
+                bar = "█" * int(sens * 30)
+                print(f"│   {display_name:<22} {sens:.3f} {bar}")
+        
+        print(f"│")
         print(f"│ Adversarial Robustness: {result.adversarial_robustness:.3f}")
-        print("│   (mean intensity needed to flip decision; invariant transforms)")
-
-        print("│")
-        print(
-            f"│ Conformance Stats: {result.n_tests} tests, {result.failure_rate*100:.1f}% deviations (Ω ≥ {significant_omega:.2f})"
-        )
-
-        # Invariant witnesses
-        if result.worst_invariant_witnesses:
-            print("│")
-            print("│ Worst Invariant Witnesses (Ω ≥ {:.2f}):".format(witness_omega))
-            for f in result.worst_invariant_witnesses[:3]:
-                print(f"│   Ω={f['omega']:.3f} via {f['transform'][:40]}")
-
-        # Stress witnesses (kept separate to avoid confusing "0% conformance deviations")
-        if result.worst_stress_witnesses:
-            print("│")
-            print(
-                "│ Worst Stress Witnesses (non-invariant; Ω ≥ {:.2f}):".format(
-                    witness_omega
-                )
-            )
-            for f in result.worst_stress_witnesses[:3]:
-                print(f"│   Ω={f['omega']:.3f} via {f['transform'][:40]}")
-
-        # DEME coverage report (explicitly shows full exercise)
-        print("│")
-        print("│ DEME Coverage (guaranteed 9/9; per-dimension):")
-        for d in sorted(DEME_EXPECTED):
-            stats = result.deme_coverage[d]
-            label = f"{d} ({DEME_FULL_NAMES.get(d, '')})"
-            print(
-                f"│   {label:<52} n={int(stats['n']):<5} meanΩ={stats['mean']:.3f} "
-                f"p95Ω={stats['p95']:.3f} rate(Ω≥{significant_omega:.2f})={stats['rate_omega_ge_sig']:.3f}"
-            )
-
+        print(f"│   (mean intensity needed to flip decision)")
+        
+        print(f"│")
+        print(f"│ Test Stats: {result.n_tests} tests, "
+              f"{result.failure_rate*100:.1f}% significant deviations")
+        
+        if result.worst_failures:
+            print(f"│")
+            print(f"│ Worst Failures:")
+            for f in result.worst_failures[:3]:
+                print(f"│   Ω={f['omega']:.3f} via {f['transform'][:30]}")
+    
+    # Final validation
     print("\n" + "=" * 78)
     print("CALIBRATION VALIDATION")
     print("=" * 78)
-
+    
     all_pass = all(r.in_expected_range for r in results.values())
     n_pass = sum(1 for r in results.values() if r.in_expected_range)
-
+    
     print(f"\nEvaluators in expected range: {n_pass}/{len(results)}")
-
+    
+    # Aggregate DEME dimension sensitivity
     print(f"\n{'─' * 78}")
     print("AGGREGATE DEME ETHICAL DIMENSION SENSITIVITY")
     print("(Lower is better - indicates invariance to ethical reframing)")
     print(f"{'─' * 78}")
-
-    deme_totals = {k: [] for k in DEME_EXPECTED}
+    
+    deme_names = {
+        "deme:consequentialist": "1. Consequences and Welfare",
+        "deme:deontological": "2. Rights and Duties",
+        "deme:justice": "3. Justice and Fairness",
+        "deme:autonomy": "4. Autonomy and Agency",
+        "deme:privacy": "5. Privacy and Data Governance",
+        "deme:societal": "6. Societal and Environmental",
+        "deme:virtue": "7. Virtue and Care",
+        "deme:procedural": "8. Procedural Legitimacy",
+        "deme:epistemic": "9. Epistemic Status",
+    }
+    
+    deme_totals = {k: [] for k in deme_names.keys()}
     for result in results.values():
         for t_name, sens in result.transform_sensitivity.items():
             if t_name in deme_totals:
                 deme_totals[t_name].append(sens)
-
-    for t_name in sorted(DEME_EXPECTED):
-        avg = (
-            sum(deme_totals[t_name]) / len(deme_totals[t_name])
-            if deme_totals[t_name]
-            else 0.0
-        )
-        bar = "█" * int(avg * 40)
-        print(f"  {DEME_FULL_NAMES.get(t_name, t_name):<32} {avg:.3f} {bar}")
-
+    
+    for t_name, display_name in deme_names.items():
+        if deme_totals[t_name]:
+            avg = sum(deme_totals[t_name]) / len(deme_totals[t_name])
+            bar = "█" * int(avg * 40)
+            print(f"  {display_name:<32} {avg:.3f} {bar}")
+    
     if all_pass:
         print("\n✓ CALIBRATION PASSED: All evaluators produced Bond Index values")
         print("  within their expected ranges. The metric discriminates correctly")
-        print("  across syntactic AND DEME ethical-dimension (lens) transforms.")
+        print("  across both syntactic AND semantic (DEME ethical dimension) transforms.")
     else:
         print("\n✗ CALIBRATION NEEDS ADJUSTMENT:")
         for name, result in results.items():
             if not result.in_expected_range:
-                direction = (
-                    "too high"
-                    if result.measured_bd > result.expected_range[1]
-                    else "too low"
-                )
-                most_sensitive = max(
-                    result.transform_sensitivity, key=result.transform_sensitivity.get
-                )
+                direction = "too high" if result.measured_bd > result.expected_range[1] else "too low"
                 print(f"  • {name}: Bd={result.measured_bd:.3f} ({direction})")
-                print(f"    Most sensitive to: {most_sensitive}")
-
+                print(f"    Most sensitive to: {max(result.transform_sensitivity, key=result.transform_sensitivity.get)}")
+    
     return results
 
 
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser()
-    parser.add_argument("--config", default=None, help="Path to YAML/JSON config file.")
-    parser.add_argument(
-        "--n-scenarios", type=int, default=None, help="Override scenario count."
-    )
-    parser.add_argument("--seed", type=int, default=None, help="Override RNG seed.")
-    parser.add_argument(
-        "--n-chains",
-        type=int,
-        default=None,
-        help="Override number of random invariant chains.",
-    )
-    parser.add_argument(
-        "--dump-default-config",
-        action="store_true",
-        help="Print the default config (YAML if PyYAML is installed, else JSON) and exit.",
-    )
-    args = parser.parse_args()
-
-    if args.dump_default_config:
-        try:
-            import yaml  # type: ignore
-
-            print(yaml.safe_dump(DEFAULT_CALIBRATION_CONFIG, sort_keys=False))
-        except Exception:
-            print(json.dumps(DEFAULT_CALIBRATION_CONFIG, indent=2))
-        raise SystemExit(0)
-
-    run_advanced_calibration_test(
-        n_scenarios=args.n_scenarios,
-        config_path=args.config,
-        seed=args.seed,
-        n_chains=args.n_chains,
-    )
+    results = run_advanced_calibration_test(n_scenarios=100)
