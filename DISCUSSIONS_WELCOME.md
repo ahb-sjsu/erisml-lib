@@ -4,8 +4,8 @@
 
 # Welcome to the erisml-lib Community
 
-> *"For 2,500 years, ethical claims have been unfalsifiable. This framework changes the question."*
-> — Philosophy Engineering
+> *"The Bond Index is the deliverable. Everything else is infrastructure."*
+> — A Categorical Framework for Verifying Representational Consistency
 
 ---
 
@@ -23,54 +23,38 @@ These aren't abstract questions. They're the difference between systems we can t
 
 ## 🎯 Our Mission
 
-To build **the definitive open-source framework** for governed, ethics-aware AI agents—a tool that:
+To build **the definitive open-source framework** for representational consistency verification—a tool that:
 
 - **Detects coherence defects** before they become real-world failures
-- **Produces witnesses** when invariance fails—enabling debugging
+- **Separates implementation bugs from specification contradictions** (the Decomposition Theorem)
 - **Provides a single, human-calibrated number** (Bd) for deployment decisions
-- **Supports democratic governance** of ethical decision-making
+- **Scales from discrete text systems to continuous perception models**
 
 We're not here to solve all of alignment. We're here to solve **one critical piece**—and solve it rigorously.
 
 ---
 
-## 📖 The Core Insight: Philosophy Engineering
+## 📖 The Science Behind the Framework
 
-We cannot test whether an ethical theory is *true*. But we **can** test whether an ethical judgment system is:
+Our approach rests on a categorical foundation—groupoids and double categories—that captures the essence of representational consistency without requiring the smoothness assumptions of gauge theory. This mathematical infrastructure supports three key results:
 
-| Property | What We Test |
-|----------|--------------|
-| **Consistent** | Same judgment for semantically equivalent inputs |
-| **Non-gameable** | Cannot be exploited via redescription |
-| **Accountable** | Differences attributable to situation, commitments, or uncertainty |
-| **Non-trivial** | Actually distinguishes between different situations |
-
-**These are engineering properties with pass/fail criteria.**
-
-### The Method
-
-1. **Declare invariances** — which transformations should not change the judgment
-2. **Test them** — run transformation suites
-3. **Produce witnesses** — minimal counterexamples when invariance fails
-4. **Audit everything** — machine-checkable artifacts with versions and hashes
-
-When a system fails, you get a witness. Witnesses enable debugging. Debugging enables improvement.
-
-**This is what it looks like when philosophy becomes engineering.**
-
----
-
-## 📊 The Bond Index
-
-### Three Coherence Defects
+### The Three Coherence Defects
 
 | Defect | Symbol | What It Measures |
-|--------|:------:|------------------|
-| **Commutator** | Ω_op | Order-sensitivity of transform composition |
-| **Mixed** | μ | Context-dependence across scenarios |
-| **Permutation** | π₃ | Higher-order 3-transform chain sensitivity |
+|--------|--------|------------------|
+| **Commutator** | Ω_op | Does order matter? (g₁ then g₂ vs. g₂ then g₁) |
+| **Mixed** | μ | Does context matter? (same transform, different scenarios) |
+| **Permutation** | π₃ | Do higher-order compositions matter? |
 
-### Deployment Scale
+### The Decomposition Theorem
+
+Every coherence defect splits uniquely into:
+- **Gauge-removable**: Fixable by better implementation (canonicalizer bugs)
+- **Intrinsic**: Requires specification changes (the spec itself is incoherent)
+
+This separation tells you *what kind of problem you have*—not just that you have one.
+
+### The Bond Index Deployment Scale
 
 | Bd Range | Rating | Decision |
 |----------|--------|----------|
@@ -79,32 +63,6 @@ When a system fails, you get a witness. Witnesses enable debugging. Debugging en
 | 0.1 – 1.0 | **Moderate** | ⚠️ Remediate first |
 | 1 – 10 | **High** | 🛑 Do not deploy |
 | > 10 | **Severe** | 🔴 Fundamental redesign |
-
----
-
-## 🧪 What's Currently Available (v0.3.0)
-
-### ErisML + DEME Stack
-
-- **Core ErisML**: Formal language for environment, agents, norms, multi-agent interaction
-- **DEME 1.0**: Democratically Governed Ethics Modules with 9 ethical dimensions
-- **Bond Index Calibration**: 18 transforms × 5 intensity levels × 100 scenarios = 10,500 tests
-- **HPC Evaluation**: SLURM scripts for SJSU cluster with GPU support
-- **MCP Server**: Integration with any MCP-compatible agent
-
-### The 9 DEME Ethical Dimensions
-
-| # | Dimension | What It Captures |
-|:-:|-----------|------------------|
-| 1 | Consequences/Welfare | Outcomes and impact |
-| 2 | Rights/Duties | Deontological constraints |
-| 3 | Justice/Fairness | Distributive considerations |
-| 4 | Autonomy/Agency | Self-determination |
-| 5 | Privacy/Data | Information ethics |
-| 6 | Societal/Environmental | Systemic impacts |
-| 7 | Virtue/Care | Character-based ethics |
-| 8 | Procedural Legitimacy | Process fairness |
-| 9 | Epistemic Status | Uncertainty and confidence |
 
 ---
 
@@ -135,45 +93,49 @@ This framework will only succeed if it's built by a diverse community of:
 
 ## 🚀 Getting Started
 
-### 1. Clone and Install
+### 1. Read the Paper
+
+📄 **[A Categorical Framework for Verifying Representational Consistency](docs/CATEGORICAL_FRAMEWORK.md)**
+
+This is the theoretical foundation. It explains:
+- Why category theory (not gauge theory) is the right foundation
+- How the three coherence defects work
+- What the Decomposition Theorem tells us
+- How to calibrate and interpret the Bond Index
+
+### 2. Run the Examples
 
 ```bash
-git clone https://github.com/ahb-sjsu/erisml-lib.git
-cd erisml-lib
-pip install -e .
+cd src/erisml/examples/llm-eval/
+python itai_bond_index_evaluation.py --n-scenarios 20 --output test.json
 ```
 
-### 2. Run the Bond Invariance Demo
+### 3. Try the AV Case Study
+
+The autonomous vehicle pedestrian detection case study demonstrates the full pipeline:
+- 48 stakeholders, 12 MORAL COMPASS episodes, 1,694 scenario pairs
+- 7 transforms compiled with >75% consensus
+- Mean Bd = 0.006 (Negligible), p95 = 0.04 (Low), max = 0.82 (Moderate)
+- **Verdict**: Deploy with monitoring
 
 ```bash
-python -m erisml.examples.bond_invariance_demo
+cd src/erisml/examples/av-pedestrian/
+python av_bond_index_evaluation.py --n-scenarios 100
 ```
 
-Tests bond-preserving transforms (reorder, relabel, unit scale, paraphrase) and produces BIP audit artifacts.
+### 4. Compute Your First Bond Index
 
-### 3. Run the Triage Ethics Demo
+```python
+from erisml.core import BondIndexEvaluator
 
-```bash
-python -m erisml.examples.triage_ethics_demo
-```
+evaluator = BondIndexEvaluator(
+    transforms=your_g_declared,
+    canonicalizer=your_canonicalizer,
+    distance_fn=your_delta
+)
 
-Clinical triage scenario demonstrating DEME governance with three candidate allocations.
-
-### 4. Run Bond Index Calibration
-
-```bash
-python -m erisml.examples.bond_index_calibration_deme_fuzzing
-```
-
-Full calibration suite testing 5 evaluator profiles across syntactic and DEME ethical dimension transforms.
-
-### 5. HPC Evaluation (SJSU)
-
-```bash
-ssh YOUR_SJSU_ID@coe-hpc.sjsu.edu
-cd erisml-lib/src/erisml/examples/llm-eval
-./setup_itai_environment.sh
-sbatch run_itai_evaluation.slurm
+results = evaluator.evaluate(your_test_inputs)
+print(f"Bond Index: {results.bd:.4f} ({results.tier})")
 ```
 
 ---
@@ -200,33 +162,24 @@ But the cage must be built. And mandated. And verified.
 
 ---
 
-## 📚 Key Documents
+## 📚 Additional Resources
 
-| Document | Description |
+| Resource | Description |
 |----------|-------------|
-| [README.md](README.md) | Full project documentation |
-| [ANNOUNCEMENT.md](ANNOUNCEMENT.md) | v0.3.0 release notes |
-| [Categorical Framework](docs/CATEGORICAL_FRAMEWORK.md) | IEEE TAI paper (under review) |
-| [GUASS v12.0](GUASS_SAI.md) | Grand Unified AI Safety Stack |
-| [Bond Invariance Principle](bond_invariance_principle.md) | Core falsifiability mechanism |
-| [No Escape Theorem](No_Escape_Mathematical_Containment_for_AI.pdf) | Mathematical containment |
+| [CATEGORICAL_FRAMEWORK.md](docs/CATEGORICAL_FRAMEWORK.md) | Full theoretical paper |
+| [I-EIP Monitor Whitepaper](docs/I-EIP_MONITOR.md) | Internal representation testing |
+| [No Escape Theorem](docs/NO_ESCAPE.md) | Why structural constraints succeed |
+| [GUASS Specification](docs/GUASS.md) | Unified alignment safety spec |
+| [AV Case Study](examples/av-pedestrian/) | Complete worked example |
 
 ---
 
-## 🔮 Roadmap
+## 🔗 Related Work
 
-### Current: v0.3.0
-
-- ✅ DEME 1.0 with 9 ethical dimensions
-- ✅ Bond Index calibration suite
-- ✅ HPC evaluation scripts
-- ✅ MCP server integration
-
-### Under Review: DEME 2.0 (Nature Machine Intelligence)
-
-- 🔄 Real-time hardware enforcement
-- 🔄 Computable moral landscapes
-- 🔄 Hardware Ethics Modules
+- **Geometric Deep Learning**: Bronstein et al. (2021) — The mathematical language of equivariance
+- **Mechanistic Interpretability**: Anthropic, Neel Nanda et al. — Probing internal structure
+- **Causal Representation Learning**: Schölkopf et al. — Learning invariant representations
+- **Value Sensitive Design**: Friedman & Hendry — Democratic deliberation for technology
 
 ---
 
@@ -234,7 +187,7 @@ But the cage must be built. And mandated. And verified.
 
 - **GitHub Issues**: Technical bugs and feature requests
 - **Discussions**: This forum! Questions, ideas, collaboration
-- **Email**: andrew.bond@sjsu.edu / agi.hpc@gmail.com
+- **Email**: andrew.bond@sjsu.edu (theory questions)
 
 ---
 
@@ -242,7 +195,7 @@ But the cage must be built. And mandated. And verified.
 
 ---
 
-*"The Bond Index is the deliverable. Everything else is infrastructure."*
+*"Bd < 0.01: Deploy. Bd > 10: Fundamental redesign required. This is the number that matters."*
 
 ---
 
