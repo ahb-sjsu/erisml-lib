@@ -1,4 +1,10 @@
-# ErisML Library
+# ErisML/DEME Library
+
+<p align="center">
+  <img src="https://ahb-sjsu.github.io/erisml-lib/assets/erisml-discord-icon.svg" width="200"/>
+</p>
+
+# ErisML
 
 ErisML is a modeling language for **governed, foundation-model-enabled agents**
 operating in pervasive computing environments (homes, hospitals, campuses,
@@ -11,6 +17,8 @@ ErisML provides a single, machine-interpretable and human-legible representation
 - **(iii)** intents and utilities  
 - **(iv)** norms (permissions, obligations, prohibitions, sanctions)  
 - **(v)** multi-agent strategic interaction  
+
+DEME is the Democratically Governed Ethics Module Enginer, — ethics-only decision layer
 
 We define a concrete syntax, a formal grammar, denotational semantics, and
 an execution model that treats norms as first-class constraints on action,
