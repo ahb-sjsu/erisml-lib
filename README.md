@@ -1,4 +1,6 @@
-# ErisML/DEME Library
+# ErisML/DEME Research Repository and Library 🍎
+
+Ordo ex Chāōnā; Ethos ex Māchinā
 
 <p align="center">
   <img src="https://ahb-sjsu.github.io/erisml-lib/assets/erisml-discord-icon.svg" width="200"/>
