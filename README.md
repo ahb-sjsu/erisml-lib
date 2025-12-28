@@ -12,13 +12,24 @@ factories, vehicles, etc.).
 
 ErisML provides a single, machine-interpretable and human-legible representation of:
 
-- **(i)** environment state and dynamics  
-- **(ii)** agents and their capabilities and beliefs  
+- **(i)**   environment state and dynamics  
+- **(ii)**  agents and their capabilities and beliefs  
 - **(iii)** intents and utilities  
-- **(iv)** norms (permissions, obligations, prohibitions, sanctions)  
-- **(v)** multi-agent strategic interaction  
+- **(iv)**  norms (permissions, obligations, prohibitions, sanctions)  
+- **(v)**   multi-agent strategic interaction  
+
+# DEME
 
 DEME is the Democratically Governed Ethics Module Enginer, — ethics-only decision layer
+
+- **(i)**   democratic governance layer that aggregates multiple 
+     `      EthicalJudgement` outputs using configurable stakeholder weights, hard
+            vetoes, and lexical priority layers.
+- **(ii)**  DEME profile format (`DEMEProfileV03`) for versioned governance
+            configurations (e.g., `hospital_service_robot_v1` or `Jain-1`).
+- **(iii)** narrative CLI that elicits stakeholder values via scenarios and
+            produces DEME profiles.
+- **(iv)**  MCP server (`erisml.ethics.interop.mcp_deme_server`)
 
 We define a concrete syntax, a formal grammar, denotational semantics, and
 an execution model that treats norms as first-class constraints on action,
