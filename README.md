@@ -1,6 +1,6 @@
 # ErisML/DEME Research Repository and Library 🍎
 
-Ordo ex Chāōnā; Ethos ex Māchinā
+***Ordo ex Chāōnā; Ethos ex Māchinā***
 
 <p align="center">
   <img src="https://ahb-sjsu.github.io/erisml-lib/assets/erisml-discord-icon.svg" width="200"/>
@@ -22,7 +22,7 @@ ErisML provides a single, machine-interpretable and human-legible representation
 
 # DEME
 
-DEME is the Democratically Governed Ethics Module Enginer, — ethics-only decision layer
+DEME is the Democratically Governed Ethics Module Engine, — ethics-only decision layer
 
 - **(i)**   democratic governance layer that aggregates multiple 
      `      EthicalJudgement` outputs using configurable stakeholder weights, hard
