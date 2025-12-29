@@ -1,4 +1,4 @@
-# The Unified AI Safety Stack
+# The EFM AI Safety Stack
 
 > *From Metaphysics to Deployment — A Unified Architecture for Verifiable AI Alignment*
 
@@ -11,11 +11,8 @@
 ║  L7  ║  The Geometry of Good 塞翁失马                           [APPLICATION]  ║
 ║      ║  Real-world deployment under uncertainty                               ║
 ╠══════╬════════════════════════════════════════════════════════════════════════╣
-║  L6  ║  ErisML                                                [PRESENTATION]  ║
-║      ║  Intermediate representation — the target of all translations          ║
-╠══════╬════════════════════════════════════════════════════════════════════════╣
-║  L5  ║  Translation Layer                                         [SESSION]   ║
-║      ║  Modular policy DAGs — any ethics → ErisML                             ║
+║      ║  ┄┄┄ Layers 5-6: Future Work ┄┄┄                                        ║
+║      ║  Multi-agent coordination, transform representation                    ║
 ╠══════╬════════════════════════════════════════════════════════════════════════╣
 ║  L4  ║  Philosophy Engineering                                   [TRANSPORT]  ║
 ║      ║  The methodological turn — ethics becomes testable                     ║
@@ -134,139 +131,14 @@ We cannot test whether an ethical theory is *true*. But we **can** test whether 
 
 ---
 
-### L5 — Translation Layer `[SESSION]`
+### L5-L6 — Future Work `[SESSION / PRESENTATION]`
 
-**The universal adapter.** Any ethical framework can be translated to ErisML through modular, DAG-structured policy modules. This layer answers the question: "How do we get from human ethics to machine constraints?"
+These layers are intentionally left for future development:
 
-```
-┌─────────────────┐      ┌─────────────────┐      ┌─────────────────┐
-│  EU AI Ethics   │      │                 │      │                 │
-│   Guidelines    │─────>│                 │      │                 │
-├─────────────────┤      │   TRANSLATION   │      │                 │
-│    Kantian      │─────>│      LAYER      │─────>│     ErisML      │
-│   Deontology    │      │                 │      │   Constraints   │
-├─────────────────┤      │  (Policy DAGs)  │      │                 │
-│  Utilitarian    │─────>│                 │      │                 │
-│    Calculus     │      │                 │      │                 │
-├─────────────────┤      │                 │      │                 │
-│    [Any...]     │─────>│                 │      │                 │
-└─────────────────┘      └─────────────────┘      └─────────────────┘
-```
+- **L5 (Session):** Multi-agent coordination protocols, governance handshakes
+- **L6 (Presentation):** Transform suite standardization, G_declared representation formats
 
-#### Key Innovations
-
-**Modular Policy Units:** Ethical requirements decomposed into independent, versioned modules:
-
-```
-policy_module {
-  id: "eu.trustworthy_ai.transparency"
-  version: "1.0.0"
-  depends_on: ["technical_robustness", "data_governance"]
-  constraints: [ ... ]
-  fidelity_class: "Faithful" | "Approximate" | "Indicative"
-}
-```
-
-**DAG-Based Composition:** Dependencies form a Directed Acyclic Graph:
-
-```
-                    ┌─────────────────┐
-                    │  HUMAN_DIGNITY  │
-                    └────────┬────────┘
-                             │
-            ┌────────────────┼────────────────┐
-            ▼                ▼                ▼
-    ┌──────────────┐  ┌─────────────┐  ┌───────────┐
-    │ HUMAN_AGENCY │  │  WELLBEING  │  │ FUND_RIGHTS│
-    └──────┬───────┘  └─────────────┘  └─────┬─────┘
-           │                                 │
-           ▼                    ┌────────────┼────────────┐
-    ┌──────────────┐            ▼            ▼            ▼
-    │HUMAN_OVERSGHT│     ┌──────────┐  ┌─────────┐  ┌─────────┐
-    └──────────────┘     │ PRIVACY  │  │FAIRNESS │  │ROBUSTNS │
-                         └────┬─────┘  └────┬────┘  └────┬────┘
-                              │             │            │
-                              ▼             ▼            ▼
-                       ┌────────────┐ ┌──────────┐ ┌──────────┐
-                       │TRANSPARENCY│ │BIAS_DET  │ │ SAFETY   │
-                       └─────┬──────┘ └──────────┘ └──────────┘
-                             │
-                             ▼
-                      ┌──────────────┐
-                      │ACCOUNTABILITY│
-                      └──────────────┘
-```
-
-**Fidelity Classes:** Honest about translation quality:
-
-| Class | Meaning | Example |
-|-------|---------|---------|
-| **Faithful** | Near-lossless translation | GDPR → ErisML |
-| **Approximate** | Significant structure preserved | Kantian ethics → ErisML |
-| **Indicative** | Gesture toward framework; human review required | Virtue ethics → ErisML |
-
-#### The Rawlsian Objection — Addressed
-
-A sophisticated critic objects: *"Ethics cannot be 'compiled' because principles emerge from deliberation (the veil of ignorance) and evolve through reflective equilibrium. There is no fixed source to translate from."*
-
-**Response:**
-
-1. **Translation of Snapshots:** We translate the *current* consensus, not eternal truth. Translations are versioned (v1.0.0 → v2.0.0) as equilibrium shifts.
-
-2. **The Veil is Formalizable:** Rawls's veil of ignorance is itself a decision procedure (maximin under uncertainty) that can be expressed in ErisML.
-
-3. **DEME is Computational Reflective Equilibrium:** The deliberative process Rawls described happens in DEME. Layer 5 translates the *output* of that process.
-
-```
-┌───────────────────────────────────────────────────────────────┐
-│         DEME: COMPUTATIONAL REFLECTIVE EQUILIBRIUM            │
-├───────────────────────────────────────────────────────────────┤
-│  ┌─────────────┐    MORAL COMPASS    ┌─────────────────┐      │
-│  │ Governance  │ ──── Episodes ────→ │ Case Judgments  │      │
-│  │   Profile   │                     │                 │      │
-│  │ (principles)│ ←─── Refinement ─── │                 │      │
-│  └─────────────┘                     └─────────────────┘      │
-│         │         ┌───────────────┐           │               │
-│         └────────→│   Consensus   │←──────────┘               │
-│                   │   (α > 0.67)  │                           │
-│                   └───────┬───────┘                           │
-│                           ▼                                   │
-│                   ┌───────────────┐                           │
-│                   │  Translation  │                           │
-│                   │  Model v(n+1) │                           │
-│                   └───────────────┘                           │
-└───────────────────────────────────────────────────────────────┘
-```
-
-**Key insight:** We honor Rawls not by refusing to formalize, but by formalizing well—with versioning, transparency, and explicit acknowledgment of what lies beyond formalization.
-
-**Documentation:** [Translation_Layer_Whitepaper_v2.1.docx](docs/Translation_Layer_Whitepaper_v2.1_Rawls.docx)
-
----
-
-### L6 — ErisML `[PRESENTATION]`
-
-**The intermediate representation.** ErisML is the target language for all translations—a formal specification for:
-
-- **(i)** Environment state and dynamics
-- **(ii)** Agents and their capabilities and beliefs
-- **(iii)** Intents and utilities
-- **(iv)** Norms (permissions, obligations, prohibitions, sanctions)
-- **(v)** Multi-agent strategic interaction
-
-```erisml
-constraint Transparency(system: AISystem) {
-  require system.data_provenance.documented == true;
-  require system.model_provenance.documented == true;
-  require system.decision_logging.enabled == true;
-  
-  if (system.impacts_fundamental_rights) {
-    require system.explanation_detail >= HIGH;
-  }
-}
-```
-
-**Key insight:** ErisML makes ethics machine-checkable without making it machine-originated.
+**Contributions welcome.**
 
 ---
 
@@ -291,8 +163,8 @@ This layer handles:
 | OSI Layer | OSI Function | EFM Layer | EFM Function |
 |-----------|--------------|-----------|--------------|
 | 7 - Application | User interface | Geometry of Good | Real-world decisions |
-| 6 - Presentation | Data formatting | ErisML | Constraint representation |
-| 5 - Session | Connection management | Translation Layer | Framework → ErisML mapping |
+| 6 - Presentation | Data formatting | *(Future)* | Transform representation |
+| 5 - Session | Connection management | *(Future)* | Multi-agent coordination |
 | 4 - Transport | Reliable delivery | Philosophy Engineering | Reliable verification |
 | 3 - Network | Routing | GUASS | Integration & routing |
 | 2 - Data Link | Error detection | Noether Ethics | Symmetry violation detection |
@@ -330,16 +202,6 @@ The 9 ethical dimensions in Democratically Governed Ethics Modules:
 8. Procedural Legitimacy
 9. Epistemic Status
 
-### Policy Module Dependency Types
-
-| Edge Type | Semantics | Example |
-|-----------|-----------|---------|
-| `depends_on` | Hard requirement | Accountability requires Transparency |
-| `extends` | Inheritance | GDPR_Transparency extends Transparency |
-| `recommends` | Soft dependency | Transparency recommends Diversity |
-| `conflicts_with` | Mutual exclusion | Full_Automation conflicts_with Human_Oversight |
-| `specializes` | Domain narrowing | Medical_AI_Safety specializes Technical_Robustness |
-
 ---
 
 ## Why This Architecture?
@@ -349,8 +211,6 @@ The 9 ethical dimensions in Democratically Governed Ethics Modules:
 | **Bottom-up** | Start with pragmatic defense, not metaphysical claims |
 | **Physics-inspired** | Symmetry → conservation (Noether). Uncertainty → superposition (QM). |
 | **Falsifiable** | Every layer produces testable predictions |
-| **Modular** | Translation Layer enables any framework → ErisML |
-| **Versioned** | Ethics evolves; translations have changelogs |
 | **Actionable** | Terminates in a deployment decision, not a paper |
 
 ---
@@ -364,58 +224,16 @@ The 9 ethical dimensions in Democratically Governed Ethics Modules:
 └────────────────┘     └────────────────┘     └────────────────┘     └────────────────┘
                                                                              │
                                                                              v
-┌────────────────────────────────────────────────────────────────────────────────────────┐
-│                              TRANSLATION LAYER (L5)                                    │
-│  ┌──────────────┐   ┌──────────────┐   ┌──────────────┐   ┌──────────────┐             │
-│  │ EU AI Ethics │   │   Kantian    │   │ Utilitarian  │   │   [Custom]   │             │
-│  │  Guidelines  │   │  Deontology  │   │   Calculus   │   │  Framework   │             │
-│  └──────┬───────┘   └──────┬───────┘   └──────┬───────┘   └──────┬───────┘             │
-│         │                  │                  │                  │                     │
-│         └──────────────────┴──────────────────┴──────────────────┘                     │
-│                                      │                                                 │
-│                                      ▼                                                 │
-│                            ┌─────────────────┐                                         │
-│                            │  Policy Module  │                                         │
-│                            │      DAG        │                                         │
-│                            └────────┬────────┘                                         │
-└─────────────────────────────────────┼──────────────────────────────────────────────────┘
-                                      │
-                                      v
-                            ┌─────────────────┐
-                            │     ErisML      │
-                            │  Constraints    │
-                            └────────┬────────┘
-                                     │
-                                     v
-                       ┌────────────────────────────────────────┐
-                       │            Testable Claims             │
-                       └────────────────────────────────────────┘
-                                     │
-                                     v
-                          ┌────────────────────┐
-                          │  DEPLOY / DON'T    │
-                          │      DEPLOY        │
-                          └────────────────────┘
+                       ┌────────────────────────────────────────────────────────────────┐
+                       │                      Testable Claims                           │
+                       └────────────────────────────────────────────────────────────────┘
+                                                                             │
+                                                                             v
+                                                                ┌────────────────────┐
+                                                                │  DEPLOY / DON'T    │
+                                                                │      DEPLOY        │
+                                                                └────────────────────┘
 ```
-
----
-
-## Complete Translation Example: EU AI Ethics Guidelines
-
-The Translation Layer provides a complete mapping of the EU Ethics Guidelines for Trustworthy AI (April 2019):
-
-| EU Requirement | Module ID | Fidelity | Key Constraints |
-|----------------|-----------|----------|-----------------|
-| Human Agency & Oversight | `eu.trustworthy_ai.human_agency` | Approximate | `HumanAutonomy`, `HumanOversight` |
-| Technical Robustness | `eu.trustworthy_ai.technical_robustness` | Faithful | `ResilienceToAttack`, `Safety`, `Accuracy` |
-| Privacy & Data Governance | `eu.trustworthy_ai.privacy_data_governance` | Faithful | `PrivacyByDesign`, `DataQuality`, `UserControl` |
-| Transparency | `eu.trustworthy_ai.transparency` | Approximate | `Traceability`, `Explainability`, `AIIdentification` |
-| Diversity & Fairness | `eu.trustworthy_ai.diversity_fairness` | Approximate | `UnfairBiasAvoidance`, `Accessibility` |
-| Societal Wellbeing | `eu.trustworthy_ai.wellbeing` | Indicative | `EnvironmentalImpact`, `SocialImpact` |
-| Accountability | `eu.trustworthy_ai.accountability` | Approximate | `Auditability`, `Redress`, `ImpactAssessment` |
-
-**Topological Order:** Modules are evaluated in dependency order:
-1. `human_dignity` → 2. `fundamental_rights` → 3. `human_agency` → 4. `technical_robustness` → 5. `privacy_data_governance` → 6. `transparency` → 7. `diversity_fairness` → 8. `accountability`
 
 ---
 
@@ -435,9 +253,6 @@ python -m erisml.examples.triage_ethics_demo
 
 # Run full calibration suite
 python -m erisml.examples.bond_index_calibration_deme_fuzzing
-
-# Load EU AI Ethics translation module
-python -m erisml.translations.eu_trustworthy_ai
 ```
 
 ---
@@ -451,7 +266,6 @@ python -m erisml.translations.eu_trustworthy_ai
 | [CATEGORICAL_FRAMEWORK.md](docs/CATEGORICAL_FRAMEWORK.md) | IEEE TAI paper |
 | [GUASS_SAI.md](GUASS_SAI.md) | Grand Unified AI Safety Stack v12.0 |
 | [bond_invariance_principle.md](bond_invariance_principle.md) | Core falsifiability mechanism |
-| [Translation_Layer_Whitepaper_v2.1.docx](docs/Translation_Layer_Whitepaper_v2.1_Rawls.docx) | **NEW:** Complete L5 specification |
 
 ---
 
@@ -463,23 +277,9 @@ We need contributors across all layers:
 - **L2:** Mathematicians (category theory, symmetry groups)
 - **L3:** ML engineers, systems architects
 - **L4:** Safety researchers, red-teamers
-- **L5:** Ethicists, policy experts, translation model authors
-- **L6:** Language designers, formal methods experts
 - **L7:** Domain experts, deployment practitioners
 
 See [DISCUSSIONS_WELCOME.md](DISCUSSIONS_WELCOME.md) to get started.
-
----
-
-## Addressing Common Objections
-
-| Objection | Response |
-|-----------|----------|
-| "Ethics can't be formalized" | We formalize *constraints*, not *ethics itself*. The system checks declared commitments, not moral truth. |
-| "The veil of ignorance shows ethics is dynamic" | Yes—that's why translations are versioned. DEME provides computational reflective equilibrium. |
-| "Different frameworks are incommensurable" | Layer 5 doesn't adjudicate between frameworks. It translates each on its own terms with explicit loss documentation. |
-| "Who decides the translation?" | Governed stakeholder deliberation with consensus thresholds. No single authority. |
-| "This is just ethics washing" | The Bond Index is falsifiable. If the system fails invariance tests, it fails—no amount of documentation saves it. |
 
 ---
 
