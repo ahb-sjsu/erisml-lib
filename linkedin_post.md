@@ -19,7 +19,7 @@ What it means: Moral judgment — at least in AI systems — is not order-invari
 
 What it doesn't mean: This isn't proof that ethics is "literally quantum." The formal structure may be quantum-like without the mechanism being quantum mechanical. More work is needed.
 
-Full writeup with methodology and analysis: https://ahb-sjsu.github.io/qnd_announcement.md
+Full writeup with methodology and analysis: https://ahb-sjsu.github.io/QND_EXPERIMENT_ANNOUNCEMENT.md
 
 This is Phase 1 of a larger research program. Next steps include replication across models, interference tests, and (ambitiously) Bell inequality experiments for collective moral responsibility.
 

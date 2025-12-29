@@ -138,7 +138,21 @@ This experiment provides a new domain — AI moral reasoning — for testing qua
 5. **Prompt robustness**: Verify effects persist across diverse prompt formulations
 
 ---
+## Statistical Disclaimer
 
+Important note on sigma levels: The reported significance depends on which null hypothesis is tested:
+Null Hypothesis	Sigma Level	Interpretation
+Effect rate > 5%	8.0σ	Extremely confident
+Effect rate > 10%	6.5σ	Discovery-level
+Effect rate > 15%	4.4σ	Strong evidence
+Effect rate > 20%	2.6σ	Suggestive only
+
+The "6.5σ" claim is valid against a 10% baseline. However, if baseline LLM variability or prompt sensitivity accounts for 15-20% variation, the significance drops considerably. The appropriate null hypothesis is a matter of scientific judgment, not statistics alone.
+
+What we can confidently claim: Order effects exist and are substantial (~29%).
+What requires further investigation: Whether this exceeds what classical explanations (anchoring, priming, prompt sensitivity) would predict.
+
+---
 ## Conclusion
 
 We have demonstrated, with high statistical confidence, that the order of moral assessment affects AI ethical judgments. This effect is substantial (29.3%), robust (6.5σ), and shows theoretically predicted patterns (higher rates in ambiguous cases).
