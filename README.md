@@ -6,6 +6,21 @@
   <img src="https://ahb-sjsu.github.io/erisml-lib/assets/erisml-discord-icon.svg" width="200"/>
 </p>
 
+## 💬 Join the ErisML/DEME Community
+
+We coordinate on Discord and GitHub Discussions.
+
+[![Discord](https://img.shields.io/badge/Discord-Join%20Us-7289da?style=for-the-badge&logo=discord&logoColor=white)](YOUR_DISCORD_INVITE_LINK)
+
+**Getting involved:**
+
+1. ⭐ Star this repo
+2. [Join our Discord] https://discord.gg/W3Bkj4AZ
+3. Introduce yourself in `#introductions`
+4. Read [DISCUSSIONS_WELCOME.md](./DISCUSSIONS_WELCOME.md)
+5. Pick up a `good-first-issue` or propose your own contribution
+
+Questions? Reach out to andrew.bond@sjsu.edu or ping us on Discord.
 # ErisML
 
 ErisML is a modeling language for **governed, foundation-model-enabled agents**
