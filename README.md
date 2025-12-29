@@ -6,11 +6,11 @@
   <img src="https://ahb-sjsu.github.io/erisml-lib/assets/erisml-discord-icon.svg" width="200"/>
 </p>
 
-## 💬 Join the ErisML/DEME Community
+## 💬 Join the  Community
 
 We coordinate on Discord and GitHub Discussions.
 
-[![Discord](https://img.shields.io/badge/Discord-Join%20Us-7289da?style=for-the-badge&logo=discord&logoColor=white)]https://discord.gg/W3Bkj4AZ
+[![Discord](https://img.shields.io/badge/Discord-Join%20Us-7289da?style=for-the-badge&logo=discord&logoColor=white)](https://discord.gg/W3Bkj4AZ)
 
 **Getting involved:**
 
