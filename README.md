@@ -10,7 +10,7 @@
 
 We coordinate on Discord and GitHub Discussions.
 
-[![Discord](https://img.shields.io/badge/Discord-Join%20Us-7289da?style=for-the-badge&logo=discord&logoColor=white)](YOUR_DISCORD_INVITE_LINK)
+[![Discord](https://img.shields.io/badge/Discord-Join%20Us-7289da?style=for-the-badge&logo=discord&logoColor=white)]https://discord.gg/W3Bkj4AZ
 
 **Getting involved:**
 
