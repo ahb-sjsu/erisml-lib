@@ -1,4 +1,4 @@
-# The EFM AI Safety Stack
+# The Unified AI Safety Stack
 
 > *From Metaphysics to Deployment — A Unified Architecture for Verifiable AI Alignment*
 
