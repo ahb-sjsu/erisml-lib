@@ -1,4 +1,4 @@
-# ErisML/DEME Research Repository and Library 🍎
+# ErisML/DEME Research Repository and Library 🍎#
 
 ***Ordo ex Chāōnā; Ethos ex Māchinā***
 
