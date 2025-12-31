@@ -63,6 +63,7 @@ democratically-governed ethical reasoning, grounded in the **Philosophy Engineer
 ![CI](https://github.com/ahb-sjsu/erisml-lib/actions/workflows/ci.yaml/badge.svg)
 ![Python](https://img.shields.io/badge/Python-3.12%2B-blue.svg)
 ![License](https://img.shields.io/badge/License-AGI--HPC%20Responsible%20AI-blue.svg)
+[![PyPI version](https://badge.fury.io/py/erisml.svg)](https://badge.fury.io/py/erisml)
 
 ---
 
@@ -948,6 +949,62 @@ It provides (at minimum) the following MCP tools:
 Any MCP-compatible client (agent frameworks, IDE copilots, or custom agents)
 can use this server to add ethical oversight to planning and action selection.
 See `erisml/ethics/interop/` and the examples for details.
+
+### MCP Server Setup
+
+#### Installation
+
+```bash
+pip install erisml
+```
+
+#### Running the Server
+
+The MCP server can be run directly from the command line:
+
+```bash
+# Use default profiles directory (./deme_profiles)
+erisml-mcp-server
+
+# Specify custom profiles directory
+erisml-mcp-server --profiles-dir /path/to/profiles
+
+# Set log level
+erisml-mcp-server --log-level DEBUG
+```
+
+#### Claude Desktop Configuration
+
+To use the ErisML DEME MCP server with Claude Desktop, add the following to your Claude Desktop MCP configuration file (typically located at `~/Library/Application Support/Claude/claude_desktop_config.json` on macOS or `%APPDATA%\Claude\claude_desktop_config.json` on Windows):
+
+```json
+{
+  "mcpServers": {
+    "erisml-deme": {
+      "command": "erisml-mcp-server",
+      "args": ["--profiles-dir", "/path/to/deme_profiles"]
+    }
+  }
+}
+```
+
+Replace `/path/to/deme_profiles` with the actual path to your DEME profiles directory. The server will automatically discover all `.json` files in this directory as available profiles.
+
+#### Environment Variables
+
+You can also configure the profiles directory using the `DEME_PROFILES_DIR` environment variable:
+
+```bash
+export DEME_PROFILES_DIR=/path/to/profiles
+erisml-mcp-server
+```
+
+#### Troubleshooting
+
+- **Server won't start**: Ensure `erisml` is installed and the `erisml-mcp-server` command is in your PATH. Try running `erisml-mcp-server --help` to verify installation.
+- **No profiles found**: Check that your profiles directory contains valid `.json` files matching the `DEMEProfileV03` schema. See `schemas/deme_profile_v03.json` for the schema definition.
+- **Connection issues**: The server uses stdio transport by default. Ensure your MCP client is configured to communicate over stdio.
+- **Profile loading errors**: Check the log output (use `--log-level DEBUG`) to see detailed error messages about profile parsing issues.
 
 ---
 

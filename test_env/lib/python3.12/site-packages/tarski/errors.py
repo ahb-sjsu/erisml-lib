@@ -1,0 +1,174 @@
+class TarskiError(Exception):
+    """Common ancestor class to all of Tarski's exceptions"""
+
+
+class LanguageError(TarskiError):
+    def __init__(self, msg=None):
+        msg = msg or "Unexplained Tarski language error"
+        super().__init__(msg)
+
+
+class SyntacticError(LanguageError):
+    def __init__(self, msg=None):
+        msg = msg or "Unexplained Tarski syntactic error"
+        super().__init__(msg)
+
+
+class SemanticError(LanguageError):
+    def __init__(self, msg=None):
+        msg = msg or "Unexplained Tarski semantic error"
+        super().__init__(msg)
+
+
+class LanguageMismatch(SyntacticError):
+    def __init__(self, obj, l1, l2, msg=None):
+        msg = msg or (
+            f"Language mismatch when operating on object {obj} of type {type(obj).__name__}.\n"
+            f"Expected language: {l2}\n"
+            f"Actual language: : {l1}\n"
+        )
+        super().__init__(msg)
+
+
+class ArityMismatch(SyntacticError):
+    def __init__(self, head, arguments, msg=None):
+        msg = msg or f"Arity mismatch applying element {head} with arity {head.arity} to arguments {arguments}"
+        super().__init__(msg)
+
+
+class SortMismatch(SyntacticError):
+    def __init__(self, element, type_, expected_type, msg=None):
+        msg = (
+            msg
+            or f'Sort mismatch on element {element}. Expected sort was "{expected_type}", element has sort "{type_}"'
+        )
+        super().__init__(msg)
+
+
+class DuplicateDefinition(SyntacticError):
+    def __init__(self, name, other=None, msg=None):
+        msg = msg or f'Duplicate definition of element "{name}"'
+        super().__init__(msg)
+        self.name = name
+        self.other = other
+
+
+class UndefinedElement(SyntacticError):
+    def __init__(self, name, msg=None):
+        super().__init__(f'Undefined element "{name}" (error msg: {msg})')
+        self.name = name
+
+
+class UnexpectedElementType(SyntacticError):
+    def __init__(self, element):
+        super().__init__(f'Unexpected type "{type(element)}" for object "{element}"')
+
+
+class DuplicateSortDefinition(DuplicateDefinition):
+    pass
+
+
+class DuplicateTheoryDefinition(DuplicateDefinition):
+    pass
+
+
+class DuplicatePredicateDefinition(DuplicateDefinition):
+    pass
+
+
+class DuplicateFunctionDefinition(DuplicateDefinition):
+    pass
+
+
+class DuplicateConstantDefinition(DuplicateDefinition):
+    pass
+
+
+class DuplicateActionDefinition(DuplicateDefinition):
+    pass
+
+
+class DuplicateVariableDefinition(DuplicateDefinition):
+    def __init__(self, variable, other, msg=None):
+        msg = msg or f"Variable with name '{variable.symbol}' already defined in binding: {other}"
+        super().__init__(variable, other, msg)
+
+
+class UndefinedTerm(UndefinedElement):
+    pass
+
+
+class UndefinedSort(UndefinedElement):
+    pass
+
+
+class UndefinedPredicate(UndefinedElement):
+    pass
+
+
+class UndefinedFunction(UndefinedElement):
+    pass
+
+
+class UndefinedConstant(UndefinedElement):
+    pass
+
+
+class UndefinedAction(UndefinedElement):
+    pass
+
+
+class UndefinedVariable(UndefinedElement):
+    pass
+
+
+class UnboundVariable(SemanticError):
+    def __init__(self, var, msg=None):
+        msg = msg or f"Attempted to evaluate open formula with free variable {var}"
+        super().__init__(msg)
+
+
+class IncorrectExtensionDefinition(SemanticError):
+    def __init__(self, element, point, value, msg=None):
+        msg = (
+            msg
+            or f'Incorrect definition of extension of symbol "{element}". '
+            f'Cannot assign value "{value}" to point "{point}"'
+        )
+        super().__init__(msg)
+
+
+class UnknownTheory(LanguageError):
+    def __init__(self, theory):
+        super().__init__(f'Unknown first-order theory "{theory}"')
+
+
+class CommandNotFoundError(TarskiError):
+    def __init__(self, name, msg=None):
+        msg = msg or f'Necessary command "{name}" could not be found'
+        super().__init__(msg)
+
+
+class ExternalCommandError(TarskiError):
+    pass
+
+
+class OutOfMemoryError(TarskiError):
+    pass
+
+
+class OutOfTimeError(TarskiError):
+    pass
+
+
+class ArgumentError(TarskiError):
+    pass
+
+
+# class WrongTermUsageError(TarskiError):
+#     def __init__(self):
+#         super().__init__("""Tarski terms overload the equality operator `__eq__` to allow the
+#         construction of FOL atoms such as "loc(b1)==table". A side-effect of this is that Term objects cannot be
+#         inserted as such into associative containers such as dictionaries or sets. In order to use those, you will
+#         need to wrap the Term object with a call to `symref`, as e.g. in counter[symref(c)] = 2
+#         """)
