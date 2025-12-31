@@ -374,14 +374,14 @@ def main() -> None:
             "  erisml-mcp-server --log-level DEBUG\n\n"
             "Claude Desktop Configuration:\n"
             "  Add this to your Claude Desktop MCP configuration file:\n"
-            '  {\n'
+            "  {\n"
             '    "mcpServers": {\n'
             '      "erisml-deme": {\n'
             '        "command": "erisml-mcp-server",\n'
             '        "args": ["--profiles-dir", "/path/to/deme_profiles"]\n'
-            '      }\n'
-            '    }\n'
-            '  }\n\n'
+            "      }\n"
+            "    }\n"
+            "  }\n\n"
             "Environment Variables:\n"
             "  DEME_PROFILES_DIR: Default directory for DEME profiles (default: ./deme_profiles)\n"
             "                      This is overridden by --profiles-dir if provided.\n\n"
@@ -449,7 +449,9 @@ def main() -> None:
             "--port option is not yet implemented. Server will use stdio transport."
         )
 
-    logging.info(f"Starting ErisML DEME MCP server with profiles from: {_DEME_PROFILE_DIR}")
+    logging.info(
+        f"Starting ErisML DEME MCP server with profiles from: {_DEME_PROFILE_DIR}"
+    )
     logging.info(f"Found {len(_list_profile_files())} profile(s)")
 
     # Run the MCP server over stdio

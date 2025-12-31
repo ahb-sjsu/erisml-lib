@@ -20,4 +20,3 @@
 """Version information for ErisML."""
 
 __version__ = "0.1.0"
-
