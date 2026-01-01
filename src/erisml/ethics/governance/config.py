@@ -9,7 +9,7 @@ Version: 0.3 (EthicalDomains + base EMs / 'Geneva' layer)
 
 from __future__ import annotations
 
-from dataclasses import dataclass, field, replace
+from dataclasses import dataclass, field
 from typing import Dict, List, Optional
 
 from erisml.ethics.profile_v03 import BaseEMEnforcementMode
