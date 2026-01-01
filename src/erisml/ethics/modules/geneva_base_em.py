@@ -207,6 +207,6 @@ class GenevaBaselineEM(GenevaBaseEM):
             stakeholder=self.stakeholder,
             verdict=verdict,  # type: ignore
             normative_score=score,
-            reasons=reasons,
+            reasons=list(metadata["reasons"]),
             metadata=metadata,
         )
