@@ -151,7 +151,7 @@ class ASTBuilder(Transformer):
 
     def _expr_to_str(self, node: Any) -> str:
         if isinstance(node, Token):
-            return node.value
+            return str(node.value)
         if isinstance(node, tuple) and len(node) == 3:
             op, left, right = node
             return f"({self._expr_to_str(left)} {op} {self._expr_to_str(right)})"

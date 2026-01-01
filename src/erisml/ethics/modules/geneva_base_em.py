@@ -375,13 +375,12 @@ class GenevaBaselineEM(GenevaBaseEM):
             },
         )
 
-        reasons_list: List[str] = list(metadata["reasons"])
         return EthicalJudgement(
             option_id=facts.option_id,
             em_name=self.em_name,
             stakeholder=self.stakeholder,
             verdict=verdict,  # type: ignore
             normative_score=score,
-            reasons=reasons_list,
+            reasons=reasons,
             metadata=metadata,
         )  # type: ignore

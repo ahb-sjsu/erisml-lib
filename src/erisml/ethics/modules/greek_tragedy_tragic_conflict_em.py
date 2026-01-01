@@ -65,29 +65,75 @@ class TragicConflictEM:
 
     def judge(self, facts: EthicalFacts) -> EthicalJudgement:
         urgency = float(_get(facts, "consequences.urgency", 0.0) or 0.0)
-        # REMOVED unused variables 'benefit' and 'harm' here to satisfy linter
+        benefit = float(_get(facts, "consequences.expected_benefit", 0.0) or 0.0)
+        harm = float(_get(facts, "consequences.expected_harm", 0.0) or 0.0)
+        violates_rights = _bool(_get(facts, "rights_and_duties.violates_rights", False))
+        violates_rule = _bool(
+            _get(facts, "rights_and_duties.violates_explicit_rule", False)
+        )
+        has_valid_consent = _bool(
+            _get(facts, "rights_and_duties.has_valid_consent", True)
+        )
+        discriminates = _bool(
+            _get(facts, "justice_and_fairness.discriminates_on_protected_attr", False)
+        )
 
         # Logic section
         conflict = 0.0
         triggers: List[str] = []
 
         if urgency >= 0.75:
-            conflict += 0.25
+            conflict += 0.20
             triggers.append("high_urgency")
 
-        score = 0.8 - (0.5 * conflict)
+        if harm >= 0.8:
+            conflict += 0.35
+            triggers.append("severe_harm")
+        elif harm >= 0.6:
+            conflict += 0.25
+            triggers.append("high_harm")
+
+        if benefit >= 0.6 and harm >= 0.6:
+            conflict += 0.15
+            triggers.append("benefit_harm_tension")
+
+        if violates_rights:
+            conflict += 0.25
+            triggers.append("rights_violation")
+
+        if violates_rule:
+            conflict += 0.15
+            triggers.append("rule_violation")
+
+        if not has_valid_consent:
+            conflict += 0.10
+            triggers.append("consent_gap")
+
+        if discriminates:
+            conflict += 0.15
+            triggers.append("discrimination")
+
+        conflict = min(1.0, conflict)
+        score = 0.85 - (0.6 * conflict)
         score = max(0.0, score)
 
-        if conflict >= 0.5:
+        if conflict >= 0.55:
             verdict = "neutral"
         else:
             verdict = "prefer"
 
-        reasons = ["Tragic conflict check complete.", f"Conflict index: {conflict}"]
+        reasons = [
+            "Tragic conflict check complete.",
+            f"Tragic conflict index={conflict:.2f}",
+            f"Trigger(s): {', '.join(triggers) if triggers else 'none'}",
+        ]
+        if conflict >= 0.55:
+            reasons.append("• tragic_conflict_high = True")
 
         metadata = {
             "tragic_conflict_index": conflict,
             "triggers": triggers,
+            "tragic_conflict_high": conflict >= 0.55,
         }
 
         opt_id = _get(facts, "option_id", None)
