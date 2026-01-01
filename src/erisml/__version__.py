@@ -17,8 +17,6 @@
 # of any kind. See the License for the specific language governing
 # permissions and limitations.
 
-from __future__ import annotations
+"""Version information for ErisML."""
 
-from . import __version__
-
-__all__: list[str] = ["__version__"]
+__version__ = "0.1.0"
