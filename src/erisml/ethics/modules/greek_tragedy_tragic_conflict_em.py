@@ -30,10 +30,8 @@ def _make_judgement(
 ) -> EthicalJudgement:
 
     score = float(max(0.0, min(1.0, score)))
-    # FIX: Ensure reasons is a standard list
     safe_reasons = list(reasons)
 
-    # We use a simplified construction to avoid type errors
     return EthicalJudgement(
         em_name=em_name,
         verdict=verdict,  # type: ignore
@@ -41,7 +39,7 @@ def _make_judgement(
         reasons=safe_reasons,
         metadata=metadata,
         option_id=option_id,  # type: ignore
-        stakeholder="unspecified",  # Default to satisfy type checker if needed
+        stakeholder="unspecified",
     )  # type: ignore
 
 
@@ -67,8 +65,7 @@ class TragicConflictEM:
 
     def judge(self, facts: EthicalFacts) -> EthicalJudgement:
         urgency = float(_get(facts, "consequences.urgency", 0.0) or 0.0)
-        benefit = float(_get(facts, "consequences.expected_benefit", 0.0) or 0.0)
-        harm = float(_get(facts, "consequences.expected_harm", 0.0) or 0.0)
+        # REMOVED unused variables 'benefit' and 'harm' here to satisfy linter
 
         # Logic section
         conflict = 0.0
@@ -78,7 +75,6 @@ class TragicConflictEM:
             conflict += 0.25
             triggers.append("high_urgency")
 
-        # Simplified logic for type safety
         score = 0.8 - (0.5 * conflict)
         score = max(0.0, score)
 
