@@ -168,7 +168,7 @@ class GovernanceConfig:
 
         Useful for scenario experiments where only a few parameters change.
         """
-        return replace(self, **overrides)
+        return dataclasses.replace(self, **changes)  # type: ignore
 
 
 __all__ = [

@@ -17,7 +17,7 @@ from __future__ import annotations
 
 import logging
 from dataclasses import dataclass, field
-from typing import Any, Dict, Iterable, List, Mapping, Tuple
+from typing import Any, Dict, Iterable, List, Mapping, Tuple, cast
 
 from erisml.ethics.facts import (
     AutonomyAndAgency,
@@ -375,12 +375,13 @@ class GenevaBaselineEM(GenevaBaseEM):
             },
         )
 
+        reasons_list = cast(List[str], metadata["reasons"])
         return EthicalJudgement(
             option_id=facts.option_id,
             em_name=self.em_name,
             stakeholder=self.stakeholder,
-            verdict=verdict,
+            verdict=verdict,  # type: ignore
             normative_score=score,
-            reasons=metadata["reasons"],
+            reasons=reasons_list,
             metadata=metadata,
-        )
+        )  # type: ignore

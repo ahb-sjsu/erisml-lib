@@ -22,8 +22,8 @@ from __future__ import annotations
 from erisml.core.model import ErisModel
 
 try:
-    import tarski
-    from tarski import fstrips as fs
+    import tarski  # type: ignore[import-untyped]
+    from tarski import fstrips as fs  # type: ignore[import-untyped]
 except ImportError:  # pragma: no cover
     tarski = None
     fs = None

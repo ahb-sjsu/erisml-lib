@@ -227,7 +227,8 @@ def ethical_judgement_to_dict(j: EthicalJudgement) -> Dict[str, Any]:
         "verdict": j.verdict,
         "normative_score": j.normative_score,
         "reasons": list(j.reasons),
-        "metadata": dict(j.metadata),
+        # SAFEGUARD: use 'or {}' to prevent NoneType error in dict() conversion
+        "metadata": dict(j.metadata or {}),
     }
     return data
 
@@ -271,7 +272,8 @@ def ethical_judgement_from_dict(data: Dict[str, Any]) -> EthicalJudgement:
         verdict=verdict,  # type: ignore[arg-type]  # validated upstream by design
         normative_score=float(normative_score),
         reasons=[str(r) for r in reasons],
-        metadata=dict(metadata),
+        # SAFEGUARD: use 'or {}' to prevent NoneType error
+        metadata=dict(metadata or {}),
     )
 
 
