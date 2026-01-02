@@ -53,11 +53,11 @@ SKIP_DIR_NAMES = {
     ".env",
     ".mypy_cache",
     ".idea",
-    "Lib",           # Windows Python install stuff
-    "lib",           # *nix-style
+    "Lib",  # Windows Python install stuff
+    "lib",  # *nix-style
     "site-packages",
     "dist-packages",
-    "proto_gen",     # our generated code lives here
+    "proto_gen",  # our generated code lives here
 }
 
 
@@ -78,8 +78,7 @@ def find_python_files(root: str) -> List[str]:
     py_files: List[str] = []
     for dirpath, dirnames, filenames in os.walk(root):
         dirnames[:] = [
-            d for d in dirnames
-            if not should_skip_dir(os.path.join(dirpath, d))
+            d for d in dirnames if not should_skip_dir(os.path.join(dirpath, d))
         ]
         for filename in filenames:
             if filename.endswith(".py"):
