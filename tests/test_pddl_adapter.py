@@ -44,7 +44,11 @@ def test_erisml_to_tarski_creates_problem(monkeypatch):
     """Check that the problem is created with correct sorts and constants."""
 
     try:
-        import tarski.fstrips as fs
+        import importlib.util
+
+        def tarski_available():
+            return importlib.util.find_spec("tarski") is not None
+
     except ImportError:
         pytest.skip("tarski not installed")
 
