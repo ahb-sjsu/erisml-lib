@@ -57,15 +57,12 @@ def sample_profile() -> DEMEProfileV03:
 # triage_em_from_profile
 # ---------------------------------------------------------------------------
 
+
 def test_triage_em_weights_sum_to_1(sample_profile: DEMEProfileV03) -> None:
     """Weights produced by triage_em_from_profile sum to 1.0."""
     em = triage_em_from_profile(sample_profile)
     total = (
-        em.w_benefit
-        + em.w_harm
-        + em.w_urgency
-        + em.w_disadvantaged
-        + em.w_procedural
+        em.w_benefit + em.w_harm + em.w_urgency + em.w_disadvantaged + em.w_procedural
     )
     assert abs(total - 1.0) < 1e-6
 
@@ -85,6 +82,7 @@ def test_triage_em_respects_principlism(sample_profile: DEMEProfileV03) -> None:
 # governance_from_profile
 # ---------------------------------------------------------------------------
 
+
 @pytest.mark.parametrize(
     "override_mode, expected_veto_em",
     [
@@ -94,7 +92,9 @@ def test_triage_em_respects_principlism(sample_profile: DEMEProfileV03) -> None:
     ],
 )
 def test_governance_override_modes(
-    sample_profile: DEMEProfileV03, override_mode: OverrideMode, expected_veto_em: List[str]
+    sample_profile: DEMEProfileV03,
+    override_mode: OverrideMode,
+    expected_veto_em: List[str],
 ) -> None:
     """OverrideMode affects veto EMs as expected."""
     profile = sample_profile
@@ -130,6 +130,7 @@ def test_governance_base_em_advisory(sample_profile: DEMEProfileV03) -> None:
 # build_triage_ems_and_governance
 # ---------------------------------------------------------------------------
 
+
 def test_build_triage_ems_and_governance_types(sample_profile: DEMEProfileV03) -> None:
     """Check returned objects are of expected types."""
     triage_em, rights_em, gov_cfg = build_triage_ems_and_governance(sample_profile)
@@ -138,7 +139,9 @@ def test_build_triage_ems_and_governance_types(sample_profile: DEMEProfileV03) -
     assert isinstance(gov_cfg, GovernanceConfig)
 
 
-def test_build_triage_ems_and_governance_weights(sample_profile: DEMEProfileV03) -> None:
+def test_build_triage_ems_and_governance_weights(
+    sample_profile: DEMEProfileV03,
+) -> None:
     """Check governance EM weights and vetoes are correct."""
     _, _, gov = build_triage_ems_and_governance(sample_profile)
     # EM weights sum to 1
