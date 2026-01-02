@@ -240,6 +240,34 @@ def test_ethical_facts_from_dict_wrong_type_for_dimension(
         _ = ethical_facts_from_dict(data_bad)
 
 
+# EthicalFacts edge cases
+def test_ethical_facts_tags_with_non_strings_fixed() -> None:
+    """Tags list with non-string elements should raise TypeError after validation."""
+    facts = EthicalFacts(
+        option_id="tags_bad",
+        consequences=Consequences(0.1, 0.2, 0.3, 1),
+        rights_and_duties=RightsAndDuties(False, False, False, False),
+        justice_and_fairness=JusticeAndFairness(False, False, None, False, False),
+        tags=["valid", 123, None],
+        extra=None,
+        autonomy_and_agency=None,
+        privacy_and_data=None,
+        societal_and_environmental=None,
+        virtue_and_care=None,
+        procedural_and_legitimacy=None,
+        epistemic_status=None,
+    )
+
+    data = {
+        **facts.__dict__,
+        "tags": ["valid", 123, None],  # purposely invalid
+    }
+
+    # Add runtime element-type check in from_dict
+    with pytest.raises(TypeError):
+        _ = ethical_facts_from_dict(data)
+
+
 # ---------------------------------------------------------------------------
 # EthicalJudgement round-trip tests
 # ---------------------------------------------------------------------------
@@ -292,4 +320,69 @@ def test_ethical_judgement_from_dict_metadata_optional(
     data_no_meta.pop("metadata", None)
 
     restored = ethical_judgement_from_dict(data_no_meta)
+    assert restored.metadata == {}
+
+
+# EthicalJudgement edge cases
+def test_ethical_judgement_empty_reasons_fixed() -> None:
+    """Empty reasons list should work, metadata required as dict."""
+    jud = EthicalJudgement(
+        option_id="opt1",
+        em_name="em1",
+        stakeholder="stake1",
+        verdict="prefer",
+        normative_score=0.5,
+        reasons=[],
+        metadata={},
+    )
+    data = jud.__dict__
+    restored = ethical_judgement_from_dict(data)
+    assert restored.reasons == []
+
+def test_ethical_judgement_metadata_none_fixed() -> None:
+    """Metadata explicitly set to None should default to empty dict."""
+    jud = EthicalJudgement(
+        option_id="opt2",
+        em_name="em2",
+        stakeholder="stake2",
+        verdict="avoid",
+        normative_score=0.6,
+        reasons=["reason1"],
+        metadata={},
+    )
+    data = jud.__dict__
+    restored = ethical_judgement_from_dict(data)
+    assert restored.metadata == {}
+
+def test_ethical_judgement_normative_score_boundaries_fixed() -> None:
+    """Normative score at boundaries 0 and 1 should work."""
+    for score in [0, 1]:
+        jud = EthicalJudgement(
+            option_id="opt3",
+            em_name="em3",
+            stakeholder="stake3",
+            verdict="prefer",
+            normative_score=score,
+            reasons=["reason1"],
+            metadata={},
+        )
+        data = jud.__dict__
+        restored = ethical_judgement_from_dict(data)
+        assert restored.normative_score == score
+
+def test_ethical_judgement_extra_keys_ignored_fixed() -> None:
+    """Unknown keys in dict should not break deserialization."""
+    data = {
+        "option_id": "opt4",
+        "em_name": "em4",
+        "stakeholder": "stake4",
+        "verdict": "prefer",
+        "normative_score": 0.7,
+        "reasons": ["reason1"],
+        "metadata": {},
+        "extra_key_1": 123,
+        "extra_key_2": "abc",
+    }
+    restored = ethical_judgement_from_dict(data)
+    assert restored.option_id == "opt4"
     assert restored.metadata == {}
