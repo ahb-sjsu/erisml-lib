@@ -12,8 +12,10 @@ from erisml.core.types import ActionInstance
 # Dummy classes for testing
 # ---------------------------
 
+
 class DummyEngine:
     """Fake engine to track calls."""
+
     def __init__(self, model):
         self.model = model
         self.step_called_with = []
@@ -25,6 +27,7 @@ class DummyEngine:
 
 class DummyModel(ErisModel):
     """Fake ErisModel with agents only."""
+
     def __init__(self):
         self.agents = {"agent1": None, "agent2": None}
         self.env = SimpleNamespace(object_types={})
@@ -33,6 +36,7 @@ class DummyModel(ErisModel):
 # ---------------------------
 # Tests
 # ---------------------------
+
 
 def test_env_initialization(monkeypatch):
     """Check initialization of agents, action/obs spaces, and state."""
@@ -67,7 +71,9 @@ def test_env_step(monkeypatch):
     """Step should call engine.step and cycle _agent_index."""
     model = DummyModel()
     engine_instance = DummyEngine(model)
-    monkeypatch.setattr("erisml.interop.pettingzoo_adapter.ErisEngine", lambda m: engine_instance)
+    monkeypatch.setattr(
+        "erisml.interop.pettingzoo_adapter.ErisEngine", lambda m: engine_instance
+    )
 
     env = ErisPettingZooEnv(model)
     env.reset()
@@ -83,7 +89,9 @@ def test_env_step_multiple_agents(monkeypatch):
     """_agent_index cycles correctly over multiple steps."""
     model = DummyModel()
     engine_instance = DummyEngine(model)
-    monkeypatch.setattr("erisml.interop.pettingzoo_adapter.ErisEngine", lambda m: engine_instance)
+    monkeypatch.setattr(
+        "erisml.interop.pettingzoo_adapter.ErisEngine", lambda m: engine_instance
+    )
 
     env = ErisPettingZooEnv(model)
     env.reset()
@@ -111,4 +119,4 @@ def test_env_render_close(monkeypatch):
     env = ErisPettingZooEnv(model)
 
     env.render()  # prints state
-    env.close()   # no-op
+    env.close()  # no-op

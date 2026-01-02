@@ -339,6 +339,7 @@ def test_ethical_judgement_empty_reasons_fixed() -> None:
     restored = ethical_judgement_from_dict(data)
     assert restored.reasons == []
 
+
 def test_ethical_judgement_metadata_none_fixed() -> None:
     """Metadata explicitly set to None should default to empty dict."""
     jud = EthicalJudgement(
@@ -353,6 +354,7 @@ def test_ethical_judgement_metadata_none_fixed() -> None:
     data = jud.__dict__
     restored = ethical_judgement_from_dict(data)
     assert restored.metadata == {}
+
 
 def test_ethical_judgement_normative_score_boundaries_fixed() -> None:
     """Normative score at boundaries 0 and 1 should work."""
@@ -369,6 +371,7 @@ def test_ethical_judgement_normative_score_boundaries_fixed() -> None:
         data = jud.__dict__
         restored = ethical_judgement_from_dict(data)
         assert restored.normative_score == score
+
 
 def test_ethical_judgement_extra_keys_ignored_fixed() -> None:
     """Unknown keys in dict should not break deserialization."""
