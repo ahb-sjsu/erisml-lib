@@ -35,6 +35,7 @@ dependencies = [
   "structlog>=24.0.0",
   "mcp>=0.9.0",
 ]
+
 [project.urls]
 Homepage = "https://github.com/ahb-sjsu/erisml-lib"
 Repository = "https://github.com/ahb-sjsu/erisml-lib"
@@ -45,11 +46,6 @@ Discord = "https://discord.gg/W3Bkj4AZ"
 [project.scripts]
 erisml-mcp-server = "erisml.ethics.interop.mcp_deme_server:main"
 
-[tool.pytest.ini_options]
-markers = [
-    "smoke: marks tests as smoke tests (quick sanity checks)",
-]
-
 [project.optional-dependencies]
 dev = [
   "pytest>=7.0.0",
@@ -58,6 +54,7 @@ dev = [
   "isort>=5.0.0",
   "ruff>=0.4.8",
   "taplo>=0.9.0",
+  "pytest-cov",
 ]
 
 [tool.setuptools]
@@ -69,6 +66,16 @@ version = {attr = "erisml.__version__.__version__"}
 [tool.setuptools.packages.find]
 where = ["src"]
 
+# --- UPDATED CONFIGURATION START ---
+
+[tool.pytest.ini_options]
+markers = [
+    "smoke: marks tests as smoke tests (quick sanity checks)",
+]
+# We added coverage flags here so 'Run pytest' reports %
+addopts = "--cov=src/erisml --cov-report=term-missing --cov-report=html"
+testpaths = ["tests"]
+
 [tool.black]
 line-length = 88
 target-version = ["py310"]
@@ -79,3 +86,14 @@ profile = "black"
 
 [tool.ruff]
 line-length = 88
+
+[tool.mypy]
+python_version = "3.10"
+warn_return_any = true
+warn_unused_configs = true
+ignore_missing_imports = true
+check_untyped_defs = true
+# Crucial: This prevents the server from checking the messy examples folder
+exclude = "(?x)(^src/erisml/examples/.*$)"
+
+# --- UPDATED CONFIGURATION END ---

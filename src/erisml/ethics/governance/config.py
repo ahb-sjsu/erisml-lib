@@ -9,7 +9,8 @@ Version: 0.3 (EthicalDomains + base EMs / 'Geneva' layer)
 
 from __future__ import annotations
 
-from dataclasses import dataclass, field, replace
+import dataclasses
+from dataclasses import dataclass, field
 from typing import Dict, List, Optional
 
 from erisml.ethics.profile_v03 import BaseEMEnforcementMode
@@ -168,7 +169,7 @@ class GovernanceConfig:
 
         Useful for scenario experiments where only a few parameters change.
         """
-        return replace(self, **overrides)
+        return dataclasses.replace(self, **overrides)  # type: ignore
 
 
 __all__ = [
