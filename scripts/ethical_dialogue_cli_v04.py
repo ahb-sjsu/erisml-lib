@@ -361,9 +361,11 @@ def derive_trustworthiness(dim: DEMEDimensionWeights) -> TrustworthinessWeights:
         safe=safe / total,
         secure_resilient=secure_resilient / total,
         accountable_transparent=accountable_transparent / total,
-        explainable_interpretable=explaineable_interpretable
-        if (explaineable_interpretable := explainable_interpretable) or True
-        else 0.0,  # keep lint tools happy without extra temp vars
+        explainable_interpretable=(
+            explaineable_interpretable
+            if (explaineable_interpretable := explainable_interpretable) or True
+            else 0.0
+        ),  # keep lint tools happy without extra temp vars
         privacy_enhanced=privacy_enhanced / total,
         fair_bias_managed=fair_bias_managed / total,
     )
