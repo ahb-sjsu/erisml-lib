@@ -136,6 +136,25 @@ class EMRegistry:
         return list(cls._entries.values())
 
     @classmethod
+    def list_all(cls) -> Dict[str, Dict[str, any]]:
+        """
+        Get all registered EMs as a dict mapping name -> info dict.
+
+        Returns dict with keys: tier, default_weight, veto_capable, description, tags.
+        This is a convenience method for iteration.
+        """
+        result: Dict[str, Dict[str, any]] = {}
+        for name, entry in cls._entries.items():
+            result[name] = {
+                "tier": entry.tier,
+                "default_weight": entry.default_weight,
+                "veto_capable": entry.veto_capable,
+                "description": entry.description,
+                "tags": entry.tags,
+            }
+        return result
+
+    @classmethod
     def tier_names(cls) -> Dict[int, str]:
         """Get human-readable tier names."""
         return {

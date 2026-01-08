@@ -496,7 +496,7 @@ def evaluate_options_v2(
             if tier_config and not tier_config.enabled:
                 continue
 
-            em_cls = EMRegistry.get(em_id)
+            em_cls = EMRegistry.get_class(em_id)
             if em_cls is None:
                 continue
 

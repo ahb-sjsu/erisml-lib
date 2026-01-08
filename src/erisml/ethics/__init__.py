@@ -142,10 +142,21 @@ from .governance.config import (
     GovernanceConfig,
 )
 
+from .governance.config_v2 import (
+    GovernanceConfigV2,
+    DimensionWeights,
+)
+
 from .governance.aggregation import (
     DecisionOutcome,
     aggregate_judgements,
     select_option,
+)
+
+from .governance.aggregation_v2 import (
+    DecisionOutcomeV2,
+    aggregate_moral_vectors,
+    select_option_v2,
 )
 
 from .domain.interfaces import (
@@ -198,6 +209,12 @@ __all__ = [
     "DecisionOutcome",
     "aggregate_judgements",
     "select_option",
+    # Governance (V2 - DEME 2.0)
+    "GovernanceConfigV2",
+    "DimensionWeights",
+    "DecisionOutcomeV2",
+    "aggregate_moral_vectors",
+    "select_option_v2",
     # Domain & assessment interfaces
     "CandidateOption",
     "DomainAssessmentContext",

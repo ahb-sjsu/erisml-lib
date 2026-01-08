@@ -199,7 +199,7 @@ def pipeline_from_profile(profile: DEMEProfileV04) -> DEMEPipeline:
         if tier_config and not tier_config.enabled:
             continue
 
-        em_cls = EMRegistry.get(em_id)
+        em_cls = EMRegistry.get_class(em_id)
         if em_cls is not None:
             try:
                 em = em_cls()
