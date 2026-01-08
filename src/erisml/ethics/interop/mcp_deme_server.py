@@ -17,10 +17,11 @@ Assumptions:
         ethical_judgement_to_dict}
 """
 
-from __future__ import annotations
-
+import argparse
 import json
+import logging
 import os
+import sys
 from pathlib import Path
 from typing import Any, Dict, List
 
@@ -58,7 +59,14 @@ mcp = FastMCP("ErisML DEME Ethics Server")
 # ---------------------------------------------------------------------------
 
 _DEME_PROFILE_CACHE: Dict[str, DEMEProfileV03] = {}
-_DEME_PROFILE_DIR = Path(os.environ.get("DEME_PROFILES_DIR", "./deme_profiles"))
+_DEME_PROFILE_DIR: Path = Path(os.environ.get("DEME_PROFILES_DIR", "./deme_profiles"))
+
+
+def _set_profile_dir(path: Path) -> None:
+    """Set the profile directory and clear cache."""
+    global _DEME_PROFILE_DIR
+    _DEME_PROFILE_DIR = path
+    _DEME_PROFILE_CACHE.clear()
 
 
 def _load_profile(profile_id: str) -> DEMEProfileV03:
@@ -288,11 +296,175 @@ def govern_decision(
 
 
 # ---------------------------------------------------------------------------
-# Entrypoint
+# CLI Entrypoint
 # ---------------------------------------------------------------------------
 
+
+def main() -> None:
+    """
+    Main entry point for the ErisML DEME MCP server.
+
+    This function parses command-line arguments and starts the MCP server.
+    The server communicates over stdio by default, making it compatible
+    with MCP clients like Claude Desktop.
+    """
+    # Handle --help early to avoid MCP tool registration issues during import
+    if len(sys.argv) > 1 and sys.argv[1] in ("--help", "-h"):
+        # Create parser just for help
+        parser = argparse.ArgumentParser(
+            description=(
+                "ErisML DEME Ethics Server - MCP server exposing DEME (Democratically "
+                "Governed Ethics Modules) as tools for ethical decision-making.\n\n"
+                "This server provides three MCP tools:\n"
+                "  - deme.list_profiles: List available DEME profiles\n"
+                "  - deme.evaluate_options: Evaluate candidate options using ethics modules\n"
+                "  - deme.govern_decision: Apply governance to aggregate EM judgements\n\n"
+                "The server communicates over stdio, making it compatible with MCP clients "
+                "like Claude Desktop."
+            ),
+            formatter_class=argparse.RawDescriptionHelpFormatter,
+        )
+        parser.add_argument(
+            "--profiles-dir",
+            type=Path,
+            default=None,
+            help=(
+                "Directory containing DEME profile JSON files. "
+                "Defaults to ./deme_profiles or DEME_PROFILES_DIR environment variable."
+            ),
+        )
+        parser.add_argument(
+            "--log-level",
+            type=str,
+            choices=["DEBUG", "INFO", "WARNING", "ERROR", "CRITICAL"],
+            default="INFO",
+            help="Set the logging level (default: INFO)",
+        )
+        parser.add_argument(
+            "--port",
+            type=int,
+            default=None,
+            help=(
+                "Port for HTTP/SSE transport (not yet implemented, server uses stdio by default). "
+                "This option is reserved for future use."
+            ),
+        )
+        parser.print_help()
+        return
+
+    parser = argparse.ArgumentParser(
+        description=(
+            "ErisML DEME Ethics Server - MCP server exposing DEME (Democratically "
+            "Governed Ethics Modules) as tools for ethical decision-making.\n\n"
+            "This server provides three MCP tools:\n"
+            "  - deme.list_profiles: List available DEME profiles\n"
+            "  - deme.evaluate_options: Evaluate candidate options using ethics modules\n"
+            "  - deme.govern_decision: Apply governance to aggregate EM judgements\n\n"
+            "The server communicates over stdio, making it compatible with MCP clients "
+            "like Claude Desktop."
+        ),
+        formatter_class=argparse.RawDescriptionHelpFormatter,
+        epilog=(
+            "Examples:\n"
+            "  # Use default profiles directory (./deme_profiles)\n"
+            "  erisml-mcp-server\n\n"
+            "  # Specify custom profiles directory\n"
+            "  erisml-mcp-server --profiles-dir /path/to/profiles\n\n"
+            "  # Set log level to DEBUG\n"
+            "  erisml-mcp-server --log-level DEBUG\n\n"
+            "Claude Desktop Configuration:\n"
+            "  Add this to your Claude Desktop MCP configuration file:\n"
+            "  {\n"
+            '    "mcpServers": {\n'
+            '      "erisml-deme": {\n'
+            '        "command": "erisml-mcp-server",\n'
+            '        "args": ["--profiles-dir", "/path/to/deme_profiles"]\n'
+            "      }\n"
+            "    }\n"
+            "  }\n\n"
+            "Environment Variables:\n"
+            "  DEME_PROFILES_DIR: Default directory for DEME profiles (default: ./deme_profiles)\n"
+            "                      This is overridden by --profiles-dir if provided.\n\n"
+            "For more information, visit: https://github.com/ahb-sjsu/erisml-lib"
+        ),
+    )
+
+    parser.add_argument(
+        "--profiles-dir",
+        type=Path,
+        default=None,
+        help=(
+            "Directory containing DEME profile JSON files. "
+            "Defaults to ./deme_profiles or DEME_PROFILES_DIR environment variable."
+        ),
+    )
+
+    parser.add_argument(
+        "--log-level",
+        type=str,
+        choices=["DEBUG", "INFO", "WARNING", "ERROR", "CRITICAL"],
+        default="INFO",
+        help="Set the logging level (default: INFO)",
+    )
+
+    # Note: --port is not currently used as FastMCP uses stdio by default
+    # but we include it for future HTTP/SSE transport support
+    parser.add_argument(
+        "--port",
+        type=int,
+        default=None,
+        help=(
+            "Port for HTTP/SSE transport (not yet implemented, server uses stdio by default). "
+            "This option is reserved for future use."
+        ),
+    )
+
+    args = parser.parse_args()
+
+    # Set up logging
+    logging.basicConfig(
+        level=getattr(logging, args.log_level),
+        format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
+    )
+
+    # Set profile directory
+    if args.profiles_dir is not None:
+        profile_dir = args.profiles_dir.resolve()
+        if not profile_dir.exists():
+            logging.warning(
+                f"Profile directory does not exist: {profile_dir}. "
+                "Server will start but no profiles will be available."
+            )
+        _set_profile_dir(profile_dir)
+    else:
+        # Use environment variable or default
+        env_dir = os.environ.get("DEME_PROFILES_DIR")
+        if env_dir:
+            _set_profile_dir(Path(env_dir).resolve())
+        else:
+            _set_profile_dir(Path("./deme_profiles").resolve())
+
+    if args.port is not None:
+        logging.warning(
+            "--port option is not yet implemented. Server will use stdio transport."
+        )
+
+    logging.info(
+        f"Starting ErisML DEME MCP server with profiles from: {_DEME_PROFILE_DIR}"
+    )
+    logging.info(f"Found {len(_list_profile_files())} profile(s)")
+
+    # Run the MCP server over stdio
+    # FastMCP handles stdio communication automatically
+    try:
+        mcp.run()
+    except KeyboardInterrupt:
+        logging.info("Server stopped by user")
+        sys.exit(0)
+    except Exception as e:
+        logging.error(f"Server error: {e}", exc_info=True)
+        sys.exit(1)
+
+
 if __name__ == "__main__":
-    # Run the MCP server over stdio by default.
-    # You can also use HTTP/SSE or other transports as documented
-    # in the MCP Python SDK.
-    mcp.run()
+    main()

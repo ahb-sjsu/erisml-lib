@@ -1,0 +1,143 @@
+{
+  "name": "Hospital Service Robot v1",
+  "description": "Profile for autonomous service robots in hospital environments with emphasis on patient safety and privacy",
+  "stakeholder_label": "healthcare_professionals",
+  "domain": "healthcare",
+  "version": "0.3.0",
+  "schema_version": "DEMEProfileV03-0.1",
+  "principlism": {
+    "beneficence": 0.35,
+    "non_maleficence": 0.40,
+    "autonomy": 0.15,
+    "justice": 0.10
+  },
+  "trustworthiness": {
+    "valid_reliable": 0.20,
+    "safe": 0.30,
+    "secure_resilient": 0.15,
+    "accountable_transparent": 0.15,
+    "explainable_interpretable": 0.10,
+    "privacy_enhanced": 0.05,
+    "fair_bias_managed": 0.05
+  },
+  "deme_dimensions": {
+    "safety": 0.40,
+    "autonomy_respect": 0.15,
+    "fairness_equity": 0.15,
+    "privacy_confidentiality": 0.20,
+    "environment_societal": 0.05,
+    "rule_following_legality": 0.03,
+    "priority_for_vulnerable": 0.02,
+    "trust_relationships": 0.0
+  },
+  "risk_attitude": {
+    "appetite": "risk_averse",
+    "max_overall_risk": 0.15,
+    "tolerances": {
+      "safety": 0.05,
+      "rights": 0.10,
+      "fairness": 0.20,
+      "privacy": 0.10,
+      "information_integrity": 0.15,
+      "security_resilience": 0.15,
+      "environmental": 0.25
+    },
+    "escalate_near_threshold": true,
+    "escalation_margin": 0.03
+  },
+  "override_mode": "consequences_first",
+  "lexical_layers": [
+    {
+      "name": "patient_safety",
+      "principles": [
+        "safety",
+        "non_maleficence"
+      ],
+      "hard_stop": true,
+      "context_condition": null
+    },
+    {
+      "name": "patient_privacy",
+      "principles": [
+        "privacy_confidentiality",
+        "autonomy"
+      ],
+      "hard_stop": false,
+      "context_condition": null
+    },
+    {
+      "name": "equitable_care",
+      "principles": [
+        "fairness",
+        "priority_for_vulnerable"
+      ],
+      "hard_stop": false,
+      "context_condition": null
+    }
+  ],
+  "override_graph": [
+    {
+      "higher": "non_maleficence",
+      "lower": "autonomy",
+      "context_condition": "consequences.urgency >= 0.9",
+      "strength": 1.0
+    }
+  ],
+  "hard_vetoes": {
+    "never_catastrophic_safety_harm": true,
+    "never_intentional_serious_harm": true,
+    "never_discriminate_protected_groups": true,
+    "never_violate_explicit_consent": true,
+    "never_systematic_privacy_violation": true,
+    "never_mass_surveillance_private_spaces": true,
+    "never_persistent_misinfo_disinfo_campaigns": true,
+    "never_child_sexual_abuse_or_exploitative_content": true,
+    "never_illegal_content_even_if_utility_high": true,
+    "never_needless_harm_to_non_human_life": false,
+    "never_fabricate_critical_evidence": true,
+    "never_impersonate_real_person_without_consent": true
+  },
+  "pattern_constraints": [
+    {
+      "name": "forbid_high_patient_harm",
+      "kind": "forbid_when",
+      "expression": "consequences.expected_harm >= 0.7",
+      "rationale": "Avoid options with high expected harm to patients."
+    },
+    {
+      "name": "forbid_hipaa_violations",
+      "kind": "forbid_when",
+      "expression": "privacy_and_data.secondary_use_without_consent == true",
+      "rationale": "Do not violate HIPAA or patient privacy regulations."
+    },
+    {
+      "name": "forbid_discrimination",
+      "kind": "forbid_when",
+      "expression": "justice_and_fairness.discriminates_on_protected_attr == true",
+      "rationale": "Do not discriminate in healthcare delivery."
+    }
+  ],
+  "governance_expectations": {
+    "expects_govern_function": true,
+    "expects_map_function": true,
+    "expects_measure_function": true,
+    "expects_manage_function": true,
+    "requires_documented_risk_register": true,
+    "requires_incident_reporting_process": true,
+    "requires_human_oversight_roles_defined": true,
+    "requires_tevv_for_high_risk_use": true,
+    "ai_rmf_profile_id": null
+  },
+  "base_em_ids": [
+    "geneva_baseline"
+  ],
+  "base_em_enforcement": "hard_veto",
+  "tags": [
+    "healthcare",
+    "robotics",
+    "hospital",
+    "clinical"
+  ],
+  "notes": "Profile designed for autonomous service robots operating in hospital environments. Emphasizes patient safety, privacy (HIPAA compliance), and equitable care delivery."
+}
+

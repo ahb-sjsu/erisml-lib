@@ -35,16 +35,16 @@ class CaseStudy1TriageEM(EthicsModule):
         # 1. Hard deontic veto: rights / explicit rule violations → forbid.
         rd = facts.rights_and_duties
         if rd.violates_rights or rd.violates_explicit_rule:
-            reasons: List[str] = [
+            veto_reasons: List[str] = [
                 (
                     "Option is forbidden because it violates fundamental rights "
                     "and/or explicit rules or regulations."
                 )
             ]
             if rd.violates_rights:
-                reasons.append("• violates_rights = True")
+                veto_reasons.append("• violates_rights = True")
             if rd.violates_explicit_rule:
-                reasons.append("• violates_explicit_rule = True")
+                veto_reasons.append("• violates_explicit_rule = True")
 
             return EthicalJudgement(
                 option_id=facts.option_id,
@@ -52,7 +52,7 @@ class CaseStudy1TriageEM(EthicsModule):
                 stakeholder=self.stakeholder,
                 verdict="forbid",
                 normative_score=0.0,
-                reasons=reasons,
+                reasons=veto_reasons,
                 metadata={"kind": "hard_veto"},
             )
 

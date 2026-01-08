@@ -116,7 +116,9 @@ def intro(config: dict) -> tuple[str, str, str, List[str]]:
         "If you are a group, answer according to your consensus or majority view.\n"
     )
 
-    name = input("Internal name for this EM profile (e.g., 'Jain_Household_v1'): ").strip()
+    name = input(
+        "Internal name for this EM profile (e.g., 'Jain_Household_v1'): "
+    ).strip()
     if not name:
         name = "EM_Profile_1"
 
@@ -192,7 +194,9 @@ def ask_high_level_orientation(
     dim_key = chosen["dimension"]
 
     if dim_key not in weights:
-        print(f"[WARN] Dimension '{dim_key}' from high_level not in dimensions; skipping boost.")
+        print(
+            f"[WARN] Dimension '{dim_key}' from high_level not in dimensions; skipping boost."
+        )
         return
 
     # Boost chosen dimension
@@ -443,9 +447,7 @@ def derive_policy_blocks_from_weights(
     )
 
     # Constraints / pattern rules from hard vetoes
-    hard_veto_ids = [
-        hid for hid, enabled in hard_veto_flags.items() if enabled
-    ]
+    hard_veto_ids = [hid for hid, enabled in hard_veto_flags.items() if enabled]
 
     pattern_rules: List[PatternRule] = []
 

@@ -17,6 +17,8 @@ Version: 0.2 (EthicalDomains update)
 
 from __future__ import annotations
 
+import json
+from pathlib import Path
 from typing import Any, Dict
 
 
@@ -235,7 +237,7 @@ def get_ethical_facts_schema() -> Dict[str, Any]:
 
     schema: Dict[str, Any] = {
         "$schema": "http://json-schema.org/draft-07/schema#",
-        "$id": "https://erisml.org/schema/ethical_facts.json",
+        "$id": "https://ahb-sjsu.github.io/erisml-lib/schemas/ethical_facts.json",
         "title": "EthicalFacts",
         "type": "object",
         "description": (
@@ -313,7 +315,7 @@ def get_ethical_judgement_schema() -> Dict[str, Any]:
     """
     schema: Dict[str, Any] = {
         "$schema": "http://json-schema.org/draft-07/schema#",
-        "$id": "https://erisml.org/schema/ethical_judgement.json",
+        "$id": "https://ahb-sjsu.github.io/erisml-lib/schemas/ethical_judgement.json",
         "title": "EthicalJudgement",
         "type": "object",
         "description": (
@@ -361,7 +363,32 @@ def get_ethical_judgement_schema() -> Dict[str, Any]:
     return schema
 
 
+def export_schemas_to_files(output_dir: Path) -> None:
+    """
+    Export all JSON schemas to files in the specified directory.
+
+    Args:
+        output_dir: Directory where schema files should be written.
+    """
+    output_dir.mkdir(parents=True, exist_ok=True)
+
+    # Export ethical_facts schema
+    ethical_facts_schema = get_ethical_facts_schema()
+    ethical_facts_path = output_dir / "ethical_facts.json"
+    with open(ethical_facts_path, "w", encoding="utf-8") as f:
+        json.dump(ethical_facts_schema, f, indent=2, ensure_ascii=False)
+    print(f"Exported ethical_facts schema to {ethical_facts_path}")
+
+    # Export ethical_judgement schema
+    ethical_judgement_schema = get_ethical_judgement_schema()
+    ethical_judgement_path = output_dir / "ethical_judgement.json"
+    with open(ethical_judgement_path, "w", encoding="utf-8") as f:
+        json.dump(ethical_judgement_schema, f, indent=2, ensure_ascii=False)
+    print(f"Exported ethical_judgement schema to {ethical_judgement_path}")
+
+
 __all__ = [
     "get_ethical_facts_schema",
     "get_ethical_judgement_schema",
+    "export_schemas_to_files",
 ]

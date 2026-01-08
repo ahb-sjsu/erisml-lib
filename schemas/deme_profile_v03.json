@@ -1,0 +1,281 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://ahb-sjsu.github.io/erisml-lib/schemas/deme_profile_v03.json",
+  "title": "DEMEProfileV03",
+  "type": "object",
+  "description": "DEME Profile Schema 0.2 (V03) - Captures a stakeholder/community ethical stance that can be compiled into Ethics Modules (EMs).",
+  "properties": {
+    "name": {
+      "type": "string",
+      "description": "Human-readable name for this profile"
+    },
+    "description": {
+      "type": "string",
+      "description": "Optional description of the profile's ethical stance and use cases"
+    },
+    "stakeholder_label": {
+      "type": "string",
+      "description": "Label identifying the stakeholder group (e.g., 'healthcare_professionals', 'general_public')"
+    },
+    "domain": {
+      "type": ["string", "null"],
+      "description": "Optional domain identifier (e.g., 'healthcare', 'finance', 'education')"
+    },
+    "version": {
+      "type": "string",
+      "default": "0.3.0",
+      "description": "Profile version"
+    },
+    "schema_version": {
+      "type": "string",
+      "default": "DEMEProfileV03-0.1",
+      "description": "Schema version identifier"
+    },
+    "principlism": {
+      "type": "object",
+      "description": "Relative importance of the four core bioethical principles",
+      "properties": {
+        "beneficence": {"type": "number", "minimum": 0.0, "maximum": 1.0},
+        "non_maleficence": {"type": "number", "minimum": 0.0, "maximum": 1.0},
+        "autonomy": {"type": "number", "minimum": 0.0, "maximum": 1.0},
+        "justice": {"type": "number", "minimum": 0.0, "maximum": 1.0}
+      },
+      "additionalProperties": false
+    },
+    "trustworthiness": {
+      "type": "object",
+      "description": "Relative importance of NIST AI RMF trustworthy AI characteristics",
+      "properties": {
+        "valid_reliable": {"type": "number", "minimum": 0.0, "maximum": 1.0},
+        "safe": {"type": "number", "minimum": 0.0, "maximum": 1.0},
+        "secure_resilient": {"type": "number", "minimum": 0.0, "maximum": 1.0},
+        "accountable_transparent": {"type": "number", "minimum": 0.0, "maximum": 1.0},
+        "explainable_interpretable": {"type": "number", "minimum": 0.0, "maximum": 1.0},
+        "privacy_enhanced": {"type": "number", "minimum": 0.0, "maximum": 1.0},
+        "fair_bias_managed": {"type": "number", "minimum": 0.0, "maximum": 1.0}
+      },
+      "additionalProperties": false
+    },
+    "deme_dimensions": {
+      "type": "object",
+      "description": "Weights over DEME's EthicalFacts-style dimensions",
+      "properties": {
+        "safety": {"type": "number", "minimum": 0.0, "maximum": 1.0},
+        "autonomy_respect": {"type": "number", "minimum": 0.0, "maximum": 1.0},
+        "fairness_equity": {"type": "number", "minimum": 0.0, "maximum": 1.0},
+        "privacy_confidentiality": {"type": "number", "minimum": 0.0, "maximum": 1.0},
+        "environment_societal": {"type": "number", "minimum": 0.0, "maximum": 1.0},
+        "rule_following_legality": {"type": "number", "minimum": 0.0, "maximum": 1.0},
+        "priority_for_vulnerable": {"type": "number", "minimum": 0.0, "maximum": 1.0},
+        "trust_relationships": {"type": "number", "minimum": 0.0, "maximum": 1.0}
+      },
+      "additionalProperties": false
+    },
+    "risk_attitude": {
+      "type": "object",
+      "description": "Overall risk posture plus per-dimension tolerances",
+      "properties": {
+        "appetite": {
+          "type": "string",
+          "enum": ["risk_averse", "balanced", "risk_tolerant"],
+          "description": "High-level risk posture"
+        },
+        "max_overall_risk": {
+          "type": "number",
+          "minimum": 0.0,
+          "maximum": 1.0,
+          "description": "Maximum acceptable residual risk [0,1]"
+        },
+        "tolerances": {
+          "type": "object",
+          "description": "Per-dimension tolerance for residual risk after controls",
+          "properties": {
+            "safety": {"type": "number", "minimum": 0.0, "maximum": 1.0},
+            "rights": {"type": "number", "minimum": 0.0, "maximum": 1.0},
+            "fairness": {"type": "number", "minimum": 0.0, "maximum": 1.0},
+            "privacy": {"type": "number", "minimum": 0.0, "maximum": 1.0},
+            "information_integrity": {"type": "number", "minimum": 0.0, "maximum": 1.0},
+            "security_resilience": {"type": "number", "minimum": 0.0, "maximum": 1.0},
+            "environmental": {"type": "number", "minimum": 0.0, "maximum": 1.0}
+          },
+          "additionalProperties": false
+        },
+        "escalate_near_threshold": {
+          "type": "boolean",
+          "description": "Whether to escalate when approaching risk thresholds"
+        },
+        "escalation_margin": {
+          "type": "number",
+          "minimum": 0.0,
+          "maximum": 1.0,
+          "description": "Margin for escalation warnings"
+        }
+      },
+      "required": ["appetite", "max_overall_risk", "tolerances"],
+      "additionalProperties": false
+    },
+    "override_mode": {
+      "type": "string",
+      "enum": ["rights_first", "consequences_first", "balanced_case_by_case"],
+      "description": "High-level summary of how this profile tends to resolve conflicts"
+    },
+    "lexical_layers": {
+      "type": "array",
+      "description": "Lexical priority layers (e.g., 'rights' above 'welfare' above 'utility')",
+      "items": {
+        "type": "object",
+        "properties": {
+          "name": {"type": "string"},
+          "principles": {
+            "type": "array",
+            "items": {"type": "string"}
+          },
+          "hard_stop": {
+            "type": "boolean",
+            "description": "If true, violations at this layer cannot be overridden"
+          },
+          "context_condition": {
+            "type": ["string", "null"],
+            "description": "Optional expression restricting when this layer applies"
+          }
+        },
+        "required": ["name", "principles", "hard_stop"],
+        "additionalProperties": false
+      }
+    },
+    "override_graph": {
+      "type": "array",
+      "description": "Directed edges in an override DAG",
+      "items": {
+        "type": "object",
+        "properties": {
+          "higher": {
+            "type": "string",
+            "description": "Higher priority principle"
+          },
+          "lower": {
+            "type": "string",
+            "description": "Lower priority principle"
+          },
+          "context_condition": {
+            "type": "string",
+            "description": "Expression that must hold for override to apply"
+          },
+          "strength": {
+            "type": "number",
+            "minimum": 0.0,
+            "maximum": 1.0,
+            "default": 1.0,
+            "description": "How strong the override is [0,1]"
+          }
+        },
+        "required": ["higher", "lower", "context_condition"],
+        "additionalProperties": false
+      }
+    },
+    "hard_vetoes": {
+      "type": "object",
+      "description": "Non-negotiable 'red lines' – if any are triggered, the option is forbidden",
+      "properties": {
+        "never_catastrophic_safety_harm": {"type": "boolean"},
+        "never_intentional_serious_harm": {"type": "boolean"},
+        "never_discriminate_protected_groups": {"type": "boolean"},
+        "never_violate_explicit_consent": {"type": "boolean"},
+        "never_systematic_privacy_violation": {"type": "boolean"},
+        "never_mass_surveillance_private_spaces": {"type": "boolean"},
+        "never_persistent_misinfo_disinfo_campaigns": {"type": "boolean"},
+        "never_child_sexual_abuse_or_exploitative_content": {"type": "boolean"},
+        "never_illegal_content_even_if_utility_high": {"type": "boolean"},
+        "never_needless_harm_to_non_human_life": {"type": "boolean"},
+        "never_fabricate_critical_evidence": {"type": "boolean"},
+        "never_impersonate_real_person_without_consent": {"type": "boolean"}
+      },
+      "additionalProperties": false
+    },
+    "pattern_constraints": {
+      "type": "array",
+      "description": "Normative constraints over EthicalFacts / Judgements",
+      "items": {
+        "type": "object",
+        "properties": {
+          "name": {"type": "string"},
+          "kind": {
+            "type": "string",
+            "enum": ["forbid_when", "require_when", "strongly_prefer_when", "avoid_when"]
+          },
+          "expression": {
+            "type": "string",
+            "description": "Expression evaluated by the host system (e.g., 'consequences.expected_harm >= 0.8')"
+          },
+          "rationale": {
+            "type": "string",
+            "description": "Human-readable explanation of the constraint"
+          }
+        },
+        "required": ["name", "kind", "expression", "rationale"],
+        "additionalProperties": false
+      }
+    },
+    "governance_expectations": {
+      "type": "object",
+      "description": "Assumptions about the deployer's governance practices, aligned with NIST AI RMF",
+      "properties": {
+        "expects_govern_function": {"type": "boolean"},
+        "expects_map_function": {"type": "boolean"},
+        "expects_measure_function": {"type": "boolean"},
+        "expects_manage_function": {"type": "boolean"},
+        "requires_documented_risk_register": {"type": "boolean"},
+        "requires_incident_reporting_process": {"type": "boolean"},
+        "requires_human_oversight_roles_defined": {"type": "boolean"},
+        "requires_tevv_for_high_risk_use": {"type": "boolean"},
+        "ai_rmf_profile_id": {
+          "type": ["string", "null"],
+          "description": "Optional NIST AI RMF profile identifier"
+        }
+      },
+      "additionalProperties": false
+    },
+    "base_em_ids": {
+      "type": "array",
+      "description": "List of EM identifiers that should be treated as foundational (e.g., 'geneva_baseline')",
+      "items": {"type": "string"}
+    },
+    "base_em_enforcement": {
+      "type": "string",
+      "enum": ["hard_veto", "lexical_superior", "advisory"],
+      "description": "How the foundational EM judgements are enforced"
+    },
+    "tags": {
+      "type": "array",
+      "description": "Optional tags for categorization",
+      "items": {"type": "string"}
+    },
+    "notes": {
+      "type": "string",
+      "description": "Optional notes or rationale for this profile"
+    }
+  },
+  "required": [
+    "name",
+    "description",
+    "stakeholder_label",
+    "version",
+    "schema_version",
+    "principlism",
+    "trustworthiness",
+    "deme_dimensions",
+    "risk_attitude",
+    "override_mode",
+    "lexical_layers",
+    "override_graph",
+    "hard_vetoes",
+    "pattern_constraints",
+    "governance_expectations",
+    "base_em_ids",
+    "base_em_enforcement",
+    "tags",
+    "notes"
+  ],
+  "additionalProperties": false
+}
+
