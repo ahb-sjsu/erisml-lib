@@ -5,7 +5,9 @@ This module converts between:
 
 - Python dataclasses:
     * EthicalFacts and its dimension objects
-    * EthicalJudgement
+    * EthicalJudgement (V1)
+    * EthicalJudgementV2 (DEME 2.0)
+    * MoralVector (DEME 2.0)
 
 and
 
@@ -14,7 +16,7 @@ and
 No external libraries are required; this intentionally keeps the
 serialization layer lightweight and embeddable.
 
-Version: 0.2 (EthicalDomains update)
+Version: 2.0.0 (DEME 2.0)
 """
 
 from __future__ import annotations
@@ -34,7 +36,8 @@ from ..facts import (
     ProceduralAndLegitimacy,
     EpistemicStatus,
 )
-from ..judgement import EthicalJudgement
+from ..judgement import EthicalJudgement, EthicalJudgementV2
+from ..moral_vector import MoralVector
 
 
 # ---------------------------------------------------------------------------
@@ -277,9 +280,131 @@ def ethical_judgement_from_dict(data: Dict[str, Any]) -> EthicalJudgement:
     )
 
 
+# ---------------------------------------------------------------------------
+# DEME 2.0: MoralVector serialization
+# ---------------------------------------------------------------------------
+
+
+def moral_vector_to_dict(vec: MoralVector) -> Dict[str, Any]:
+    """
+    Convert a MoralVector instance into a JSON-serializable dict.
+
+    The resulting structure matches the schema returned by
+    get_moral_vector_schema() in json_schema.py.
+    """
+    data: Dict[str, Any] = {
+        "physical_harm": vec.physical_harm,
+        "rights_respect": vec.rights_respect,
+        "fairness_equity": vec.fairness_equity,
+        "autonomy_respect": vec.autonomy_respect,
+        "legitimacy_trust": vec.legitimacy_trust,
+        "epistemic_quality": vec.epistemic_quality,
+        "extensions": dict(vec.extensions),
+        "veto_flags": list(vec.veto_flags),
+        "reason_codes": list(vec.reason_codes),
+    }
+    return data
+
+
+def moral_vector_from_dict(data: Dict[str, Any]) -> MoralVector:
+    """
+    Construct a MoralVector instance from a dict.
+
+    The input is expected to conform to the schema produced by
+    get_moral_vector_schema().
+    """
+    if not isinstance(data, dict):
+        raise TypeError(f"Expected dict for MoralVector, got {type(data)!r}")
+
+    return MoralVector(
+        physical_harm=float(data.get("physical_harm", 0.0)),
+        rights_respect=float(data.get("rights_respect", 1.0)),
+        fairness_equity=float(data.get("fairness_equity", 1.0)),
+        autonomy_respect=float(data.get("autonomy_respect", 1.0)),
+        legitimacy_trust=float(data.get("legitimacy_trust", 1.0)),
+        epistemic_quality=float(data.get("epistemic_quality", 1.0)),
+        extensions=dict(data.get("extensions", {})),
+        veto_flags=list(data.get("veto_flags", [])),
+        reason_codes=list(data.get("reason_codes", [])),
+    )
+
+
+# ---------------------------------------------------------------------------
+# DEME 2.0: EthicalJudgementV2 serialization
+# ---------------------------------------------------------------------------
+
+
+def ethical_judgement_v2_to_dict(j: EthicalJudgementV2) -> Dict[str, Any]:
+    """
+    Convert an EthicalJudgementV2 instance into a JSON-serializable dict.
+
+    The resulting structure matches the schema returned by
+    get_ethical_judgement_v2_schema() in json_schema.py.
+    """
+    data: Dict[str, Any] = {
+        "option_id": j.option_id,
+        "em_name": j.em_name,
+        "stakeholder": j.stakeholder,
+        "em_tier": j.em_tier,
+        "verdict": j.verdict,
+        "moral_vector": moral_vector_to_dict(j.moral_vector),
+        "veto_triggered": j.veto_triggered,
+        "veto_reason": j.veto_reason,
+        "confidence": j.confidence,
+        "reasons": list(j.reasons),
+        "metadata": dict(j.metadata or {}),
+    }
+    return data
+
+
+def ethical_judgement_v2_from_dict(data: Dict[str, Any]) -> EthicalJudgementV2:
+    """
+    Construct an EthicalJudgementV2 instance from a dict.
+
+    The input is expected to conform to the schema produced by
+    get_ethical_judgement_v2_schema().
+    """
+    if not isinstance(data, dict):
+        raise TypeError(f"Expected dict for EthicalJudgementV2, got {type(data)!r}")
+
+    try:
+        option_id = data["option_id"]
+        em_name = data["em_name"]
+        stakeholder = data["stakeholder"]
+        em_tier = data["em_tier"]
+        verdict = data["verdict"]
+        moral_vector_data = data["moral_vector"]
+    except KeyError as exc:
+        raise KeyError(
+            f"Missing required field in EthicalJudgementV2: {exc.args[0]!r}"
+        ) from exc
+
+    moral_vector = moral_vector_from_dict(moral_vector_data)
+
+    return EthicalJudgementV2(
+        option_id=str(option_id),
+        em_name=str(em_name),
+        stakeholder=str(stakeholder),
+        em_tier=int(em_tier),
+        verdict=verdict,
+        moral_vector=moral_vector,
+        veto_triggered=bool(data.get("veto_triggered", False)),
+        veto_reason=data.get("veto_reason"),
+        confidence=float(data.get("confidence", 1.0)),
+        reasons=[str(r) for r in data.get("reasons", [])],
+        metadata=dict(data.get("metadata", {})),
+    )
+
+
 __all__ = [
+    # V1
     "ethical_facts_to_dict",
     "ethical_facts_from_dict",
     "ethical_judgement_to_dict",
     "ethical_judgement_from_dict",
+    # V2 (DEME 2.0)
+    "moral_vector_to_dict",
+    "moral_vector_from_dict",
+    "ethical_judgement_v2_to_dict",
+    "ethical_judgement_v2_from_dict",
 ]

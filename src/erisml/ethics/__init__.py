@@ -117,12 +117,26 @@ from .facts import (
 from .judgement import (
     Verdict,
     EthicalJudgement,
+    # V2 (DEME 2.0)
+    EthicalJudgementV2,
+    judgement_v1_to_v2,
+    judgement_v2_to_v1,
 )
 
 from .modules.base import (
     EthicsModule,
     BaseEthicsModule,
+    # V2 (DEME 2.0)
+    EthicsModuleV2,
+    BaseEthicsModuleV2,
+    V1ToV2Adapter,
+    V2ToV1Adapter,
 )
+
+# DEME 2.0 Core Types
+from .moral_vector import MoralVector
+from .moral_landscape import MoralLandscape
+from .decision_proof import DecisionProof, DecisionProofChain
 
 from .governance.config import (
     GovernanceConfig,
@@ -159,13 +173,27 @@ __all__ = [
     "VirtueAndCare",
     "ProceduralAndLegitimacy",
     "EpistemicStatus",
-    # Judgements & verdicts
+    # Judgements & verdicts (V1)
     "Verdict",
     "EthicalJudgement",
-    # Module interfaces
+    # Judgements (V2 - DEME 2.0)
+    "EthicalJudgementV2",
+    "judgement_v1_to_v2",
+    "judgement_v2_to_v1",
+    # Module interfaces (V1)
     "EthicsModule",
     "BaseEthicsModule",
-    # Governance
+    # Module interfaces (V2 - DEME 2.0)
+    "EthicsModuleV2",
+    "BaseEthicsModuleV2",
+    "V1ToV2Adapter",
+    "V2ToV1Adapter",
+    # DEME 2.0 Core Types
+    "MoralVector",
+    "MoralLandscape",
+    "DecisionProof",
+    "DecisionProofChain",
+    # Governance (V1)
     "GovernanceConfig",
     "DecisionOutcome",
     "aggregate_judgements",

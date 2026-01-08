@@ -1,7 +1,13 @@
+// ErisML Grammar v2.0 - DEME 2.0 Support
+// Supports MoralVector dimensions, tiered EMs, and ethics governance
+
 ?start: model
 
-model: environment_block agent_block+ norms_block? dynamics_block?
+model: environment_block agent_block+ norms_block? ethics_block? dynamics_block?
 
+// ============================================================================
+// Environment Block
+// ============================================================================
 environment_block: "environment" CNAME "{" env_body "}"
 env_body: objects_decl state_decl env_dynamics_decl?
 
@@ -13,6 +19,9 @@ type_expr: base_type
          | CNAME "->" base_type
 base_type: "bool" | "int" | "real" | "(" type_expr "," type_expr ")"
 
+// ============================================================================
+// Agent Block
+// ============================================================================
 agent_block: "agent" CNAME "{" agent_body "}"
 agent_body: capabilities_decl beliefs_decl? intents_decl? constraints_decl?
 
@@ -21,6 +30,9 @@ beliefs_decl: "beliefs:" CNAME* ";"
 intents_decl: "intents:" CNAME* ";"
 constraints_decl: "constraints:" CNAME* ";"
 
+// ============================================================================
+// Norms Block
+// ============================================================================
 norms_block: "norms" CNAME "{" norm_rule* "}"
 norm_rule: prohibition_rule
          | obligation_rule
@@ -30,19 +42,76 @@ prohibition_rule: "prohibition:" expr ";"
 obligation_rule: "obligation:" expr ";"
 sanction_rule: "sanction:" expr ";"
 
+// ============================================================================
+// Ethics Block (DEME 2.0)
+// ============================================================================
+ethics_block: "ethics" CNAME "{" ethics_body "}"
+ethics_body: moral_vector_decl? tier_config_decl* em_decl* veto_rule*
+
+// MoralVector dimension weights
+moral_vector_decl: "moral_vector" "{" dimension_weight* "}"
+dimension_weight: MORAL_DIMENSION ":" NUMBER ";"
+MORAL_DIMENSION: "physical_harm" | "rights_respect" | "fairness_equity"
+               | "autonomy_respect" | "legitimacy_trust" | "epistemic_quality"
+
+// Tier configuration
+tier_config_decl: "tier" TIER_NUM "{" tier_body "}"
+tier_body: tier_enabled? tier_weight? tier_veto?
+tier_enabled: "enabled:" BOOLEAN ";"
+tier_weight: "weight:" NUMBER ";"
+tier_veto: "veto_enabled:" BOOLEAN ";"
+TIER_NUM: "0" | "1" | "2" | "3" | "4"
+BOOLEAN: "true" | "false"
+
+// Ethics Module declarations
+em_decl: "em" CNAME "{" em_body "}"
+em_body: em_tier? em_weight? em_veto_capable? em_tags?
+em_tier: "tier:" TIER_NUM ";"
+em_weight: "weight:" NUMBER ";"
+em_veto_capable: "veto_capable:" BOOLEAN ";"
+em_tags: "tags:" string_list ";"
+string_list: STRING ("," STRING)*
+
+// Veto rules (reflex layer)
+veto_rule: "veto" "when" expr "{" veto_body "}"
+veto_body: veto_flag veto_reason?
+veto_flag: "flag:" STRING ";"
+veto_reason: "reason:" STRING ";"
+
+// ============================================================================
+// Dynamics Block
+// ============================================================================
 dynamics_block: "dynamics" "{" joint_action_decl reward_decl "}"
 joint_action_decl: "joint_action" "{" joint_term+ "}"
 joint_term: CNAME "." CNAME "->" "cost" NUMBER ";"
 reward_decl: "reward" "{" reward_term+ "}"
 reward_term: CNAME ":" expr ";"
 
+// ============================================================================
+// Expressions
+// ============================================================================
 ?expr: CNAME
      | expr "==" expr
+     | expr "!=" expr
      | expr "&&" expr
      | expr "||" expr
+     | expr "<" expr
+     | expr ">" expr
+     | expr "<=" expr
+     | expr ">=" expr
+     | "!" expr
      | "(" expr ")"
+     | NUMBER
+     | STRING
 
+// ============================================================================
+// Terminals
+// ============================================================================
+STRING: "\"" /[^"]*/ "\""
 %import common.CNAME
 %import common.NUMBER
 %import common.WS
+%import common.NEWLINE
+COMMENT: "//" /[^\n]*/
 %ignore WS
+%ignore COMMENT

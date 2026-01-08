@@ -11,8 +11,9 @@ They are **hand-authored** to match the dataclasses in:
 
 - erisml.ethics.facts
 - erisml.ethics.judgement
+- erisml.ethics.moral_vector (DEME 2.0)
 
-Version: 0.2 (EthicalDomains update)
+Version: 2.0.0 (DEME 2.0)
 """
 
 from __future__ import annotations
@@ -387,8 +388,234 @@ def export_schemas_to_files(output_dir: Path) -> None:
     print(f"Exported ethical_judgement schema to {ethical_judgement_path}")
 
 
+# ============================================================================
+# DEME 2.0 Schemas
+# ============================================================================
+
+
+def get_moral_vector_schema() -> Dict[str, Any]:
+    """
+    Return a JSON Schema for the MoralVector type (DEME 2.0).
+
+    MoralVector is a k-dimensional ethical assessment vector with
+    values in [0, 1] for each dimension.
+    """
+    schema: Dict[str, Any] = {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "$id": "https://ahb-sjsu.github.io/erisml-lib/schemas/moral_vector.json",
+        "title": "MoralVector",
+        "type": "object",
+        "description": (
+            "k-dimensional ethical assessment vector (DEME 2.0). "
+            "Each dimension is a value in [0, 1]."
+        ),
+        "properties": {
+            "physical_harm": {
+                "type": "number",
+                "minimum": 0.0,
+                "maximum": 1.0,
+                "description": "Level of physical harm (0=none, 1=severe)",
+            },
+            "rights_respect": {
+                "type": "number",
+                "minimum": 0.0,
+                "maximum": 1.0,
+                "description": "Respect for rights (0=violated, 1=fully respected)",
+            },
+            "fairness_equity": {
+                "type": "number",
+                "minimum": 0.0,
+                "maximum": 1.0,
+                "description": "Fairness and equity (0=unfair, 1=fully fair)",
+            },
+            "autonomy_respect": {
+                "type": "number",
+                "minimum": 0.0,
+                "maximum": 1.0,
+                "description": "Respect for autonomy (0=coerced, 1=fully autonomous)",
+            },
+            "legitimacy_trust": {
+                "type": "number",
+                "minimum": 0.0,
+                "maximum": 1.0,
+                "description": "Legitimacy and trust (0=illegitimate, 1=fully legitimate)",
+            },
+            "epistemic_quality": {
+                "type": "number",
+                "minimum": 0.0,
+                "maximum": 1.0,
+                "description": "Epistemic quality (0=uncertain, 1=certain)",
+            },
+            "extensions": {
+                "type": "object",
+                "additionalProperties": {"type": "number"},
+                "description": "Custom extension dimensions",
+            },
+            "veto_flags": {
+                "type": "array",
+                "items": {"type": "string"},
+                "description": "List of veto flag codes",
+            },
+            "reason_codes": {
+                "type": "array",
+                "items": {"type": "string"},
+                "description": "List of reason codes explaining the assessment",
+            },
+        },
+        "required": [
+            "physical_harm",
+            "rights_respect",
+            "fairness_equity",
+            "autonomy_respect",
+            "legitimacy_trust",
+            "epistemic_quality",
+        ],
+        "additionalProperties": False,
+    }
+    return schema
+
+
+def get_ethical_judgement_v2_schema() -> Dict[str, Any]:
+    """
+    Return a JSON Schema for the EthicalJudgementV2 type (DEME 2.0).
+
+    EthicalJudgementV2 includes a MoralVector instead of a scalar normative_score.
+    """
+    moral_vector_ref = {"$ref": "#/definitions/MoralVector"}
+
+    schema: Dict[str, Any] = {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "$id": "https://ahb-sjsu.github.io/erisml-lib/schemas/ethical_judgement_v2.json",
+        "title": "EthicalJudgementV2",
+        "type": "object",
+        "description": (
+            "Normative assessment using MoralVector (DEME 2.0). "
+            "Replaces scalar normative_score with k-dimensional vector."
+        ),
+        "definitions": {
+            "MoralVector": get_moral_vector_schema(),
+        },
+        "properties": {
+            "option_id": {"type": "string"},
+            "em_name": {"type": "string"},
+            "stakeholder": {"type": "string"},
+            "em_tier": {
+                "type": "integer",
+                "minimum": 0,
+                "maximum": 4,
+                "description": "EM tier (0=Constitutional, 1=Core Safety, 2=Rights/Fairness, 3=Soft Values, 4=Meta)",
+            },
+            "verdict": {
+                "type": "string",
+                "enum": [
+                    "strongly_prefer",
+                    "prefer",
+                    "neutral",
+                    "avoid",
+                    "forbid",
+                ],
+            },
+            "moral_vector": moral_vector_ref,
+            "veto_triggered": {"type": "boolean"},
+            "veto_reason": {"type": ["string", "null"]},
+            "confidence": {
+                "type": "number",
+                "minimum": 0.0,
+                "maximum": 1.0,
+            },
+            "reasons": {
+                "type": "array",
+                "items": {"type": "string"},
+            },
+            "metadata": {
+                "type": "object",
+                "additionalProperties": True,
+            },
+        },
+        "required": [
+            "option_id",
+            "em_name",
+            "stakeholder",
+            "em_tier",
+            "verdict",
+            "moral_vector",
+        ],
+        "additionalProperties": False,
+    }
+    return schema
+
+
+def get_decision_proof_schema() -> Dict[str, Any]:
+    """
+    Return a JSON Schema for the DecisionProof audit artifact (DEME 2.0).
+    """
+    schema: Dict[str, Any] = {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "$id": "https://ahb-sjsu.github.io/erisml-lib/schemas/decision_proof.json",
+        "title": "DecisionProof",
+        "type": "object",
+        "description": (
+            "Audit artifact capturing the ethical decision process (DEME 2.0). "
+            "Includes hash chain for verification."
+        ),
+        "properties": {
+            "proof_id": {"type": "string", "format": "uuid"},
+            "timestamp": {"type": "string", "format": "date-time"},
+            "profile_id": {"type": ["string", "null"]},
+            "input_facts": {
+                "type": "array",
+                "items": {"$ref": "ethical_facts.json"},
+            },
+            "layer_outputs": {
+                "type": "array",
+                "items": {
+                    "type": "object",
+                    "properties": {
+                        "layer_name": {"type": "string"},
+                        "vetoed_options": {
+                            "type": "array",
+                            "items": {"type": "string"},
+                        },
+                        "latency_ms": {"type": "number"},
+                    },
+                },
+            },
+            "em_judgements": {
+                "type": "array",
+                "items": {"$ref": "ethical_judgement_v2.json"},
+            },
+            "selected_option_id": {"type": ["string", "null"]},
+            "ranked_options": {
+                "type": "array",
+                "items": {"type": "string"},
+            },
+            "forbidden_options": {
+                "type": "array",
+                "items": {"type": "string"},
+            },
+            "moral_vector_summary": {
+                "type": "object",
+                "additionalProperties": {"$ref": "#/definitions/MoralVector"},
+            },
+            "previous_proof_hash": {"type": ["string", "null"]},
+        },
+        "required": [
+            "proof_id",
+            "timestamp",
+            "selected_option_id",
+            "ranked_options",
+            "forbidden_options",
+        ],
+        "additionalProperties": False,
+    }
+    return schema
+
+
 __all__ = [
     "get_ethical_facts_schema",
     "get_ethical_judgement_schema",
+    "get_moral_vector_schema",
+    "get_ethical_judgement_v2_schema",
+    "get_decision_proof_schema",
     "export_schemas_to_files",
 ]

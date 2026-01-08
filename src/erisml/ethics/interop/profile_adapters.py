@@ -1,4 +1,11 @@
 # src/erisml/ethics/interop/profile_adapters.py
+"""
+Profile adapters for building EMs and governance configs from profiles.
+
+Supports both V03 (legacy) and V04 (DEME 2.0) profiles.
+
+Version: 2.0.0 (DEME 2.0)
+"""
 
 from __future__ import annotations
 
@@ -9,6 +16,14 @@ from erisml.ethics.profile_v03 import (
     OverrideMode,
     BaseEMEnforcementMode,
 )
+
+# V2 imports
+from erisml.ethics.profile_v04 import DEMEProfileV04
+from erisml.ethics.governance.config_v2 import GovernanceConfigV2
+from erisml.ethics.layers.pipeline import DEMEPipeline, PipelineConfig
+from erisml.ethics.layers.reflex import ReflexLayer, ReflexLayerConfig
+from erisml.ethics.layers.tactical import TacticalLayer, TacticalLayerConfig
+from erisml.ethics.modules.registry import EMRegistry
 
 # Note: We import these assuming they exist in your project structure.
 # If these imports fail, the type: ignore handles the linter, but the file paths must be correct.
@@ -124,3 +139,90 @@ def build_triage_ems_and_governance(
     rights_em = RightsFirstEM()
     gov_cfg = governance_from_profile(profile)
     return triage_em, rights_em, gov_cfg
+
+
+# ============================================================================
+# DEME 2.0 Profile Adapters
+# ============================================================================
+
+
+def governance_v2_from_profile(profile: DEMEProfileV04) -> GovernanceConfigV2:
+    """
+    Build a GovernanceConfigV2 from a DEMEProfileV04.
+
+    Uses the MoralVector dimension weights from the profile.
+    """
+    return GovernanceConfigV2(
+        dimension_weights=profile.moral_dimension_weights,
+    )
+
+
+def pipeline_from_profile(profile: DEMEProfileV04) -> DEMEPipeline:
+    """
+    Build a DEMEPipeline from a DEMEProfileV04.
+
+    Configures all three layers based on profile settings.
+    """
+    # Build pipeline config from profile layer settings
+    pipeline_config = PipelineConfig(
+        reflex_enabled=profile.layer_config.get("reflex_enabled", True),
+        tactical_enabled=profile.layer_config.get("tactical_enabled", True),
+        strategic_enabled=profile.layer_config.get("strategic_enabled", False),
+    )
+
+    # Build reflex layer
+    reflex_config = ReflexLayerConfig(
+        enabled=pipeline_config.reflex_enabled,
+    )
+    reflex_layer = ReflexLayer(config=reflex_config)
+
+    # Build tactical layer with tier weights from profile
+    tier_weights: Dict[int, float] = {}
+    tier_veto_enabled: Dict[int, bool] = {}
+
+    for tier_num, tier_cfg in profile.tier_configs.items():
+        tier_weights[tier_num] = tier_cfg.weight
+        tier_veto_enabled[tier_num] = tier_cfg.veto_enabled
+
+    tactical_config = TacticalLayerConfig(
+        enabled=pipeline_config.tactical_enabled,
+        tier_weights=tier_weights,
+        tier_veto_enabled=tier_veto_enabled,
+    )
+    tactical_layer = TacticalLayer(config=tactical_config)
+
+    # Build EMs from registry based on tier config
+    for em_id, em_info in EMRegistry.list_all().items():
+        tier = em_info.get("tier", 3)
+        tier_config = profile.tier_configs.get(tier)
+
+        if tier_config and not tier_config.enabled:
+            continue
+
+        em_cls = EMRegistry.get(em_id)
+        if em_cls is not None:
+            try:
+                em = em_cls()
+                tactical_layer.add_em(em)
+            except Exception:
+                pass  # Skip EMs that fail to instantiate
+
+    return DEMEPipeline(
+        config=pipeline_config,
+        reflex_layer=reflex_layer,
+        tactical_layer=tactical_layer,
+    )
+
+
+def build_v2_from_profile(
+    profile: DEMEProfileV04,
+) -> Tuple[DEMEPipeline, GovernanceConfigV2]:
+    """
+    Convenience helper: given a DEMEProfileV04, build:
+
+      - configured DEMEPipeline (three-layer architecture)
+      - GovernanceConfigV2 (MoralVector aggregation settings)
+    """
+    pipeline = pipeline_from_profile(profile)
+    gov_cfg = governance_v2_from_profile(profile)
+    return pipeline, gov_cfg
