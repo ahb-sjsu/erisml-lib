@@ -80,11 +80,14 @@ class GenevaEMV2(BaseEthicsModuleV2):
         reasons: List[str] = []
         metadata: Dict[str, Any] = {}
 
-        # Start with baseline vector
+        # Start with baseline vector (8+1 dimensions)
         physical_harm = facts.consequences.expected_harm
         rights_respect = 1.0
         fairness_equity = 1.0
         autonomy_respect = 1.0
+        privacy_protection = 1.0
+        societal_environmental = 1.0
+        virtue_care = 1.0
         legitimacy_trust = 1.0
         epistemic_quality = 1.0
 
@@ -163,12 +166,15 @@ class GenevaEMV2(BaseEthicsModuleV2):
         else:
             verdict = "avoid"
 
-        # Build moral vector
+        # Build moral vector (8+1 dimensions)
         moral_vector = MoralVector(
             physical_harm=physical_harm,
             rights_respect=rights_respect,
             fairness_equity=fairness_equity,
             autonomy_respect=autonomy_respect,
+            privacy_protection=privacy_protection,
+            societal_environmental=societal_environmental,
+            virtue_care=virtue_care,
             legitimacy_trust=legitimacy_trust,
             epistemic_quality=epistemic_quality,
             veto_flags=veto_flags,

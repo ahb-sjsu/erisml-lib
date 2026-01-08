@@ -222,13 +222,16 @@ def judgement_v1_to_v2(
     is_veto = j.verdict == "forbid"
     veto_flags = ["V1_FORBID"] if is_veto else []
 
-    # Create a uniform MoralVector based on the scalar score
+    # Create a uniform MoralVector based on the scalar score (8+1 dimensions)
     # For harm, we invert: higher score = lower harm
     moral_vector = MoralVector(
         physical_harm=1.0 - base_score if not is_veto else 1.0,
         rights_respect=base_score if not is_veto else 0.0,
         fairness_equity=base_score,
         autonomy_respect=base_score,
+        privacy_protection=base_score,
+        societal_environmental=base_score,
+        virtue_care=base_score,
         legitimacy_trust=base_score,
         epistemic_quality=0.8,  # Default moderate confidence
         veto_flags=veto_flags,

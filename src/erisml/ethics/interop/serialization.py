@@ -287,17 +287,22 @@ def ethical_judgement_from_dict(data: Dict[str, Any]) -> EthicalJudgement:
 
 def moral_vector_to_dict(vec: MoralVector) -> Dict[str, Any]:
     """
-    Convert a MoralVector instance into a JSON-serializable dict.
+    Convert a MoralVector instance into a JSON-serializable dict (8+1 dimensions).
 
     The resulting structure matches the schema returned by
     get_moral_vector_schema() in json_schema.py.
     """
     data: Dict[str, Any] = {
+        # Core 8 dimensions
         "physical_harm": vec.physical_harm,
         "rights_respect": vec.rights_respect,
         "fairness_equity": vec.fairness_equity,
         "autonomy_respect": vec.autonomy_respect,
+        "privacy_protection": vec.privacy_protection,
+        "societal_environmental": vec.societal_environmental,
+        "virtue_care": vec.virtue_care,
         "legitimacy_trust": vec.legitimacy_trust,
+        # +1 epistemic dimension
         "epistemic_quality": vec.epistemic_quality,
         "extensions": dict(vec.extensions),
         "veto_flags": list(vec.veto_flags),
@@ -317,11 +322,16 @@ def moral_vector_from_dict(data: Dict[str, Any]) -> MoralVector:
         raise TypeError(f"Expected dict for MoralVector, got {type(data)!r}")
 
     return MoralVector(
+        # Core 8 dimensions
         physical_harm=float(data.get("physical_harm", 0.0)),
         rights_respect=float(data.get("rights_respect", 1.0)),
         fairness_equity=float(data.get("fairness_equity", 1.0)),
         autonomy_respect=float(data.get("autonomy_respect", 1.0)),
+        privacy_protection=float(data.get("privacy_protection", 1.0)),
+        societal_environmental=float(data.get("societal_environmental", 1.0)),
+        virtue_care=float(data.get("virtue_care", 1.0)),
         legitimacy_trust=float(data.get("legitimacy_trust", 1.0)),
+        # +1 epistemic dimension
         epistemic_quality=float(data.get("epistemic_quality", 1.0)),
         extensions=dict(data.get("extensions", {})),
         veto_flags=list(data.get("veto_flags", [])),

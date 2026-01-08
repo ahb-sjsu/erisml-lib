@@ -113,12 +113,15 @@ class AutonomyConsentEMV2(BaseEthicsModuleV2):
         else:
             verdict = "avoid"
 
-        # Build moral vector
+        # Build moral vector (8+1 dimensions)
         moral_vector = MoralVector(
             physical_harm=facts.consequences.expected_harm,
             rights_respect=1.0 if facts.rights_and_duties.has_valid_consent else 0.5,
             fairness_equity=0.8,  # Not this EM's focus
             autonomy_respect=autonomy_score,
+            privacy_protection=0.8,  # Not this EM's focus
+            societal_environmental=0.8,  # Not this EM's focus
+            virtue_care=0.8,  # Not this EM's focus
             legitimacy_trust=0.8,  # Not this EM's focus
             epistemic_quality=0.8,
             veto_flags=veto_flags,
