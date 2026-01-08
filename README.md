@@ -36,18 +36,23 @@ ErisML provides a single, machine-interpretable and human-legible representation
 - **(iv)**  norms (permissions, obligations, prohibitions, sanctions)  
 - **(v)**   multi-agent strategic interaction  
 
-# DEME
+# DEME 2.0
 
-DEME is the Democratically Governed Ethics Module Engine, — ethics-only decision layer
+DEME is the Democratically Governed Ethics Module Engine — an ethics-only decision layer.
 
-- **(i)**   democratic governance layer that aggregates multiple 
-     `      EthicalJudgement` outputs using configurable stakeholder weights, hard
-            vetoes, and lexical priority layers.
-- **(ii)**  DEME profile format (`DEMEProfileV03`) for versioned governance
-            configurations (e.g., `hospital_service_robot_v1` or `Jain-1`).
-- **(iii)** narrative CLI that elicits stakeholder values via scenarios and
-            produces DEME profiles.
-- **(iv)**  MCP server (`erisml.ethics.interop.mcp_deme_server`)
+**DEME 2.0** introduces a major architectural upgrade with:
+
+- **(i)**   **MoralVector**: k-dimensional ethical assessment replacing scalar scores
+            (`physical_harm`, `rights_respect`, `fairness_equity`, `autonomy_respect`,
+            `legitimacy_trust`, `epistemic_quality`)
+- **(ii)**  **Three-Layer Architecture**: Reflex (<100μs veto checks), Tactical (10-100ms
+            full reasoning), Strategic (policy optimization)
+- **(iii)** **Tiered EM Catalog**: Constitutional (Tier 0), Core Safety (Tier 1),
+            Rights/Fairness (Tier 2), Soft Values (Tier 3), Meta-Governance (Tier 4)
+- **(iv)**  **DecisionProof**: Audit artifacts with hash chains for verification
+- **(v)**   **BIP Integration**: Bond Invariance Principle verification built-in
+- **(vi)**  **DEMEProfileV04**: Enhanced profiles with tier configs and MoralVector weights
+- **(vii)** **MCP server** with V2 tools (`evaluate_options_v2`, `run_pipeline`)
 
 We define a concrete syntax, a formal grammar, denotational semantics, and
 an execution model that treats norms as first-class constraints on action,
@@ -114,28 +119,39 @@ ErisML has two tightly-related layers:
      - Longitudinal safety metrics (e.g., NVR, ADV)
      - Adapters for planners, verifiers, and simulators
 
-2. **DEME (Democratically Governed Ethics Modules)** — ethics-only decision layer
+2. **DEME 2.0 (Democratically Governed Ethics Modules)** — ethics-only decision layer
 
-   - A structured `EthicalFacts` abstraction that captures ethically-salient
-     context (consequences, rights/duties, fairness, autonomy, privacy,
-     societal/environmental impact, procedural legitimacy, epistemic status).
-   - Pluggable `EthicsModule` implementations that perform **purely normative**
-     reasoning over `EthicalFacts` (never raw domain data).
-   - A **democratic governance** layer that aggregates multiple
-     `EthicalJudgement` outputs using configurable stakeholder weights, hard
-     vetoes, and lexical priority layers.
-   - A **DEME profile** format (`DEMEProfileV03`) for versioned governance
-     configurations (e.g., `hospital_service_robot_v1` or `Jain-1`).
-   - A **narrative CLI** that elicits stakeholder values via scenarios and
-     produces DEME profiles.
-   - A **MCP server** (`erisml.ethics.interop.mcp_deme_server`) so any
-     MCP-compatible agent can call DEME tools:
-       - `deme.list_profiles`
-       - `deme.evaluate_options`
-       - `deme.govern_decision`
-   - A cross-cutting **Geneva baseline EM** (`GenevaBaselineEM`) intended as a
-     "Geneva convention" style base module for rights, non-discrimination,
-     autonomy/consent, privacy, societal impact, and epistemic caution.
+   - **MoralVector**: k-dimensional ethical assessment with 6 core dimensions:
+     - `physical_harm` [0,1]: 0=none, 1=catastrophic
+     - `rights_respect` [0,1]: 0=violated, 1=fully respected
+     - `fairness_equity` [0,1]: 0=discriminatory, 1=fair
+     - `autonomy_respect` [0,1]: 0=coerced, 1=autonomous
+     - `legitimacy_trust` [0,1]: 0=illegitimate, 1=legitimate
+     - `epistemic_quality` [0,1]: 0=uncertain, 1=certain
+
+   - **Three-Layer Architecture**:
+     - **Reflex Layer**: Fast veto checks (<100μs), constitutional constraints
+     - **Tactical Layer**: Full MoralVector reasoning (10-100ms)
+     - **Strategic Layer**: Policy optimization (seconds to hours)
+
+   - **Tiered EM Catalog**:
+     - **Tier 0 (Constitutional)**: Non-removable, hard veto (e.g., `GenevaEMV2`)
+     - **Tier 1 (Core Safety)**: Physical harm prevention, hard veto capable
+     - **Tier 2 (Rights/Fairness)**: Autonomy, consent, fairness (e.g., `AutonomyConsentEMV2`)
+     - **Tier 3 (Soft Values)**: Beneficence, virtue ethics, advisory only
+     - **Tier 4 (Meta-Governance)**: Pattern guards, drift detection
+
+   - **DecisionProof**: Structured audit artifacts with hash chains
+
+   - **BIP Verifier**: Bond Invariance Principle verification for decision proofs
+
+   - **Profile formats**:
+     - `DEMEProfileV03` (legacy, still supported)
+     - `DEMEProfileV04` (DEME 2.0 with tier configs and MoralVector weights)
+
+   - **MCP Server** (`erisml.ethics.interop.mcp_deme_server`):
+     - V1 tools: `list_profiles`, `evaluate_options`, `govern_decision`
+     - V2 tools: `list_profiles_v2`, `evaluate_options_v2`, `govern_decision_v2`, `run_pipeline`
 
 Together, ErisML + DEME support **norm-governed, ethics-aware agents** that can
 be inspected, audited, and configured by multiple stakeholders.
