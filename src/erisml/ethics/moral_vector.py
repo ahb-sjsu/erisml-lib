@@ -351,11 +351,17 @@ class MoralVector:
             rights_respect=min(1.0, self.rights_respect + other.rights_respect),
             fairness_equity=min(1.0, self.fairness_equity + other.fairness_equity),
             autonomy_respect=min(1.0, self.autonomy_respect + other.autonomy_respect),
-            privacy_protection=min(1.0, self.privacy_protection + other.privacy_protection),
-            societal_environmental=min(1.0, self.societal_environmental + other.societal_environmental),
+            privacy_protection=min(
+                1.0, self.privacy_protection + other.privacy_protection
+            ),
+            societal_environmental=min(
+                1.0, self.societal_environmental + other.societal_environmental
+            ),
             virtue_care=min(1.0, self.virtue_care + other.virtue_care),
             legitimacy_trust=min(1.0, self.legitimacy_trust + other.legitimacy_trust),
-            epistemic_quality=min(1.0, self.epistemic_quality + other.epistemic_quality),
+            epistemic_quality=min(
+                1.0, self.epistemic_quality + other.epistemic_quality
+            ),
             extensions={
                 k: min(1.0, self.extensions.get(k, 0) + other.extensions.get(k, 0))
                 for k in set(self.extensions) | set(other.extensions)
@@ -372,7 +378,9 @@ class MoralVector:
             fairness_equity=max(0.0, min(1.0, self.fairness_equity * scalar)),
             autonomy_respect=max(0.0, min(1.0, self.autonomy_respect * scalar)),
             privacy_protection=max(0.0, min(1.0, self.privacy_protection * scalar)),
-            societal_environmental=max(0.0, min(1.0, self.societal_environmental * scalar)),
+            societal_environmental=max(
+                0.0, min(1.0, self.societal_environmental * scalar)
+            ),
             virtue_care=max(0.0, min(1.0, self.virtue_care * scalar)),
             legitimacy_trust=max(0.0, min(1.0, self.legitimacy_trust * scalar)),
             epistemic_quality=max(0.0, min(1.0, self.epistemic_quality * scalar)),

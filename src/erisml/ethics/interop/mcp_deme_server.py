@@ -588,7 +588,9 @@ def govern_decision_v2(
             fairness_equity=jdict["moral_vector"]["fairness_equity"],
             autonomy_respect=jdict["moral_vector"]["autonomy_respect"],
             privacy_protection=jdict["moral_vector"].get("privacy_protection", 1.0),
-            societal_environmental=jdict["moral_vector"].get("societal_environmental", 1.0),
+            societal_environmental=jdict["moral_vector"].get(
+                "societal_environmental", 1.0
+            ),
             virtue_care=jdict["moral_vector"].get("virtue_care", 1.0),
             legitimacy_trust=jdict["moral_vector"]["legitimacy_trust"],
             epistemic_quality=jdict["moral_vector"]["epistemic_quality"],
