@@ -145,12 +145,15 @@ def full_ethical_facts() -> EthicalFacts:
 
 @pytest.fixture
 def baseline_moral_vector() -> MoralVector:
-    """Standard MoralVector for testing."""
+    """Standard MoralVector for testing (8+1 dimensions)."""
     return MoralVector(
         physical_harm=0.2,
         rights_respect=0.9,
         fairness_equity=0.8,
         autonomy_respect=0.85,
+        privacy_protection=0.9,
+        societal_environmental=0.8,
+        virtue_care=0.85,
         legitimacy_trust=0.75,
         epistemic_quality=0.7,
     )
@@ -158,12 +161,15 @@ def baseline_moral_vector() -> MoralVector:
 
 @pytest.fixture
 def vetoed_moral_vector() -> MoralVector:
-    """MoralVector with veto flags."""
+    """MoralVector with veto flags (8+1 dimensions)."""
     return MoralVector(
         physical_harm=0.8,
         rights_respect=0.0,
         fairness_equity=0.3,
         autonomy_respect=0.4,
+        privacy_protection=0.5,
+        societal_environmental=0.4,
+        virtue_care=0.3,
         legitimacy_trust=0.2,
         epistemic_quality=0.5,
         veto_flags=["RIGHTS_VIOLATION"],
@@ -204,13 +210,16 @@ def v2_judgement(baseline_moral_vector: MoralVector) -> EthicalJudgementV2:
 
 @pytest.fixture
 def v2_governance_config() -> GovernanceConfigV2:
-    """Standard V2 governance config for testing."""
+    """Standard V2 governance config for testing (8+1 dimensions)."""
     return GovernanceConfigV2(
         dimension_weights=DimensionWeights(
             physical_harm=1.0,
             rights_respect=1.0,
             fairness_equity=1.0,
             autonomy_respect=1.0,
+            privacy_protection=1.0,
+            societal_environmental=0.8,
+            virtue_care=0.7,
             legitimacy_trust=1.0,
             epistemic_quality=0.5,
         ),

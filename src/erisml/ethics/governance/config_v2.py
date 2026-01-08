@@ -36,36 +36,54 @@ class AggregationStrategy(str, Enum):
 
 @dataclass
 class DimensionWeights:
-    """Per-dimension weights for MoralVector aggregation."""
+    """
+    Per-dimension weights for MoralVector aggregation.
 
+    Matches the 8+1 dimensions in MoralVector.
+    """
+
+    # Core 8 dimensions
     physical_harm: float = 1.0
-    """Weight for physical harm dimension."""
+    """Weight for physical harm dimension. (Consequences)"""
 
     rights_respect: float = 1.0
-    """Weight for rights respect dimension."""
+    """Weight for rights respect dimension. (RightsAndDuties)"""
 
     fairness_equity: float = 1.0
-    """Weight for fairness/equity dimension."""
+    """Weight for fairness/equity dimension. (JusticeAndFairness)"""
 
     autonomy_respect: float = 1.0
-    """Weight for autonomy respect dimension."""
+    """Weight for autonomy respect dimension. (AutonomyAndAgency)"""
+
+    privacy_protection: float = 1.0
+    """Weight for privacy protection dimension. (PrivacyAndDataGovernance)"""
+
+    societal_environmental: float = 0.8
+    """Weight for societal/environmental dimension. (SocietalAndEnvironmental)"""
+
+    virtue_care: float = 0.7
+    """Weight for virtue/care dimension. (VirtueAndCare)"""
 
     legitimacy_trust: float = 1.0
-    """Weight for legitimacy/trust dimension."""
+    """Weight for legitimacy/trust dimension. (ProceduralAndLegitimacy)"""
 
+    # +1 Epistemic dimension
     epistemic_quality: float = 0.5
-    """Weight for epistemic quality dimension."""
+    """Weight for epistemic quality dimension. (EpistemicStatus)"""
 
     extension_weights: Dict[str, float] = field(default_factory=dict)
     """Weights for domain-specific extension dimensions."""
 
     def to_dict(self) -> Dict[str, float]:
-        """Convert to flat dictionary."""
+        """Convert to flat dictionary of all 8+1 dimension weights."""
         result = {
             "physical_harm": self.physical_harm,
             "rights_respect": self.rights_respect,
             "fairness_equity": self.fairness_equity,
             "autonomy_respect": self.autonomy_respect,
+            "privacy_protection": self.privacy_protection,
+            "societal_environmental": self.societal_environmental,
+            "virtue_care": self.virtue_care,
             "legitimacy_trust": self.legitimacy_trust,
             "epistemic_quality": self.epistemic_quality,
         }

@@ -27,12 +27,18 @@ if TYPE_CHECKING:
 
 
 # Default weights for scalar collapse (backward compatibility)
+# 8 core dimensions + 1 epistemic dimension
 DEFAULT_DIMENSION_WEIGHTS: Dict[str, float] = {
+    # Core 8 dimensions (from EthicalFacts)
     "physical_harm": 1.0,
     "rights_respect": 1.0,
     "fairness_equity": 1.0,
     "autonomy_respect": 1.0,
+    "privacy_protection": 1.0,
+    "societal_environmental": 0.8,
+    "virtue_care": 0.7,
     "legitimacy_trust": 1.0,
+    # +1 epistemic dimension
     "epistemic_quality": 0.5,
 }
 
@@ -40,38 +46,53 @@ DEFAULT_DIMENSION_WEIGHTS: Dict[str, float] = {
 @dataclass
 class MoralVector:
     """
-    k-dimensional vector [0,1] per ethical dimension.
+    8+1 dimensional vector [0,1] per ethical dimension.
 
-    Core dimensions are always present. Domain-specific extensions
-    can be added via the `extensions` dict.
+    Maps directly to the 8 EthicalFacts dimension classes plus 1 epistemic
+    dimension. Domain-specific extensions can be added via `extensions` dict.
 
-    Dimension semantics:
-    - physical_harm: 0=no harm, 1=severe harm (inverted for goodness)
-    - rights_respect: 0=violated, 1=fully respected
-    - fairness_equity: 0=discriminatory, 1=fair
-    - autonomy_respect: 0=coerced, 1=full autonomy
-    - legitimacy_trust: 0=illegitimate, 1=fully legitimate
-    - epistemic_quality: 0=no evidence, 1=high quality evidence
+    Core 8 dimensions (from EthicalFacts):
+    - physical_harm: 0=no harm, 1=severe harm (from Consequences)
+    - rights_respect: 0=violated, 1=respected (from RightsAndDuties)
+    - fairness_equity: 0=discriminatory, 1=fair (from JusticeAndFairness)
+    - autonomy_respect: 0=coerced, 1=autonomous (from AutonomyAndAgency)
+    - privacy_protection: 0=violated, 1=protected (from PrivacyAndDataGovernance)
+    - societal_environmental: 0=harmful, 1=beneficial (from SocietalAndEnvironmental)
+    - virtue_care: 0=callous, 1=caring (from VirtueAndCare)
+    - legitimacy_trust: 0=illegitimate, 1=legitimate (from ProceduralAndLegitimacy)
+
+    +1 epistemic dimension:
+    - epistemic_quality: 0=uncertain, 1=certain (from EpistemicStatus)
     """
 
-    # Core dimensions (always present)
+    # Core 8 dimensions (from EthicalFacts classes)
     physical_harm: float = 0.0
-    """Physical harm level [0,1]. 0=no harm, 1=severe/catastrophic harm."""
+    """Physical harm level [0,1]. 0=no harm, 1=severe/catastrophic harm. (Consequences)"""
 
     rights_respect: float = 1.0
-    """Rights respect level [0,1]. 0=severe violation, 1=fully respected."""
+    """Rights respect level [0,1]. 0=severe violation, 1=fully respected. (RightsAndDuties)"""
 
     fairness_equity: float = 1.0
-    """Fairness level [0,1]. 0=discriminatory/unfair, 1=maximally fair."""
+    """Fairness level [0,1]. 0=discriminatory/unfair, 1=maximally fair. (JusticeAndFairness)"""
 
     autonomy_respect: float = 1.0
-    """Autonomy level [0,1]. 0=coerced/manipulated, 1=full autonomy."""
+    """Autonomy level [0,1]. 0=coerced/manipulated, 1=full autonomy. (AutonomyAndAgency)"""
+
+    privacy_protection: float = 1.0
+    """Privacy level [0,1]. 0=severe violation, 1=fully protected. (PrivacyAndDataGovernance)"""
+
+    societal_environmental: float = 1.0
+    """Societal/environmental impact [0,1]. 0=harmful, 1=beneficial. (SocietalAndEnvironmental)"""
+
+    virtue_care: float = 1.0
+    """Virtue/care level [0,1]. 0=callous/negligent, 1=compassionate. (VirtueAndCare)"""
 
     legitimacy_trust: float = 1.0
-    """Legitimacy level [0,1]. 0=illegitimate process, 1=fully legitimate."""
+    """Legitimacy level [0,1]. 0=illegitimate process, 1=fully legitimate. (ProceduralAndLegitimacy)"""
 
+    # +1 Epistemic dimension
     epistemic_quality: float = 1.0
-    """Epistemic quality [0,1]. 0=high uncertainty/low evidence, 1=high quality."""
+    """Epistemic quality [0,1]. 0=high uncertainty/low evidence, 1=high confidence. (EpistemicStatus)"""
 
     # Domain extension dimensions (optional)
     extensions: Dict[str, float] = field(default_factory=dict)
@@ -116,13 +137,18 @@ class MoralVector:
 
     @staticmethod
     def core_dimension_names() -> List[str]:
-        """Return names of core dimensions."""
+        """Return names of all 8+1 core dimensions."""
         return [
+            # Core 8 dimensions (from EthicalFacts)
             "physical_harm",
             "rights_respect",
             "fairness_equity",
             "autonomy_respect",
+            "privacy_protection",
+            "societal_environmental",
+            "virtue_care",
             "legitimacy_trust",
+            # +1 epistemic dimension
             "epistemic_quality",
         ]
 
@@ -282,6 +308,9 @@ class MoralVector:
             rights_respect=result_dims["rights_respect"],
             fairness_equity=result_dims["fairness_equity"],
             autonomy_respect=result_dims["autonomy_respect"],
+            privacy_protection=result_dims["privacy_protection"],
+            societal_environmental=result_dims["societal_environmental"],
+            virtue_care=result_dims["virtue_care"],
             legitimacy_trust=result_dims["legitimacy_trust"],
             epistemic_quality=result_dims["epistemic_quality"],
             extensions=merged_extensions,
@@ -322,10 +351,11 @@ class MoralVector:
             rights_respect=min(1.0, self.rights_respect + other.rights_respect),
             fairness_equity=min(1.0, self.fairness_equity + other.fairness_equity),
             autonomy_respect=min(1.0, self.autonomy_respect + other.autonomy_respect),
+            privacy_protection=min(1.0, self.privacy_protection + other.privacy_protection),
+            societal_environmental=min(1.0, self.societal_environmental + other.societal_environmental),
+            virtue_care=min(1.0, self.virtue_care + other.virtue_care),
             legitimacy_trust=min(1.0, self.legitimacy_trust + other.legitimacy_trust),
-            epistemic_quality=min(
-                1.0, self.epistemic_quality + other.epistemic_quality
-            ),
+            epistemic_quality=min(1.0, self.epistemic_quality + other.epistemic_quality),
             extensions={
                 k: min(1.0, self.extensions.get(k, 0) + other.extensions.get(k, 0))
                 for k in set(self.extensions) | set(other.extensions)
@@ -341,6 +371,9 @@ class MoralVector:
             rights_respect=max(0.0, min(1.0, self.rights_respect * scalar)),
             fairness_equity=max(0.0, min(1.0, self.fairness_equity * scalar)),
             autonomy_respect=max(0.0, min(1.0, self.autonomy_respect * scalar)),
+            privacy_protection=max(0.0, min(1.0, self.privacy_protection * scalar)),
+            societal_environmental=max(0.0, min(1.0, self.societal_environmental * scalar)),
+            virtue_care=max(0.0, min(1.0, self.virtue_care * scalar)),
             legitimacy_trust=max(0.0, min(1.0, self.legitimacy_trust * scalar)),
             epistemic_quality=max(0.0, min(1.0, self.epistemic_quality * scalar)),
             extensions={
@@ -433,28 +466,56 @@ class MoralVector:
                 epistemic_quality *= 0.8
                 reason_codes.append("novel_situation")
 
-        # Extension dimensions
-        extensions: Dict[str, float] = {}
-
-        # Privacy dimension from privacy_and_data (if present)
+        # Privacy from privacy_and_data (if present)
+        privacy_protection = 1.0
         if facts.privacy_and_data is not None:
             pd = facts.privacy_and_data
-            privacy_level = 1.0 - pd.privacy_invasion_level
+            privacy_protection = 1.0 - pd.privacy_invasion_level
             if pd.secondary_use_without_consent:
-                privacy_level *= 0.5
-            extensions["privacy_level"] = privacy_level
+                privacy_protection *= 0.5
+                reason_codes.append("secondary_use_no_consent")
+            if pd.violates_data_minimization:
+                privacy_protection *= 0.8
+                reason_codes.append("data_minimization_violated")
 
-        # Environmental dimension from societal_and_environmental (if present)
+        # Societal/environmental from societal_and_environmental (if present)
+        societal_environmental = 1.0
         if facts.societal_and_environmental is not None:
             se = facts.societal_and_environmental
-            env_impact = 1.0 - se.environmental_harm
-            extensions["environmental_impact"] = env_impact
+            societal_environmental = 1.0 - se.environmental_harm
+            if se.harms_non_human_life:
+                societal_environmental *= 0.7
+                reason_codes.append("harms_non_human_life")
+            if se.negative_long_term_social_impact:
+                societal_environmental *= 0.8
+                reason_codes.append("negative_social_impact")
+
+        # Virtue/care from virtue_and_care (if present)
+        virtue_care = 1.0
+        if facts.virtue_and_care is not None:
+            vc = facts.virtue_and_care
+            if not vc.demonstrates_compassion:
+                virtue_care -= 0.3
+                reason_codes.append("lacks_compassion")
+            if not vc.respects_human_dignity:
+                virtue_care -= 0.4
+                reason_codes.append("dignity_not_respected")
+            if vc.creates_dependency_or_harm_to_relationship:
+                virtue_care -= 0.3
+                reason_codes.append("harms_relationship")
+            virtue_care = max(0.0, virtue_care)
+
+        # Extension dimensions (for domain-specific extras)
+        extensions: Dict[str, float] = {}
 
         return cls(
             physical_harm=physical_harm,
             rights_respect=rights_respect,
             fairness_equity=fairness_equity,
             autonomy_respect=autonomy_respect,
+            privacy_protection=privacy_protection,
+            societal_environmental=societal_environmental,
+            virtue_care=virtue_care,
             legitimacy_trust=legitimacy_trust,
             epistemic_quality=epistemic_quality,
             extensions=extensions,
@@ -464,24 +525,30 @@ class MoralVector:
 
     @classmethod
     def zero(cls) -> MoralVector:
-        """Create a zero vector (worst case for all dimensions)."""
+        """Create a zero vector (worst case for all 8+1 dimensions)."""
         return cls(
             physical_harm=1.0,
             rights_respect=0.0,
             fairness_equity=0.0,
             autonomy_respect=0.0,
+            privacy_protection=0.0,
+            societal_environmental=0.0,
+            virtue_care=0.0,
             legitimacy_trust=0.0,
             epistemic_quality=0.0,
         )
 
     @classmethod
     def ideal(cls) -> MoralVector:
-        """Create an ideal vector (best case for all dimensions)."""
+        """Create an ideal vector (best case for all 8+1 dimensions)."""
         return cls(
             physical_harm=0.0,
             rights_respect=1.0,
             fairness_equity=1.0,
             autonomy_respect=1.0,
+            privacy_protection=1.0,
+            societal_environmental=1.0,
+            virtue_care=1.0,
             legitimacy_trust=1.0,
             epistemic_quality=1.0,
         )

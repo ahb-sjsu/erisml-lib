@@ -281,7 +281,7 @@ class DecisionProof:
 
 def hash_moral_vector(vector: MoralVector) -> str:
     """
-    Compute SHA-256 hash of a MoralVector.
+    Compute SHA-256 hash of a MoralVector (8+1 dimensions).
 
     Args:
         vector: The MoralVector to hash.
@@ -290,11 +290,16 @@ def hash_moral_vector(vector: MoralVector) -> str:
         Hexadecimal hash string.
     """
     data = {
+        # Core 8 dimensions
         "physical_harm": vector.physical_harm,
         "rights_respect": vector.rights_respect,
         "fairness_equity": vector.fairness_equity,
         "autonomy_respect": vector.autonomy_respect,
+        "privacy_protection": vector.privacy_protection,
+        "societal_environmental": vector.societal_environmental,
+        "virtue_care": vector.virtue_care,
         "legitimacy_trust": vector.legitimacy_trust,
+        # +1 epistemic dimension
         "epistemic_quality": vector.epistemic_quality,
         "extensions": dict(sorted(vector.extensions.items())),
         "veto_flags": sorted(vector.veto_flags),
