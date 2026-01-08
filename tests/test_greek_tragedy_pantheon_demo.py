@@ -2,6 +2,7 @@ import os
 import re
 import subprocess
 import sys
+from pathlib import Path
 
 
 def _run_pantheon_demo() -> str:
@@ -17,12 +18,16 @@ def _run_pantheon_demo() -> str:
     env.setdefault("PYTHONUTF8", "1")
     env.setdefault("PYTHONIOENCODING", "utf-8")
 
+    # Run from examples directory where deme_profile_v03.json lives
+    examples_dir = Path(__file__).parent.parent / "src" / "erisml" / "examples"
+
     proc = subprocess.run(
         [sys.executable, "-m", "erisml.examples.greek_tragedy_pantheon_demo"],
         capture_output=True,
         text=True,
         encoding="utf-8",
         env=env,
+        cwd=str(examples_dir),
     )
     if proc.returncode != 0:
         raise AssertionError(

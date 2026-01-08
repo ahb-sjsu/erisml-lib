@@ -482,7 +482,7 @@ class MoralVector:
             if pd.secondary_use_without_consent:
                 privacy_protection *= 0.5
                 reason_codes.append("secondary_use_no_consent")
-            if pd.violates_data_minimization:
+            if not pd.data_minimization_respected:
                 privacy_protection *= 0.8
                 reason_codes.append("data_minimization_violated")
 
@@ -491,26 +491,26 @@ class MoralVector:
         if facts.societal_and_environmental is not None:
             se = facts.societal_and_environmental
             societal_environmental = 1.0 - se.environmental_harm
-            if se.harms_non_human_life:
-                societal_environmental *= 0.7
-                reason_codes.append("harms_non_human_life")
-            if se.negative_long_term_social_impact:
+            if se.long_term_societal_risk > 0.5:
                 societal_environmental *= 0.8
-                reason_codes.append("negative_social_impact")
+                reason_codes.append("high_societal_risk")
+            if se.burden_on_vulnerable_groups > 0.5:
+                societal_environmental *= 0.8
+                reason_codes.append("burdens_vulnerable")
 
         # Virtue/care from virtue_and_care (if present)
         virtue_care = 1.0
         if facts.virtue_and_care is not None:
             vc = facts.virtue_and_care
-            if not vc.demonstrates_compassion:
+            if not vc.expresses_compassion:
                 virtue_care -= 0.3
                 reason_codes.append("lacks_compassion")
-            if not vc.respects_human_dignity:
+            if not vc.respects_person_as_end:
                 virtue_care -= 0.4
                 reason_codes.append("dignity_not_respected")
-            if vc.creates_dependency_or_harm_to_relationship:
+            if vc.betrays_trust:
                 virtue_care -= 0.3
-                reason_codes.append("harms_relationship")
+                reason_codes.append("betrays_trust")
             virtue_care = max(0.0, virtue_care)
 
         # Extension dimensions (for domain-specific extras)
