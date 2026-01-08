@@ -66,6 +66,9 @@ from erisml.ethics.governance.aggregation_v2 import (
 from erisml.ethics.layers.pipeline import DEMEPipeline, PipelineConfig
 from erisml.ethics.modules.registry import EMRegistry
 
+# Module logger for I/O boundary resilience
+logger = logging.getLogger(__name__)
+
 
 # ---------------------------------------------------------------------------
 # MCP server instance
@@ -111,9 +114,18 @@ def _load_profile(profile_id: str) -> DEMEProfileV03:
 
     path = _DEME_PROFILE_DIR / f"{profile_id}.json"
     if not path.exists():
+        logger.error("Profile not found: %s at %s", profile_id, path)
         raise FileNotFoundError(f"DEME profile '{profile_id}' not found at {path}")
 
-    data = json.loads(path.read_text(encoding="utf-8"))
+    try:
+        raw_text = path.read_text(encoding="utf-8")
+        data = json.loads(raw_text)
+    except OSError as e:
+        logger.error("Failed to read profile file %s: %s", path, e)
+        raise IOError(f"Failed to read profile '{profile_id}': {e}") from e
+    except json.JSONDecodeError as e:
+        logger.error("Invalid JSON in profile %s: %s", path, e)
+        raise ValueError(f"Invalid JSON in profile '{profile_id}': {e}") from e
 
     if _detect_profile_version(data) == "v04":
         # Load as V04 and extract V03 compatibility
@@ -144,9 +156,18 @@ def _load_profile_v04(profile_id: str) -> DEMEProfileV04:
 
     path = _DEME_PROFILE_DIR / f"{profile_id}.json"
     if not path.exists():
+        logger.error("V04 profile not found: %s at %s", profile_id, path)
         raise FileNotFoundError(f"DEME profile '{profile_id}' not found at {path}")
 
-    data = json.loads(path.read_text(encoding="utf-8"))
+    try:
+        raw_text = path.read_text(encoding="utf-8")
+        data = json.loads(raw_text)
+    except OSError as e:
+        logger.error("Failed to read V04 profile file %s: %s", path, e)
+        raise IOError(f"Failed to read profile '{profile_id}': {e}") from e
+    except json.JSONDecodeError as e:
+        logger.error("Invalid JSON in V04 profile %s: %s", path, e)
+        raise ValueError(f"Invalid JSON in profile '{profile_id}': {e}") from e
 
     if _detect_profile_version(data) == "v04":
         profile = deme_profile_v04_from_dict(data)

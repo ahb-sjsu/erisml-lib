@@ -15,10 +15,14 @@ from __future__ import annotations
 
 import hashlib
 import json
+import logging
 from dataclasses import asdict, dataclass, field
 from datetime import datetime, timezone
 from typing import Any, Dict, List, Optional, TYPE_CHECKING
 import uuid
+
+# Module logger for I/O boundary resilience
+logger = logging.getLogger(__name__)
 
 if TYPE_CHECKING:
     from erisml.ethics.moral_vector import MoralVector
@@ -236,8 +240,15 @@ class DecisionProof:
 
         Returns:
             Reconstructed DecisionProof.
+
+        Raises:
+            ValueError: If JSON is invalid or malformed.
         """
-        data = json.loads(json_str)
+        try:
+            data = json.loads(json_str)
+        except json.JSONDecodeError as e:
+            logger.error("Invalid JSON in DecisionProof: %s", e)
+            raise ValueError(f"Invalid JSON in DecisionProof: {e}") from e
 
         # Reconstruct LayerOutput objects
         layer_outputs = [LayerOutput(**lo) for lo in data.get("layer_outputs", [])]
@@ -389,9 +400,19 @@ class DecisionProofChain:
 
     @classmethod
     def from_json(cls, json_str: str) -> DecisionProofChain:
-        """Deserialize chain from JSON."""
+        """
+        Deserialize chain from JSON.
+
+        Raises:
+            ValueError: If JSON is invalid or malformed.
+        """
         chain = cls()
-        data = json.loads(json_str)
+        try:
+            data = json.loads(json_str)
+        except json.JSONDecodeError as e:
+            logger.error("Invalid JSON in DecisionProofChain: %s", e)
+            raise ValueError(f"Invalid JSON in DecisionProofChain: {e}") from e
+
         for proof_data in data:
             proof = DecisionProof.from_audit_json(json.dumps(proof_data))
             chain._proofs.append(proof)
