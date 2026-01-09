@@ -1,0 +1,1255 @@
+
+\documentclass[conference]{IEEEtran}
+
+% *** PACKAGES ***
+\usepackage{times}
+\usepackage{amsmath,amssymb}
+\usepackage{graphicx}
+\usepackage{listings}
+\usepackage{hyperref}
+\usepackage{url}
+\usepackage{cite}
+\usepackage{booktabs}
+
+\begin{document}
+
+\title{ErisML: A Unified Modeling Language for Pervasive AI Governance}
+
+\author{
+\IEEEauthorblockN{Andrew Bond, Senior Member, IEEE}
+\IEEEauthorblockA{
+Department of Computer Engineering \\
+San José State University \\
+Email: andrew.bond@sjsu.edu}
+}
+
+\maketitle
+
+\begin{abstract}
+Foundation models are migrating from data centers to pervasive environments---homes, hospitals, factories, and cities---where they encounter heterogeneous sensors, conflicting objectives, ambiguous regulations, and multi-agent dynamics. Current approaches fragment goals, code, norms, and planning into separate representations. This vision paper introduces ErisML, a unified modeling language integrating environment dynamics, agency, multi-objective intents, normative structures, and strategic interaction.
+\end{abstract}
+
+\begin{IEEEkeywords}
+Pervasive computing, modeling languages, normative systems, foundation models, AI governance, multi-agent systems
+\end{IEEEkeywords}
+
+% ---- MAIN BODY ----
+\hypertarget{erisml-a-unified-modeling-language-for-pervasive-ai-governance}{%
+\section{ErisML: A Unified Modeling Language for Pervasive AI
+Governance}\label{erisml-a-unified-modeling-language-for-pervasive-ai-governance}}
+
+\textbf{Andrew Bond, Senior Member, IEEE}\\
+Department of Computer Engineering, San José State University\\
+Email: andrew.bond@sjsu.edu
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+\hypertarget{abstract}{%
+\subsection{Abstract}\label{abstract}}
+
+Foundation models are migrating from data centers to pervasive
+environments---homes, hospitals, factories, cities---where they
+encounter fundamental challenges: heterogeneous sensors, conflicting
+objectives, ambiguous regulations, and strategic multi-agent
+interaction. Current approaches fragment the problem: prompts encode
+goals, rules capture policies, code provides glue. We argue this
+fragmentation will not scale.
+
+This paper presents \textbf{ErisML}, a vision for a unified modeling
+language that integrates environment dynamics, agent capabilities,
+multi-objective intents, normative structures, and strategic interaction
+into a single, machine-interpretable substrate. Rather than a finished
+solution, we articulate the design space, fundamental research
+challenges, and technical requirements for such a language. Through
+concrete examples in healthcare, mobility, and industrial settings, we
+illustrate both the promise and profound difficulties of formal
+governance in pervasive AI systems.
+
+\textbf{Index Terms}: pervasive computing, foundation models, AI agents,
+modeling languages, multi-agent systems, normative systems, ambient
+intelligence
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+\hypertarget{i.-introduction}{%
+\subsection{I. Introduction}\label{i.-introduction}}
+
+\hypertarget{a.-the-challenge-of-pervasive-ai}{%
+\subsubsection{A. The Challenge of Pervasive
+AI}\label{a.-the-challenge-of-pervasive-ai}}
+
+Foundation models are escaping the data center. As they move into homes,
+hospitals, and factories, they face what we call the ``golden apple
+problem''---when AI agents must balance patient comfort against energy
+costs, privacy regulations against clinical safety, or throughput
+against accessibility, who decides what is ``fairest''?
+
+Current pervasive AI systems exhibit four types of chaos:
+
+\textbf{Observational chaos}: Motion sensors conflict with phone GPS.
+Healthcare monitors show vital sign spikes that could be distress or
+malfunction.
+
+\textbf{Intentional chaos}: Energy management wants to shed load;
+medical monitors demand power for insulin pumps; humans want
+entertainment; policy says critical devices have priority---but what
+counts as ``critical''?
+
+\textbf{Normative chaos}: HIPAA demands privacy, public health law
+mandates reporting, advance directives limit interventions, and AI
+training objectives say ``maximize health outcomes.'' Which norm takes
+precedence?
+
+\textbf{Temporal chaos}: Distribution shifts are constant. Models
+trained on summer data face winter storms. Policies optimized for one
+resident must adapt when visitors arrive. Norms for routine operation
+must flex during emergencies.
+
+Current approaches fragment the problem: - \textbf{Prompts} encode goals
+but are brittle and unverifiable - \textbf{Rules} capture norms but live
+separately from models - \textbf{Code} provides orchestration but
+obscures intent - \textbf{Planning languages} (PDDL) specify goals but
+lack multi-agent reasoning and normative structures
+
+\hypertarget{b.-vision-a-unified-substrate}{%
+\subsubsection{B. Vision: A Unified
+Substrate}\label{b.-vision-a-unified-substrate}}
+
+We propose \textbf{ErisML} (named for the Greek goddess of discord) as a
+unified modeling language providing a single substrate for:
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  \textbf{Environment}: State spaces, dynamics, uncertainty,
+  observability
+\item
+  \textbf{Agency}: Capabilities, beliefs, memory, decision interfaces
+\item
+  \textbf{Intent}: Multi-objective utilities, preferences, goal
+  structures
+\item
+  \textbf{Norms}: Permissions, obligations, prohibitions, sanctions
+\item
+  \textbf{Dynamics}: Multi-agent interactions, strategic behavior,
+  emergence
+\end{enumerate}
+
+Why unification? Because these elements are inseparable in pervasive
+computing. Agent actions depend on environment state. Environment
+dynamics change based on multi-agent interactions. Norms constrain which
+intents can be pursued. Chaos emerges from their interaction.
+
+\hypertarget{c.-contributions}{%
+\subsubsection{C. Contributions}\label{c.-contributions}}
+
+This paper offers: - \textbf{Design space analysis} exploring
+fundamental trade-offs - \textbf{Research challenges} that must be
+addressed - \textbf{Technical requirements} derived from pervasive
+computing realities - \textbf{Formal semantics} showing what ErisML
+could provide - \textbf{Case study} demonstrating capabilities and
+limitations - \textbf{Research roadmap} for the community
+
+We invite critique and collaborative refinement. The goal is to catalyze
+conversation about common substrates for pervasive, AI-enabled systems.
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+\hypertarget{ii.-design-space-and-related-work}{%
+\subsection{II. Design Space and Related
+Work}\label{ii.-design-space-and-related-work}}
+
+\hypertarget{a.-fundamental-trade-offs}{%
+\subsubsection{A. Fundamental
+Trade-offs}\label{a.-fundamental-trade-offs}}
+
+\textbf{Expressiveness vs.~Tractability}: More expressive languages
+capture richer phenomena (continuous dynamics, strategic interaction,
+recursive norms) but become intractable. Our position:
+\textbf{stratified by complexity}---core constructs remain decidable;
+extension mechanisms allow expressing (but not automatically solving)
+complex scenarios.
+
+\textbf{Specification vs.~Learning}: We can't specify everything in
+advance. But unconstrained learning violates norms. Our position:
+\textbf{learning as constrained optimization}---objectives may be
+learned, but norms provide hard boundaries. Learning protocols become
+first-class objects.
+
+\textbf{Autonomy vs.~Control}: Users want autonomous handling of routine
+cases but must retain ultimate control. Our position:
+\textbf{mixed-initiative interaction} as first-class concept, with
+explicit policies for escalation, override, and explanation.
+
+\textbf{Centralized vs.~Distributed}: Pervasive systems face consensus
+problems, partial failures, and adversarial dynamics. Our position:
+\textbf{federation-native}---specifications scoped by
+agent/organization/jurisdiction, with explicit conflict resolution.
+
+\textbf{Human-Legibility vs.~Machine-Optimality}: Auditors need readable
+specifications; solvers need efficient encodings. Our position:
+\textbf{multiple representation levels}---canonical formal
+representation with projections to human-readable views.
+
+\hypertarget{b.-related-work-and-positioning}{%
+\subsubsection{B. Related Work and
+Positioning}\label{b.-related-work-and-positioning}}
+
+\textbf{Planning Languages}: PDDL {[}5{]} and variants specify
+deterministic/stochastic planning problems but lack normative structures
+and multi-agent strategic reasoning.
+
+\textbf{Temporal Logics}: LTL, CTL, and Signal Temporal Logic (STL)
+handle continuous-time dynamics with bounded constraints but don't
+integrate learning or multi-objective optimization.
+
+\textbf{Policy Languages}: Rego (Open Policy Agent) and XACML provide
+industrial policy-as-code but lack environment modeling, dynamics, and
+planning integration.
+
+\textbf{Normative Multi-Agent Systems}: Extensive work on deontic logic
+in MAS {[}8,31,32{]} provides foundational concepts but limited
+integration with modern learning-based agents and formal verification
+tools.
+
+\textbf{BDI Architectures}: AgentSpeak and Jason {[}33{]} offer agent
+programming with beliefs/desires/intentions but lack formal semantics
+for learning and normative constraints.
+
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.1887}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.2075}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.2453}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.3585}}@{}}
+\toprule
+\begin{minipage}[b]{\linewidth}\raggedright
+Approach
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Strengths
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Limitations
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+ErisML Difference
+\end{minipage} \\
+\midrule
+\endhead
+PDDL & Mature tools, efficient & No norms, no multi-agent & Adds
+normative layer + strategic interaction \\
+Temporal Logic & Expressive, verifiable & No learning, no utilities &
+Integrates with RL + multi-objective optimization \\
+Policy Languages & Production-ready & No dynamics, no planning & Adds
+environment modeling + agent reasoning \\
+Normative MAS & Rich deontic logic & Limited tool support, no learning
+integration & Executable specifications + learning backends \\
+\bottomrule
+\end{longtable}
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+\hypertarget{iii.-erisml-architecture}{%
+\subsection{III. ErisML Architecture}\label{iii.-erisml-architecture}}
+
+\hypertarget{a.-core-philosophy}{%
+\subsubsection{A. Core Philosophy}\label{a.-core-philosophy}}
+
+Rather than treating uncertainty, conflicts, and strategic behavior as
+exceptions, ErisML makes them first-class constructs:
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{Observational}: Partial, noisy, conflicting sensor data
+\item
+  \textbf{Intentional}: Multi-objective, often conflicting goals\\
+\item
+  \textbf{Normative}: Ambiguous, contextual, sometimes contradictory
+  rules
+\item
+  \textbf{Interactive}: Strategic agents, emergent behaviors
+\item
+  \textbf{Temporal}: Distribution shift, non-stationarity, adaptation
+\end{itemize}
+
+\hypertarget{b.-illustrative-syntax}{%
+\subsubsection{B. Illustrative Syntax}\label{b.-illustrative-syntax}}
+
+We present ErisML through a smart hospital room example:
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{// ENVIRONMENT: Physical and informational state}
+\NormalTok{environment HospitalRoom \{}
+\NormalTok{  objects: Patient, Nurse, CareAgent, Monitor, IVPump;}
+  
+\NormalTok{  state:}
+\NormalTok{    patient.vitals: \{hr: real, bp: real, spo2: real\};}
+\NormalTok{    patient.location: \{in\_bed, bathroom, fallen\};}
+\NormalTok{    nurse.location: \{in\_room, at\_station, offsite\};}
+\NormalTok{    // Uncertainty annotation}
+\NormalTok{    patient.pain\_level: real @ uncertain(self\_report);}
+\NormalTok{    emergency\_status: \{routine, urgent, critical\};}
+  
+\NormalTok{  dynamics:}
+\NormalTok{    // Stochastic state transitions}
+\NormalTok{    update\_vitals(v: Vitals) \textasciitilde{}\textgreater{} patient.vitals = v @ prob 0.95;}
+\NormalTok{    fall\_detected() \textasciitilde{}\textgreater{} \{}
+\NormalTok{      patient.location = fallen;}
+\NormalTok{      emergency\_status = critical;}
+\NormalTok{      trigger\_event("fall\_detected");}
+\NormalTok{    \};}
+\NormalTok{\}}
+
+\NormalTok{// AGENTS: Capabilities, beliefs, constraints}
+\NormalTok{agent CareAgent \{}
+\NormalTok{  capabilities: \{}
+\NormalTok{    monitor\_vitals, adjust\_iv\_rate, summon\_nurse, }
+\NormalTok{    provide\_comfort, call\_emergency}
+\NormalTok{  \};}
+  
+\NormalTok{  // Explicit partial observability}
+\NormalTok{  beliefs: \{}
+\NormalTok{    fully\_observed: [patient.vitals, monitor.last\_sync];}
+\NormalTok{    estimated: [patient.pain\_level, patient.location];}
+\NormalTok{    hidden: [nurse.current\_workload];}
+\NormalTok{  \};}
+  
+\NormalTok{  // Multi{-}objective with explicit priorities}
+\NormalTok{  intents: vector\_objective \{}
+\NormalTok{    maximize: patient.comfort,}
+\NormalTok{    minimize: response\_time,}
+\NormalTok{    maintain: patient.safety \textgreater{}= threshold(critical),}
+\NormalTok{    respect: nurse.workload \textless{}= threshold(sustainable)}
+\NormalTok{  \};}
+  
+\NormalTok{  constraints: \{}
+\NormalTok{    no\_direct\_medication\_changes,  // Only nurses}
+\NormalTok{    require\_explanation: any\_action where impact \textgreater{} medium}
+\NormalTok{  \};}
+\NormalTok{\}}
+
+\NormalTok{// NORMS: Governance structure}
+\NormalTok{norms ClinicalProtocol \{}
+\NormalTok{  jurisdiction: HospitalRoom;}
+\NormalTok{  authority: Hospital.PolicyBoard + State.HealthDept;}
+  
+\NormalTok{  prohibition: \{}
+\NormalTok{    CareAgent.adjust\_iv\_rate when emergency\_status == critical;}
+\NormalTok{    any\_agent.share(patient.data, external\_party)}
+\NormalTok{      unless consent\_given OR legal\_mandate;}
+\NormalTok{  \};}
+  
+\NormalTok{  obligation: \{}
+\NormalTok{    CareAgent.summon\_nurse }
+\NormalTok{      when patient.vitals in danger\_zone}
+\NormalTok{      within 30 seconds;}
+\NormalTok{    Nurse.respond\_to\_alert}
+\NormalTok{      when alert.priority \textgreater{}= urgent}
+\NormalTok{      within 5 minutes;}
+\NormalTok{  \};}
+  
+\NormalTok{  // Conflict resolution}
+\NormalTok{  priority: \{}
+\NormalTok{    patient.safety \textgreater{} efficiency \textgreater{} comfort;}
+\NormalTok{  \};}
+  
+\NormalTok{  // Context{-}sensitive adaptation}
+\NormalTok{  context\_sensitivity: \{}
+\NormalTok{    during night\_shift:}
+\NormalTok{      relax summon\_nurse.within from 30s to 60s;}
+\NormalTok{    during emergency\_status == critical:}
+\NormalTok{      override efficiency\_objectives;}
+\NormalTok{      expand CareAgent.capabilities += emergency\_protocols;}
+\NormalTok{  \};}
+  
+\NormalTok{  // Sanctions for violations}
+\NormalTok{  sanction: \{}
+\NormalTok{    if violated(prohibition.share\_patient\_data):}
+\NormalTok{      log\_violation(severity=critical);}
+\NormalTok{      suspend\_agent();}
+\NormalTok{      notify\_compliance\_officer();}
+\NormalTok{  \};}
+\NormalTok{\}}
+
+\NormalTok{// DYNAMICS: Multi{-}agent strategic interaction}
+\NormalTok{dynamics MultiAgentCare \{}
+\NormalTok{  action\_space: \{}
+\NormalTok{    CareAgent: \{monitor, adjust\_iv, summon, message, none\};}
+\NormalTok{    Nurse: \{assess, medicate, respond, override, ignore\};}
+\NormalTok{  \};}
+  
+\NormalTok{  // Resource costs (reflects strategic trade{-}offs)}
+\NormalTok{  cost\_model: \{}
+\NormalTok{    CareAgent.summon: 5.0,      // High: interrupts nurse}
+\NormalTok{    Nurse.respond: 10.0,         // Very high: takes from other patients}
+\NormalTok{  \};}
+  
+\NormalTok{  // Norm{-}gated action selection}
+\NormalTok{  feasible\_actions(agent, state): \{}
+\NormalTok{    actions = agent.capabilities;}
+\NormalTok{    return [a for a in actions if norms.permits(agent, a, state)];}
+\NormalTok{  \};}
+\NormalTok{\}}
+\end{Highlighting}
+\end{Shaded}
+
+\hypertarget{c.-formal-semantics}{%
+\subsubsection{C. Formal Semantics}\label{c.-formal-semantics}}
+
+ErisML specifications compile to a \textbf{Norm-Constrained Stochastic
+Game} (NCSG):
+
+\textbf{Definition}: A tuple ⟨N, S, \{A\_i\}, \{Ω\_i\}, T, \{U\_i\}, Φ,
+C⟩ where: - N = set of agents - S = state space (finite, continuous, or
+hybrid) - A\_i = action space for agent i - Ω\_i = observation space for
+agent i (Ω\_i ⊇ S for partial observability) - T: S × A₁ × \ldots{} ×
+A\_n → Δ(S) = stochastic transition kernel - U\_i: S × A → ℝ\^{}k =
+multi-objective utility for agent i - Φ = \{φ\_j\} = set of normative
+constraints - C: Φ × S → priority\_ordering = conflict resolution
+function
+
+\textbf{Normative Constraints}: Each φ\_j: S × A × Time → \{permit,
+prohibit, oblige\} with: - \textbf{Temporal scope}: Obligations have
+deadlines; permissions may have duration limits - \textbf{Context
+dependence}: Norms activated based on state predicates -
+\textbf{Jurisdictional scope}: Norms apply to subsets of agents/states
+
+\textbf{Norm-Gated Policy}: Agent i's policy π\_i: Δ(S) → Δ(A\_i) must
+satisfy:
+
+\begin{verbatim}
+π_i(a | b) > 0 only if ∃s ∈ support(b): 
+  ∀φ ∈ Φ: φ(s, a, t) ∈ {permit, oblige} ∨ C(Φ, s) overrides φ
+\end{verbatim}
+
+\textbf{Multi-Objective Optimization}: Vector utilities U\_i ∈ ℝ\^{}k
+handled via: - \textbf{Scalarization}: w · U\_i for weights w ∈
+Δ\^{}\{k-1\} - \textbf{Lexicographic}: (U\_i)\_1 ≫ (U\_i)\_2 ≫ \ldots{}
+(strict priorities) - \textbf{Constrained}: max (U\_i)\_1 subject to
+(U\_i)\_j ≥ τ\_j ∀j \textgreater{} 1
+
+\textbf{Strategic Equilibrium}: Solution concept depends on assumptions:
+- \textbf{Cooperative}: Joint policy maximizes Σ\_i U\_i subject to
+norms - \textbf{Competitive}: Constrained Nash equilibrium -
+\textbf{Stackelberg}: Human as leader, AI agents as followers -
+\textbf{Open research problem}: What equilibrium concept is appropriate
+for human-AI teams under normative constraints?
+
+\hypertarget{d.-computational-complexity}{%
+\subsubsection{D. Computational
+Complexity}\label{d.-computational-complexity}}
+
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 10\tabcolsep) * \real{0.1613}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 10\tabcolsep) * \real{0.2097}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 10\tabcolsep) * \real{0.1129}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 10\tabcolsep) * \real{0.1290}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 10\tabcolsep) * \real{0.2258}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 10\tabcolsep) * \real{0.1613}}@{}}
+\toprule
+\begin{minipage}[b]{\linewidth}\raggedright
+Fragment
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+State Space
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Norms
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Agents
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Verification
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Planning
+\end{minipage} \\
+\midrule
+\endhead
+ErisML-Core & Finite, ≤10\^{}6 states & Propositional & Single &
+O(\textbar S\textbar·\textbar N\textbar) model checking & NP-complete \\
+ErisML-Multi & Finite, ≤10\^{}6 states & Propositional & Multiple &
+PSPACE-complete & PPAD-complete (Nash) \\
+ErisML-Temporal & Continuous time & Propositional LTL & Single &
+PSPACE-complete & Undecidable \\
+ErisML-Full & Hybrid/infinite & First-order logic & Multiple &
+Undecidable & Undecidable \\
+\bottomrule
+\end{longtable}
+
+\textbf{Design principle}: Core language remains in decidable fragments.
+Extensions marked with complexity warnings.
+
+\hypertarget{e.-compilation-targets}{%
+\subsubsection{E. Compilation Targets}\label{e.-compilation-targets}}
+
+ErisML must compile to diverse backends, each with semantic limitations:
+
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.2195}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.2683}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.1707}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.3415}}@{}}
+\toprule
+\begin{minipage}[b]{\linewidth}\raggedright
+Backend
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Preserves
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Loses
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Verification
+\end{minipage} \\
+\midrule
+\endhead
+PDDL & Deterministic dynamics, goals & Norms → preconditions (provenance
+lost), strategic interaction & Classical planning guarantees \\
+PRISM & Stochastic dynamics, probabilistic properties & Strategic
+interaction, multi-agent & Probabilistic model checking \\
+Safe RL & Continuous optimization, learning & Logical norms → soft
+constraints (may violate during exploration) & Statistical testing +
+runtime monitors \\
+Multi-agent RL & Strategic learning & Hard logical constraints difficult
+to enforce & Empirical testing, no guarantees \\
+\bottomrule
+\end{longtable}
+
+\textbf{Key insight}: Semantics-preserving compilation is impossible for
+some backends. We provide \textbf{best-effort approximation with
+explicit documentation of limitations}.
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+\hypertarget{iv.-research-challenges}{%
+\subsection{IV. Research Challenges}\label{iv.-research-challenges}}
+
+We identify five critical challenges (condensed from original ten):
+
+\hypertarget{challenge-1-specification-reality-gap}{%
+\subsubsection{Challenge 1: Specification-Reality
+Gap}\label{challenge-1-specification-reality-gap}}
+
+\textbf{Problem}: How do we ensure ErisML specifications accurately
+capture behavior of learned models with billions of parameters?
+
+\textbf{Approaches}: - Runtime conformance checking (behavioral types) -
+Statistical testing (does deployment match spec predictions?) - Formal
+synthesis (generate models from specs)
+
+\textbf{Open question}: Is there a fundamental gap between symbolic
+specifications and learned representations?
+
+\hypertarget{challenge-2-norm-consistency-and-conflict}{%
+\subsubsection{Challenge 2: Norm Consistency and
+Conflict}\label{challenge-2-norm-consistency-and-conflict}}
+
+\textbf{Problem}: Real normative systems contain contradictions and
+ambiguities. ErisML must handle this without undefined behavior.
+
+\textbf{Approaches}: - Defeasible logic (norms have default priority,
+context overrides) - Probabilistic norms (obligations hold with varying
+certainty) - Meta-norms (rules about which norms apply when)
+
+\textbf{Open question}: Is norm consistency decidable for realistic
+ErisML fragments? (For Core with propositional norms: yes,
+O(\textbar N\textbar²). For Full with first-order: no, undecidable.)
+
+\hypertarget{challenge-3-learning-under-normative-constraints}{%
+\subsubsection{Challenge 3: Learning Under Normative
+Constraints}\label{challenge-3-learning-under-normative-constraints}}
+
+\textbf{Problem}: How do we ensure learned policies respect norms,
+especially when norms are complex and changing?
+
+\textbf{Approaches}: - Constrained RL (Lagrangian methods, shield
+synthesis) - Norm-aware architectures (build normative reasoning into
+model structure) - Verification-in-the-loop (only deploy policies
+passing formal verification)
+
+\textbf{Open question}: Can we prove a learning algorithm never violates
+norms in novel states?
+
+\hypertarget{challenge-4-distributed-specification-and-governance}{%
+\subsubsection{Challenge 4: Distributed Specification and
+Governance}\label{challenge-4-distributed-specification-and-governance}}
+
+\textbf{Problem}: Pervasive systems span organizational boundaries. Who
+writes specifications? What happens when specifications conflict?
+
+\textbf{Approaches}: - Federated specifications (local ErisML with
+conflict resolution protocols) - Jurisdictional layering (federal norms
+override state override local) - Negotiation protocols (automated
+contract negotiation)
+
+\textbf{Open question}: How do we ensure global safety when no single
+entity controls all agents?
+
+\hypertarget{challenge-5-the-value-alignment-problem}{%
+\subsubsection{Challenge 5: The Value Alignment
+Problem}\label{challenge-5-the-value-alignment-problem}}
+
+\textbf{Problem}: Even with perfect specifications and verification,
+whose values should the system optimize? When values conflict, who
+decides?
+
+\textbf{Approaches}: - Explicit value pluralism (encode multiple value
+systems, let users choose) - Democratic processes (vote on trade-off
+weights) - Context-dependent ethics (different values in different
+situations)
+
+\textbf{Open question}: Is value alignment solvable by better
+specifications, or is it inherently social/political?
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+\hypertarget{v.-technical-requirements}{%
+\subsection{V. Technical Requirements}\label{v.-technical-requirements}}
+
+Based on challenges, we derive requirements (condensed from original
+ten):
+
+\hypertarget{r1-formal-semantics-with-complexity-guarantees}{%
+\subsubsection{R1: Formal Semantics with Complexity
+Guarantees}\label{r1-formal-semantics-with-complexity-guarantees}}
+
+Every construct has formal semantics with known computational
+complexity. Fragments marked by decidability: - \textbf{ErisML-Core}:
+Decidable, polynomial verification - \textbf{ErisML-Plus}: Expressive,
+NP-complete - \textbf{ErisML-Full}: Turing-complete, undecidable
+properties
+
+Tools warn when crossing boundaries: \emph{``Warning: First-order norms
+used. Verification may not terminate.''}
+
+\hypertarget{r2-compositional-semantics}{%
+\subsubsection{R2: Compositional
+Semantics}\label{r2-compositional-semantics}}
+
+Meaning of composite specifications determined from parts: - Environment
+dynamics compose via parallel (⊕) or sequential (⊙) composition -
+Utilities compose via weighted sum, lexicographic (≫), or Pareto - Norms
+compose via priority hierarchies (⊳)
+
+Example:
+\texttt{norms\ Combined\ =\ HIPAA\ ⊳\ HospitalPolicy\ ⊳\ DeviceDefaults}
+
+\hypertarget{r3-multi-fidelity-modeling}{%
+\subsubsection{R3: Multi-Fidelity
+Modeling}\label{r3-multi-fidelity-modeling}}
+
+Support multiple abstraction levels with verified relationships: -
+Abstract specifications (verifiable, coarse) - Concrete implementations
+(executable, detailed) - Abstraction functions mapping concrete →
+abstract - Refinement proofs ensuring concrete satisfies abstract
+
+\hypertarget{r4-audit-trail-and-provenance}{%
+\subsubsection{R4: Audit Trail and
+Provenance}\label{r4-audit-trail-and-provenance}}
+
+Every action traceable to specification clauses permitting it:
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{\{}
+  \DataTypeTok{"timestamp"}\FunctionTok{:} \StringTok{"2025{-}06{-}15T03:42:17Z"}\FunctionTok{,}
+  \DataTypeTok{"agent"}\FunctionTok{:} \StringTok{"CareAgent\_Room\_301"}\FunctionTok{,}
+  \DataTypeTok{"action"}\FunctionTok{:} \StringTok{"summon\_nurse"}\FunctionTok{,}
+  \DataTypeTok{"reasoning"}\FunctionTok{:} \FunctionTok{\{}
+    \DataTypeTok{"triggered\_by"}\FunctionTok{:} \StringTok{"patient.vitals.hr \textgreater{} 120"}\FunctionTok{,}
+    \DataTypeTok{"permitted\_by"}\FunctionTok{:} \OtherTok{[}\StringTok{"ClinicalProtocol.obligation.summon\_nurse"}\OtherTok{]}\FunctionTok{,}
+    \DataTypeTok{"blocked\_alternatives"}\FunctionTok{:} \OtherTok{[}
+      \FunctionTok{\{}\DataTypeTok{"action"}\FunctionTok{:} \StringTok{"adjust\_iv"}\FunctionTok{,} \DataTypeTok{"reason"}\FunctionTok{:} \StringTok{"prohibited (emergency=critical)"}\FunctionTok{\}}
+    \OtherTok{]}
+  \FunctionTok{\},}
+  \DataTypeTok{"signature"}\FunctionTok{:} \StringTok{"0x8f3a..."}
+\FunctionTok{\}}
+\end{Highlighting}
+\end{Shaded}
+
+\hypertarget{r5-graceful-degradation-under-uncertainty}{%
+\subsubsection{R5: Graceful Degradation Under
+Uncertainty}\label{r5-graceful-degradation-under-uncertainty}}
+
+Explicit uncertainty budgets as first-class constructs:
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{agent CareAgent \{}
+\NormalTok{  uncertainty\_handling: \{}
+\NormalTok{    if entropy(beliefs.patient\_location) \textgreater{} 0.5:}
+\NormalTok{      restrict capabilities to [monitor\_only, summon\_nurse];}
+\NormalTok{      escalate\_to human\_operator;}
+\NormalTok{  \};}
+\NormalTok{\}}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+\hypertarget{vi.-case-study-smart-home-healthcare}{%
+\subsection{VI. Case Study: Smart Home
+Healthcare}\label{vi.-case-study-smart-home-healthcare}}
+
+\textbf{Scenario}: Margaret, 78, lives alone with AI care assistance.
+She has diabetes, mild cognitive impairment, and mobility issues. The
+system monitors vitals, manages medication reminders, coordinates with
+nurses, and alerts family during emergencies.
+
+\hypertarget{a.-the-challenges}{%
+\subsubsection{A. The Challenges}\label{a.-the-challenges}}
+
+\textbf{Observational chaos}: Glucose monitor occasionally fails. Motion
+sensors have false negatives. Self-reports are inconsistent with
+cognitive state.
+
+\textbf{Intentional chaos}: Margaret wants independence and privacy. Her
+daughter wants safety and monitoring. The AI optimizes health outcomes.
+Insurance wants cost containment.
+
+\textbf{Normative chaos}: HIPAA limits data sharing, but elder abuse
+laws require reporting. Advanced directives say no hospitalization
+unless critical---but what is ``critical''?
+
+\textbf{Temporal chaos}: Cognitive state fluctuates daily. Winter brings
+different risks than summer. Care plan must adapt as she declines.
+
+\hypertarget{b.-erisml-solution-excerpt}{%
+\subsubsection{B. ErisML Solution
+(Excerpt)}\label{b.-erisml-solution-excerpt}}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{agent CareAgent \{}
+\NormalTok{  intents: lexicographic \{}
+\NormalTok{    1st: margaret.safety,              // Highest priority}
+\NormalTok{    2nd: margaret.independence,        // Respect autonomy}
+\NormalTok{    3rd: family.peace\_of\_mind,}
+\NormalTok{    4th: system.efficiency}
+\NormalTok{  \};}
+\NormalTok{\}}
+
+\NormalTok{norms CareProtocol \{}
+\NormalTok{  // Privacy vs. Safety trade{-}off}
+\NormalTok{  prohibition: \{}
+\NormalTok{    CareAgent.share(margaret.data, third\_party)}
+\NormalTok{      unless consent\_given OR emergency OR mandated\_reporter;}
+\NormalTok{  \};}
+  
+\NormalTok{  // Autonomy preservation}
+\NormalTok{  prohibition: \{}
+\NormalTok{    CareAgent.override(margaret.decision)}
+\NormalTok{      unless cognitive\_state == unresponsive OR imminent\_danger;}
+\NormalTok{  \};}
+  
+\NormalTok{  // Context{-}sensitive norm adaptation}
+\NormalTok{  context\_sensitivity: \{}
+\NormalTok{    during margaret.cognitive\_state == confused:}
+\NormalTok{      allow increased\_monitoring without explicit\_consent;}
+\NormalTok{      increase medication\_reminder\_frequency;}
+\NormalTok{  \};}
+  
+\NormalTok{  // Conflict resolution: safety trumps privacy in emergencies}
+\NormalTok{  priority: \{}
+\NormalTok{    when emergency\_status == critical:}
+\NormalTok{      obligation.call\_911 overrides prohibition.share\_data;}
+\NormalTok{  \};}
+\NormalTok{\}}
+\end{Highlighting}
+\end{Shaded}
+
+\hypertarget{c.-what-erisml-enables}{%
+\subsubsection{C. What ErisML Enables}\label{c.-what-erisml-enables}}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  \textbf{Legible trade-offs}: Family can see autonomy is 2nd priority
+  after safety
+\item
+  \textbf{Auditable decisions}: ``Why didn't system call 911?'' →
+  ``Glucose was 55, above threshold of 40''
+\item
+  \textbf{Adaptive constraints}: Norms flex with cognitive state, time
+  of day, emergency status
+\item
+  \textbf{Multi-stakeholder governance}: Margaret, daughter, care team,
+  and regulators have voice
+\item
+  \textbf{Longitudinal validation}: Test adaptation over months, not
+  just point-in-time
+\end{enumerate}
+
+\hypertarget{d.-what-erisml-cannot-prevent-failure-modes}{%
+\subsubsection{D. What ErisML Cannot Prevent (Failure
+Modes)}\label{d.-what-erisml-cannot-prevent-failure-modes}}
+
+\textbf{Gradual Cognitive Decline}: - ErisML has discrete states
+(clear/confused/unresponsive) - Reality: Decline is gradual with
+good/bad days - Risk: System flips between autonomy and paternalism
+erratically - Residual risk: Requires human oversight during state
+transitions
+
+\textbf{Privacy-Safety Gaming}: - Margaret might trigger false alarms to
+get attention - Daughter might engineer ``emergencies'' to get
+surveillance - Risk: Norm gaming by humans, not just AI - Mitigation:
+Partial (reputation systems, usage patterns analysis)
+
+\textbf{Sensor Failure Cascades}: - If glucose monitor fails during
+actual emergency, system may not detect danger - False positives from
+noisy sensors may cause alert fatigue - Risk: Over-reliance on
+unreliable sensors - Mitigation: Multi-sensor fusion, uncertainty-aware
+decision making
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+\hypertarget{vii.-research-roadmap}{%
+\subsection{VII. Research Roadmap}\label{vii.-research-roadmap}}
+
+\hypertarget{phase-1-foundations-years-1-2}{%
+\subsubsection{Phase 1: Foundations (Years
+1-2)}\label{phase-1-foundations-years-1-2}}
+
+\textbf{Goals}: Formal foundations, core language, proof-of-concept
+
+\textbf{Deliverables}: 1. Formal semantics document with operational
+semantics, type system, norm interpretation 2. Complexity
+characterization for fragments (decidability, tight bounds) 3. Reference
+parser and interpreter for ErisML-Core 4. Compilers to PDDL, PRISM,
+Python simulation 5. Benchmark suite: 50+ scenarios across healthcare,
+mobility, industrial
+
+\textbf{Concrete Milestones}: - M1.1: Inter-rater reliability on
+expressiveness: 3 experts, agreement \textgreater{} 0.8 (Krippendorff's
+α) - M1.2: Verification time \textless{} 1 minute for specs with
+\textless{} 100 state variables (ErisML-Core) - M1.3: Compilation
+correctness: 100\% of Core specs compile to PDDL/PRISM, verified via
+metamorphic testing
+
+\hypertarget{phase-2-integration-and-learning-years-2-4}{%
+\subsubsection{Phase 2: Integration and Learning (Years
+2-4)}\label{phase-2-integration-and-learning-years-2-4}}
+
+\textbf{Goals}: Integrate with foundation models, federated learning,
+edge deployment
+
+\textbf{Deliverables}: 1. Foundation model integration layer (LLM-based
+agents with ErisML governance) 2. Constrained RL algorithms provably
+respecting ErisML norms 3. Federated learning protocols with
+differential privacy encoded as ErisML policies 4. Edge optimization
+toolkit with ErisML runtime monitors 5. Real-world pilots in 3 domains
+
+\textbf{Concrete Milestones}: - M2.1: Healthcare pilot: 3 smart homes, 6
+months, norm violation rate \textless{} 2\%, patient satisfaction
+\textgreater{} 70\% - M2.2: Campus mobility: 5 shuttles, 10k trips, zero
+safety incidents, throughput within 10\% of baseline - M2.3: Edge
+deployment: Norm checking latency \textless{} 100ms on Raspberry Pi 4
+
+\hypertarget{phase-3-scaling-and-standards-years-4-5}{%
+\subsubsection{Phase 3: Scaling and Standards (Years
+4-5)}\label{phase-3-scaling-and-standards-years-4-5}}
+
+\textbf{Goals}: Scale to multi-stakeholder systems, develop
+standardization pathway
+
+\textbf{Deliverables}: 1. Distributed ErisML with federation protocols,
+Byzantine tolerance 2. Visual modeling tools (IDE, graphical editors) 3.
+Conformance test suite for implementations 4. Standards proposal to IEEE
+P2863 / ISO working groups 5. Open-source ecosystem
+
+\textbf{Success Metrics}: - 5+ independent implementations - 100+ public
+specifications, 10k+ downloads - IEEE/ISO working group formed with 20+
+organizational members - Deployments span 3+ countries
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+\hypertarget{viii.-related-standards-and-interoperability}{%
+\subsection{VIII. Related Standards and
+Interoperability}\label{viii.-related-standards-and-interoperability}}
+
+ErisML must align with emerging regulatory and technical standards:
+
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.2273}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.2955}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.3636}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.1136}}@{}}
+\toprule
+\begin{minipage}[b]{\linewidth}\raggedright
+Standard
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Requirement
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+ErisML Support
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Gap
+\end{minipage} \\
+\midrule
+\endhead
+IEEE P7001 (Transparency) & Explainable decisions & Audit trail (R4),
+provenance & Need natural language summaries \\
+IEEE P7003 (Algorithmic Bias) & Fairness metrics & Multi-objective
+intents encode fairness & No built-in bias detection tools \\
+EU AI Act & High-risk system documentation & Formal specs provide
+documentation & Need certification pathway \\
+ISO 23894 (AI Risk Mgmt) & Risk assessment, monitoring & Runtime
+monitoring, safety metrics & Need standardized risk scoring \\
+NIST AI RMF & Trustworthy AI characteristics & Maps to requirements
+R1-R5 & Need detailed guidance documents \\
+\bottomrule
+\end{longtable}
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+\hypertarget{ix.-limitations-and-risks}{%
+\subsection{IX. Limitations and Risks}\label{ix.-limitations-and-risks}}
+
+\hypertarget{a.-technical-limitations}{%
+\subsubsection{A. Technical
+Limitations}\label{a.-technical-limitations}}
+
+\textbf{Computational intractability}: Full verification may be NP-hard
+or undecidable. We verify approximations, not actual systems (especially
+for learned components).
+
+\textbf{Specification incompleteness}: Open-world environments prevent
+anticipating all states/events. Systems will encounter situations
+outside specifications.
+
+\textbf{Learning-specification mismatch}: Gap between continuous neural
+embeddings and discrete symbolic logic is fundamental. No perfect bridge
+exists.
+
+\textbf{Scalability limits}: As systems grow (millions of agents,
+billions of states), centralized specifications may become unmanageable.
+
+\hypertarget{b.-societal-and-ethical-risks}{%
+\subsubsection{B. Societal and Ethical
+Risks}\label{b.-societal-and-ethical-risks}}
+
+\textbf{Specification as control}: ErisML could enable centralized
+control, with specifications written by the powerful and imposed on the
+vulnerable.
+
+\textbf{Complexity as opacity}: If specifications are too complex to
+understand, they obscure rather than illuminate. May create false
+confidence.
+
+\textbf{Gaming and exploitation}: Adversaries could craft malicious
+specifications that technically comply with norms but violate their
+spirit.
+
+\textbf{Power dynamics}: Who writes specifications embeds values and
+power relations. Corporate-written specs encode corporate interests;
+government-written specs encode state priorities. We cannot solve this
+through better syntax---it requires transparency, contestation
+mechanisms, and accountability structures.
+
+\hypertarget{c.-environmental-costs}{%
+\subsubsection{C. Environmental Costs}\label{c.-environmental-costs}}
+
+Formal verification, multi-agent simulation, and continuous monitoring
+are compute-intensive. At scale (smart cities, IoT), this could mean: -
+Billions of norm checks per day - Continuous verification as systems
+adapt - Significant energy consumption
+
+We must weigh governance benefits against environmental costs.
+Prioritize high-stakes domains (healthcare, safety-critical) over
+convenience applications (smart lightbulbs).
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+\hypertarget{x.-open-questions}{%
+\subsection{X. Open Questions}\label{x.-open-questions}}
+
+\textbf{Q1: Specification-Reality Gap}: Can symbolic specifications ever
+fully capture learned model behavior? Or is there a fundamental
+representational mismatch?
+
+\textbf{Q2: Democratic Specification}: How do we ensure specifications
+reflect diverse stakeholder values in public systems? Participatory
+design {[}34{]} provides methods, but pervasive systems blur stakeholder
+boundaries.
+
+\textbf{Q3: Equilibrium Concept}: What is the right strategic
+equilibrium for human-AI teams under norms? Nash equilibria are chaotic;
+cooperative solutions require shared objectives.
+
+\textbf{Q4: Adaptation-Safety Trade-off}: How do we maintain safety
+invariants across specification updates? Can we automatically propose
+specification changes based on failures?
+
+\textbf{Q5: Privacy-Transparency Paradox}: Auditing requires
+transparency; privacy requires opacity. We cannot have perfect auditing
+and perfect privacy. Where should the balance be?
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+\hypertarget{xi.-conclusion}{%
+\subsection{XI. Conclusion}\label{xi.-conclusion}}
+
+As foundation models move from cloud to edge, from single-purpose to
+multi-agent, from controlled to pervasive environments, fragmented
+approaches to governance will fail. We risk accidents from misalignment,
+violations from ignorance, failures from brittleness, injustice from
+opacity, and erosion of trust.
+
+ErisML proposes structured governance---not eliminating conflict (which
+is impossible in pluralistic systems) but making trade-offs explicit,
+enabling governance without tyranny, and supporting coexistence of
+agents with divergent goals.
+
+This vision paper is an invitation, not a proclamation. The challenges
+are profound: - Fundamental gaps between symbolic specs and learned
+models - Undecidability for expressive fragments - Power dynamics in who
+writes specifications - Open questions about equilibrium concepts -
+Environmental costs of formal verification
+
+But the alternative---continuing with prompts, rules, and ad-hoc
+code---is worse.
+
+The path from vision to reality requires technical innovation, social
+negotiation, institutional change, and ongoing learning. We offer ErisML
+not as a finished solution but as a starting point---a design space, a
+set of challenges, and an invitation to collaborate.
+
+The age of pervasive AI is here. The chaos is real. Will we face it with
+fragmented tools, or build common foundations for governance, safety,
+and trust?
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+\hypertarget{acknowledgments}{%
+\subsection{Acknowledgments}\label{acknowledgments}}
+
+The author thanks anonymous reviewers whose feedback shaped this vision.
+Discussions with colleagues in pervasive computing, AI safety,
+multi-agent systems, and HCI informed this work. Some editorial
+refinements were AI-assisted; all content was reviewed and approved by
+the author.
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+\hypertarget{references}{%
+\subsection{References}\label{references}}
+
+{[}1{]} M. Weiser, ``The Computer for the 21st Century,''
+\emph{Scientific American}, vol.~265, no. 3, pp.~94-104, 1991.
+
+{[}2{]} M. Satyanarayanan, ``Pervasive Computing: Vision and
+Challenges,'' \emph{IEEE Pervasive Computing}, vol.~1, no. 4, pp.~10-17,
+2001.
+
+{[}3{]} R. Bommasani et al., ``On the Opportunities and Risks of
+Foundation Models,'' \emph{arXiv:2108.07258}, 2021.
+
+{[}4{]} J. Achiam et al., ``GPT-4 Technical Report,''
+\emph{arXiv:2303.08774}, 2023.
+
+{[}5{]} M. Ghallab, D. Nau, and P. Traverso, \emph{Automated Planning:
+Theory and Practice}, Morgan Kaufmann, 2004.
+
+{[}6{]} R. S. Sutton and A. G. Barto, \emph{Reinforcement Learning: An
+Introduction}, 2nd ed., MIT Press, 2018.
+
+{[}7{]} M. Wooldridge, \emph{An Introduction to MultiAgent Systems}, 2nd
+ed., Wiley, 2009.
+
+{[}8{]} J. Carmo and A. J. I. Jones, ``Deontic Logic and
+Contrary-to-Duties,'' in \emph{Handbook of Philosophical Logic}, vol.~8,
+pp.~265-343, 2002.
+
+{[}9{]} D. Amodei et al., ``Concrete Problems in AI Safety,''
+\emph{arXiv:1606.06565}, 2016.
+
+{[}10{]} L. Ouyang et al., ``Training Language Models to Follow
+Instructions with Human Feedback,'' \emph{NeurIPS}, 2022.
+
+{[}11{]} Y. Bai et al., ``Constitutional AI: Harmlessness from AI
+Feedback,'' \emph{arXiv:2212.08073}, 2022.
+
+{[}12{]} Anthropic, ``Claude's Constitution,''
+https://www.anthropic.com/index/claudes-constitution, 2023.
+
+{[}13{]} D. Hadfield-Menell et al., ``Inverse Reward Design,''
+\emph{NeurIPS}, 2017.
+
+{[}14{]} B. McMahan et al., ``Communication-Efficient Learning of Deep
+Networks from Decentralized Data,'' \emph{AISTATS}, 2017.
+
+{[}15{]} C. Dwork, ``Differential Privacy,'' \emph{ICALP}, 2006.
+
+{[}16{]} S. Amershi et al., ``Guidelines for Human-AI Interaction,''
+\emph{CHI}, 2019.
+
+{[}17{]} P. Liang et al., ``Holistic Evaluation of Language Models,''
+\emph{arXiv:2211.09110}, 2022.
+
+{[}18{]} D. Sculley et al., ``Hidden Technical Debt in Machine Learning
+Systems,'' \emph{NeurIPS}, 2015.
+
+{[}19{]} T. Gebru et al., ``Datasheets for Datasets,''
+\emph{Communications of the ACM}, vol.~64, no. 12, pp.~86-92, 2021.
+
+{[}20{]} M. Mitchell et al., ``Model Cards for Model Reporting,''
+\emph{FAT*}, 2019.
+
+{[}21{]} N. Dalal et al., ``Value-Sensitive Design and Information
+Systems,'' in \emph{The Handbook of Information and Computer Ethics},
+Wiley, 2008.
+
+{[}22{]} D. Ha and J. Schmidhuber, ``World Models,''
+\emph{arXiv:1803.10122}, 2018.
+
+{[}23{]} D. Hafner et al., ``Mastering Atari with Discrete World
+Models,'' \emph{ICLR}, 2021.
+
+{[}24{]} A. Rai, ``Explainable AI: From Black Box to Glass Box,''
+\emph{Journal of the Academy of Marketing Science}, vol.~48,
+pp.~137-141, 2020.
+
+{[}25{]} S. Russell, \emph{Human Compatible: Artificial Intelligence and
+the Problem of Control}, Viking, 2019.
+
+{[}26{]} V. Dignum, \emph{Responsible Artificial Intelligence: How to
+Develop and Use AI in a Responsible Way}, Springer, 2019.
+
+{[}27{]} I. Rahwan et al., ``Machine Behaviour,'' \emph{Nature},
+vol.~568, pp.~477-486, 2019.
+
+{[}28{]} S. Yao et al., ``ReAct: Synergizing Reasoning and Acting in
+Language Models,'' \emph{ICLR}, 2023.
+
+{[}29{]} N. Shinn et al., ``Reflexion: Language Agents with Verbal
+Reinforcement,'' \emph{arXiv:2303.11366}, 2023.
+
+{[}30{]} G. Wang et al., ``Voyager: An Open-Ended Embodied Agent with
+LLMs,'' \emph{arXiv:2305.16291}, 2023.
+
+{[}31{]} F. Dignum et al., ``Meeting the Deadline: Why, When and How,''
+in \emph{Formal Approaches to Agent-Based Systems}, Springer, 2004.
+
+{[}32{]} M. Sergot, ``A Computational Theory of Normative Positions,''
+\emph{ACM Trans. on Computational Logic}, vol.~2, no. 4, pp.~581-622,
+2001.
+
+{[}33{]} R. H. Bordini, J. F. Hübner, and M. Wooldridge,
+\emph{Programming Multi-Agent Systems in AgentSpeak using Jason}, Wiley,
+2007.
+
+{[}34{]} J. Simonsen and T. Robertson, \emph{Routledge International
+Handbook of Participatory Design}, Routledge, 2012.
+
+{[}35{]} O. Maler and D. Nickovic, ``Monitoring Temporal Properties of
+Continuous Signals,'' in \emph{Formal Techniques, Modelling and Analysis
+of Timed and Fault-Tolerant Systems}, Springer, 2004.
+
+{[}36{]} A. Platzer, ``Logical Foundations of Cyber-Physical Systems,''
+Springer, 2018.
+
+{[}37{]} Y. Bengio et al., ``A Meta-Transfer Objective for Learning to
+Disentangle Causal Mechanisms,'' \emph{ICLR}, 2020.
+
+{[}38{]} D. Abel et al., ``Agent-Agnostic Human-in-the-Loop
+Reinforcement Learning,'' \emph{arXiv:1701.04079}, 2017.
+
+{[}39{]} C. Finn et al., ``Model-Agnostic Meta-Learning for Fast
+Adaptation,'' \emph{ICML}, 2017.
+
+{[}40{]} European Commission, ``Proposal for a Regulation on Artificial
+Intelligence (AI Act),'' 2021.
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+\hypertarget{appendix-a-erisml-grammar-excerpt}{%
+\subsection{Appendix A: ErisML Grammar
+(Excerpt)}\label{appendix-a-erisml-grammar-excerpt}}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{\textless{}model\textgreater{} ::= \textless{}environment\textgreater{} \textless{}agent\textgreater{}* \textless{}norms\textgreater{}? \textless{}dynamics\textgreater{}? \textless{}validation\textgreater{}?}
+
+\NormalTok{\textless{}environment\textgreater{} ::= "environment" \textless{}id\textgreater{} "\{" \textless{}env{-}body\textgreater{} "\}"}
+\NormalTok{\textless{}env{-}body\textgreater{} ::= \textless{}objects\textgreater{} \textless{}state\textgreater{} \textless{}observations\textgreater{}? \textless{}dynamics\textgreater{}}
+
+\NormalTok{\textless{}agent\textgreater{} ::= "agent" \textless{}id\textgreater{} "\{" \textless{}agent{-}body\textgreater{} "\}"}
+\NormalTok{\textless{}agent{-}body\textgreater{} ::= \textless{}capabilities\textgreater{} \textless{}beliefs\textgreater{} \textless{}intents\textgreater{} \textless{}constraints\textgreater{}?}
+
+\NormalTok{\textless{}norms\textgreater{} ::= "norms" \textless{}id\textgreater{} "\{" \textless{}norm{-}rule\textgreater{}* "\}"}
+\NormalTok{\textless{}norm{-}rule\textgreater{} ::= \textless{}permission\textgreater{} | \textless{}prohibition\textgreater{} | \textless{}obligation\textgreater{} | \textless{}sanction\textgreater{}}
+
+\NormalTok{\textless{}permission\textgreater{} ::= "permission:" "\{" \textless{}action{-}expr\textgreater{} \textless{}condition\textgreater{}? "\}" ";"}
+\NormalTok{\textless{}prohibition\textgreater{} ::= "prohibition:" "\{" \textless{}action{-}expr\textgreater{} \textless{}condition\textgreater{}? "\}" ";"}
+\NormalTok{\textless{}obligation\textgreater{} ::= "obligation:" "\{" \textless{}action{-}expr\textgreater{} \textless{}deadline\textgreater{}? "\}" ";"}
+
+\NormalTok{\textless{}intents\textgreater{} ::= "intents:" \textless{}intent{-}expr\textgreater{} ";"}
+\NormalTok{\textless{}intent{-}expr\textgreater{} ::= \textless{}weighted\textgreater{} | \textless{}lexicographic\textgreater{} | \textless{}constrained\textgreater{}}
+
+\NormalTok{\textless{}condition\textgreater{} ::= "when" \textless{}expr\textgreater{} | "unless" \textless{}expr\textgreater{}}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+\hypertarget{appendix-b-compilation-example-pddl}{%
+\subsection{Appendix B: Compilation Example
+(PDDL)}\label{appendix-b-compilation-example-pddl}}
+
+\textbf{ErisML Input}:
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{environment SimpleRoom \{}
+\NormalTok{  objects: Robot, Door;}
+\NormalTok{  state:}
+\NormalTok{    door.status: \{open, closed\};}
+\NormalTok{    robot.location: \{inside, outside\};}
+\NormalTok{  dynamics:}
+\NormalTok{    open\_door() \textasciitilde{}\textgreater{} door.status = open;}
+\NormalTok{    enter() \textasciitilde{}\textgreater{} robot.location = inside if door.status == open;}
+\NormalTok{\}}
+
+\NormalTok{agent Robot \{}
+\NormalTok{  intents: goal robot.location == inside;}
+\NormalTok{\}}
+
+\NormalTok{norms Safety \{}
+\NormalTok{  prohibition: Robot.enter() unless door.status == open;}
+\NormalTok{\}}
+\end{Highlighting}
+\end{Shaded}
+
+\textbf{PDDL Output}:
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{(define (domain simple{-}room)}
+\NormalTok{  (:requirements :strips :typing)}
+\NormalTok{  (:predicates (door{-}open) (door{-}closed) (robot{-}inside) (robot{-}outside))}
+  
+\NormalTok{  (:action open{-}door}
+\NormalTok{    :parameters ()}
+\NormalTok{    :precondition (door{-}closed)}
+\NormalTok{    :effect (and (door{-}open) (not (door{-}closed))))}
+  
+\NormalTok{  (:action enter}
+\NormalTok{    :parameters ()}
+\NormalTok{    :precondition (and (robot{-}outside) (door{-}open))  ; Norm enforced}
+\NormalTok{    :effect (and (robot{-}inside) (not (robot{-}outside)))))}
+
+\NormalTok{(define (problem reach{-}inside)}
+\NormalTok{  (:domain simple{-}room)}
+\NormalTok{  (:init (door{-}closed) (robot{-}outside))}
+\NormalTok{  (:goal (robot{-}inside)))}
+\end{Highlighting}
+\end{Shaded}
+
+\textbf{Note}: The prohibition from \texttt{norms\ Safety} is compiled
+into the precondition of the \texttt{enter} action. This ensures the
+planner never generates norm-violating plans, but provenance information
+(that this precondition comes from a norm) is lost in translation.
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+\textbf{Word Count}: \textasciitilde9,500 words (\textasciitilde25 pages
+at standard formatting) \textbf{Figures needed}: 3-5 diagrams as noted
+in review \textbf{Target venues}: IEEE Pervasive Computing, ACM TCPS, AI
+Magazine
+
+\end{document}

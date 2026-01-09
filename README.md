@@ -18,7 +18,7 @@ We coordinate on Discord and GitHub Discussions.
 1. ⭐ Star this repo
 2. [Join our Discord] https://discord.gg/W3Bkj4AZ
 3. Introduce yourself in `#introductions`
-4. Read [DISCUSSIONS_WELCOME.md](./DISCUSSIONS_WELCOME.md)
+4. Read [DISCUSSIONS_WELCOME.md](./docs/community/DISCUSSIONS_WELCOME.md)
 5. Pick up a `good-first-issue` or propose your own contribution
 
 Questions? Reach out to andrew.bond@sjsu.edu or ping us on Discord.
@@ -1161,205 +1161,205 @@ This document provides a comprehensive index of all documentation files in the E
 
 ## ErisML Foundation Papers
 
-1. **[erisml.md](https://github.com/ahb-sjsu/erisml-lib/blob/main/erisml.md)**  
+1. **[erisml.md](https://github.com/ahb-sjsu/erisml-lib/blob/main/docs/vision/erisml.md)**  
    Core ErisML language specification in markdown format detailing syntax, semantics, and execution model.
 
-2. **[erisml.pdf](https://github.com/ahb-sjsu/erisml-lib/blob/main/erisml.pdf)**  
+2. **[erisml.pdf](https://github.com/ahb-sjsu/erisml-lib/blob/main/docs/papers/foundations/erisml.pdf)**  
    Comprehensive PDF documentation of ErisML language specification, formal grammar, and denotational semantics.
 
-3. **[ErisML_Vision.md](https://github.com/ahb-sjsu/erisml-lib/blob/main/ErisML_Vision.md)**  
+3. **[ErisML_Vision.md](https://github.com/ahb-sjsu/erisml-lib/blob/main/docs/vision/ErisML_Vision.md)**  
    Vision document outlining ErisML goals, architecture, and philosophy for governed AI agents in pervasive computing.
 
-4. **[ErisML Vision Paper.pdf](https://github.com/ahb-sjsu/erisml-lib/blob/main/ErisML%20Vision%20Paper.pdf)**  
+4. **[ErisML Vision Paper.pdf](https://github.com/ahb-sjsu/erisml-lib/blob/main/docs/papers/foundations/ErisML%20Vision%20Paper.pdf)**  
    Academic vision paper presenting theoretical foundations and challenges of creating governed AI agents.
 
-5. **[ErisML_IEEE.pdf](https://github.com/ahb-sjsu/erisml-lib/blob/main/ErisML_IEEE.pdf)**  
+5. **[ErisML_IEEE.pdf](https://github.com/ahb-sjsu/erisml-lib/blob/main/docs/papers/foundations/ErisML_IEEE.pdf)**  
    IEEE-formatted publication documenting technical aspects including concrete syntax and execution semantics.
 
 6. **[ErisML_IEEE.tex](https://github.com/ahb-sjsu/erisml-lib/blob/main/ErisML_IEEE.tex)**  
    LaTeX source code for the IEEE publication.
 
-7. **[ErisML - Comparison with Related Normative Frameworks.md](https://github.com/ahb-sjsu/erisml-lib/blob/main/ErisML%20-%20Comparison%20with%20Related%20Normative%20Frameworks.md)**  
+7. **[ErisML - Comparison with Related Normative Frameworks.md](https://github.com/ahb-sjsu/erisml-lib/blob/main/docs/guides/ErisML%20-%20Comparison%20with%20Related%20Normative%20Frameworks.md)**  
    Comparative analysis of ErisML against other normative and governance frameworks in AI.
 
 ---
 
 ## GUASS (Grand Unified AI Safety Stack)
 
-1. **[GUASS_SAI.md](https://github.com/ahb-sjsu/erisml-lib/blob/main/GUASS_SAI.md)**  
+1. **[GUASS_SAI.md](https://github.com/ahb-sjsu/erisml-lib/blob/main/docs/guides/GUASS_SAI.md)**  
    The Grand Unified AI Safety Stack: SAI-Hardened Edition. A comprehensive contract-and-cage architecture for agentic AI integrating invariance enforcement, cryptographic attestation, capability bounds, zero-trust architecture, mechanistic monitoring, and SAI-level hardening. Includes 45 academic references. Companion paper to Electrodynamics of Value.
 
-2. **[GUASS_SAI_paper.pdf](https://github.com/ahb-sjsu/erisml-lib/blob/main/GUASS_SAI_paper.pdf)**  
+2. **[GUASS_SAI_paper.pdf](https://github.com/ahb-sjsu/erisml-lib/blob/main/docs/papers/foundations/GUASS_SAI_paper.pdf)**  
    PDF version of the Grand Unified AI Safety Stack specification for distribution and review.
 
 ---
 
 ## DEME (Democratic Ethics Module Engine) 2.0
 
-1. **[DEME_2.0_Vision_Paper.md](https://github.com/ahb-sjsu/erisml-lib/blob/main/DEME_2.0_Vision_Paper.md)**  
+1. **[DEME_2.0_Vision_Paper.md](https://github.com/ahb-sjsu/erisml-lib/blob/main/docs/vision/DEME_2.0_Vision_Paper.md)**  
    Vision paper for DEME 2.0 architecture introducing democratic governance for AI ethics modules.
 
-2. **[DEME 2.0 - NMI Manuscript - Dec 2025.pdf](https://github.com/ahb-sjsu/erisml-lib/blob/main/DEME%202.0%20-%20NMI%20Manuscript%20-%20Dec%202025.pdf)**  
+2. **[DEME 2.0 - NMI Manuscript - Dec 2025.pdf](https://github.com/ahb-sjsu/erisml-lib/blob/main/docs/papers/foundations/DEME%202.0%20-%20NMI%20Manuscript%20-%20Dec%202025.pdf)**  
    Recent manuscript on DEME 2.0 Normative Module Integration (NMI) architecture and implementation.
 
 3. **[DEME 2.0 - Three tier architecture.svg](https://github.com/ahb-sjsu/erisml-lib/blob/main/DEME%202.0%20-%20Three%20tier%20architecture.svg)**  
    SVG diagram illustrating the three-tier architectural design of DEME 2.0 system.
 
-4. **[DEME Advanced Architectural Roadmap.md](https://github.com/ahb-sjsu/erisml-lib/blob/main/DEME%20Advanced%20Architectural%20Roadmap.md)**  
+4. **[DEME Advanced Architectural Roadmap.md](https://github.com/ahb-sjsu/erisml-lib/blob/main/docs/vision/DEME%20Advanced%20Architectural%20Roadmap.md)**  
    Technical roadmap detailing advanced architectural features and mobile agent hardware integration for DEME.
 
-5. **[DEME_EFM_Design_Guide_v0.1.md](https://github.com/ahb-sjsu/erisml-lib/blob/main/DEME_EFM_Design_Guide_v0.1.md)**  
+5. **[DEME_EFM_Design_Guide_v0.1.md](https://github.com/ahb-sjsu/erisml-lib/blob/main/docs/guides/DEME_EFM_Design_Guide_v0.1.md)**  
    Design guide for Ethical Facts Modules (EFM) in DEME, covering implementation patterns and best practices.
 
-6. **[DEME–ErisML Governance Plugin for Gazebo.pdf](https://github.com/ahb-sjsu/erisml-lib/blob/main/DEME%E2%80%93ErisML%20Governance%20Plugin%20for%20Gazebo.pdf)**  
+6. **[DEME–ErisML Governance Plugin for Gazebo.pdf](https://github.com/ahb-sjsu/erisml-lib/blob/main/docs/papers/foundations/DEME%E2%80%93ErisML%20Governance%20Plugin%20for%20Gazebo.pdf)**  
    Documentation for integrating DEME-ErisML governance into Gazebo robotics simulator.
 
 7. **[deme_profile_v03.json](https://github.com/ahb-sjsu/erisml-lib/blob/main/deme_profile_v03.json)**  
    JSON configuration profile for DEME deployment, including ethics module settings and governance parameters.
 
-8. **[deme_whitepaper_nist.md](https://github.com/ahb-sjsu/erisml-lib/blob/main/deme_whitepaper_nist.md)**  
+8. **[deme_whitepaper_nist.md](https://github.com/ahb-sjsu/erisml-lib/blob/main/docs/guides/deme_whitepaper_nist.md)**  
    NIST-oriented whitepaper on DEME system architecture and compliance with AI governance standards.
 
-9. **[SGE DEME2 Nontechnical Summary.pdf](https://github.com/ahb-sjsu/erisml-lib/blob/main/SGE%20DEME2%20Nontechnical%20Summary.pdf)**  
+9. **[SGE DEME2 Nontechnical Summary.pdf](https://github.com/ahb-sjsu/erisml-lib/blob/main/docs/papers/foundations/SGE%20DEME2%20Nontechnical%20Summary.pdf)**  
    Non-technical summary of Stratified Geometric Ethics integration with DEME 2.0 for general audiences.
 
-10. **[SGE+DEME_2.0_Nontechnical_Summary.pdf](https://github.com/ahb-sjsu/erisml-lib/blob/main/SGE%2BDEME_2.0_Nontechnical_Summary.pdf)**  
+10. **[SGE+DEME_2.0_Nontechnical_Summary.pdf](https://github.com/ahb-sjsu/erisml-lib/blob/main/docs/papers/foundations/SGE%2BDEME_2.0_Nontechnical_Summary.pdf)**  
     Combined non-technical overview of SGE and DEME 2.0 collaboration and capabilities.
 
 ---
 
 ## DEME 3.0 & Tensorial Ethics
 
-1. **[DEME_3.0_Tensorial_Ethics_Vision.md](https://github.com/ahb-sjsu/erisml-lib/blob/main/DEME_3.0_Tensorial_Ethics_Vision.md)**  
+1. **[DEME_3.0_Tensorial_Ethics_Vision.md](https://github.com/ahb-sjsu/erisml-lib/blob/main/docs/vision/DEME_3.0_Tensorial_Ethics_Vision.md)**  
    Vision document for DEME 3.0 introducing tensorial ethics framework for multi-dimensional moral reasoning.
 
 2. **[Tensorial Ethics.docx](https://github.com/ahb-sjsu/erisml-lib/blob/main/Tensorial%20Ethics.docx)**  
    Word document version of tensorial ethics framework with detailed mathematical formulations.
 
-3. **[Tensorial Ethics.pdf](https://github.com/ahb-sjsu/erisml-lib/blob/main/Tensorial%20Ethics.pdf)**  
+3. **[Tensorial Ethics.pdf](https://github.com/ahb-sjsu/erisml-lib/blob/main/docs/papers/foundations/Tensorial%20Ethics.pdf)**  
    PDF publication on tensorial ethics combining geometric algebra with ethical reasoning.
 
-4. **[tensorial_ethics_chapter_2.md](https://github.com/ahb-sjsu/erisml-lib/blob/main/tensorial_ethics_chapter_2.md)**  
+4. **[tensorial_ethics_chapter_2.md](https://github.com/ahb-sjsu/erisml-lib/blob/main/docs/guides/tensorial_ethics_chapter_2.md)**
    Chapter 2 of tensorial ethics series covering mathematical foundations and tensor representations.
 
-5. **[tensorial_ethics_chapter_3.md](https://github.com/ahb-sjsu/erisml-lib/blob/main/tensorial_ethics_chapter_3.md)**  
+5. **[tensorial_ethics_chapter_3.md](https://github.com/ahb-sjsu/erisml-lib/blob/main/docs/guides/tensorial_ethics_chapter_3.md)**
    Chapter 3 exploring ethical manifolds and geometric structures in moral decision spaces.
 
-6. **[tensorial_ethics_chapter_4.md](https://github.com/ahb-sjsu/erisml-lib/blob/main/tensorial_ethics_chapter_4.md)**  
+6. **[tensorial_ethics_chapter_4.md](https://github.com/ahb-sjsu/erisml-lib/blob/main/docs/guides/tensorial_ethics_chapter_4.md)**
    Chapter 4 detailing practical applications and computational methods for tensorial ethics.
 
-7. **[The Inevitability of Tensorial Manifolds in Multi-Agent Ethics.pdf](https://github.com/ahb-sjsu/erisml-lib/blob/main/The%20Inevitability%20of%20Tensorial%20Manifolds%20in%20Multi-Agent%20Ethics.pdf)**  
+7. **[The Inevitability of Tensorial Manifolds in Multi-Agent Ethics.pdf](https://github.com/ahb-sjsu/erisml-lib/blob/main/docs/papers/foundations/The%20Inevitability%20of%20Tensorial%20Manifolds%20in%20Multi-Agent%20Ethics.pdf)**
    Theoretical paper arguing for necessity of tensorial manifolds in representing multi-agent ethical interactions.
 
 ---
 
 ## Stratified Geometric Ethics (SGE)
 
-1. **[geometric_ethics.pdf](https://github.com/ahb-sjsu/erisml-lib/blob/main/geometric_ethics.pdf)**  
+1. **[geometric_ethics.pdf](https://github.com/ahb-sjsu/erisml-lib/blob/main/docs/papers/foundations/geometric_ethics.pdf)**
    Introduction to geometric ethics framework using differential geometry for moral analysis.
 
-2. **[Stratified Geometric Ethics - Foundational Paper - Bond - Dec 2025.pdf](https://github.com/ahb-sjsu/erisml-lib/blob/main/Stratified%20Geometric%20Ethics%20-%20Foundational%20Paper%20-%20Bond%20-%20Dec%202025.pdf)**  
+2. **[Stratified Geometric Ethics - Foundational Paper - Bond - Dec 2025.pdf](https://github.com/ahb-sjsu/erisml-lib/blob/main/docs/papers/foundations/Stratified%20Geometric%20Ethics%20-%20Foundational%20Paper%20-%20Bond%20-%20Dec%202025.pdf)**
    Foundational paper on Stratified Geometric Ethics methodology (December 2025 version).
 
-3. **[The_Geometry_of_Good_塞翁失马.pdf](https://github.com/ahb-sjsu/erisml-lib/blob/main/The_Geometry_of_Good_%E5%A1%9E%E7%BF%81%E5%A4%B1%E9%A9%AC.pdf)**  
+3. **[The_Geometry_of_Good_塞翁失马.pdf](https://github.com/ahb-sjsu/erisml-lib/blob/main/docs/papers/foundations/The_Geometry_of_Good_%E5%A1%9E%E7%BF%81%E5%A4%B1%E9%A9%AC.pdf)**
    Philosophical exploration of geometric ethics with cross-cultural perspectives (塞翁失马 - Sàiwēngshīmǎ).
 
-4. **[geometry_of_good_whitepaper.pdf](https://github.com/ahb-sjsu/erisml-lib/blob/main/geometry_of_good_whitepaper.pdf)**  
+4. **[geometry_of_good_whitepaper.pdf](https://github.com/ahb-sjsu/erisml-lib/blob/main/docs/papers/foundations/geometry_of_good_whitepaper.pdf)**
    Whitepaper on geometric approaches to defining and computing ethical good in AI systems.
 
-5. **[sge_section_9_4_6_bip_verification.md](https://github.com/ahb-sjsu/erisml-lib/blob/main/sge_section_9_4_6_bip_verification.md)**  
+5. **[sge_section_9_4_6_bip_verification.md](https://github.com/ahb-sjsu/erisml-lib/blob/main/docs/guides/sge_section_9_4_6_bip_verification.md)**
    Technical section documenting Bond Invariance Principle verification methods in SGE framework.
 
-6. **[Geometry_of_Integrity_Paper.md](https://github.com/ahb-sjsu/erisml-lib/blob/main/Geometry_of_Integrity_Paper.md)**  
+6. **[Geometry_of_Integrity_Paper.md](https://github.com/ahb-sjsu/erisml-lib/blob/main/docs/guides/Geometry_of_Integrity_Paper.md)**
    Paper exploring the geometric structure of integrity constraints in ethical reasoning systems.
 
-7. **[Unified_Architecture_of_Ethical_Geometry.pdf](https://github.com/ahb-sjsu/erisml-lib/blob/main/Unified_Architecture_of_Ethical_Geometry.pdf)**  
+7. **[Unified_Architecture_of_Ethical_Geometry.pdf](https://github.com/ahb-sjsu/erisml-lib/blob/main/docs/papers/foundations/Unified_Architecture_of_Ethical_Geometry.pdf)**
    Unified architectural framework synthesizing geometric approaches to AI ethics.
 
 ---
 
 ## Invariance Principles & Mathematical Foundations
 
-1. **[bond_invariance_principle.md](https://github.com/ahb-sjsu/erisml-lib/blob/main/bond_invariance_principle.md)**  
+1. **[bond_invariance_principle.md](https://github.com/ahb-sjsu/erisml-lib/blob/main/docs/guides/bond_invariance_principle.md)**
    Core document defining the Bond Invariance Principle for consistent ethical reasoning across contexts.
 
-2. **[bond_invariance_principle.md.pdf](https://github.com/ahb-sjsu/erisml-lib/blob/main/bond_invariance_principle.md.pdf)**  
+2. **[bond_invariance_principle.md.pdf](https://github.com/ahb-sjsu/erisml-lib/blob/main/docs/papers/foundations/bond_invariance_principle.md.pdf)**
    PDF version of Bond Invariance Principle documentation for easy distribution.
 
-3. **[Epistemic Invariance Principle (EIP) (Draft).pdf](https://github.com/ahb-sjsu/erisml-lib/blob/main/Epistemic%20Invariance%20Principle%20%28EIP%29%20%28Draft%29.pdf)**  
+3. **[Epistemic Invariance Principle (EIP) (Draft).pdf](https://github.com/ahb-sjsu/erisml-lib/blob/main/docs/papers/foundations/Epistemic%20Invariance%20Principle%20%28EIP%29%20%28Draft%29.pdf)**
    Draft paper introducing Epistemic Invariance Principle redefining objectivity in AI systems.
 
-4. **[I-EIP_Monitor_Whitepaper.pdf](https://github.com/ahb-sjsu/erisml-lib/blob/main/I-EIP_Monitor_Whitepaper.pdf)**  
+4. **[I-EIP_Monitor_Whitepaper.pdf](https://github.com/ahb-sjsu/erisml-lib/blob/main/docs/papers/foundations/I-EIP_Monitor_Whitepaper.pdf)**
    Whitepaper on implementing EIP monitoring systems for foundation models and AI agents.
 
-5. **[Internal_EIP_Research_Proposal.pdf](https://github.com/ahb-sjsu/erisml-lib/blob/main/Internal_EIP_Research_Proposal.pdf)**  
+5. **[Internal_EIP_Research_Proposal.pdf](https://github.com/ahb-sjsu/erisml-lib/blob/main/docs/papers/foundations/Internal_EIP_Research_Proposal.pdf)**
    Internal research proposal for advancing EIP theory and practical implementation.
 
-6. **[Technical Brief - The Invariance Framework for Verifiable AI Governance.pdf](https://github.com/ahb-sjsu/erisml-lib/blob/main/Technical%20Brief%20-%20The%20Invariance%20Framework%20for%20Verifiable%20AI%20Governance.pdf)**  
+6. **[Technical Brief - The Invariance Framework for Verifiable AI Governance.pdf](https://github.com/ahb-sjsu/erisml-lib/blob/main/docs/papers/foundations/Technical%20Brief%20-%20The%20Invariance%20Framework%20for%20Verifiable%20AI%20Governance.pdf)**
    Technical brief outlining invariance-based framework for verifying AI governance compliance.
 
-7. **[Philosophy_Engineering_EIP_Technical_Whitepaper_v0.01.pdf](https://github.com/ahb-sjsu/erisml-lib/blob/main/Philosophy_Engineering_EIP_Technical_Whitepaper_v0.01.pdf)**  
+7. **[Philosophy_Engineering_EIP_Technical_Whitepaper_v0.01.pdf](https://github.com/ahb-sjsu/erisml-lib/blob/main/docs/papers/foundations/Philosophy_Engineering_EIP_Technical_Whitepaper_v0.01.pdf)**
    Early version technical whitepaper bridging philosophy and engineering in EIP implementation.
 
-8. **[Differential Geometry for Moral Alignment -The Mathematical Foundations of DEME 3.0.pdf](https://github.com/ahb-sjsu/erisml-lib/blob/main/Differential%20Geometry%20for%20Moral%20Alignment%20-The%20Mathematical%20Foundations%20of%20DEME%203.0.pdf)**  
+8. **[Differential Geometry for Moral Alignment -The Mathematical Foundations of DEME 3.0.pdf](https://github.com/ahb-sjsu/erisml-lib/blob/main/docs/papers/foundations/Differential%20Geometry%20for%20Moral%20Alignment%20-The%20Mathematical%20Foundations%20of%20DEME%203.0.pdf)**
    Mathematical foundations paper applying differential geometry to moral alignment in DEME 3.0.
 
 ---
 
 ## Gauge Theory & Physics-Inspired Ethics
 
-1. **[gauge_theory_control.pdf](https://github.com/ahb-sjsu/erisml-lib/blob/main/gauge_theory_control.pdf)**  
+1. **[gauge_theory_control.pdf](https://github.com/ahb-sjsu/erisml-lib/blob/main/docs/papers/foundations/gauge_theory_control.pdf)**
    Paper on applying gauge theory principles to ethical control systems and constraint management.
 
-2. **[stratified_gauge_theory.pdf](https://github.com/ahb-sjsu/erisml-lib/blob/main/stratified_gauge_theory.pdf)**  
+2. **[stratified_gauge_theory.pdf](https://github.com/ahb-sjsu/erisml-lib/blob/main/docs/papers/foundations/stratified_gauge_theory.pdf)**
    Stratified approach to gauge theory in ethical reasoning, combining topology with normative frameworks.
 
-3. **[electrodynamics_of_value.pdf](https://github.com/ahb-sjsu/erisml-lib/blob/main/electrodynamics_of_value.pdf)**  
+3. **[electrodynamics_of_value.pdf](https://github.com/ahb-sjsu/erisml-lib/blob/main/docs/papers/foundations/electrodynamics_of_value.pdf)**
    Electrodynamics of Value: Novel framework treating ethical values through electrodynamics-inspired field theory. Establishes gauge-theoretic foundations for alignment verification with 28 academic references. Companion paper to GUASS.
 
-4. **[BIP_Fusion_Theory_Whitepaper.md](https://github.com/ahb-sjsu/erisml-lib/blob/main/BIP_Fusion_Theory_Whitepaper.md)**  
+4. **[BIP_Fusion_Theory_Whitepaper.md](https://github.com/ahb-sjsu/erisml-lib/blob/main/docs/applications/BIP_Fusion_Theory_Whitepaper.md)**
    Whitepaper on fusion theory integrating Bond Invariance Principle across multiple ethical frameworks.
 
-5. **[foundations_paper.pdf](https://github.com/ahb-sjsu/erisml-lib/blob/main/foundations_paper.pdf)**  
+5. **[foundations_paper.pdf](https://github.com/ahb-sjsu/erisml-lib/blob/main/docs/papers/foundations/foundations_paper.pdf)**
    Foundational paper establishing theoretical basis for physics-inspired approaches to AI ethics.
 
-6. **[ruling_ring_synthesis.pdf](https://github.com/ahb-sjsu/erisml-lib/blob/main/ruling_ring_synthesis.pdf)**  
+6. **[ruling_ring_synthesis.pdf](https://github.com/ahb-sjsu/erisml-lib/blob/main/docs/papers/foundations/ruling_ring_synthesis.pdf)**
    Synthesis paper on ruling ring structures in ethical governance and constraint propagation.
 
 ---
 
 ## Mathematical Containment & Safety
 
-1. **[No_Escape_Mathematical_Containment_for_AI.pdf](https://github.com/ahb-sjsu/erisml-lib/blob/main/No_Escape_Mathematical_Containment_for_AI.pdf)**  
+1. **[No_Escape_Mathematical_Containment_for_AI.pdf](https://github.com/ahb-sjsu/erisml-lib/blob/main/docs/papers/foundations/No_Escape_Mathematical_Containment_for_AI.pdf)**
    Paper on mathematical methods for ensuring AI systems cannot escape ethical constraints.
 
-2. **[bip_audit_artifact.json](https://github.com/ahb-sjsu/erisml-lib/blob/main/bip_audit_artifact.json)**  
+2. **[bip_audit_artifact.json](https://github.com/ahb-sjsu/erisml-lib/blob/main/bip_audit_artifact.json)**
    JSON artifact containing Bond Invariance Principle audit trail and verification data.
 
 ---
 
 ## Philosophy & Ethics Papers
 
-1. **[The_End_of_Armchair_Ethics.pdf](https://github.com/ahb-sjsu/erisml-lib/blob/main/The_End_of_Armchair_Ethics.pdf)**  
+1. **[The_End_of_Armchair_Ethics.pdf](https://github.com/ahb-sjsu/erisml-lib/blob/main/docs/papers/foundations/The_End_of_Armchair_Ethics.pdf)**
    Paper arguing for the transition from traditional philosophical ethics to empirically testable normative engineering.
 
-2. **[A Pragmatist Rebuttal to Logical and Metaphysical Arguments for God.pdf](https://github.com/ahb-sjsu/erisml-lib/blob/main/A%20Pragmatist%20Rebuttal%20to%20Logical%20and%20Metaphysical%20Arguments%20for%20God.pdf)**  
+2. **[A Pragmatist Rebuttal to Logical and Metaphysical Arguments for God.pdf](https://github.com/ahb-sjsu/erisml-lib/blob/main/docs/papers/foundations/A%20Pragmatist%20Rebuttal%20to%20Logical%20and%20Metaphysical%20Arguments%20for%20God.pdf)**
    Philosophical paper applying pragmatist methodology to traditional arguments in philosophy of religion.
 
-3. **[ethical_geometry_reviewer_QA_v2.pdf](https://github.com/ahb-sjsu/erisml-lib/blob/main/ethical_geometry_reviewer_QA_v2.pdf)**  
+3. **[ethical_geometry_reviewer_QA_v2.pdf](https://github.com/ahb-sjsu/erisml-lib/blob/main/docs/papers/foundations/ethical_geometry_reviewer_QA_v2.pdf)**
    Q&A document addressing reviewer questions about the ethical geometry framework.
 
 ---
 
 ## Data & Configuration Files
 
-1. **[Item-1.jsonl](https://github.com/ahb-sjsu/erisml-lib/blob/main/Item-1.jsonl)**  
+1. **[Item-1.jsonl](https://github.com/ahb-sjsu/erisml-lib/blob/main/data/Item-1.jsonl)**
    JSONL data file containing structured items for DEME system testing and evaluation.
 
-2. **[top_10_domains_analysis.md](https://github.com/ahb-sjsu/erisml-lib/blob/main/top_10_domains_analysis.md)**  
+2. **[top_10_domains_analysis.md](https://github.com/ahb-sjsu/erisml-lib/blob/main/docs/guides/top_10_domains_analysis.md)**
    Analysis document ranking and evaluating top 10 application domains for ErisML and DEME deployment.
 
-3. **[Staff_Mathematician_Job_Posting.md](https://github.com/ahb-sjsu/erisml-lib/blob/main/Staff_Mathematician_Job_Posting.md)**  
+3. **[Staff_Mathematician_Job_Posting.md](https://github.com/ahb-sjsu/erisml-lib/blob/main/docs/community/Staff_Mathematician_Job_Posting.md)**
    Job posting for Staff Mathematician position to support ErisML/DEME mathematical foundations.
 
 ---
