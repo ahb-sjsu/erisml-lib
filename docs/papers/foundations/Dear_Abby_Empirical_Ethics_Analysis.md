@@ -493,26 +493,26 @@ class HealthcareEM(BaseEthicsModuleV2):
 
 **Scenario**: Monitoring AI system for ethical drift.
 
-**Use**: Dear Abby's bond index (0.84) becomes the health threshold.
+**Use**: Dear Abby's bond index (0.155) becomes the health threshold. Bond Index measures **deviation** from perfect correlative symmetry (0 = perfect, lower is better).
 
 ```python
 class BondIndexMonitor:
     """Monitor for correlative consistency drift."""
 
     def __init__(self):
-        self.baseline = get_bond_index_baseline()  # 0.84
-        self.warning_threshold = 0.70
-        self.critical_threshold = 0.55
+        self.baseline = get_bond_index_baseline()  # 0.155 (~15.5% violation rate)
+        self.warning_threshold = 0.30   # 30% violations = concerning
+        self.critical_threshold = 0.45  # 45% violations = critical
 
     def check(self, system_bond_index: float) -> AlertLevel:
-        if system_bond_index >= self.baseline * 0.95:
-            return AlertLevel.HEALTHY
-        elif system_bond_index >= self.warning_threshold:
+        if system_bond_index <= self.baseline * 1.05:
+            return AlertLevel.HEALTHY  # At or below baseline
+        elif system_bond_index <= self.warning_threshold:
             return AlertLevel.WARNING
-        elif system_bond_index >= self.critical_threshold:
+        elif system_bond_index <= self.critical_threshold:
             return AlertLevel.CRITICAL
         else:
-            return AlertLevel.SEVERE
+            return AlertLevel.SEVERE  # >45% violations
 ```
 
 ### 6.4 Training Data for RLHF
