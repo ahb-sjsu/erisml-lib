@@ -38,15 +38,15 @@ GROUND_STATE_VERSION = "1.0.0-synthetic"
 # as observed in 32 years of Dear Abby moral reasoning.
 
 DEFAULT_DIMENSION_WEIGHTS = {
-    "physical_harm": 0.14,       # Preventing harm (implicit but important)
-    "rights_respect": 0.16,       # Entitlements, promises, claims
-    "fairness_equity": 0.18,      # Reciprocity, equal treatment (dominant)
-    "autonomy_respect": 0.13,     # Freedom of choice
-    "privacy_protection": 0.07,   # Boundaries, confidentiality
+    "physical_harm": 0.14,  # Preventing harm (implicit but important)
+    "rights_respect": 0.16,  # Entitlements, promises, claims
+    "fairness_equity": 0.18,  # Reciprocity, equal treatment (dominant)
+    "autonomy_respect": 0.13,  # Freedom of choice
+    "privacy_protection": 0.07,  # Boundaries, confidentiality
     "societal_environmental": 0.10,  # Community bonds, relationships
-    "virtue_care": 0.05,          # Character, compassion
-    "legitimacy_trust": 0.12,     # Authority, rules, procedure
-    "epistemic_quality": 0.05,    # Certainty, evidence
+    "virtue_care": 0.05,  # Character, compassion
+    "legitimacy_trust": 0.12,  # Authority, rules, procedure
+    "epistemic_quality": 0.05,  # Certainty, evidence
 }
 
 # ============================================================================
@@ -95,12 +95,14 @@ CONTEXT_WEIGHTS = {
 # ============================================================================
 # Phrases that reliably flip moral obligations (O↔L).
 
+
 @dataclass
 class SemanticGate:
     """A semantic trigger that changes moral state."""
+
     trigger: str
     from_state: str  # "O" or "L"
-    to_state: str    # "O" or "L"
+    to_state: str  # "O" or "L"
     effectiveness: float  # 0.0-1.0
     description: str
 
@@ -258,6 +260,7 @@ def load_ground_state(path: Optional[Path] = None) -> Dict:
     """
     if path and path.exists():
         import json
+
         with open(path) as f:
             return json.load(f)
 
