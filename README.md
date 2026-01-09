@@ -121,13 +121,16 @@ ErisML has two tightly-related layers:
 
 2. **DEME 2.0 (Democratically Governed Ethics Modules)** — ethics-only decision layer
 
-   - **MoralVector**: k-dimensional ethical assessment with 6 core dimensions:
-     - `physical_harm` [0,1]: 0=none, 1=catastrophic
-     - `rights_respect` [0,1]: 0=violated, 1=fully respected
-     - `fairness_equity` [0,1]: 0=discriminatory, 1=fair
-     - `autonomy_respect` [0,1]: 0=coerced, 1=autonomous
-     - `legitimacy_trust` [0,1]: 0=illegitimate, 1=legitimate
-     - `epistemic_quality` [0,1]: 0=uncertain, 1=certain
+   - **MoralVector**: k-dimensional ethical assessment with 8+1 core dimensions:
+     - `physical_harm` [0,1]: 0=none, 1=catastrophic (from Consequences)
+     - `rights_respect` [0,1]: 0=violated, 1=fully respected (from RightsAndDuties)
+     - `fairness_equity` [0,1]: 0=discriminatory, 1=fair (from JusticeAndFairness)
+     - `autonomy_respect` [0,1]: 0=coerced, 1=autonomous (from AutonomyAndAgency)
+     - `privacy_protection` [0,1]: 0=violated, 1=protected (from PrivacyAndDataGovernance)
+     - `societal_environmental` [0,1]: 0=harmful, 1=beneficial (from SocietalAndEnvironmental)
+     - `virtue_care` [0,1]: 0=callous, 1=caring (from VirtueAndCare)
+     - `legitimacy_trust` [0,1]: 0=illegitimate, 1=legitimate (from ProceduralAndLegitimacy)
+     - `epistemic_quality` [0,1]: 0=uncertain, 1=certain (+1 epistemic dimension)
 
    - **Three-Layer Architecture**:
      - **Reflex Layer**: Fast veto checks (<100μs), constitutional constraints
@@ -152,6 +155,13 @@ ErisML has two tightly-related layers:
    - **MCP Server** (`erisml.ethics.interop.mcp_deme_server`):
      - V1 tools: `list_profiles`, `evaluate_options`, `govern_decision`
      - V2 tools: `list_profiles_v2`, `evaluate_options_v2`, `govern_decision_v2`, `run_pipeline`
+
+   - **Empirically-Derived Defaults** (`erisml.ethics.defaults`):
+     - Default dimension weights derived from Dear Abby corpus (20K letters, 1985-2017)
+     - Semantic gates with empirical effectiveness rates (e.g., "you promised" → 94%)
+     - Bond Index baseline (0.155) for system health monitoring (0 = perfect symmetry)
+     - Context-specific weights for family, workplace, friendship scenarios
+     - See [Dear_Abby_Empirical_Ethics_Analysis.md](docs/papers/foundations/Dear_Abby_Empirical_Ethics_Analysis.md)
 
 Together, ErisML + DEME support **norm-governed, ethics-aware agents** that can
 be inspected, audited, and configured by multiple stakeholders.
@@ -1349,6 +1359,19 @@ This document provides a comprehensive index of all documentation files in the E
 3. **[ethical_geometry_reviewer_QA_v2.pdf](https://github.com/ahb-sjsu/erisml-lib/blob/main/docs/papers/foundations/ethical_geometry_reviewer_QA_v2.pdf)**
    Q&A document addressing reviewer questions about the ethical geometry framework.
 
+4. **[Dear_Abby_Empirical_Ethics_Analysis.md](https://github.com/ahb-sjsu/erisml-lib/blob/main/docs/papers/foundations/Dear_Abby_Empirical_Ethics_Analysis.md)**
+   Comprehensive analysis of using the Dear Abby corpus (20K letters, 1985-2017) as empirical ground truth for AI ethics. Covers semantic gates, dimension weights, and the Dear Abby EM design.
+
+---
+
+## DEME 2.0 Development
+
+1. **[V2_TEST_PLAN.md](https://github.com/ahb-sjsu/erisml-lib/blob/main/docs/development/V2_TEST_PLAN.md)**
+   Comprehensive test plan for DEME 2.0, targeting 80%+ coverage. Includes 99 test cases across 11 test files.
+
+2. **[ground_state_loader.py](https://github.com/ahb-sjsu/erisml-lib/blob/main/src/erisml/ethics/defaults/ground_state_loader.py)**
+   Empirically-derived default ethics from Dear Abby corpus. Provides default dimension weights, semantic gates, and Bond Index baseline (0.155).
+
 ---
 
 ## Data & Configuration Files
@@ -1366,8 +1389,8 @@ This document provides a comprehensive index of all documentation files in the E
 
 ## Summary
 
-**Total Categories:** 12  
-**Total Documentation Files:** 59
+**Total Categories:** 13
+**Total Documentation Files:** 62
 
 For the latest updates and to contribute, visit the [GitHub repository](https://github.com/ahb-sjsu/erisml-lib).
 

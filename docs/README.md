@@ -74,6 +74,7 @@ See [papers/](papers/) for all published research:
 - [papers/foundations/](papers/foundations/) - Core theory papers
 - [papers/applications/](papers/applications/) - Domain applications
 - [papers/experiments/](papers/experiments/) - Experiment reports
+- [Dear_Abby_Empirical_Ethics_Analysis.md](papers/foundations/Dear_Abby_Empirical_Ethics_Analysis.md) - Empirical ethics from Dear Abby corpus
 
 ### Community
 - [DISCUSSIONS_WELCOME.md](community/DISCUSSIONS_WELCOME.md) - Community guidelines
@@ -81,3 +82,4 @@ See [papers/](papers/) for all published research:
 
 ### Development
 - [DEVELOPMENT_TASKS.md](development/DEVELOPMENT_TASKS.md) - Current development tasks
+- [V2_TEST_PLAN.md](development/V2_TEST_PLAN.md) - DEME 2.0 test coverage plan (targeting 80%+)
