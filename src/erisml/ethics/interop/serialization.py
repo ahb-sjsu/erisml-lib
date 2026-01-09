@@ -53,9 +53,9 @@ def _dataclass_to_dict_or_none(obj: Any) -> Optional[Dict[str, Any]]:
     """
     if obj is None:
         return None
-    if not is_dataclass(obj):
-        raise TypeError(f"Expected dataclass or None, got {type(obj)!r}")
-    return asdict(obj)
+    if not is_dataclass(obj) or isinstance(obj, type):
+        raise TypeError(f"Expected dataclass instance or None, got {type(obj)!r}")
+    return asdict(obj)  # type: ignore[arg-type]
 
 
 def ethical_facts_to_dict(facts: EthicalFacts) -> Dict[str, Any]:

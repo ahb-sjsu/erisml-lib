@@ -18,7 +18,7 @@ from dataclasses import dataclass
 from typing import Dict, List, Optional, Tuple
 
 from erisml.ethics.moral_vector import MoralVector
-from erisml.ethics.judgement import EthicalJudgementV2
+from erisml.ethics.judgement import EthicalJudgementV2, Verdict
 from erisml.ethics.decision_proof import DecisionProof
 from erisml.ethics.governance.config_v2 import (
     GovernanceConfigV2,
@@ -197,6 +197,7 @@ def aggregate_judgements_v2(
     vetoed, veto_reasons = check_vetoes(judgements, config)
 
     # Determine verdict
+    verdict: Verdict
     if vetoed:
         verdict = "forbid"
     else:

@@ -149,9 +149,9 @@ class DEMEPipeline:
         reflex_vetoed: List[str] = []
 
         for facts in options:
-            result = self.reflex.check(facts)
-            reflex_results[facts.option_id] = result
-            if result.vetoed:
+            reflex_result = self.reflex.check(facts)
+            reflex_results[facts.option_id] = reflex_result
+            if reflex_result.vetoed:
                 reflex_vetoed.append(facts.option_id)
 
         reflex_duration = int((time.perf_counter() - reflex_start) * 1_000_000)
@@ -184,15 +184,15 @@ class DEMEPipeline:
                 # Skip options already vetoed by reflex
                 continue
 
-            result = self.tactical.evaluate(facts)
-            tactical_results[facts.option_id] = result
-            landscape.add(facts.option_id, result.aggregated_vector)
+            tactical_result = self.tactical.evaluate(facts)
+            tactical_results[facts.option_id] = tactical_result
+            landscape.add(facts.option_id, tactical_result.aggregated_vector)
 
-            if result.vetoed:
+            if tactical_result.vetoed:
                 tactical_vetoed.append(facts.option_id)
 
             # Record EM judgements for proof
-            for j in result.judgements:
+            for j in tactical_result.judgements:
                 em_judgement_records.append(
                     EMJudgementRecord(
                         em_name=j.em_name,

@@ -338,7 +338,7 @@ class MoralVector:
         if metric == "euclidean":
             return math.sqrt(sum(d**2 for d in diffs))
         elif metric == "manhattan":
-            return sum(diffs)
+            return float(sum(diffs))
         elif metric == "chebyshev":
             return max(diffs) if diffs else 0.0
         else:

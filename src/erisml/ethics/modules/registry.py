@@ -14,7 +14,7 @@ Version: 2.0.0 (DEME 2.0)
 from __future__ import annotations
 
 from dataclasses import dataclass
-from typing import Callable, Dict, List, Optional, Type, TYPE_CHECKING
+from typing import Any, Callable, Dict, List, Optional, Type, TYPE_CHECKING
 
 if TYPE_CHECKING:
     from erisml.ethics.modules.base import EthicsModuleV2
@@ -136,14 +136,14 @@ class EMRegistry:
         return list(cls._entries.values())
 
     @classmethod
-    def list_all(cls) -> Dict[str, Dict[str, any]]:
+    def list_all(cls) -> Dict[str, Dict[str, Any]]:
         """
         Get all registered EMs as a dict mapping name -> info dict.
 
         Returns dict with keys: tier, default_weight, veto_capable, description, tags.
         This is a convenience method for iteration.
         """
-        result: Dict[str, Dict[str, any]] = {}
+        result: Dict[str, Dict[str, Any]] = {}
         for name, entry in cls._entries.items():
             result[name] = {
                 "tier": entry.tier,

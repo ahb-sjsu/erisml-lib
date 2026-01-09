@@ -211,21 +211,24 @@ class MoralLandscape:
         """
         result: List[Tuple[str, float, float]] = []
         for oid, vec in self.vectors.items():
+            v1: Optional[float] = None
+            v2: Optional[float] = None
+
             if dim1 in vec.extensions:
                 v1 = vec.extensions[dim1]
             else:
                 v1 = getattr(vec, dim1, None)
-                if v1 is None:
-                    continue
+            if v1 is None:
+                continue
 
             if dim2 in vec.extensions:
                 v2 = vec.extensions[dim2]
             else:
                 v2 = getattr(vec, dim2, None)
-                if v2 is None:
-                    continue
+            if v2 is None:
+                continue
 
-            result.append((oid, v1, v2))
+            result.append((oid, float(v1), float(v2)))
         return result
 
     def aggregate(

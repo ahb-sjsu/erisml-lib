@@ -94,20 +94,22 @@ def demo_moral_vector_basics() -> None:
     """Demonstrate MoralVector creation and operations."""
     print_section("MoralVector Basics")
 
-    print("""
+    print(
+        """
 MoralVector replaces scalar normative_score with 8+1 dimensions:
 - 8 ethical dimensions from EthicalFacts (harm, rights, fairness, etc.)
 - +1 epistemic dimension (uncertainty, evidence quality)
-""")
+"""
+    )
 
     # Create from scratch
     print("1. Creating MoralVectors manually:")
 
     good_option = MoralVector(
-        physical_harm=0.1,       # Low harm
-        rights_respect=0.9,      # High rights respect
-        fairness_equity=0.85,    # Fair
-        autonomy_respect=0.9,    # High autonomy
+        physical_harm=0.1,  # Low harm
+        rights_respect=0.9,  # High rights respect
+        fairness_equity=0.85,  # Fair
+        autonomy_respect=0.9,  # High autonomy
         privacy_protection=0.8,  # Good privacy
         societal_environmental=0.7,
         virtue_care=0.8,
@@ -117,8 +119,8 @@ MoralVector replaces scalar normative_score with 8+1 dimensions:
 
     problematic_option = MoralVector(
         physical_harm=0.3,
-        rights_respect=0.0,      # Rights violation!
-        fairness_equity=0.2,     # Discriminatory
+        rights_respect=0.0,  # Rights violation!
+        fairness_equity=0.2,  # Discriminatory
         autonomy_respect=0.3,
         privacy_protection=0.4,
         societal_environmental=0.5,
@@ -144,8 +146,12 @@ MoralVector replaces scalar normative_score with 8+1 dimensions:
 
     # Distance metrics
     print("\n3. Distance Metrics:")
-    print(f"  Euclidean distance: {good_option.distance(problematic_option, 'euclidean'):.3f}")
-    print(f"  Manhattan distance: {good_option.distance(problematic_option, 'manhattan'):.3f}")
+    print(
+        f"  Euclidean distance: {good_option.distance(problematic_option, 'euclidean'):.3f}"
+    )
+    print(
+        f"  Manhattan distance: {good_option.distance(problematic_option, 'manhattan'):.3f}"
+    )
 
 
 # =============================================================================
@@ -157,10 +163,12 @@ def demo_from_ethical_facts() -> None:
     """Demonstrate MoralVector extraction from EthicalFacts."""
     print_section("MoralVector from EthicalFacts")
 
-    print("""
+    print(
+        """
 MoralVector.from_ethical_facts() provides a standard mapping from
 structured EthicalFacts to the 8+1 moral dimensions.
-""")
+"""
+    )
 
     facts = EthicalFacts(
         option_id="emergency_treatment",
@@ -226,12 +234,14 @@ def demo_ethical_judgement_v2() -> None:
     """Demonstrate EthicalJudgementV2 with moral vectors."""
     print_section("EthicalJudgementV2")
 
-    print("""
+    print(
+        """
 EthicalJudgementV2 replaces normative_score with MoralVector and adds:
 - em_tier: Classification for weighted aggregation (0-4)
 - veto_triggered: Explicit veto flag
 - confidence: EM's confidence in its assessment
-""")
+"""
+    )
 
     # Tier 0 (Constitutional) judgement
     geneva_judgement = EthicalJudgementV2(
@@ -301,18 +311,20 @@ def demo_governance_v2() -> None:
     """Demonstrate GovernanceConfigV2 and select_option_v2."""
     print_section("Governance V2: Tier-Based Aggregation")
 
-    print("""
+    print(
+        """
 GovernanceConfigV2 provides:
 - DimensionWeights: Per-dimension weights for scalar collapse
 - Tier-based weighting: Constitutional EMs weighted 10x, Core Safety 5x, etc.
 - Lexical priorities: DAG-based conflict resolution
-""")
+"""
+    )
 
     # Configure governance
     config = GovernanceConfigV2(
         dimension_weights=DimensionWeights(
-            physical_harm=1.5,      # Higher weight on harm prevention
-            rights_respect=1.2,     # Rights are important
+            physical_harm=1.5,  # Higher weight on harm prevention
+            rights_respect=1.2,  # Rights are important
             fairness_equity=1.0,
             autonomy_respect=1.0,
             privacy_protection=0.9,
@@ -333,7 +345,9 @@ GovernanceConfigV2 provides:
     print("\nTier Weights:")
     for tier in range(5):
         tc = config.get_tier_config(tier)
-        print(f"  Tier {tier}: weight={tc.weight_multiplier}x, can_veto={tc.veto_enabled}")
+        print(
+            f"  Tier {tier}: weight={tc.weight_multiplier}x, can_veto={tc.veto_enabled}"
+        )
 
     # Create judgements for 3 options
     judgements_by_option: Dict[str, List[EthicalJudgementV2]] = {
@@ -345,10 +359,15 @@ GovernanceConfigV2 provides:
                 em_tier=0,
                 verdict="prefer",
                 moral_vector=MoralVector(
-                    physical_harm=0.1, rights_respect=0.95, fairness_equity=0.9,
-                    autonomy_respect=0.9, privacy_protection=0.85,
-                    societal_environmental=0.8, virtue_care=0.85,
-                    legitimacy_trust=0.9, epistemic_quality=0.9,
+                    physical_harm=0.1,
+                    rights_respect=0.95,
+                    fairness_equity=0.9,
+                    autonomy_respect=0.9,
+                    privacy_protection=0.85,
+                    societal_environmental=0.8,
+                    virtue_care=0.85,
+                    legitimacy_trust=0.9,
+                    epistemic_quality=0.9,
                 ),
                 reasons=["Good rights posture"],
             ),
@@ -359,10 +378,15 @@ GovernanceConfigV2 provides:
                 em_tier=2,
                 verdict="strongly_prefer",
                 moral_vector=MoralVector(
-                    physical_harm=0.15, rights_respect=0.9, fairness_equity=0.95,
-                    autonomy_respect=0.85, privacy_protection=0.8,
-                    societal_environmental=0.75, virtue_care=0.8,
-                    legitimacy_trust=0.85, epistemic_quality=0.85,
+                    physical_harm=0.15,
+                    rights_respect=0.9,
+                    fairness_equity=0.95,
+                    autonomy_respect=0.85,
+                    privacy_protection=0.8,
+                    societal_environmental=0.75,
+                    virtue_care=0.8,
+                    legitimacy_trust=0.85,
+                    epistemic_quality=0.85,
                 ),
                 reasons=["Maximally fair"],
             ),
@@ -375,10 +399,15 @@ GovernanceConfigV2 provides:
                 em_tier=0,
                 verdict="neutral",
                 moral_vector=MoralVector(
-                    physical_harm=0.3, rights_respect=0.7, fairness_equity=0.6,
-                    autonomy_respect=0.7, privacy_protection=0.6,
-                    societal_environmental=0.5, virtue_care=0.6,
-                    legitimacy_trust=0.7, epistemic_quality=0.7,
+                    physical_harm=0.3,
+                    rights_respect=0.7,
+                    fairness_equity=0.6,
+                    autonomy_respect=0.7,
+                    privacy_protection=0.6,
+                    societal_environmental=0.5,
+                    virtue_care=0.6,
+                    legitimacy_trust=0.7,
+                    epistemic_quality=0.7,
                 ),
                 reasons=["Acceptable but not ideal"],
             ),
@@ -389,10 +418,15 @@ GovernanceConfigV2 provides:
                 em_tier=2,
                 verdict="avoid",
                 moral_vector=MoralVector(
-                    physical_harm=0.35, rights_respect=0.65, fairness_equity=0.5,
-                    autonomy_respect=0.6, privacy_protection=0.55,
-                    societal_environmental=0.45, virtue_care=0.55,
-                    legitimacy_trust=0.6, epistemic_quality=0.65,
+                    physical_harm=0.35,
+                    rights_respect=0.65,
+                    fairness_equity=0.5,
+                    autonomy_respect=0.6,
+                    privacy_protection=0.55,
+                    societal_environmental=0.45,
+                    virtue_care=0.55,
+                    legitimacy_trust=0.6,
+                    epistemic_quality=0.65,
                 ),
                 reasons=["Some fairness concerns"],
             ),
@@ -405,10 +439,15 @@ GovernanceConfigV2 provides:
                 em_tier=0,
                 verdict="forbid",
                 moral_vector=MoralVector(
-                    physical_harm=0.6, rights_respect=0.0, fairness_equity=0.2,
-                    autonomy_respect=0.2, privacy_protection=0.3,
-                    societal_environmental=0.3, virtue_care=0.2,
-                    legitimacy_trust=0.2, epistemic_quality=0.5,
+                    physical_harm=0.6,
+                    rights_respect=0.0,
+                    fairness_equity=0.2,
+                    autonomy_respect=0.2,
+                    privacy_protection=0.3,
+                    societal_environmental=0.3,
+                    virtue_care=0.2,
+                    legitimacy_trust=0.2,
+                    epistemic_quality=0.5,
                     veto_flags=["RIGHTS_VIOLATION"],
                 ),
                 veto_triggered=True,
@@ -448,38 +487,60 @@ def demo_moral_landscape() -> None:
     """Demonstrate MoralLandscape for Pareto analysis."""
     print_section("MoralLandscape: Pareto Frontier Analysis")
 
-    print("""
+    print(
+        """
 MoralLandscape provides Pareto-optimal reasoning:
 - pareto_frontier(): Find non-dominated options
 - dominated_options(): Find options dominated by others
 - Enables multi-objective decision making without forced scalar collapse
-""")
+"""
+    )
 
     # Create a landscape with multiple options
     options = {
         "fast_risky": MoralVector(
-            physical_harm=0.4, rights_respect=0.8, fairness_equity=0.7,
-            autonomy_respect=0.9, privacy_protection=0.6,
-            societal_environmental=0.5, virtue_care=0.6,
-            legitimacy_trust=0.7, epistemic_quality=0.8,
+            physical_harm=0.4,
+            rights_respect=0.8,
+            fairness_equity=0.7,
+            autonomy_respect=0.9,
+            privacy_protection=0.6,
+            societal_environmental=0.5,
+            virtue_care=0.6,
+            legitimacy_trust=0.7,
+            epistemic_quality=0.8,
         ),
         "slow_safe": MoralVector(
-            physical_harm=0.1, rights_respect=0.85, fairness_equity=0.8,
-            autonomy_respect=0.7, privacy_protection=0.8,
-            societal_environmental=0.7, virtue_care=0.8,
-            legitimacy_trust=0.85, epistemic_quality=0.7,
+            physical_harm=0.1,
+            rights_respect=0.85,
+            fairness_equity=0.8,
+            autonomy_respect=0.7,
+            privacy_protection=0.8,
+            societal_environmental=0.7,
+            virtue_care=0.8,
+            legitimacy_trust=0.85,
+            epistemic_quality=0.7,
         ),
         "balanced": MoralVector(
-            physical_harm=0.2, rights_respect=0.82, fairness_equity=0.75,
-            autonomy_respect=0.8, privacy_protection=0.7,
-            societal_environmental=0.65, virtue_care=0.75,
-            legitimacy_trust=0.8, epistemic_quality=0.75,
+            physical_harm=0.2,
+            rights_respect=0.82,
+            fairness_equity=0.75,
+            autonomy_respect=0.8,
+            privacy_protection=0.7,
+            societal_environmental=0.65,
+            virtue_care=0.75,
+            legitimacy_trust=0.8,
+            epistemic_quality=0.75,
         ),
         "dominated_option": MoralVector(
-            physical_harm=0.5, rights_respect=0.6, fairness_equity=0.5,
-            autonomy_respect=0.5, privacy_protection=0.5,
-            societal_environmental=0.4, virtue_care=0.5,
-            legitimacy_trust=0.5, epistemic_quality=0.5,
+            physical_harm=0.5,
+            rights_respect=0.6,
+            fairness_equity=0.5,
+            autonomy_respect=0.5,
+            privacy_protection=0.5,
+            societal_environmental=0.4,
+            virtue_care=0.5,
+            legitimacy_trust=0.5,
+            epistemic_quality=0.5,
         ),
     }
 
@@ -525,7 +586,8 @@ def main() -> None:
     demo_moral_landscape()
 
     print_section("Summary")
-    print("""
+    print(
+        """
 DEME 2.0 Key Improvements:
 
 1. MULTI-DIMENSIONAL ASSESSMENT
@@ -554,7 +616,8 @@ DEME 2.0 Key Improvements:
    - normative_score property on EthicalJudgementV2
    - judgement_v1_to_v2() migration function
    - V1ToV2Adapter for legacy EMs
-""")
+"""
+    )
 
 
 if __name__ == "__main__":

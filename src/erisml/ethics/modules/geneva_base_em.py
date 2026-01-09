@@ -13,12 +13,12 @@ from __future__ import annotations
 
 import logging
 from dataclasses import dataclass, field
-from typing import Any, Dict, Iterable, List, Mapping, Optional, Tuple
+from typing import Any, Dict, Iterable, List, Mapping, Optional, Tuple, cast
 
 from erisml.ethics.facts import (
     EthicalFacts,
 )
-from erisml.ethics.judgement import EthicalJudgement
+from erisml.ethics.judgement import EthicalJudgement, Verdict
 from erisml.ethics.modules.base import BaseEthicsModule
 
 logger = logging.getLogger(__name__)
@@ -186,7 +186,7 @@ class GenevaBaselineEM(GenevaBaseEM):
             option_id=facts.option_id,
             em_name=self.em_name,
             stakeholder=self.stakeholder,
-            verdict=verdict,
+            verdict=cast(Verdict, verdict),
             normative_score=final_score,
             reasons=reasons,
             metadata=metadata,
