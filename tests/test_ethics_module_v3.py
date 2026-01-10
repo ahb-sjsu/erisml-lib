@@ -827,9 +827,7 @@ class TestGenevaEMV3:
         assert judgement.option_id == "test_option"
         assert judgement.em_name == "geneva_constitutional_v3"
 
-    def test_judge_distributed(
-        self, v3_facts_three_party: EthicalFactsV3
-    ) -> None:
+    def test_judge_distributed(self, v3_facts_three_party: EthicalFactsV3) -> None:
         """Test V3 judge_distributed() method."""
         em = GenevaEMV3()
         judgement = em.judge_distributed(v3_facts_three_party)
@@ -868,9 +866,7 @@ class TestGenevaEMV3:
         result = em.reflex_check(v2_facts)
         assert result is False  # No veto conditions
 
-    def test_reflex_check_distributed(
-        self, v3_facts_with_veto: EthicalFactsV3
-    ) -> None:
+    def test_reflex_check_distributed(self, v3_facts_with_veto: EthicalFactsV3) -> None:
         """Test V3 reflex check returns per-party results."""
         em = GenevaEMV3()
         results = em.reflex_check_distributed(v3_facts_with_veto)
@@ -1095,7 +1091,13 @@ class TestIntegration:
             vector = judgement.get_party_vector(party)
             assert isinstance(vector, MoralVector)
             verdict = judgement.get_party_verdict(party)
-            assert verdict in ["strongly_prefer", "prefer", "neutral", "avoid", "forbid"]
+            assert verdict in [
+                "strongly_prefer",
+                "prefer",
+                "neutral",
+                "avoid",
+                "forbid",
+            ]
 
         # 5. Collapse to V2 for governance
         v2_judgement = judgement.to_v2(collapse_strategy="mean")

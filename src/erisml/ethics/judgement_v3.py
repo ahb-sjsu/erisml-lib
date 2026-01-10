@@ -135,7 +135,11 @@ class EthicalJudgementV3:
                 self.party_labels = tuple(labels)
             else:
                 # Generate default labels
-                n_parties = self.moral_tensor.shape[1] if len(self.moral_tensor.shape) > 1 else 1
+                n_parties = (
+                    self.moral_tensor.shape[1]
+                    if len(self.moral_tensor.shape) > 1
+                    else 1
+                )
                 self.party_labels = tuple(f"party_{i}" for i in range(n_parties))
 
         # Update distributed_veto_triggered from tensor veto_locations
@@ -176,7 +180,9 @@ class EthicalJudgementV3:
 
         if isinstance(party, str):
             if party not in self.party_labels:
-                raise KeyError(f"Party '{party}' not found. Available: {self.party_labels}")
+                raise KeyError(
+                    f"Party '{party}' not found. Available: {self.party_labels}"
+                )
             idx = self.party_labels.index(party)
         else:
             idx = party
@@ -241,7 +247,9 @@ class EthicalJudgementV3:
         else:
             moral_vector = collapse_v3_to_v2(
                 self.moral_tensor,
-                strategy=collapse_strategy if collapse_strategy != "weighted" else "weighted",
+                strategy=(
+                    collapse_strategy if collapse_strategy != "weighted" else "weighted"
+                ),
                 weights=weights,
             )
 
@@ -405,7 +413,9 @@ def get_worst_off_party(j: EthicalJudgementV3) -> Tuple[str, float]:
     min_idx = int(welfare_scores.argmin())
     min_welfare = float(welfare_scores[min_idx])
 
-    party_id = j.party_labels[min_idx] if min_idx < len(j.party_labels) else f"party_{min_idx}"
+    party_id = (
+        j.party_labels[min_idx] if min_idx < len(j.party_labels) else f"party_{min_idx}"
+    )
 
     return party_id, min_welfare
 

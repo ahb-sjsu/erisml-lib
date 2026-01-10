@@ -249,7 +249,9 @@ class GenevaEMV3(BaseEthicsModuleV3):
         metadata: Dict[str, Any] = {"per_party_details": {}}
 
         # Global checks that apply to all parties
-        global_discrimination = facts.justice_and_fairness.discriminates_on_protected_attr
+        global_discrimination = (
+            facts.justice_and_fairness.discriminates_on_protected_attr
+        )
 
         # Evaluate each party
         for j, party_conseq in enumerate(party_consequences):
