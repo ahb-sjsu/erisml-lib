@@ -28,20 +28,16 @@ Version: 0.06 (Batch API)
 import argparse
 import json
 import time
-import random
-import hashlib
-import uuid
 import secrets
 import math
 from pathlib import Path
-from datetime import datetime
-from typing import Optional, Dict, List, Tuple, Any
-from dataclasses import dataclass, asdict, field
+from typing import Dict, List, Tuple, Any
+from dataclasses import dataclass, asdict
 from enum import Enum
 import sys
 
 try:
-    import numpy as np
+    import numpy as np  # noqa: F401 - used conditionally
     import anthropic
 except ImportError as e:
     print(f"Missing dependency: {e}")
@@ -1084,7 +1080,7 @@ def calculate_chsh(results: Dict[str, Any]) -> List[CHSHResult]:
     )  # (scenario, alpha_lang, beta_lang, is_cross) -> {setting -> [correlations]}
 
     # Reverse scenario codes
-    code_to_scenario = {
+    _code_to_scenario = {
         "mb": "mutual_betrayal",
         "kg": "kidney_gift",
         "ti": "tainted_inheritance",

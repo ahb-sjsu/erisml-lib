@@ -188,7 +188,7 @@ def parse_custom_id(
             return (trial_idx, axes, subject)
 
     if debug:
-        print(f"  Failed to parse custom_id")
+        print("  Failed to parse custom_id")
 
     return None
 
@@ -657,7 +657,7 @@ def main():
             print("Check that the directory contains *_results.json file.")
             return
 
-        print(f"\nCalculating CHSH values...")
+        print("\nCalculating CHSH values...")
         chsh_results = calculate_chsh(results, specs_by_id, model, debug=args.debug)
 
         if not chsh_results:

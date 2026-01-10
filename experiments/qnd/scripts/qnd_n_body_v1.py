@@ -38,10 +38,10 @@ import hashlib
 import random
 from pathlib import Path
 from datetime import datetime
-from typing import Dict, List, Tuple, Optional, Set
-from dataclasses import dataclass, field, asdict
+from typing import Dict, List, Tuple, Optional
+from dataclasses import dataclass
 from enum import Enum
-from itertools import product, combinations
+from itertools import product
 import sys
 
 try:
@@ -424,7 +424,7 @@ def generate_triage_narrative(n_agents: int, topology: Topology) -> Dict:
 - Full treatment: 90% survival. Partial: 50% survival. No treatment: varies by severity.
 - Committee must agree on allocation by majority vote."""
     elif topology == Topology.CHAIN:
-        mechanism = f"""Triage protocol (sequential):
+        mechanism = """Triage protocol (sequential):
 - Patients treated in order of arrival: A, B, C, ...
 - Each treatment delays the next; later patients may deteriorate
 - Resources deplete: first patient gets full treatment, later patients get diminishing care."""
@@ -436,7 +436,7 @@ def generate_triage_narrative(n_agents: int, topology: Topology) -> Dict:
 
     # Generate treatment decisions
     treated = random.sample(agent_names, k=min(doctors * 2, n_agents))
-    untreated = [n for n in agent_names if n not in treated]
+    _untreated = [n for n in agent_names if n not in treated]
 
     actions = "Treatment decisions:\n"
     for name in agent_names:
@@ -704,7 +704,7 @@ def compute_mermin_correlator(
     correlations = []
     for config in configs:
         # Get verdicts for this configuration
-        key_set = tuple((agents[i], axes[config[i]]) for i in range(n_agents))
+        _key_set = tuple((agents[i], axes[config[i]]) for i in range(n_agents))
 
         # Compute N-body correlation: product of all verdicts
         product_val = 1
@@ -740,7 +740,7 @@ def compute_chsh_extended(
     For N=2, this reduces to standard CHSH.
     For N>2, uses Mermin inequality.
     """
-    agents = [chr(65 + i) for i in range(n_agents)]
+    _agents = [chr(65 + i) for i in range(n_agents)]
 
     # Compute correlator for each trial
     correlators = []
@@ -842,7 +842,7 @@ def generate_requests(
                 salt = secrets.token_hex(4)
                 axis_code = "p" if axis == config.axes[0] else "s"
                 lang_str = "-".join(
-                    l.value for l in config.languages[: config.n_agents]
+                    lang.value for lang in config.languages[: config.n_agents]
                 )
                 custom_id = f"nb_{config.template.value[:4]}_{config.n_agents}_{config.topology.value[:3]}_{lang_str}_{trial:03d}_{agent}{axis_code}_{salt}"
 
@@ -868,7 +868,7 @@ def generate_requests(
                         "axis": axis.value,
                         "language": lang.value,
                         "languages": [
-                            l.value for l in config.languages[: config.n_agents]
+                            lang.value for lang in config.languages[: config.n_agents]
                         ],
                         "axes": [a.value for a in config.axes],
                     }
@@ -953,7 +953,7 @@ def parse_verdict(text: str) -> Tuple[int, Optional[str]]:
             return 1, None
         elif "GUILTY" in v:
             return -1, None
-    except:
+    except Exception:
         pass
 
     # Regex fallback
@@ -1206,11 +1206,11 @@ def main():
             print("Generating parameter sweep...")
             all_requests, all_specs, configs = generate_sweep(args.n_trials, args.model)
 
-            print(f"Sweep configuration:")
-            print(f"  - N agents: 3, 4, 5, 6")
-            print(f"  - Topologies: all, chain, star")
-            print(f"  - Templates: liferaft, trolley_network, prisoners")
-            print(f"  - Axes: deon/conseq, justice/care")
+            print("Sweep configuration:")
+            print("  - N agents: 3, 4, 5, 6")
+            print("  - Topologies: all, chain, star")
+            print("  - Templates: liferaft, trolley_network, prisoners")
+            print("  - Axes: deon/conseq, justice/care")
             print(f"  - Total configs: {len(configs)}")
 
         else:
@@ -1218,7 +1218,7 @@ def main():
             template = Template(args.template)
             topology = Topology(args.topology)
             axes = tuple(MoralAxis(a) for a in args.axes)
-            languages = [Language(l) for l in args.languages]
+            languages = [Language(lng) for lng in args.languages]
 
             config = ExperimentConfig(
                 n_agents=args.n_agents,
@@ -1233,7 +1233,7 @@ def main():
             all_requests, all_specs = generate_requests(config)
             configs = [config]
 
-            print(f"Single configuration:")
+            print("Single configuration:")
             print(f"  - N agents: {args.n_agents}")
             print(f"  - Template: {args.template}")
             print(f"  - Topology: {args.topology}")

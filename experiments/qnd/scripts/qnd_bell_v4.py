@@ -27,10 +27,8 @@ import json
 import math
 import secrets
 import hashlib
-import random
 from pathlib import Path
 from datetime import datetime
-from typing import Dict, List, Tuple, Optional
 from dataclasses import dataclass
 from enum import Enum
 import sys
@@ -639,7 +637,7 @@ def parse_verdict(text):
             return 1, None
         elif "GUILTY" in v:
             return -1, None
-    except:
+    except Exception:
         pass
     if re.search(r"\bNOT[_\s]?GUILTY\b", text, re.I):
         return 1, None
@@ -830,7 +828,7 @@ def main():
     output_dir = Path(args.output_dir)
     output_dir.mkdir(exist_ok=True)
 
-    lang_map = {l.value: l for l in Language}
+    lang_map = {lg.value: lg for lg in Language}
     tense_map = {t.value: t for t in Tense}
 
     languages = [lang_map[c] for c in args.languages if c in lang_map]

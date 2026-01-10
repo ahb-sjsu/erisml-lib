@@ -44,13 +44,13 @@ def auto_fill(cls: Type, **overrides) -> Any:
         if field.name in overrides:
             valid_args[field.name] = overrides[field.name]
         elif field.default == dataclasses.MISSING:
-            if field.type == bool:
+            if field.type is bool:
                 valid_args[field.name] = False
-            elif field.type == float:
+            elif field.type is float:
                 valid_args[field.name] = 0.5
-            elif field.type == int:
+            elif field.type is int:
                 valid_args[field.name] = 1
-            elif field.type == str:
+            elif field.type is str:
                 valid_args[field.name] = "default"
             else:
                 valid_args[field.name] = None

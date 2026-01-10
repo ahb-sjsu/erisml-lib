@@ -344,7 +344,7 @@ def main():
         print("Check if there's a *_results.json file in the directory.")
         return
 
-    print(f"\nCalculating CHSH values...")
+    print("\nCalculating CHSH values...")
     chsh_results = calculate_chsh(results, specs_by_id)
 
     if not chsh_results:

@@ -21,7 +21,6 @@ Version: 3.0 (High-Entanglement)
 
 import argparse
 import json
-import time
 import math
 import secrets
 from pathlib import Path
@@ -1174,10 +1173,9 @@ def parse_verdict(text: str) -> int:
             return 1
         elif "GUILTY" in v:
             return -1
-    except:
+    except Exception:
         pass
 
-    import re
 
     if re.search(r"\bNOT[_\s]?GUILTY\b", text, re.IGNORECASE):
         return 1
@@ -1416,7 +1414,7 @@ def main():
     output_dir.mkdir(exist_ok=True)
 
     # Parse languages
-    lang_map = {l.value: l for l in Language}
+    lang_map = {lg.value: lg for lg in Language}
     languages = [lang_map[c] for c in args.languages if c in lang_map]
 
     # Parse cross-lingual
@@ -1446,7 +1444,7 @@ def main():
         cost = len(requests) * (800 * 1.5 + 100 * 7.5) / 1_000_000
 
         print(f"Scenarios: {args.scenarios}")
-        print(f"Languages: {[l.value for l in languages]}")
+        print(f"Languages: {[lg.value for lg in languages]}")
         print(f"Cross-lingual: {[(a.value, b.value) for a, b in cross_pairs]}")
         print(f"Trials: {args.n_trials}")
         print(f"Total requests: {len(requests)}")
@@ -1469,7 +1467,7 @@ def main():
                     "n_requests": len(requests),
                     "config": {
                         "n_trials": args.n_trials,
-                        "languages": [l.value for l in languages],
+                        "languages": [lg.value for lg in languages],
                         "cross_lingual": [(a.value, b.value) for a, b in cross_pairs],
                         "scenarios": args.scenarios,
                     },

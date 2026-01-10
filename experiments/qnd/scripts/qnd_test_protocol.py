@@ -24,12 +24,11 @@ ACKNOWLEDGMENTS:
 
 import anthropic
 import json
-import random
 import math
 import time
 import argparse
 from dataclasses import dataclass, field, asdict
-from typing import List, Dict, Tuple, Optional, Any
+from typing import List, Dict, Tuple, Any
 from datetime import datetime
 from enum import Enum
 import statistics
@@ -481,12 +480,12 @@ class BellTestRunner:
         print()
 
         if result.violation:
-            print(f"  ✓✓ BELL INEQUALITY VIOLATED!")
+            print("  ✓✓ BELL INEQUALITY VIOLATED!")
             print(f"     |S| > 2 by {abs(result.S) - 2:.3f}")
             print(f"     Significance: {result.sigma:.1f}σ")
         else:
-            print(f"  ✗ No violation detected")
-            print(f"     |S| ≤ 2 (within classical bound)")
+            print("  ✗ No violation detected")
+            print("     |S| ≤ 2 (within classical bound)")
 
 
 # ============================================================================
@@ -643,10 +642,10 @@ class LatencyTestRunner:
             mean_l = statistics.mean(latencies)
 
             numerator = sum(
-                (h - mean_h) * (l - mean_l) for h, l in zip(harms, latencies)
+                (h - mean_h) * (lat - mean_l) for h, lat in zip(harms, latencies)
             )
             denom_h = math.sqrt(sum((h - mean_h) ** 2 for h in harms))
-            denom_l = math.sqrt(sum((l - mean_l) ** 2 for l in latencies))
+            denom_l = math.sqrt(sum((lat - mean_l) ** 2 for lat in latencies))
 
             if denom_h > 0 and denom_l > 0:
                 correlation = numerator / (denom_h * denom_l)
@@ -896,20 +895,20 @@ class QNDExperimentSuite:
 
         s = results.summary
 
-        print(f"\nAPI Usage:")
+        print("\nAPI Usage:")
         print(f"  Total calls: {results.total_api_calls}")
         print(f"  Estimated cost: ${results.total_cost_estimate:.2f}")
 
-        print(f"\nBell Tests:")
+        print("\nBell Tests:")
         print(f"  Violations: {s['bell_violations']}/{s['total_bell_tests']}")
         print(f"  Max |S|: {s['max_S']:.3f} (classical bound: 2.0)")
         print(f"  Max significance: {s['max_sigma']:.1f}σ")
 
-        print(f"\nQuantum Effects:")
+        print("\nQuantum Effects:")
         print(f"  Order effects detected: {s['order_effects_detected']}")
         print(f"  Interference detected: {s['interference_detected']}")
 
-        print(f"\n" + "=" * 70)
+        print("\n" + "=" * 70)
         print("CONCLUSIONS")
         print("=" * 70)
 

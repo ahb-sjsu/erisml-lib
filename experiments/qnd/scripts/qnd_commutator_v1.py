@@ -202,7 +202,7 @@ def parse_response(text: str) -> Dict:
         if result["first"] is not None and result["second"] is not None:
             result["parsed"] = True
 
-    except:
+    except Exception:
         # Regex fallback
         first_match = re.search(r'"first_answer"\s*:\s*"(YES|NO)"', text, re.I)
         second_match = re.search(r'"second_answer"\s*:\s*"(YES|NO)"', text, re.I)
@@ -255,7 +255,7 @@ def analyze_commutators(results: Dict, specs: List[Dict]) -> Dict:
     # [A,B] = P(A | B first) - P(A | A first)
     # This measures how much measuring B first changes the response to A
 
-    n_axes = len(AXIS_NAMES)
+    _n_axes = len(AXIS_NAMES)
     matrix = {}
     significant = []
 

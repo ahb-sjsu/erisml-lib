@@ -24,10 +24,8 @@ from dataclasses import dataclass, field, asdict
 from typing import Optional
 from datetime import datetime
 from pathlib import Path
-import random
 
 # Data processing
-import pandas as pd
 
 # For API calls
 try:
@@ -470,7 +468,7 @@ Respond in JSON format:
         # Try direct parse
         try:
             return json.loads(response)
-        except:
+        except Exception:
             pass
 
         # Try to find JSON in response
@@ -480,7 +478,7 @@ Respond in JSON format:
         if json_match:
             try:
                 return json.loads(json_match.group())
-            except:
+            except Exception:
                 pass
 
         return {}
@@ -573,7 +571,7 @@ Respond in JSON:
                 both_verdicts.append(
                     self._parse_json_response(r_b).get("verdict", "UNKNOWN")
                 )
-            except:
+            except Exception:
                 pass
 
         # Calculate probabilities
@@ -946,7 +944,7 @@ def main():
     summary = results["summary"]
 
     print("1. ORDER EFFECTS (Non-commuting observables)")
-    print(f"   QND Prediction: Should detect order effects")
+    print("   QND Prediction: Should detect order effects")
     print(
         f"   Result: {summary['order_effect_rate']*100:.1f}% of posts showed order effects"
     )
@@ -955,7 +953,7 @@ def main():
     )
 
     print("\n2. INTERFERENCE (Reasoning paths don't just add)")
-    print(f"   QND Prediction: Should see constructive/destructive interference")
+    print("   QND Prediction: Should see constructive/destructive interference")
     int_dist = summary["interference_distribution"]
     print(
         f"   Result: Constructive={int_dist.get('constructive',0)*100:.1f}%, "
@@ -968,14 +966,14 @@ def main():
     print(f"   {'✓ SUPPORTS QND' if has_interference else '? INCONCLUSIVE'}")
 
     print("\n3. SUPERPOSITION (Multiple valid interpretations)")
-    print(f"   QND Prediction: Ambiguous cases should show superposition")
+    print("   QND Prediction: Ambiguous cases should show superposition")
     print(f"   Result: {summary['superposition_rate']*100:.1f}% detected as superposed")
     print(
         f"   {'✓ SUPPORTS QND' if summary['superposition_rate'] > 0.5 else '? INCONCLUSIVE'}"
     )
 
     print("\n4. ENTANGLEMENT (Correlated moral status)")
-    print(f"   QND Prediction: Some cases have entangled parties")
+    print("   QND Prediction: Some cases have entangled parties")
     print(f"   Result: {summary['entanglement_rate']*100:.1f}% showed entanglement")
     print(
         f"   {'✓ SUPPORTS QND' if summary['entanglement_rate'] > 0.1 else '? INCONCLUSIVE'}"

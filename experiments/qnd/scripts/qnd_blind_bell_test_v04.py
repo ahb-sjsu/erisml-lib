@@ -41,20 +41,16 @@ import time
 import random
 import hashlib
 import uuid
-import base64
-import os
-from pathlib import Path
 from datetime import datetime
-from typing import Optional, Dict, List, Tuple, Any
+from typing import Optional, Dict, List, Any
 from dataclasses import dataclass, asdict, field
 from enum import Enum
 import math
 import secrets
-import string
 
 try:
     import numpy as np
-    from scipy import stats
+    from scipy import stats  # noqa: F401 - used conditionally
     import anthropic
 except ImportError as e:
     print(f"Missing dependency: {e}")
@@ -822,16 +818,16 @@ def print_blinded_report(
         print(f"  E(α_p, β_s) = {result.E_primary_secondary:+.3f}")
         print(f"  E(α_s, β_p) = {result.E_secondary_primary:+.3f}")
         print(f"  E(α_s, β_s) = {result.E_secondary_secondary:+.3f}")
-        print(f"  ─────────────────────")
+        print("  ─────────────────────")
         print(f"  S = {result.S:+.3f} ± {result.std_error:.3f}")
         print(f"  |S| = {result.S_magnitude:.3f}")
 
         if result.violation:
-            print(f"\n  ★★ VIOLATION DETECTED ★★")
+            print("\n  ★★ VIOLATION DETECTED ★★")
             print(f"     |S| > 2 by {result.S_magnitude - 2:.3f}")
             print(f"     Significance: {result.significance_sigma:.1f}σ")
         else:
-            print(f"\n  No violation (|S| ≤ 2)")
+            print("\n  No violation (|S| ≤ 2)")
 
     # Summary before deblinding
     print("\n" + "=" * 70)
@@ -848,7 +844,7 @@ def print_blinded_report(
     print(f"Maximum significance: {max_sig:.1f}σ")
 
     if max_S > 2.0:
-        print(f"\n★★★ BELL INEQUALITY VIOLATED UNDER BLIND PROTOCOL ★★★")
+        print("\n★★★ BELL INEQUALITY VIOLATED UNDER BLIND PROTOCOL ★★★")
         print("\nThis result CANNOT be attributed to:")
         print("  - Semantic caching (quantum salt)")
         print("  - Session linking (header randomization)")

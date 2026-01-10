@@ -6,7 +6,6 @@ QND Statistical Analysis - 150 POSTS - 6-SIGMA ATTEMPT
 import math
 from scipy import stats
 from scipy.stats import binomtest, fisher_exact
-import numpy as np
 from statsmodels.stats.proportion import proportion_confint
 
 # =============================================================================
