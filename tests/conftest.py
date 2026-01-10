@@ -234,3 +234,108 @@ def sample_profile_v04() -> DEMEProfileV04:
         description="A test profile for DEME 2.0",
         stakeholder_label="test_stakeholder",
     )
+
+
+# =============================================================================
+# DEME V3 Fixtures (MoralTensor)
+# =============================================================================
+
+from erisml.ethics.moral_tensor import MoralTensor, SparseCOO
+import numpy as np
+
+
+@pytest.fixture
+def rank1_tensor() -> MoralTensor:
+    """Basic rank-1 tensor (9,) - equivalent to MoralVector."""
+    return MoralTensor.from_dense(
+        np.array([0.2, 0.9, 0.8, 0.85, 0.9, 0.8, 0.85, 0.75, 0.7])
+    )
+
+
+@pytest.fixture
+def rank2_tensor() -> MoralTensor:
+    """Rank-2 tensor (9, 3) with 3 parties."""
+    data = np.array([
+        [0.1, 0.2, 0.3],  # physical_harm
+        [0.9, 0.8, 0.7],  # rights_respect
+        [0.8, 0.85, 0.9],  # fairness_equity
+        [0.85, 0.8, 0.75],  # autonomy_respect
+        [0.9, 0.85, 0.8],  # privacy_protection
+        [0.8, 0.75, 0.7],  # societal_environmental
+        [0.85, 0.9, 0.8],  # virtue_care
+        [0.75, 0.8, 0.85],  # legitimacy_trust
+        [0.7, 0.75, 0.8],  # epistemic_quality
+    ])
+    return MoralTensor.from_dense(
+        data,
+        axis_labels={"n": ["alice", "bob", "carol"]},
+    )
+
+
+@pytest.fixture
+def rank3_tensor() -> MoralTensor:
+    """Rank-3 tensor (9, 2, 4) with 2 parties over 4 time steps."""
+    np.random.seed(42)
+    data = np.random.rand(9, 2, 4)
+    data = np.clip(data, 0.1, 0.9)
+    return MoralTensor.from_dense(
+        data,
+        axis_labels={
+            "n": ["party_a", "party_b"],
+            "tau": ["t0", "t1", "t2", "t3"],
+        },
+    )
+
+
+@pytest.fixture
+def sparse_tensor() -> MoralTensor:
+    """Sparse tensor for efficiency tests."""
+    # Create sparse tensor with only a few non-zero values
+    coords = np.array([
+        [0, 0],  # physical_harm for party 0
+        [1, 1],  # rights_respect for party 1
+        [2, 2],  # fairness_equity for party 2
+    ], dtype=np.int32)
+    values = np.array([0.3, 0.8, 0.9], dtype=np.float64)
+
+    return MoralTensor.from_sparse(
+        coords=coords,
+        values=values,
+        shape=(9, 3),
+        fill_value=0.5,  # Default ethical score
+    )
+
+
+@pytest.fixture
+def vetoed_tensor() -> MoralTensor:
+    """Tensor with veto flags and locations."""
+    data = np.array([
+        [0.8, 0.2, 0.3],  # physical_harm (high for party 0)
+        [0.1, 0.9, 0.8],  # rights_respect (low for party 0)
+        [0.3, 0.8, 0.9],  # fairness_equity
+        [0.4, 0.85, 0.8],  # autonomy_respect
+        [0.5, 0.9, 0.85],  # privacy_protection
+        [0.4, 0.8, 0.75],  # societal_environmental
+        [0.3, 0.85, 0.9],  # virtue_care
+        [0.2, 0.75, 0.8],  # legitimacy_trust
+        [0.5, 0.7, 0.75],  # epistemic_quality
+    ])
+    return MoralTensor.from_dense(
+        data,
+        axis_labels={"n": ["harmful_party", "neutral_party", "good_party"]},
+        veto_flags=["RIGHTS_VIOLATION", "HIGH_HARM"],
+        veto_locations=[(0,)],  # Veto applies to party 0
+        reason_codes=["rights_violated", "harm_above_threshold"],
+    )
+
+
+@pytest.fixture
+def ideal_tensor() -> MoralTensor:
+    """Ideal tensor (harm=0, others=1)."""
+    return MoralTensor.ones((9, 3))
+
+
+@pytest.fixture
+def worst_tensor() -> MoralTensor:
+    """Worst-case tensor (harm=1, others=0)."""
+    return MoralTensor.zeros((9, 3))

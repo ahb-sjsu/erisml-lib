@@ -138,6 +138,15 @@ from .moral_vector import MoralVector
 from .moral_landscape import MoralLandscape
 from .decision_proof import DecisionProof, DecisionProofChain
 
+# DEME V3 Core Types
+from .moral_tensor import (
+    MoralTensor,
+    SparseCOO,
+    MORAL_DIMENSION_NAMES,
+    DIMENSION_INDEX,
+    DEFAULT_AXIS_NAMES,
+)
+
 from .governance.config import (
     GovernanceConfig,
 )
@@ -204,6 +213,12 @@ __all__ = [
     "MoralLandscape",
     "DecisionProof",
     "DecisionProofChain",
+    # DEME V3 Core Types
+    "MoralTensor",
+    "SparseCOO",
+    "MORAL_DIMENSION_NAMES",
+    "DIMENSION_INDEX",
+    "DEFAULT_AXIS_NAMES",
     # Governance (V1)
     "GovernanceConfig",
     "DecisionOutcome",
