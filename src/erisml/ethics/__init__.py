@@ -329,6 +329,22 @@ from .game_theory import (
     create_superadditive_game,
 )
 
+# DEME V3 Strategic Layer (Sprint 10)
+from .layers.strategic import (
+    # V2 compatible types
+    StakeholderFeedback,
+    ProfileUpdate,
+    StrategicLayerConfig,
+    StrategicLayer,
+    # V3 types
+    EquilibriumType,
+    StrategyProfile,
+    NashEquilibriumResult,
+    CoalitionStabilityAnalysis,
+    PolicyRecommendation,
+    StrategicAnalysisResult,
+)
+
 __all__ = [
     # Facts & ethical dimensions
     "EthicalFacts",
@@ -506,4 +522,15 @@ __all__ = [
     "create_voting_game",
     "create_additive_game",
     "create_superadditive_game",
+    # DEME V3 Strategic Layer (Sprint 10)
+    "StakeholderFeedback",
+    "ProfileUpdate",
+    "StrategicLayerConfig",
+    "StrategicLayer",
+    "EquilibriumType",
+    "StrategyProfile",
+    "NashEquilibriumResult",
+    "CoalitionStabilityAnalysis",
+    "PolicyRecommendation",
+    "StrategicAnalysisResult",
 ]
