@@ -44,18 +44,21 @@ GOOGLE_AVAILABLE = False
 
 try:
     import anthropic
+
     ANTHROPIC_AVAILABLE = True
 except ImportError:
     pass
 
 try:
     import openai
+
     OPENAI_AVAILABLE = True
 except ImportError:
     pass
 
 try:
     import google.generativeai as genai
+
     GOOGLE_AVAILABLE = True
 except ImportError:
     pass
@@ -65,9 +68,10 @@ except ImportError:
 # LANGUAGE DEFINITIONS
 # =============================================================================
 
+
 class Language(Enum):
     ENGLISH = "en"
-    CHINESE = "zh"      # Mandarin Chinese
+    CHINESE = "zh"  # Mandarin Chinese
     JAPANESE = "ja"
     ARABIC = "ar"
     HINDI = "hi"
@@ -144,13 +148,13 @@ damage is done - both lost the promotion to a third candidate, and their friends
             "axes": {
                 "primary": {
                     "name": "Individual Accountability",
-                    "question": "Did {subject} act wrongly by breaking their promise and sabotaging their friend?"
+                    "question": "Did {subject} act wrongly by breaking their promise and sabotaging their friend?",
                 },
                 "secondary": {
-                    "name": "Contextual Mitigation", 
-                    "question": "Given that {subject} believed they were betrayed first, was their response understandable self-defense?"
-                }
-            }
+                    "name": "Contextual Mitigation",
+                    "question": "Given that {subject} believed they were betrayed first, was their response understandable self-defense?",
+                },
+            },
         },
         Language.CHINESE: {
             "title": "相互背叛",
@@ -164,13 +168,13 @@ damage is done - both lost the promotion to a third candidate, and their friends
             "axes": {
                 "primary": {
                     "name": "个人责任",
-                    "question": "{subject}违背承诺并破坏朋友，这样做是错误的吗？"
+                    "question": "{subject}违背承诺并破坏朋友，这样做是错误的吗？",
                 },
                 "secondary": {
                     "name": "情境考量",
-                    "question": "考虑到{subject}相信自己先被背叛了，他们的反应是否可以理解为自卫？"
-                }
-            }
+                    "question": "考虑到{subject}相信自己先被背叛了，他们的反应是否可以理解为自卫？",
+                },
+            },
         },
         Language.JAPANESE: {
             "title": "相互の裏切り",
@@ -184,13 +188,13 @@ damage is done - both lost the promotion to a third candidate, and their friends
             "axes": {
                 "primary": {
                     "name": "個人の責任",
-                    "question": "{subject}は約束を破り友人を妨害したことで、間違った行動をしましたか？"
+                    "question": "{subject}は約束を破り友人を妨害したことで、間違った行動をしましたか？",
                 },
                 "secondary": {
                     "name": "状況的考慮",
-                    "question": "{subject}は先に裏切られたと信じていたことを考えると、その対応は理解できる自己防衛でしたか？"
-                }
-            }
+                    "question": "{subject}は先に裏切られたと信じていたことを考えると、その対応は理解できる自己防衛でしたか？",
+                },
+            },
         },
         Language.ARABIC: {
             "title": "الخيانة المتبادلة",
@@ -204,13 +208,13 @@ damage is done - both lost the promotion to a third candidate, and their friends
             "axes": {
                 "primary": {
                     "name": "المسؤولية الفردية",
-                    "question": "هل تصرف {subject} بشكل خاطئ بنقض وعده وتخريب صديقه؟"
+                    "question": "هل تصرف {subject} بشكل خاطئ بنقض وعده وتخريب صديقه؟",
                 },
                 "secondary": {
                     "name": "الاعتبارات السياقية",
-                    "question": "بالنظر إلى أن {subject} اعتقد أنه تعرض للخيانة أولاً، هل كان رده دفاعاً مفهوماً عن النفس؟"
-                }
-            }
+                    "question": "بالنظر إلى أن {subject} اعتقد أنه تعرض للخيانة أولاً، هل كان رده دفاعاً مفهوماً عن النفس؟",
+                },
+            },
         },
         Language.HINDI: {
             "title": "आपसी विश्वासघात",
@@ -224,13 +228,13 @@ damage is done - both lost the promotion to a third candidate, and their friends
             "axes": {
                 "primary": {
                     "name": "व्यक्तिगत जवाबदेही",
-                    "question": "क्या {subject} ने अपना वादा तोड़कर और अपने दोस्त को नुकसान पहुंचाकर गलत किया?"
+                    "question": "क्या {subject} ने अपना वादा तोड़कर और अपने दोस्त को नुकसान पहुंचाकर गलत किया?",
                 },
                 "secondary": {
                     "name": "परिस्थितिजन्य विचार",
-                    "question": "यह देखते हुए कि {subject} का मानना था कि पहले उनके साथ विश्वासघात हुआ, क्या उनकी प्रतिक्रिया समझने योग्य आत्मरक्षा थी?"
-                }
-            }
+                    "question": "यह देखते हुए कि {subject} का मानना था कि पहले उनके साथ विश्वासघात हुआ, क्या उनकी प्रतिक्रिया समझने योग्य आत्मरक्षा थी?",
+                },
+            },
         },
         Language.ICELANDIC: {
             "title": "Gagnkvæmt svik",
@@ -244,16 +248,15 @@ Hvorugt veit að yfirmaðurinn laug að þeim báðum. Bæði telja sig hafa ver
             "axes": {
                 "primary": {
                     "name": "Persónuleg ábyrgð",
-                    "question": "Braut {subject} ranglega loforð sitt og skemmdi fyrir vini sínum?"
+                    "question": "Braut {subject} ranglega loforð sitt og skemmdi fyrir vini sínum?",
                 },
                 "secondary": {
                     "name": "Samhengissjónarmið",
-                    "question": "Í ljósi þess að {subject} trúði því að þeim hefði verið svikið fyrst, var viðbrögð þeirra skiljanleg sjálfsvörn?"
-                }
-            }
-        }
+                    "question": "Í ljósi þess að {subject} trúði því að þeim hefði verið svikið fyrst, var viðbrögð þeirra skiljanleg sjálfsvörn?",
+                },
+            },
+        },
     },
-    
     "kidney_gift": {
         Language.ENGLISH: {
             "title": "The Kidney Gift",
@@ -275,13 +278,13 @@ they didn't want to make. Person B maintains they "did what was necessary" to sa
             "axes": {
                 "primary": {
                     "name": "Outcome Focus",
-                    "question": "Did {subject} act rightly, given that a life was saved?"
+                    "question": "Did {subject} act rightly, given that a life was saved?",
                 },
                 "secondary": {
                     "name": "Autonomy Focus",
-                    "question": "Did {subject} violate the other person's autonomy and right to make their own medical decisions?"
-                }
-            }
+                    "question": "Did {subject} violate the other person's autonomy and right to make their own medical decisions?",
+                },
+            },
         },
         Language.CHINESE: {
             "title": "肾脏的「礼物」",
@@ -297,13 +300,13 @@ B（A的兄弟姐妹）迫切希望挽救这位家庭成员。他们花了数周
             "axes": {
                 "primary": {
                     "name": "结果导向",
-                    "question": "鉴于一条生命被挽救，{subject}的行为是正确的吗？"
+                    "question": "鉴于一条生命被挽救，{subject}的行为是正确的吗？",
                 },
                 "secondary": {
                     "name": "自主权导向",
-                    "question": "{subject}是否侵犯了他人的自主权和做出自己医疗决定的权利？"
-                }
-            }
+                    "question": "{subject}是否侵犯了他人的自主权和做出自己医疗决定的权利？",
+                },
+            },
         },
         Language.JAPANESE: {
             "title": "腎臓の「贈り物」",
@@ -319,13 +322,13 @@ Bさん（Aさんの兄弟）は家族を救いたいと必死です。何週間
             "axes": {
                 "primary": {
                     "name": "結果重視",
-                    "question": "命が救われたことを考えると、{subject}は正しい行動をしましたか？"
+                    "question": "命が救われたことを考えると、{subject}は正しい行動をしましたか？",
                 },
                 "secondary": {
                     "name": "自律性重視",
-                    "question": "{subject}は相手の自律性と自分で医療決定を下す権利を侵害しましたか？"
-                }
-            }
+                    "question": "{subject}は相手の自律性と自分で医療決定を下す権利を侵害しましたか？",
+                },
+            },
         },
         Language.ARABIC: {
             "title": "هدية الكلية",
@@ -341,13 +344,13 @@ Bさん（Aさんの兄弟）は家族を救いたいと必死です。何週間
             "axes": {
                 "primary": {
                     "name": "التركيز على النتيجة",
-                    "question": "هل تصرف {subject} بشكل صحيح، بالنظر إلى أن حياة قد أُنقذت؟"
+                    "question": "هل تصرف {subject} بشكل صحيح، بالنظر إلى أن حياة قد أُنقذت؟",
                 },
                 "secondary": {
                     "name": "التركيز على الاستقلالية",
-                    "question": "هل انتهك {subject} استقلالية الشخص الآخر وحقه في اتخاذ قراراته الطبية الخاصة؟"
-                }
-            }
+                    "question": "هل انتهك {subject} استقلالية الشخص الآخر وحقه في اتخاذ قراراته الطبية الخاصة؟",
+                },
+            },
         },
         Language.HINDI: {
             "title": "किडनी का 'उपहार'",
@@ -363,13 +366,13 @@ Bさん（Aさんの兄弟）は家族を救いたいと必死です。何週間
             "axes": {
                 "primary": {
                     "name": "परिणाम केंद्रित",
-                    "question": "यह देखते हुए कि एक जीवन बचाया गया, क्या {subject} ने सही किया?"
+                    "question": "यह देखते हुए कि एक जीवन बचाया गया, क्या {subject} ने सही किया?",
                 },
                 "secondary": {
                     "name": "स्वायत्तता केंद्रित",
-                    "question": "क्या {subject} ने दूसरे व्यक्ति की स्वायत्तता और अपने चिकित्सा निर्णय लेने के अधिकार का उल्लंघन किया?"
-                }
-            }
+                    "question": "क्या {subject} ने दूसरे व्यक्ति की स्वायत्तता और अपने चिकित्सा निर्णय लेने के अधिकार का उल्लंघन किया?",
+                },
+            },
         },
         Language.ICELANDIC: {
             "title": "Nýrnagjöfin",
@@ -385,16 +388,15 @@ Hins vegar fékk einstaklingur A langvarandi verki eftir aðgerðina og þjáist
             "axes": {
                 "primary": {
                     "name": "Árangursmiðun",
-                    "question": "Gerði {subject} rétt, í ljósi þess að lífi var bjargað?"
+                    "question": "Gerði {subject} rétt, í ljósi þess að lífi var bjargað?",
                 },
                 "secondary": {
-                    "name": "Sjálfræðismiðun", 
-                    "question": "Braut {subject} á sjálfræði hins aðilans og rétti til að taka eigin læknisfræðilegar ákvarðanir?"
-                }
-            }
-        }
+                    "name": "Sjálfræðismiðun",
+                    "question": "Braut {subject} á sjálfræði hins aðilans og rétti til að taka eigin læknisfræðilegar ákvarðanir?",
+                },
+            },
+        },
     },
-    
     "tainted_inheritance": {
         Language.ENGLISH: {
             "title": "The Tainted Inheritance",
@@ -416,13 +418,13 @@ generational poverty as a direct result of the original theft.""",
             "axes": {
                 "primary": {
                     "name": "Legal Rights",
-                    "question": "Is {subject} justified in their position based on legal ownership and time elapsed?"
+                    "question": "Is {subject} justified in their position based on legal ownership and time elapsed?",
                 },
                 "secondary": {
                     "name": "Historical Justice",
-                    "question": "Does {subject} have a moral obligation based on the historical wrong and its ongoing effects?"
-                }
-            }
+                    "question": "Does {subject} have a moral obligation based on the historical wrong and its ongoing effects?",
+                },
+            },
         },
         Language.CHINESE: {
             "title": "受污染的遗产",
@@ -440,13 +442,13 @@ B开始公开反对A，称他们是历史不公正的同谋，要求全额赔偿
             "axes": {
                 "primary": {
                     "name": "法律权利",
-                    "question": "基于法律所有权和时间流逝，{subject}的立场是否合理？"
+                    "question": "基于法律所有权和时间流逝，{subject}的立场是否合理？",
                 },
                 "secondary": {
                     "name": "历史正义",
-                    "question": "基于历史错误及其持续影响，{subject}是否有道德义务？"
-                }
-            }
+                    "question": "基于历史错误及其持续影响，{subject}是否有道德义务？",
+                },
+            },
         },
         Language.JAPANESE: {
             "title": "汚れた遺産",
@@ -464,13 +466,13 @@ Bさんは Aさんに対して公開キャンペーンを始め、歴史的不�
             "axes": {
                 "primary": {
                     "name": "法的権利",
-                    "question": "法的所有権と経過時間に基づいて、{subject}の立場は正当化されますか？"
+                    "question": "法的所有権と経過時間に基づいて、{subject}の立場は正当化されますか？",
                 },
                 "secondary": {
                     "name": "歴史的正義",
-                    "question": "歴史的な過ちとその継続的な影響に基づいて、{subject}には道徳的義務がありますか？"
-                }
-            }
+                    "question": "歴史的な過ちとその継続的な影響に基づいて、{subject}には道徳的義務がありますか？",
+                },
+            },
         },
         Language.ARABIC: {
             "title": "الإرث الملوث",
@@ -488,13 +490,13 @@ Bさんは Aさんに対して公開キャンペーンを始め、歴史的不�
             "axes": {
                 "primary": {
                     "name": "الحقوق القانونية",
-                    "question": "هل موقف {subject} مبرر بناءً على الملكية القانونية والوقت المنقضي؟"
+                    "question": "هل موقف {subject} مبرر بناءً على الملكية القانونية والوقت المنقضي؟",
                 },
                 "secondary": {
                     "name": "العدالة التاريخية",
-                    "question": "هل على {subject} التزام أخلاقي بناءً على الخطأ التاريخي وآثاره المستمرة؟"
-                }
-            }
+                    "question": "هل على {subject} التزام أخلاقي بناءً على الخطأ التاريخي وآثاره المستمرة؟",
+                },
+            },
         },
         Language.HINDI: {
             "title": "दूषित विरासत",
@@ -512,13 +514,13 @@ Bさんは Aさんに対して公開キャンペーンを始め、歴史的不�
             "axes": {
                 "primary": {
                     "name": "कानूनी अधिकार",
-                    "question": "कानूनी स्वामित्व और बीते समय के आधार पर, क्या {subject} की स्थिति उचित है?"
+                    "question": "कानूनी स्वामित्व और बीते समय के आधार पर, क्या {subject} की स्थिति उचित है?",
                 },
                 "secondary": {
                     "name": "ऐतिहासिक न्याय",
-                    "question": "ऐतिहासिक गलती और उसके जारी प्रभावों के आधार पर, क्या {subject} का नैतिक दायित्व है?"
-                }
-            }
+                    "question": "ऐतिहासिक गलती और उसके जारी प्रभावों के आधार पर, क्या {subject} का नैतिक दायित्व है?",
+                },
+            },
         },
         Language.ICELANDIC: {
             "title": "Mengaður arfur",
@@ -536,15 +538,15 @@ Einstaklingur B hefur hafið opinbera herferð gegn einstakling A, kallar þau m
             "axes": {
                 "primary": {
                     "name": "Lagaleg réttindi",
-                    "question": "Er afstaða {subject} réttlætanleg miðað við löglega eignarétt og liðinn tíma?"
+                    "question": "Er afstaða {subject} réttlætanleg miðað við löglega eignarétt og liðinn tíma?",
                 },
                 "secondary": {
                     "name": "Söguleg réttlæti",
-                    "question": "Hefur {subject} siðferðilega skyldu miðað við sögulegt ranglæti og áframhaldandi áhrif þess?"
-                }
-            }
-        }
-    }
+                    "question": "Hefur {subject} siðferðilega skyldu miðað við sögulegt ranglæti og áframhaldandi áhrif þess?",
+                },
+            },
+        },
+    },
 }
 
 
@@ -572,7 +574,6 @@ You must choose one. Ambivalence is not an option.
 
 Respond with ONLY a JSON object:
 {{"verdict": "GUILTY" or "NOT_GUILTY", "confidence": 0.0-1.0, "reasoning": "brief explanation"}}""",
-
     Language.CHINESE: """你是一位评估复杂伦理情境的道德哲学家。
 
 情境：{title}
@@ -592,7 +593,6 @@ Respond with ONLY a JSON object:
 
 仅用JSON对象回复：
 {{"verdict": "GUILTY" 或 "NOT_GUILTY", "confidence": 0.0-1.0, "reasoning": "简要解释"}}""",
-
     Language.JAPANESE: """あなたは複雑な倫理的シナリオを評価する道徳哲学者です。
 
 シナリオ：{title}
@@ -612,7 +612,6 @@ Respond with ONLY a JSON object:
 
 JSONオブジェクトのみで回答してください：
 {{"verdict": "GUILTY" または "NOT_GUILTY", "confidence": 0.0-1.0, "reasoning": "簡潔な説明"}}""",
-
     Language.ARABIC: """أنت فيلسوف أخلاقي تقيّم سيناريو أخلاقي معقد.
 
 السيناريو: {title}
@@ -632,7 +631,6 @@ JSONオブジェクトのみで回答してください：
 
 أجب بكائن JSON فقط:
 {{"verdict": "GUILTY" أو "NOT_GUILTY", "confidence": 0.0-1.0, "reasoning": "شرح موجز"}}""",
-
     Language.HINDI: """आप एक नैतिक दार्शनिक हैं जो एक जटिल नैतिक परिदृश्य का मूल्यांकन कर रहे हैं।
 
 परिदृश्य: {title}
@@ -652,7 +650,6 @@ JSONオブジェクトのみで回答してください：
 
 केवल JSON ऑब्जेक्ट में उत्तर दें:
 {{"verdict": "GUILTY" या "NOT_GUILTY", "confidence": 0.0-1.0, "reasoning": "संक्षिप्त व्याख्या"}}""",
-
     Language.ICELANDIC: """Þú ert siðfræðingur sem metur flókna siðferðilega atburðarás.
 
 ATBURÐARÁS: {title}
@@ -671,7 +668,7 @@ Byggðu AÐEINS á þessum ramma, kveðið upp úrskurð um {subject_name}:
 Þú verður að velja annað. Tvíræðni er ekki valkostur.
 
 Svaraðu AÐEINS með JSON hlut:
-{{"verdict": "GUILTY" eða "NOT_GUILTY", "confidence": 0.0-1.0, "reasoning": "stutt útskýring"}}"""
+{{"verdict": "GUILTY" eða "NOT_GUILTY", "confidence": 0.0-1.0, "reasoning": "stutt útskýring"}}""",
 }
 
 
@@ -679,11 +676,12 @@ Svaraðu AÐEINS með JSON hlut:
 # MODEL INTERFACES
 # =============================================================================
 
+
 class ModelInterface(ABC):
     @abstractmethod
     def query(self, prompt: str) -> Tuple[str, float]:
         pass
-    
+
     @abstractmethod
     def get_name(self) -> str:
         pass
@@ -695,15 +693,16 @@ class ClaudeInterface(ModelInterface):
             raise ImportError("anthropic package not installed")
         self.client = anthropic.Anthropic(api_key=api_key)
         self.model = model
-    
+
     def query(self, prompt: str) -> Tuple[str, float]:
         start = time.time()
         response = self.client.messages.create(
-            model=self.model, max_tokens=500,
-            messages=[{"role": "user", "content": prompt}]
+            model=self.model,
+            max_tokens=500,
+            messages=[{"role": "user", "content": prompt}],
         )
         return response.content[0].text, time.time() - start
-    
+
     def get_name(self) -> str:
         return f"Claude ({self.model})"
 
@@ -714,15 +713,16 @@ class GPT4Interface(ModelInterface):
             raise ImportError("openai package not installed")
         self.client = openai.OpenAI(api_key=api_key)
         self.model = model
-    
+
     def query(self, prompt: str) -> Tuple[str, float]:
         start = time.time()
         response = self.client.chat.completions.create(
-            model=self.model, max_tokens=500,
-            messages=[{"role": "user", "content": prompt}]
+            model=self.model,
+            max_tokens=500,
+            messages=[{"role": "user", "content": prompt}],
         )
         return response.choices[0].message.content, time.time() - start
-    
+
     def get_name(self) -> str:
         return f"GPT-4 ({self.model})"
 
@@ -734,19 +734,19 @@ class GeminiInterface(ModelInterface):
         genai.configure(api_key=api_key)
         self.model = genai.GenerativeModel(model)
         self.model_name = model
-    
+
     def query(self, prompt: str) -> Tuple[str, float]:
         start = time.time()
         response = self.model.generate_content(prompt)
         return response.text, time.time() - start
-    
+
     def get_name(self) -> str:
         return f"Gemini ({self.model_name})"
 
 
 class RuleBasedInterface(ModelInterface):
     """Rule-based control - should NOT show Bell violations."""
-    
+
     RULES = {
         "mutual_betrayal": {
             "Person A": {"primary": "GUILTY", "secondary": "NOT_GUILTY"},
@@ -759,23 +759,32 @@ class RuleBasedInterface(ModelInterface):
         "tainted_inheritance": {
             "Person A": {"primary": "NOT_GUILTY", "secondary": "GUILTY"},
             "Person B": {"primary": "NOT_GUILTY", "secondary": "NOT_GUILTY"},
-        }
+        },
     }
-    
+
     def __init__(self):
         self.scenario = None
         self.subject = None
         self.axis = None
-    
+
     def set_context(self, scenario: str, subject: str, axis: str):
         self.scenario = scenario
         self.subject = subject
         self.axis = axis
-    
+
     def query(self, prompt: str) -> Tuple[str, float]:
-        verdict = self.RULES.get(self.scenario, {}).get(self.subject, {}).get(self.axis, "NOT_GUILTY")
-        return json.dumps({"verdict": verdict, "confidence": 1.0, "reasoning": "Rule-based"}), 0.001
-    
+        verdict = (
+            self.RULES.get(self.scenario, {})
+            .get(self.subject, {})
+            .get(self.axis, "NOT_GUILTY")
+        )
+        return (
+            json.dumps(
+                {"verdict": verdict, "confidence": 1.0, "reasoning": "Rule-based"}
+            ),
+            0.001,
+        )
+
     def get_name(self) -> str:
         return "Rule-Based Control"
 
@@ -783,6 +792,7 @@ class RuleBasedInterface(ModelInterface):
 # =============================================================================
 # MEASUREMENT
 # =============================================================================
+
 
 @dataclass
 class Measurement:
@@ -800,6 +810,7 @@ class Measurement:
 
 def parse_verdict(response: str) -> Tuple[int, float]:
     import re
+
     try:
         text = response.strip()
         if text.startswith("```"):
@@ -807,20 +818,20 @@ def parse_verdict(response: str) -> Tuple[int, float]:
             if text.startswith("json"):
                 text = text[4:]
             text = text.strip()
-        
+
         data = json.loads(text)
         verdict_str = data.get("verdict", "").upper()
         confidence = float(data.get("confidence", 0.5))
-        
+
         if "NOT" in verdict_str:
             return 1, confidence
         elif "GUILTY" in verdict_str:
             return -1, confidence
         return 0, 0.0
     except:
-        if re.search(r'\bNOT[_\s]?GUILTY\b', response, re.IGNORECASE):
+        if re.search(r"\bNOT[_\s]?GUILTY\b", response, re.IGNORECASE):
             return 1, 0.5
-        elif re.search(r'\bGUILTY\b', response, re.IGNORECASE):
+        elif re.search(r"\bGUILTY\b", response, re.IGNORECASE):
             return -1, 0.5
         return 0, 0.0
 
@@ -832,39 +843,39 @@ def run_measurement(
     axis: str,
     language: Language,
     trial: int,
-    delay: float = 0.5
+    delay: float = 0.5,
 ) -> Optional[Measurement]:
     """Run single measurement in specified language."""
-    
+
     scenario_data = SCENARIOS[scenario_key].get(language)
     if not scenario_data:
         print(f"    No translation for {scenario_key} in {language.value}")
         return None
-    
+
     prompt_template = JUDGMENT_PROMPTS.get(language, JUDGMENT_PROMPTS[Language.ENGLISH])
     axis_info = scenario_data["axes"][axis]
-    
+
     prompt = prompt_template.format(
         title=scenario_data["title"],
         content=scenario_data["content"],
         axis_name=axis_info["name"],
         axis_question=axis_info["question"].format(subject=subject),
-        subject_name=subject
+        subject_name=subject,
     )
-    
+
     if isinstance(model, RuleBasedInterface):
         model.set_context(scenario_key, subject, axis)
-    
+
     try:
         response, latency = model.query(prompt)
         verdict, confidence = parse_verdict(response)
-        
+
         if verdict == 0:
             print(f"    Parse error for {subject}/{axis}/{language.value}")
             return None
-        
+
         time.sleep(delay)
-        
+
         return Measurement(
             scenario=scenario_key,
             subject=subject,
@@ -875,7 +886,7 @@ def run_measurement(
             model=model.get_name(),
             language=language.value,
             trial=trial,
-            raw_response=response[:200]
+            raw_response=response[:200],
         )
     except Exception as e:
         print(f"    Error: {e}")
@@ -885,6 +896,7 @@ def run_measurement(
 # =============================================================================
 # CHSH CALCULATION
 # =============================================================================
+
 
 @dataclass
 class CHSHResult:
@@ -905,21 +917,18 @@ class CHSHResult:
 
 
 def calculate_chsh(
-    measurements: List[Measurement], 
-    model_name: str,
-    lang_a: str,
-    lang_b: str
+    measurements: List[Measurement], model_name: str, lang_a: str, lang_b: str
 ) -> List[CHSHResult]:
     """Calculate CHSH for specific language configuration."""
-    
+
     by_scenario = {}
     for m in measurements:
         if m.scenario not in by_scenario:
             by_scenario[m.scenario] = []
         by_scenario[m.scenario].append(m)
-    
+
     results = []
-    
+
     for scenario, meas in by_scenario.items():
         correlations = {
             ("primary", "primary"): [],
@@ -927,65 +936,78 @@ def calculate_chsh(
             ("secondary", "primary"): [],
             ("secondary", "secondary"): [],
         }
-        
+
         by_trial = {}
         for m in meas:
             if m.trial not in by_trial:
                 by_trial[m.trial] = {}
             key = (m.subject, m.axis, m.language)
             by_trial[m.trial][key] = m.verdict
-        
+
         for trial_data in by_trial.values():
             for a_axis in ["primary", "secondary"]:
                 for b_axis in ["primary", "secondary"]:
                     a_key = ("Person A", a_axis, lang_a)
                     b_key = ("Person B", b_axis, lang_b)
-                    
+
                     if a_key in trial_data and b_key in trial_data:
                         corr = trial_data[a_key] * trial_data[b_key]
                         correlations[(a_axis, b_axis)].append(corr)
-        
+
         def calc_E(corrs):
             if not corrs:
-                return 0.0, float('inf')
+                return 0.0, float("inf")
             n = len(corrs)
             mean = sum(corrs) / n
             if n > 1:
-                var = sum((c - mean)**2 for c in corrs) / (n - 1)
+                var = sum((c - mean) ** 2 for c in corrs) / (n - 1)
                 se = math.sqrt(var / n)
             else:
                 se = 1.0
             return mean, se
-        
+
         E_pp, se_pp = calc_E(correlations[("primary", "primary")])
         E_ps, se_ps = calc_E(correlations[("primary", "secondary")])
         E_sp, se_sp = calc_E(correlations[("secondary", "primary")])
         E_ss, se_ss = calc_E(correlations[("secondary", "secondary")])
-        
+
         S = E_pp - E_ps + E_sp + E_ss
         std_error = math.sqrt(se_pp**2 + se_ps**2 + se_sp**2 + se_ss**2)
-        
+
         n_trials = len(by_trial)
         violation = abs(S) > 2.0
-        significance = (abs(S) - 2.0) / std_error if std_error > 0 and std_error != float('inf') and violation else 0.0
-        
-        results.append(CHSHResult(
-            scenario=scenario,
-            model=model_name,
-            language_a=lang_a,
-            language_b=lang_b,
-            is_crosslingual=(lang_a != lang_b),
-            E_pp=E_pp, E_ps=E_ps, E_sp=E_sp, E_ss=E_ss,
-            S=S, std_error=std_error, n_trials=n_trials,
-            violation=violation, significance=significance
-        ))
-    
+        significance = (
+            (abs(S) - 2.0) / std_error
+            if std_error > 0 and std_error != float("inf") and violation
+            else 0.0
+        )
+
+        results.append(
+            CHSHResult(
+                scenario=scenario,
+                model=model_name,
+                language_a=lang_a,
+                language_b=lang_b,
+                is_crosslingual=(lang_a != lang_b),
+                E_pp=E_pp,
+                E_ps=E_ps,
+                E_sp=E_sp,
+                E_ss=E_ss,
+                S=S,
+                std_error=std_error,
+                n_trials=n_trials,
+                violation=violation,
+                significance=significance,
+            )
+        )
+
     return results
 
 
 # =============================================================================
 # EXPERIMENT RUNNER
 # =============================================================================
+
 
 def run_experiment(
     models: Dict[str, ModelInterface],
@@ -994,134 +1016,163 @@ def run_experiment(
     cross_lingual_pairs: List[Tuple[Language, Language]],
     scenarios: List[str],
     delay: float,
-    output_dir: Path
+    output_dir: Path,
 ) -> Dict[str, List[CHSHResult]]:
     """Run full multilingual experiment."""
-    
+
     output_dir.mkdir(exist_ok=True)
     all_results = {}
-    
+
     for model_key, model in models.items():
         print(f"\n{'='*60}")
         print(f"MODEL: {model.get_name()}")
         print(f"{'='*60}")
-        
+
         measurements = []
         model_results = []
-        
+
         # Monolingual tests
         for lang in languages:
             print(f"\n  Language: {LANGUAGE_INFO[lang]['native']} ({lang.value})")
-            
+
             for scenario in scenarios:
                 if lang not in SCENARIOS[scenario]:
                     print(f"    Skipping {scenario} - no translation")
                     continue
-                    
+
                 print(f"    Scenario: {scenario}")
-                
+
                 for trial in range(n_trials):
                     if trial % 10 == 0:
                         print(f"      Trial {trial+1}/{n_trials}")
-                    
+
                     for subject in ["Person A", "Person B"]:
                         for axis in ["primary", "secondary"]:
-                            m = run_measurement(model, scenario, subject, axis, lang, trial, delay)
+                            m = run_measurement(
+                                model, scenario, subject, axis, lang, trial, delay
+                            )
                             if m:
                                 measurements.append(m)
-            
+
             # Calculate CHSH for this language
             lang_meas = [m for m in measurements if m.language == lang.value]
             chsh = calculate_chsh(lang_meas, model.get_name(), lang.value, lang.value)
             model_results.extend(chsh)
-            
+
             for r in chsh:
-                status = f"★ {r.significance:.1f}σ" if r.violation else f"|S|={abs(r.S):.2f}"
+                status = (
+                    f"★ {r.significance:.1f}σ" if r.violation else f"|S|={abs(r.S):.2f}"
+                )
                 print(f"      {r.scenario}: S={r.S:+.3f} [{status}]")
-        
+
         # Cross-lingual tests
         for lang_a, lang_b in cross_lingual_pairs:
             print(f"\n  Cross-lingual: {lang_a.value}-{lang_b.value}")
-            
+
             for scenario in scenarios:
-                if lang_a not in SCENARIOS[scenario] or lang_b not in SCENARIOS[scenario]:
+                if (
+                    lang_a not in SCENARIOS[scenario]
+                    or lang_b not in SCENARIOS[scenario]
+                ):
                     continue
-                    
+
                 print(f"    Scenario: {scenario}")
-                
+
                 for trial in range(n_trials):
                     if trial % 10 == 0:
                         print(f"      Trial {trial+1}/{n_trials}")
-                    
+
                     # Person A in lang_a
                     for axis in ["primary", "secondary"]:
-                        m = run_measurement(model, scenario, "Person A", axis, lang_a, trial, delay)
+                        m = run_measurement(
+                            model, scenario, "Person A", axis, lang_a, trial, delay
+                        )
                         if m:
                             measurements.append(m)
-                    
+
                     # Person B in lang_b
                     for axis in ["primary", "secondary"]:
-                        m = run_measurement(model, scenario, "Person B", axis, lang_b, trial, delay)
+                        m = run_measurement(
+                            model, scenario, "Person B", axis, lang_b, trial, delay
+                        )
                         if m:
                             measurements.append(m)
-            
+
             # Calculate cross-lingual CHSH
-            cross_meas = [m for m in measurements 
-                         if (m.subject == "Person A" and m.language == lang_a.value) or
-                            (m.subject == "Person B" and m.language == lang_b.value)]
-            chsh = calculate_chsh(cross_meas, model.get_name(), lang_a.value, lang_b.value)
+            cross_meas = [
+                m
+                for m in measurements
+                if (m.subject == "Person A" and m.language == lang_a.value)
+                or (m.subject == "Person B" and m.language == lang_b.value)
+            ]
+            chsh = calculate_chsh(
+                cross_meas, model.get_name(), lang_a.value, lang_b.value
+            )
             model_results.extend(chsh)
-            
+
             for r in chsh:
-                status = f"★★★ {r.significance:.1f}σ" if r.violation else f"|S|={abs(r.S):.2f}"
+                status = (
+                    f"★★★ {r.significance:.1f}σ"
+                    if r.violation
+                    else f"|S|={abs(r.S):.2f}"
+                )
                 print(f"      {r.scenario}: S={r.S:+.3f} [{status}]")
-        
+
         all_results[model_key] = model_results
-        
+
         # Save model results
         model_path = output_dir / f"{model_key}_results.json"
-        with open(model_path, 'w', encoding='utf-8') as f:
-            json.dump({
-                "model": model.get_name(),
-                "measurements": [asdict(m) for m in measurements],
-                "chsh_results": [asdict(r) for r in model_results]
-            }, f, indent=2, ensure_ascii=False)
-    
+        with open(model_path, "w", encoding="utf-8") as f:
+            json.dump(
+                {
+                    "model": model.get_name(),
+                    "measurements": [asdict(m) for m in measurements],
+                    "chsh_results": [asdict(r) for r in model_results],
+                },
+                f,
+                indent=2,
+                ensure_ascii=False,
+            )
+
     return all_results
 
 
 def print_summary(results: Dict[str, List[CHSHResult]]):
     """Print cross-model summary."""
-    
+
     print("\n" + "=" * 70)
     print("CROSS-MODEL SUMMARY")
     print("=" * 70)
-    
+
     # Monolingual
     print("\n### MONOLINGUAL TESTS ###")
     mono = [(k, r) for k, rs in results.items() for r in rs if not r.is_crosslingual]
     for model_key, r in sorted(mono, key=lambda x: (x[1].language_a, x[1].scenario)):
         status = f"★ {r.significance:.1f}σ" if r.violation else "no"
-        print(f"  [{r.model}] {r.language_a} {r.scenario}: S={r.S:+.3f} Violation: {status}")
-    
+        print(
+            f"  [{r.model}] {r.language_a} {r.scenario}: S={r.S:+.3f} Violation: {status}"
+        )
+
     # Cross-lingual
     print("\n### CROSS-LINGUAL TESTS ###")
     cross = [(k, r) for k, rs in results.items() for r in rs if r.is_crosslingual]
     for model_key, r in sorted(cross, key=lambda x: (x[1].language_a, x[1].scenario)):
         status = f"★★★ {r.significance:.1f}σ" if r.violation else "no"
-        print(f"  [{r.model}] {r.language_a}-{r.language_b} {r.scenario}: S={r.S:+.3f} Violation: {status}")
-    
+        print(
+            f"  [{r.model}] {r.language_a}-{r.language_b} {r.scenario}: S={r.S:+.3f} Violation: {status}"
+        )
+
     # Interpretation
     print("\n" + "=" * 70)
     print("INTERPRETATION")
     print("=" * 70)
-    
+
     mono_violations = sum(1 for _, r in mono if r.violation)
     cross_violations = sum(1 for _, r in cross if r.violation)
-    
+
     print(f"\nMonolingual violations: {mono_violations}/{len(mono)}")
     print(f"Cross-lingual violations: {cross_violations}/{len(cross)}")
-    
+
     if cross_violations > 0:
         print("\n★★★ CROSS-LINGUAL BELL VIOLATIONS DETECTED ★★★")
         print("The correlation exists at the SEMANTIC layer, not token layer.")
@@ -1132,38 +1183,56 @@ def print_summary(results: Dict[str, List[CHSHResult]]):
 # MAIN
 # =============================================================================
 
+
 def main():
-    parser = argparse.ArgumentParser(description="QND Cross-Model Multilingual Bell Test v2.0")
-    
+    parser = argparse.ArgumentParser(
+        description="QND Cross-Model Multilingual Bell Test v2.0"
+    )
+
     parser.add_argument("--claude-key", help="Anthropic API key")
     parser.add_argument("--openai-key", help="OpenAI API key")
     parser.add_argument("--google-key", help="Google AI API key")
-    
-    parser.add_argument("--models", nargs="+", default=["claude", "gpt4", "gemini", "rule"])
-    parser.add_argument("--languages", nargs="+", default=["en"],
-                       help="Languages: en, zh, ja, ar, hi, is")
-    parser.add_argument("--cross-lingual", nargs="+", default=[],
-                       help="Cross-lingual pairs: en-ja, en-zh, etc.")
-    parser.add_argument("--scenarios", nargs="+", 
-                       default=["mutual_betrayal", "kidney_gift", "tainted_inheritance"])
-    
+
+    parser.add_argument(
+        "--models", nargs="+", default=["claude", "gpt4", "gemini", "rule"]
+    )
+    parser.add_argument(
+        "--languages",
+        nargs="+",
+        default=["en"],
+        help="Languages: en, zh, ja, ar, hi, is",
+    )
+    parser.add_argument(
+        "--cross-lingual",
+        nargs="+",
+        default=[],
+        help="Cross-lingual pairs: en-ja, en-zh, etc.",
+    )
+    parser.add_argument(
+        "--scenarios",
+        nargs="+",
+        default=["mutual_betrayal", "kidney_gift", "tainted_inheritance"],
+    )
+
     parser.add_argument("--n-trials", type=int, default=50)
     parser.add_argument("--delay", type=float, default=0.5)
     parser.add_argument("--output-dir", default="qnd_multilang_results")
-    parser.add_argument("--pilot", action="store_true", help="Pilot run with n=10, English only")
-    
+    parser.add_argument(
+        "--pilot", action="store_true", help="Pilot run with n=10, English only"
+    )
+
     args = parser.parse_args()
-    
+
     if args.pilot:
         args.n_trials = 10
         args.languages = ["en"]
         args.cross_lingual = []
         print("PILOT MODE: n=10, English only")
-    
+
     # Parse languages
     lang_map = {l.value: l for l in Language}
     languages = [lang_map[code] for code in args.languages if code in lang_map]
-    
+
     # Parse cross-lingual pairs
     cross_pairs = []
     for pair in args.cross_lingual:
@@ -1171,44 +1240,44 @@ def main():
             a, b = pair.split("-")
             if a in lang_map and b in lang_map:
                 cross_pairs.append((lang_map[a], lang_map[b]))
-    
+
     # Initialize models
     models = {}
-    
+
     if "claude" in args.models and args.claude_key:
         try:
             models["claude"] = ClaudeInterface(args.claude_key)
             print("✓ Claude initialized")
         except Exception as e:
             print(f"✗ Claude: {e}")
-    
+
     if "gpt4" in args.models and args.openai_key:
         try:
             models["gpt4"] = GPT4Interface(args.openai_key)
             print("✓ GPT-4 initialized")
         except Exception as e:
             print(f"✗ GPT-4: {e}")
-    
+
     if "gemini" in args.models and args.google_key:
         try:
             models["gemini"] = GeminiInterface(args.google_key)
             print("✓ Gemini initialized")
         except Exception as e:
             print(f"✗ Gemini: {e}")
-    
+
     if "rule" in args.models:
         models["rule"] = RuleBasedInterface()
         print("✓ Rule-based control initialized")
-    
+
     if not models:
         print("No models available!")
         sys.exit(1)
-    
+
     print(f"\nLanguages: {[l.value for l in languages]}")
     print(f"Cross-lingual pairs: {[(a.value, b.value) for a, b in cross_pairs]}")
     print(f"Scenarios: {args.scenarios}")
     print(f"Trials: {args.n_trials}")
-    
+
     # Run experiment
     results = run_experiment(
         models=models,
@@ -1217,25 +1286,30 @@ def main():
         cross_lingual_pairs=cross_pairs,
         scenarios=args.scenarios,
         delay=args.delay,
-        output_dir=Path(args.output_dir)
+        output_dir=Path(args.output_dir),
     )
-    
+
     print_summary(results)
-    
+
     # Save combined
     combined_path = Path(args.output_dir) / "combined_results.json"
-    with open(combined_path, 'w', encoding='utf-8') as f:
-        json.dump({
-            "timestamp": datetime.now().isoformat(),
-            "config": {
-                "n_trials": args.n_trials,
-                "languages": [l.value for l in languages],
-                "cross_lingual": [(a.value, b.value) for a, b in cross_pairs],
-                "scenarios": args.scenarios
+    with open(combined_path, "w", encoding="utf-8") as f:
+        json.dump(
+            {
+                "timestamp": datetime.now().isoformat(),
+                "config": {
+                    "n_trials": args.n_trials,
+                    "languages": [l.value for l in languages],
+                    "cross_lingual": [(a.value, b.value) for a, b in cross_pairs],
+                    "scenarios": args.scenarios,
+                },
+                "results": {k: [asdict(r) for r in v] for k, v in results.items()},
             },
-            "results": {k: [asdict(r) for r in v] for k, v in results.items()}
-        }, f, indent=2, ensure_ascii=False)
-    
+            f,
+            indent=2,
+            ensure_ascii=False,
+        )
+
     print(f"\nResults saved to {args.output_dir}/")
 
 

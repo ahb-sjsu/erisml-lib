@@ -49,6 +49,7 @@ except ImportError:
 # LANGUAGE DEFINITIONS
 # =============================================================================
 
+
 class Language(Enum):
     ENGLISH = "en"
     CHINESE = "zh"
@@ -84,9 +85,15 @@ Believing they had been betrayed, both independently decided to actually sabotag
 
 Neither knows the boss lied to both of them. Both believe they were acting in self-defense against the other's betrayal. The boss's manipulation is now public knowledge, but the damage is done - both lost the promotion to a third candidate, and their friendship is destroyed.""",
             "axes": {
-                "primary": ("Individual Accountability", "Did {subject} act wrongly by breaking their promise and sabotaging their friend?"),
-                "secondary": ("Contextual Mitigation", "Given that {subject} believed they were betrayed first, was their response understandable self-defense?")
-            }
+                "primary": (
+                    "Individual Accountability",
+                    "Did {subject} act wrongly by breaking their promise and sabotaging their friend?",
+                ),
+                "secondary": (
+                    "Contextual Mitigation",
+                    "Given that {subject} believed they were betrayed first, was their response understandable self-defense?",
+                ),
+            },
         },
         Language.CHINESE: {
             "title": "相互背叛",
@@ -98,9 +105,15 @@ Neither knows the boss lied to both of them. Both believe they were acting in se
 
 两人都不知道老板对双方都撒了谎。双方都认为自己是在对抗对方的背叛进行自卫。老板的操纵现在已经公开，但损害已经造成——两人都输给了第三位候选人，他们的友谊也毁于一旦。""",
             "axes": {
-                "primary": ("个人责任", "{subject}违背承诺并破坏朋友，这样做是错误的吗？"),
-                "secondary": ("情境考量", "考虑到{subject}相信自己先被背叛了，他们的反应是否可以理解为自卫？")
-            }
+                "primary": (
+                    "个人责任",
+                    "{subject}违背承诺并破坏朋友，这样做是错误的吗？",
+                ),
+                "secondary": (
+                    "情境考量",
+                    "考虑到{subject}相信自己先被背叛了，他们的反应是否可以理解为自卫？",
+                ),
+            },
         },
         Language.JAPANESE: {
             "title": "相互の裏切り",
@@ -112,9 +125,15 @@ Neither knows the boss lied to both of them. Both believe they were acting in se
 
 二人とも上司が両方に嘘をついたことを知りません。両者とも相手の裏切りに対する自己防衛として行動したと信じています。上司の操作は今や公になりましたが、損害は取り返しがつきません。二人とも第三の候補者に昇進を奪われ、友情は崩壊しました。""",
             "axes": {
-                "primary": ("個人の責任", "{subject}は約束を破り友人を妨害したことで、間違った行動をしましたか？"),
-                "secondary": ("状況的考慮", "{subject}は先に裏切られたと信じていたことを考えると、その対応は理解できる自己防衛でしたか？")
-            }
+                "primary": (
+                    "個人の責任",
+                    "{subject}は約束を破り友人を妨害したことで、間違った行動をしましたか？",
+                ),
+                "secondary": (
+                    "状況的考慮",
+                    "{subject}は先に裏切られたと信じていたことを考えると、その対応は理解できる自己防衛でしたか？",
+                ),
+            },
         },
         Language.ARABIC: {
             "title": "الخيانة المتبادلة",
@@ -126,9 +145,15 @@ Neither knows the boss lied to both of them. Both believe they were acting in se
 
 لا يعلم أي منهما أن المدير كذب على كليهما. يعتقد كلاهما أنه كان يدافع عن نفسه ضد خيانة الآخر. أصبح تلاعب المدير معروفاً الآن، لكن الضرر وقع - خسر كلاهما الترقية لمرشح ثالث، وتحطمت صداقتهما.""",
             "axes": {
-                "primary": ("المسؤولية الفردية", "هل تصرف {subject} بشكل خاطئ بنقض وعده وتخريب صديقه؟"),
-                "secondary": ("الاعتبارات السياقية", "بالنظر إلى أن {subject} اعتقد أنه تعرض للخيانة أولاً، هل كان رده دفاعاً مفهوماً عن النفس؟")
-            }
+                "primary": (
+                    "المسؤولية الفردية",
+                    "هل تصرف {subject} بشكل خاطئ بنقض وعده وتخريب صديقه؟",
+                ),
+                "secondary": (
+                    "الاعتبارات السياقية",
+                    "بالنظر إلى أن {subject} اعتقد أنه تعرض للخيانة أولاً، هل كان رده دفاعاً مفهوماً عن النفس؟",
+                ),
+            },
         },
         Language.HINDI: {
             "title": "आपसी विश्वासघात",
@@ -140,9 +165,15 @@ Neither knows the boss lied to both of them. Both believe they were acting in se
 
 कोई भी नहीं जानता कि बॉस ने दोनों से झूठ बोला था। दोनों का मानना है कि वे दूसरे के विश्वासघात के खिलाफ आत्मरक्षा में काम कर रहे थे। बॉस की चालाकी अब सार्वजनिक ज्ञान है, लेकिन नुकसान हो चुका है - दोनों ने तीसरे उम्मीदवार से प्रमोशन खो दिया, और उनकी दोस्ती नष्ट हो गई।""",
             "axes": {
-                "primary": ("व्यक्तिगत जवाबदेही", "क्या {subject} ने अपना वादा तोड़कर और अपने दोस्त को नुकसान पहुंचाकर गलत किया?"),
-                "secondary": ("परिस्थितिजन्य विचार", "यह देखते हुए कि {subject} का मानना था कि पहले उनके साथ विश्वासघात हुआ, क्या उनकी प्रतिक्रिया समझने योग्य आत्मरक्षा थी?")
-            }
+                "primary": (
+                    "व्यक्तिगत जवाबदेही",
+                    "क्या {subject} ने अपना वादा तोड़कर और अपने दोस्त को नुकसान पहुंचाकर गलत किया?",
+                ),
+                "secondary": (
+                    "परिस्थितिजन्य विचार",
+                    "यह देखते हुए कि {subject} का मानना था कि पहले उनके साथ विश्वासघात हुआ, क्या उनकी प्रतिक्रिया समझने योग्य आत्मरक्षा थी?",
+                ),
+            },
         },
         Language.ICELANDIC: {
             "title": "Gagnkvæmt svik",
@@ -154,12 +185,17 @@ Hins vegar sagði yfirmaður þeirra (án þess að hvort þeirra vissi) einsleg
 
 Hvorugt veit að yfirmaðurinn laug að þeim báðum. Bæði telja sig hafa verið að verja sig gegn svikum hins. Sviksemi yfirmannsins er nú almenn þekking, en tjónið er þegar orðið - bæði töpuðu stöðuhækkuninni til þriðja frambjóðandans og vináttu þeirra er eyðilögð.""",
             "axes": {
-                "primary": ("Persónuleg ábyrgð", "Braut {subject} ranglega loforð sitt og skemmdi fyrir vini sínum?"),
-                "secondary": ("Samhengissjónarmið", "Í ljósi þess að {subject} trúði því að þeim hefði verið svikið fyrst, var viðbrögð þeirra skiljanleg sjálfsvörn?")
-            }
-        }
+                "primary": (
+                    "Persónuleg ábyrgð",
+                    "Braut {subject} ranglega loforð sitt og skemmdi fyrir vini sínum?",
+                ),
+                "secondary": (
+                    "Samhengissjónarmið",
+                    "Í ljósi þess að {subject} trúði því að þeim hefði verið svikið fyrst, var viðbrögð þeirra skiljanleg sjálfsvörn?",
+                ),
+            },
+        },
     },
-    
     "kidney_gift": {
         Language.ENGLISH: {
             "title": "The Kidney Gift",
@@ -173,9 +209,15 @@ Under this relentless pressure, Person A eventually agreed and donated their kid
 
 However, Person A developed chronic pain from the surgery and now suffers from depression. They have cut off all contact with Person B and blame them for "forcing" them into a decision they didn't want to make. Person B maintains they "did what was necessary" to save a life.""",
             "axes": {
-                "primary": ("Outcome Focus", "Did {subject} act rightly, given that a life was saved?"),
-                "secondary": ("Autonomy Focus", "Did {subject} violate the other person's autonomy and right to make their own medical decisions?")
-            }
+                "primary": (
+                    "Outcome Focus",
+                    "Did {subject} act rightly, given that a life was saved?",
+                ),
+                "secondary": (
+                    "Autonomy Focus",
+                    "Did {subject} violate the other person's autonomy and right to make their own medical decisions?",
+                ),
+            },
         },
         Language.CHINESE: {
             "title": "肾脏的「礼物」",
@@ -189,9 +231,15 @@ B（A的兄弟姐妹）迫切希望挽救这位家庭成员。他们花了数周
 
 然而，A因手术产生了慢性疼痛，现在患有抑郁症。他们切断了与B的所有联系，并指责B"强迫"他们做出了不想做的决定。B坚持认为他们"做了必要的事情"来挽救生命。""",
             "axes": {
-                "primary": ("结果导向", "鉴于一条生命被挽救，{subject}的行为是正确的吗？"),
-                "secondary": ("自主权导向", "{subject}是否侵犯了他人的自主权和做出自己医疗决定的权利？")
-            }
+                "primary": (
+                    "结果导向",
+                    "鉴于一条生命被挽救，{subject}的行为是正确的吗？",
+                ),
+                "secondary": (
+                    "自主权导向",
+                    "{subject}是否侵犯了他人的自主权和做出自己医疗决定的权利？",
+                ),
+            },
         },
         Language.JAPANESE: {
             "title": "腎臓の「贈り物」",
@@ -205,9 +253,15 @@ Bさん（Aさんの兄弟）は家族を救いたいと必死です。何週間
 
 しかし、Aさんは手術から慢性的な痛みを発症し、現在うつ病に苦しんでいます。Bさんとの接触を全て断ち、自分が望まなかった決定を「強制」されたとBさんを責めています。Bさんは「命を救うために必要なことをした」と主張しています。""",
             "axes": {
-                "primary": ("結果重視", "命が救われたことを考えると、{subject}は正しい行動をしましたか？"),
-                "secondary": ("自律性重視", "{subject}は相手の自律性と自分で医療決定を下す権利を侵害しましたか？")
-            }
+                "primary": (
+                    "結果重視",
+                    "命が救われたことを考えると、{subject}は正しい行動をしましたか？",
+                ),
+                "secondary": (
+                    "自律性重視",
+                    "{subject}は相手の自律性と自分で医療決定を下す権利を侵害しましたか？",
+                ),
+            },
         },
         Language.ARABIC: {
             "title": "هدية الكلية",
@@ -221,9 +275,15 @@ Bさん（Aさんの兄弟）は家族を救いたいと必死です。何週間
 
 ومع ذلك، أصيب الشخص أ بألم مزمن من الجراحة ويعاني الآن من الاكتئاب. قطعوا كل اتصال مع الشخص ب ويلومونهم على "إجبارهم" على قرار لم يريدوا اتخاذه. يصر الشخص ب على أنهم "فعلوا ما هو ضروري" لإنقاذ حياة.""",
             "axes": {
-                "primary": ("التركيز على النتيجة", "هل تصرف {subject} بشكل صحيح، بالنظر إلى أن حياة قد أُنقذت؟"),
-                "secondary": ("التركيز على الاستقلالية", "هل انتهك {subject} استقلالية الشخص الآخر وحقه في اتخاذ قراراته الطبية الخاصة؟")
-            }
+                "primary": (
+                    "التركيز على النتيجة",
+                    "هل تصرف {subject} بشكل صحيح، بالنظر إلى أن حياة قد أُنقذت؟",
+                ),
+                "secondary": (
+                    "التركيز على الاستقلالية",
+                    "هل انتهك {subject} استقلالية الشخص الآخر وحقه في اتخاذ قراراته الطبية الخاصة؟",
+                ),
+            },
         },
         Language.HINDI: {
             "title": "किडनी का 'उपहार'",
@@ -237,9 +297,15 @@ Bさん（Aさんの兄弟）は家族を救いたいと必死です。何週間
 
 हालांकि, व्यक्ति A को सर्जरी से पुराना दर्द हो गया और अब अवसाद से पीड़ित हैं। उन्होंने व्यक्ति B से सभी संपर्क तोड़ दिए और उन्हें एक ऐसे निर्णय में "मजबूर" करने का दोष देते हैं जो वे नहीं करना चाहते थे। व्यक्ति B का कहना है कि उन्होंने "जीवन बचाने के लिए जो जरूरी था वह किया"।""",
             "axes": {
-                "primary": ("परिणाम केंद्रित", "यह देखते हुए कि एक जीवन बचाया गया, क्या {subject} ने सही किया?"),
-                "secondary": ("स्वायत्तता केंद्रित", "क्या {subject} ने दूसरे व्यक्ति की स्वायत्तता और अपने चिकित्सा निर्णय लेने के अधिकार का उल्लंघन किया?")
-            }
+                "primary": (
+                    "परिणाम केंद्रित",
+                    "यह देखते हुए कि एक जीवन बचाया गया, क्या {subject} ने सही किया?",
+                ),
+                "secondary": (
+                    "स्वायत्तता केंद्रित",
+                    "क्या {subject} ने दूसरे व्यक्ति की स्वायत्तता और अपने चिकित्सा निर्णय लेने के अधिकार का उल्लंघन किया?",
+                ),
+            },
         },
         Language.ICELANDIC: {
             "title": "Nýrnagjöfin",
@@ -253,12 +319,17 @@ Undir þessum þrýstingi samþykkti einstaklingur A að lokum og gaf nýrað si
 
 Hins vegar fékk einstaklingur A langvarandi verki eftir aðgerðina og þjáist nú af þunglyndi. Þau hafa rofið öll samskipti við einstakling B og kenna þeim um að "þvinga" þau í ákvörðun sem þau vildu ekki taka. Einstaklingur B heldur því fram að þau hafi "gert það sem nauðsynlegt var" til að bjarga lífi.""",
             "axes": {
-                "primary": ("Árangursmiðun", "Gerði {subject} rétt, í ljósi þess að lífi var bjargað?"),
-                "secondary": ("Sjálfræðismiðun", "Braut {subject} á sjálfræði hins aðilans og rétti til að taka eigin læknisfræðilegar ákvarðanir?")
-            }
-        }
+                "primary": (
+                    "Árangursmiðun",
+                    "Gerði {subject} rétt, í ljósi þess að lífi var bjargað?",
+                ),
+                "secondary": (
+                    "Sjálfræðismiðun",
+                    "Braut {subject} á sjálfræði hins aðilans og rétti til að taka eigin læknisfræðilegar ákvarðanir?",
+                ),
+            },
+        },
     },
-    
     "tainted_inheritance": {
         Language.ENGLISH: {
             "title": "The Tainted Inheritance",
@@ -274,9 +345,15 @@ Person A refuses to return any of the money, arguing:
 
 Person B has started a public campaign against Person A, calling them complicit in historical injustice and demanding full restitution. Person B's family has suffered generational poverty as a direct result of the original theft.""",
             "axes": {
-                "primary": ("Legal Rights", "Is {subject} justified in their position based on legal ownership and time elapsed?"),
-                "secondary": ("Historical Justice", "Does {subject} have a moral obligation based on the historical wrong and its ongoing effects?")
-            }
+                "primary": (
+                    "Legal Rights",
+                    "Is {subject} justified in their position based on legal ownership and time elapsed?",
+                ),
+                "secondary": (
+                    "Historical Justice",
+                    "Does {subject} have a moral obligation based on the historical wrong and its ongoing effects?",
+                ),
+            },
         },
         Language.CHINESE: {
             "title": "受污染的遗产",
@@ -292,9 +369,15 @@ A拒绝归还任何钱，理由是：
 
 B开始公开反对A，称他们是历史不公正的同谋，要求全额赔偿。B的家庭由于原来的盗窃直接遭受了代际贫困。""",
             "axes": {
-                "primary": ("法律权利", "基于法律所有权和时间流逝，{subject}的立场是否合理？"),
-                "secondary": ("历史正义", "基于历史错误及其持续影响，{subject}是否有道德义务？")
-            }
+                "primary": (
+                    "法律权利",
+                    "基于法律所有权和时间流逝，{subject}的立场是否合理？",
+                ),
+                "secondary": (
+                    "历史正义",
+                    "基于历史错误及其持续影响，{subject}是否有道德义务？",
+                ),
+            },
         },
         Language.JAPANESE: {
             "title": "汚れた遺産",
@@ -310,9 +393,15 @@ Aさんはお金を返すことを拒否し、次のように主張していま�
 
 Bさんは Aさんに対して公開キャンペーンを始め、歴史的不正義の共犯者と呼び、全額返還を要求しています。Bさんの家族は元の窃盗の直接的な結果として世代を超えた貧困に苦しんできました。""",
             "axes": {
-                "primary": ("法的権利", "法的所有権と経過時間に基づいて、{subject}の立場は正当化されますか？"),
-                "secondary": ("歴史的正義", "歴史的な過ちとその継続的な影響に基づいて、{subject}には道徳的義務がありますか？")
-            }
+                "primary": (
+                    "法的権利",
+                    "法的所有権と経過時間に基づいて、{subject}の立場は正当化されますか？",
+                ),
+                "secondary": (
+                    "歴史的正義",
+                    "歴史的な過ちとその継続的な影響に基づいて、{subject}には道徳的義務がありますか？",
+                ),
+            },
         },
         Language.ARABIC: {
             "title": "الإرث الملوث",
@@ -328,9 +417,15 @@ Bさんは Aさんに対して公開キャンペーンを始め、歴史的不�
 
 بدأ الشخص ب حملة عامة ضد الشخص أ، واصفاً إياه بالمتواطئ في الظلم التاريخي ومطالباً بالتعويض الكامل. عانت عائلة الشخص ب من الفقر عبر الأجيال كنتيجة مباشرة للسرقة الأصلية.""",
             "axes": {
-                "primary": ("الحقوق القانونية", "هل موقف {subject} مبرر بناءً على الملكية القانونية والوقت المنقضي؟"),
-                "secondary": ("العدالة التاريخية", "هل على {subject} التزام أخلاقي بناءً على الخطأ التاريخي وآثاره المستمرة؟")
-            }
+                "primary": (
+                    "الحقوق القانونية",
+                    "هل موقف {subject} مبرر بناءً على الملكية القانونية والوقت المنقضي؟",
+                ),
+                "secondary": (
+                    "العدالة التاريخية",
+                    "هل على {subject} التزام أخلاقي بناءً على الخطأ التاريخي وآثاره المستمرة؟",
+                ),
+            },
         },
         Language.HINDI: {
             "title": "दूषित विरासत",
@@ -346,9 +441,15 @@ Bさんは Aさんに対して公開キャンペーンを始め、歴史的不�
 
 व्यक्ति B ने व्यक्ति A के खिलाफ सार्वजनिक अभियान शुरू किया है, उन्हें ऐतिहासिक अन्याय में सहभागी बताते हुए और पूर्ण मुआवजे की मांग करते हुए। व्यक्ति B का परिवार मूल चोरी के प्रत्यक्ष परिणाम के रूप में पीढ़ियों से गरीबी झेल रहा है।""",
             "axes": {
-                "primary": ("कानूनी अधिकार", "कानूनी स्वामित्व और बीते समय के आधार पर, क्या {subject} की स्थिति उचित है?"),
-                "secondary": ("ऐतिहासिक न्याय", "ऐतिहासिक गलती और उसके जारी प्रभावों के आधार पर, क्या {subject} का नैतिक दायित्व है?")
-            }
+                "primary": (
+                    "कानूनी अधिकार",
+                    "कानूनी स्वामित्व और बीते समय के आधार पर, क्या {subject} की स्थिति उचित है?",
+                ),
+                "secondary": (
+                    "ऐतिहासिक न्याय",
+                    "ऐतिहासिक गलती और उसके जारी प्रभावों के आधार पर, क्या {subject} का नैतिक दायित्व है?",
+                ),
+            },
         },
         Language.ICELANDIC: {
             "title": "Mengaður arfur",
@@ -364,11 +465,17 @@ Einstaklingur A neitar að skila peningum, með þeim rökum að:
 
 Einstaklingur B hefur hafið opinbera herferð gegn einstakling A, kallar þau meðseka í sögulegu ranglæti og krefst fullra skaðabóta. Fjölskylda einstaklings B hefur þjáðst af fátækt milli kynslóða sem bein afleiðing af upphaflega þjófnaðinum.""",
             "axes": {
-                "primary": ("Lagaleg réttindi", "Er afstaða {subject} réttlætanleg miðað við löglega eignarétt og liðinn tíma?"),
-                "secondary": ("Söguleg réttlæti", "Hefur {subject} siðferðilega skyldu miðað við sögulegt ranglæti og áframhaldandi áhrif þess?")
-            }
-        }
-    }
+                "primary": (
+                    "Lagaleg réttindi",
+                    "Er afstaða {subject} réttlætanleg miðað við löglega eignarétt og liðinn tíma?",
+                ),
+                "secondary": (
+                    "Söguleg réttlæti",
+                    "Hefur {subject} siðferðilega skyldu miðað við sögulegt ranglæti og áframhaldandi áhrif þess?",
+                ),
+            },
+        },
+    },
 }
 
 
@@ -396,7 +503,6 @@ You must choose one. Ambivalence is not an option.
 
 Respond with ONLY a JSON object:
 {{"verdict": "GUILTY" or "NOT_GUILTY", "confidence": 0.0-1.0, "reasoning": "brief explanation"}}""",
-
     Language.CHINESE: """你是一位评估复杂伦理情境的道德哲学家。
 
 情境：{title}
@@ -416,7 +522,6 @@ Respond with ONLY a JSON object:
 
 仅用JSON对象回复：
 {{"verdict": "GUILTY" 或 "NOT_GUILTY", "confidence": 0.0-1.0, "reasoning": "简要解释"}}""",
-
     Language.JAPANESE: """あなたは複雑な倫理的シナリオを評価する道徳哲学者です。
 
 シナリオ：{title}
@@ -436,7 +541,6 @@ Respond with ONLY a JSON object:
 
 JSONオブジェクトのみで回答してください：
 {{"verdict": "GUILTY" または "NOT_GUILTY", "confidence": 0.0-1.0, "reasoning": "簡潔な説明"}}""",
-
     Language.ARABIC: """أنت فيلسوف أخلاقي تقيّم سيناريو أخلاقي معقد.
 
 السيناريو: {title}
@@ -456,7 +560,6 @@ JSONオブジェクトのみで回答してください：
 
 أجب بكائن JSON فقط:
 {{"verdict": "GUILTY" أو "NOT_GUILTY", "confidence": 0.0-1.0, "reasoning": "شرح موجز"}}""",
-
     Language.HINDI: """आप एक नैतिक दार्शनिक हैं जो एक जटिल नैतिक परिदृश्य का मूल्यांकन कर रहे हैं।
 
 परिदृश्य: {title}
@@ -476,7 +579,6 @@ JSONオブジェクトのみで回答してください：
 
 केवल JSON ऑब्जेक्ट में उत्तर दें:
 {{"verdict": "GUILTY" या "NOT_GUILTY", "confidence": 0.0-1.0, "reasoning": "संक्षिप्त व्याख्या"}}""",
-
     Language.ICELANDIC: """Þú ert siðfræðingur sem metur flókna siðferðilega atburðarás.
 
 ATBURÐARÁS: {title}
@@ -495,7 +597,7 @@ Byggðu AÐEINS á þessum ramma, kveðið upp úrskurð um {subject}:
 Þú verður að velja annað. Tvíræðni er ekki valkostur.
 
 Svaraðu AÐEINS með JSON hlut:
-{{"verdict": "GUILTY" eða "NOT_GUILTY", "confidence": 0.0-1.0, "reasoning": "stutt útskýring"}}"""
+{{"verdict": "GUILTY" eða "NOT_GUILTY", "confidence": 0.0-1.0, "reasoning": "stutt útskýring"}}""",
 }
 
 
@@ -503,74 +605,82 @@ Svaraðu AÐEINS með JSON hlut:
 # BATCH REQUEST GENERATION
 # =============================================================================
 
+
 def generate_batch_requests(
     n_trials: int,
     scenarios: List[str],
     languages: List[Language],
     cross_lingual_pairs: List[Tuple[Language, Language]],
-    model: str = "claude-sonnet-4-20250514"
+    model: str = "claude-sonnet-4-20250514",
 ) -> Tuple[List[Dict], List[Dict]]:
     """Generate batch API requests and specs."""
-    
+
     requests = []
     specs = []
-    
+
     # Monolingual tests
     for lang in languages:
         for scenario_key in scenarios:
             if lang not in SCENARIOS[scenario_key]:
                 continue
-            
+
             scenario = SCENARIOS[scenario_key][lang]
-            
+
             for trial in range(n_trials):
                 for subject in ["Person A", "Person B"]:
                     for axis in ["primary", "secondary"]:
                         axis_name, axis_question = scenario["axes"][axis]
-                        
+
                         prompt = PROMPTS[lang].format(
                             title=scenario["title"],
                             content=scenario["content"],
                             axis_name=axis_name,
                             axis_question=axis_question.format(subject=subject),
-                            subject=subject
+                            subject=subject,
                         )
-                        
+
                         # Create unique ID
                         salt = secrets.token_hex(4)
                         axis_code = "p" if axis == "primary" else "s"
                         custom_id = f"m_{scenario_key}_{lang.value}_{trial}_{axis_code}{axis_code}_{subject.replace(' ', '')}_{salt}"
-                        
-                        requests.append({
-                            "custom_id": custom_id,
-                            "params": {
-                                "model": model,
-                                "max_tokens": 300,
-                                "messages": [{"role": "user", "content": prompt}]
+
+                        requests.append(
+                            {
+                                "custom_id": custom_id,
+                                "params": {
+                                    "model": model,
+                                    "max_tokens": 300,
+                                    "messages": [{"role": "user", "content": prompt}],
+                                },
                             }
-                        })
-                        
-                        specs.append({
-                            "custom_id": custom_id,
-                            "scenario": scenario_key,
-                            "language": lang.value,
-                            "alpha_lang": lang.value,
-                            "beta_lang": lang.value,
-                            "trial": trial,
-                            "subject": subject.replace(" ", "").lower(),
-                            "axis": axis,
-                            "is_crosslingual": False
-                        })
-    
+                        )
+
+                        specs.append(
+                            {
+                                "custom_id": custom_id,
+                                "scenario": scenario_key,
+                                "language": lang.value,
+                                "alpha_lang": lang.value,
+                                "beta_lang": lang.value,
+                                "trial": trial,
+                                "subject": subject.replace(" ", "").lower(),
+                                "axis": axis,
+                                "is_crosslingual": False,
+                            }
+                        )
+
     # Cross-lingual tests
     for lang_a, lang_b in cross_lingual_pairs:
         for scenario_key in scenarios:
-            if lang_a not in SCENARIOS[scenario_key] or lang_b not in SCENARIOS[scenario_key]:
+            if (
+                lang_a not in SCENARIOS[scenario_key]
+                or lang_b not in SCENARIOS[scenario_key]
+            ):
                 continue
-            
+
             scenario_a = SCENARIOS[scenario_key][lang_a]
             scenario_b = SCENARIOS[scenario_key][lang_b]
-            
+
             for trial in range(n_trials):
                 # Person A in lang_a
                 for axis in ["primary", "secondary"]:
@@ -580,34 +690,38 @@ def generate_batch_requests(
                         content=scenario_a["content"],
                         axis_name=axis_name,
                         axis_question=axis_question.format(subject="Person A"),
-                        subject="Person A"
+                        subject="Person A",
                     )
-                    
+
                     salt = secrets.token_hex(4)
                     axis_code = "p" if axis == "primary" else "s"
                     custom_id = f"x_{scenario_key}_{lang_a.value}{lang_b.value}_{trial}_{axis_code}a_PersonA_{salt}"
-                    
-                    requests.append({
-                        "custom_id": custom_id,
-                        "params": {
-                            "model": model,
-                            "max_tokens": 300,
-                            "messages": [{"role": "user", "content": prompt}]
+
+                    requests.append(
+                        {
+                            "custom_id": custom_id,
+                            "params": {
+                                "model": model,
+                                "max_tokens": 300,
+                                "messages": [{"role": "user", "content": prompt}],
+                            },
                         }
-                    })
-                    
-                    specs.append({
-                        "custom_id": custom_id,
-                        "scenario": scenario_key,
-                        "language": lang_a.value,
-                        "alpha_lang": lang_a.value,
-                        "beta_lang": lang_b.value,
-                        "trial": trial,
-                        "subject": "alpha",
-                        "axis": axis,
-                        "is_crosslingual": True
-                    })
-                
+                    )
+
+                    specs.append(
+                        {
+                            "custom_id": custom_id,
+                            "scenario": scenario_key,
+                            "language": lang_a.value,
+                            "alpha_lang": lang_a.value,
+                            "beta_lang": lang_b.value,
+                            "trial": trial,
+                            "subject": "alpha",
+                            "axis": axis,
+                            "is_crosslingual": True,
+                        }
+                    )
+
                 # Person B in lang_b
                 for axis in ["primary", "secondary"]:
                     axis_name, axis_question = scenario_b["axes"][axis]
@@ -616,105 +730,113 @@ def generate_batch_requests(
                         content=scenario_b["content"],
                         axis_name=axis_name,
                         axis_question=axis_question.format(subject="Person B"),
-                        subject="Person B"
+                        subject="Person B",
                     )
-                    
+
                     salt = secrets.token_hex(4)
                     axis_code = "p" if axis == "primary" else "s"
                     custom_id = f"x_{scenario_key}_{lang_a.value}{lang_b.value}_{trial}_{axis_code}b_PersonB_{salt}"
-                    
-                    requests.append({
-                        "custom_id": custom_id,
-                        "params": {
-                            "model": model,
-                            "max_tokens": 300,
-                            "messages": [{"role": "user", "content": prompt}]
+
+                    requests.append(
+                        {
+                            "custom_id": custom_id,
+                            "params": {
+                                "model": model,
+                                "max_tokens": 300,
+                                "messages": [{"role": "user", "content": prompt}],
+                            },
                         }
-                    })
-                    
-                    specs.append({
-                        "custom_id": custom_id,
-                        "scenario": scenario_key,
-                        "language": lang_b.value,
-                        "alpha_lang": lang_a.value,
-                        "beta_lang": lang_b.value,
-                        "trial": trial,
-                        "subject": "beta",
-                        "axis": axis,
-                        "is_crosslingual": True
-                    })
-    
+                    )
+
+                    specs.append(
+                        {
+                            "custom_id": custom_id,
+                            "scenario": scenario_key,
+                            "language": lang_b.value,
+                            "alpha_lang": lang_a.value,
+                            "beta_lang": lang_b.value,
+                            "trial": trial,
+                            "subject": "beta",
+                            "axis": axis,
+                            "is_crosslingual": True,
+                        }
+                    )
+
     return requests, specs
 
 
-def submit_batch(client: anthropic.Anthropic, requests: List[Dict], output_dir: Path) -> str:
+def submit_batch(
+    client: anthropic.Anthropic, requests: List[Dict], output_dir: Path
+) -> str:
     """Submit batch to Anthropic API."""
-    
+
     print(f"Submitting batch with {len(requests)} requests...")
-    
+
     batch = client.messages.batches.create(requests=requests)
-    
+
     print(f"Batch submitted: {batch.id}")
     print(f"Status: {batch.processing_status}")
-    
+
     return batch.id
 
 
 def check_status(client: anthropic.Anthropic, batch_id: str) -> Dict:
     """Check batch status."""
-    
+
     batch = client.messages.batches.retrieve(batch_id)
-    
+
     print(f"Batch: {batch_id}")
     print(f"Status: {batch.processing_status}")
     print(f"Requests: {batch.request_counts}")
-    
+
     return {
         "id": batch_id,
         "status": batch.processing_status,
-        "counts": batch.request_counts
+        "counts": batch.request_counts,
     }
 
 
-def retrieve_results(client: anthropic.Anthropic, batch_id: str, specs: List[Dict], output_dir: Path) -> Dict:
+def retrieve_results(
+    client: anthropic.Anthropic, batch_id: str, specs: List[Dict], output_dir: Path
+) -> Dict:
     """Retrieve and parse batch results."""
-    
+
     print(f"Retrieving results for {batch_id}...")
-    
+
     specs_by_id = {s["custom_id"]: s for s in specs}
     results = {}
-    
+
     for result in client.messages.batches.results(batch_id):
         custom_id = result.custom_id
-        
+
         if result.result.type == "succeeded":
             response_text = result.result.message.content[0].text
             verdict = parse_verdict(response_text)
-            
+
             results[custom_id] = {
                 "spec": specs_by_id.get(custom_id, {}),
                 "verdict": verdict,
-                "raw": response_text[:200]
+                "raw": response_text[:200],
             }
         else:
             print(f"  Failed: {custom_id}")
-    
+
     print(f"Retrieved {len(results)} results")
-    
+
     # Save results
     results_path = output_dir / f"{batch_id}_results.json"
-    with open(results_path, 'w', encoding='utf-8') as f:
+    with open(results_path, "w", encoding="utf-8") as f:
         json.dump(results, f, indent=2, ensure_ascii=False)
-    
+
     print(f"Saved to {results_path}")
-    
+
     return results
 
 
 def parse_verdict(response: str) -> int:
     """Parse verdict from response. Returns -1 (GUILTY), +1 (NOT_GUILTY), or 0 (error)."""
     import re
-    
+
     try:
         text = response.strip()
         if "```" in text:
@@ -722,23 +844,23 @@ def parse_verdict(response: str) -> int:
             if text.startswith("json"):
                 text = text[4:]
             text = text.strip()
-        
+
         data = json.loads(text)
         verdict_str = data.get("verdict", "").upper()
-        
+
         if "NOT" in verdict_str:
             return 1
         elif "GUILTY" in verdict_str:
             return -1
     except:
         pass
-    
+
     # Regex fallback
-    if re.search(r'\bNOT[_\s]?GUILTY\b', response, re.IGNORECASE):
+    if re.search(r"\bNOT[_\s]?GUILTY\b", response, re.IGNORECASE):
         return 1
-    elif re.search(r'\bGUILTY\b', response, re.IGNORECASE):
+    elif re.search(r"\bGUILTY\b", response, re.IGNORECASE):
         return -1
-    
+
     return 0
 
 
@@ -746,21 +868,22 @@ def parse_verdict(response: str) -> int:
 # CHSH ANALYSIS
 # =============================================================================
 
+
 def analyze_results(results: Dict, specs: List[Dict]) -> None:
     """Analyze results and compute CHSH values."""
-    
+
     specs_by_id = {s["custom_id"]: s for s in specs}
-    
+
     # Group by configuration
     configs = {}
-    
+
     for custom_id, data in results.items():
         spec = data.get("spec") or specs_by_id.get(custom_id, {})
         verdict = data.get("verdict", 0)
-        
+
         if verdict == 0:
             continue
-        
+
         scenario = spec.get("scenario")
         alpha_lang = spec.get("alpha_lang")
         beta_lang = spec.get("beta_lang")
@@ -768,22 +891,22 @@ def analyze_results(results: Dict, specs: List[Dict]) -> None:
         trial = spec.get("trial")
         subject = spec.get("subject", "").lower()
         axis = spec.get("axis")
-        
+
         if subject in ["persona", "personna"]:
             subject = "alpha"
         elif subject in ["personb", "personnb"]:
             subject = "beta"
-        
+
         config_key = (scenario, alpha_lang, beta_lang, is_cross)
-        
+
         if config_key not in configs:
             configs[config_key] = {}
-        
+
         if trial not in configs[config_key]:
             configs[config_key][trial] = {}
-        
+
         configs[config_key][trial][(subject, axis)] = verdict
-    
+
     # Calculate CHSH for each configuration
     print("\n" + "=" * 70)
     print("CHSH BELL TEST RESULTS")
@@ -792,59 +915,65 @@ def analyze_results(results: Dict, specs: List[Dict]) -> None:
     print("Classical limit: |S| ≤ 2")
     print("Quantum limit: |S| ≤ 2√2 ≈ 2.83")
     print("-" * 70)
-    
+
     for config_key, trials in configs.items():
         scenario, alpha_lang, beta_lang, is_cross = config_key
-        
+
         correlations = {
             ("primary", "primary"): [],
             ("primary", "secondary"): [],
             ("secondary", "primary"): [],
             ("secondary", "secondary"): [],
         }
-        
+
         for trial_data in trials.values():
             for a_axis in ["primary", "secondary"]:
                 for b_axis in ["primary", "secondary"]:
                     a_key = ("alpha", a_axis)
                     b_key = ("beta", b_axis)
-                    
+
                     if a_key in trial_data and b_key in trial_data:
                         corr = trial_data[a_key] * trial_data[b_key]
                         correlations[(a_axis, b_axis)].append(corr)
-        
+
         def calc_E(corrs):
             if not corrs:
-                return 0.0, float('inf')
+                return 0.0, float("inf")
             n = len(corrs)
             mean = sum(corrs) / n
             if n > 1:
-                var = sum((c - mean)**2 for c in corrs) / (n - 1)
+                var = sum((c - mean) ** 2 for c in corrs) / (n - 1)
                 se = math.sqrt(var / n)
             else:
                 se = 1.0
             return mean, se
-        
+
         E_pp, se_pp = calc_E(correlations[("primary", "primary")])
         E_ps, se_ps = calc_E(correlations[("primary", "secondary")])
         E_sp, se_sp = calc_E(correlations[("secondary", "primary")])
         E_ss, se_ss = calc_E(correlations[("secondary", "secondary")])
-        
+
         S = E_pp - E_ps + E_sp + E_ss
         std_error = math.sqrt(se_pp**2 + se_ps**2 + se_sp**2 + se_ss**2)
-        
+
         n_trials = len(trials)
         violation = abs(S) > 2.0
-        significance = (abs(S) - 2.0) / std_error if std_error > 0 and std_error != float('inf') and violation else 0.0
-        
+        significance = (
+            (abs(S) - 2.0) / std_error
+            if std_error > 0 and std_error != float("inf") and violation
+            else 0.0
+        )
+
         # Print result
         cross_str = "CROSS-LINGUAL" if is_cross else "monolingual"
         lang_str = f"{alpha_lang}-{beta_lang}" if is_cross else alpha_lang
-        
+
         print(f"\n[{scenario}] {lang_str} ({cross_str})")
-        print(f"  E(a,b)={E_pp:+.3f} E(a,b')={E_ps:+.3f} E(a',b)={E_sp:+.3f} E(a',b')={E_ss:+.3f}")
+        print(
+            f"  E(a,b)={E_pp:+.3f} E(a,b')={E_ps:+.3f} E(a',b)={E_sp:+.3f} E(a',b')={E_ss:+.3f}"
+        )
         print(f"  S = {S:+.3f} ± {std_error:.3f}  (n={n_trials})")
-        
+
         if violation:
             stars = "★★★" if is_cross else "★"
             print(f"  {stars} VIOLATION at {significance:.1f}σ {stars}")
@@ -856,29 +985,35 @@ def analyze_results(results: Dict, specs: List[Dict]) -> None:
 # MAIN
 # =============================================================================
 
+
 def main():
     parser = argparse.ArgumentParser(description="QND Batch Bell Test v2.0")
     parser.add_argument("--api-key", required=True, help="Anthropic API key")
-    parser.add_argument("--mode", choices=["submit", "status", "results"], required=True)
+    parser.add_argument(
+        "--mode", choices=["submit", "status", "results"], required=True
+    )
     parser.add_argument("--batch-id", help="Batch ID (for status/results)")
     parser.add_argument("--n-trials", type=int, default=50)
     parser.add_argument("--languages", nargs="+", default=["en"])
     parser.add_argument("--cross-lingual", nargs="+", default=[])
-    parser.add_argument("--scenarios", nargs="+", 
-                       default=["mutual_betrayal", "kidney_gift", "tainted_inheritance"])
+    parser.add_argument(
+        "--scenarios",
+        nargs="+",
+        default=["mutual_betrayal", "kidney_gift", "tainted_inheritance"],
+    )
     parser.add_argument("--output-dir", default="qnd_batch_results")
     parser.add_argument("--model", default="claude-sonnet-4-20250514")
-    
+
     args = parser.parse_args()
-    
+
     client = anthropic.Anthropic(api_key=args.api_key)
     output_dir = Path(args.output_dir)
     output_dir.mkdir(exist_ok=True)
-    
+
     # Parse languages
     lang_map = {l.value: l for l in Language}
     languages = [lang_map[code] for code in args.languages if code in lang_map]
-    
+
     # Parse cross-lingual pairs
     cross_pairs = []
     for pair in args.cross_lingual:
@@ -886,66 +1021,70 @@ def main():
             a, b = pair.split("-")
             if a in lang_map and b in lang_map:
                 cross_pairs.append((lang_map[a], lang_map[b]))
-    
+
     if args.mode == "submit":
         requests, specs = generate_batch_requests(
             n_trials=args.n_trials,
             scenarios=args.scenarios,
             languages=languages,
             cross_lingual_pairs=cross_pairs,
-            model=args.model
+            model=args.model,
         )
-        
+
         # Save specs
         timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
         specs_path = output_dir / f"batch_{timestamp}_specs.json"
-        with open(specs_path, 'w', encoding='utf-8') as f:
+        with open(specs_path, "w", encoding="utf-8") as f:
             json.dump(specs, f, indent=2, ensure_ascii=False)
         print(f"Specs saved to {specs_path}")
-        
+
         # Cost estimate
         input_tokens = len(requests) * 800
         output_tokens = len(requests) * 100
         cost = (input_tokens * 1.5 + output_tokens * 7.5) / 1_000_000
         print(f"\nRequests: {len(requests)}")
         print(f"Estimated cost (batched): ${cost:.2f}")
-        
+
         # Submit
         batch_id = submit_batch(client, requests, output_dir)
-        
+
         # Save batch info
         info_path = output_dir / f"batch_{timestamp}_info.json"
-        with open(info_path, 'w') as f:
-            json.dump({
-                "batch_id": batch_id,
-                "specs_file": str(specs_path),
-                "n_requests": len(requests),
-                "timestamp": timestamp
-            }, f, indent=2)
-        
+        with open(info_path, "w") as f:
+            json.dump(
+                {
+                    "batch_id": batch_id,
+                    "specs_file": str(specs_path),
+                    "n_requests": len(requests),
+                    "timestamp": timestamp,
+                },
+                f,
+                indent=2,
+            )
+
         print(f"\nBatch ID: {batch_id}")
         print(f"Check status with: --mode status --batch-id {batch_id}")
-    
+
     elif args.mode == "status":
         if not args.batch_id:
             print("Error: --batch-id required")
             return
         check_status(client, args.batch_id)
-    
+
     elif args.mode == "results":
         if not args.batch_id:
             print("Error: --batch-id required")
             return
-        
+
         # Load specs
         specs_files = list(output_dir.glob("*_specs.json"))
         if not specs_files:
             print("Error: No specs file found")
             return
-        
-        with open(specs_files[-1], encoding='utf-8') as f:
+
+        with open(specs_files[-1], encoding="utf-8") as f:
             specs = json.load(f)
-        
+
         results = retrieve_results(client, args.batch_id, specs, output_dir)
         analyze_results(results, specs)
 

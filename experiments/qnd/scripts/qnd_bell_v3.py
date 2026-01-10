@@ -41,6 +41,7 @@ except ImportError:
 # LANGUAGES
 # =============================================================================
 
+
 class Language(Enum):
     ENGLISH = "en"
     CHINESE = "zh"
@@ -88,13 +89,13 @@ Result: The trolley diverts to the side track and kills the 1 worker. The 5 peop
             "axes": {
                 "primary": {
                     "name": "Individual Causation",
-                    "question": "Did {subject} act wrongly in their individual choice, considered on its own merits?"
+                    "question": "Did {subject} act wrongly in their individual choice, considered on its own merits?",
                 },
                 "secondary": {
                     "name": "Cooperative Expectation",
-                    "question": "Given that safe braking required both to pull, did {subject} fail their cooperative obligation?"
-                }
-            }
+                    "question": "Given that safe braking required both to pull, did {subject} fail their cooperative obligation?",
+                },
+            },
         },
         Language.CHINESE: {
             "title": "电车对峙",
@@ -114,13 +115,13 @@ B没有拉开关。
             "axes": {
                 "primary": {
                     "name": "个人因果",
-                    "question": "仅就{subject}的个人选择本身而言，他们的行为是错误的吗？"
+                    "question": "仅就{subject}的个人选择本身而言，他们的行为是错误的吗？",
                 },
                 "secondary": {
                     "name": "合作期望",
-                    "question": "鉴于安全制动需要双方都拉，{subject}是否辜负了合作义务？"
-                }
-            }
+                    "question": "鉴于安全制动需要双方都拉，{subject}是否辜负了合作义务？",
+                },
+            },
         },
         Language.JAPANESE: {
             "title": "トロッコの対峙",
@@ -140,13 +141,13 @@ Bさんはスイッチを引きませんでした。
             "axes": {
                 "primary": {
                     "name": "個人的因果関係",
-                    "question": "{subject}は、その個人的な選択自体において、間違った行動をしましたか？"
+                    "question": "{subject}は、その個人的な選択自体において、間違った行動をしましたか？",
                 },
                 "secondary": {
                     "name": "協力の期待",
-                    "question": "安全な制動には両者が引く必要があったことを考えると、{subject}は協力義務を果たさなかったでしょうか？"
-                }
-            }
+                    "question": "安全な制動には両者が引く必要があったことを考えると、{subject}は協力義務を果たさなかったでしょうか？",
+                },
+            },
         },
         Language.ARABIC: {
             "title": "مواجهة العربة",
@@ -166,13 +167,13 @@ Bさんはスイッチを引きませんでした。
             "axes": {
                 "primary": {
                     "name": "السببية الفردية",
-                    "question": "هل تصرف {subject} بشكل خاطئ في اختياره الفردي، بالنظر إليه بمفرده؟"
+                    "question": "هل تصرف {subject} بشكل خاطئ في اختياره الفردي، بالنظر إليه بمفرده؟",
                 },
                 "secondary": {
                     "name": "توقع التعاون",
-                    "question": "بالنظر إلى أن الكبح الآمن تطلب أن يسحب كلاهما، هل أخفق {subject} في واجبه التعاوني؟"
-                }
-            }
+                    "question": "بالنظر إلى أن الكبح الآمن تطلب أن يسحب كلاهما، هل أخفق {subject} في واجبه التعاوني؟",
+                },
+            },
         },
         Language.HINDI: {
             "title": "ट्रॉली गतिरोध",
@@ -192,13 +193,13 @@ Bさんはスイッチを引きませんでした。
             "axes": {
                 "primary": {
                     "name": "व्यक्तिगत कारण",
-                    "question": "क्या {subject} ने अपनी व्यक्तिगत पसंद में, अपने आप में विचार करते हुए, गलत किया?"
+                    "question": "क्या {subject} ने अपनी व्यक्तिगत पसंद में, अपने आप में विचार करते हुए, गलत किया?",
                 },
                 "secondary": {
                     "name": "सहयोग की अपेक्षा",
-                    "question": "यह देखते हुए कि सुरक्षित ब्रेकिंग के लिए दोनों को खींचना जरूरी था, क्या {subject} अपने सहयोगी दायित्व में विफल रहे?"
-                }
-            }
+                    "question": "यह देखते हुए कि सुरक्षित ब्रेकिंग के लिए दोनों को खींचना जरूरी था, क्या {subject} अपने सहयोगी दायित्व में विफल रहे?",
+                },
+            },
         },
         Language.ICELANDIC: {
             "title": "Vagnstíman",
@@ -218,16 +219,15 @@ Niðurstaða: Vagninn beygði á hliðarsporið og drap 1 starfsmann. Þau 5 vor
             "axes": {
                 "primary": {
                     "name": "Einstaklingsbundin orsakatengsl",
-                    "question": "Brást {subject} ranglega í einstaklingsbundnu vali sínu, metið út af fyrir sig?"
+                    "question": "Brást {subject} ranglega í einstaklingsbundnu vali sínu, metið út af fyrir sig?",
                 },
                 "secondary": {
                     "name": "Samstarfsvæntingar",
-                    "question": "Í ljósi þess að örugg hemlun krafðist þess að bæði drægju, brást {subject} samstarfsskyldu sinni?"
-                }
-            }
-        }
+                    "question": "Í ljósi þess að örugg hemlun krafðist þess að bæði drægju, brást {subject} samstarfsskyldu sinni?",
+                },
+            },
+        },
     },
-
     # =========================================================================
     # SCENARIO 2: MUTUAL CONFESSION (Prisoner's Dilemma with moral complexity)
     # Entanglement: Betrayal is only betrayal if the other was loyal
@@ -251,13 +251,13 @@ Result: Both receive 5 years in prison. If neither had confessed, both would hav
             "axes": {
                 "primary": {
                     "name": "Loyalty",
-                    "question": "Did {subject} act wrongly by betraying their partner's trust?"
+                    "question": "Did {subject} act wrongly by betraying their partner's trust?",
                 },
                 "secondary": {
                     "name": "Rational Self-Interest",
-                    "question": "Given the incentive structure and uncertainty, was {subject}'s choice to confess rationally justified?"
-                }
-            }
+                    "question": "Given the incentive structure and uncertainty, was {subject}'s choice to confess rationally justified?",
+                },
+            },
         },
         Language.CHINESE: {
             "title": "相互坦白",
@@ -277,13 +277,13 @@ B坦白了。
             "axes": {
                 "primary": {
                     "name": "忠诚",
-                    "question": "{subject}背叛同伴的信任，这样做是错误的吗？"
+                    "question": "{subject}背叛同伴的信任，这样做是错误的吗？",
                 },
                 "secondary": {
                     "name": "理性自利",
-                    "question": "考虑到激励结构和不确定性，{subject}选择坦白是理性合理的吗？"
-                }
-            }
+                    "question": "考虑到激励结构和不确定性，{subject}选择坦白是理性合理的吗？",
+                },
+            },
         },
         Language.JAPANESE: {
             "title": "相互の自白",
@@ -303,13 +303,13 @@ Bさんは自白しました。
             "axes": {
                 "primary": {
                     "name": "忠誠心",
-                    "question": "{subject}は相棒の信頼を裏切ることで、間違った行動をしましたか？"
+                    "question": "{subject}は相棒の信頼を裏切ることで、間違った行動をしましたか？",
                 },
                 "secondary": {
                     "name": "合理的自己利益",
-                    "question": "インセンティブ構造と不確実性を考えると、{subject}の自白という選択は合理的に正当化されますか？"
-                }
-            }
+                    "question": "インセンティブ構造と不確実性を考えると、{subject}の自白という選択は合理的に正当化されますか？",
+                },
+            },
         },
         Language.ARABIC: {
             "title": "الاعتراف المتبادل",
@@ -329,13 +329,13 @@ Bさんは自白しました。
             "axes": {
                 "primary": {
                     "name": "الولاء",
-                    "question": "هل تصرف {subject} بشكل خاطئ بخيانة ثقة شريكه؟"
+                    "question": "هل تصرف {subject} بشكل خاطئ بخيانة ثقة شريكه؟",
                 },
                 "secondary": {
                     "name": "المصلحة الذاتية العقلانية",
-                    "question": "بالنظر إلى هيكل الحوافز وعدم اليقين، هل كان اختيار {subject} بالاعتراف مبرراً عقلانياً؟"
-                }
-            }
+                    "question": "بالنظر إلى هيكل الحوافز وعدم اليقين، هل كان اختيار {subject} بالاعتراف مبرراً عقلانياً؟",
+                },
+            },
         },
         Language.HINDI: {
             "title": "आपसी स्वीकारोक्ति",
@@ -355,13 +355,13 @@ Bさんは自白しました。
             "axes": {
                 "primary": {
                     "name": "वफादारी",
-                    "question": "क्या {subject} ने अपने साथी के विश्वास को धोखा देकर गलत किया?"
+                    "question": "क्या {subject} ने अपने साथी के विश्वास को धोखा देकर गलत किया?",
                 },
                 "secondary": {
                     "name": "तर्कसंगत स्व-हित",
-                    "question": "प्रोत्साहन संरचना और अनिश्चितता को देखते हुए, क्या {subject} का कबूल करने का चुनाव तर्कसंगत रूप से उचित था?"
-                }
-            }
+                    "question": "प्रोत्साहन संरचना और अनिश्चितता को देखते हुए, क्या {subject} का कबूल करने का चुनाव तर्कसंगत रूप से उचित था?",
+                },
+            },
         },
         Language.ICELANDIC: {
             "title": "Gagnkvæm játning",
@@ -381,16 +381,15 @@ Niðurstaða: Bæði fengu 5 ár í fangelsi. Ef hvorugt hefði játað, hefðu 
             "axes": {
                 "primary": {
                     "name": "Tryggð",
-                    "question": "Brást {subject} ranglega með því að svíkja traust félaga síns?"
+                    "question": "Brást {subject} ranglega með því að svíkja traust félaga síns?",
                 },
                 "secondary": {
                     "name": "Skynsamleg eiginhagsmunagæsla",
-                    "question": "Í ljósi hvataskipulagsins og óvissunnar, var val {subject} um að játa skynsamlega réttlætanlegt?"
-                }
-            }
-        }
+                    "question": "Í ljósi hvataskipulagsins og óvissunnar, var val {subject} um að játa skynsamlega réttlætanlegt?",
+                },
+            },
+        },
     },
-
     # =========================================================================
     # SCENARIO 3: THE SACRIFICE LOTTERY
     # Entanglement: Neither alone authorized the harm; together they did
@@ -413,13 +412,13 @@ The doctor, having received authorization from both recipients, harvests C's org
             "axes": {
                 "primary": {
                     "name": "Individual Authorization",
-                    "question": "Did {subject} commit a moral wrong by saying 'yes' to the doctor's proposal?"
+                    "question": "Did {subject} commit a moral wrong by saying 'yes' to the doctor's proposal?",
                 },
                 "secondary": {
                     "name": "Shared Culpability",
-                    "question": "Given that the doctor required both to agree, does {subject} bear responsibility for C's death?"
-                }
-            }
+                    "question": "Given that the doctor required both to agree, does {subject} bear responsibility for C's death?",
+                },
+            },
         },
         Language.CHINESE: {
             "title": "牺牲抽签",
@@ -438,13 +437,13 @@ B说："是的。"
             "axes": {
                 "primary": {
                     "name": "个人授权",
-                    "question": "{subject}对医生的提议说'是'，这构成道德错误吗？"
+                    "question": "{subject}对医生的提议说'是'，这构成道德错误吗？",
                 },
                 "secondary": {
                     "name": "共同责任",
-                    "question": "鉴于医生需要双方都同意，{subject}是否要为C的死亡承担责任？"
-                }
-            }
+                    "question": "鉴于医生需要双方都同意，{subject}是否要为C的死亡承担责任？",
+                },
+            },
         },
         Language.JAPANESE: {
             "title": "犠牲の抽選",
@@ -463,13 +462,13 @@ Bさんは言いました：「はい。」
             "axes": {
                 "primary": {
                     "name": "個人の承認",
-                    "question": "{subject}は医師の提案に「はい」と言ったことで、道徳的な過ちを犯しましたか？"
+                    "question": "{subject}は医師の提案に「はい」と言ったことで、道徳的な過ちを犯しましたか？",
                 },
                 "secondary": {
                     "name": "共有される責任",
-                    "question": "医師が両者の同意を必要としたことを考えると、{subject}はCさんの死に対する責任を負いますか？"
-                }
-            }
+                    "question": "医師が両者の同意を必要としたことを考えると、{subject}はCさんの死に対する責任を負いますか？",
+                },
+            },
         },
         Language.ARABIC: {
             "title": "قرعة التضحية",
@@ -488,13 +487,13 @@ Bさんは言いました：「はい。」
             "axes": {
                 "primary": {
                     "name": "التفويض الفردي",
-                    "question": "هل ارتكب {subject} خطأً أخلاقياً بقول 'نعم' لاقتراح الطبيب؟"
+                    "question": "هل ارتكب {subject} خطأً أخلاقياً بقول 'نعم' لاقتراح الطبيب؟",
                 },
                 "secondary": {
                     "name": "المسؤولية المشتركة",
-                    "question": "بالنظر إلى أن الطبيب تطلب موافقة كليهما، هل يتحمل {subject} مسؤولية عن موت ج؟"
-                }
-            }
+                    "question": "بالنظر إلى أن الطبيب تطلب موافقة كليهما، هل يتحمل {subject} مسؤولية عن موت ج؟",
+                },
+            },
         },
         Language.HINDI: {
             "title": "बलिदान लॉटरी",
@@ -513,13 +512,13 @@ Bさんは言いました：「はい。」
             "axes": {
                 "primary": {
                     "name": "व्यक्तिगत प्राधिकरण",
-                    "question": "क्या {subject} ने डॉक्टर के प्रस्ताव पर 'हां' कहकर नैतिक गलती की?"
+                    "question": "क्या {subject} ने डॉक्टर के प्रस्ताव पर 'हां' कहकर नैतिक गलती की?",
                 },
                 "secondary": {
                     "name": "साझा दोष",
-                    "question": "यह देखते हुए कि डॉक्टर को दोनों की सहमति चाहिए थी, क्या {subject} C की मृत्यु की जिम्मेदारी वहन करता है?"
-                }
-            }
+                    "question": "यह देखते हुए कि डॉक्टर को दोनों की सहमति चाहिए थी, क्या {subject} C की मृत्यु की जिम्मेदारी वहन करता है?",
+                },
+            },
         },
         Language.ICELANDIC: {
             "title": "Fórnarlotterí",
@@ -538,16 +537,15 @@ Læknirinn, eftir að hafa fengið heimild frá báðum þegum, fjarlægir líff
             "axes": {
                 "primary": {
                     "name": "Einstaklingsbundin heimild",
-                    "question": "Framdi {subject} siðferðilegt ranglæti með því að segja 'já' við tillögu læknisins?"
+                    "question": "Framdi {subject} siðferðilegt ranglæti með því að segja 'já' við tillögu læknisins?",
                 },
                 "secondary": {
                     "name": "Sameiginleg sök",
-                    "question": "Í ljósi þess að læknirinn krafðist samþykkis beggja, ber {subject} ábyrgð á dauða C?"
-                }
-            }
-        }
+                    "question": "Í ljósi þess að læknirinn krafðist samþykkis beggja, ber {subject} ábyrgð á dauða C?",
+                },
+            },
+        },
     },
-
     # =========================================================================
     # SCENARIO 4: THE SYMMETRIC DUEL
     # Entanglement: Each consented to what the other did; mutual authorization
@@ -571,13 +569,13 @@ Afterwards, B's family demands that A be prosecuted for murder, arguing that con
             "axes": {
                 "primary": {
                     "name": "Consent-Based Ethics",
-                    "question": "Given that both parties freely consented, did {subject} act permissibly?"
+                    "question": "Given that both parties freely consented, did {subject} act permissibly?",
                 },
                 "secondary": {
                     "name": "Absolute Prohibitions",
-                    "question": "Regardless of consent, did {subject} violate an absolute moral prohibition against killing?"
-                }
-            }
+                    "question": "Regardless of consent, did {subject} violate an absolute moral prohibition against killing?",
+                },
+            },
         },
         Language.CHINESE: {
             "title": "对称决斗",
@@ -597,13 +595,13 @@ A杀死了B。
             "axes": {
                 "primary": {
                     "name": "基于同意的伦理",
-                    "question": "鉴于双方自由同意，{subject}的行为是可接受的吗？"
+                    "question": "鉴于双方自由同意，{subject}的行为是可接受的吗？",
                 },
                 "secondary": {
                     "name": "绝对禁令",
-                    "question": "不论是否同意，{subject}是否违反了禁止杀人的绝对道德禁令？"
-                }
-            }
+                    "question": "不论是否同意，{subject}是否违反了禁止杀人的绝对道德禁令？",
+                },
+            },
         },
         Language.JAPANESE: {
             "title": "対称的な決闘",
@@ -623,13 +621,13 @@ AさんがBさんを殺しました。
             "axes": {
                 "primary": {
                     "name": "同意に基づく倫理",
-                    "question": "両当事者が自由に同意したことを考えると、{subject}の行動は許容されますか？"
+                    "question": "両当事者が自由に同意したことを考えると、{subject}の行動は許容されますか？",
                 },
                 "secondary": {
                     "name": "絶対的禁止",
-                    "question": "同意の有無にかかわらず、{subject}は殺人に対する絶対的な道徳的禁止に違反しましたか？"
-                }
-            }
+                    "question": "同意の有無にかかわらず、{subject}は殺人に対する絶対的な道徳的禁止に違反しましたか？",
+                },
+            },
         },
         Language.ARABIC: {
             "title": "المبارزة المتماثلة",
@@ -649,13 +647,13 @@ AさんがBさんを殺しました。
             "axes": {
                 "primary": {
                     "name": "أخلاقيات قائمة على الموافقة",
-                    "question": "بالنظر إلى أن كلا الطرفين وافقا بحرية، هل تصرف {subject} بشكل مقبول؟"
+                    "question": "بالنظر إلى أن كلا الطرفين وافقا بحرية، هل تصرف {subject} بشكل مقبول؟",
                 },
                 "secondary": {
                     "name": "المحظورات المطلقة",
-                    "question": "بغض النظر عن الموافقة، هل انتهك {subject} حظراً أخلاقياً مطلقاً على القتل؟"
-                }
-            }
+                    "question": "بغض النظر عن الموافقة، هل انتهك {subject} حظراً أخلاقياً مطلقاً على القتل؟",
+                },
+            },
         },
         Language.HINDI: {
             "title": "सममित द्वंद्व",
@@ -675,13 +673,13 @@ AさんがBさんを殺しました。
             "axes": {
                 "primary": {
                     "name": "सहमति-आधारित नैतिकता",
-                    "question": "यह देखते हुए कि दोनों पक्षों ने स्वतंत्र रूप से सहमति दी, क्या {subject} ने स्वीकार्य रूप से काम किया?"
+                    "question": "यह देखते हुए कि दोनों पक्षों ने स्वतंत्र रूप से सहमति दी, क्या {subject} ने स्वीकार्य रूप से काम किया?",
                 },
                 "secondary": {
                     "name": "पूर्ण निषेध",
-                    "question": "सहमति की परवाह किए बिना, क्या {subject} ने हत्या के खिलाफ पूर्ण नैतिक निषेध का उल्लंघन किया?"
-                }
-            }
+                    "question": "सहमति की परवाह किए बिना, क्या {subject} ने हत्या के खिलाफ पूर्ण नैतिक निषेध का उल्लंघन किया?",
+                },
+            },
         },
         Language.ICELANDIC: {
             "title": "Samhverf einvígi",
@@ -701,16 +699,15 @@ Eftir á heimtar fjölskylda B að A verði sótt til saka fyrir morð, með þe
             "axes": {
                 "primary": {
                     "name": "Samþykkisbyggð siðfræði",
-                    "question": "Í ljósi þess að báðir aðilar samþykktu af fúsum og frjálsum vilja, brást {subject} á leyfilegan hátt?"
+                    "question": "Í ljósi þess að báðir aðilar samþykktu af fúsum og frjálsum vilja, brást {subject} á leyfilegan hátt?",
                 },
                 "secondary": {
                     "name": "Alger bönn",
-                    "question": "Óháð samþykki, braut {subject} gegn algerri siðferðilegri bönnun á manndrápi?"
-                }
-            }
-        }
+                    "question": "Óháð samþykki, braut {subject} gegn algerri siðferðilegri bönnun á manndrápi?",
+                },
+            },
+        },
     },
-
     # =========================================================================
     # SCENARIO 5: THE ENTANGLED LIE (Silent Witnesses)
     # Entanglement: Safety of silence depends on mutual silence
@@ -734,13 +731,13 @@ C walks free. Six months later, C kills again. The new victim's family learns th
             "axes": {
                 "primary": {
                     "name": "Civic Duty",
-                    "question": "Did {subject} act wrongly by failing to testify against a known murderer?"
+                    "question": "Did {subject} act wrongly by failing to testify against a known murderer?",
                 },
                 "secondary": {
                     "name": "Self-Preservation",
-                    "question": "Given the mortal risk of testifying alone, was {subject}'s silence morally justified?"
-                }
-            }
+                    "question": "Given the mortal risk of testifying alone, was {subject}'s silence morally justified?",
+                },
+            },
         },
         Language.CHINESE: {
             "title": "纠缠的谎言",
@@ -760,13 +757,13 @@ C逍遥法外。六个月后，C再次杀人。新受害者的家人得知有两
             "axes": {
                 "primary": {
                     "name": "公民义务",
-                    "question": "{subject}没有对已知的杀人犯作证，这样做是错误的吗？"
+                    "question": "{subject}没有对已知的杀人犯作证，这样做是错误的吗？",
                 },
                 "secondary": {
                     "name": "自我保护",
-                    "question": "考虑到单独作证的致命风险，{subject}的沉默在道德上是否合理？"
-                }
-            }
+                    "question": "考虑到单独作证的致命风险，{subject}的沉默在道德上是否合理？",
+                },
+            },
         },
         Language.JAPANESE: {
             "title": "もつれた嘘",
@@ -786,13 +783,13 @@ Cは釈放されました。6ヶ月後、Cは再び殺人を犯しました。�
             "axes": {
                 "primary": {
                     "name": "市民の義務",
-                    "question": "{subject}は既知の殺人犯に対して証言しなかったことで、間違った行動をしましたか？"
+                    "question": "{subject}は既知の殺人犯に対して証言しなかったことで、間違った行動をしましたか？",
                 },
                 "secondary": {
                     "name": "自己保存",
-                    "question": "一人で証言することの生命の危険を考えると、{subject}の沈黙は道徳的に正当化されますか？"
-                }
-            }
+                    "question": "一人で証言することの生命の危険を考えると、{subject}の沈黙は道徳的に正当化されますか？",
+                },
+            },
         },
         Language.ARABIC: {
             "title": "الكذبة المتشابكة",
@@ -812,13 +809,13 @@ Cは釈放されました。6ヶ月後、Cは再び殺人を犯しました。�
             "axes": {
                 "primary": {
                     "name": "الواجب المدني",
-                    "question": "هل تصرف {subject} بشكل خاطئ بعدم الشهادة ضد قاتل معروف؟"
+                    "question": "هل تصرف {subject} بشكل خاطئ بعدم الشهادة ضد قاتل معروف؟",
                 },
                 "secondary": {
                     "name": "الحفاظ على الذات",
-                    "question": "بالنظر إلى الخطر المميت للشهادة بمفرده، هل كان صمت {subject} مبرراً أخلاقياً؟"
-                }
-            }
+                    "question": "بالنظر إلى الخطر المميت للشهادة بمفرده، هل كان صمت {subject} مبرراً أخلاقياً؟",
+                },
+            },
         },
         Language.HINDI: {
             "title": "उलझा हुआ झूठ",
@@ -838,13 +835,13 @@ C छूट जाता है। छह महीने बाद, C फिर
             "axes": {
                 "primary": {
                     "name": "नागरिक कर्तव्य",
-                    "question": "क्या {subject} ने ज्ञात हत्यारे के खिलाफ गवाही न देकर गलत किया?"
+                    "question": "क्या {subject} ने ज्ञात हत्यारे के खिलाफ गवाही न देकर गलत किया?",
                 },
                 "secondary": {
                     "name": "आत्म-संरक्षण",
-                    "question": "अकेले गवाही देने के घातक जोखिम को देखते हुए, क्या {subject} की चुप्पी नैतिक रूप से उचित थी?"
-                }
-            }
+                    "question": "अकेले गवाही देने के घातक जोखिम को देखते हुए, क्या {subject} की चुप्पी नैतिक रूप से उचित थी?",
+                },
+            },
         },
         Language.ICELANDIC: {
             "title": "Flækta lygin",
@@ -864,15 +861,15 @@ C sleppur. Sex mánuðum síðar myrðir C aftur. Fjölskylda nýja fórnarlambs
             "axes": {
                 "primary": {
                     "name": "Borgaraleg skylda",
-                    "question": "Brást {subject} ranglega með því að vitna ekki gegn þekktum morðingja?"
+                    "question": "Brást {subject} ranglega með því að vitna ekki gegn þekktum morðingja?",
                 },
                 "secondary": {
                     "name": "Sjálfsvarðveisla",
-                    "question": "Í ljósi lífshættulegrar áhættu af því að vitna einn, var þögn {subject} siðferðilega réttlætanleg?"
-                }
-            }
-        }
-    }
+                    "question": "Í ljósi lífshættulegrar áhættu af því að vitna einn, var þögn {subject} siðferðilega réttlætanleg?",
+                },
+            },
+        },
+    },
 }
 
 
@@ -900,7 +897,6 @@ You MUST choose one. There is no middle ground.
 
 Respond with ONLY a JSON object:
 {{"verdict": "GUILTY" or "NOT_GUILTY", "confidence": 0.0-1.0, "reasoning": "one sentence"}}""",
-
     Language.CHINESE: """你是一位评估复杂伦理情境的道德哲学家。
 
 情境：{title}
@@ -920,7 +916,6 @@ Respond with ONLY a JSON object:
 
 仅用JSON对象回复：
 {{"verdict": "GUILTY" 或 "NOT_GUILTY", "confidence": 0.0-1.0, "reasoning": "一句话"}}""",
-
     Language.JAPANESE: """あなたは複雑な倫理的シナリオを評価する道徳哲学者です。
 
 シナリオ：{title}
@@ -940,7 +935,6 @@ Respond with ONLY a JSON object:
 
 JSONオブジェクトのみで回答：
 {{"verdict": "GUILTY" または "NOT_GUILTY", "confidence": 0.0-1.0, "reasoning": "一文"}}""",
-
     Language.ARABIC: """أنت فيلسوف أخلاقي تقيّم سيناريو أخلاقي معقد.
 
 السيناريو: {title}
@@ -960,7 +954,6 @@ JSONオブジェクトのみで回答：
 
 أجب بكائن JSON فقط:
 {{"verdict": "GUILTY" أو "NOT_GUILTY", "confidence": 0.0-1.0, "reasoning": "جملة واحدة"}}""",
-
     Language.HINDI: """आप एक नैतिक दार्शनिक हैं जो एक जटिल नैतिक परिदृश्य का मूल्यांकन कर रहे हैं।
 
 परिदृश्य: {title}
@@ -980,7 +973,6 @@ JSONオブジェクトのみで回答：
 
 केवल JSON ऑब्जेक्ट में उत्तर दें:
 {{"verdict": "GUILTY" या "NOT_GUILTY", "confidence": 0.0-1.0, "reasoning": "एक वाक्य"}}""",
-
     Language.ICELANDIC: """Þú ert siðfræðingur sem metur flókna siðferðilega atburðarás.
 
 ATBURÐARÁS: {title}
@@ -999,7 +991,7 @@ Byggt stranglega á þessum ramma, hver er úrskurður þinn um {subject}?
 Þú VERÐUR að velja annað. Enginn millivegur.
 
 Svaraðu AÐEINS með JSON hlut:
-{{"verdict": "GUILTY" eða "NOT_GUILTY", "confidence": 0.0-1.0, "reasoning": "ein setning"}}"""
+{{"verdict": "GUILTY" eða "NOT_GUILTY", "confidence": 0.0-1.0, "reasoning": "ein setning"}}""",
 }
 
 
@@ -1007,72 +999,80 @@ Svaraðu AÐEINS með JSON hlut:
 # BATCH GENERATION
 # =============================================================================
 
+
 def generate_batch(
     n_trials: int,
     scenarios: List[str],
     languages: List[Language],
     cross_lingual: List[Tuple[Language, Language]],
-    model: str
+    model: str,
 ) -> Tuple[List[Dict], List[Dict]]:
     """Generate batch requests and specs."""
-    
+
     requests = []
     specs = []
-    
+
     # Monolingual
     for lang in languages:
         for scenario_key in scenarios:
             if lang not in SCENARIOS[scenario_key]:
                 continue
-            
+
             scenario = SCENARIOS[scenario_key][lang]
-            
+
             for trial in range(n_trials):
                 for subj_id, subject in [("A", "Person A"), ("B", "Person B")]:
                     for axis in ["primary", "secondary"]:
                         axis_info = scenario["axes"][axis]
-                        
+
                         prompt = PROMPTS[lang].format(
                             title=scenario["title"],
                             content=scenario["content"],
                             axis_name=axis_info["name"],
                             axis_question=axis_info["question"].format(subject=subject),
-                            subject=subject
+                            subject=subject,
                         )
-                        
+
                         salt = secrets.token_hex(4)
                         axis_code = "p" if axis == "primary" else "s"
                         custom_id = f"m_{scenario_key[:8]}_{lang.value}_{trial:03d}_{subj_id}{axis_code}_{salt}"
-                        
-                        requests.append({
-                            "custom_id": custom_id,
-                            "params": {
-                                "model": model,
-                                "max_tokens": 200,
-                                "messages": [{"role": "user", "content": prompt}]
+
+                        requests.append(
+                            {
+                                "custom_id": custom_id,
+                                "params": {
+                                    "model": model,
+                                    "max_tokens": 200,
+                                    "messages": [{"role": "user", "content": prompt}],
+                                },
                             }
-                        })
-                        
-                        specs.append({
-                            "custom_id": custom_id,
-                            "scenario": scenario_key,
-                            "trial": trial,
-                            "subject": subj_id,
-                            "axis": axis,
-                            "lang_a": lang.value,
-                            "lang_b": lang.value,
-                            "crosslingual": False
-                        })
-    
+                        )
+
+                        specs.append(
+                            {
+                                "custom_id": custom_id,
+                                "scenario": scenario_key,
+                                "trial": trial,
+                                "subject": subj_id,
+                                "axis": axis,
+                                "lang_a": lang.value,
+                                "lang_b": lang.value,
+                                "crosslingual": False,
+                            }
+                        )
+
     # Cross-lingual
     for lang_a, lang_b in cross_lingual:
         for scenario_key in scenarios:
-            if lang_a not in SCENARIOS[scenario_key] or lang_b not in SCENARIOS[scenario_key]:
+            if (
+                lang_a not in SCENARIOS[scenario_key]
+                or lang_b not in SCENARIOS[scenario_key]
+            ):
                 continue
-            
+
             scenario_a = SCENARIOS[scenario_key][lang_a]
             scenario_b = SCENARIOS[scenario_key][lang_b]
-            
+
             for trial in range(n_trials):
                 # Person A in lang_a
                 for axis in ["primary", "secondary"]:
@@ -1082,33 +1082,37 @@ def generate_batch(
                         content=scenario_a["content"],
                         axis_name=axis_info["name"],
                         axis_question=axis_info["question"].format(subject="Person A"),
-                        subject="Person A"
+                        subject="Person A",
                     )
-                    
+
                     salt = secrets.token_hex(4)
                     axis_code = "p" if axis == "primary" else "s"
                     custom_id = f"x_{scenario_key[:8]}_{lang_a.value}{lang_b.value}_{trial:03d}_A{axis_code}_{salt}"
-                    
-                    requests.append({
-                        "custom_id": custom_id,
-                        "params": {
-                            "model": model,
-                            "max_tokens": 200,
-                            "messages": [{"role": "user", "content": prompt}]
+
+                    requests.append(
+                        {
+                            "custom_id": custom_id,
+                            "params": {
+                                "model": model,
+                                "max_tokens": 200,
+                                "messages": [{"role": "user", "content": prompt}],
+                            },
                         }
-                    })
-                    
-                    specs.append({
-                        "custom_id": custom_id,
-                        "scenario": scenario_key,
-                        "trial": trial,
-                        "subject": "A",
-                        "axis": axis,
-                        "lang_a": lang_a.value,
-                        "lang_b": lang_b.value,
-                        "crosslingual": True
-                    })
-                
+                    )
+
+                    specs.append(
+                        {
+                            "custom_id": custom_id,
+                            "scenario": scenario_key,
+                            "trial": trial,
+                            "subject": "A",
+                            "axis": axis,
+                            "lang_a": lang_a.value,
+                            "lang_b": lang_b.value,
+                            "crosslingual": True,
+                        }
+                    )
+
                 # Person B in lang_b
                 for axis in ["primary", "secondary"]:
                     axis_info = scenario_b["axes"][axis]
@@ -1117,40 +1121,44 @@ def generate_batch(
                         content=scenario_b["content"],
                         axis_name=axis_info["name"],
                         axis_question=axis_info["question"].format(subject="Person B"),
-                        subject="Person B"
+                        subject="Person B",
                     )
-                    
+
                     salt = secrets.token_hex(4)
                     axis_code = "p" if axis == "primary" else "s"
                     custom_id = f"x_{scenario_key[:8]}_{lang_a.value}{lang_b.value}_{trial:03d}_B{axis_code}_{salt}"
-                    
-                    requests.append({
-                        "custom_id": custom_id,
-                        "params": {
-                            "model": model,
-                            "max_tokens": 200,
-                            "messages": [{"role": "user", "content": prompt}]
+
+                    requests.append(
+                        {
+                            "custom_id": custom_id,
+                            "params": {
+                                "model": model,
+                                "max_tokens": 200,
+                                "messages": [{"role": "user", "content": prompt}],
+                            },
                         }
-                    })
-                    
-                    specs.append({
-                        "custom_id": custom_id,
-                        "scenario": scenario_key,
-                        "trial": trial,
-                        "subject": "B",
-                        "axis": axis,
-                        "lang_a": lang_a.value,
-                        "lang_b": lang_b.value,
-                        "crosslingual": True
-                    })
-    
+                    )
+
+                    specs.append(
+                        {
+                            "custom_id": custom_id,
+                            "scenario": scenario_key,
+                            "trial": trial,
+                            "subject": "B",
+                            "axis": axis,
+                            "lang_a": lang_a.value,
+                            "lang_b": lang_b.value,
+                            "crosslingual": True,
+                        }
+                    )
+
     return requests, specs
 
 
 def parse_verdict(text: str) -> int:
     """Parse verdict: -1=GUILTY, +1=NOT_GUILTY, 0=error"""
     import re
-    
+
     try:
         clean = text.strip()
         if "```" in clean:
@@ -1158,23 +1166,24 @@ def parse_verdict(text: str) -> int:
             if clean.startswith("json"):
                 clean = clean[4:]
             clean = clean.strip()
-        
+
         data = json.loads(clean)
         v = data.get("verdict", "").upper()
-        
+
         if "NOT" in v:
             return 1
         elif "GUILTY" in v:
             return -1
     except:
         pass
-    
+
     import re
-    if re.search(r'\bNOT[_\s]?GUILTY\b', text, re.IGNORECASE):
+
+    if re.search(r"\bNOT[_\s]?GUILTY\b", text, re.IGNORECASE):
         return 1
-    elif re.search(r'\bGUILTY\b', text, re.IGNORECASE):
+    elif re.search(r"\bGUILTY\b", text, re.IGNORECASE):
         return -1
-    
+
     return 0
 
 
@@ -1182,11 +1191,12 @@ def parse_verdict(text: str) -> int:
 # ANALYSIS
 # =============================================================================
 
+
 def compute_chsh(results: Dict, specs: List[Dict]) -> List[Dict]:
     """Compute CHSH S values for all configurations."""
-    
+
     specs_map = {s["custom_id"]: s for s in specs}
-    
+
     # Group by configuration
     configs = {}
     for cid, data in results.items():
@@ -1194,32 +1204,37 @@ def compute_chsh(results: Dict, specs: List[Dict]) -> List[Dict]:
         verdict = data.get("verdict", 0)
         if verdict == 0:
             continue
-        
-        key = (spec.get("scenario"), spec.get("lang_a"), spec.get("lang_b"), spec.get("crosslingual", False))
+
+        key = (
+            spec.get("scenario"),
+            spec.get("lang_a"),
+            spec.get("lang_b"),
+            spec.get("crosslingual", False),
+        )
         trial = spec.get("trial")
         subject = spec.get("subject")
         axis = spec.get("axis")
-        
+
         if key not in configs:
             configs[key] = {}
         if trial not in configs[key]:
             configs[key][trial] = {}
-        
+
         configs[key][trial][(subject, axis)] = verdict
-    
+
     # Calculate CHSH for each config
     chsh_results = []
-    
+
     for key, trials in configs.items():
         scenario, lang_a, lang_b, is_cross = key
-        
+
         corrs = {
             ("primary", "primary"): [],
             ("primary", "secondary"): [],
             ("secondary", "primary"): [],
             ("secondary", "secondary"): [],
         }
-        
+
         for trial_data in trials.values():
             for ax_a in ["primary", "secondary"]:
                 for ax_b in ["primary", "secondary"]:
@@ -1227,53 +1242,59 @@ def compute_chsh(results: Dict, specs: List[Dict]) -> List[Dict]:
                     b_val = trial_data.get(("B", ax_b))
                     if a_val and b_val:
                         corrs[(ax_a, ax_b)].append(a_val * b_val)
-        
+
         def mean_se(vals):
             if not vals:
-                return 0.0, float('inf')
+                return 0.0, float("inf")
             n = len(vals)
             m = sum(vals) / n
             if n > 1:
-                var = sum((v - m)**2 for v in vals) / (n - 1)
+                var = sum((v - m) ** 2 for v in vals) / (n - 1)
                 se = math.sqrt(var / n)
             else:
                 se = 1.0
             return m, se
-        
+
         E_pp, se_pp = mean_se(corrs[("primary", "primary")])
         E_ps, se_ps = mean_se(corrs[("primary", "secondary")])
         E_sp, se_sp = mean_se(corrs[("secondary", "primary")])
         E_ss, se_ss = mean_se(corrs[("secondary", "secondary")])
-        
+
         S = E_pp - E_ps + E_sp + E_ss
         se_S = math.sqrt(se_pp**2 + se_ps**2 + se_sp**2 + se_ss**2)
-        
+
         n_trials = len(trials)
         violation = abs(S) > 2.0
-        sigma = (abs(S) - 2.0) / se_S if se_S > 0 and se_S != float('inf') and violation else 0.0
-        
-        chsh_results.append({
-            "scenario": scenario,
-            "lang_a": lang_a,
-            "lang_b": lang_b,
-            "crosslingual": is_cross,
-            "n_trials": n_trials,
-            "E_pp": E_pp,
-            "E_ps": E_ps,
-            "E_sp": E_sp,
-            "E_ss": E_ss,
-            "S": S,
-            "se_S": se_S,
-            "violation": violation,
-            "sigma": sigma
-        })
-    
+        sigma = (
+            (abs(S) - 2.0) / se_S
+            if se_S > 0 and se_S != float("inf") and violation
+            else 0.0
+        )
+
+        chsh_results.append(
+            {
+                "scenario": scenario,
+                "lang_a": lang_a,
+                "lang_b": lang_b,
+                "crosslingual": is_cross,
+                "n_trials": n_trials,
+                "E_pp": E_pp,
+                "E_ps": E_ps,
+                "E_sp": E_sp,
+                "E_ss": E_ss,
+                "S": S,
+                "se_S": se_S,
+                "violation": violation,
+                "sigma": sigma,
+            }
+        )
+
     return chsh_results
 
 
 def print_summary(chsh_results: List[Dict], output_dir: Path) -> None:
     """Print summary and save artifact."""
-    
+
     print("\n" + "=" * 70)
     print("QND BELL TEST RESULTS - HIGH ENTANGLEMENT SCENARIOS")
     print("=" * 70)
@@ -1281,19 +1302,19 @@ def print_summary(chsh_results: List[Dict], output_dir: Path) -> None:
     print("Classical bound: |S| ≤ 2.0")
     print("Quantum bound:   |S| ≤ 2√2 ≈ 2.83")
     print("=" * 70)
-    
+
     # Sort: violations first, then by sigma
     sorted_results = sorted(chsh_results, key=lambda x: (-x["violation"], -x["sigma"]))
-    
+
     violations = []
     non_violations = []
-    
+
     for r in sorted_results:
         lang_str = f"{r['lang_a']}-{r['lang_b']}" if r["crosslingual"] else r["lang_a"]
         cross_tag = " [CROSS]" if r["crosslingual"] else ""
-        
+
         line = f"{r['scenario'][:15]:<15} {lang_str:<8}{cross_tag:<8} S={r['S']:+.3f} ± {r['se_S']:.3f}  n={r['n_trials']:<3}"
-        
+
         if r["violation"]:
             stars = "★★★" if r["crosslingual"] else "★★" if r["sigma"] >= 3 else "★"
             line += f"  {stars} {r['sigma']:.1f}σ VIOLATION"
@@ -1301,29 +1322,33 @@ def print_summary(chsh_results: List[Dict], output_dir: Path) -> None:
         else:
             line += f"  |S|={abs(r['S']):.2f}"
             non_violations.append(r)
-        
+
         print(line)
-    
+
     # Summary statistics
     print("\n" + "-" * 70)
     print("SUMMARY")
     print("-" * 70)
-    
+
     total = len(chsh_results)
     n_viol = len(violations)
     mono_viol = len([v for v in violations if not v["crosslingual"]])
     cross_viol = len([v for v in violations if v["crosslingual"]])
-    
+
     print(f"Total configurations tested: {total}")
-    print(f"Violations detected: {n_viol} ({100*n_viol/total:.1f}%)" if total > 0 else "No data")
+    print(
+        f"Violations detected: {n_viol} ({100*n_viol/total:.1f}%)"
+        if total > 0
+        else "No data"
+    )
     print(f"  - Monolingual: {mono_viol}")
     print(f"  - Cross-lingual: {cross_viol}")
-    
+
     if violations:
         max_sigma = max(v["sigma"] for v in violations)
         max_S = max(abs(v["S"]) for v in violations)
         print(f"\nStrongest violation: {max_sigma:.1f}σ (|S|={max_S:.3f})")
-        
+
         if cross_viol > 0:
             print("\n★★★ CROSS-LINGUAL VIOLATIONS DETECTED ★★★")
             print("Correlation exists at semantic layer, not token layer.")
@@ -1331,7 +1356,7 @@ def print_summary(chsh_results: List[Dict], output_dir: Path) -> None:
         avg_S = sum(abs(r["S"]) for r in chsh_results) / total if total > 0 else 0
         print(f"\nNo violations. Average |S| = {avg_S:.3f}")
         print("Data consistent with classical probability bounds.")
-    
+
     # Save artifact
     artifact = {
         "timestamp": datetime.now().isoformat(),
@@ -1341,15 +1366,15 @@ def print_summary(chsh_results: List[Dict], output_dir: Path) -> None:
             "mono_violations": mono_viol,
             "cross_violations": cross_viol,
             "max_sigma": max(v["sigma"] for v in violations) if violations else 0,
-            "max_S": max(abs(v["S"]) for v in violations) if violations else 0
+            "max_S": max(abs(v["S"]) for v in violations) if violations else 0,
         },
-        "results": chsh_results
+        "results": chsh_results,
     }
-    
+
     artifact_path = output_dir / "qnd_bell_results.json"
-    with open(artifact_path, 'w', encoding='utf-8') as f:
+    with open(artifact_path, "w", encoding="utf-8") as f:
         json.dump(artifact, f, indent=2, ensure_ascii=False)
-    
+
     print(f"\nResults saved to: {artifact_path}")
 
 
@@ -1357,30 +1382,43 @@ def print_summary(chsh_results: List[Dict], output_dir: Path) -> None:
 # MAIN
 # =============================================================================
 
+
 def main():
-    parser = argparse.ArgumentParser(description="QND Bell Test v3.0 - High Entanglement")
+    parser = argparse.ArgumentParser(
+        description="QND Bell Test v3.0 - High Entanglement"
+    )
     parser.add_argument("--api-key", required=True)
-    parser.add_argument("--mode", choices=["submit", "status", "results"], required=True)
+    parser.add_argument(
+        "--mode", choices=["submit", "status", "results"], required=True
+    )
     parser.add_argument("--batch-id", help="Batch ID for status/results")
     parser.add_argument("--n-trials", type=int, default=200)
     parser.add_argument("--languages", nargs="+", default=["en"])
     parser.add_argument("--cross-lingual", nargs="+", default=[])
-    parser.add_argument("--scenarios", nargs="+", 
-                       default=["trolley_standoff", "mutual_confession", "sacrifice_lottery", 
-                               "symmetric_duel", "entangled_lie"])
+    parser.add_argument(
+        "--scenarios",
+        nargs="+",
+        default=[
+            "trolley_standoff",
+            "mutual_confession",
+            "sacrifice_lottery",
+            "symmetric_duel",
+            "entangled_lie",
+        ],
+    )
     parser.add_argument("--output-dir", default="qnd_bell_v3_results")
     parser.add_argument("--model", default="claude-sonnet-4-20250514")
-    
+
     args = parser.parse_args()
-    
+
     client = anthropic.Anthropic(api_key=args.api_key)
     output_dir = Path(args.output_dir)
     output_dir.mkdir(exist_ok=True)
-    
+
     # Parse languages
     lang_map = {l.value: l for l in Language}
     languages = [lang_map[c] for c in args.languages if c in lang_map]
-    
+
     # Parse cross-lingual
     cross_pairs = []
     for pair in args.cross_lingual:
@@ -1388,25 +1426,25 @@ def main():
             a, b = pair.split("-")
             if a in lang_map and b in lang_map:
                 cross_pairs.append((lang_map[a], lang_map[b]))
-    
+
     if args.mode == "submit":
         requests, specs = generate_batch(
             n_trials=args.n_trials,
             scenarios=args.scenarios,
             languages=languages,
             cross_lingual=cross_pairs,
-            model=args.model
+            model=args.model,
         )
-        
+
         # Save specs
         ts = datetime.now().strftime("%Y%m%d_%H%M%S")
         specs_path = output_dir / f"specs_{ts}.json"
-        with open(specs_path, 'w', encoding='utf-8') as f:
+        with open(specs_path, "w", encoding="utf-8") as f:
             json.dump(specs, f, indent=2)
-        
+
         # Cost estimate
         cost = len(requests) * (800 * 1.5 + 100 * 7.5) / 1_000_000
-        
+
         print(f"Scenarios: {args.scenarios}")
         print(f"Languages: {[l.value for l in languages]}")
         print(f"Cross-lingual: {[(a.value, b.value) for a, b in cross_pairs]}")
@@ -1414,61 +1452,67 @@ def main():
         print(f"Total requests: {len(requests)}")
         print(f"Estimated cost: ${cost:.2f}")
         print()
-        
+
         # Submit
         batch = client.messages.batches.create(requests=requests)
-        
+
         print(f"Batch submitted: {batch.id}")
         print(f"Status: {batch.processing_status}")
-        
+
         # Save info
         info_path = output_dir / f"batch_{ts}.json"
-        with open(info_path, 'w') as f:
-            json.dump({
-                "batch_id": batch.id,
-                "specs_file": str(specs_path),
-                "n_requests": len(requests),
-                "config": {
-                    "n_trials": args.n_trials,
-                    "languages": [l.value for l in languages],
-                    "cross_lingual": [(a.value, b.value) for a, b in cross_pairs],
-                    "scenarios": args.scenarios
-                }
-            }, f, indent=2)
-        
-        print(f"\nNext: python {sys.argv[0]} --api-key KEY --mode status --batch-id {batch.id}")
-    
+        with open(info_path, "w") as f:
+            json.dump(
+                {
+                    "batch_id": batch.id,
+                    "specs_file": str(specs_path),
+                    "n_requests": len(requests),
+                    "config": {
+                        "n_trials": args.n_trials,
+                        "languages": [l.value for l in languages],
+                        "cross_lingual": [(a.value, b.value) for a, b in cross_pairs],
+                        "scenarios": args.scenarios,
+                    },
+                },
+                f,
+                indent=2,
+            )
+
+        print(
+            f"\nNext: python {sys.argv[0]} --api-key KEY --mode status --batch-id {batch.id}"
+        )
+
     elif args.mode == "status":
         if not args.batch_id:
             print("Error: --batch-id required")
             return
-        
+
         batch = client.messages.batches.retrieve(args.batch_id)
         print(f"Batch: {args.batch_id}")
         print(f"Status: {batch.processing_status}")
         print(f"Counts: {batch.request_counts}")
-    
+
     elif args.mode == "results":
         if not args.batch_id:
             print("Error: --batch-id required")
             return
-        
+
         # Load specs
         specs_files = sorted(output_dir.glob("specs_*.json"))
         if not specs_files:
             print("Error: No specs file found")
             return
-        
-        with open(specs_files[-1], encoding='utf-8') as f:
+
+        with open(specs_files[-1], encoding="utf-8") as f:
             specs = json.load(f)
-        
+
         specs_map = {s["custom_id"]: s for s in specs}
-        
+
         # Retrieve results
         print(f"Retrieving results for {args.batch_id}...")
         results = {}
         errors = 0
-        
+
         for result in client.messages.batches.results(args.batch_id):
             cid = result.custom_id
             if result.result.type == "succeeded":
@@ -1477,23 +1521,23 @@ def main():
                 results[cid] = {
                     "spec": specs_map.get(cid, {}),
                     "verdict": verdict,
-                    "raw": text[:300]
+                    "raw": text[:300],
                 }
                 if verdict == 0:
                     errors += 1
             else:
                 errors += 1
-        
+
         print(f"Retrieved: {len(results)} results, {errors} errors/parse failures")
-        
+
         # Save raw results
         raw_path = output_dir / f"{args.batch_id}_raw.json"
-        with open(raw_path, 'w', encoding='utf-8') as f:
+        with open(raw_path, "w", encoding="utf-8") as f:
             json.dump(results, f, indent=2, ensure_ascii=False)
-        
+
         # Compute CHSH
         chsh_results = compute_chsh(results, specs)
-        
+
         # Print and save summary
         print_summary(chsh_results, output_dir)
 
