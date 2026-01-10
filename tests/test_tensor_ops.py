@@ -15,13 +15,11 @@ Covers:
 - Wasserstein distance metric
 """
 
+# ruff: noqa: E402
 from __future__ import annotations
 
 import sys
 from pathlib import Path
-
-import numpy as np
-import pytest
 
 # Add src to path for imports
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
@@ -29,9 +27,11 @@ SRC_DIR = PROJECT_ROOT / "src"
 if SRC_DIR.exists() and str(SRC_DIR) not in sys.path:
     sys.path.insert(0, str(SRC_DIR))
 
+import numpy as np
+import pytest
+
 from erisml.ethics.moral_tensor import (
     MoralTensor,
-    DIMENSION_INDEX,
     MORAL_DIMENSION_NAMES,
 )
 from erisml.ethics.tensor_ops import (

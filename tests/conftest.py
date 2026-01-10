@@ -240,7 +240,7 @@ def sample_profile_v04() -> DEMEProfileV04:
 # DEME V3 Fixtures (MoralTensor)
 # =============================================================================
 
-from erisml.ethics.moral_tensor import MoralTensor, SparseCOO
+from erisml.ethics.moral_tensor import MoralTensor
 import numpy as np
 
 
