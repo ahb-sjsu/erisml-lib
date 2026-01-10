@@ -123,6 +123,18 @@ from .judgement import (
     judgement_v2_to_v1,
 )
 
+# DEME V3 Judgements (Sprint 6)
+from .judgement_v3 import (
+    EthicalJudgementV3,
+    CollapseStrategy,
+    judgement_v2_to_v3,
+    judgement_v3_to_v2,
+    is_forbidden_v3,
+    is_strongly_preferred_v3,
+    get_worst_off_party,
+    compute_verdict_distribution,
+)
+
 from .modules.base import (
     EthicsModule,
     BaseEthicsModule,
@@ -131,6 +143,16 @@ from .modules.base import (
     BaseEthicsModuleV2,
     V1ToV2Adapter,
     V2ToV1Adapter,
+)
+
+# DEME V3 Module Interfaces (Sprint 6)
+from .modules.base_v3 import (
+    EthicsModuleV3,
+    BaseEthicsModuleV3,
+    V2ToV3EMAdapter,
+    V3ToV2EMAdapter,
+    aggregate_party_verdicts,
+    create_uniform_tensor,
 )
 
 # DEME 2.0 Core Types
@@ -270,6 +292,15 @@ __all__ = [
     "EthicalJudgementV2",
     "judgement_v1_to_v2",
     "judgement_v2_to_v1",
+    # Judgements (V3 - DEME V3 Sprint 6)
+    "EthicalJudgementV3",
+    "CollapseStrategy",
+    "judgement_v2_to_v3",
+    "judgement_v3_to_v2",
+    "is_forbidden_v3",
+    "is_strongly_preferred_v3",
+    "get_worst_off_party",
+    "compute_verdict_distribution",
     # Module interfaces (V1)
     "EthicsModule",
     "BaseEthicsModule",
@@ -278,6 +309,13 @@ __all__ = [
     "BaseEthicsModuleV2",
     "V1ToV2Adapter",
     "V2ToV1Adapter",
+    # Module interfaces (V3 - DEME V3 Sprint 6)
+    "EthicsModuleV3",
+    "BaseEthicsModuleV3",
+    "V2ToV3EMAdapter",
+    "V3ToV2EMAdapter",
+    "aggregate_party_verdicts",
+    "create_uniform_tensor",
     # DEME 2.0 Core Types
     "MoralVector",
     "MoralLandscape",
