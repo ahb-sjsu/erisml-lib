@@ -236,6 +236,21 @@ from .interop.json_schema import (
     get_ethical_judgement_schema,
 )
 
+# DEME V3 Fairness Metrics (Sprint 5)
+from .fairness_metrics import (
+    gini_coefficient,
+    rawlsian_maximin,
+    rawlsian_maximin_welfare,
+    utilitarian_sum,
+    utilitarian_average,
+    prioritarian_weighted_welfare,
+    extract_vulnerability_weights,
+    atkinson_index,
+    theil_index,
+    theil_decomposition,
+    FairnessMetrics,
+)
+
 __all__ = [
     # Facts & ethical dimensions
     "EthicalFacts",
@@ -338,4 +353,16 @@ __all__ = [
     # Interop / schemas
     "get_ethical_facts_schema",
     "get_ethical_judgement_schema",
+    # DEME V3 Fairness Metrics (Sprint 5)
+    "gini_coefficient",
+    "rawlsian_maximin",
+    "rawlsian_maximin_welfare",
+    "utilitarian_sum",
+    "utilitarian_average",
+    "prioritarian_weighted_welfare",
+    "extract_vulnerability_weights",
+    "atkinson_index",
+    "theil_index",
+    "theil_decomposition",
+    "FairnessMetrics",
 ]
