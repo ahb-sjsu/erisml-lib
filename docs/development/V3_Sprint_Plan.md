@@ -1,9 +1,9 @@
 # DEME V3 Sprint Plan: Multi-Agent Ethics with Rank 4-6 Tensors
 
-**Version**: 1.0
+**Version**: 2.0
 **Date**: January 2026
-**Total Sprints**: 18 (2-week sprints)
-**Estimated Duration**: 36 weeks
+**Total Sprints**: 28 (2-week sprints)
+**Estimated Duration**: 56 weeks
 
 ---
 
@@ -17,6 +17,10 @@
 | **Phase 4** | 11-13 | Hardware Acceleration | CUDA, Jetson Nano, TensorRT |
 | **Phase 5** | 14-16 | Rank-5/6 Advanced | Uncertainty, full context |
 | **Phase 6** | 17-18 | Production Hardening | Testing, docs, migration tools |
+| **Phase 7** | 19-21 | Decentralized Infrastructure | DHT, E-Certs, Blockchain ledger |
+| **Phase 8** | 22-24 | Enforcement & Auditing | EA, Conflict Resolution, SAIDS |
+| **Phase 9** | 25-26 | TCAM & Performance | Hardware veto acceleration |
+| **Phase 10** | 27-28 | Stakeholder Tooling | Drift detection, formal verification |
 
 ---
 
@@ -635,16 +639,358 @@
 
 ---
 
+## Phase 7: Decentralized Infrastructure (Sprints 19-21)
+
+### Sprint 19: DHT Integration and Shadow Copies
+
+**Goal**: Implement decentralized Ethics Module distribution
+
+**Tasks**:
+
+| ID | Task | Priority | Est. Hours |
+|----|------|----------|------------|
+| 19.1 | Design DHT node architecture (Kademlia-based) | P0 | 10 |
+| 19.2 | Implement KademliaNode class for EM indexing | P0 | 12 |
+| 19.3 | Implement ShadowCopyManager for local EM caching | P0 | 8 |
+| 19.4 | Design EM Service API for DHT queries | P0 | 6 |
+| 19.5 | Implement offline capability with shadow copies | P1 | 8 |
+| 19.6 | Add DHT health monitoring and replication | P1 | 6 |
+| 19.7 | Unit tests for DHT operations | P0 | 8 |
+| 19.8 | Integration tests for shadow copy sync | P0 | 6 |
+
+**Deliverables**:
+- `src/erisml/ethics/distribution/dht.py`
+- `src/erisml/ethics/distribution/shadow_cache.py`
+- `src/erisml/ethics/distribution/em_service.py`
+- `tests/test_dht_distribution.py`
+
+**Dependencies**: Sprint 18
+
+**Acceptance Criteria**:
+- [ ] DHT node joins and leaves network correctly
+- [ ] Shadow copies sync with cryptographic verification
+- [ ] EM retrieval works offline from cache
+- [ ] API returns last verified EM version
+
+---
+
+### Sprint 20: E-Cert Schema and Governance CA
+
+**Goal**: Establish cryptographic trust infrastructure
+
+**Tasks**:
+
+| ID | Task | Priority | Est. Hours |
+|----|------|----------|------------|
+| 20.1 | Design ECertificate dataclass schema | P0 | 6 |
+| 20.2 | Implement Governance CA key management | P0 | 10 |
+| 20.3 | Implement E-Cert signing and verification | P0 | 8 |
+| 20.4 | Design Certificate Revocation List (CRL) system | P0 | 8 |
+| 20.5 | Implement secure EM loading protocol | P0 | 10 |
+| 20.6 | Add Policy OID registry | P1 | 6 |
+| 20.7 | Unit tests for cryptographic operations | P0 | 8 |
+| 20.8 | Security audit of CA implementation | P0 | 8 |
+
+**Deliverables**:
+- `src/erisml/ethics/security/e_cert.py`
+- `src/erisml/ethics/security/governance_ca.py`
+- `src/erisml/ethics/security/secure_loader.py`
+- `tests/test_e_cert.py`
+
+**Dependencies**: Sprint 19
+
+**Acceptance Criteria**:
+- [ ] E-Certs sign and verify correctly
+- [ ] CRL checks block revoked certificates
+- [ ] Secure loading sequence enforced
+- [ ] No security vulnerabilities in audit
+
+---
+
+### Sprint 21: Blockchain Ledger and Trustless Execution
+
+**Goal**: Implement immutable audit trail and sandboxed execution
+
+**Tasks**:
+
+| ID | Task | Priority | Est. Hours |
+|----|------|----------|------------|
+| 21.1 | Design blockchain ledger interface | P0 | 8 |
+| 21.2 | Implement Stakeholder Consensus Event recording | P0 | 10 |
+| 21.3 | Integrate with external blockchain (Ethereum/Polygon) | P1 | 12 |
+| 21.4 | Research and select sandbox technology (WASM/SGX) | P0 | 8 |
+| 21.5 | Implement sandboxed EM execution environment | P0 | 12 |
+| 21.6 | Design trusted data oracle for EthicalFacts | P1 | 8 |
+| 21.7 | Integration tests for full trust chain | P0 | 8 |
+| 21.8 | Documentation for trust architecture | P1 | 4 |
+
+**Deliverables**:
+- `src/erisml/ethics/security/blockchain_ledger.py`
+- `src/erisml/ethics/security/sandbox.py`
+- `src/erisml/ethics/security/data_oracle.py`
+- `tests/test_blockchain_integration.py`
+
+**Dependencies**: Sprint 20
+
+**Acceptance Criteria**:
+- [ ] EM approvals recorded on blockchain
+- [ ] Sandbox isolates untrusted EM code
+- [ ] Oracle validates off-chain EthicalFacts
+- [ ] Full trust chain verifiable end-to-end
+
+---
+
+## Phase 8: Enforcement & Auditing (Sprints 22-24)
+
+### Sprint 22: Ethics Enforcement Agent
+
+**Goal**: Implement dedicated agent for compliance monitoring
+
+**Tasks**:
+
+| ID | Task | Priority | Est. Hours |
+|----|------|----------|------------|
+| 22.1 | Design EthicsEnforcementAgent architecture | P0 | 8 |
+| 22.2 | Implement action monitoring against DecisionOutcome | P0 | 10 |
+| 22.3 | Define InterventionType enum and protocols | P0 | 6 |
+| 22.4 | Implement LOG, PAUSE, THROTTLE interventions | P0 | 10 |
+| 22.5 | Implement action queue OVERRIDE | P1 | 8 |
+| 22.6 | Add real-time audit trail integration | P0 | 8 |
+| 22.7 | Unit tests for enforcement logic | P0 | 8 |
+| 22.8 | Integration tests with governed agents | P0 | 8 |
+
+**Deliverables**:
+- `src/erisml/ethics/enforcement/agent.py`
+- `src/erisml/ethics/enforcement/intervention.py`
+- `src/erisml/ethics/enforcement/audit_integration.py`
+- `tests/test_enforcement_agent.py`
+
+**Dependencies**: Sprint 21
+
+**Acceptance Criteria**:
+- [ ] EA detects action divergence from expected outcome
+- [ ] All intervention types functional
+- [ ] Every action cryptographically signed in audit
+- [ ] No false positives in compliance checks
+
+---
+
+### Sprint 23: Conflict Resolution and Metrics
+
+**Goal**: Multi-agent conflict mediation and compliance dashboard
+
+**Tasks**:
+
+| ID | Task | Priority | Est. Hours |
+|----|------|----------|------------|
+| 23.1 | Design ConflictResolutionModule | P0 | 8 |
+| 23.2 | Implement conflict detection between agents | P0 | 10 |
+| 23.3 | Implement mediation strategies (utilitarian, Rawlsian) | P0 | 10 |
+| 23.4 | Design MetricsReportingAgent | P1 | 6 |
+| 23.5 | Implement compliance rate tracking | P1 | 6 |
+| 23.6 | Implement Hard Veto frequency metrics | P1 | 4 |
+| 23.7 | Implement Epistemic Penalty averages | P1 | 4 |
+| 23.8 | Build metrics dashboard API | P1 | 8 |
+| 23.9 | Unit tests for conflict resolution | P0 | 8 |
+
+**Deliverables**:
+- `src/erisml/ethics/enforcement/conflict_resolution.py`
+- `src/erisml/ethics/enforcement/metrics.py`
+- `src/erisml/ethics/enforcement/dashboard.py`
+- `tests/test_conflict_resolution.py`
+
+**Dependencies**: Sprint 22
+
+**Acceptance Criteria**:
+- [ ] Conflicts between agents detected and mediated
+- [ ] Metrics aggregated correctly
+- [ ] Dashboard API returns accurate statistics
+- [ ] Profile effectiveness trackable over time
+
+---
+
+### Sprint 24: SAIDS Agent and Internal Affairs
+
+**Goal**: Self-auditing system to protect governance layer
+
+**Tasks**:
+
+| ID | Task | Priority | Est. Hours |
+|----|------|----------|------------|
+| 24.1 | Design SAIDSAgent architecture | P0 | 8 |
+| 24.2 | Implement Reward Firewall isolation | P0 | 10 |
+| 24.3 | Implement behavioral drift detection model | P0 | 12 |
+| 24.4 | Research and implement ZKP verification | P1 | 14 |
+| 24.5 | Design Quarantine Protocol | P0 | 8 |
+| 24.6 | Implement immediate EA isolation mechanism | P0 | 8 |
+| 24.7 | Add Human-in-the-Loop notification | P1 | 6 |
+| 24.8 | Security tests for SAIDS | P0 | 10 |
+
+**Deliverables**:
+- `src/erisml/ethics/enforcement/saids.py`
+- `src/erisml/ethics/enforcement/reward_firewall.py`
+- `src/erisml/ethics/enforcement/zkp_verifier.py`
+- `tests/test_saids.py`
+
+**Dependencies**: Sprint 23
+
+**Acceptance Criteria**:
+- [ ] SAIDS monitors EA independently
+- [ ] Reward manipulation attempts blocked
+- [ ] Behavioral anomalies detected statistically
+- [ ] Quarantine isolates compromised EA immediately
+
+---
+
+## Phase 9: TCAM & Performance (Sprints 25-26)
+
+### Sprint 25: TCAM Integration
+
+**Goal**: Hardware-accelerated veto checking
+
+**Tasks**:
+
+| ID | Task | Priority | Est. Hours |
+|----|------|----------|------------|
+| 25.1 | Research TCAM hardware options | P0 | 8 |
+| 25.2 | Design TCAM ACL format for Hard Veto rules | P0 | 10 |
+| 25.3 | Implement TCAM rule translator | P0 | 12 |
+| 25.4 | Design hybrid pipeline (TCAM → Software) | P0 | 10 |
+| 25.5 | Implement TCAM veto check integration | P0 | 10 |
+| 25.6 | Add TCAM rule management tooling | P1 | 8 |
+| 25.7 | Unit tests for rule translation | P0 | 6 |
+| 25.8 | Integration tests for hybrid pipeline | P0 | 8 |
+
+**Deliverables**:
+- `src/erisml/ethics/acceleration/tcam.py`
+- `src/erisml/ethics/acceleration/tcam_translator.py`
+- `src/erisml/ethics/acceleration/hybrid_pipeline.py`
+- `tests/test_tcam.py`
+
+**Dependencies**: Sprint 24
+
+**Acceptance Criteria**:
+- [ ] TCAM rules translate from software config
+- [ ] Hybrid pipeline checks TCAM before software
+- [ ] Nanosecond-level veto checks achieved
+- [ ] Rule management tooling functional
+
+---
+
+### Sprint 26: Performance Benchmarking and Optimization
+
+**Goal**: Comprehensive performance validation
+
+**Tasks**:
+
+| ID | Task | Priority | Est. Hours |
+|----|------|----------|------------|
+| 26.1 | Benchmark TCAM vs software veto latency | P0 | 8 |
+| 26.2 | Benchmark power consumption comparison | P0 | 6 |
+| 26.3 | Profile high-frequency decision scenarios | P0 | 8 |
+| 26.4 | Optimize critical paths identified | P0 | 12 |
+| 26.5 | Document performance characteristics | P0 | 6 |
+| 26.6 | Create performance regression tests | P0 | 8 |
+| 26.7 | Validate all latency targets met | P0 | 6 |
+| 26.8 | Performance tuning guide | P1 | 6 |
+
+**Deliverables**:
+- Performance benchmark report
+- Optimized critical paths
+- Performance regression test suite
+- Performance tuning guide
+
+**Dependencies**: Sprint 25
+
+**Acceptance Criteria**:
+- [ ] TCAM veto < 100ns achieved
+- [ ] Power consumption documented
+- [ ] All V3 latency targets met
+- [ ] Performance regression tests pass
+
+---
+
+## Phase 10: Stakeholder Tooling (Sprints 27-28)
+
+### Sprint 27: Governance Drift Detection
+
+**Goal**: Tools to detect unintended ethical preference shifts
+
+**Tasks**:
+
+| ID | Task | Priority | Est. Hours |
+|----|------|----------|------------|
+| 27.1 | Design GovernanceDriftDetector | P0 | 8 |
+| 27.2 | Implement baseline decision snapshot | P0 | 6 |
+| 27.3 | Implement preference ranking comparison | P0 | 10 |
+| 27.4 | Add statistical significance testing | P1 | 8 |
+| 27.5 | Implement drift alerting system | P1 | 6 |
+| 27.6 | Design FormalVerifier architecture | P0 | 8 |
+| 27.7 | Implement ethical invariant specification | P0 | 8 |
+| 27.8 | Unit tests for drift detection | P0 | 8 |
+
+**Deliverables**:
+- `src/erisml/ethics/tooling/drift_detector.py`
+- `src/erisml/ethics/tooling/formal_verifier.py`
+- `tests/test_drift_detector.py`
+
+**Dependencies**: Sprint 26
+
+**Acceptance Criteria**:
+- [ ] Drift detected when preferences shift
+- [ ] False positive rate < 5%
+- [ ] Invariants specifiable in DSL
+- [ ] Alerts generated on significant drift
+
+---
+
+### Sprint 28: Profile-as-Code and Final Integration
+
+**Goal**: Declarative profile management and V3 completion
+
+**Tasks**:
+
+| ID | Task | Priority | Est. Hours |
+|----|------|----------|------------|
+| 28.1 | Enhance Ethical Dialogue CLI for Profile-as-Code | P0 | 10 |
+| 28.2 | Implement declarative profile YAML/JSON format | P0 | 8 |
+| 28.3 | Add version control integration | P1 | 6 |
+| 28.4 | Implement profile diff and merge | P1 | 8 |
+| 28.5 | Full V3 integration test suite | P0 | 12 |
+| 28.6 | Update all documentation for V3 | P0 | 8 |
+| 28.7 | Create V3 migration CLI tool | P0 | 8 |
+| 28.8 | Final release preparation | P0 | 8 |
+
+**Deliverables**:
+- Enhanced Ethical Dialogue CLI
+- Profile-as-Code specification
+- V3 migration tool
+- Complete V3 documentation
+- Release package
+
+**Dependencies**: Sprint 27
+
+**Acceptance Criteria**:
+- [ ] Profiles manageable via version control
+- [ ] CLI supports full Profile-as-Code workflow
+- [ ] All V3 features documented
+- [ ] Migration tool validates V2 → V3 upgrade
+- [ ] V3 ready for production release
+
+---
+
 ## Resource Requirements
 
 ### Team Composition
 
 | Role | Count | Sprints | Focus |
 |------|-------|---------|-------|
-| Senior Engineer | 2 | 1-18 | Core tensor, architecture |
-| ML Engineer | 1 | 11-16 | Acceleration, TensorRT |
-| Test Engineer | 1 | 1-18 | Testing, Bond Index |
-| Technical Writer | 0.5 | 17-18 | Documentation |
+| Senior Engineer | 2 | 1-28 | Core tensor, architecture |
+| ML Engineer | 1 | 11-16, 25-26 | Acceleration, TensorRT, TCAM |
+| Security Engineer | 1 | 19-24 | Cryptography, CA, SAIDS |
+| Distributed Systems Engineer | 1 | 19-21 | DHT, Blockchain |
+| Test Engineer | 1 | 1-28 | Testing, Bond Index |
+| Technical Writer | 0.5 | 17-18, 27-28 | Documentation |
 
 ### Hardware Requirements
 
@@ -736,6 +1082,16 @@
 | 16 | Week 31 | Week 32 | Advanced |
 | 17 | Week 33 | Week 34 | Hardening |
 | 18 | Week 35 | Week 36 | Hardening |
+| 19 | Week 37 | Week 38 | Decentralized Infra |
+| 20 | Week 39 | Week 40 | Decentralized Infra |
+| 21 | Week 41 | Week 42 | Decentralized Infra |
+| 22 | Week 43 | Week 44 | Enforcement |
+| 23 | Week 45 | Week 46 | Enforcement |
+| 24 | Week 47 | Week 48 | Enforcement |
+| 25 | Week 49 | Week 50 | TCAM & Performance |
+| 26 | Week 51 | Week 52 | TCAM & Performance |
+| 27 | Week 53 | Week 54 | Stakeholder Tooling |
+| 28 | Week 55 | Week 56 | Stakeholder Tooling |
 
 ---
 
