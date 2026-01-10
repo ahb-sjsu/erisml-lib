@@ -273,6 +273,24 @@ from .fairness_metrics import (
     FairnessMetrics,
 )
 
+# DEME V3 Temporal Operations (Sprint 7)
+from .temporal_ops import (
+    TimeMetadata,
+    validate_temporal_tensor,
+    is_temporal_tensor,
+    apply_temporal_discount,
+    temporal_aggregate,
+    IrreversibilityResult,
+    detect_irreversibility,
+    dtw_distance,
+    trajectory_similarity,
+    slice_time_window,
+    sliding_window,
+    rolling_aggregate,
+    compute_temporal_trend,
+    detect_trend_reversal,
+)
+
 __all__ = [
     # Facts & ethical dimensions
     "EthicalFacts",
@@ -403,4 +421,19 @@ __all__ = [
     "theil_index",
     "theil_decomposition",
     "FairnessMetrics",
+    # DEME V3 Temporal Operations (Sprint 7)
+    "TimeMetadata",
+    "validate_temporal_tensor",
+    "is_temporal_tensor",
+    "apply_temporal_discount",
+    "temporal_aggregate",
+    "IrreversibilityResult",
+    "detect_irreversibility",
+    "dtw_distance",
+    "trajectory_similarity",
+    "slice_time_window",
+    "sliding_window",
+    "rolling_aggregate",
+    "compute_temporal_trend",
+    "detect_trend_reversal",
 ]
