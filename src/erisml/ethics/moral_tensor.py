@@ -1484,7 +1484,6 @@ class MoralTensor:
             MoralTensor instance.
         """
         shape = tuple(data["shape"])
-        rank = data["rank"]
         axis_names = tuple(data["axis_names"])
         axis_labels = data.get("axis_labels", {})
         veto_flags = data.get("veto_flags", [])
@@ -1565,7 +1564,7 @@ class MoralTensor:
         """
         data = self.to_dense()
         lines = [
-            f"MoralTensor Summary",
+            "MoralTensor Summary",
             f"  Shape: {self.shape}",
             f"  Rank: {self.rank}",
             f"  Axes: {self.axis_names}",
