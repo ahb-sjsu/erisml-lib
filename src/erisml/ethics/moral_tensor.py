@@ -39,19 +39,21 @@ if TYPE_CHECKING:
 # Standard dimension names (from Nine Dimensions paper)
 # Maps k=0..8 to dimension names
 MORAL_DIMENSION_NAMES: Tuple[str, ...] = (
-    "physical_harm",         # 0: Consequences/Welfare
-    "rights_respect",        # 1: Rights/Duties
-    "fairness_equity",       # 2: Justice/Fairness
-    "autonomy_respect",      # 3: Autonomy/Agency
-    "privacy_protection",    # 4: Privacy/Data
+    "physical_harm",  # 0: Consequences/Welfare
+    "rights_respect",  # 1: Rights/Duties
+    "fairness_equity",  # 2: Justice/Fairness
+    "autonomy_respect",  # 3: Autonomy/Agency
+    "privacy_protection",  # 4: Privacy/Data
     "societal_environmental",  # 5: Societal/Environmental
-    "virtue_care",           # 6: Virtue/Care
-    "legitimacy_trust",      # 7: Procedural Legitimacy
-    "epistemic_quality",     # 8: Epistemic Status
+    "virtue_care",  # 6: Virtue/Care
+    "legitimacy_trust",  # 7: Procedural Legitimacy
+    "epistemic_quality",  # 8: Epistemic Status
 )
 
 # Dimension index mapping
-DIMENSION_INDEX: Dict[str, int] = {name: i for i, name in enumerate(MORAL_DIMENSION_NAMES)}
+DIMENSION_INDEX: Dict[str, int] = {
+    name: i for i, name in enumerate(MORAL_DIMENSION_NAMES)
+}
 
 # Standard axis names by position for each rank
 # rank 1: (k,)
@@ -227,7 +229,9 @@ class MoralTensor:
         if not 1 <= self.rank <= 6:
             raise ValueError(f"Rank must be 1-6, got {self.rank}")
         if self.rank != len(self.shape):
-            raise ValueError(f"Rank ({self.rank}) must match shape dimensions ({len(self.shape)})")
+            raise ValueError(
+                f"Rank ({self.rank}) must match shape dimensions ({len(self.shape)})"
+            )
 
     def _validate_shape(self) -> None:
         """Ensure shape is valid."""
@@ -240,7 +244,9 @@ class MoralTensor:
     def _validate_first_dimension(self) -> None:
         """First dimension must be k=9 (moral dimensions)."""
         if self.shape[0] != 9:
-            raise ValueError(f"First dimension must be 9 (moral dimensions), got {self.shape[0]}")
+            raise ValueError(
+                f"First dimension must be 9 (moral dimensions), got {self.shape[0]}"
+            )
 
     def _validate_bounds(self) -> None:
         """All values must be in [0, 1]."""
@@ -328,7 +334,9 @@ class MoralTensor:
         shape = data.shape
 
         if axis_names is None:
-            axis_names = DEFAULT_AXIS_NAMES.get(rank, tuple(f"dim{i}" for i in range(rank)))
+            axis_names = DEFAULT_AXIS_NAMES.get(
+                rank, tuple(f"dim{i}" for i in range(rank))
+            )
 
         return cls(
             _data=data,
@@ -387,7 +395,9 @@ class MoralTensor:
         rank = len(shape)
 
         if axis_names is None:
-            axis_names = DEFAULT_AXIS_NAMES.get(rank, tuple(f"dim{i}" for i in range(rank)))
+            axis_names = DEFAULT_AXIS_NAMES.get(
+                rank, tuple(f"dim{i}" for i in range(rank))
+            )
 
         return cls(
             _data=sparse_data,
@@ -414,17 +424,20 @@ class MoralTensor:
         Returns:
             Rank-1 MoralTensor equivalent to the MoralVector.
         """
-        data = np.array([
-            vec.physical_harm,
-            vec.rights_respect,
-            vec.fairness_equity,
-            vec.autonomy_respect,
-            vec.privacy_protection,
-            vec.societal_environmental,
-            vec.virtue_care,
-            vec.legitimacy_trust,
-            vec.epistemic_quality,
-        ], dtype=np.float64)
+        data = np.array(
+            [
+                vec.physical_harm,
+                vec.rights_respect,
+                vec.fairness_equity,
+                vec.autonomy_respect,
+                vec.privacy_protection,
+                vec.societal_environmental,
+                vec.virtue_care,
+                vec.legitimacy_trust,
+                vec.epistemic_quality,
+            ],
+            dtype=np.float64,
+        )
 
         return cls(
             _data=data,
@@ -595,7 +608,9 @@ class MoralTensor:
             ValueError: If tensor rank > 1.
         """
         if self.rank != 1:
-            raise ValueError(f"Can only convert rank-1 tensor to MoralVector, got rank {self.rank}")
+            raise ValueError(
+                f"Can only convert rank-1 tensor to MoralVector, got rank {self.rank}"
+            )
 
         # Import here to avoid circular dependency
         from erisml.ethics.moral_vector import MoralVector
@@ -646,9 +661,7 @@ class MoralTensor:
                 )
         return float(result)
 
-    def slice_axis(
-        self, axis: str, index: Union[int, slice]
-    ) -> "MoralTensor":
+    def slice_axis(self, axis: str, index: Union[int, slice]) -> "MoralTensor":
         """
         Slice tensor by named axis.
 
@@ -675,7 +688,9 @@ class MoralTensor:
 
         # Build new axis names (remove axis if single index)
         if isinstance(index, int):
-            new_axis_names = tuple(n for i, n in enumerate(self.axis_names) if i != axis_idx)
+            new_axis_names = tuple(
+                n for i, n in enumerate(self.axis_names) if i != axis_idx
+            )
         else:
             new_axis_names = self.axis_names
 
@@ -690,6 +705,87 @@ class MoralTensor:
             metadata=self.metadata.copy(),
             extensions=self.extensions.copy(),
         )
+
+    def slice_party(self, index: Union[int, str]) -> "MoralTensor":
+        """
+        Slice tensor by party index or label.
+
+        Convenience method for slicing the 'n' (party) axis.
+
+        Args:
+            index: Party index (int) or label (str).
+
+        Returns:
+            MoralTensor with the specified party.
+
+        Raises:
+            ValueError: If party axis not found or label not in axis_labels.
+        """
+        if "n" not in self.axis_names:
+            raise ValueError("Tensor does not have party axis 'n'")
+
+        if isinstance(index, str):
+            labels = self.axis_labels.get("n", [])
+            if index not in labels:
+                raise ValueError(f"Party label '{index}' not found in {labels}")
+            idx = labels.index(index)
+        else:
+            idx = index
+
+        return self.slice_axis("n", idx)
+
+    def slice_time(self, index: Union[int, slice, str]) -> "MoralTensor":
+        """
+        Slice tensor by time step.
+
+        Convenience method for slicing the 'tau' (time) axis.
+
+        Args:
+            index: Time index (int), slice, or label (str).
+
+        Returns:
+            MoralTensor with the specified time step(s).
+
+        Raises:
+            ValueError: If time axis not found or label not in axis_labels.
+        """
+        if "tau" not in self.axis_names:
+            raise ValueError("Tensor does not have time axis 'tau'")
+
+        if isinstance(index, str):
+            labels = self.axis_labels.get("tau", [])
+            if index not in labels:
+                raise ValueError(f"Time label '{index}' not found in {labels}")
+            idx: Union[int, slice] = labels.index(index)
+        else:
+            idx = index
+
+        return self.slice_axis("tau", idx)
+
+    def slice_dimension(self, dim_name: str) -> np.ndarray:
+        """
+        Extract values for a single ethical dimension.
+
+        Note: This returns a numpy array, not a MoralTensor, because
+        the result no longer has the 9 ethical dimensions as the first axis.
+
+        Args:
+            dim_name: Name of the ethical dimension (e.g., "physical_harm").
+
+        Returns:
+            numpy array of values for that dimension across all other axes.
+
+        Raises:
+            ValueError: If dimension name not found.
+        """
+        if dim_name not in DIMENSION_INDEX:
+            raise ValueError(
+                f"Dimension '{dim_name}' not found. Valid: {list(DIMENSION_INDEX.keys())}"
+            )
+
+        idx = DIMENSION_INDEX[dim_name]
+        data = self.to_dense()
+        return data[idx, ...]
 
     # -------------------------------------------------------------------------
     # Reduction Operations
@@ -733,11 +829,280 @@ class MoralTensor:
         if keepdims:
             new_axis_names = self.axis_names
         else:
-            new_axis_names = tuple(n for i, n in enumerate(self.axis_names) if i != axis_idx)
+            new_axis_names = tuple(
+                n for i, n in enumerate(self.axis_names) if i != axis_idx
+            )
 
         return MoralTensor.from_dense(
             result,
             axis_names=new_axis_names if new_axis_names else None,
+            veto_flags=self.veto_flags.copy(),
+            reason_codes=self.reason_codes.copy(),
+            metadata=self.metadata.copy(),
+            extensions=self.extensions.copy(),
+        )
+
+    def contract(
+        self,
+        axis: str,
+        weights: Optional[np.ndarray] = None,
+        normalize: bool = True,
+    ) -> "MoralTensor":
+        """
+        Contract tensor along axis using optional weights.
+
+        This is a weighted reduction that computes a weighted average
+        along the specified axis.
+
+        Args:
+            axis: Named axis to contract.
+            weights: Weight array matching axis dimension (default: uniform).
+            normalize: If True, normalize weights to sum to 1.
+
+        Returns:
+            Contracted MoralTensor with reduced rank.
+
+        Example:
+            # Weight parties by stakeholder importance
+            tensor.contract("n", weights=np.array([0.5, 0.3, 0.2]))
+        """
+        if axis not in self.axis_names:
+            raise ValueError(f"Axis '{axis}' not found in {self.axis_names}")
+
+        axis_idx = self.axis_names.index(axis)
+        data = self.to_dense()
+        axis_size = data.shape[axis_idx]
+
+        # Default to uniform weights
+        if weights is None:
+            w = np.ones(axis_size, dtype=np.float64) / axis_size
+        else:
+            w = np.asarray(weights, dtype=np.float64)
+            if len(w) != axis_size:
+                raise ValueError(
+                    f"Weights length ({len(w)}) must match axis size ({axis_size})"
+                )
+            if normalize:
+                w_sum = w.sum()
+                if w_sum > 0:
+                    w = w / w_sum
+                else:
+                    w = np.ones(axis_size, dtype=np.float64) / axis_size
+
+        # Compute weighted sum using tensordot
+        result = np.tensordot(data, w, axes=([axis_idx], [0]))
+
+        # Clamp to [0, 1]
+        result = np.clip(result, 0.0, 1.0)
+
+        # Build new axis names (remove contracted axis)
+        new_axis_names = tuple(
+            n for i, n in enumerate(self.axis_names) if i != axis_idx
+        )
+
+        # Update axis_labels
+        new_axis_labels = {k: v for k, v in self.axis_labels.items() if k != axis}
+
+        return MoralTensor.from_dense(
+            result,
+            axis_names=new_axis_names if new_axis_names else None,
+            axis_labels=new_axis_labels,
+            veto_flags=self.veto_flags.copy(),
+            reason_codes=self.reason_codes.copy(),
+            metadata=self.metadata.copy(),
+            extensions=self.extensions.copy(),
+        )
+
+    # -------------------------------------------------------------------------
+    # Conversion Operations
+    # -------------------------------------------------------------------------
+
+    def to_vector(
+        self,
+        strategy: str = "mean",
+        weights: Optional[Dict[str, np.ndarray]] = None,
+        party_idx: Optional[int] = None,
+    ) -> "MoralVector":
+        """
+        Collapse tensor to MoralVector using specified strategy.
+
+        Args:
+            strategy: One of:
+                - "mean": Average across all non-k dimensions.
+                - "max": Maximum (best case per dimension).
+                - "min": Minimum (worst case per dimension).
+                - "weighted": Use provided weights per axis.
+                - "party": Extract single party (requires party_idx).
+            weights: Dict mapping axis names to weight arrays (for "weighted").
+            party_idx: Party index for "party" strategy.
+
+        Returns:
+            MoralVector (9 dimensions).
+
+        Raises:
+            ValueError: If strategy invalid or missing required params.
+        """
+        # Import here to avoid circular dependency
+        from erisml.ethics.moral_vector import MoralVector
+
+        if self.rank == 1:
+            return self.to_moral_vector()
+
+        data = self.to_dense()
+
+        if strategy == "mean":
+            # Average across all non-k dimensions
+            result = data
+            for _ in range(1, self.rank):
+                result = np.mean(result, axis=-1)
+
+        elif strategy == "max":
+            # Maximum across all non-k dimensions
+            result = data
+            for _ in range(1, self.rank):
+                result = np.max(result, axis=-1)
+
+        elif strategy == "min":
+            # Minimum across all non-k dimensions
+            result = data
+            for _ in range(1, self.rank):
+                result = np.min(result, axis=-1)
+
+        elif strategy == "weighted":
+            if weights is None:
+                raise ValueError("'weighted' strategy requires weights dict")
+
+            # Start from the full tensor and contract each non-k axis
+            tensor = self
+            for axis_name in reversed(list(self.axis_names[1:])):
+                w = weights.get(axis_name)
+                tensor = tensor.contract(axis_name, weights=w)
+
+            result = tensor.to_dense()
+
+        elif strategy == "party":
+            if party_idx is None:
+                raise ValueError("'party' strategy requires party_idx")
+            if "n" not in self.axis_names:
+                raise ValueError("Tensor does not have party axis 'n'")
+
+            # Extract party and collapse remaining dimensions
+            tensor = self.slice_party(party_idx)
+            if tensor.rank == 1:
+                return tensor.to_moral_vector()
+            else:
+                return tensor.to_vector(strategy="mean")
+
+        else:
+            raise ValueError(
+                f"Unknown strategy: {strategy}. "
+                "Valid: 'mean', 'max', 'min', 'weighted', 'party'"
+            )
+
+        return MoralVector(
+            physical_harm=float(result[0]),
+            rights_respect=float(result[1]),
+            fairness_equity=float(result[2]),
+            autonomy_respect=float(result[3]),
+            privacy_protection=float(result[4]),
+            societal_environmental=float(result[5]),
+            virtue_care=float(result[6]),
+            legitimacy_trust=float(result[7]),
+            epistemic_quality=float(result[8]),
+            veto_flags=self.veto_flags.copy(),
+            reason_codes=self.reason_codes.copy(),
+        )
+
+    def promote_rank(
+        self,
+        target_rank: int,
+        axis_sizes: Optional[Dict[str, int]] = None,
+        broadcast: bool = True,
+    ) -> "MoralTensor":
+        """
+        Expand tensor to higher rank by adding dimensions.
+
+        New dimensions are added by broadcasting (replicating) values.
+
+        Args:
+            target_rank: Target rank (must be > current rank, max 6).
+            axis_sizes: Sizes for new axes {axis_name: size}.
+            broadcast: If True, broadcast values; if False, copy.
+
+        Returns:
+            Higher-rank MoralTensor.
+
+        Raises:
+            ValueError: If target rank invalid or axis_sizes missing.
+
+        Example:
+            # Expand rank-1 to rank-2 with 3 parties
+            tensor.promote_rank(2, axis_sizes={"n": 3})
+        """
+        if target_rank <= self.rank:
+            raise ValueError(
+                f"Target rank ({target_rank}) must be > current rank ({self.rank})"
+            )
+        if target_rank > 6:
+            raise ValueError(f"Target rank cannot exceed 6, got {target_rank}")
+
+        # Get expected axis names for target rank
+        target_axis_names = DEFAULT_AXIS_NAMES.get(
+            target_rank, tuple(f"dim{i}" for i in range(target_rank))
+        )
+
+        # Determine which axes need to be added
+        new_axes = [name for name in target_axis_names if name not in self.axis_names]
+
+        if axis_sizes is None:
+            axis_sizes = {}
+
+        # Check all new axes have sizes
+        for axis in new_axes:
+            if axis not in axis_sizes:
+                raise ValueError(f"Missing size for new axis '{axis}' in axis_sizes")
+
+        # Build the new shape
+        data = self.to_dense()
+        new_shape: List[int] = []
+        old_axis_idx = 0
+
+        for name in target_axis_names:
+            if name in self.axis_names:
+                new_shape.append(self.shape[old_axis_idx])
+                old_axis_idx += 1
+            else:
+                new_shape.append(axis_sizes[name])
+
+        # Reshape with broadcasting
+        # First, add new axes with size 1, then broadcast
+        reshape_shape: List[int] = []
+        for name in target_axis_names:
+            if name in self.axis_names:
+                idx = self.axis_names.index(name)
+                reshape_shape.append(self.shape[idx])
+            else:
+                reshape_shape.append(1)
+
+        # Reshape data to add singleton dimensions
+        # Move axes to correct positions
+        reshaped = data
+        for i, name in enumerate(target_axis_names):
+            if name not in self.axis_names:
+                reshaped = np.expand_dims(reshaped, axis=i)
+
+        # Broadcast to target shape
+        result = np.broadcast_to(reshaped, tuple(new_shape)).copy()
+
+        # Update axis_labels with empty lists for new axes
+        new_axis_labels = dict(self.axis_labels)
+        for axis in new_axes:
+            new_axis_labels[axis] = []
+
+        return MoralTensor.from_dense(
+            result,
+            axis_names=target_axis_names,
+            axis_labels=new_axis_labels,
             veto_flags=self.veto_flags.copy(),
             reason_codes=self.reason_codes.copy(),
             metadata=self.metadata.copy(),
@@ -824,6 +1189,120 @@ class MoralTensor:
         """Right multiplication."""
         return self.__mul__(other)
 
+    def __sub__(self, other: Union["MoralTensor", float]) -> "MoralTensor":
+        """
+        Element-wise subtraction with clamping to [0, 1].
+
+        Args:
+            other: MoralTensor or scalar to subtract.
+
+        Returns:
+            New MoralTensor with difference values clamped to [0, 1].
+        """
+        data = self.to_dense()
+
+        if isinstance(other, MoralTensor):
+            other_data = other.to_dense()
+            if data.shape != other_data.shape:
+                raise ValueError(f"Shape mismatch: {data.shape} vs {other_data.shape}")
+            result = np.clip(data - other_data, 0.0, 1.0)
+            merged_vetoes = list(set(self.veto_flags) | set(other.veto_flags))
+            merged_reasons = list(set(self.reason_codes) | set(other.reason_codes))
+        else:
+            result = np.clip(data - float(other), 0.0, 1.0)
+            merged_vetoes = self.veto_flags.copy()
+            merged_reasons = self.reason_codes.copy()
+
+        return MoralTensor.from_dense(
+            result,
+            axis_names=self.axis_names,
+            axis_labels=self.axis_labels.copy(),
+            veto_flags=merged_vetoes,
+            reason_codes=merged_reasons,
+            metadata=self.metadata.copy(),
+            extensions=self.extensions.copy(),
+        )
+
+    def __rsub__(self, other: float) -> "MoralTensor":
+        """Right subtraction (other - self)."""
+        data = self.to_dense()
+        result = np.clip(float(other) - data, 0.0, 1.0)
+
+        return MoralTensor.from_dense(
+            result,
+            axis_names=self.axis_names,
+            axis_labels=self.axis_labels.copy(),
+            veto_flags=self.veto_flags.copy(),
+            reason_codes=self.reason_codes.copy(),
+            metadata=self.metadata.copy(),
+            extensions=self.extensions.copy(),
+        )
+
+    def __truediv__(self, other: Union["MoralTensor", float]) -> "MoralTensor":
+        """
+        Element-wise division with clamping to [0, 1].
+
+        Division by zero is handled gracefully by returning 1.0 (maximum).
+
+        Args:
+            other: MoralTensor or scalar to divide by.
+
+        Returns:
+            New MoralTensor with quotient values clamped to [0, 1].
+        """
+        data = self.to_dense()
+
+        if isinstance(other, MoralTensor):
+            other_data = other.to_dense()
+            if data.shape != other_data.shape:
+                raise ValueError(f"Shape mismatch: {data.shape} vs {other_data.shape}")
+            # Handle division by zero: where divisor is ~0, result is 1.0
+            with np.errstate(divide="ignore", invalid="ignore"):
+                result = np.where(
+                    np.abs(other_data) < 1e-10,
+                    1.0,  # Division by zero yields max
+                    data / other_data,
+                )
+            result = np.clip(result, 0.0, 1.0)
+            merged_vetoes = list(set(self.veto_flags) | set(other.veto_flags))
+            merged_reasons = list(set(self.reason_codes) | set(other.reason_codes))
+        else:
+            divisor = float(other)
+            if abs(divisor) < 1e-10:
+                result = np.ones_like(data)  # Division by zero yields max
+            else:
+                result = np.clip(data / divisor, 0.0, 1.0)
+            merged_vetoes = self.veto_flags.copy()
+            merged_reasons = self.reason_codes.copy()
+
+        return MoralTensor.from_dense(
+            result,
+            axis_names=self.axis_names,
+            axis_labels=self.axis_labels.copy(),
+            veto_flags=merged_vetoes,
+            reason_codes=merged_reasons,
+            metadata=self.metadata.copy(),
+            extensions=self.extensions.copy(),
+        )
+
+    def __rtruediv__(self, other: float) -> "MoralTensor":
+        """Right division (other / self)."""
+        data = self.to_dense()
+        # Handle division by zero: where self is ~0, result is 1.0
+        with np.errstate(divide="ignore", invalid="ignore"):
+            result = np.where(np.abs(data) < 1e-10, 1.0, float(other) / data)
+        result = np.clip(result, 0.0, 1.0)
+
+        return MoralTensor.from_dense(
+            result,
+            axis_names=self.axis_names,
+            axis_labels=self.axis_labels.copy(),
+            veto_flags=self.veto_flags.copy(),
+            reason_codes=self.reason_codes.copy(),
+            metadata=self.metadata.copy(),
+            extensions=self.extensions.copy(),
+        )
+
     # -------------------------------------------------------------------------
     # Comparison Operations
     # -------------------------------------------------------------------------
@@ -865,8 +1344,7 @@ class MoralTensor:
         # Must be strictly better in at least one place
         harm_strictly_better = bool(np.any(harm_self < harm_other))
         other_strictly_better = any(
-            bool(np.any(self_data[k, ...] > other_data[k, ...]))
-            for k in range(1, 9)
+            bool(np.any(self_data[k, ...] > other_data[k, ...])) for k in range(1, 9)
         )
 
         return harm_strictly_better or other_strictly_better
@@ -881,7 +1359,12 @@ class MoralTensor:
 
         Args:
             other: MoralTensor to compare against.
-            metric: Distance metric - "frobenius", "max", "mean_abs".
+            metric: Distance metric:
+                - "frobenius": Frobenius norm (default)
+                - "euclidean": Euclidean (L2) norm (alias for frobenius)
+                - "max": Maximum absolute difference
+                - "mean_abs": Mean absolute difference
+                - "wasserstein": Wasserstein-1 distance (requires scipy)
 
         Returns:
             Distance value (>= 0).
@@ -891,12 +1374,17 @@ class MoralTensor:
 
         diff = self.to_dense() - other.to_dense()
 
-        if metric == "frobenius":
+        if metric in ("frobenius", "euclidean"):
             return float(np.linalg.norm(diff))
         elif metric == "max":
             return float(np.max(np.abs(diff)))
         elif metric == "mean_abs":
             return float(np.mean(np.abs(diff)))
+        elif metric == "wasserstein":
+            # Use the tensor_ops implementation
+            from erisml.ethics.tensor_ops import wasserstein_distance
+
+            return wasserstein_distance(self, other, p=1)
         else:
             raise ValueError(f"Unknown metric: {metric}")
 
@@ -1040,7 +1528,9 @@ class MoralTensor:
         """Concise string representation."""
         sparse_str = ", sparse" if self.is_sparse else ""
         veto_str = f", vetoes={len(self.veto_flags)}" if self.veto_flags else ""
-        return f"MoralTensor(rank={self.rank}, shape={self.shape}{sparse_str}{veto_str})"
+        return (
+            f"MoralTensor(rank={self.rank}, shape={self.shape}{sparse_str}{veto_str})"
+        )
 
     def __eq__(self, other: object) -> bool:
         """

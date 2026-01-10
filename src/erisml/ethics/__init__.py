@@ -147,6 +147,18 @@ from .moral_tensor import (
     DEFAULT_AXIS_NAMES,
 )
 
+# DEME V3 Tensor Operations
+from .tensor_ops import (
+    broadcast_tensors,
+    stack_tensors,
+    concat_tensors,
+    normalize_tensor,
+    clip_tensor,
+    wasserstein_distance,
+    cosine_similarity,
+    weighted_aggregate,
+)
+
 from .governance.config import (
     GovernanceConfig,
 )
@@ -219,6 +231,15 @@ __all__ = [
     "MORAL_DIMENSION_NAMES",
     "DIMENSION_INDEX",
     "DEFAULT_AXIS_NAMES",
+    # DEME V3 Tensor Operations
+    "broadcast_tensors",
+    "stack_tensors",
+    "concat_tensors",
+    "normalize_tensor",
+    "clip_tensor",
+    "wasserstein_distance",
+    "cosine_similarity",
+    "weighted_aggregate",
     # Governance (V1)
     "GovernanceConfig",
     "DecisionOutcome",

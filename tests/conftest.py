@@ -255,17 +255,19 @@ def rank1_tensor() -> MoralTensor:
 @pytest.fixture
 def rank2_tensor() -> MoralTensor:
     """Rank-2 tensor (9, 3) with 3 parties."""
-    data = np.array([
-        [0.1, 0.2, 0.3],  # physical_harm
-        [0.9, 0.8, 0.7],  # rights_respect
-        [0.8, 0.85, 0.9],  # fairness_equity
-        [0.85, 0.8, 0.75],  # autonomy_respect
-        [0.9, 0.85, 0.8],  # privacy_protection
-        [0.8, 0.75, 0.7],  # societal_environmental
-        [0.85, 0.9, 0.8],  # virtue_care
-        [0.75, 0.8, 0.85],  # legitimacy_trust
-        [0.7, 0.75, 0.8],  # epistemic_quality
-    ])
+    data = np.array(
+        [
+            [0.1, 0.2, 0.3],  # physical_harm
+            [0.9, 0.8, 0.7],  # rights_respect
+            [0.8, 0.85, 0.9],  # fairness_equity
+            [0.85, 0.8, 0.75],  # autonomy_respect
+            [0.9, 0.85, 0.8],  # privacy_protection
+            [0.8, 0.75, 0.7],  # societal_environmental
+            [0.85, 0.9, 0.8],  # virtue_care
+            [0.75, 0.8, 0.85],  # legitimacy_trust
+            [0.7, 0.75, 0.8],  # epistemic_quality
+        ]
+    )
     return MoralTensor.from_dense(
         data,
         axis_labels={"n": ["alice", "bob", "carol"]},
@@ -291,11 +293,14 @@ def rank3_tensor() -> MoralTensor:
 def sparse_tensor() -> MoralTensor:
     """Sparse tensor for efficiency tests."""
     # Create sparse tensor with only a few non-zero values
-    coords = np.array([
-        [0, 0],  # physical_harm for party 0
-        [1, 1],  # rights_respect for party 1
-        [2, 2],  # fairness_equity for party 2
-    ], dtype=np.int32)
+    coords = np.array(
+        [
+            [0, 0],  # physical_harm for party 0
+            [1, 1],  # rights_respect for party 1
+            [2, 2],  # fairness_equity for party 2
+        ],
+        dtype=np.int32,
+    )
     values = np.array([0.3, 0.8, 0.9], dtype=np.float64)
 
     return MoralTensor.from_sparse(
@@ -309,17 +314,19 @@ def sparse_tensor() -> MoralTensor:
 @pytest.fixture
 def vetoed_tensor() -> MoralTensor:
     """Tensor with veto flags and locations."""
-    data = np.array([
-        [0.8, 0.2, 0.3],  # physical_harm (high for party 0)
-        [0.1, 0.9, 0.8],  # rights_respect (low for party 0)
-        [0.3, 0.8, 0.9],  # fairness_equity
-        [0.4, 0.85, 0.8],  # autonomy_respect
-        [0.5, 0.9, 0.85],  # privacy_protection
-        [0.4, 0.8, 0.75],  # societal_environmental
-        [0.3, 0.85, 0.9],  # virtue_care
-        [0.2, 0.75, 0.8],  # legitimacy_trust
-        [0.5, 0.7, 0.75],  # epistemic_quality
-    ])
+    data = np.array(
+        [
+            [0.8, 0.2, 0.3],  # physical_harm (high for party 0)
+            [0.1, 0.9, 0.8],  # rights_respect (low for party 0)
+            [0.3, 0.8, 0.9],  # fairness_equity
+            [0.4, 0.85, 0.8],  # autonomy_respect
+            [0.5, 0.9, 0.85],  # privacy_protection
+            [0.4, 0.8, 0.75],  # societal_environmental
+            [0.3, 0.85, 0.9],  # virtue_care
+            [0.2, 0.75, 0.8],  # legitimacy_trust
+            [0.5, 0.7, 0.75],  # epistemic_quality
+        ]
+    )
     return MoralTensor.from_dense(
         data,
         axis_labels={"n": ["harmful_party", "neutral_party", "good_party"]},

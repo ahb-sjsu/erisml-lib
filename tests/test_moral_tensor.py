@@ -122,7 +122,10 @@ class TestMoralTensorCreation:
 
         tensor = MoralTensor.from_dense(
             data,
-            axis_labels={"k": list(MORAL_DIMENSION_NAMES), "n": ["alice", "bob", "carol"]},
+            axis_labels={
+                "k": list(MORAL_DIMENSION_NAMES),
+                "n": ["alice", "bob", "carol"],
+            },
         )
 
         assert tensor.axis_labels["n"] == ["alice", "bob", "carol"]
@@ -249,15 +252,31 @@ class TestMoralVectorCompatibility:
         tensor = MoralTensor.from_moral_vector(baseline_moral_vector)
         vec_back = tensor.to_moral_vector()
 
-        assert vec_back.physical_harm == pytest.approx(baseline_moral_vector.physical_harm)
-        assert vec_back.rights_respect == pytest.approx(baseline_moral_vector.rights_respect)
-        assert vec_back.fairness_equity == pytest.approx(baseline_moral_vector.fairness_equity)
-        assert vec_back.autonomy_respect == pytest.approx(baseline_moral_vector.autonomy_respect)
-        assert vec_back.privacy_protection == pytest.approx(baseline_moral_vector.privacy_protection)
-        assert vec_back.societal_environmental == pytest.approx(baseline_moral_vector.societal_environmental)
+        assert vec_back.physical_harm == pytest.approx(
+            baseline_moral_vector.physical_harm
+        )
+        assert vec_back.rights_respect == pytest.approx(
+            baseline_moral_vector.rights_respect
+        )
+        assert vec_back.fairness_equity == pytest.approx(
+            baseline_moral_vector.fairness_equity
+        )
+        assert vec_back.autonomy_respect == pytest.approx(
+            baseline_moral_vector.autonomy_respect
+        )
+        assert vec_back.privacy_protection == pytest.approx(
+            baseline_moral_vector.privacy_protection
+        )
+        assert vec_back.societal_environmental == pytest.approx(
+            baseline_moral_vector.societal_environmental
+        )
         assert vec_back.virtue_care == pytest.approx(baseline_moral_vector.virtue_care)
-        assert vec_back.legitimacy_trust == pytest.approx(baseline_moral_vector.legitimacy_trust)
-        assert vec_back.epistemic_quality == pytest.approx(baseline_moral_vector.epistemic_quality)
+        assert vec_back.legitimacy_trust == pytest.approx(
+            baseline_moral_vector.legitimacy_trust
+        )
+        assert vec_back.epistemic_quality == pytest.approx(
+            baseline_moral_vector.epistemic_quality
+        )
 
     def test_to_moral_vector_rejects_rank2(self) -> None:
         """Test that to_moral_vector rejects rank > 1."""
@@ -274,11 +293,13 @@ class TestMoralVectorCompatibility:
         vec2 = MoralVector(physical_harm=0.3, rights_respect=0.7)
         vec3 = MoralVector(physical_harm=0.2, rights_respect=0.8)
 
-        tensor = MoralTensor.from_moral_vectors({
-            "alice": vec1,
-            "bob": vec2,
-            "carol": vec3,
-        })
+        tensor = MoralTensor.from_moral_vectors(
+            {
+                "alice": vec1,
+                "bob": vec2,
+                "carol": vec3,
+            }
+        )
 
         assert tensor.rank == 2
         assert tensor.shape == (9, 3)
