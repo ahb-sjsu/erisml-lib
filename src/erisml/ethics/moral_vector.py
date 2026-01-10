@@ -561,6 +561,73 @@ class MoralVector:
             epistemic_quality=1.0,
         )
 
+    # -------------------------------------------------------------------------
+    # V3 Integration Methods (DEME 3.0)
+    # -------------------------------------------------------------------------
+
+    def to_tensor(self) -> "MoralTensor":
+        """
+        Convert to rank-1 MoralTensor (V3 compatibility).
+
+        Returns:
+            Rank-1 MoralTensor equivalent to this vector.
+
+        Example:
+            >>> vec = MoralVector(physical_harm=0.2, rights_respect=0.9, ...)
+            >>> tensor = vec.to_tensor()
+            >>> tensor.shape  # (9,)
+        """
+        from erisml.ethics.moral_tensor import MoralTensor
+
+        return MoralTensor.from_moral_vector(self)
+
+    @classmethod
+    def from_tensor(
+        cls,
+        tensor: "MoralTensor",
+        strategy: str = "mean",
+    ) -> MoralVector:
+        """
+        Create MoralVector from MoralTensor (V3 compatibility).
+
+        For rank-1 tensors, creates an equivalent vector directly.
+        For higher-rank tensors, uses the specified collapse strategy.
+
+        Args:
+            tensor: MoralTensor to convert.
+            strategy: Collapse strategy for rank > 1:
+                - "mean": Average across all non-k dimensions
+                - "worst_case": Most pessimistic values
+                - "best_case": Most optimistic values
+                - "weighted": Use provided weights
+
+        Returns:
+            MoralVector collapsed from the tensor.
+
+        Example:
+            >>> tensor = MoralTensor.from_dense(np.random.rand(9, 3))
+            >>> vec = MoralVector.from_tensor(tensor, strategy="mean")
+        """
+        from erisml.ethics.compat import collapse_v3_to_v2
+
+        return collapse_v3_to_v2(tensor, strategy=strategy)
+
+    def is_v3_compatible(self) -> bool:
+        """
+        Check if this vector can be used in V3 context.
+
+        All MoralVectors are V3-compatible (can be promoted to MoralTensor).
+
+        Returns:
+            True (all V2 vectors are V3-compatible).
+        """
+        return True
+
+
+# Import for type hints only
+if TYPE_CHECKING:
+    from erisml.ethics.moral_tensor import MoralTensor
+
 
 __all__ = [
     "MoralVector",

@@ -8,15 +8,22 @@ MoralLandscape: Collection operations for MoralVectors.
 Provides Pareto frontier computation, dominated option identification,
 and multi-objective optimization utilities for ethical decision-making.
 
-Version: 2.0.0 (DEME 2.0)
+Supports both V2 MoralVector and V3 MoralTensor inputs via the V2/V3
+compatibility layer. MoralTensors are automatically collapsed to
+MoralVectors using a configurable strategy.
+
+Version: 3.0.0 (DEME V3 Compatible)
 """
 
 from __future__ import annotations
 
 from dataclasses import dataclass, field
-from typing import Dict, List, Optional, Set, Tuple
+from typing import TYPE_CHECKING, Dict, List, Optional, Set, Tuple, Union
 
 from erisml.ethics.moral_vector import MoralVector
+
+if TYPE_CHECKING:
+    from erisml.ethics.moral_tensor import MoralTensor
 
 
 @dataclass
@@ -29,25 +36,101 @@ class MoralLandscape:
     - Dominated option filtering
     - Distance and similarity metrics
     - Trade-off analysis
+
+    V3 Compatibility:
+        Accepts both MoralVector (V2) and MoralTensor (V3) inputs.
+        MoralTensors are automatically collapsed to MoralVectors using
+        the configured collapse strategy (default: "mean").
     """
 
     vectors: Dict[str, MoralVector] = field(default_factory=dict)
     """Mapping from option_id to MoralVector."""
 
+    default_collapse_strategy: str = "mean"
+    """Default strategy for collapsing MoralTensor to MoralVector."""
+
+    _tensor_cache: Dict[str, "MoralTensor"] = field(default_factory=dict, repr=False)
+    """Cache of original MoralTensors for options added as tensors."""
+
     def __len__(self) -> int:
         """Return number of options in the landscape."""
         return len(self.vectors)
 
-    def add(self, option_id: str, vector: MoralVector) -> None:
-        """Add a vector to the landscape."""
-        self.vectors[option_id] = vector
+    def add(
+        self,
+        option_id: str,
+        assessment: Union[MoralVector, "MoralTensor"],
+        collapse_strategy: Optional[str] = None,
+    ) -> None:
+        """
+        Add an assessment to the landscape.
+
+        Accepts both V2 MoralVector and V3 MoralTensor. When a MoralTensor
+        is provided, it is collapsed to a MoralVector using the specified
+        strategy, and the original tensor is cached for later retrieval.
+
+        Args:
+            option_id: Unique identifier for this option.
+            assessment: MoralVector or MoralTensor to add.
+            collapse_strategy: Strategy for tensor collapse (default uses
+                self.default_collapse_strategy). Options: "mean",
+                "worst_case", "best_case", "weighted".
+        """
+        from erisml.ethics.moral_tensor import MoralTensor
+
+        if isinstance(assessment, MoralTensor):
+            # Cache original tensor
+            self._tensor_cache[option_id] = assessment
+            # Collapse to vector for storage
+            from erisml.ethics.compat import collapse_v3_to_v2
+
+            strategy = collapse_strategy or self.default_collapse_strategy
+            self.vectors[option_id] = collapse_v3_to_v2(assessment, strategy=strategy)
+        else:
+            # Direct MoralVector
+            self.vectors[option_id] = assessment
+            # Clear any cached tensor for this option
+            self._tensor_cache.pop(option_id, None)
 
     def get(self, option_id: str) -> Optional[MoralVector]:
         """Get a vector by option_id."""
         return self.vectors.get(option_id)
 
+    def get_tensor(self, option_id: str) -> Optional["MoralTensor"]:
+        """
+        Get the original MoralTensor for an option, if available.
+
+        Returns the cached tensor if the option was added as a MoralTensor,
+        or promotes the MoralVector to a rank-1 tensor otherwise.
+
+        Args:
+            option_id: Option identifier.
+
+        Returns:
+            MoralTensor if option exists, None otherwise.
+        """
+        if option_id in self._tensor_cache:
+            return self._tensor_cache[option_id]
+        elif option_id in self.vectors:
+            # Promote vector to tensor
+            return self.vectors[option_id].to_tensor()
+        return None
+
+    def has_tensor(self, option_id: str) -> bool:
+        """
+        Check if an option was added as a MoralTensor.
+
+        Args:
+            option_id: Option identifier.
+
+        Returns:
+            True if option was added as a tensor (original preserved).
+        """
+        return option_id in self._tensor_cache
+
     def remove(self, option_id: str) -> Optional[MoralVector]:
         """Remove and return a vector by option_id."""
+        self._tensor_cache.pop(option_id, None)
         return self.vectors.pop(option_id, None)
 
     def pareto_frontier(self) -> List[str]:
@@ -101,8 +184,19 @@ class MoralLandscape:
         Returns:
             New MoralLandscape containing only non-vetoed options.
         """
-        filtered = {oid: vec for oid, vec in self.vectors.items() if not vec.has_veto()}
-        return MoralLandscape(vectors=filtered)
+        filtered_vectors = {
+            oid: vec for oid, vec in self.vectors.items() if not vec.has_veto()
+        }
+        filtered_tensors = {
+            oid: tensor
+            for oid, tensor in self._tensor_cache.items()
+            if oid in filtered_vectors
+        }
+        return MoralLandscape(
+            vectors=filtered_vectors,
+            default_collapse_strategy=self.default_collapse_strategy,
+            _tensor_cache=filtered_tensors,
+        )
 
     def vetoed_options(self) -> List[Tuple[str, List[str]]]:
         """

@@ -159,6 +159,17 @@ from .tensor_ops import (
     weighted_aggregate,
 )
 
+# DEME V3 Compatibility Layer (V2/V3 Interop)
+from .compat import (
+    promote_v2_to_v3,
+    collapse_v3_to_v2,
+    ensure_tensor,
+    ensure_vector,
+    is_v3_compatible,
+    promote_vectors_to_tensor,
+    collapse_tensor_to_vectors,
+)
+
 from .governance.config import (
     GovernanceConfig,
 )
@@ -240,6 +251,14 @@ __all__ = [
     "wasserstein_distance",
     "cosine_similarity",
     "weighted_aggregate",
+    # DEME V3 Compatibility Layer
+    "promote_v2_to_v3",
+    "collapse_v3_to_v2",
+    "ensure_tensor",
+    "ensure_vector",
+    "is_v3_compatible",
+    "promote_vectors_to_tensor",
+    "collapse_tensor_to_vectors",
     # Governance (V1)
     "GovernanceConfig",
     "DecisionOutcome",
