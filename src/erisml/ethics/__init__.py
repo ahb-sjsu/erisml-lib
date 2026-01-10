@@ -197,6 +197,38 @@ from .domain.interfaces import (
     EthicalFactsBuilder,
     BatchEthicalFactsBuilder,
     build_facts_for_options,
+    # V3 interfaces
+    EthicalFactsBuilderV3,
+    V2ToV3FactsAdapter,
+    build_facts_for_options_v3,
+)
+
+# DEME V3 Facts (Per-Party Tracking)
+from .facts_v3 import (
+    # Per-party dataclasses
+    PartyConsequences,
+    PartyRights,
+    PartyJustice,
+    PartyAutonomy,
+    PartyPrivacy,
+    PartySocietal,
+    PartyVirtue,
+    PartyProcedural,
+    # V3 dimension dataclasses
+    ConsequencesV3,
+    RightsAndDutiesV3,
+    JusticeAndFairnessV3,
+    AutonomyAndAgencyV3,
+    PrivacyAndDataGovernanceV3,
+    SocietalAndEnvironmentalV3,
+    VirtueAndCareV3,
+    ProceduralAndLegitimacyV3,
+    EpistemicStatusV3,
+    # V3 container
+    EthicalFactsV3,
+    # V2↔V3 conversion
+    promote_facts_v2_to_v3,
+    collapse_facts_v3_to_v2,
 )
 
 from .interop.json_schema import (
@@ -276,6 +308,33 @@ __all__ = [
     "EthicalFactsBuilder",
     "BatchEthicalFactsBuilder",
     "build_facts_for_options",
+    # Domain & assessment interfaces (V3)
+    "EthicalFactsBuilderV3",
+    "V2ToV3FactsAdapter",
+    "build_facts_for_options_v3",
+    # DEME V3 Facts - Per-party dataclasses
+    "PartyConsequences",
+    "PartyRights",
+    "PartyJustice",
+    "PartyAutonomy",
+    "PartyPrivacy",
+    "PartySocietal",
+    "PartyVirtue",
+    "PartyProcedural",
+    # DEME V3 Facts - Dimension dataclasses
+    "ConsequencesV3",
+    "RightsAndDutiesV3",
+    "JusticeAndFairnessV3",
+    "AutonomyAndAgencyV3",
+    "PrivacyAndDataGovernanceV3",
+    "SocietalAndEnvironmentalV3",
+    "VirtueAndCareV3",
+    "ProceduralAndLegitimacyV3",
+    "EpistemicStatusV3",
+    # DEME V3 Facts - Container & conversion
+    "EthicalFactsV3",
+    "promote_facts_v2_to_v3",
+    "collapse_facts_v3_to_v2",
     # Interop / schemas
     "get_ethical_facts_schema",
     "get_ethical_judgement_schema",

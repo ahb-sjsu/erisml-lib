@@ -20,13 +20,30 @@ The ethics layer is responsible for:
 - producing EthicalJudgement objects,
 - aggregating those judgements via governance.
 
-Version: 0.2 (EthicalDomains update)
+V3 Extensions:
+- EthicalFactsBuilderV3: Protocol for builders with per-party tracking
+- V2ToV3FactsAdapter: Adapter to use V2 builders with V3 interface
+
+Version: 0.3 (V3 Per-Party Tracking)
 """
 
 from __future__ import annotations
 
 from dataclasses import dataclass
-from typing import Any, Dict, Iterable, Mapping, Optional, Protocol, Sequence
+from typing import (
+    TYPE_CHECKING,
+    Any,
+    Dict,
+    Iterable,
+    List,
+    Mapping,
+    Optional,
+    Protocol,
+    Sequence,
+)
+
+if TYPE_CHECKING:
+    from ..facts_v3 import EthicalFactsV3
 
 from ..facts import EthicalFacts
 
@@ -219,10 +236,130 @@ def build_facts_for_options(
     return facts_by_id
 
 
+# =============================================================================
+# V3 Interfaces (Per-Party Tracking)
+# =============================================================================
+
+
+class EthicalFactsBuilderV3(Protocol):
+    """
+    Protocol for V3 facts builders with per-party tracking.
+
+    Extends the V2 EthicalFactsBuilder concept to support distributional
+    ethics assessment with explicit party tracking.
+    """
+
+    def build_facts(
+        self,
+        option: CandidateOption,
+        context: DomainAssessmentContext,
+        parties: Optional[List[str]] = None,
+    ) -> "EthicalFactsV3":
+        """
+        Build V3 EthicalFacts with per-party breakdown.
+
+        Args:
+            option:
+                The domain-level candidate option.
+
+            context:
+                Domain assessment context.
+
+            parties:
+                Optional list of party IDs to track. If None, the builder
+                determines parties from domain data.
+
+        Returns:
+            EthicalFactsV3 instance with per-party tracking.
+        """
+        ...
+
+
+class V2ToV3FactsAdapter:
+    """
+    Adapter to use V2 EthicalFactsBuilder with V3 interface.
+
+    Wraps a V2 builder and promotes its output to V3 format with
+    uniform distribution across specified parties.
+    """
+
+    def __init__(self, v2_builder: EthicalFactsBuilder):
+        """
+        Initialize adapter with a V2 builder.
+
+        Args:
+            v2_builder: V2 EthicalFactsBuilder to wrap.
+        """
+        self._v2_builder = v2_builder
+
+    def build_facts(
+        self,
+        option: CandidateOption,
+        context: DomainAssessmentContext,
+        parties: Optional[List[str]] = None,
+    ) -> "EthicalFactsV3":
+        """
+        Build V3 facts by promoting V2 output.
+
+        Args:
+            option: The domain-level candidate option.
+            context: Domain assessment context.
+            parties: Optional list of party IDs for distribution.
+
+        Returns:
+            EthicalFactsV3 with per-party tracking (uniform distribution).
+        """
+        from ..facts_v3 import promote_facts_v2_to_v3
+
+        v2_facts = self._v2_builder.build_facts(option, context)
+        return promote_facts_v2_to_v3(v2_facts, parties=parties)
+
+
+def build_facts_for_options_v3(
+    builder: EthicalFactsBuilderV3,
+    options: Iterable[CandidateOption],
+    context: DomainAssessmentContext,
+    parties: Optional[List[str]] = None,
+) -> Dict[str, "EthicalFactsV3"]:
+    """
+    Build V3 EthicalFacts for many options using an EthicalFactsBuilderV3.
+
+    Args:
+        builder: V3-compatible facts builder.
+        options: Candidate options to assess.
+        context: Domain assessment context.
+        parties: Optional party IDs for all options.
+
+    Returns:
+        Dict mapping option_id to EthicalFactsV3.
+    """
+    facts_by_id: Dict[str, "EthicalFactsV3"] = {}
+
+    for option in options:
+        try:
+            facts = builder.build_facts(option, context, parties=parties)
+        except ValueError:
+            continue
+
+        if facts.option_id != option.option_id:
+            raise ValueError(
+                f"EthicalFactsV3.option_id mismatch: expected {option.option_id!r}, "
+                f"got {facts.option_id!r}"
+            )
+
+        facts_by_id[facts.option_id] = facts
+
+    return facts_by_id
+
+
 __all__ = [
     "CandidateOption",
     "DomainAssessmentContext",
     "EthicalFactsBuilder",
     "BatchEthicalFactsBuilder",
     "build_facts_for_options",
+    # V3 interfaces
+    "EthicalFactsBuilderV3",
+    "V2ToV3FactsAdapter",
+    "build_facts_for_options_v3",
 ]
