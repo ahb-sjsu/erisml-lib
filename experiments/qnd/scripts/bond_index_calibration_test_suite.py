@@ -8,7 +8,6 @@ by testing systems with controlled defect levels.
 import numpy as np
 from dataclasses import dataclass, field
 from typing import List, Dict, Callable, Tuple
-from enum import Enum
 import hashlib
 from abc import ABC, abstractmethod
 
@@ -225,7 +224,6 @@ class IdealEvaluator(Evaluator):
 
             if score > best_score:
                 best_score = score
-                best_option = opt
 
         return EvaluationResult(
             selected_option=best_option.label,  # Return canonical label
@@ -267,7 +265,6 @@ class MinorEdgeCaseEvaluator(Evaluator):
 
             if score > best_score:
                 best_score = score
-                best_option = opt
 
         return EvaluationResult(
             selected_option=best_option.label,
@@ -306,7 +303,6 @@ class OrderSensitiveEvaluator(Evaluator):
 
             if score > best_score:
                 best_score = score
-                best_option = opt
 
         return EvaluationResult(
             selected_option=best_option.id,  # Returns raw ID, not canonical
@@ -330,8 +326,6 @@ class SurfaceFeatureEvaluator(Evaluator):
 
     def evaluate(self, scenario: Scenario) -> EvaluationResult:
         # NO canonicalization. Raw feature sensitivity.
-
-        best_option = None
         best_score = float("-inf")
 
         for opt in scenario.options:
@@ -353,7 +347,6 @@ class SurfaceFeatureEvaluator(Evaluator):
 
             if score > best_score:
                 best_score = score
-                best_option = opt
 
         return EvaluationResult(
             selected_option=opt.id,
@@ -434,7 +427,6 @@ def compute_omega_op(
     """
     # Baseline: evaluate original
     baseline_result = evaluator.evaluate(scenario)
-    baseline_canonical = scenario.canonical_form()
     baseline_selection = baseline_result.selected_option
 
     # Transform, then evaluate
@@ -643,7 +635,7 @@ def run_calibration_test(n_scenarios: int = 100) -> Dict[str, BondIndexResult]:
         print(f"  Expected tier: {result.expected_tier}")
         print(f"  Measured Bd: {result.measured_bd:.4f}")
         print(f"  Measured tier: {result.measured_tier}")
-        print(f"  Ω_op distribution:")
+        print("  Ω_op distribution:")
         print(f"    Mean: {np.mean(result.omega_op_values):.4f}")
         print(f"    Std:  {np.std(result.omega_op_values):.4f}")
         print(f"    p95:  {np.percentile(result.omega_op_values, 95):.4f}")
@@ -654,7 +646,7 @@ def run_calibration_test(n_scenarios: int = 100) -> Dict[str, BondIndexResult]:
         )
 
         if result.failures and len(result.failures) <= 5:
-            print(f"  Sample failures:")
+            print("  Sample failures:")
             for f in result.failures[:3]:
                 print(f"    {f['transform']}: {f['baseline']} → {f['transformed']}")
 

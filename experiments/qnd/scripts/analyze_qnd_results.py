@@ -450,7 +450,7 @@ def create_visualizations(results: dict, output_dir: str = "."):
     ax.set_title("Superposition Branches by Post")
 
     # Add legend
-    handles = [mpatches.Patch(color=c, label=l) for l, c in color_map.items()]
+    handles = [mpatches.Patch(color=c, label=lbl) for lbl, c in color_map.items()]
     ax.legend(handles=handles, title="Ambiguity", loc="upper right")
 
     plt.tight_layout()

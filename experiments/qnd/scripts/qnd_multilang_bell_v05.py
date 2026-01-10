@@ -40,14 +40,11 @@ import argparse
 import json
 import time
 import random
-import hashlib
-import uuid
 import secrets
 import math
-from pathlib import Path
 from datetime import datetime
-from typing import Optional, Dict, List, Tuple, Any
-from dataclasses import dataclass, asdict, field
+from typing import Optional, Dict, List
+from dataclasses import dataclass, asdict
 from enum import Enum
 
 try:
@@ -1190,7 +1187,7 @@ class MultiLangAPICaller:
                     "raw": result,
                 }
 
-            except (json.JSONDecodeError, anthropic.APIError) as e:
+            except (json.JSONDecodeError, anthropic.APIError):
                 if attempt < max_retries - 1:
                     time.sleep(2)
 
@@ -1478,7 +1475,7 @@ def print_multilang_report(results: List[CHSHResult], birefringence: Dict):
             if r.violation:
                 print(f"  ★ VIOLATION at {r.significance:.1f}σ")
             else:
-                print(f"  No violation")
+                print("  No violation")
 
     if cross_results:
         print("\n" + "-" * 70)
@@ -1497,7 +1494,7 @@ def print_multilang_report(results: List[CHSHResult], birefringence: Dict):
             if r.violation:
                 print(f"  ★★★ CROSS-LINGUAL VIOLATION at {r.significance:.1f}σ ★★★")
             else:
-                print(f"  No violation")
+                print("  No violation")
 
     # Birefringence analysis
     print("\n" + "-" * 70)
@@ -1638,7 +1635,7 @@ def main():
     print("QND MULTI-LANGUAGE BELL TEST v0.05")
     print("=" * 70)
     print(f"\nMode: {args.mode}")
-    print(f"Languages: {[LANGUAGE_NAMES[l] for l in languages]}")
+    print(f"Languages: {[LANGUAGE_NAMES[lg] for lg in languages]}")
     print(f"Scenarios: {args.scenarios}")
     print(f"Trials per test: {args.n_trials}")
 
@@ -1704,7 +1701,7 @@ def main():
             "model": args.model,
             "n_trials": args.n_trials,
             "mode": args.mode,
-            "languages": [l.value for l in languages],
+            "languages": [lang.value for lang in languages],
             "scenarios": args.scenarios,
         },
         "results": [asdict(r) for r in results],

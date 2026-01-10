@@ -41,9 +41,6 @@ from datetime import datetime
 from typing import Optional, Dict, List, Tuple
 from dataclasses import dataclass, asdict
 import numpy as np
-from scipy import stats
-from scipy.stats import binomtest
-from statsmodels.stats.proportion import proportion_confint
 
 try:
     import anthropic
@@ -762,17 +759,17 @@ def print_chsh_report(chsh_results: List[CHSHResult]):
         print(f"  E(a, b')  = {result.E_ab_prime:+.3f}")
         print(f"  E(a', b)  = {result.E_a_prime_b:+.3f}")
         print(f"  E(a', b') = {result.E_a_prime_b_prime:+.3f}")
-        print(f"  ─────────────────────")
+        print("  ─────────────────────")
         print(f"  S = {result.S:+.3f} ± {result.std_error:.3f}")
         print(f"  |S| = {abs(result.S):.3f}")
 
         if result.violation:
-            print(f"\n  ✓✓ BELL INEQUALITY VIOLATED!")
+            print("\n  ✓✓ BELL INEQUALITY VIOLATED!")
             print(f"     |S| > 2 by {result.violation_magnitude:.3f}")
             print(f"     Significance: {result.significance:.1f}σ")
         else:
-            print(f"\n  ✗ No violation detected")
-            print(f"     |S| ≤ 2 (within classical bound)")
+            print("\n  ✗ No violation detected")
+            print("     |S| ≤ 2 (within classical bound)")
 
     # Overall summary
     print("\n" + "=" * 70)
@@ -840,7 +837,7 @@ def print_full_report(
             print(f"    Order 2 guilty rate: {data['order2_guilty_rate']:.1%}")
             print(f"    Difference: {data['difference']:.1%}")
             if data["order_effect_detected"]:
-                print(f"    ✓ Order effect detected!")
+                print("    ✓ Order effect detected!")
 
     # Interference
     print("\n" + "=" * 70)
@@ -865,7 +862,7 @@ def print_full_report(
             f"  Interference magnitude:               {data['interference_magnitude']:.1%}"
         )
         if data["interference_detected"]:
-            print(f"  ✓ Interference pattern detected!")
+            print("  ✓ Interference pattern detected!")
 
 
 # =============================================================================
@@ -993,7 +990,7 @@ def main():
     )
 
     if not args.chsh_only:
-        print(f"Additional tests: Order effects, Interference")
+        print("Additional tests: Order effects, Interference")
         print(f"Total API calls: ~{args.n_trials * 12 * len(args.scenarios)}")
 
     print("\n" + "-" * 70)

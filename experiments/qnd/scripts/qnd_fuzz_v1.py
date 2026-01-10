@@ -29,10 +29,8 @@ import hashlib
 import random
 from pathlib import Path
 from datetime import datetime
-from typing import Dict, List, Tuple, Optional, Any
-from dataclasses import dataclass, field, asdict
-from enum import Enum
-from itertools import product, combinations
+from typing import Dict, List, Any
+from dataclasses import dataclass, asdict
 from collections import defaultdict
 import sys
 
@@ -229,13 +227,13 @@ def generate_prompt(sample: FuzzSample) -> str:
     # Measurement timing affects framing
     if sample.measurement_timing == "before":
         timing_frame = f"Person {sample.agent_label} is about to decide."
-        action_frame = "will act"
+
     elif sample.measurement_timing == "during":
         timing_frame = f"Person {sample.agent_label} is deciding right now."
-        action_frame = "is acting"
+
     else:  # after
         timing_frame = f"Person {sample.agent_label} has already acted."
-        action_frame = "acted"
+
 
     # Response type affects answer format
     if sample.response_type == "binary":
@@ -523,7 +521,7 @@ def parse_response(text: str, response_type: str) -> Dict[str, Any]:
 
         result["reasoning"] = data.get("reasoning", "")
 
-    except:
+    except Exception:
         # Regex fallbacks
         if response_type == "binary":
             if re.search(r'"verdict"\s*:\s*"YES"', text, re.I):
@@ -717,7 +715,7 @@ def analyze_fuzz_results(results: Dict, samples: List[FuzzSample]) -> Dict:
 
     abstraction_stats = analysis["by_dimension"]["abstraction"]
     levels = ["concrete", "abstract", "philosophical"]
-    abstraction_values = [abstraction_stats.get(l, {}).get("mean") for l in levels]
+    abstraction_values = [abstraction_stats.get(lvl, {}).get("mean") for lvl in levels]
 
     if all(v is not None for v in abstraction_values):
         # Check for monotonic trend
@@ -895,11 +893,11 @@ def print_fuzz_analysis(analysis: Dict, output_dir: Path):
     print("CROSS-LINGUAL INVARIANCE")
     print("-" * 80)
 
-    for l in analysis["language_effects"]:
-        print(f"  By language: {l['by_language']}")
-        print(f"  Variance across languages: {l['variance_across_languages']:.4f}")
+    for lang_effect in analysis["language_effects"]:
+        print(f"  By language: {lang_effect['by_language']}")
+        print(f"  Variance across languages: {lang_effect['variance_across_languages']:.4f}")
         print(
-            f"  Invariant: {'YES ✓' if l['invariant'] else 'NO - language affects judgment'}"
+            f"  Invariant: {'YES ✓' if lang_effect['invariant'] else 'NO - language affects judgment'}"
         )
 
     # ==========================================================================

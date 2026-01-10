@@ -21,7 +21,7 @@ import secrets
 import hashlib
 from pathlib import Path
 from datetime import datetime
-from typing import Dict, List, Tuple
+from typing import Dict, List
 from collections import defaultdict
 import sys
 
@@ -173,7 +173,6 @@ def generate_requests(n_trials: int, model: str):
 
 def parse_response(text: str) -> Dict:
     """Parse response."""
-    import re
 
     result = {"parsed": False, "answer": None, "probability": None}
 
@@ -196,7 +195,7 @@ def parse_response(text: str) -> Dict:
         if prob is not None:
             result["probability"] = float(prob)
 
-    except:
+    except Exception:
         if "YES" in text.upper():
             result["answer"] = 1
             result["parsed"] = True

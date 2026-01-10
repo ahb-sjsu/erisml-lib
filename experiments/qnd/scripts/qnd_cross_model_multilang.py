@@ -27,11 +27,10 @@ Version: 2.0 (Multilingual)
 import argparse
 import json
 import time
-import random
 import math
 from pathlib import Path
 from datetime import datetime
-from typing import Dict, List, Any, Optional, Tuple
+from typing import Dict, List, Optional, Tuple
 from dataclasses import dataclass, asdict
 from abc import ABC, abstractmethod
 from enum import Enum
@@ -828,7 +827,7 @@ def parse_verdict(response: str) -> Tuple[int, float]:
         elif "GUILTY" in verdict_str:
             return -1, confidence
         return 0, 0.0
-    except:
+    except Exception:
         if re.search(r"\bNOT[_\s]?GUILTY\b", response, re.IGNORECASE):
             return 1, 0.5
         elif re.search(r"\bGUILTY\b", response, re.IGNORECASE):
@@ -1230,7 +1229,7 @@ def main():
         print("PILOT MODE: n=10, English only")
 
     # Parse languages
-    lang_map = {l.value: l for l in Language}
+    lang_map = {lg.value: lg for lg in Language}
     languages = [lang_map[code] for code in args.languages if code in lang_map]
 
     # Parse cross-lingual pairs
@@ -1273,7 +1272,7 @@ def main():
         print("No models available!")
         sys.exit(1)
 
-    print(f"\nLanguages: {[l.value for l in languages]}")
+    print(f"\nLanguages: {[lang.value for lang in languages]}")
     print(f"Cross-lingual pairs: {[(a.value, b.value) for a, b in cross_pairs]}")
     print(f"Scenarios: {args.scenarios}")
     print(f"Trials: {args.n_trials}")
@@ -1299,7 +1298,7 @@ def main():
                 "timestamp": datetime.now().isoformat(),
                 "config": {
                     "n_trials": args.n_trials,
-                    "languages": [l.value for l in languages],
+                    "languages": [lang.value for lang in languages],
                     "cross_lingual": [(a.value, b.value) for a, b in cross_pairs],
                     "scenarios": args.scenarios,
                 },

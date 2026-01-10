@@ -27,14 +27,13 @@ Usage:
     python collect_datasets.py --list          # Show available datasets
 """
 
-import os
 import sys
 import json
 import argparse
 import hashlib
 from pathlib import Path
 from datetime import datetime
-from typing import Optional, List, Dict
+from typing import Optional, List
 import urllib.request
 import zipfile
 import gzip
@@ -190,8 +189,8 @@ class DatasetCollector:
     def download_huggingface(self, dataset_id: str, config: dict) -> Optional[Path]:
         """Download dataset from HuggingFace"""
         if not HAS_DATASETS:
-            print(f"  ERROR: 'datasets' library not installed")
-            print(f"  Run: pip install datasets")
+            print("  ERROR: 'datasets' library not installed")
+            print("  Run: pip install datasets")
             return None
 
         hf_path = config["hf_path"]
@@ -245,7 +244,7 @@ class DatasetCollector:
             print()  # Newline after progress
 
             # Extract
-            print(f"  Extracting...")
+            print("  Extracting...")
             if filename.endswith(".tar.gz"):
                 import tarfile
 
@@ -317,7 +316,7 @@ class DatasetCollector:
 
         total_size = sum(DATASETS[d]["size_mb"] for d in dataset_ids)
         print(f"\n{'#'*60}")
-        print(f"QND Dataset Collection")
+        print("QND Dataset Collection")
         print(f"Datasets to download: {len(dataset_ids)}")
         print(f"Estimated total size: ~{total_size} MB")
         print(f"Output directory: {self.output_dir}")
@@ -353,7 +352,7 @@ def prepare_aita_for_qnd(
         print("pandas required for data preparation")
         return None
 
-    print(f"\nPreparing AITA data for QND...")
+    print("\nPreparing AITA data for QND...")
     df = pd.read_parquet(parquet_path)
 
     # Calculate ambiguity proxy from score distribution
@@ -409,7 +408,7 @@ def prepare_aita_for_qnd(
 
     # Stats
     verdicts = pd.DataFrame(qnd_data)["verdict"].value_counts()
-    print(f"\nVerdict distribution:")
+    print("\nVerdict distribution:")
     for v, c in verdicts.items():
         print(f"  {v}: {c}")
 
@@ -424,7 +423,7 @@ def prepare_scruples_for_qnd(
         print("pandas required for data preparation")
         return None
 
-    print(f"\nPreparing Scruples data for QND...")
+    print("\nPreparing Scruples data for QND...")
 
     # Find the JSON files
     data_files = list(scruples_dir.rglob("*.jsonl")) + list(
@@ -553,7 +552,6 @@ def create_synthetic_test_data(output_path: Path, n_samples: int = 100):
 
     verdicts = ["NTA", "YTA", "ESH", "NAH"]
     verdict_weights = [0.5, 0.25, 0.15, 0.1]  # NTA most common
-    ambiguity_levels = ["low", "medium", "high"]
 
     data = []
     for i in range(n_samples):
@@ -670,7 +668,7 @@ Examples:
         create_synthetic_test_data(
             output_dir / "qnd_synthetic_data.json", args.synthetic_size
         )
-        print(f"\n✓ Synthetic data ready for testing!")
+        print("\n✓ Synthetic data ready for testing!")
         print(
             f"  Run: python qnd_aita_experiment.py --data-file {output_dir}/qnd_synthetic_data.json"
         )
@@ -702,7 +700,7 @@ Examples:
         datasets_to_download = ["aita_huggingface", "jigsaw_toxic"]
 
     # Download
-    results = collector.download_all(datasets_to_download)
+    _results = collector.download_all(datasets_to_download)
 
     # Prepare for QND if requested
     if args.prepare:

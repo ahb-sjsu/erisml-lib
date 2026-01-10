@@ -27,14 +27,11 @@ Version: 2.0 (Multilingual Batch)
 
 import argparse
 import json
-import time
 import math
-import hashlib
 import secrets
 from pathlib import Path
 from datetime import datetime
-from typing import Dict, List, Any, Optional, Tuple
-from dataclasses import dataclass, asdict
+from typing import Dict, List, Tuple
 from enum import Enum
 import sys
 
@@ -852,7 +849,7 @@ def parse_verdict(response: str) -> int:
             return 1
         elif "GUILTY" in verdict_str:
             return -1
-    except:
+    except Exception:
         pass
 
     # Regex fallback
@@ -1011,7 +1008,7 @@ def main():
     output_dir.mkdir(exist_ok=True)
 
     # Parse languages
-    lang_map = {l.value: l for l in Language}
+    lang_map = {lg.value: lg for lg in Language}
     languages = [lang_map[code] for code in args.languages if code in lang_map]
 
     # Parse cross-lingual pairs
