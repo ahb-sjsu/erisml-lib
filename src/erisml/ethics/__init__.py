@@ -291,6 +291,24 @@ from .temporal_ops import (
     detect_trend_reversal,
 )
 
+# DEME V3 Coalition Context (Sprint 8)
+from .coalition import (
+    Coalition,
+    CoalitionStructure,
+    ActionProfile,
+    CoalitionContext,
+    SparseCoalitionTensor,
+    CoalitionStabilityResult,
+    check_coalition_stability,
+    slice_by_action,
+    slice_by_coalition,
+    slice_by_action_profile,
+    create_coalition_tensor,
+    create_uniform_coalition_tensor,
+    aggregate_over_coalitions,
+    aggregate_over_actions,
+)
+
 __all__ = [
     # Facts & ethical dimensions
     "EthicalFacts",
@@ -436,4 +454,19 @@ __all__ = [
     "rolling_aggregate",
     "compute_temporal_trend",
     "detect_trend_reversal",
+    # DEME V3 Coalition Context (Sprint 8)
+    "Coalition",
+    "CoalitionStructure",
+    "ActionProfile",
+    "CoalitionContext",
+    "SparseCoalitionTensor",
+    "CoalitionStabilityResult",
+    "check_coalition_stability",
+    "slice_by_action",
+    "slice_by_coalition",
+    "slice_by_action_profile",
+    "create_coalition_tensor",
+    "create_uniform_coalition_tensor",
+    "aggregate_over_coalitions",
+    "aggregate_over_actions",
 ]
