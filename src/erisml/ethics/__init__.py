@@ -309,6 +309,26 @@ from .coalition import (
     aggregate_over_actions,
 )
 
+# DEME V3 Game Theory (Sprint 9)
+from .game_theory import (
+    ShapleyValues,
+    ContributionMargins,
+    CoreStabilityResult,
+    NucleolusResult,
+    ShapleyAttribution,
+    compute_shapley_exact,
+    compute_shapley_monte_carlo,
+    compute_shapley_from_tensor,
+    compute_contribution_margins,
+    check_core_stability,
+    is_core_empty,
+    compute_nucleolus,
+    compute_ethical_attribution,
+    create_voting_game,
+    create_additive_game,
+    create_superadditive_game,
+)
+
 __all__ = [
     # Facts & ethical dimensions
     "EthicalFacts",
@@ -469,4 +489,21 @@ __all__ = [
     "create_uniform_coalition_tensor",
     "aggregate_over_coalitions",
     "aggregate_over_actions",
+    # DEME V3 Game Theory (Sprint 9)
+    "ShapleyValues",
+    "ContributionMargins",
+    "CoreStabilityResult",
+    "NucleolusResult",
+    "ShapleyAttribution",
+    "compute_shapley_exact",
+    "compute_shapley_monte_carlo",
+    "compute_shapley_from_tensor",
+    "compute_contribution_margins",
+    "check_core_stability",
+    "is_core_empty",
+    "compute_nucleolus",
+    "compute_ethical_attribution",
+    "create_voting_game",
+    "create_additive_game",
+    "create_superadditive_game",
 ]
