@@ -385,6 +385,32 @@ from .acceleration import (
     HAS_TENSORRT,
 )
 
+# DEME V3 Uncertainty Quantification (Sprint 14)
+from .uncertainty import (
+    DistributionType,
+    AggregationMethod,
+    UncertaintyBounds,
+    UncertainValue,
+    UncertaintyAnalysis,
+    generate_samples,
+    generate_moral_samples,
+    expected_value,
+    variance,
+    std_dev,
+    percentiles,
+    confidence_interval,
+    cvar,
+    cvar_upper,
+    worst_case,
+    best_case,
+    value_at_risk,
+    aggregate_samples,
+    analyze_uncertainty,
+    propagate_uncertainty,
+    compare_under_uncertainty,
+    stochastic_dominance,
+)
+
 __all__ = [
     # Facts & ethical dimensions
     "EthicalFacts",
@@ -601,4 +627,27 @@ __all__ = [
     "get_jetson_backend",
     "HAS_JETSON",
     "HAS_TENSORRT",
+    # DEME V3 Uncertainty Quantification (Sprint 14)
+    "DistributionType",
+    "AggregationMethod",
+    "UncertaintyBounds",
+    "UncertainValue",
+    "UncertaintyAnalysis",
+    "generate_samples",
+    "generate_moral_samples",
+    "expected_value",
+    "variance",
+    "std_dev",
+    "percentiles",
+    "confidence_interval",
+    "cvar",
+    "cvar_upper",
+    "worst_case",
+    "best_case",
+    "value_at_risk",
+    "aggregate_samples",
+    "analyze_uncertainty",
+    "propagate_uncertainty",
+    "compare_under_uncertainty",
+    "stochastic_dominance",
 ]
