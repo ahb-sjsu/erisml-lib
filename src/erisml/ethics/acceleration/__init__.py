@@ -80,6 +80,31 @@ except ImportError:
     get_cuda_backend = None  # type: ignore
     HAS_CUPY = False
 
+# Jetson backend (optional - requires Jetson hardware + CuPy)
+try:
+    from .jetson import (
+        JetsonBackend,
+        JetsonConfig,
+        JetsonPowerMode,
+        DLACore,
+        jetson_is_available,
+        get_jetson_model,
+        get_jetson_backend,
+        HAS_JETSON,
+        HAS_TENSORRT,
+    )
+except ImportError:
+    # Not on Jetson or CuPy not installed
+    JetsonBackend = None  # type: ignore
+    JetsonConfig = None  # type: ignore
+    JetsonPowerMode = None  # type: ignore
+    DLACore = None  # type: ignore
+    jetson_is_available = lambda: False  # noqa: E731
+    get_jetson_model = lambda: None  # noqa: E731
+    get_jetson_backend = None  # type: ignore
+    HAS_JETSON = False
+    HAS_TENSORRT = False
+
 
 def get_backend(name: str = "cpu") -> AccelerationBackend:
     """
@@ -130,6 +155,16 @@ __all__ = [
     "cuda_is_available",
     "get_cuda_backend",
     "HAS_CUPY",
+    # Jetson backend
+    "JetsonBackend",
+    "JetsonConfig",
+    "JetsonPowerMode",
+    "DLACore",
+    "jetson_is_available",
+    "get_jetson_model",
+    "get_jetson_backend",
+    "HAS_JETSON",
+    "HAS_TENSORRT",
     # Dispatcher
     "AccelerationDispatcher",
     "BackendPreference",

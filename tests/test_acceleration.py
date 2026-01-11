@@ -26,6 +26,10 @@ from erisml.ethics.acceleration import (
     CUDABackend,
     cuda_is_available,
     HAS_CUPY,
+    # Jetson backend
+    JetsonBackend,
+    jetson_is_available,
+    HAS_JETSON,
     # Dispatcher
     AccelerationDispatcher,
     BackendPreference,
@@ -972,3 +976,123 @@ class TestDispatcherWithCUDA:
         """get_backend('cuda') should return CUDA backend."""
         backend = dispatcher.get_backend("cuda")
         assert backend.name == "cuda"
+
+
+# =============================================================================
+# Test Jetson Backend (Sprint 13)
+# =============================================================================
+
+
+# Skip all Jetson tests if not on Jetson hardware
+SKIP_JETSON = not HAS_JETSON or not jetson_is_available()
+JETSON_SKIP_REASON = "Jetson not available (not on Jetson hardware)"
+
+
+@pytest.fixture
+def jetson_backend():
+    """Get a fresh Jetson backend instance."""
+    if SKIP_JETSON:
+        pytest.skip(JETSON_SKIP_REASON)
+    return JetsonBackend()
+
+
+class TestJetsonBackendAvailability:
+    """Tests for Jetson backend availability checking."""
+
+    def test_has_jetson_flag(self):
+        """HAS_JETSON should reflect hardware detection."""
+        # Just verify it's a boolean
+        assert isinstance(HAS_JETSON, bool)
+
+    def test_jetson_is_available_function(self):
+        """jetson_is_available() should return correct status."""
+        result = jetson_is_available()
+        assert isinstance(result, bool)
+        # Should be False on non-Jetson hardware
+        if not HAS_JETSON:
+            assert result is False
+
+    def test_jetson_backend_class_exists(self):
+        """JetsonBackend class should be importable (may be None)."""
+        # JetsonBackend should exist even if not on Jetson
+        assert JetsonBackend is not None
+
+
+@pytest.mark.skipif(SKIP_JETSON, reason=JETSON_SKIP_REASON)
+class TestJetsonBackendCreation:
+    """Tests for Jetson backend tensor creation."""
+
+    def test_from_numpy(self, jetson_backend, sample_array):
+        """from_numpy should create a TensorHandle on Jetson."""
+        handle = jetson_backend.from_numpy(sample_array)
+        assert handle.backend_name == "jetson"
+        assert handle.shape == sample_array.shape
+
+    def test_to_numpy(self, jetson_backend, sample_array):
+        """to_numpy should return the same data."""
+        handle = jetson_backend.from_numpy(sample_array)
+        result = jetson_backend.to_numpy(handle)
+        assert_allclose(result, sample_array)
+
+    def test_zeros(self, jetson_backend):
+        """zeros should create zero-filled tensor."""
+        handle = jetson_backend.zeros((9, 3))
+        result = jetson_backend.to_numpy(handle)
+        assert_allclose(result, 0.0)
+
+
+@pytest.mark.skipif(SKIP_JETSON, reason=JETSON_SKIP_REASON)
+class TestJetsonBackendOperations:
+    """Tests for Jetson backend operations."""
+
+    def test_add_scalar(self, jetson_backend, sample_array):
+        """add with scalar should work on Jetson."""
+        handle = jetson_backend.from_numpy(sample_array)
+        result_handle = jetson_backend.add(handle, 0.1)
+        result = jetson_backend.to_numpy(result_handle)
+        assert_allclose(result, sample_array + 0.1)
+
+    def test_multiply_scalar(self, jetson_backend, sample_array):
+        """multiply with scalar should work on Jetson."""
+        handle = jetson_backend.from_numpy(sample_array)
+        result_handle = jetson_backend.multiply(handle, 2.0)
+        result = jetson_backend.to_numpy(result_handle)
+        assert_allclose(result, sample_array * 2.0)
+
+    def test_clip(self, jetson_backend):
+        """clip should clamp values on Jetson."""
+        arr = np.array([0.0, 0.5, 1.0, 1.5, -0.5], dtype=np.float64)
+        handle = jetson_backend.from_numpy(arr)
+        result_handle = jetson_backend.clip(handle, 0.0, 1.0)
+        result = jetson_backend.to_numpy(result_handle)
+        assert_allclose(result, [0.0, 0.5, 1.0, 1.0, 0.0])
+
+
+@pytest.mark.skipif(SKIP_JETSON, reason=JETSON_SKIP_REASON)
+class TestJetsonBackendDeviceInfo:
+    """Tests for Jetson backend device information."""
+
+    def test_is_available(self, jetson_backend):
+        """Jetson backend should be available when fixture succeeds."""
+        assert jetson_backend.is_available() is True
+
+    def test_get_device_info(self, jetson_backend):
+        """get_device_info should return valid Jetson info."""
+        info = jetson_backend.get_device_info()
+        assert info.device_type == DeviceType.JETSON
+        assert info.is_available is True
+
+
+@pytest.mark.skipif(SKIP_JETSON, reason=JETSON_SKIP_REASON)
+class TestDispatcherWithJetson:
+    """Tests for dispatcher with Jetson backend."""
+
+    def test_jetson_in_available_backends(self, dispatcher):
+        """Jetson should appear in available backends."""
+        backends = dispatcher.get_available_backends()
+        assert "jetson" in backends
+
+    def test_get_jetson_backend(self, dispatcher):
+        """get_backend('jetson') should return Jetson backend."""
+        backend = dispatcher.get_backend("jetson")
+        assert backend.name == "jetson"
