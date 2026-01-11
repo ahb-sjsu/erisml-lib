@@ -678,9 +678,12 @@ class CUDABackend(AccelerationBackend):
         coords_gpu = self._get_tensor(coords)
         values_gpu = self._get_tensor(values)
 
+        # Ensure coordinates are integers for indexing
+        coords_int = coords_gpu.astype(cp.int64)
+
         dense = cp.full(shape, fill_value, dtype=cp.float64)
-        if len(coords_gpu) > 0:
-            idx = tuple(coords_gpu[:, i] for i in range(len(shape)))
+        if len(coords_int) > 0:
+            idx = tuple(coords_int[:, i] for i in range(len(shape)))
             dense[idx] = values_gpu
 
         return self._wrap_result(dense, coords.device_id)

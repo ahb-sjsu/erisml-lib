@@ -602,10 +602,13 @@ class CPUBackend(AccelerationBackend):
         coords_np = self._get_tensor(coords)
         values_np = self._get_tensor(values)
 
-        if self._use_scipy_sparse and len(shape) == 2 and len(coords_np) > 0:
+        # Ensure coordinates are integers for indexing
+        coords_int = coords_np.astype(np.int64)
+
+        if self._use_scipy_sparse and len(shape) == 2 and len(coords_int) > 0:
             # Use SciPy for 2D sparse (optimized)
             sparse_mat = sp.coo_matrix(
-                (values_np, (coords_np[:, 0], coords_np[:, 1])),
+                (values_np, (coords_int[:, 0], coords_int[:, 1])),
                 shape=shape,
             )
             dense = sparse_mat.toarray().astype(np.float64)
@@ -615,8 +618,8 @@ class CPUBackend(AccelerationBackend):
         else:
             # General N-D sparse conversion
             dense = np.full(shape, fill_value, dtype=np.float64)
-            if len(coords_np) > 0:
-                idx = tuple(coords_np[:, i] for i in range(len(shape)))
+            if len(coords_int) > 0:
+                idx = tuple(coords_int[:, i] for i in range(len(shape)))
                 dense[idx] = values_np
 
         return self.from_numpy(dense, coords.device_id)
@@ -647,10 +650,13 @@ class CPUBackend(AccelerationBackend):
         values_np = self._get_tensor(values_a)
         b_np = self._get_tensor(b)
 
-        if self._use_scipy_sparse and len(coords_np) > 0:
+        # Ensure coordinates are integers for indexing
+        coords_int = coords_np.astype(np.int64)
+
+        if self._use_scipy_sparse and len(coords_int) > 0:
             # Create SciPy sparse matrix
             sparse_a = sp.csr_matrix(
-                (values_np, (coords_np[:, 0], coords_np[:, 1])),
+                (values_np, (coords_int[:, 0], coords_int[:, 1])),
                 shape=shape_a,
             )
             # Sparse-dense multiplication (SciPy optimized)
@@ -658,8 +664,8 @@ class CPUBackend(AccelerationBackend):
         else:
             # Fall back to dense multiplication
             dense_a = np.zeros(shape_a, dtype=np.float64)
-            if len(coords_np) > 0:
-                idx = (coords_np[:, 0], coords_np[:, 1])
+            if len(coords_int) > 0:
+                idx = (coords_int[:, 0], coords_int[:, 1])
                 dense_a[idx] = values_np
             result = np.dot(dense_a, b_np)
 
