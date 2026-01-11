@@ -65,6 +65,21 @@ from .dispatcher import (
     reset_dispatcher,
 )
 
+# CUDA backend (optional - requires CuPy)
+try:
+    from .cuda import (
+        CUDABackend,
+        cuda_is_available,
+        get_cuda_backend,
+        HAS_CUPY,
+    )
+except ImportError:
+    # CuPy not installed
+    CUDABackend = None  # type: ignore
+    cuda_is_available = lambda: False  # noqa: E731
+    get_cuda_backend = None  # type: ignore
+    HAS_CUPY = False
+
 
 def get_backend(name: str = "cpu") -> AccelerationBackend:
     """
@@ -110,6 +125,11 @@ __all__ = [
     "get_cpu_backend",
     "HAS_SCIPY",
     "EPSILON",
+    # CUDA backend
+    "CUDABackend",
+    "cuda_is_available",
+    "get_cuda_backend",
+    "HAS_CUPY",
     # Dispatcher
     "AccelerationDispatcher",
     "BackendPreference",

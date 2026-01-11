@@ -364,6 +364,14 @@ from .acceleration import (
     list_backends,
 )
 
+# DEME V3 CUDA Backend (Sprint 12 - optional)
+from .acceleration import (
+    CUDABackend,
+    cuda_is_available,
+    get_cuda_backend,
+    HAS_CUPY,
+)
+
 __all__ = [
     # Facts & ethical dimensions
     "EthicalFacts",
@@ -565,4 +573,9 @@ __all__ = [
     "get_dispatcher",
     "get_backend",
     "list_backends",
+    # DEME V3 CUDA Backend (Sprint 12)
+    "CUDABackend",
+    "cuda_is_available",
+    "get_cuda_backend",
+    "HAS_CUPY",
 ]
