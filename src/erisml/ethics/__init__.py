@@ -345,6 +345,25 @@ from .layers.strategic import (
     StrategicAnalysisResult,
 )
 
+# DEME V3 Acceleration Framework (Sprint 11)
+from .acceleration import (
+    # Core abstractions
+    AccelerationBackend,
+    DeviceInfo,
+    DeviceType,
+    TensorHandle,
+    # CPU backend
+    CPUBackend,
+    get_cpu_backend,
+    # Dispatcher
+    AccelerationDispatcher,
+    BackendPreference,
+    DispatcherConfig,
+    get_dispatcher,
+    get_backend,
+    list_backends,
+)
+
 __all__ = [
     # Facts & ethical dimensions
     "EthicalFacts",
@@ -533,4 +552,17 @@ __all__ = [
     "CoalitionStabilityAnalysis",
     "PolicyRecommendation",
     "StrategicAnalysisResult",
+    # DEME V3 Acceleration Framework (Sprint 11)
+    "AccelerationBackend",
+    "DeviceInfo",
+    "DeviceType",
+    "TensorHandle",
+    "CPUBackend",
+    "get_cpu_backend",
+    "AccelerationDispatcher",
+    "BackendPreference",
+    "DispatcherConfig",
+    "get_dispatcher",
+    "get_backend",
+    "list_backends",
 ]
