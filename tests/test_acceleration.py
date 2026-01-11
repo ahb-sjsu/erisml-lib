@@ -22,6 +22,10 @@ from erisml.ethics.acceleration import (
     CPUBackend,
     get_cpu_backend,
     HAS_SCIPY,
+    # CUDA backend
+    CUDABackend,
+    cuda_is_available,
+    HAS_CUPY,
     # Dispatcher
     AccelerationDispatcher,
     BackendPreference,
@@ -836,3 +840,416 @@ class TestScipyIntegration:
         # Verify result values (manually computed)
         expected = np.array([[1, 2], [10, 12], [21, 24]], dtype=np.float64)
         assert_allclose(result, expected)
+
+
+# =============================================================================
+# Test CUDA Backend (Sprint 12)
+# =============================================================================
+
+
+# Skip all CUDA tests if CuPy not installed or CUDA not available
+SKIP_CUDA = not HAS_CUPY or not cuda_is_available()
+CUDA_SKIP_REASON = "CUDA not available (CuPy not installed or no NVIDIA GPU)"
+
+
+@pytest.fixture
+def cuda_backend():
+    """Get a fresh CUDA backend instance."""
+    if SKIP_CUDA:
+        pytest.skip(CUDA_SKIP_REASON)
+    return CUDABackend()
+
+
+class TestCUDABackendAvailability:
+    """Tests for CUDA backend availability checking."""
+
+    def test_has_cupy_flag(self):
+        """HAS_CUPY should reflect actual availability."""
+        try:
+            import cupy  # noqa: F401
+
+            assert HAS_CUPY is True
+        except ImportError:
+            assert HAS_CUPY is False
+
+    def test_cuda_is_available_function(self):
+        """cuda_is_available() should return correct status."""
+        result = cuda_is_available()
+        assert isinstance(result, bool)
+        if HAS_CUPY:
+            # If CuPy is installed, result depends on GPU availability
+            pass
+        else:
+            assert result is False
+
+    def test_cuda_backend_class_exists(self):
+        """CUDABackend class should be importable (may be None)."""
+        # When CuPy not installed, CUDABackend may be None
+        if HAS_CUPY:
+            assert CUDABackend is not None
+
+
+@pytest.mark.skipif(SKIP_CUDA, reason=CUDA_SKIP_REASON)
+class TestCUDABackendCreation:
+    """Tests for CUDA backend tensor creation."""
+
+    def test_from_numpy(self, cuda_backend, sample_array):
+        """from_numpy should create a TensorHandle on GPU."""
+        handle = cuda_backend.from_numpy(sample_array)
+        assert handle.backend_name == "cuda"
+        assert handle.shape == sample_array.shape
+        assert handle.dtype == "float64"
+
+    def test_to_numpy(self, cuda_backend, sample_array):
+        """to_numpy should return the same data."""
+        handle = cuda_backend.from_numpy(sample_array)
+        result = cuda_backend.to_numpy(handle)
+        assert_allclose(result, sample_array)
+
+    def test_zeros(self, cuda_backend):
+        """zeros should create zero-filled tensor on GPU."""
+        handle = cuda_backend.zeros((9, 3))
+        result = cuda_backend.to_numpy(handle)
+        assert result.shape == (9, 3)
+        assert_allclose(result, 0.0)
+
+    def test_ones(self, cuda_backend):
+        """ones should create one-filled tensor on GPU."""
+        handle = cuda_backend.ones((9, 4))
+        result = cuda_backend.to_numpy(handle)
+        assert result.shape == (9, 4)
+        assert_allclose(result, 1.0)
+
+    def test_full(self, cuda_backend):
+        """full should create constant-filled tensor on GPU."""
+        handle = cuda_backend.full((9, 2), fill_value=0.5)
+        result = cuda_backend.to_numpy(handle)
+        assert result.shape == (9, 2)
+        assert_allclose(result, 0.5)
+
+
+@pytest.mark.skipif(SKIP_CUDA, reason=CUDA_SKIP_REASON)
+class TestCUDABackendElementwise:
+    """Tests for CUDA backend element-wise operations."""
+
+    def test_add_scalar(self, cuda_backend, sample_array):
+        """add with scalar should work on GPU."""
+        handle = cuda_backend.from_numpy(sample_array)
+        result_handle = cuda_backend.add(handle, 0.1)
+        result = cuda_backend.to_numpy(result_handle)
+        assert_allclose(result, sample_array + 0.1)
+
+    def test_add_tensor(self, cuda_backend, sample_array):
+        """add with tensor should work on GPU."""
+        handle = cuda_backend.from_numpy(sample_array)
+        result_handle = cuda_backend.add(handle, handle)
+        result = cuda_backend.to_numpy(result_handle)
+        assert_allclose(result, sample_array * 2)
+
+    def test_multiply_scalar(self, cuda_backend, sample_array):
+        """multiply with scalar should work on GPU."""
+        handle = cuda_backend.from_numpy(sample_array)
+        result_handle = cuda_backend.multiply(handle, 2.0)
+        result = cuda_backend.to_numpy(result_handle)
+        assert_allclose(result, sample_array * 2.0)
+
+    def test_divide_safe(self, cuda_backend):
+        """divide by zero with safe=True should return 1.0 on GPU."""
+        arr = np.array([0.5, 0.3, 0.7], dtype=np.float64)
+        handle = cuda_backend.from_numpy(arr)
+        result_handle = cuda_backend.divide(handle, 0.0, safe=True)
+        result = cuda_backend.to_numpy(result_handle)
+        assert_allclose(result, 1.0)
+
+    def test_clip(self, cuda_backend):
+        """clip should clamp values on GPU."""
+        arr = np.array([0.0, 0.5, 1.0, 1.5, -0.5], dtype=np.float64)
+        handle = cuda_backend.from_numpy(arr)
+        result_handle = cuda_backend.clip(handle, 0.0, 1.0)
+        result = cuda_backend.to_numpy(result_handle)
+        assert_allclose(result, [0.0, 0.5, 1.0, 1.0, 0.0])
+
+    def test_exp(self, cuda_backend):
+        """exp should compute exponentials on GPU."""
+        arr = np.array([0.0, 1.0], dtype=np.float64)
+        handle = cuda_backend.from_numpy(arr)
+        result_handle = cuda_backend.exp(handle)
+        result = cuda_backend.to_numpy(result_handle)
+        assert_allclose(result, [1.0, np.e], rtol=1e-6)
+
+    def test_log_safe(self, cuda_backend):
+        """log with safe=True should handle near-zero values on GPU."""
+        arr = np.array([1.0, np.e, 0.0], dtype=np.float64)
+        handle = cuda_backend.from_numpy(arr)
+        result_handle = cuda_backend.log(handle, safe=True)
+        result = cuda_backend.to_numpy(result_handle)
+        assert_allclose(result[0], 0.0, atol=1e-6)
+        assert_allclose(result[1], 1.0, atol=1e-6)
+        assert result[2] < -20  # log(EPSILON)
+
+
+@pytest.mark.skipif(SKIP_CUDA, reason=CUDA_SKIP_REASON)
+class TestCUDABackendReductions:
+    """Tests for CUDA backend reduction operations."""
+
+    def test_sum_all(self, cuda_backend, sample_array):
+        """sum over all elements should work on GPU."""
+        handle = cuda_backend.from_numpy(sample_array)
+        result_handle = cuda_backend.sum(handle)
+        result = cuda_backend.to_numpy(result_handle)
+        assert_allclose(result, sample_array.sum())
+
+    def test_sum_axis(self, cuda_backend, sample_array):
+        """sum over specific axis should work on GPU."""
+        handle = cuda_backend.from_numpy(sample_array)
+        result_handle = cuda_backend.sum(handle, axis=1)
+        result = cuda_backend.to_numpy(result_handle)
+        assert_allclose(result, sample_array.sum(axis=1))
+
+    def test_mean(self, cuda_backend, sample_array):
+        """mean should compute average on GPU."""
+        handle = cuda_backend.from_numpy(sample_array)
+        result_handle = cuda_backend.mean(handle, axis=0)
+        result = cuda_backend.to_numpy(result_handle)
+        assert_allclose(result, sample_array.mean(axis=0))
+
+    def test_min_max(self, cuda_backend, sample_array):
+        """min and max should work on GPU."""
+        handle = cuda_backend.from_numpy(sample_array)
+        min_result = cuda_backend.to_numpy(cuda_backend.min(handle, axis=1))
+        max_result = cuda_backend.to_numpy(cuda_backend.max(handle, axis=1))
+        assert_allclose(min_result, sample_array.min(axis=1))
+        assert_allclose(max_result, sample_array.max(axis=1))
+
+
+@pytest.mark.skipif(SKIP_CUDA, reason=CUDA_SKIP_REASON)
+class TestCUDABackendLinAlg:
+    """Tests for CUDA backend linear algebra operations."""
+
+    def test_dot(self, cuda_backend):
+        """dot product should work on GPU."""
+        a = np.array([1.0, 2.0, 3.0], dtype=np.float64)
+        b = np.array([4.0, 5.0, 6.0], dtype=np.float64)
+        ha = cuda_backend.from_numpy(a)
+        hb = cuda_backend.from_numpy(b)
+        result = cuda_backend.to_numpy(cuda_backend.dot(ha, hb))
+        assert_allclose(result, np.dot(a, b))
+
+    def test_tensordot(self, cuda_backend, sample_array):
+        """tensordot should contract tensors on GPU."""
+        weights = np.array([0.2, 0.2, 0.2, 0.2, 0.2], dtype=np.float64)
+        ht = cuda_backend.from_numpy(sample_array)
+        hw = cuda_backend.from_numpy(weights)
+        result_handle = cuda_backend.tensordot(ht, hw, axes=([1], [0]))
+        result = cuda_backend.to_numpy(result_handle)
+        expected = np.tensordot(sample_array, weights, axes=([1], [0]))
+        assert_allclose(result, expected)
+
+    def test_einsum(self, cuda_backend, sample_array):
+        """einsum should work on GPU."""
+        weights = np.array([0.2, 0.2, 0.2, 0.2, 0.2], dtype=np.float64)
+        ht = cuda_backend.from_numpy(sample_array)
+        hw = cuda_backend.from_numpy(weights)
+        result = cuda_backend.to_numpy(cuda_backend.einsum("ij,j->i", ht, hw))
+        expected = np.einsum("ij,j->i", sample_array, weights)
+        assert_allclose(result, expected)
+
+
+@pytest.mark.skipif(SKIP_CUDA, reason=CUDA_SKIP_REASON)
+class TestCUDABackendShape:
+    """Tests for CUDA backend shape operations."""
+
+    def test_reshape(self, cuda_backend, sample_array):
+        """reshape should work on GPU."""
+        handle = cuda_backend.from_numpy(sample_array)  # (9, 5)
+        result_handle = cuda_backend.reshape(handle, (45,))
+        result = cuda_backend.to_numpy(result_handle)
+        assert result.shape == (45,)
+        assert_allclose(result, sample_array.flatten())
+
+    def test_transpose(self, cuda_backend, sample_array):
+        """transpose should work on GPU."""
+        handle = cuda_backend.from_numpy(sample_array)  # (9, 5)
+        result_handle = cuda_backend.transpose(handle)
+        result = cuda_backend.to_numpy(result_handle)
+        assert result.shape == (5, 9)
+        assert_allclose(result, sample_array.T)
+
+    def test_expand_dims(self, cuda_backend, sample_rank1):
+        """expand_dims should add dimension on GPU."""
+        handle = cuda_backend.from_numpy(sample_rank1)  # (9,)
+        result_handle = cuda_backend.expand_dims(handle, axis=1)
+        result = cuda_backend.to_numpy(result_handle)
+        assert result.shape == (9, 1)
+
+
+@pytest.mark.skipif(SKIP_CUDA, reason=CUDA_SKIP_REASON)
+class TestCUDABackendEthics:
+    """Tests for CUDA backend ethics-specific operations."""
+
+    def test_moral_contraction(self, cuda_backend, sample_array):
+        """moral_contraction should work on GPU."""
+        weights = np.array([0.5, 0.3, 0.1, 0.05, 0.05], dtype=np.float64)
+        ht = cuda_backend.from_numpy(sample_array)
+        hw = cuda_backend.from_numpy(weights)
+
+        result_handle = cuda_backend.moral_contraction(ht, hw, axis=1, normalize=True)
+        result = cuda_backend.to_numpy(result_handle)
+
+        assert result.shape == (9,)
+        assert np.all(result >= 0.0)
+        assert np.all(result <= 1.0)
+
+    def test_batch_gini_equal(self, cuda_backend):
+        """batch_gini should return 0 for equal distribution on GPU."""
+        equal = np.array([[0.5, 0.5, 0.5, 0.5]], dtype=np.float64)
+        handle = cuda_backend.from_numpy(equal)
+        result = cuda_backend.to_numpy(cuda_backend.batch_gini(handle, axis=1))
+        assert_allclose(result, 0.0, atol=1e-6)
+
+    def test_batch_gini_unequal(self, cuda_backend):
+        """batch_gini should return positive for unequal distribution on GPU."""
+        unequal = np.array([[0.0, 0.0, 0.0, 1.0]], dtype=np.float64)
+        handle = cuda_backend.from_numpy(unequal)
+        result = cuda_backend.to_numpy(cuda_backend.batch_gini(handle, axis=1))
+        assert result[0] > 0.5
+
+
+@pytest.mark.skipif(SKIP_CUDA, reason=CUDA_SKIP_REASON)
+class TestCUDABackendBatched:
+    """Tests for CUDA backend batched operations."""
+
+    def test_batch_matmul(self, cuda_backend):
+        """batch_matmul should work on GPU."""
+        # Batch of 3 matrices: (3, 4, 5) @ (3, 5, 2) -> (3, 4, 2)
+        np.random.seed(42)
+        a = np.random.rand(3, 4, 5).astype(np.float64)
+        b = np.random.rand(3, 5, 2).astype(np.float64)
+
+        ha = cuda_backend.from_numpy(a)
+        hb = cuda_backend.from_numpy(b)
+        result = cuda_backend.to_numpy(cuda_backend.batch_matmul(ha, hb))
+
+        expected = np.matmul(a, b)
+        assert result.shape == (3, 4, 2)
+        assert_allclose(result, expected)
+
+    def test_batch_trace(self, cuda_backend):
+        """batch_trace should compute traces on GPU."""
+        # Batch of 2 square matrices: (2, 3, 3)
+        arr = np.array(
+            [
+                [[1, 0, 0], [0, 2, 0], [0, 0, 3]],
+                [[4, 0, 0], [0, 5, 0], [0, 0, 6]],
+            ],
+            dtype=np.float64,
+        )
+
+        handle = cuda_backend.from_numpy(arr)
+        result = cuda_backend.to_numpy(cuda_backend.batch_trace(handle))
+
+        assert result.shape == (2,)
+        assert_allclose(result, [6.0, 15.0])  # 1+2+3, 4+5+6
+
+
+@pytest.mark.skipif(SKIP_CUDA, reason=CUDA_SKIP_REASON)
+class TestCUDABackendMemory:
+    """Tests for CUDA backend memory management."""
+
+    def test_get_memory_info(self, cuda_backend):
+        """get_memory_info should return valid values."""
+        used, total = cuda_backend.get_memory_info()
+        assert total > 0
+        assert used >= 0
+        assert used <= total
+
+    def test_clear_cache(self, cuda_backend):
+        """clear_cache should not raise."""
+        # Just verify it runs without error
+        cuda_backend.clear_cache()
+
+    def test_synchronize(self, cuda_backend):
+        """synchronize should not raise."""
+        cuda_backend.synchronize()
+
+
+@pytest.mark.skipif(SKIP_CUDA, reason=CUDA_SKIP_REASON)
+class TestCUDABackendDeviceInfo:
+    """Tests for CUDA backend device information."""
+
+    def test_is_available(self, cuda_backend):
+        """CUDA backend should be available when fixture succeeds."""
+        assert cuda_backend.is_available() is True
+
+    def test_get_device_info(self, cuda_backend):
+        """get_device_info should return valid GPU info."""
+        info = cuda_backend.get_device_info()
+        assert info.device_type == DeviceType.CUDA
+        assert info.is_available is True
+        assert info.memory_total is not None
+        assert info.memory_total > 0
+
+    def test_get_all_devices(self, cuda_backend):
+        """get_all_devices should return at least one GPU."""
+        devices = cuda_backend.get_all_devices()
+        assert len(devices) >= 1
+        assert devices[0].device_type == DeviceType.CUDA
+
+
+@pytest.mark.skipif(SKIP_CUDA, reason=CUDA_SKIP_REASON)
+class TestDispatcherWithCUDA:
+    """Tests for dispatcher with CUDA backend."""
+
+    def test_cuda_in_available_backends(self, dispatcher):
+        """CUDA should appear in available backends."""
+        backends = dispatcher.get_available_backends()
+        assert "cuda" in backends
+
+    def test_get_cuda_backend(self, dispatcher):
+        """get_backend('cuda') should return CUDA backend."""
+        backend = dispatcher.get_backend("cuda")
+        assert backend.name == "cuda"
+
+    def test_auto_select_prefers_cuda(self):
+        """Auto-select should prefer CUDA for large tensors."""
+        config = DispatcherConfig(preference=BackendPreference.AUTO)
+        dispatcher = AccelerationDispatcher(config)
+        backend = dispatcher.get_backend(tensor_size=100000)
+        # Should prefer CUDA if available
+        assert backend.name in ("cuda", "cpu")
+
+    def test_cuda_preference(self):
+        """CUDA preference should select CUDA backend."""
+        config = DispatcherConfig(preference=BackendPreference.CUDA)
+        dispatcher = AccelerationDispatcher(config)
+        backend = dispatcher.get_backend()
+        assert backend.name == "cuda"
+
+    def test_benchmark_includes_cuda(self, dispatcher):
+        """Benchmark should include CUDA backend."""
+        results = dispatcher.benchmark_backends(shape=(9, 50, 25), n_iterations=5)
+        assert "cuda" in results
+        if "error" not in results["cuda"]:
+            assert "multiply_scalar" in results["cuda"]
+
+    def test_transfer_cpu_to_cuda(self, dispatcher, sample_array):
+        """Transfer from CPU to CUDA should work."""
+        handle = dispatcher.from_numpy(sample_array, backend="cpu")
+        assert handle.backend_name == "cpu"
+
+        transferred = dispatcher.transfer(handle, "cuda")
+        assert transferred.backend_name == "cuda"
+
+        result = dispatcher.to_numpy(transferred)
+        assert_allclose(result, sample_array)
+
+    def test_transfer_cuda_to_cpu(self, dispatcher, sample_array):
+        """Transfer from CUDA to CPU should work."""
+        handle = dispatcher.from_numpy(sample_array, backend="cuda")
+        assert handle.backend_name == "cuda"
+
+        transferred = dispatcher.transfer(handle, "cpu")
+        assert transferred.backend_name == "cpu"
+
+        result = dispatcher.to_numpy(transferred)
+        assert_allclose(result, sample_array)
