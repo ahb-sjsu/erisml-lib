@@ -372,6 +372,19 @@ from .acceleration import (
     HAS_CUPY,
 )
 
+# DEME V3 Jetson Backend (Sprint 13 - optional)
+from .acceleration import (
+    JetsonBackend,
+    JetsonConfig,
+    JetsonPowerMode,
+    DLACore,
+    jetson_is_available,
+    get_jetson_model,
+    get_jetson_backend,
+    HAS_JETSON,
+    HAS_TENSORRT,
+)
+
 __all__ = [
     # Facts & ethical dimensions
     "EthicalFacts",
@@ -578,4 +591,14 @@ __all__ = [
     "cuda_is_available",
     "get_cuda_backend",
     "HAS_CUPY",
+    # DEME V3 Jetson Backend (Sprint 13)
+    "JetsonBackend",
+    "JetsonConfig",
+    "JetsonPowerMode",
+    "DLACore",
+    "jetson_is_available",
+    "get_jetson_model",
+    "get_jetson_backend",
+    "HAS_JETSON",
+    "HAS_TENSORRT",
 ]
