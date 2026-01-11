@@ -1256,6 +1256,11 @@ The DEME V3 implementation extends the DEME 2.0 architecture with multi-agent te
 | Sprint 8 | Coalition Context for rank-4 tensors | Complete |
 | Sprint 9 | Shapley values and fair credit assignment | Complete |
 | Sprint 10 | Strategic Layer with game-theoretic analysis | Complete |
+| Sprint 11 | Acceleration Framework and CPU Backend | Complete |
+| Sprint 12 | CUDA Backend with CuPy | Complete |
+| Sprint 13 | Jetson Nano Edge Deployment | Complete |
+| Sprint 14 | Uncertainty Quantification (Rank-5) | Complete |
+| Sprint 15 | Full Context Tensors and Decomposition (Rank-6) | Complete |
 
 ### Sprint 10: Strategic Layer
 
@@ -1306,6 +1311,119 @@ print(f"Nash equilibria found: {result.nash_analysis.n_pure_equilibria}")
 print(f"Coalition stable: {result.coalition_analysis.is_stable}")
 print(f"Recommendations: {len(result.recommendations)}")
 ```
+
+### Sprints 11-13: Hardware Acceleration
+
+The acceleration framework provides seamless hardware backend switching for tensor operations:
+
+- **Sprint 11: CPU Backend** - Optimized NumPy/SciPy operations with sparse tensor support
+- **Sprint 12: CUDA Backend** - GPU acceleration via CuPy with async data transfer
+- **Sprint 13: Jetson Backend** - Edge deployment with TensorRT, DLA support, power modes
+
+```python
+from erisml.ethics import (
+    get_dispatcher, list_backends, DeviceType, BackendPreference,
+    JetsonBackend, JetsonConfig, JetsonPowerMode,
+)
+
+# Auto-select best available backend
+dispatcher = get_dispatcher()
+backends = list_backends()
+print(f"Available: {[b.name for b in backends]}")
+
+# Use specific backend
+from erisml.ethics.acceleration import get_cuda_backend, cuda_is_available
+if cuda_is_available():
+    cuda = get_cuda_backend()
+    handle = cuda.transfer_to_device(tensor.to_dense())
+    result = cuda.contract(handle, weights, axis=0)
+
+# Edge deployment on Jetson
+from erisml.ethics.acceleration import jetson_is_available, get_jetson_backend
+if jetson_is_available():
+    config = JetsonConfig(power_mode=JetsonPowerMode.MAXN, enable_dla=True)
+    jetson = get_jetson_backend(config)
+```
+
+New types exported:
+- `AccelerationBackend`, `DeviceInfo`, `DeviceType`, `TensorHandle`
+- `CPUBackend`, `CUDABackend`, `JetsonBackend`
+- `AccelerationDispatcher`, `BackendPreference`, `DispatcherConfig`
+- `JetsonConfig`, `JetsonPowerMode`, `DLACore`
+
+### Sprint 14: Uncertainty Quantification
+
+Monte Carlo uncertainty propagation for risk-aware ethical decision-making:
+
+```python
+from erisml.ethics import (
+    generate_samples, generate_moral_samples, expected_value, variance,
+    cvar, worst_case, best_case, confidence_interval,
+    compare_under_uncertainty, stochastic_dominance,
+    DistributionType, AggregationMethod,
+)
+
+# Generate samples from distributions
+samples = generate_samples(
+    mean=0.7, std=0.1, n_samples=1000,
+    distribution=DistributionType.NORMAL,
+)
+
+# Risk measures
+ev = expected_value(samples)
+var = variance(samples)
+cvar_05 = cvar(samples, alpha=0.05)  # Conditional Value at Risk
+worst = worst_case(samples, percentile=0.01)
+ci = confidence_interval(samples, confidence=0.95)
+
+# Decision support under uncertainty
+comparison = compare_under_uncertainty(samples_a, samples_b)
+dominates = stochastic_dominance(samples_a, samples_b)
+```
+
+New types exported:
+- `DistributionType`, `AggregationMethod`
+- `UncertaintyBounds`, `UncertainValue`, `UncertaintyAnalysis`
+
+### Sprint 15: Full Context Tensors (Rank-6)
+
+Tensor decomposition for memory-efficient rank-6 ethical state spaces:
+
+```python
+from erisml.ethics import (
+    TuckerDecomposition, TensorTrainDecomposition, HierarchicalSparseTensor,
+    OptimizedTensor, MemoryLayout, DecompositionType,
+    validate_rank6_shape, create_rank6_tensor, compress_tensor,
+    decompose_for_backend, reconstruct_from_decomposition,
+)
+
+# Create rank-6 tensor: (k=9, n_parties, time, actions, coalitions, samples)
+tensor = create_rank6_tensor(
+    n_parties=5, n_timesteps=10, n_actions=3,
+    n_coalitions=8, n_samples=100, fill_value=0.5,
+)
+
+# Tucker decomposition for compression
+tucker = TuckerDecomposition.from_tensor(tensor.to_dense(), relative_ranks=(0.5,)*6)
+print(f"Compression: {tucker.compression_ratio:.1f}x")
+reconstructed = tucker.reconstruct()
+
+# Tensor Train for high-rank tensors
+tt = TensorTrainDecomposition.from_tensor(tensor.to_dense(), max_rank=5)
+element = tt.get_element((0, 1, 2, 1, 0, 50))  # Fast element access
+
+# Memory-optimized layouts
+opt = OptimizedTensor.from_tensor(data, MemoryLayout.PARTY_FIRST)
+party_slice = opt.slice_axis("n", 2)  # Efficient party-wise access
+
+# Auto-select decomposition for backend
+compressed = decompose_for_backend(tensor.to_dense(), "jetson", memory_limit=1_000_000)
+```
+
+New types exported:
+- `DecompositionType`, `MemoryLayout`
+- `TuckerDecomposition`, `TensorTrainDecomposition`, `HierarchicalSparseTensor`
+- `OptimizedTensor`, `SparseBlock`
 
 ---
 
