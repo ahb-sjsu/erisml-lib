@@ -411,6 +411,24 @@ from .uncertainty import (
     stochastic_dominance,
 )
 
+# DEME V3 Tensor Decomposition (Sprint 15)
+from .tensor_decomposition import (
+    DecompositionType,
+    MemoryLayout,
+    TuckerDecomposition,
+    TensorTrainDecomposition,
+    HierarchicalSparseTensor,
+    SparseBlock,
+    OptimizedTensor,
+    validate_rank6_shape,
+    create_rank6_tensor,
+    estimate_memory_usage,
+    recommend_decomposition,
+    compress_tensor,
+    decompose_for_backend,
+    reconstruct_from_decomposition,
+)
+
 __all__ = [
     # Facts & ethical dimensions
     "EthicalFacts",
@@ -650,4 +668,19 @@ __all__ = [
     "propagate_uncertainty",
     "compare_under_uncertainty",
     "stochastic_dominance",
+    # DEME V3 Tensor Decomposition (Sprint 15)
+    "DecompositionType",
+    "MemoryLayout",
+    "TuckerDecomposition",
+    "TensorTrainDecomposition",
+    "HierarchicalSparseTensor",
+    "SparseBlock",
+    "OptimizedTensor",
+    "validate_rank6_shape",
+    "create_rank6_tensor",
+    "estimate_memory_usage",
+    "recommend_decomposition",
+    "compress_tensor",
+    "decompose_for_backend",
+    "reconstruct_from_decomposition",
 ]
