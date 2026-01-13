@@ -2,6 +2,13 @@
 
 This directory contains all documentation for the ErisML/DEME project.
 
+## Related Repositories
+
+| Repository | Description |
+|------------|-------------|
+| [ahb-sjsu/non-abelian-sqnd](https://github.com/ahb-sjsu/non-abelian-sqnd) | NA-SQND theoretical research - papers, experiments, and mathematical foundations |
+| [ahb-sjsu/sqnd-probe](https://github.com/ahb-sjsu/sqnd-probe) | Dear Ethicist - advice column game for measuring moral reasoning structure |
+
 ## Directory Structure
 
 ```
