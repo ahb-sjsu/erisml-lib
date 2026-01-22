@@ -16,7 +16,12 @@ try:
         StrategicLayer,
         NashResult,
         CooperativeLayer,
+    
+        GovernanceConfig,
+        aggregate_judgements,
+        select_option,
     )  # noqa: F401
+
 except ImportError:
     DEME = None
     MoralTensor = None
@@ -28,14 +33,24 @@ except ImportError:
         "RightsAndDuties",
         "AutonomyAndAgency",
         "EpistemicStatus",
-    ]:
-        vars()[name] = None
+        "GovernanceConfig",
+    "aggregate_judgements",
+    "select_option",
+]:
+        vars()[name    "GovernanceConfig",
+    "aggregate_judgements",
+    "select_option",
+] = None
     EthicsModule = None
     BaseEthicsModule = None
     EthicalJudgement = None
     StrategicLayer = None
     NashResult = None
     CooperativeLayer = None
+    GovernanceConfig = None
+    aggregate_judgements = None
+    select_option = None
+
 
 __all__ = [
     "DEME",
@@ -52,4 +67,7 @@ __all__ = [
     "StrategicLayer",
     "NashResult",
     "CooperativeLayer",
+    "GovernanceConfig",
+    "aggregate_judgements",
+    "select_option",
 ]
