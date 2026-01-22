@@ -6,6 +6,9 @@ try:
         MoralTensor,
         EthicalFacts,
         Consequences,
+        JusticeAndFairness,
+        RightsAndDuties,
+        Virtues,
         EthicsModule,
         BaseEthicsModule,
         EthicalJudgement,
@@ -14,10 +17,14 @@ try:
         CooperativeLayer,
     )  # noqa: F401
 except ImportError:
+    # Fallback to avoid setup.py crashing
     DEME = None
     MoralTensor = None
     EthicalFacts = None
     Consequences = None
+    JusticeAndFairness = None
+    RightsAndDuties = None
+    Virtues = None
     EthicsModule = None
     BaseEthicsModule = None
     EthicalJudgement = None
@@ -30,6 +37,9 @@ __all__ = [
     "MoralTensor",
     "EthicalFacts",
     "Consequences",
+    "JusticeAndFairness",
+    "RightsAndDuties",
+    "Virtues",
     "EthicsModule",
     "BaseEthicsModule",
     "EthicalJudgement",
