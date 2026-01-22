@@ -50,7 +50,6 @@ class StrategicLayer:
         n_agents: int,
         n_actions: int,
     ) -> bool:
-        # Check if any agent wants to deviate
         for agent_idx in range(n_agents):
             current_action = profile[agent_idx]
             current_utility = payoffs[(agent_idx,) + profile]
@@ -59,7 +58,6 @@ class StrategicLayer:
                 if other_action == current_action:
                     continue
 
-                # Hypothesize switching action
                 hypothetical_profile = list(profile)
                 hypothetical_profile[agent_idx] = other_action
                 hypothetical_profile = tuple(hypothetical_profile)
@@ -67,6 +65,6 @@ class StrategicLayer:
                 hypothetical_utility = payoffs[(agent_idx,) + hypothetical_profile]
 
                 if hypothetical_utility > current_utility:
-                    return False  # Unstable: Agent improves by switching
+                    return False
 
         return True
