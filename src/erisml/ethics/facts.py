@@ -1,5 +1,5 @@
 """
-EthicalFacts: Complete schema for erisml-lib test suites.
+EthicalFacts: Complete V3 aligned schema for erisml-lib.
 """
 
 from dataclasses import dataclass, field
@@ -9,6 +9,8 @@ from typing import Dict, Any, List, Optional
 @dataclass
 class EpistemicStatus:
     uncertainty_level: float = 0.0
+    evidence_quality: str = "medium"
+    novel_situation_flag: bool = False
     knowledge_gaps: List[str] = field(default_factory=list)
 
 
@@ -65,18 +67,27 @@ class RightsAndDuties:
 
 @dataclass
 class VirtueAndCare:
+    expresses_compassion: bool = True
+    betrays_trust: bool = False
+    respects_person_as_end: bool = True
     virtues_promoted: List[str] = field(default_factory=list)
     care_considerations: Dict[str, Any] = field(default_factory=dict)
 
 
 @dataclass
 class AutonomyAndAgency:
+    has_meaningful_choice: bool = True
+    supports_self_determination: bool = True
+    manipulative_intent_detected: bool = False
     freedom_metrics: Dict[str, float] = field(default_factory=dict)
     informed_consent: bool = False
 
 
 @dataclass
 class PrivacyAndDataGovernance:
+    collection_is_minimal: bool = True
+    data_retention_excessive: bool = False
+    reidentification_risk: float = 0.0
     data_usage: str = "consensual"
     retention_policy: str = "standard"
 
@@ -113,12 +124,20 @@ class SustainabilityAndEnvironment:
 
 @dataclass
 class SocietalAndEnvironmental:
+    environmental_harm: float = 0.0
+    long_term_societal_risk: float = 0.0
+    benefits_to_future_generations: float = 0.0
+    burden_on_vulnerable_groups: float = 0.0
     societal_impact: str = "neutral"
     environmental_impact: str = "neutral"
 
 
 @dataclass
 class ProceduralAndLegitimacy:
+    followed_approved_procedure: bool = True
+    stakeholders_consulted: bool = True
+    decision_explainable_to_public: bool = True
+    contestation_available: bool = True
     process_integrity: str = "high"
     institutional_legitimacy: str = "standard"
 
