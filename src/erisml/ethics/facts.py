@@ -1,5 +1,5 @@
 """
-EthicalFacts: Exhaustive V3-aligned schema for erisml-lib.
+EthicalFacts: Final exhaustive V3 schema for SJSU erisml-lib.
 """
 
 from dataclasses import dataclass, field
@@ -88,9 +88,12 @@ class AutonomyAndAgency:
 
 @dataclass
 class PrivacyAndDataGovernance:
-    collection_is_minimal: bool = True
+    privacy_invasion_level: float = 0.0
+    data_minimization_respected: bool = True
+    secondary_use_without_consent: bool = False
     data_retention_excessive: bool = False
     reidentification_risk: float = 0.0
+    collection_is_minimal: bool = True
     data_usage: str = "consensual"
     retention_policy: str = "standard"
 
