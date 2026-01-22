@@ -21,6 +21,7 @@ try:
         AccountabilityAndLiability,
         SustainabilityAndEnvironment,
         SocietalAndEnvironmental,
+        ProceduralAndLegitimacy,
         EthicsModule,
         BaseEthicsModule,
         EthicalJudgement,
@@ -37,8 +38,9 @@ except ImportError:
     VirtueAndCare = AutonomyAndAgency = PrivacyAndDataGovernance = None
     TransparencyAndExplainability = SafetyAndSecurity = FairnessAndBias = None
     AccountabilityAndLiability = SustainabilityAndEnvironment = None
-    SocietalAndEnvironmental = EthicsModule = BaseEthicsModule = None
-    EthicalJudgement = StrategicLayer = NashResult = CooperativeLayer = None
+    SocietalAndEnvironmental = ProceduralAndLegitimacy = EthicsModule = None
+    BaseEthicsModule = EthicalJudgement = None
+    StrategicLayer = NashResult = CooperativeLayer = None
     GovernanceConfig = aggregate_judgements = select_option = None
 
 __all__ = [
@@ -61,6 +63,7 @@ __all__ = [
     "AccountabilityAndLiability",
     "SustainabilityAndEnvironment",
     "SocietalAndEnvironmental",
+    "ProceduralAndLegitimacy",
     "EthicsModule",
     "BaseEthicsModule",
     "EthicalJudgement",

@@ -53,8 +53,6 @@ class RightsAndDuties:
 
 @dataclass
 class VirtueAndCare:
-    """Specific class required by test_ethics_module_v3.py"""
-
     virtues_promoted: List[str] = field(default_factory=list)
     care_considerations: Dict[str, Any] = field(default_factory=dict)
 
@@ -107,6 +105,14 @@ class SocietalAndEnvironmental:
     environmental_impact: str = "neutral"
 
 
+@dataclass
+class ProceduralAndLegitimacy:
+    """Specific class required by test_ethics_module_v3.py"""
+
+    process_integrity: str = "high"
+    institutional_legitimacy: str = "standard"
+
+
 # --- Main Facts Class ---
 @dataclass
 class EthicalFacts:
@@ -139,3 +145,4 @@ class EthicalFacts:
     societal_env: SocietalAndEnvironmental = field(
         default_factory=SocietalAndEnvironmental
     )
+    procedural: ProceduralAndLegitimacy = field(default_factory=ProceduralAndLegitimacy)
