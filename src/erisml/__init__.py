@@ -4,11 +4,12 @@ try:
     from erisml.ethics import (
         DEME,
         MoralTensor,
-        EthicalFacts,
         Consequences,
+        EthicalFacts,
         JusticeAndFairness,
         RightsAndDuties,
-        Virtues,
+        AutonomyAndAgency,
+        EpistemicStatus,
         EthicsModule,
         BaseEthicsModule,
         EthicalJudgement,
@@ -17,14 +18,18 @@ try:
         CooperativeLayer,
     )  # noqa: F401
 except ImportError:
-    # Fallback to avoid setup.py crashing
     DEME = None
     MoralTensor = None
-    EthicalFacts = None
-    Consequences = None
-    JusticeAndFairness = None
-    RightsAndDuties = None
-    Virtues = None
+    # Auto-generated fallbacks
+    for name in [
+        "Consequences",
+        "EthicalFacts",
+        "JusticeAndFairness",
+        "RightsAndDuties",
+        "AutonomyAndAgency",
+        "EpistemicStatus",
+    ]:
+        vars()[name] = None
     EthicsModule = None
     BaseEthicsModule = None
     EthicalJudgement = None
@@ -35,11 +40,12 @@ except ImportError:
 __all__ = [
     "DEME",
     "MoralTensor",
-    "EthicalFacts",
     "Consequences",
+    "EthicalFacts",
     "JusticeAndFairness",
     "RightsAndDuties",
-    "Virtues",
+    "AutonomyAndAgency",
+    "EpistemicStatus",
     "EthicsModule",
     "BaseEthicsModule",
     "EthicalJudgement",
