@@ -7,9 +7,9 @@ try:
         StrategicLayer,
         NashResult,
         CooperativeLayer,
-    )
+    )  # noqa: F401
 except ImportError:
-    # Fallback for setup.py when dependencies aren't installed yet
+    # Fallback if dependencies are missing
     DEME = None
     MoralTensor = None
     StrategicLayer = None
