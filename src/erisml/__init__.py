@@ -5,6 +5,7 @@ try:
         DEME,
         MoralTensor,
         EthicalFacts,
+        Consequences,
         EthicsModule,
         BaseEthicsModule,
         EthicalJudgement,
@@ -16,6 +17,7 @@ except ImportError:
     DEME = None
     MoralTensor = None
     EthicalFacts = None
+    Consequences = None
     EthicsModule = None
     BaseEthicsModule = None
     EthicalJudgement = None
@@ -27,6 +29,7 @@ __all__ = [
     "DEME",
     "MoralTensor",
     "EthicalFacts",
+    "Consequences",
     "EthicsModule",
     "BaseEthicsModule",
     "EthicalJudgement",
