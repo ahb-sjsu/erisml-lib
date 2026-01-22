@@ -3,7 +3,7 @@ DEME: Democratic Ethics Module Engine
 """
 
 from dataclasses import dataclass
-from typing import List, Dict, Any, Optional
+from typing import Dict, Any, Optional
 
 
 @dataclass
