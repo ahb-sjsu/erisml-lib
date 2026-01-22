@@ -10,6 +10,8 @@ try:
         RightsAndDuties,
         Virtues,
         AutonomyAndAgency,
+        PrivacyAndConfidentiality,
+        Sustainability,
         EthicsModule,
         BaseEthicsModule,
         EthicalJudgement,
@@ -21,7 +23,7 @@ try:
         select_option,
     )  # noqa: F401
 except ImportError:
-    # Fallback for setup.py
+    # Nuclear Option: Define everything as None if import fails to prevent crash
     DEME = None
     MoralTensor = None
     EthicalFacts = None
@@ -30,6 +32,8 @@ except ImportError:
     RightsAndDuties = None
     Virtues = None
     AutonomyAndAgency = None
+    PrivacyAndConfidentiality = None
+    Sustainability = None
     EthicsModule = None
     BaseEthicsModule = None
     EthicalJudgement = None
@@ -49,6 +53,8 @@ __all__ = [
     "RightsAndDuties",
     "Virtues",
     "AutonomyAndAgency",
+    "PrivacyAndConfidentiality",
+    "Sustainability",
     "EthicsModule",
     "BaseEthicsModule",
     "EthicalJudgement",

@@ -14,38 +14,48 @@ class Consequences:
 
 
 @dataclass
+class JusticeAndFairness:
+    affected_groups: Dict[str, Any] = field(default_factory=dict)
+    equity_metrics: Dict[str, float] = field(default_factory=dict)
+
+
+@dataclass
+class RightsAndDuties:
+    rights_infringed: Dict[str, Any] = field(default_factory=dict)
+    duties_upheld: Dict[str, Any] = field(default_factory=dict)
+
+
+@dataclass
+class Virtues:
+    virtues_promoted: Dict[str, Any] = field(default_factory=dict)
+    vices_enabled: Dict[str, Any] = field(default_factory=dict)
+
+
+@dataclass
+class AutonomyAndAgency:
+    freedom_metrics: Dict[str, float] = field(default_factory=dict)
+    informed_consent: bool = False
+
+
+@dataclass
+class PrivacyAndConfidentiality:
+    data_sensitivity: str = "LOW"
+    encryption_standard: str = "AES-256"
+
+
+@dataclass
+class Sustainability:
+    carbon_footprint: float = 0.0
+    resource_usage: float = 0.0
+
+
+@dataclass
 class EthicalFacts:
     option_id: str
     scenario_id: str
     metadata: Dict[str, Any] = field(default_factory=dict)
     consequences: Consequences = field(default_factory=Consequences)
-    # Dynamic fields will be added by the user manually if needed,
-    # but the classes must exist for the imports to work.
-
-
-@dataclass
-class JusticeAndFairness:
-    """Auto-generated placeholder for JusticeAndFairness"""
-
-    metadata: Dict[str, Any] = field(default_factory=dict)
-
-
-@dataclass
-class RightsAndDuties:
-    """Auto-generated placeholder for RightsAndDuties"""
-
-    metadata: Dict[str, Any] = field(default_factory=dict)
-
-
-@dataclass
-class AutonomyAndAgency:
-    """Auto-generated placeholder for AutonomyAndAgency"""
-
-    metadata: Dict[str, Any] = field(default_factory=dict)
-
-
-@dataclass
-class EpistemicStatus:
-    """Auto-generated placeholder for EpistemicStatus"""
-
-    metadata: Dict[str, Any] = field(default_factory=dict)
+    justice: JusticeAndFairness = field(default_factory=JusticeAndFairness)
+    rights: RightsAndDuties = field(default_factory=RightsAndDuties)
+    virtues: Virtues = field(default_factory=Virtues)
+    autonomy: AutonomyAndAgency = field(default_factory=AutonomyAndAgency)
