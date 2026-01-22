@@ -5,6 +5,10 @@ try:
         DEME,
         MoralTensor,
         EthicalFacts,
+        EpistemicStatus,
+        Stakeholder,
+        Timeframe,
+        Context,
         Consequences,
         JusticeAndFairness,
         RightsAndDuties,
@@ -23,10 +27,14 @@ try:
         select_option,
     )  # noqa: F401
 except ImportError:
-    # Nuclear Option: Define everything as None if import fails to prevent crash
+    # Nuclear Fallback
     DEME = None
     MoralTensor = None
     EthicalFacts = None
+    EpistemicStatus = None
+    Stakeholder = None
+    Timeframe = None
+    Context = None
     Consequences = None
     JusticeAndFairness = None
     RightsAndDuties = None
@@ -48,6 +56,10 @@ __all__ = [
     "DEME",
     "MoralTensor",
     "EthicalFacts",
+    "EpistemicStatus",
+    "Stakeholder",
+    "Timeframe",
+    "Context",
     "Consequences",
     "JusticeAndFairness",
     "RightsAndDuties",

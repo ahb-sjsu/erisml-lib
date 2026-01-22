@@ -3,7 +3,40 @@ EthicalFacts: Core data structures for ethical reasoning.
 """
 
 from dataclasses import dataclass, field
-from typing import Dict, Any, Optional  # noqa: F401
+from typing import Dict, Any, List, Optional  # noqa: F401
+
+
+@dataclass
+class EpistemicStatus:
+    """Represents certainty and knowledge state."""
+
+    uncertainty_level: float = 0.0
+    knowledge_gaps: List[str] = field(default_factory=list)
+
+
+@dataclass
+class Stakeholder:
+    """Represents an entity affected by the decision."""
+
+    id: str
+    role: str
+    impact_weight: float = 1.0
+
+
+@dataclass
+class Timeframe:
+    """Represents temporal scope."""
+
+    duration: str = "immediate"
+    urgency: float = 1.0
+
+
+@dataclass
+class Context:
+    """Represents situational context."""
+
+    domain: str = "general"
+    constraints: Dict[str, Any] = field(default_factory=dict)
 
 
 @dataclass
@@ -54,8 +87,16 @@ class EthicalFacts:
     option_id: str
     scenario_id: str
     metadata: Dict[str, Any] = field(default_factory=dict)
+    epistemic_status: EpistemicStatus = field(default_factory=EpistemicStatus)
+    stakeholders: List[Stakeholder] = field(default_factory=list)
+    timeframe: Timeframe = field(default_factory=Timeframe)
+    context: Context = field(default_factory=Context)
     consequences: Consequences = field(default_factory=Consequences)
     justice: JusticeAndFairness = field(default_factory=JusticeAndFairness)
     rights: RightsAndDuties = field(default_factory=RightsAndDuties)
     virtues: Virtues = field(default_factory=Virtues)
     autonomy: AutonomyAndAgency = field(default_factory=AutonomyAndAgency)
+    privacy: PrivacyAndConfidentiality = field(
+        default_factory=PrivacyAndConfidentiality
+    )
+    sustainability: Sustainability = field(default_factory=Sustainability)

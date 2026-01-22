@@ -2,6 +2,10 @@ from .deme import DEME  # noqa: F401
 from .tensor import MoralTensor  # noqa: F401
 from .facts import (  # noqa: F401
     EthicalFacts,
+    EpistemicStatus,
+    Stakeholder,
+    Timeframe,
+    Context,
     Consequences,
     JusticeAndFairness,
     RightsAndDuties,
@@ -23,6 +27,10 @@ __all__ = [
     "DEME",
     "MoralTensor",
     "EthicalFacts",
+    "EpistemicStatus",
+    "Stakeholder",
+    "Timeframe",
+    "Context",
     "Consequences",
     "JusticeAndFairness",
     "RightsAndDuties",
