@@ -20,6 +20,7 @@ from erisml.examples.smart_home_demo import (
     EmergencyGuardianEM,
 )
 
+
 class TestSmartHomeEthics(unittest.TestCase):
     def setUp(self):
         self.guardian = EmergencyGuardianEM()
