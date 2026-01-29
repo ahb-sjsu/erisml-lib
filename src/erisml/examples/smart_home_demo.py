@@ -17,7 +17,6 @@ from __future__ import annotations
 import sys
 import os
 import codecs
-from typing import List
 
 # Ensure we use the local 'src' directory, avoiding installed package mismatches
 current_dir = os.path.dirname(os.path.abspath(__file__))
@@ -32,7 +31,7 @@ if sys.platform == "win32":
     sys.stdout = codecs.getwriter("utf-8")(sys.stdout.detach())
 
 
-from erisml.ethics import (
+from erisml.ethics import (  # noqa: E402
     AutonomyAndAgency,
     Consequences,
     EpistemicStatus,
@@ -40,12 +39,11 @@ from erisml.ethics import (
     JusticeAndFairness,
     RightsAndDuties,
     PrivacyAndDataGovernance,  # Added for this scenario
-    SocietalAndEnvironmental,  # Added for this scenario
 )
 
 # We'll use the basic Module interface to create a custom "HomeGuardian"
-from erisml.ethics.modules.base import EthicsModule
-from erisml.ethics.judgement import EthicalJudgement
+from erisml.ethics.modules.base import EthicsModule  # noqa: E402
+from erisml.ethics.judgement import EthicalJudgement  # noqa: E402
 
 
 # --- Helper: ASCII Chart Visualizer ---
@@ -341,7 +339,7 @@ def main():
     judgement_toast = guardian.judge(opt_toast)
 
     # 4. Show Results
-    print(f"\n📋 DECISION MATRIX:")
+    print("\n📋 DECISION MATRIX:")
     print("-" * 80)
     print(
         f"Scenario 1 (Real Fire):   {judgement_real.verdict.upper():<10} [{judgement_real.reasons[0]}]"

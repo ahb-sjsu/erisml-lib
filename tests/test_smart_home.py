@@ -13,7 +13,7 @@ src_path = os.path.abspath(os.path.join(current_dir, "../src"))
 if src_path not in sys.path:
     sys.path.insert(0, src_path)
 
-from erisml.examples.smart_home_demo import (
+from erisml.examples.smart_home_demo import (  # noqa: E402
     create_allow_entry_option,
     create_uncertain_entry_option,
     create_false_alarm_option,
