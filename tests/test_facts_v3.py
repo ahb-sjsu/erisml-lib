@@ -1,4 +1,4 @@
-# Copyright (c) 2026 Andrew H. Bond and Claude Opus 4.5
+# Copyright (c) 2026 Andrew H. Bond
 # Department of Computer Engineering, San Jose State University
 # Licensed under the AGI-HPC Responsible AI License v1.0.
 # ruff: noqa: E402
@@ -42,7 +42,6 @@ from erisml.ethics.facts_v3 import (
     collapse_facts_v3_to_v2,
 )
 from erisml.ethics.moral_tensor import MoralTensor
-
 
 # =============================================================================
 # Test Fixtures

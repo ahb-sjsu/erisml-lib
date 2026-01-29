@@ -619,7 +619,7 @@ def print_outcome(
 
 
 def bond_signature(
-    facts_by_option: Dict[str, EthicalFacts]
+    facts_by_option: Dict[str, EthicalFacts],
 ) -> Dict[str, Dict[str, Any]]:
     """A small, stable signature of ethically salient structure for audit artifacts.
 
@@ -655,7 +655,7 @@ def bond_signature(
 
 
 def transform_reorder(
-    facts_by_option: Dict[str, EthicalFacts]
+    facts_by_option: Dict[str, EthicalFacts],
 ) -> Dict[str, EthicalFacts]:
     """Bond-preserving transform: reorder option presentation."""
     keys = list(facts_by_option.keys())

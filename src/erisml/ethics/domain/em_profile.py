@@ -21,7 +21,6 @@ from dataclasses import dataclass, field, asdict
 from datetime import datetime, timezone
 from typing import Any, Dict, List, Literal
 
-
 SchemaVersion = Literal["DEME-EMProfile-0.1"]
 
 RiskAttitudeLabel = Literal["risk_averse", "balanced", "risk_seeking"]

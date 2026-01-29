@@ -50,7 +50,6 @@ from erisml.ethics.modules import EM_REGISTRY
 from erisml.ethics.profile_v03 import DEMEProfileV03, deme_profile_v03_from_dict
 from erisml.ethics.modules.greek_tragedy_tragic_conflict_em import TragicConflictEM
 
-
 # ---------------------------------------------------------------------------
 # Provenance helpers (lightweight, demo-only)
 # ---------------------------------------------------------------------------

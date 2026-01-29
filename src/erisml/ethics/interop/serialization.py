@@ -39,7 +39,6 @@ from ..facts import (
 from ..judgement import EthicalJudgement, EthicalJudgementV2
 from ..moral_vector import MoralVector
 
-
 # ---------------------------------------------------------------------------
 # EthicalFacts serialization
 # ---------------------------------------------------------------------------

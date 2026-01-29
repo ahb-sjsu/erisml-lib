@@ -6,7 +6,6 @@ from erisml.interop.pettingzoo_adapter import ErisPettingZooEnv
 from erisml.core.model import ErisModel
 from erisml.core.types import ActionInstance
 
-
 # ---------------------------
 # Dummy classes for testing
 # ---------------------------

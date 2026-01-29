@@ -535,7 +535,7 @@ def print_outcome(
 
 
 def transform_reorder(
-    facts_by_option: Dict[str, EthicalFacts]
+    facts_by_option: Dict[str, EthicalFacts],
 ) -> Dict[str, EthicalFacts]:
     """Bond-preserving transform: reorder option presentation."""
     keys = list(facts_by_option.keys())

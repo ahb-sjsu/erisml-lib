@@ -1,4 +1,4 @@
-# Copyright (c) 2026 Andrew H. Bond and Claude Opus 4.5
+# Copyright (c) 2026 Andrew H. Bond
 # Department of Computer Engineering, San Jose State University
 # Licensed under the AGI-HPC Responsible AI License v1.0.
 
@@ -34,7 +34,6 @@ from erisml.ethics.tensor_decomposition import (
     reconstruct_from_decomposition,
 )
 from erisml.ethics.moral_tensor import MoralTensor
-
 
 # =============================================================================
 # Tucker Decomposition Tests

@@ -31,7 +31,6 @@ from typing import Callable, Dict, List, Tuple
 import numpy as np
 import pytest
 
-
 # =============================================================================
 # CORE DATA STRUCTURES
 # =============================================================================

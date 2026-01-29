@@ -1,4 +1,4 @@
-# Copyright (c) 2026 Andrew H. Bond and Claude Opus 4.5
+# Copyright (c) 2026 Andrew H. Bond
 # Department of Computer Engineering, San Jose State University
 # Licensed under the AGI-HPC Responsible AI License v1.0.
 
@@ -47,7 +47,6 @@ from erisml.ethics import (
     select_option_v2,
 )
 
-
 # =============================================================================
 # HELPER FUNCTIONS
 # =============================================================================
@@ -94,13 +93,11 @@ def demo_moral_vector_basics() -> None:
     """Demonstrate MoralVector creation and operations."""
     print_section("MoralVector Basics")
 
-    print(
-        """
+    print("""
 MoralVector replaces scalar normative_score with 8+1 dimensions:
 - 8 ethical dimensions from EthicalFacts (harm, rights, fairness, etc.)
 - +1 epistemic dimension (uncertainty, evidence quality)
-"""
-    )
+""")
 
     # Create from scratch
     print("1. Creating MoralVectors manually:")
@@ -163,12 +160,10 @@ def demo_from_ethical_facts() -> None:
     """Demonstrate MoralVector extraction from EthicalFacts."""
     print_section("MoralVector from EthicalFacts")
 
-    print(
-        """
+    print("""
 MoralVector.from_ethical_facts() provides a standard mapping from
 structured EthicalFacts to the 8+1 moral dimensions.
-"""
-    )
+""")
 
     facts = EthicalFacts(
         option_id="emergency_treatment",
@@ -234,14 +229,12 @@ def demo_ethical_judgement_v2() -> None:
     """Demonstrate EthicalJudgementV2 with moral vectors."""
     print_section("EthicalJudgementV2")
 
-    print(
-        """
+    print("""
 EthicalJudgementV2 replaces normative_score with MoralVector and adds:
 - em_tier: Classification for weighted aggregation (0-4)
 - veto_triggered: Explicit veto flag
 - confidence: EM's confidence in its assessment
-"""
-    )
+""")
 
     # Tier 0 (Constitutional) judgement
     geneva_judgement = EthicalJudgementV2(
@@ -311,14 +304,12 @@ def demo_governance_v2() -> None:
     """Demonstrate GovernanceConfigV2 and select_option_v2."""
     print_section("Governance V2: Tier-Based Aggregation")
 
-    print(
-        """
+    print("""
 GovernanceConfigV2 provides:
 - DimensionWeights: Per-dimension weights for scalar collapse
 - Tier-based weighting: Constitutional EMs weighted 10x, Core Safety 5x, etc.
 - Lexical priorities: DAG-based conflict resolution
-"""
-    )
+""")
 
     # Configure governance
     config = GovernanceConfigV2(
@@ -487,14 +478,12 @@ def demo_moral_landscape() -> None:
     """Demonstrate MoralLandscape for Pareto analysis."""
     print_section("MoralLandscape: Pareto Frontier Analysis")
 
-    print(
-        """
+    print("""
 MoralLandscape provides Pareto-optimal reasoning:
 - pareto_frontier(): Find non-dominated options
 - dominated_options(): Find options dominated by others
 - Enables multi-objective decision making without forced scalar collapse
-"""
-    )
+""")
 
     # Create a landscape with multiple options
     options = {
@@ -586,8 +575,7 @@ def main() -> None:
     demo_moral_landscape()
 
     print_section("Summary")
-    print(
-        """
+    print("""
 DEME 2.0 Key Improvements:
 
 1. MULTI-DIMENSIONAL ASSESSMENT
@@ -616,8 +604,7 @@ DEME 2.0 Key Improvements:
    - normative_score property on EthicalJudgementV2
    - judgement_v1_to_v2() migration function
    - V1ToV2Adapter for legacy EMs
-"""
-    )
+""")
 
 
 if __name__ == "__main__":

@@ -1,5 +1,5 @@
 # ErisML - D4 Gauge Structure for Normative Positions
-# Copyright (c) 2026 Andrew H. Bond and Claude Opus 4.5
+# Copyright (c) 2026 Andrew H. Bond
 # Department of Computer Engineering, San Jose State University
 #
 # Licensed under the AGI-HPC Responsible AI License v1.0.
@@ -32,7 +32,6 @@ from __future__ import annotations
 from dataclasses import dataclass
 from enum import Enum
 from typing import Dict, List, Optional, Tuple
-
 
 # =============================================================================
 # HOHFELDIAN NORMATIVE POSITIONS

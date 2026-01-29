@@ -57,7 +57,6 @@ from erisml.ethics.interop.profile_adapters import build_triage_ems_and_governan
 from erisml.ethics.modules import EM_REGISTRY
 from erisml.ethics.profile_v03 import DEMEProfileV03, deme_profile_v03_from_dict
 
-
 # ---------------------------------------------------------------------------
 # Helpers
 # ---------------------------------------------------------------------------

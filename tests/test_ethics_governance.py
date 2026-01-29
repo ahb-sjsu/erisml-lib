@@ -13,7 +13,6 @@ import pytest
 from erisml.ethics import GovernanceConfig, aggregate_judgements, select_option
 from erisml.ethics.judgement import EthicalJudgement
 
-
 # ---------------------------------------------------------------------------
 # Helpers
 # ---------------------------------------------------------------------------

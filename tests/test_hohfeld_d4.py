@@ -1,5 +1,5 @@
 # ErisML - Tests for D4 Gauge Structure
-# Copyright (c) 2026 Andrew H. Bond and Claude Opus 4.5
+# Copyright (c) 2026 Andrew H. Bond
 # Department of Computer Engineering, San Jose State University
 
 """
