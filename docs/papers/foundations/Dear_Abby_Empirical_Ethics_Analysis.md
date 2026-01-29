@@ -1,6 +1,6 @@
 # Empirical Ethics from Dear Abby: A Ground Truth Approach to Machine Morality
 
-**Andrew H. Bond & Claude Opus 4.5**
+**Andrew H. Bond Opus 4.5**
 Department of Computer Engineering, San José State University
 
 *Draft: January 2026*

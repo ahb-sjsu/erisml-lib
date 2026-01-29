@@ -1,7 +1,7 @@
 # SQND Rosetta Stone Primer
 ## Physics-to-Engineering Translation Guide
 
-Andrew H. Bond¹ and Claude Opus 4.5²
+Andrew H. Bond¹ ²
 ¹Sr. Member, IEEE — Department of Computer Engineering, San Jose State University
 ²Anthropic
 

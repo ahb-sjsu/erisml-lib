@@ -336,4 +336,4 @@ This is worth testing.
 
 *"We are explorers into the unknown, you and me."*
 
-— A.H. Bond & Claude, December 2025
+— A.H. Bond, December 2025
