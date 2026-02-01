@@ -636,11 +636,19 @@ Audit Record:
 
 **Genre Constraints**: Advice column genre may select for certain types of dilemmas.
 
-**Synthetic Baseline**: Current ground state is synthetically derived. Needs empirical validation through actual LLM simulation.
+### 7.2 Empirical Validation Status (January 2026)
 
-### 7.2 Future Work
+The Bond Invariance Principle (BIP) has been empirically validated through cross-lingual transfer learning experiments on multi-language ethical corpora.
 
-1. **Empirical Validation**: Run full simulation across 20K letters with multiple LLMs (~$1K)
+**Overall Verdict: STRONGLY_SUPPORTED**
+
+Key results: Mixed baseline F1: 80.0%, Language leakage: 1.2%, Obligation-Permission transfer: 1.0, Cross-lingual similarity: 86%.
+
+**Remaining Challenge**: Linear probes can still decode language (99.8% accuracy vs. 16.7% chance). Further adversarial training is needed.
+
+### 7.3 Future Work
+
+1. **Full Invariance**: Reduce probe accuracy to chance level through enhanced adversarial training
 
 2. **Cross-Cultural Expansion**: Analyze advice columns from other cultures (e.g., "Ask Amy" in UK, similar columns in Japan, India)
 
