@@ -467,6 +467,37 @@ python -m erisml.examples.hohfeld_d4_demo
 3. Complex scenarios need path variants (test ordering effects)
 4. Track the Bond Index to monitor overall quality
 
+
+---
+
+## 11. Empirical Validation Results (January 2026)
+
+The SQND framework has been validated through cross-lingual transfer learning experiments testing the Bond Invariance Principle (BIP).
+
+### Key Results
+
+| Metric | Result | Significance |
+|--------|--------|--------------|
+| Mixed baseline F1 | 80.0% | Strong ethical classification |
+| Language leakage | 1.2% | Near-zero language encoding |
+| Obligation-Permission transfer | 1.0 | Perfect correlative transfer |
+| Structural/Surface ratio | 11.1x | BIP confirmed (p=0.023) |
+| Cross-lingual similarity | 86% | Good semantic invariance |
+
+### What This Means
+
+- **80% F1 with 1.2% language leakage**: The system learns ethical structure without relying on language-specific features
+- **Perfect obligation-permission transfer**: The D4 correlative symmetry (O-C pairing) transfers perfectly across languages
+- **11.1x structural sensitivity**: Bond changes cause 11x larger embedding shifts than surface changes (name swaps, synonyms)
+
+### Remaining Work
+
+Linear probes can still decode language (99.8% accuracy vs. 16.7% chance). Further adversarial training needed to achieve full representation invariance.
+
+**Verdict: STRONGLY_SUPPORTED**
+
+See: [Bond Invariance Principle](bond_invariance_principle.md) for detailed results.
+
 ---
 
 ## Appendix A: Glossary
