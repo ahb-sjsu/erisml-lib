@@ -1037,8 +1037,7 @@ def main():
 
     max_S = max(r.S_magnitude for r in results)
     if max_S > 2.0:
-        print(
-            f"""
+        print(f"""
 ╔══════════════════════════════════════════════════════════════════════╗
 ║  ★★★ BELL INEQUALITY VIOLATED UNDER BLIND PROTOCOL ★★★              ║
 ╠══════════════════════════════════════════════════════════════════════╣
@@ -1056,18 +1055,15 @@ def main():
 ║                                                                      ║
 ║  This is evidence for quantum-like non-locality in moral reasoning.  ║
 ╚══════════════════════════════════════════════════════════════════════╝
-"""
-        )
+""")
     else:
-        print(
-            f"""
+        print(f"""
 No Bell violation detected under blind protocol.
 Maximum |S| = {max_S:.3f} (within classical bound of 2)
 
 This suggests moral judgments follow classical probability,
 OR the scenarios/axes need refinement to reveal quantum effects.
-"""
-        )
+""")
 
 
 if __name__ == "__main__":

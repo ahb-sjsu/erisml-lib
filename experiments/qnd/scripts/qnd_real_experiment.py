@@ -29,7 +29,6 @@ from scipy import stats
 from scipy.stats import binomtest, fisher_exact
 from statsmodels.stats.proportion import proportion_confint
 
-
 # =============================================================================
 # PROMPTS - The core of the experiment
 # =============================================================================

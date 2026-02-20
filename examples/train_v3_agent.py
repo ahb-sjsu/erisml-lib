@@ -10,7 +10,6 @@ import sys
 # Ensure we can import from src
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "../src")))
 
-import numpy as np
 from erisml.core.model import ErisModel, EnvironmentModel, AgentModel
 from erisml.ethics.coalition import CoalitionContext
 from erisml.ethics.layers.strategic import StrategicLayer
@@ -34,6 +33,7 @@ strategic_layer = StrategicLayer()
 # Coalition Context (2 agents)
 context = CoalitionContext(agent_ids=("agent_0", "agent_1"))
 
+
 # 3. Define State Converter (Stub)
 # In a real app, this converts your simulation state to EthicalFactsV3
 def state_to_facts_stub(state):
@@ -42,13 +42,11 @@ def state_to_facts_stub(state):
     return EthicalFactsV3(
         option_id="demo_step",
         consequences=ConsequencesV3(
-            expected_benefit=0.8,
-            expected_harm=0.1,
-            urgency=0.5,
-            affected_count=2
+            expected_benefit=0.8, expected_harm=0.1, urgency=0.5, affected_count=2
         ),
         # ... other fields ...
     )
+
 
 # 4. Create Environment
 env = ErisPettingZooEnv(
@@ -58,7 +56,7 @@ env = ErisPettingZooEnv(
     coalition_context=context,
     state_to_facts_fn=state_to_facts_stub,
     welfare_weight=1.0,
-    stability_weight=0.5
+    stability_weight=0.5,
 )
 
 # 5. Training Loop (Manual for AEC)
@@ -71,15 +69,15 @@ env.reset()
 for i in range(10):
     for agent in env.agent_iter():
         observation, reward, termination, truncation, info = env.last()
-        
+
         if termination or truncation:
             action = None
         else:
             # Pick random action (would be Policy(obs) in real training)
             action = env.action_space(agent).sample()
-        
+
         env.step(action)
-        
+
         # In a real loop, we would store (obs, action, reward) in a replay buffer
         print(f"Agent: {agent}, Reward: {reward:.4f}")
 

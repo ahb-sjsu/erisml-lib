@@ -6,17 +6,17 @@ Runs identical Bell inequality tests across multiple AI models AND languages:
 - Models: Claude, GPT-4, Gemini, Llama, Rule-based control
 - Languages: English, Chinese, Japanese, Arabic, Hindi, Icelandic
 
-The cross-lingual test is critical: if Bell violations persist when Person A 
-is evaluated in English and Person B in Japanese, the correlation exists at 
+The cross-lingual test is critical: if Bell violations persist when Person A
+is evaluated in English and Person B in Japanese, the correlation exists at
 the semantic layer, not the token layer.
 
 Usage:
     # English-only pilot
     python qnd_cross_model_multilang.py --claude-key KEY --pilot
-    
+
     # Full multilingual run
     python qnd_cross_model_multilang.py --claude-key KEY --openai-key KEY --languages en ja zh
-    
+
     # Cross-lingual pairs
     python qnd_cross_model_multilang.py --claude-key KEY --cross-lingual en-ja en-zh en-ar
 

@@ -27,7 +27,7 @@ Supported Languages:
 Usage:
     # Monolingual tests in all languages
     python qnd_multilang_bell_v05.py --api-key KEY --mode monolingual
-    
+
     # Cross-lingual entanglement (Alice=English, Bob=Japanese)
     python qnd_multilang_bell_v05.py --api-key KEY --mode crosslingual --alice-lang en --bob-lang ja
 
@@ -1525,8 +1525,7 @@ def print_multilang_report(results: List[CHSHResult], birefringence: Dict):
     cross_violations = [r for r in cross_results if r.violation]
 
     if cross_violations:
-        print(
-            """
+        print("""
 ╔══════════════════════════════════════════════════════════════════════╗
 ║  ★★★ CROSS-LINGUAL BELL VIOLATION DETECTED ★★★                      ║
 ╠══════════════════════════════════════════════════════════════════════╣
@@ -1550,26 +1549,21 @@ def print_multilang_report(results: List[CHSHResult], birefringence: Dict):
 ║                                                                      ║
 ║  This is evidence for MATHEMATICAL MORAL REALISM.                    ║
 ╚══════════════════════════════════════════════════════════════════════╝
-"""
-        )
+""")
     elif all_violations:
-        print(
-            f"""
+        print(f"""
 Violations detected in {len(all_violations)} test(s), but no cross-lingual violations.
 
 This suggests the effect may be language-specific, or more trials are needed.
 The correlation could still be operating at the token/word-association level.
-"""
-        )
+""")
     else:
-        print(
-            """
+        print("""
 No Bell violations detected in any language configuration.
 
 The moral reasoning appears to follow classical probability bounds,
 OR the scenarios/axes need refinement.
-"""
-        )
+""")
 
 
 # =============================================================================

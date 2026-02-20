@@ -12,7 +12,7 @@ The experiment uses three "Entangled AITA" scenarios:
 3. The "Tainted" Inheritance (Temporal Entanglement) - Past harm, present verdict
 
 For each scenario, we measure correlations across 4 axis combinations:
-- E(a, b): Alice on axis a, Bob on axis b  
+- E(a, b): Alice on axis a, Bob on axis b
 - E(a, b'): Alice on axis a, Bob on axis b'
 - E(a', b): Alice on axis a', Bob on axis b
 - E(a', b'): Alice on axis a', Bob on axis b'
@@ -795,8 +795,7 @@ def print_chsh_report(chsh_results: List[CHSHResult]):
     print("\n" + "-" * 70)
     print("INTERPRETATION GUIDE")
     print("-" * 70)
-    print(
-        """
+    print("""
 If |S| > 2:
   → Strong evidence for quantum-like non-locality in moral judgment
   → Alice and Bob's moral states cannot be described independently
@@ -813,8 +812,7 @@ If |S| < 2:
 If |S| > 2√2:
   → Likely experimental error or bias
   → Even quantum mechanics has this upper bound
-"""
-    )
+""")
 
 
 def print_full_report(
@@ -1072,8 +1070,7 @@ def main():
 
     max_S = max(abs(r.S) for r in chsh_results)
     if max_S > 2.0:
-        print(
-            f"""
+        print(f"""
 ★★★ BELL INEQUALITY VIOLATED ★★★
 
 Maximum |S| = {max_S:.3f} > 2 (classical limit)
@@ -1089,11 +1086,9 @@ Implications:
 
 This result suggests that moral reasoning may require a
 quantum probability framework rather than classical logic.
-"""
-        )
+""")
     elif max_S > 1.8:
-        print(
-            f"""
+        print(f"""
 ~ BORDERLINE RESULT ~
 
 Maximum |S| = {max_S:.3f} (approaching classical limit of 2)
@@ -1105,11 +1100,9 @@ This is suggestive but not conclusive. Recommend:
 
 The moral judgment system shows strong correlations that
 approach but do not clearly exceed classical bounds.
-"""
-        )
+""")
     else:
-        print(
-            f"""
+        print(f"""
 ✗ NO BELL VIOLATION DETECTED
 
 Maximum |S| = {max_S:.3f} < 2 (within classical bounds)
@@ -1122,8 +1115,7 @@ Consider:
 1. Different entangled scenarios
 2. Alternative measurement axes
 3. The order effects test may still show non-commutativity
-"""
-        )
+""")
 
 
 if __name__ == "__main__":

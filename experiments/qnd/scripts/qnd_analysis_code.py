@@ -160,8 +160,7 @@ result_5 = binomtest(n_effects, n_total, 0.05, alternative="greater")
 z_5 = (effect_rate - 0.05) / math.sqrt(0.05 * 0.95 / n_total)
 sigma_5 = stats.norm.ppf(1 - result_5.pvalue) if result_5.pvalue > 1e-16 else 8.5
 
-print(
-    f"""
+print(f"""
 ╔══════════════════════════════════════════════════════════════════════════╗
 ║                    QND EXPERIMENT - FINAL RESULTS                        ║
 ╠══════════════════════════════════════════════════════════════════════════╣
@@ -185,11 +184,9 @@ print(
 ║    ✓ YTA shows highest rate:  {yta_effects/yta_total:.1%}                                         ║
 ║    ✓ [Ĥ, Î] ≠ 0 confirmed                                                ║
 ╚══════════════════════════════════════════════════════════════════════════╝
-"""
-)
+""")
 
-print(
-    """
+print("""
 ═══════════════════════════════════════════════════════════════════════════
                          INTERPRETATION
 ═══════════════════════════════════════════════════════════════════════════
@@ -214,5 +211,4 @@ Quantum Normative Dynamics is empirically supported at the 6σ level
 This is the first empirical validation of quantum-like effects in moral
 cognition using real ethical dilemmas.
 ═══════════════════════════════════════════════════════════════════════════
-"""
-)
+""")

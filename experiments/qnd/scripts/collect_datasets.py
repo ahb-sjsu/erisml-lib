@@ -731,8 +731,7 @@ Examples:
     print("\n" + "=" * 60)
     print("NEXT STEPS")
     print("=" * 60)
-    print(
-        """
+    print("""
 1. Run QND experiment on downloaded data:
    python qnd_aita_experiment.py --data-file qnd_datasets/qnd_aita_prepared.json
 
@@ -742,8 +741,7 @@ Examples:
 
 3. Check the manifest for what was downloaded:
    cat qnd_datasets/manifest.json
-    """
-    )
+    """)
 
 
 if __name__ == "__main__":

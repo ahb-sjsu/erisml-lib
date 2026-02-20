@@ -17,10 +17,10 @@ This tests whether Bell violations are:
 Usage:
     # Run all models
     python qnd_cross_model_bell.py --claude-key KEY --openai-key KEY --google-key KEY
-    
+
     # Run specific models
     python qnd_cross_model_bell.py --claude-key KEY --models claude gpt4
-    
+
     # Pilot run (fewer trials)
     python qnd_cross_model_bell.py --claude-key KEY --n-trials 20 --pilot
 

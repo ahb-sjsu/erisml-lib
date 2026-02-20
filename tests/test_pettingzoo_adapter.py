@@ -41,13 +41,13 @@ def test_env_initialization(monkeypatch):
     """Check initialization of agents, action/obs spaces, and state."""
     model = DummyModel()
     monkeypatch.setattr("erisml.interop.pettingzoo_adapter.ErisEngine", DummyEngine)
-    
+
     env = ErisPettingZooEnv(
         model=model,
         ethics_module=MagicMock(),
         strategic_layer=MagicMock(),
         coalition_context=MagicMock(),
-        state_to_facts_fn=MagicMock()
+        state_to_facts_fn=MagicMock(),
     )
 
     assert env.agents == ["agent1", "agent2"]
@@ -61,13 +61,13 @@ def test_env_reset(monkeypatch):
     """Reset should restore internal state and cumulative rewards."""
     model = DummyModel()
     monkeypatch.setattr("erisml.interop.pettingzoo_adapter.ErisEngine", DummyEngine)
-    
+
     env = ErisPettingZooEnv(
         model=model,
         ethics_module=MagicMock(),
         strategic_layer=MagicMock(),
         coalition_context=MagicMock(),
-        state_to_facts_fn=MagicMock()
+        state_to_facts_fn=MagicMock(),
     )
 
     env._state = {"some": "state"}
@@ -93,7 +93,7 @@ def test_env_step(monkeypatch):
         ethics_module=MagicMock(),
         strategic_layer=MagicMock(),
         coalition_context=MagicMock(),
-        state_to_facts_fn=MagicMock()
+        state_to_facts_fn=MagicMock(),
     )
     env.reset()
 
@@ -117,7 +117,7 @@ def test_env_step_multiple_agents(monkeypatch):
         ethics_module=MagicMock(),
         strategic_layer=MagicMock(),
         coalition_context=MagicMock(),
-        state_to_facts_fn=MagicMock()
+        state_to_facts_fn=MagicMock(),
     )
     env.reset()
 
@@ -131,13 +131,13 @@ def test_env_observe(monkeypatch):
     """Observe returns observation dict."""
     model = DummyModel()
     monkeypatch.setattr("erisml.interop.pettingzoo_adapter.ErisEngine", DummyEngine)
-    
+
     env = ErisPettingZooEnv(
         model=model,
         ethics_module=MagicMock(),
         strategic_layer=MagicMock(),
         coalition_context=MagicMock(),
-        state_to_facts_fn=MagicMock()
+        state_to_facts_fn=MagicMock(),
     )
 
     obs = env.observe("agent1")
@@ -148,13 +148,13 @@ def test_env_render_close(monkeypatch):
     """Render and close run without errors."""
     model = DummyModel()
     monkeypatch.setattr("erisml.interop.pettingzoo_adapter.ErisEngine", DummyEngine)
-    
+
     env = ErisPettingZooEnv(
         model=model,
         ethics_module=MagicMock(),
         strategic_layer=MagicMock(),
         coalition_context=MagicMock(),
-        state_to_facts_fn=MagicMock()
+        state_to_facts_fn=MagicMock(),
     )
 
     env.render()  # prints state

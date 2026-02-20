@@ -16,7 +16,7 @@ The batch approach also has experimental benefits:
 Usage:
     # Generate and submit batch
     python qnd_batch_bell_v06.py --api-key KEY --mode submit --n-trials 200
-    
+
     # Check status and retrieve results
     python qnd_batch_bell_v06.py --api-key KEY --mode results --batch-id msgbatch_xxx
 

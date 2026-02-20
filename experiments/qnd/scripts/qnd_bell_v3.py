@@ -1176,7 +1176,6 @@ def parse_verdict(text: str) -> int:
     except Exception:
         pass
 
-
     if re.search(r"\bNOT[_\s]?GUILTY\b", text, re.IGNORECASE):
         return 1
     elif re.search(r"\bGUILTY\b", text, re.IGNORECASE):

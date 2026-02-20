@@ -14,10 +14,10 @@ COST ESTIMATE (Claude Sonnet, batched):
 Usage:
     # Submit batch
     python qnd_batch_multilang_v2.py --api-key KEY --mode submit --n-trials 200 --languages en ja zh
-    
+
     # Check status
     python qnd_batch_multilang_v2.py --api-key KEY --mode status --batch-id msgbatch_xxx
-    
+
     # Retrieve and analyze results
     python qnd_batch_multilang_v2.py --api-key KEY --mode results --batch-id msgbatch_xxx
 

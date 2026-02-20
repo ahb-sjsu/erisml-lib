@@ -41,7 +41,6 @@ from erisml.ethics.domain.em_profile import (
     OverridePolicy,
 )
 
-
 # ---------- CLI helpers (menus, prompts) ----------
 
 

@@ -385,8 +385,7 @@ def print_analysis(analysis: Dict, output_dir: Path):
     print("=" * 80)
 
     if analysis.get("interference_detected"):
-        print(
-            """
+        print("""
 INTERFERENCE CONFIRMED
 
 The probability of judging an action as wrong DURING the decision
@@ -399,18 +398,15 @@ but a superposition with interference terms.
 
 Constructive interference (during > classical): amplitudes adding
 Destructive interference (during < classical): amplitudes canceling
-"""
-        )
+""")
     else:
-        print(
-            """
+        print("""
 NO SIGNIFICANT INTERFERENCE
 
 The probability during decision matches the classical expectation.
 This is consistent with classical probability: the state during
 decision is a mixture, not a superposition.
-"""
-        )
+""")
 
     # Save
     path = output_dir / "qnd_interference_results.json"

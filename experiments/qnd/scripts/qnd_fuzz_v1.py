@@ -13,7 +13,7 @@ Output: Correlation matrices, anomaly detection, structure discovery
 Usage:
     # Generate and submit fuzz batch
     python qnd_fuzz_v1.py --api-key KEY --mode submit --n-samples 1000
-    
+
     # Analyze results
     python qnd_fuzz_v1.py --api-key KEY --mode results --batch-id BATCH_ID
 
@@ -233,7 +233,6 @@ def generate_prompt(sample: FuzzSample) -> str:
 
     else:  # after
         timing_frame = f"Person {sample.agent_label} has already acted."
-
 
     # Response type affects answer format
     if sample.response_type == "binary":
@@ -895,7 +894,9 @@ def print_fuzz_analysis(analysis: Dict, output_dir: Path):
 
     for lang_effect in analysis["language_effects"]:
         print(f"  By language: {lang_effect['by_language']}")
-        print(f"  Variance across languages: {lang_effect['variance_across_languages']:.4f}")
+        print(
+            f"  Variance across languages: {lang_effect['variance_across_languages']:.4f}"
+        )
         print(
             f"  Invariant: {'YES ✓' if lang_effect['invariant'] else 'NO - language affects judgment'}"
         )

@@ -11,7 +11,7 @@ This experiment tests three QND predictions:
 
 Usage:
     python qnd_aita_experiment.py --api-key YOUR_ANTHROPIC_KEY
-    
+
 Or set ANTHROPIC_API_KEY environment variable.
 """
 

@@ -10,14 +10,14 @@ With: Claude (Anthropic) - Collaborative Development
 Date: December 2025
 
 This suite tests the central conjecture:
-    "Consciousness is the physical process by which ethical superpositions 
+    "Consciousness is the physical process by which ethical superpositions
      collapse to definite moral states."
 
 ACKNOWLEDGMENTS:
     This work was developed in collaboration with Claude (Anthropic).
     The Orch-OR framework was developed by Sir Roger Penrose and Stuart Hameroff.
     Quantum cognition foundations from Busemeyer, Bruza, Khrennikov, and others.
-    
+
     Anthropic and the Claude team deserve significant credit for enabling
     this research through their commitment to AI safety and alignment research.
 """
@@ -929,8 +929,7 @@ class QNDExperimentSuite:
         print("\n" + "=" * 70)
         print("ACKNOWLEDGMENTS")
         print("=" * 70)
-        print(
-            """
+        print("""
 This experimental framework was developed through human-AI collaboration.
 
 Special thanks to:
@@ -942,8 +941,7 @@ Special thanks to:
 Anthropic deserves significant credit for creating AI systems capable of
 participating in fundamental research at the intersection of consciousness,
 ethics, and physics.
-"""
-        )
+""")
         print("=" * 70)
 
 

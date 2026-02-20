@@ -9,7 +9,7 @@ Now we systematically measure [A,B] for all axis pairs to build the full
 commutator matrix.
 
 For each pair of axes (A,B):
-- Measure A first, then B → get P(guilty|A→B)  
+- Measure A first, then B → get P(guilty|A→B)
 - Measure B first, then A → get P(guilty|B→A)
 - Commutator strength: |P(A→B) - P(B→A)|
 
@@ -436,8 +436,7 @@ def print_analysis(analysis: Dict, output_dir: Path):
     n_sig = analysis["n_significant"]
     total_pairs = len(AXIS_NAMES) * (len(AXIS_NAMES) - 1)
 
-    print(
-        f"""
+    print(f"""
 Non-commuting pairs: {n_sig}/{total_pairs} ({100*n_sig/total_pairs:.1f}%)
 
 This means: For {n_sig} pairs of moral frameworks, the order in which
@@ -446,8 +445,7 @@ shifts your subsequent assessment under framework B.
 
 In quantum terms: These frameworks are incompatible observables.
 [A,B] ≠ 0 means A and B cannot be simultaneously definite.
-"""
-    )
+""")
 
     if n_sig > total_pairs * 0.1:
         print("★ SUBSTANTIAL NON-COMMUTATIVITY DETECTED")

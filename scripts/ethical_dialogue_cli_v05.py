@@ -30,7 +30,6 @@ from erisml.ethics.profile_v04 import (
 )
 from erisml.ethics.governance.config_v2 import DimensionWeights
 
-
 # ---------------------------------------------------------------------------
 # CLI helpers (same as v04)
 # ---------------------------------------------------------------------------
