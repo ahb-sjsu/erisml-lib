@@ -15,7 +15,8 @@ from erisml.ethics.coalition import CoalitionContext
 from erisml.ethics.layers.strategic import StrategicLayer
 from erisml.ethics.modules.tier0.geneva_em_v3 import GenevaEMV3
 from erisml.interop.pettingzoo_adapter import ErisPettingZooEnv
-from erisml.ethics.facts_v3 import EthicalFactsV3, ConsequencesV3
+from erisml.ethics.facts_v3 import EthicalFactsV3
+from erisml.ethics.facts import EthicalFacts, Consequences, RightsAndDuties, JusticeAndFairness
 
 # 1. Setup Eris Model (Stub)
 env_model = EnvironmentModel(name="ResourceAllocation")
@@ -38,14 +39,23 @@ context = CoalitionContext(agent_ids=("agent_0", "agent_1"))
 # In a real app, this converts your simulation state to EthicalFactsV3
 def state_to_facts_stub(state):
     # Retrieve state variables...
-    # Create dummy facts for demo
-    return EthicalFactsV3(
+    # Create dummy V2 facts and promote to V3
+    v2_facts = EthicalFacts(
         option_id="demo_step",
-        consequences=ConsequencesV3(
+        consequences=Consequences(
             expected_benefit=0.8, expected_harm=0.1, urgency=0.5, affected_count=2
         ),
-        # ... other fields ...
+        rights_and_duties=RightsAndDuties(
+            violates_rights=False,
+            has_valid_consent=True,
+            violates_explicit_rule=False,
+            role_duty_conflict=False,
+        ),
+        justice_and_fairness=JusticeAndFairness(
+            discriminates_on_protected_attr=False, prioritizes_most_disadvantaged=True
+        ),
     )
+    return EthicalFactsV3.from_v2(v2_facts, parties=["agent_0", "agent_1"])
 
 
 # 4. Create Environment

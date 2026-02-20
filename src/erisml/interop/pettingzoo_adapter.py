@@ -93,6 +93,13 @@ class ErisPettingZooEnv(AECEnv):
         self._cumulative_rewards = {a: 0.0 for a in self.agents}
         self._last_judgement: EthicalJudgementV3 | None = None
         self._last_analysis: StrategicAnalysisResult | None = None
+        
+        # AEC required attributes
+        self.rewards = {a: 0.0 for a in self.agents}
+        self.terminations = {a: False for a in self.agents}
+        self.truncations = {a: False for a in self.agents}
+        self.infos = {a: {} for a in self.agents}
+        self.agent_selection = ""
 
         # Action space: Discrete(4) is a placeholder. Real implementations should override.
         self.action_spaces: Dict[str, spaces.Space] = {
@@ -114,6 +121,14 @@ class ErisPettingZooEnv(AECEnv):
         self._cumulative_rewards = {a: 0.0 for a in self.agents}
         self._last_judgement = None
         self._last_analysis = None
+        
+        # Reset AEC attributes
+        self.rewards = {a: 0.0 for a in self.agents}
+        self.terminations = {a: False for a in self.agents}
+        self.truncations = {a: False for a in self.agents}
+        self.infos = {a: {} for a in self.agents}
+        self._cumulative_rewards = {a: 0.0 for a in self.agents}
+        self.agent_selection = self.agents[0] if self.agents else ""
 
         # Initial ethical assessment of the starting state
         self._perform_ethical_assessment()
@@ -171,6 +186,7 @@ class ErisPettingZooEnv(AECEnv):
 
         # 4. Cycle agents
         self._agent_index = (self._agent_index + 1) % len(self.agents)
+        self.agent_selection = self.agents[self._agent_index]
 
     def _perform_ethical_assessment(self) -> None:
         """Evaluate current state using Ethics Module and Strategic Layer."""

@@ -172,7 +172,8 @@ def demo_nonabelian_structure() -> None:
         via_sr = d4_apply_to_state(r, d4_apply_to_state(s, state))
 
         print(
-            f"  {state.value}: r then s -> {via_rs.value}, s then r -> {via_sr.value}"
+            f"  {state.value}: r then s -> {via_rs.value}, "
+            f"s then r -> {via_sr.value}"
         )
 
     print("""
@@ -275,10 +276,12 @@ returns to the predicted state (holonomy computation).
 
         print(f"Starting from {initial.value}:")
         print(
-            f"  Path srs: {initial.value} -> {final_srs.value}, holonomy={holonomy_srs.value}, matched={matched_srs}"
+            f"  Path srs: {initial.value} -> {final_srs.value}, "
+            f"holonomy={holonomy_srs.value}, matched={matched_srs}"
         )
         print(
-            f"  Path r^3: {initial.value} -> {final_r3.value}, holonomy={holonomy_r3.value}, matched={matched_r3}"
+            f"  Path r^3: {initial.value} -> {final_r3.value}, "
+            f"holonomy={holonomy_r3.value}, matched={matched_r3}"
         )
 
     print("""

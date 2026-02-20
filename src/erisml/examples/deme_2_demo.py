@@ -144,10 +144,12 @@ MoralVector replaces scalar normative_score with 8+1 dimensions:
     # Distance metrics
     print("\n3. Distance Metrics:")
     print(
-        f"  Euclidean distance: {good_option.distance(problematic_option, 'euclidean'):.3f}"
+        f"  Euclidean distance: "
+        f"{good_option.distance(problematic_option, 'euclidean'):.3f}"
     )
     print(
-        f"  Manhattan distance: {good_option.distance(problematic_option, 'manhattan'):.3f}"
+        f"  Manhattan distance: "
+        f"{good_option.distance(problematic_option, 'manhattan'):.3f}"
     )
 
 
