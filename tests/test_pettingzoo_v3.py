@@ -6,9 +6,8 @@ Tests for V3 PettingZoo Adapter.
 """
 
 import unittest
-from unittest.mock import MagicMock, ANY
+from unittest.mock import MagicMock
 
-import numpy as np
 from erisml.core.model import ErisModel, EnvironmentModel
 from erisml.ethics.coalition import CoalitionContext
 from erisml.ethics.judgement_v3 import EthicalJudgementV3

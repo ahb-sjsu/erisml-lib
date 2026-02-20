@@ -21,7 +21,6 @@ from __future__ import annotations
 
 from typing import Any, Dict, Callable
 
-import numpy as np
 from gymnasium import spaces
 from pettingzoo.utils import AECEnv  # type: ignore
 
@@ -33,7 +32,6 @@ from erisml.ethics.facts_v3 import EthicalFactsV3
 from erisml.ethics.layers.strategic import StrategicLayer, StrategicAnalysisResult
 from erisml.ethics.modules.base_v3 import BaseEthicsModuleV3
 from erisml.ethics.judgement_v3 import EthicalJudgementV3
-from erisml.ethics.moral_vector import MoralVector
 
 
 class ErisPettingZooEnv(AECEnv):
