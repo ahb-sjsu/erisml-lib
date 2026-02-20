@@ -5,6 +5,7 @@ from types import SimpleNamespace
 from erisml.interop.pettingzoo_adapter import ErisPettingZooEnv
 from erisml.core.model import ErisModel
 from erisml.core.types import ActionInstance
+from unittest.mock import MagicMock
 
 # ---------------------------
 # Dummy classes for testing
@@ -40,7 +41,14 @@ def test_env_initialization(monkeypatch):
     """Check initialization of agents, action/obs spaces, and state."""
     model = DummyModel()
     monkeypatch.setattr("erisml.interop.pettingzoo_adapter.ErisEngine", DummyEngine)
-    env = ErisPettingZooEnv(model)
+    
+    env = ErisPettingZooEnv(
+        model=model,
+        ethics_module=MagicMock(),
+        strategic_layer=MagicMock(),
+        coalition_context=MagicMock(),
+        state_to_facts_fn=MagicMock()
+    )
 
     assert env.agents == ["agent1", "agent2"]
     assert env.possible_agents == ["agent1", "agent2"]
@@ -53,7 +61,14 @@ def test_env_reset(monkeypatch):
     """Reset should restore internal state and cumulative rewards."""
     model = DummyModel()
     monkeypatch.setattr("erisml.interop.pettingzoo_adapter.ErisEngine", DummyEngine)
-    env = ErisPettingZooEnv(model)
+    
+    env = ErisPettingZooEnv(
+        model=model,
+        ethics_module=MagicMock(),
+        strategic_layer=MagicMock(),
+        coalition_context=MagicMock(),
+        state_to_facts_fn=MagicMock()
+    )
 
     env._state = {"some": "state"}
     env._cumulative_rewards["agent1"] = 5.0
@@ -73,7 +88,13 @@ def test_env_step(monkeypatch):
         "erisml.interop.pettingzoo_adapter.ErisEngine", lambda m: engine_instance
     )
 
-    env = ErisPettingZooEnv(model)
+    env = ErisPettingZooEnv(
+        model=model,
+        ethics_module=MagicMock(),
+        strategic_layer=MagicMock(),
+        coalition_context=MagicMock(),
+        state_to_facts_fn=MagicMock()
+    )
     env.reset()
 
     env.step(0)
@@ -91,7 +112,13 @@ def test_env_step_multiple_agents(monkeypatch):
         "erisml.interop.pettingzoo_adapter.ErisEngine", lambda m: engine_instance
     )
 
-    env = ErisPettingZooEnv(model)
+    env = ErisPettingZooEnv(
+        model=model,
+        ethics_module=MagicMock(),
+        strategic_layer=MagicMock(),
+        coalition_context=MagicMock(),
+        state_to_facts_fn=MagicMock()
+    )
     env.reset()
 
     env.step(0)
@@ -101,20 +128,34 @@ def test_env_step_multiple_agents(monkeypatch):
 
 
 def test_env_observe(monkeypatch):
-    """Observe returns empty dict."""
+    """Observe returns observation dict."""
     model = DummyModel()
     monkeypatch.setattr("erisml.interop.pettingzoo_adapter.ErisEngine", DummyEngine)
-    env = ErisPettingZooEnv(model)
+    
+    env = ErisPettingZooEnv(
+        model=model,
+        ethics_module=MagicMock(),
+        strategic_layer=MagicMock(),
+        coalition_context=MagicMock(),
+        state_to_facts_fn=MagicMock()
+    )
 
     obs = env.observe("agent1")
-    assert obs == {}
+    assert "physical" in obs
 
 
 def test_env_render_close(monkeypatch):
     """Render and close run without errors."""
     model = DummyModel()
     monkeypatch.setattr("erisml.interop.pettingzoo_adapter.ErisEngine", DummyEngine)
-    env = ErisPettingZooEnv(model)
+    
+    env = ErisPettingZooEnv(
+        model=model,
+        ethics_module=MagicMock(),
+        strategic_layer=MagicMock(),
+        coalition_context=MagicMock(),
+        state_to_facts_fn=MagicMock()
+    )
 
     env.render()  # prints state
     env.close()  # no-op
