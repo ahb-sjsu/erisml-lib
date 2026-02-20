@@ -101,7 +101,7 @@ class ErisPettingZooEnv(AECEnv):
             a: spaces.Discrete(4) for a in self.agents
         }
 
-        # Observation space: 
+        # Observation space:
         # We need a defined space. For now, we use a simple Dict or Box.
         # This is strictly a placeholder as this class is intended to be subclassed
         # or the spaces injected.
@@ -116,41 +116,45 @@ class ErisPettingZooEnv(AECEnv):
         self._cumulative_rewards = {a: 0.0 for a in self.agents}
         self._last_judgement = None
         self._last_analysis = None
-        
+
         # Initial ethical assessment of the starting state
         self._perform_ethical_assessment()
 
     def observe(self, agent: str) -> Dict[str, Any]:
         """
-        Return observation for agent. 
+        Return observation for agent.
         Enhances physical state with ethical/strategic metrics.
         """
         obs = {
-            "physical": self._state, # Placeholder
+            "physical": self._state,  # Placeholder
         }
         obs = {
-            "physical": self._state, # Placeholder
+            "physical": self._state,  # Placeholder
         }
-        
+
         if self._last_judgement:
-             # Provide the ethical assessment for this agent
+            # Provide the ethical assessment for this agent
             vector = self._last_judgement.get_party_vector(agent)
             obs["ethical_welfare"] = vector.to_scalar()
             obs["verdict"] = self._last_judgement.get_party_verdict(agent)
-            
+
         if self._last_analysis and self._last_analysis.coalition_analysis:
-            obs["stability_score"] = self._last_analysis.coalition_analysis.stability_score
-            obs["shapley_value"] = self._last_analysis.coalition_analysis.get_shapley(agent)
-            
+            obs["stability_score"] = (
+                self._last_analysis.coalition_analysis.stability_score
+            )
+            obs["shapley_value"] = self._last_analysis.coalition_analysis.get_shapley(
+                agent
+            )
+
         return obs
 
     def step(self, action: int) -> None:
         if not self.agents:
             return
-            
+
         agent = self.agents[self._agent_index]
         self._cumulative_rewards[agent] = 0
-        
+
         # 1. Execute Physical Step
         act_instance = self._decode_action(agent, action)
         try:
@@ -159,14 +163,14 @@ class ErisPettingZooEnv(AECEnv):
             print(f"Norm or engine error: {exc}")
             # Penalize agent for crashing logic?
             # self.rewards[agent] -= 10.0
-            
+
         # 2. Perform Ethical & Strategic Assessment (V3)
         self._perform_ethical_assessment()
-        
+
         # 3. Calculate Rewards based on Ethics + Strategy
         reward = self._calculate_reward(agent)
         self._cumulative_rewards[agent] += reward
-        
+
         # 4. Cycle agents
         self._agent_index = (self._agent_index + 1) % len(self.agents)
 
@@ -174,14 +178,13 @@ class ErisPettingZooEnv(AECEnv):
         """Evaluate current state using Ethics Module and Strategic Layer."""
         # A. Convert state to facts
         facts = self.state_to_facts_fn(self._state)
-        
+
         # B. Ethics Module Evaluation -> MoralTensor
         self._last_judgement = self.ethics_module.judge_distributed(facts)
-        
+
         # C. Strategic Analysis -> Coalition Stability
         self._last_analysis = self.strategic_layer.analyze(
-            self._last_judgement.moral_tensor, 
-            self.coalition_context
+            self._last_judgement.moral_tensor, self.coalition_context
         )
 
     def _calculate_reward(self, agent: str) -> float:
@@ -190,12 +193,12 @@ class ErisPettingZooEnv(AECEnv):
         Reward = (w1 * agent_welfare) + (w2 * stability)
         """
         reward = 0.0
-        
+
         if self._last_judgement:
             vec = self._last_judgement.get_party_vector(agent)
             # ethical_welfare = vec.to_scalar() which handles inversion of harm
             welfare_score = vec.to_scalar()
-            
+
             reward += self.welfare_weight * welfare_score
 
         if self._last_analysis and self._last_analysis.coalition_analysis:
@@ -203,7 +206,7 @@ class ErisPettingZooEnv(AECEnv):
             # Agents are rewarded for maintaining a stable coalition
             stability = self._last_analysis.coalition_analysis.stability_score
             reward += self.stability_weight * stability
-            
+
         return reward
 
     def _decode_action(self, agent: str, action: int) -> ActionInstance:
@@ -215,7 +218,9 @@ class ErisPettingZooEnv(AECEnv):
         if self._last_judgement:
             print(f"Verdict: {self._last_judgement.verdict}")
         if self._last_analysis and self._last_analysis.coalition_analysis:
-            print(f"Stability: {self._last_analysis.coalition_analysis.stability_score:.2f}")
+            print(
+                f"Stability: {self._last_analysis.coalition_analysis.stability_score:.2f}"
+            )
 
     def close(self) -> None:
         pass
