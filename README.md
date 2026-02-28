@@ -1,10 +1,10 @@
 # ErisML
 **A library for governed, foundation-model-enabled agents with tensorial ethics.**
 
-## 🚀 Quick Start (v0.1.0)
+## 🚀 Quick Start (v3.0.0)
 You can now install ErisML directly from PyPI:
 ```bash
-pip install erisml
+pip install erisml-lib-lib
 ```
 
 To verify your installation and run the ethics demo:
@@ -1005,7 +1005,7 @@ See `erisml/ethics/interop/` and the examples for details.
 #### Installation
 
 ```bash
-pip install erisml
+pip install erisml-lib
 ```
 
 #### Running the Server
