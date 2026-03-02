@@ -50,7 +50,7 @@ San Jos\'{e} State University\\
 \begin{abstract}
 AI alignment techniques---RLHF, constitutional AI, scalar reward optimization, output filtering---operate on a shared mathematical assumption: that moral evaluation can be reduced to a scalar. We prove this assumption is information-theoretically untenable. The \emph{Information Monotonicity Theorem} establishes that any contraction of a multi-dimensional moral assessment to a scalar is irreversibly lossy; the \emph{Mandatory Canonicalization Theorem} proves that post-hoc compliance checking is insufficient for norm-compliant behavior. Specification gaming, reward hacking, and value collapse are therefore not engineering bugs---they are mathematical consequences of optimizing over the wrong structure.
 
-This paper introduces \emph{Geometric Ethics}, a framework that replaces scalar moral objectives with their natural mathematical habitat: a nine-dimensional Whitney stratified space equipped with a Riemannian metric, gauge symmetry, and a Noether conservation law. Moral reasoning is shown to be equivalent to $A^*$ pathfinding on this manifold, where moral obligations function as pre-compiled heuristic vectors $h(n)$ steering agents toward a $D_4 \times U(1)_\harm$ gauge-symmetric equilibrium that minimizes behavioral friction. Five principal results support the framework: (1) the \emph{Structured Preservation Theorem}, proving that any non-trivial, continuous moral evaluation must be defined on a manifold; (2) the \emph{Moral Noether Theorem}, deriving harm conservation from re-description invariance; (3) the \emph{$D_4$ Gauge Group Theorem}, establishing the symmetry group of deontic structure; (4) \emph{Information Monotonicity}, proving scalar moral scores are irreversibly lossy; and (5) the \emph{No Escape Theorem}, proving that sufficiently capable AI systems are necessarily subject to geometric moral constraints that cannot be circumvented through representational manipulation.
+This paper introduces \emph{Geometric Ethics}, a framework that replaces scalar moral objectives with a multi-dimensional structure that preserves the information scalars discard. Moral evaluation is represented as a vector (or higher-order tensor) in a nine-dimensional space whose axes correspond to distinct moral dimensions---consequences, rights, fairness, autonomy, privacy, societal impact, virtue, legitimacy, and epistemic status. This space is not smooth everywhere: sharp moral boundaries (e.g., consent thresholds, rights violations) are modeled as discontinuities using \emph{Whitney stratified spaces}---spaces composed of smooth regions joined along lower-dimensional boundaries. The space carries a \emph{metric} encoding context-dependent trade-offs between dimensions, \emph{symmetries} constraining which re-descriptions preserve moral content, and a \emph{conservation law} ensuring that harm cannot be made to appear or disappear through relabeling. Moral reasoning is shown to be equivalent to $A^*$ pathfinding on this space, where moral obligations function as pre-compiled heuristic functions $h(n)$ that steer agents toward low-cost equilibria. Five principal results support the framework: (1) the \emph{Structured Preservation Theorem}, proving that any non-trivial, continuous moral evaluation must be defined on a manifold; (2) the \emph{Moral Noether Theorem}, deriving harm conservation from re-description invariance; (3) the \emph{$D_4$ Gauge Group Theorem}, establishing the symmetry group of deontic structure; (4) \emph{Information Monotonicity}, proving scalar moral scores are irreversibly lossy; and (5) the \emph{No Escape Theorem}, proving that sufficiently capable AI systems are necessarily subject to geometric moral constraints that cannot be circumvented through representational manipulation.
 
 Empirical validation against 20,030 advice-column letters and 109,294 cross-lingual passages spanning 3,000 years and 11 languages confirms that the geometric structure is a stable feature of moral cognition, not an artifact of the formalism. The framework resolves a longstanding metaethical impasse---moral objectivity requires neither transcendent grounding (theism) nor cultural consensus (relativism), but mathematical inevitability under constraint---while providing an immediately actionable engineering methodology: the reference implementation, ErisML (v3.0), is open-source on PyPI and supports tensorial ethics evaluation at sub-microsecond latency on embedded hardware.
 \end{abstract}
@@ -89,11 +89,11 @@ Both frameworks fail because they misunderstand the nature of objectivity. \emph
 This paper formalizes \textbf{Geometric Ethics}, proposing that moral evaluation is a fundamentally geometric phenomenon---an exercise in topological optimization on the space of multi-agent configurations. The framework:
 
 \begin{enumerate}[label=(\roman*)]
-    \item Models the space of ethically relevant configurations as a \emph{Whitney stratified space}---a union of smooth manifolds of varying dimensions connected along boundary strata that encode moral discontinuities.
-    \item Defines \emph{behavioral friction} as the cost function on this space, measuring the energy a multi-agent system must expend to process the consequences of an action.
-    \item Demonstrates that moral reasoning is equivalent to $A^*$ pathfinding on this manifold, where moral obligations serve as pre-compiled heuristic functions $h(n)$.
-    \item Proves that the optimal equilibrium configuration exhibits $D_4 \times U(1)_\harm$ gauge symmetry---the symmetry group of Hohfeldian deontic structure.
-    \item Derives a conservation law for harm from the re-description invariance of the moral Lagrangian, via Noether's theorem.
+    \item Models the space of ethically relevant configurations as a \emph{Whitney stratified space}---a space composed of smooth regions joined along boundaries where moral evaluation changes discontinuously (e.g., the sharp shift when consent is violated, or when a promise is broken).
+    \item Defines \emph{behavioral friction} as the cost function on this space, measuring the total social energy a multi-agent system must expend to process the consequences of an action---analogous to path cost in classical search.
+    \item Demonstrates that moral reasoning is equivalent to $A^*$ pathfinding on this space, where moral obligations (``do not murder,'' ``keep promises'') serve as pre-compiled heuristic functions $h(n)$ that approximate the optimal path without requiring full computation of the entire space.
+    \item Proves that the optimal equilibrium configuration has a specific symmetry structure ($D_4 \times U(1)_\harm$) derived from the four fundamental legal relations identified by Hohfeld (1913)---rights, duties, liberties, and no-rights---and their algebraic transformations under change of perspective.
+    \item Derives a conservation law for harm: just as Noether's theorem in physics shows that symmetries imply conservation laws (time symmetry $\to$ energy conservation), the re-description invariance of moral evaluation implies that harm is conserved---it cannot be created or destroyed by relabeling.
 \end{enumerate}
 
 \subsection{Implications for AI Alignment}
@@ -585,41 +585,35 @@ This result has immediate engineering consequences: the dominant paradigm of ``A
 
 
 %==============================================================================
-\section{Conclusion: The Era of Philosophy Engineering}
+\section{Conclusion}
 \label{sec:conclusion}
 %==============================================================================
 
-\subsection{The Paradigm Shift}
+\subsection{Summary of Contributions}
 
-By stripping ethics of its metaphysical baggage and translating it into the language of differential geometry and computer science, Geometric Ethics provides a unified, computable framework for moral reasoning.
+This paper makes five contributions to AI alignment and the formal foundations of machine ethics:
 
-Morality is not a divine command. It is not a cultural preference. It is a \emph{geometric inevitability}---the unique equilibrium configuration that minimizes behavioral friction in a multi-agent system operating under the constraints of bounded rationality, shared environment, and the requirement of representational invariance.
+\begin{enumerate}
+    \item \textbf{A structural diagnosis of scalar alignment failure.} We prove (Theorem~\ref{thm:info_mono}) that contracting a multi-dimensional moral assessment to a scalar reward is irreversibly information-lossy. This establishes that specification gaming, reward hacking, and value collapse are not engineering bugs but mathematical consequences of the scalar assumption shared by RLHF, constitutional AI, and utility-maximization approaches.
 
-The paradigm shift can be summarized in a table:
+    \item \textbf{A multi-dimensional alternative with empirical grounding.} We construct a nine-dimensional moral evaluation space---a Whitney stratified space with a context-dependent metric---whose dimensional structure is empirically validated across 20,030 advice-column letters and 109,294 cross-lingual passages spanning 3,000 years and 11 languages. The structure is not an ad hoc design choice: we prove (Theorem~\ref{thm:structured}) that any non-trivial, continuous, structure-preserving moral evaluation must be equivalent to one defined on such a space.
 
-\begin{center}
-\begin{tabular}{p{3.5cm}p{3.5cm}p{3.5cm}}
-\toprule
-\textbf{Theological Paradigm} & \textbf{Relativist Paradigm} & \textbf{Geometric Paradigm} \\
-\midrule
-Moral truth is grounded in a transcendent Lawgiver & Moral truth is a cultural construction & Moral truth is a computational invariant \\
-\addlinespace
-Objectivity requires metaphysical necessity & Objectivity is impossible & Objectivity requires mathematical inevitability under constraints \\
-\addlinespace
-Moral convergence explained by shared divine nature & Moral convergence unexplained (or denied) & Moral convergence explained by optimization on a shared manifold \\
-\addlinespace
-Moral variation is error & Moral variation is fundamental & Moral variation is different positions on the same manifold \\
-\addlinespace
-Moral progress = approach to God's will & Moral progress is incoherent & Moral progress = movement toward global (vs.\ local) minima of friction \\
-\addlinespace
-Problem: theodicy & Problem: cannot explain convergence & Problem: specifying the metric \\
-\bottomrule
-\end{tabular}
-\end{center}
+    \item \textbf{Harm conservation from representational invariance.} We derive (Theorem~\ref{thm:noether}) a conservation law for harm: if a moral evaluation is invariant under meaning-preserving re-descriptions, then harm is a conserved quantity that cannot be created or destroyed by relabeling. This provides a formal, machine-checkable test for a common failure mode in AI systems---producing different moral assessments for the same scenario described differently.
 
-\subsection{The Honest Problem}
+    \item \textbf{Provable insufficiency of post-hoc safety.} We prove (Theorem~\ref{thm:mandatory}) that for actions with irreversible consequences, checking compliance \emph{after} execution cannot satisfy harm conservation. This rules out ``act then filter'' as a complete safety architecture and mandates pre-action ethics evaluation---a result with immediate implications for the design of autonomous systems.
 
-The Geometric Ethics paradigm is not without its own challenge, and intellectual honesty demands that we name it: \emph{specifying the moral metric $g_{\mu\nu}$}.
+    \item \textbf{Provable geometric containment.} We prove (Theorem~\ref{thm:no_escape}) that any AI system satisfying four minimal requirements (representational capacity, self-modeling, goal flexibility, environmental embedding) is necessarily subject to norm constraints that cannot be circumvented through representational manipulation. This establishes that structural containment of AI moral behavior is mathematically possible without relying on the system's cooperation.
+\end{enumerate}
+
+The framework is implemented in ErisML (v3.0), an open-source library on PyPI supporting tensorial ethics evaluation at sub-microsecond latency on embedded hardware, with an MCP server for integration with any AI agent architecture.
+
+\subsection{Broader Implications}
+
+Beyond AI alignment, the framework resolves a longstanding metaethical impasse. Moral objectivity requires neither transcendent grounding (theism) nor cultural consensus (relativism), but mathematical inevitability under constraint---the same kind of objectivity that makes a water droplet spherical. Moral convergence across cultures is explained by optimization on a shared space; moral variation is explained by different positions on that space.
+
+\subsection{Open Problems}
+
+The framework's principal open problem is \emph{specifying the moral metric}---the context-dependent trade-off structure encoding how much of one moral dimension is worth how much of another.
 
 The metric encodes the trade-off structure---how much of one moral dimension is worth how much of another. The framework proves that such a metric must exist (Theorem~\ref{thm:structured}) and constrains its symmetries (Theorem~\ref{thm:d4}), but it does not \emph{derive} the metric from first principles. The empirical weights of \S\ref{sec:evidence} provide a ground-state calibration, but the metric is context-dependent (it varies across the manifold), and calibrating it in every context is an ongoing empirical program.
 
@@ -652,9 +646,9 @@ We end where we began---with the old man at the border.
 \begin{quote}
 \emph{The horse runs away. Good? Bad? Maybe.}
 
-\emph{The tensor is not yet fully contracted. The uncertainty has shape. The stratum boundary is near. The holonomy is unknown. The harm is conserved. The residue will remain.}
+\emph{The assessment is multi-dimensional---not yet compressed to a single score. The uncertainty has shape. A regime boundary is near. The path-dependence is unknown. But the harm is conserved: it will not vanish through relabeling. And the information lost in any premature verdict will not return.}
 
-\emph{Hold the projection. Watch the structure unfold.}
+\emph{Hold the full assessment. Watch the structure unfold.}
 
 \emph{Ethics is not a number. It is a geometry.}
 \end{quote}
