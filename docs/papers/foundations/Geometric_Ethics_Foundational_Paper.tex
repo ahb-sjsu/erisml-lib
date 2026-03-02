@@ -130,7 +130,35 @@ Every formal statement in this paper carries an epistemic status: \emph{Definiti
 
 \subsection{Paper Structure}
 
-Section~\ref{sec:manifold} constructs the moral manifold and defines behavioral friction---the geometric substrate that scalar alignment discards. Section~\ref{sec:pathfinding} develops the $A^*$ pathfinding interpretation, formalizes obligation vectors as heuristic functions, and proves Information Monotonicity. Section~\ref{sec:gauge} establishes the $D_4$ gauge symmetry, derives harm conservation via Noether's theorem, and proves the No Escape Theorem. Section~\ref{sec:evidence} presents empirical validation. Section~\ref{sec:engineering} describes the engineering methodology (Philosophy Engineering), the reference implementation (ErisML), and the Mandatory Canonicalization result. Section~\ref{sec:conclusion} addresses the paradigm shift and open problems.
+Section~\ref{sec:related} positions the framework against prior work. Section~\ref{sec:manifold} constructs the moral manifold and defines behavioral friction---the geometric substrate that scalar alignment discards. Section~\ref{sec:pathfinding} develops the $A^*$ pathfinding interpretation, formalizes obligation vectors as heuristic functions, and proves Information Monotonicity. Section~\ref{sec:gauge} establishes the $D_4$ gauge symmetry, derives harm conservation via Noether's theorem, and proves the No Escape Theorem. Section~\ref{sec:evidence} presents empirical validation. Section~\ref{sec:engineering} describes the engineering methodology (Philosophy Engineering), the reference implementation (ErisML), and the Mandatory Canonicalization result. Section~\ref{sec:conclusion} addresses the paradigm shift and open problems.
+
+
+%==============================================================================
+\section{Related Work}
+\label{sec:related}
+%==============================================================================
+
+This work draws on and extends three lines of research: multi-objective approaches to value alignment, geometric models of moral reasoning, and formal frameworks for provable AI safety.
+
+\subsection{Multi-Objective Value Alignment}
+
+The argument that scalar reward signals are insufficient for AI alignment was made forcefully by Vamplew et al.\ \cite{vamplew2022}, who responded to Silver et al.'s ``Reward is Enough'' hypothesis by demonstrating that multi-objective reinforcement learning (MORL)---in which each aspect of alignment is treated as a separate objective within a vector reward signal---is necessary for producing behavior that a single scalar definition of reward cannot adequately capture. Their argument is primarily conceptual and engineering-driven: they show through examples and design analysis that scalar compression loses critical alignment information.
+
+Our work shares their diagnosis but differs in three respects. First, where Vamplew et al.\ argue that scalar reward is insufficient, we \emph{prove} it: the Information Monotonicity Theorem (Theorem~\ref{thm:info_mono}) establishes that the information loss under scalar contraction is irrecoverable, not merely inconvenient. Second, where they propose MORL with vector rewards as the fix, we construct a specific tensorial structure---a nine-dimensional moral manifold with Riemannian metric, Whitney stratification, and gauge symmetry---whose dimensionality and geometry are empirically grounded (\S\ref{sec:evidence}). Vector rewards are a step in the right direction, but they lack the metric structure (trade-off encoding), the stratification (regime boundaries), and the gauge invariance (representation independence) that the moral domain requires. Third, we prove that the geometric structure is not an optional modeling enhancement but a mathematical necessity: any non-trivial, continuous, structure-preserving moral evaluation must be equivalent to one defined on a manifold (Theorem~\ref{thm:structured}).
+
+Skalse and Abate \cite{skalse2023} provide a complementary formal result, proving that scalar Markovian rewards cannot express most multi-objective, risk-sensitive, and modal tasks. Their impossibility result operates at the level of reward expressiveness in MDPs; our Information Monotonicity Theorem operates at the level of information theory and applies to any contraction from a moral tensor to a scalar, regardless of the decision-making architecture.
+
+\subsection{Geometric Approaches to Moral Reasoning}
+
+The idea that moral evaluation has spatial or geometric structure has appeared in several forms. Harris \cite{harris2010} proposed a ``moral landscape'' with peaks and valleys, but treated the metaphor informally---no metric, no curvature, no formal apparatus. Peterson's geometric method for applied ethics, empirically tested by Verheyen and Peterson \cite{verheyen2020}, is the most developed prior geometric approach. They model moral principles as Voronoi regions in a multi-dimensional conceptual space (following G\"{a}rdenfors), using similarity judgments from 475 engineering-ethics students to show that moral principles can be construed as regions in a geometric moral-similarity space.
+
+Our framework differs from Peterson and Verheyen in three fundamental ways. First, their geometry is \emph{Euclidean}---flat, with a fixed metric and no curvature. Ours is \emph{Riemannian}: the metric varies across the manifold (encoding context-dependent trade-offs), producing curvature that is empirically measurable and morally significant (path-dependence of moral evaluation). Second, their space is \emph{smooth} everywhere. Ours is a \emph{Whitney stratified space}, accommodating the discontinuous transitions (consent boundaries, deontic phase shifts) that are ubiquitous in moral reasoning and that smooth models cannot represent (Proposition~\ref{prop:smooth_insufficient}). Third, their approach is \emph{descriptive}---it maps how people categorize moral cases. Ours is \emph{structural}: we prove that the geometric structure is a mathematical consequence of minimal axioms (Theorem~\ref{thm:structured}), not merely a convenient representation, and we derive gauge symmetries and conservation laws that generate novel, testable predictions.
+
+\subsection{Provable AI Safety Guarantees}
+
+Dalrymple et al.\ \cite{dalrymple2024}, in a landmark position paper with co-authors including Bengio, Russell, and Tegmark, define ``guaranteed safe AI'' as requiring three components: a world model (mathematical description of how the AI affects its environment), a safety specification (formal description of acceptable behavior), and a verifier (producing an auditable proof certificate that the system satisfies the specification relative to the world model). They argue that behavioral training alone (including RLHF) is insufficient for robust safety and that formal verification is necessary.
+
+Our framework is compatible with and extends the Dalrymple et al.\ program in a specific direction: we provide the \emph{mathematical content} of the safety specification that their architecture leaves abstract. Where Dalrymple et al.\ are architecturally agnostic---they do not commit to a specific mathematical structure for values or safety properties---we claim that the geometric structure (Whitney stratification, $D_4$ gauge symmetry, Noether conservation) is the uniquely appropriate one for moral constraints, and we prove (Theorem~\ref{thm:no_escape}) that this structure provides containment guarantees that cannot be circumvented through representational manipulation. Their verifier checks compliance against a specification; our canonicalization ensures that the specification itself is representation-invariant. The two approaches are complementary: Dalrymple et al.\ provide the verification architecture; Geometric Ethics provides the mathematical object to be verified.
 
 
 %==============================================================================
@@ -684,6 +712,18 @@ V.~Krakovna, J.~Uesato, V.~Mikulik, M.~Rahtz, T.~Everitt, R.~Kumar, Z.~Kenton, J
 
 \bibitem{skalse2022}
 J.~Skalse, N.~H.~R. Howe, D.~Krasheninnikov, and D.~Krueger, ``Defining and Characterizing Reward Hacking,'' in \emph{Advances in Neural Information Processing Systems}, vol.~35, 2022.
+
+\bibitem{vamplew2022}
+P.~Vamplew, B.~J. Smith, J.~Kallstrom, G.~De~Oliveira~Ramos, R.~Radulescu, D.~M. Roijers, C.~F. Hayes, F.~Heintz, P.~Mannion, P.~Libin, R.~Dazeley, and C.~Foale, ``Scalar Reward is Not Enough: A Response to Silver, Singh, Precup and Sutton (2021),'' \emph{Autonomous Agents and Multi-Agent Systems}, vol.~36, no.~2, pp.~1--19, 2022.
+
+\bibitem{verheyen2020}
+S.~Verheyen and M.~Peterson, ``Can We Use Conceptual Spaces to Model Moral Principles?'' \emph{Review of Philosophy and Psychology}, vol.~12, no.~2, pp.~373--395, 2020.
+
+\bibitem{dalrymple2024}
+D.~Dalrymple, J.~Skalse, Y.~Bengio, S.~Russell, M.~Tegmark, S.~Seshia, S.~Omohundro, C.~Szegedy, B.~Goldhaber, N.~Ammann, A.~Abate, J.~Halpern, C.~Barrett, D.~Zhao, T.~Zhi-Xuan, J.~Wing, and J.~Tenenbaum, ``Towards Guaranteed Safe AI: A Framework for Ensuring Robust and Reliable AI Systems,'' arXiv preprint arXiv:2405.06624, 2024.
+
+\bibitem{skalse2023}
+J.~Skalse and A.~Abate, ``On the Limitations of Markovian Rewards to Express Multi-Objective, Risk-Sensitive, and Modal Tasks,'' in \emph{Proceedings of the 39th Conference on Uncertainty in Artificial Intelligence (UAI)}, 2023.
 
 \end{thebibliography}
 
