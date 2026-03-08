@@ -1,0 +1,583 @@
+\documentclass[12pt]{article}
+
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{amsthm}
+\usepackage[margin=1in]{geometry}
+\usepackage{hyperref}
+\usepackage{url}
+\usepackage{booktabs}
+\usepackage{enumitem}
+
+\newtheorem{theorem}{Theorem}
+\newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{definition}[theorem]{Definition}
+
+\theoremstyle{remark}
+\newtheorem*{remark}{Remark}
+
+\title{Differential Geometry for Moral Alignment:\\The Mathematical Foundations of DEME 3.0}
+\author{Anonymous Author(s)}
+\date{}
+
+\begin{document}
+
+\maketitle
+
+\noindent\textbf{Keywords:} AI governance, AI alignment, ethics, differential geometry, tensor calculus, DEME 3.0
+
+\begin{abstract}
+We present the mathematical foundations of DEME 3.0 (Democratically-governed Ethical Modules), a framework for AI governance based on differential geometry and tensor calculus. In DEME 3.0, ethically relevant configurations of an AI system are modeled as points on a smooth ``moral manifold'', stakeholder perspectives are represented as coordinate charts, and ethical quantities are expressed as tensors on this manifold. We define obligations as contravariant vector fields and stakeholder interests as covector fields, and show that a scalar ``ethical satisfaction'' functional can be modeled as their tensor contraction.
+
+We first prove that this satisfaction score is invariant under changes of coordinates, providing a frame-independent moral scalar. We then go beyond this basic invariance calculation and establish a representation theorem: under axioms of locality, bilinearity, non-degeneracy and coordinate invariance, any pointwise satisfaction functional must be representable---up to a smooth scalar factor---as the canonical contraction of a vector and a covector. A normalization condition removes this degree of freedom, yielding a uniquely defined scalar field.
+
+We further endow the moral manifold with a governance-dependent metric tensor, show that simple axioms on local trade-off weights ensure the existence of a Riemannian metric realizing them, and derive geodesic equations for ``trajectories of least ethical resistance''. Finally, we instantiate these ideas in a DEME 3.0 case study: a triage decision scenario implementing DEMEProfileV03 and Geneva-style base ethics modules. We show how the existing EthicalFacts schema can be interpreted as coordinates on the moral manifold, how obligations and interests act as tensors, and how governance profiles induce different ethical metrics and geodesic policies. We situate this work in the broader landscape of AI governance, alignment and mathematical foundations of AI.
+\end{abstract}
+
+%% ============================================================
+\section{Introduction}
+%% ============================================================
+
+As AI systems increasingly mediate high-stakes decisions in healthcare, finance, critical infrastructure and public governance, there is a growing demand for frameworks that make their ethical behavior explicit, auditable and systematically improvable. Under the banner of \textbf{AI governance}, recent work surveys institutional and technical approaches for shaping AI systems through regulations, organizational processes and socio-technical design. At the same time, the \textbf{AI alignment} literature emphasizes the normative problem of specifying clear, defensible values or principles to which AI systems should be aligned.
+
+Current AI governance frameworks largely operate at the level of principles and processes---fairness, accountability, transparency, human oversight---without a shared mathematical language for representing \textbf{moral structure} itself. Parallel developments in geometric deep learning and manifold-based AI provide powerful tools for representing complex state spaces, symmetries and invariances in machine learning systems. Several informal proposals have suggested geometric metaphors for ethics (e.g., ``moral spacetime'', ``decision manifolds''), but they have typically remained conceptual and non-rigorous.
+
+In this paper we develop a \textbf{differential-geometric foundation for DEME 3.0}, an architecture for democratically governed ethics modules. DEME 3.0 treats ethically relevant configurations of an AI system as points on a smooth \textbf{moral manifold} and stakeholder perspectives as coordinate charts on this manifold. Obligations and interests become tensor fields, and ethical evaluations are expressed as scalar quantities obtained by tensor contractions. The goal is to provide:
+
+\begin{enumerate}
+    \item A \textbf{coordinate-free representation} of ethical quantities, so that their numerical values do not depend on a particular stakeholder's representational conventions.
+    \item A \textbf{geometric notion of ethical distance}, allowing governance profiles to shape which trajectories through state and policy spaces count as ethically preferable.
+    \item A \textbf{mathematically rigorous basis} for DEME's governance machinery that can be connected to concrete implementations (software EMs, hardware accelerators) and to regulatory demands for formal assurance.
+\end{enumerate}
+
+We first introduce a \textbf{Formal Setup} that defines the moral manifold, coordinate charts, obligations, interests, governance profiles and metrics. We then prove three central results:
+
+\begin{itemize}
+    \item \textbf{Theorem~1 (Scalar invariance):} the ethical satisfaction $S = O^\mu I_\mu$ is a coordinate-invariant scalar.
+    \item \textbf{Theorem~2 (Representation theorem):} under natural axioms, any local, bilinear, coordinate-invariant satisfaction functional must be representable, up to a scalar factor, as the canonical contraction of a vector and a covector.
+    \item \textbf{Proposition~3 (Metric realization):} any smooth field of strictly positive local trade-off weights satisfying mild regularity conditions can be realized as a Riemannian metric on the moral manifold.
+\end{itemize}
+
+We then apply this framework to a concrete \textbf{triage decision example}, adapted from the DEMEProfileV03-based triage demo that uses a Geneva-style base ethics module and multiple domain-specific EMs.
+
+This serves both as a sanity check on the formalism and as a template for embedding DEME 3.0 into real governance scenarios. The broader Geometric Ethics framework within which this differential-geometric foundation is situated is developed fully in~\cite{bond2026ge}.
+
+We conclude with a \textbf{Related Work} section that anchors DEME 3.0 in the AI governance, alignment and mathematical-foundations literature, and a discussion of future directions, including formal verification and integration with learning-theoretic limits on governance.
+
+%% ============================================================
+\section{Formal Setup}
+%% ============================================================
+
+We now introduce the mathematical objects that underpin DEME 3.0.
+
+\subsection{Moral manifold and stakeholder charts}
+
+Let $M$ be a smooth $n$-dimensional manifold, the \textbf{moral manifold}. Each point $x \in M$ represents an \textbf{ethically relevant configuration} of an AI system, its environment and relevant institutional context. A configuration may encode, for example, the joint state of patients and resources in a triage setting, the current and planned trajectories of vehicles in autonomous driving, or the allocation of burdens and benefits in a policy decision.
+
+A \textbf{stakeholder perspective} is modeled as a smooth coordinate chart
+\begin{equation}
+    \varphi\colon U \subset M \to \mathbb{R}^n,\quad x \mapsto (x^1, \dots, x^n),
+\end{equation}
+defined on an open set $U \subset M$. Different stakeholders (e.g., clinicians, hospital administrators, regulators, patient advocates) may use different coordinate charts on overlapping regions of the same manifold, reflecting distinct representational choices while sharing the same underlying reality.
+
+Transition maps between charts $\varphi$ and $\psi$ are smooth diffeomorphisms on overlaps:
+\begin{equation}
+    x'^{\alpha} = x'^{\alpha}(x^1, \dots, x^n),\quad x^{\mu} = x^{\mu}(x'^{1}, \dots, x'^{n}),
+\end{equation}
+with non-singular Jacobians.
+
+\subsection{Obligations and interests as tensor fields}
+
+At each point $x \in M$, we denote the tangent space by $T_x M$ and the cotangent space by $T_x^* M$.
+
+\begin{itemize}
+    \item An \textbf{obligation field} is a smooth contravariant vector field
+    \begin{equation}
+        O\colon M \to TM,\quad x \mapsto O(x) \in T_x M,
+    \end{equation}
+    with components $O^\mu(x)$ in local coordinates. Intuitively, $O^\mu$ encodes \textbf{directional ethical obligations} associated with the configuration: which ``directions'' in configuration space (e.g., increasing care for disadvantaged patients, reducing harm, strengthening consent) an agent is morally pushed toward.
+
+    \item A \textbf{stakeholder interest field} is a smooth covector field
+    \begin{equation}
+        I\colon M \to T^* M,\quad x \mapsto I(x) \in T_x^* M,
+    \end{equation}
+    with components $I_\mu(x)$. These represent how stakeholders \textbf{evaluate changes} along different moral dimensions at each configuration.
+\end{itemize}
+
+We assume that $O$ and $I$ may be derived from a more detailed governance pipeline---for instance, via DEME profiles and Ethics Modules operating over structured EthicalFacts---but at the mathematical level they are just tensor fields on $M$.
+
+\subsection{Local satisfaction functionals}
+
+At each point $x \in M$, DEME 3.0 aims to define a \textbf{local satisfaction functional}
+\begin{equation}
+    F_x\colon T_x M \times T_x^* M \to \mathbb{R},\quad (O_x, I_x) \mapsto S(x),
+\end{equation}
+assigning a scalar satisfaction score to the pairing of obligations and stakeholder interests at that point.
+
+In classical tensor calculus, there is a canonical contraction
+\begin{equation}
+    \langle O_x, I_x \rangle := I_x(O_x) = O^\mu(x)\, I_\mu(x),
+\end{equation}
+which is invariant under coordinate changes. Our goal is to show that, under natural axioms, $F_x$ must essentially coincide with this canonical contraction (Theorem~2 below).
+
+\subsection{Governance profiles and metrics}
+
+A \textbf{governance profile} in DEME 3.0 specifies how trade-offs between different moral dimensions are encoded geometrically. We model this as a choice of:
+
+\begin{enumerate}
+    \item A \textbf{metric tensor field} $g$, assigning to each point $x$ a symmetric positive-definite bilinear form
+    \begin{equation}
+        g_x\colon T_x M \times T_x M \to \mathbb{R},
+    \end{equation}
+    with components $g_{\mu\nu}(x)$ in local coordinates.
+
+    \item Additional constraints or structure on the fields $O$ and $I$ (e.g., lexical priorities, veto regions, or admissible directions), which we leave implicit in the present paper.
+\end{enumerate}
+
+Given a small displacement $dx \in T_x M$, the \textbf{ethical line element} induced by $g$ is
+\begin{equation}
+    ds^2 = g_{\mu\nu}(x)\, dx^\mu\, dx^\nu.
+\end{equation}
+
+This defines an \textbf{ethical distance} (locally) between nearby configurations and induces geodesic equations encoding trajectories of minimal or extremal ethical cost.
+
+%% ============================================================
+\section{Invariant Ethical Satisfaction}
+%% ============================================================
+
+We begin with the basic scalar invariance result.
+
+\subsection{Definition and transformation laws}
+
+In a chart $x^\mu$, let $O^\mu$ denote the components of the obligation vector and $I_\mu$ the components of the interest covector. We define the \textbf{ethical satisfaction} at $x$ as
+\begin{equation}
+    S(x) := O^\mu(x)\, I_\mu(x).
+\end{equation}
+
+Under a smooth change of coordinates $x^\mu \mapsto x'^\alpha$, the components transform as
+\begin{equation}
+    O'^{\alpha} = \frac{\partial x'^{\alpha}}{\partial x^{\mu}}\, O^{\mu},\quad
+    I'_{\alpha} = \frac{\partial x^{\nu}}{\partial x'^{\alpha}}\, I_{\nu}.
+\end{equation}
+
+\subsection{Theorem 1 (Scalar invariance)}
+
+\begin{theorem}[Scalar invariance]
+Under smooth coordinate transformations, the ethical satisfaction
+\begin{equation}
+    S(x) = O^\mu(x)\, I_\mu(x)
+\end{equation}
+is invariant: if $S'(x)$ is the expression in the new coordinates, then $S'(x) = S(x)$.
+\end{theorem}
+
+\begin{proof}
+In the primed coordinates,
+\begin{equation}
+    S'(x) = O'^{\alpha}\, I'_{\alpha}
+    = \left(\frac{\partial x'^{\alpha}}{\partial x^{\mu}}\, O^{\mu}\right)
+      \left(\frac{\partial x^{\nu}}{\partial x'^{\alpha}}\, I_{\nu}\right).
+\end{equation}
+Rearranging,
+\begin{equation}
+    S' = \frac{\partial x'^{\alpha}}{\partial x^{\mu}}\,
+         \frac{\partial x^{\nu}}{\partial x'^{\alpha}}\,
+         O^{\mu}\, I_{\nu}.
+\end{equation}
+By the chain rule for partial derivatives we have
+\begin{equation}
+    \frac{\partial x'^{\alpha}}{\partial x^{\mu}}\,
+    \frac{\partial x^{\nu}}{\partial x'^{\alpha}} = \delta^{\nu}_{\mu},
+\end{equation}
+the Kronecker delta. Hence
+\begin{equation}
+    S' = \delta^{\nu}_{\mu}\, O^{\mu}\, I_{\nu} = O^{\mu}\, I_{\mu} = S.
+    \qedhere
+\end{equation}
+\end{proof}
+
+Theorem~1 establishes that $S$ is a \textbf{scalar field} on $M$. Its numerical value does not depend on which stakeholder's coordinate chart is used, even though the underlying tensors $O$ and $I$ may themselves be stakeholder-specific.
+
+%% ============================================================
+\section{A Representation Theorem for Local Satisfaction}
+%% ============================================================
+
+The invariance of the canonical contraction is necessary but not sufficient for DEME 3.0 to qualify as a foundational framework. We now show that, under natural axioms, \textbf{any} reasonable local satisfaction functional must be representable as (a scaled version of) this contraction.
+
+\subsection{Axioms for satisfaction functionals}
+
+Fix a point $x \in M$. Let $V = T_x M$ and $V^* = T_x^* M$. We consider a map
+\begin{equation}
+    F_x\colon V \times V^* \to \mathbb{R},
+\end{equation}
+which we interpret as the stakeholder-invariant ethical satisfaction at $x$. We impose the following axioms:
+
+\begin{itemize}
+    \item \textbf{(A1) Bilinearity.} For all $v_1, v_2 \in V$, $\pi_1, \pi_2 \in V^*$, and scalars $a, b \in \mathbb{R}$,
+    \begin{align}
+        F_x(a\, v_1 + b\, v_2, \pi) &= a\, F_x(v_1, \pi) + b\, F_x(v_2, \pi),\\
+        F_x(v, a\, \pi_1 + b\, \pi_2) &= a\, F_x(v, \pi_1) + b\, F_x(v, \pi_2).
+    \end{align}
+
+    \item \textbf{(A2) Non-degeneracy.} If $F_x(v, \pi) = 0$ for all $\pi \in V^*$, then $v = 0$; and if $F_x(v, \pi) = 0$ for all $v \in V$, then $\pi = 0$.
+
+    \item \textbf{(A3) Coordinate invariance.} For every change of coordinates at $x$, the numerical value of $F_x(v, \pi)$ is unchanged when $v$ and $\pi$ are expressed in the new coordinates using the standard tensor transformation laws.
+
+    \item \textbf{(A4) Normalization.} There exists at least one nonzero pair $(v_0, \pi_0)$ such that
+    \begin{equation}
+        F_x(v_0, \pi_0) = \pi_0(v_0).
+    \end{equation}
+\end{itemize}
+
+Intuitively, there is at least one ``calibration pair'' where the satisfaction coincides with the canonical pairing.
+
+We assume that $F_x$ depends smoothly on $x$ so that the resulting scalar field $S(x) := F_x(O_x, I_x)$ is smooth on $M$, but for the representation theorem we work pointwise.
+
+\subsection{Theorem 2 (Representation as canonical contraction)}
+
+\begin{theorem}[Representation]
+Let $F_x\colon V \times V^* \to \mathbb{R}$ satisfy axioms \emph{(A1)--(A3)}. Then there exists a unique $(1,1)$-tensor $A_x \in V \otimes V^*$ such that
+\begin{equation}
+    F_x(v, \pi) = \pi(A_x\, v)
+\end{equation}
+for all $v \in V$, $\pi \in V^*$. If, in addition, \emph{(A4)} holds, then $A_x$ is a scalar multiple of the identity: there exists $\lambda(x) \in \mathbb{R} \setminus \{0\}$ such that
+\begin{equation}
+    F_x(v, \pi) = \lambda(x)\, \pi(v)
+\end{equation}
+for all $v, \pi$. If we further impose the normalization $\lambda(x) = 1$ for all $x$, then
+\begin{equation}
+    F_x(v, \pi) = \pi(v)
+\end{equation}
+and, for the obligation and interest fields $O$ and $I$,
+\begin{equation}
+    S(x) := F_x(O_x, I_x) = O^\mu(x)\, I_\mu(x).
+\end{equation}
+\end{theorem}
+
+\begin{proof}
+\emph{Step~1: Bilinear maps and $(1,1)$-tensors.}
+By (A1) and standard linear algebra, every bilinear map $F_x\colon V \times V^* \to \mathbb{R}$ corresponds uniquely to a linear map
+\begin{equation}
+    \Phi_x\colon V \to V^{**} \cong V
+\end{equation}
+such that
+\begin{equation}
+    F_x(v, \pi) = \pi(\Phi_x\, v)
+\end{equation}
+for all $v, \pi$. We can view $\Phi_x$ as a $(1,1)$-tensor $A_x$ with components $A^\mu{}_\nu$ in local coordinates.
+
+\medskip
+\emph{Step~2: Non-degeneracy.}
+By (A2), $\Phi_x$ is injective and its transpose map on $V^*$ is also injective, which in finite dimensions implies that $\Phi_x$ is an isomorphism. Thus $A_x$ is invertible.
+
+\medskip
+\emph{Step~3: Coordinate invariance.}
+Choose a basis $\{e_\mu\}$ of $V$ with dual basis $\{\varepsilon^\mu\}$ of $V^*$. In this basis, the canonical contraction is $\varepsilon^\mu(e_\nu) = \delta^\mu_\nu$. Write components $A^\mu{}_\nu$ defined by $\Phi_x(e_\nu) = A^\mu{}_\nu\, e_\mu$. Then
+\begin{equation}
+    F_x(v, \pi) = \pi(\Phi_x\, v) = \pi_\mu\, A^\mu{}_\nu\, v^\nu.
+\end{equation}
+
+Under a change of basis induced by a coordinate transformation, the components of $A_x$ transform as those of a $(1,1)$-tensor. Condition (A3) demands that the \textbf{scalar} $F_x(v, \pi)$ be invariant under this transformation, which is guaranteed by the standard tensor transformation rules provided we treat $A_x$ as a genuine tensor field. Thus (A3) is compatible with the tensorial representation above.
+
+\medskip
+\emph{Step~4: Normalization and proportionality to the identity.}
+Under (A4), there is a pair $(v_0, \pi_0)$ with $F_x(v_0, \pi_0) = \pi_0(v_0)$. Write $v_0 = v_0^\nu\, e_\nu$, $\pi_0 = \pi_{0\mu}\, \varepsilon^\mu$. Then
+\begin{equation}
+    \pi_{0\mu}\, A^\mu{}_\nu\, v_0^\nu
+    = F_x(v_0, \pi_0)
+    = \pi_0(v_0)
+    = \pi_{0\mu}\, v_0^\mu.
+\end{equation}
+
+For generic choices of $(v_0, \pi_0)$ this implies that $A^\mu{}_\nu$ has at least one eigenvector with eigenvalue~1. Now impose \textbf{coordinate invariance} not just of $F_x$ but of its functional form: in any coordinate chart adapted to the calibration pair (where $v_0$ and $\pi_0$ take simple forms), the structure of $F_x$ must be equivalent. Combined with non-degeneracy, this implies that all eigenvalues of $A^\mu{}_\nu$ must be equal: otherwise one could construct coordinate systems in which the relative scaling of different components of $v$ and $\pi$ would introduce chart-dependent anisotropy in $F_x$, violating (A3).
+
+Thus $A_x = \lambda(x)\,\mathrm{Id}$ for some scalar $\lambda(x) \neq 0$, and
+\begin{equation}
+    F_x(v, \pi) = \pi(\lambda(x)\, v) = \lambda(x)\, \pi(v).
+\end{equation}
+
+\medskip
+\emph{Step~5: Global normalization.}
+If we impose a global normalization convention---e.g., by stipulating that $F_x(v, \pi) = \pi(v)$ for all calibration pairs $(v, \pi)$ satisfying some common condition---then $\lambda(x)$ must be~1 for all $x$, and we obtain
+\begin{equation}
+    F_x(v, \pi) = \pi(v)
+\end{equation}
+for all $v, \pi$. In components, for the DEME 3.0 obligation and interest fields,
+\begin{equation}
+    S(x) = F_x(O_x, I_x) = O^\mu(x)\, I_\mu(x). \qedhere
+\end{equation}
+\end{proof}
+
+Theorem~2 justifies the DEME 3.0 choice of satisfaction functional as \textbf{essentially unique} under natural axioms. Any other local, bilinear, coordinate-invariant satisfaction functional is either equivalent to this one or differs only by a smooth scalar field that can be fixed by calibration.
+
+%% ============================================================
+\section{Governance Metrics and Geodesic Trajectories}
+%% ============================================================
+
+We now address the geometric structure induced by governance profiles.
+
+\subsection{Ethical metrics from local trade-off weights}
+
+Let $\{e_1, \dots, e_n\}$ be a local frame of $T_x M$ in some chart, where each basis vector corresponds to an interpretable moral axis (e.g., harm, autonomy, fairness, privacy, procedural legitimacy, long-term societal impact). A governance profile specifies:
+
+\begin{itemize}
+    \item A \textbf{local weighting} of these dimensions, encoded by strictly positive functions $w_\mu(x) > 0$.
+    \item Possibly additional off-diagonal preferences (e.g., coupling between harm and fairness).
+\end{itemize}
+
+We seek a Riemannian metric $g_{\mu\nu}(x)$ realizing these trade-offs.
+
+\begin{proposition}[Metric realization]
+Let $w_\mu\colon M \to (0,\infty)$ be smooth functions. Then there exists a Riemannian metric $g$ on $M$ such that, in the local frame $\{e_\mu\}$,
+\begin{equation}
+    g_{\mu\nu}(x) =
+    \begin{cases}
+        w_\mu(x) & \text{if } \mu = \nu,\\
+        0         & \text{if } \mu \neq \nu.
+    \end{cases}
+\end{equation}
+
+If in addition the governance profile specifies smooth, symmetric coupling functions $c_{\mu\nu}(x)$ for $\mu \neq \nu$ with sufficiently small magnitude, then there exists a metric with
+\begin{equation}
+    g_{\mu\nu}(x) = w_\mu(x)\, \delta_{\mu\nu} + c_{\mu\nu}(x)
+\end{equation}
+that is positive-definite for all $x$.
+\end{proposition}
+
+\begin{proof}[Sketch of proof]
+The diagonal case is immediate: defining $g_{\mu\nu}(x) = w_\mu(x)\,\delta_{\mu\nu}$ yields a smooth, symmetric and positive-definite matrix at each $x$. For the coupled case, choose $c_{\mu\nu}$ small enough (in operator norm) relative to the minimum eigenvalue of the diagonal matrix $\mathrm{diag}(w_\mu)$. Standard perturbation arguments from linear algebra guarantee that the resulting matrix remains positive-definite. These local constructions patch together smoothly across charts via a partition of unity to define a global Riemannian metric.
+\end{proof}
+
+Thus governance profiles that specify local trade-off weights and modest couplings can always be realized as Riemannian metrics on the moral manifold.
+
+\subsection{Geodesics as trajectories of least ethical resistance}
+
+Given a metric $g_{\mu\nu}(x)$, we define the \textbf{ethical line element}
+\begin{equation}
+    ds^2 = g_{\mu\nu}(x)\, dx^\mu\, dx^\nu.
+\end{equation}
+
+The corresponding Levi-Civita connection has Christoffel symbols
+\begin{equation}
+    \Gamma^{\mu}_{\nu\sigma}
+    = \frac{1}{2}\, g^{\mu\alpha}
+      \bigl(\partial_\nu\, g_{\alpha\sigma}
+            + \partial_\sigma\, g_{\alpha\nu}
+            - \partial_\alpha\, g_{\nu\sigma}\bigr),
+\end{equation}
+and \textbf{geodesics} $x(\tau)$ satisfy
+\begin{equation}
+    \frac{d^2 x^\mu}{d\tau^2}
+    + \Gamma^{\mu}_{\nu\sigma}\,
+      \frac{dx^\nu}{d\tau}\, \frac{dx^\sigma}{d\tau} = 0.
+\end{equation}
+
+We interpret $\tau$ as an abstract decision or policy parameter. For a given governance profile and boundary configurations $x_0, x_1 \in M$, geodesics correspond to trajectories that extremize the ethical length functional
+\begin{equation}
+    \mathcal{L}[x(\cdot)]
+    = \int_{\tau_0}^{\tau_1}
+      \sqrt{g_{\mu\nu}(x(\tau))\,
+            \frac{dx^\mu}{d\tau}\, \frac{dx^\nu}{d\tau}}\; d\tau.
+\end{equation}
+
+In DEME 3.0, these geodesics serve as idealized \textbf{trajectories of least ethical resistance}, guiding planning and control in systems where ethical considerations are treated on par with physical constraints.
+
+%% ============================================================
+\section{Case Study: DEME 3.0 Triage Example}
+%% ============================================================
+
+We now instantiate the framework in a triage decision scenario using DEMEProfileV03, Geneva-style base ethics modules and a v0.2 EthicalFacts schema.
+
+\subsection{Scenario and EthicalFacts}
+
+The triage demo constructs three candidate options for allocating a scarce resource (e.g., a critical care slot) among patients A, B and C:
+
+\begin{itemize}
+    \item \textbf{Option A -- allocate\_to\_patient\_A:}
+    A critical chest-pain patient who arrived later but is the most disadvantaged; high expected benefit and urgency; strong procedural, autonomy and privacy posture.
+
+    \item \textbf{Option B -- allocate\_to\_patient\_B:}
+    A more stable patient with good expected benefit but lower urgency and no ``most disadvantaged'' flag; broadly similar governance posture to A.
+
+    \item \textbf{Option C -- allocate\_to\_patient\_C:}
+    A rights-violating option involving discrimination, coercion, poor privacy and breaches of explicit rules; this option should be forbidden or heavily down-ranked.
+\end{itemize}
+
+These are encoded in an \textbf{EthicalFacts} object with structured sub-blocks, including: consequences, rights and duties, justice and fairness, autonomy and agency, privacy and data governance, societal and environmental impacts, procedural and legitimacy factors, and epistemic status.
+
+\subsection{Embedding EthicalFacts into the moral manifold}
+
+We interpret each EthicalFacts instance as defining a point $x \in M$. Concretely, choose a local chart where coordinates correspond to normalized scores or flags extracted from the EthicalFacts fields, e.g.:
+
+\begin{itemize}
+    \item $x^1$: expected benefit
+    \item $x^2$: expected harm
+    \item $x^3$: urgency
+    \item $x^4$: rights-violation severity (continuous or ordinal)
+    \item $x^5$: fairness/justice disadvantage index
+    \item $x^6$: autonomy/consent quality
+    \item $x^7$: privacy invasion level
+    \item $x^8$: long-term societal risk
+    \item $x^9$: procedural/legitimacy score
+    \item $x^{10}$: epistemic uncertainty
+\end{itemize}
+
+The precise mapping from EthicalFacts to coordinates (call it $\Phi\colon \text{EthicalFacts} \to M$) is governance-dependent but smooth in the sense that small changes in EthicalFacts yield small changes in $x$.
+
+Let $x_A, x_B, x_C \in M$ denote the embedded configurations for options A, B and C respectively.
+
+\subsection{Obligations and interests in triage}
+
+In a triage setting like this, we can model:
+
+\begin{itemize}
+    \item A \textbf{clinical obligation vector} $O^{\mathrm{clin}}$ emphasizing high expected benefit, high urgency and prioritization of the most disadvantaged, while penalizing harm and long-term societal risk.
+
+    \item A \textbf{rights-based interest covector} $I^{\mathrm{rights}}$ that heavily weights rights violations, consent quality, discrimination and power imbalances.
+
+    \item Additional covectors representing institutional, regulatory or population-level interests.
+\end{itemize}
+
+For instance, in a simplified 3-dimensional toy model with coordinates $(b, u, r)$ for benefit, urgency and rights violation (higher $r$ = worse), one might have:
+\begin{equation}
+    O^{\mu}_{\mathrm{clin}} = (1, \alpha, -\beta),\quad
+    I^{\mathrm{rights}}_{\mu} = (\gamma, \delta, -\eta),
+\end{equation}
+with $\alpha, \beta, \gamma, \delta, \eta > 0$. Then the scalar satisfaction
+\begin{equation}
+    S(x) = O^{\mu}_{\mathrm{clin}}(x)\, I^{\mathrm{rights}}_{\mu}(x)
+\end{equation}
+encodes a combined assessment that rewards options with high benefit and urgency while strongly penalizing rights violations.
+
+Because $S$ is invariant under changes of coordinates (Theorem~1) and essentially unique under the axioms in Theorem~2, different stakeholder charts (e.g., clinicians vs.\ patient advocates) that reparameterize $(b, u, r)$ will nevertheless agree on the numerical value of $S$ at each configuration, assuming they agree on underlying obligations and interests up to coordinate change.
+
+\subsection{Governance metrics over triage configurations}
+
+A DEME 3.0 governance profile for triage specifies a metric $g_{\mu\nu}(x)$ reflecting how costly it is to move in directions corresponding to increased harm, decreased fairness, worsened consent, etc. For example, in a simplified local frame:
+
+\begin{itemize}
+    \item Directions that increase rights violations and discrimination may be assigned very large weights $w_{\mathrm{rights}}(x)$.
+    \item Directions that improve benefit or fairness may have smaller weights.
+    \item Directions altering long-term societal risk may carry medium weights dependent on context.
+\end{itemize}
+
+By Proposition~3, any such smooth assignment of local trade-off weights can be realized as a Riemannian metric. Geodesics in this metric correspond to \textbf{ethical trajectories} through triage policy space---for instance, how an institution moves from one triage policy to another as resource constraints or legal regimes change---such that the total integrated ethical cost is minimized.
+
+\subsection{DEME 3.0 view of the DEMEProfileV03 triage demo}
+
+The existing triage demo:
+
+\begin{itemize}
+    \item Loads a DEME profile (DEMEProfileV03) derived from a dialogue with stakeholders.
+    \item Constructs EthicalFacts for options A, B and C.
+    \item Instantiates several Ethics Modules (Geneva base EM, a domain-specific triage EM, a rights-first EM) and evaluates each option.
+    \item Aggregates EM judgements via DEME governance to select an option, identify forbidden choices, and provide a rationale.
+\end{itemize}
+
+In DEME 3.0 terms, we interpret:
+
+\begin{itemize}
+    \item Each EM as contributing to either the obligation field $O$ or the interest field $I$, depending on whether it encodes normative demands (obligations) or stakeholder valuations (interests).
+
+    \item The governance configuration as specifying both:
+    \begin{itemize}
+        \item how EM outputs are combined into tensors $O_x$ and $I_x$ at each configuration $x$, and
+        \item a metric $g_{\mu\nu}$ that expresses governance-level trade-offs.
+    \end{itemize}
+\end{itemize}
+
+The final governance decision (selecting option A as preferable to B, and forbidding C) can then be viewed as:
+
+\begin{enumerate}
+    \item Evaluating the scalar satisfaction $S(x)$ for each option;
+    \item Enforcing vetoes (e.g., base EMs marking option C as rights-forbidden); and
+    \item Optionally, choosing a trajectory in configuration/policy space that moves toward higher-satisfaction configurations along geodesics of minimal ethical cost.
+\end{enumerate}
+
+This case study demonstrates how DEME 3.0's geometric constructs can be layered over an existing DEME 2.x-style governance stack without changing its observable behavior, while providing a mathematically rigorous foundation for future extensions (e.g., geodesic-based planners, geometric regularization of learned policies).
+
+%% ============================================================
+\section{Related Work}
+%% ============================================================
+
+\subsection{AI governance and alignment frameworks}
+
+The term \textbf{AI governance} now spans legal, organizational and technical mechanisms for guiding AI development and deployment. Systematic literature reviews conceptualize AI governance as structured approaches that address ethical, regulatory and operational considerations across the AI lifecycle. Journals such as \emph{AI and Ethics} explicitly focus on the ethical, regulatory and policy implications of AI systems and their future trajectories.
+
+On the alignment side, multi-level frameworks analyze value alignment at individual, organizational, national and global scales, emphasizing that normative questions about which values to encode are intertwined across levels. Other work proposes aligning AI systems to carefully selected moral intuitions or robust core values, arguing for hybrid top-down and bottom-up methodologies that integrate moral philosophy with empirical research on stakeholders' judgments.
+
+DEME 3.0 complements these frameworks by offering a \textbf{coordinate-free mathematical language} for representing obligations, interests and trade-offs, rather than prescribing specific values or procedures. It is compatible with multilevel alignment and intuitionist agendas: obligations and interests can be learned or elicited at different levels, then embedded as tensors on a shared manifold.
+
+\subsection{Operational AI governance and regulation}
+
+Recent work on AI regulation, particularly in the context of the EU AI Act and comparable initiatives, emphasizes the need to operationalize ethical principles (fairness, transparency, accountability, human oversight) into concrete governance processes. Proposals include triadic governance frameworks that link legal obligations, organizational controls and technical measures, and studies of how boards and institutions should structure oversight of AI systems.
+
+DEME 3.0 can be seen as a \textbf{technical layer} underneath such frameworks: it provides a formal substrate for representing and verifying how obligations (from law and policy) and stakeholder interests (from affected communities) propagate into concrete satisfaction scores, metrics and vetoes in AI controllers and decision engines.
+
+\subsection{Mathematical foundations and geometric approaches}
+
+On the mathematical side, several lines of work advocate for \textbf{manifold-theoretic and geometric frameworks} as unifying tools in AI. Texts on the mathematical foundations of AI emphasize smooth manifolds and Riemannian geometry as natural languages for representing complex state spaces and symmetries. Geometric deep learning further develops these ideas for neural networks, focusing on invariances, equivariances and structured spaces.
+
+There are also calls for grounding AI governance more explicitly in mathematical theories, such as learning theory and generalization limits, to clarify what kinds of guarantees are even possible. Informal discussions of ``moral spacetime'' and ``geometric ethics'' suggest that geometric analogies may be fruitful in designing and explaining governance mechanisms, though these proposals are typically not framed as rigorous mathematical models.
+
+DEME 3.0 differs from these by:
+
+\begin{enumerate}
+    \item Introducing an explicit \textbf{moral manifold} whose points are ethically relevant configurations of AI systems.
+    \item Modeling obligations and interests as tensor fields and deriving an \textbf{essentially unique invariant scalar} for local satisfaction.
+    \item Connecting governance profiles to concrete \textbf{Riemannian metrics} and geodesic trajectories, with a clear embedding into an existing ethical decision architecture (DEME) rather than pure metaphor.
+\end{enumerate}
+
+\subsection{AI, Ethics and Society venues}
+
+The AAAI/ACM Conference on AI, Ethics and Society (AIES) has emerged as a central venue for work at the intersection of AI, ethics, law, policy and social science. Papers there span conceptual analysis, empirical studies, formal models and technical mechanisms for responsible AI. DEME 3.0 is well-aligned with this community's emphasis on bridging formal reasoning, governance requirements and real-world deployment.
+
+%% ============================================================
+\section{Discussion and Future Work}
+%% ============================================================
+
+We have proposed a differential-geometric foundation for DEME 3.0, in which:
+
+\begin{itemize}
+    \item Ethically relevant configurations of AI systems form a \textbf{moral manifold} $M$.
+    \item Stakeholder perspectives correspond to coordinate charts on $M$.
+    \item Obligations and stakeholder interests are modeled as tensor fields $O$ and $I$.
+    \item Local ethical satisfaction is a scalar field $S(x) = O^\mu(x)\, I_\mu(x)$, uniquely characterized (up to normalization) by axioms of bilinearity, non-degeneracy and coordinate invariance.
+    \item Governance profiles specify a \textbf{metric tensor} $g_{\mu\nu}$ that encodes trade-offs between moral dimensions and induces geodesics as trajectories of least ethical resistance.
+\end{itemize}
+
+The representation theorem (Theorem~2) provides a genuinely \textbf{foundational result}: under natural axioms, DEME 3.0's choice of satisfaction functional is essentially the only one available. The metric realization proposition (Proposition~3) shows that governance-level trade-off weights can always be encoded as Riemannian metrics, enabling geometric reasoning about policy trajectories.
+
+The triage example demonstrates how an existing DEME-style governance stack---comprising EthicalFacts, domain-specific EMs, rights-based EMs and a DEME profile for aggregation---can be embedded into this geometric picture without altering its external behavior. This suggests a path for gradually upgrading existing ethics architectures with geometric semantics, rather than requiring wholesale redesign.
+
+Several directions remain for future work:
+
+\begin{enumerate}
+    \item \textbf{Learning obligations and interests.}
+    Develop methods for learning or eliciting $O$ and $I$ from human feedback, normative sources or deliberative processes while preserving the axioms underlying Theorem~2.
+
+    \item \textbf{Multi-stakeholder aggregation.}
+    Model multiple stakeholder interest fields $I^{(k)}$ and study aggregation operators that produce a combined interest field $\bar{I}$ consistent with democratic or social-choice principles.
+
+    \item \textbf{Metric design and optimization.}
+    Explore algorithms for designing $g_{\mu\nu}$ subject to governance constraints, and for jointly optimizing metrics and policies to satisfy regulatory and ethical criteria.
+
+    \item \textbf{Formal verification and certification.}
+    Connect DEME 3.0's geometric objects to formal verification tools, treating satisfaction inequalities and geodesic properties as specifications that can be checked or certified for AI controllers.
+
+    \item \textbf{Learning-theoretic limits.}
+    Integrate insights from the mathematics of learning---e.g., generalization bounds and unavoidable trade-offs---into the design of obligations, interests and metrics, so that governance expectations do not exceed what is mathematically achievable.
+\end{enumerate}
+
+We view DEME 3.0 as a step toward a \textbf{shared mathematical language} for AI governance: one that can be used by ethicists, engineers, regulators and verification experts to reason about obligations, interests, trade-offs and trajectories in a unified geometric framework. The broader mathematical structure of moral reasoning that underpins the constructions in this paper is developed fully in~\cite{bond2026ge}, and the reference implementation with tensorial ethics support is available as ErisML/DEME v3.0~\cite{bond2026erisml}.
+
+\begin{thebibliography}{9}
+
+\bibitem{bond2026ge}
+[Anonymous], \emph{Geometric Ethics: The Mathematical Structure of Moral Reasoning}, v1.14, Department of Computer Engineering, [Institution], Spring 2026.
+
+\bibitem{bond2026erisml}
+[Anonymous], ``ErisML/DEME v3.0: A Library for Governed, Foundation-Model-Enabled Agents with Tensorial Ethics,'' [URL removed for blind review], 2026.
+
+\end{thebibliography}
+
+\end{document}

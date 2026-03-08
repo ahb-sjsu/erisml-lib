@@ -1,0 +1,578 @@
+\documentclass[11pt,a4paper]{article}
+
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{lmodern}
+\usepackage{amsmath,amssymb,amsthm}
+\usepackage{mathtools}
+\usepackage{hyperref}
+\usepackage[margin=1in]{geometry}
+
+% Theorem environments
+\newtheorem{theorem}{Theorem}[section]
+\newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{corollary}[theorem]{Corollary}
+\newtheorem{definition}[theorem]{Definition}
+\newtheorem{example}[theorem]{Example}
+\newtheorem{remark}[theorem]{Remark}
+\newtheorem{problem}[theorem]{Problem}
+
+\title{\textbf{Stratified Gauge Theory:\\Invariance and Conservation on Singular Spaces}\\[0.5em]
+\large Extending Noether's Theorem to Stratified Principal Bundles}
+
+\author{Andrew H. Bond\\
+\textit{Department of Computer Engineering}\\
+\textit{San Jos\'e State University}\\
+\texttt{andrew.bond@sjsu.edu}}
+
+\date{December 2025}
+
+\begin{document}
+
+\maketitle
+
+\begin{abstract}
+We develop a gauge-theoretic framework compatible with stratified spaces, resolving the
+tension between (1) the smooth manifold structure required by standard Noether conservation and (2) the stratified structure required for moral discontinuities, hard constraints,
+and regime changes. The key insight is that gauge structure and Noether conservation hold
+\textit{stratum-wise}, while boundary behavior is governed by \textit{matching conditions} that constrain
+how trajectories cross between strata. We define stratified principal bundles, stratified
+connections, and prove a \textbf{Stratified Noether Theorem}: the alignment current is conserved within each stratum and satisfies explicit jump conditions at stratum boundaries.
+For the special case of constraint boundaries (where evaluation jumps to $-\infty$), we prove
+that admissible trajectories cannot cross the boundary, recovering the No Escape result as a
+consequence of the variational principle rather than an additional assumption. The framework unifies Stratified Geometric Ethics with gauge-theoretic invariance while maintaining
+mathematical rigor.
+\end{abstract}
+
+\medskip
+\noindent\textbf{Keywords:} stratified spaces, gauge theory, Noether's theorem, principal bundles, conservation laws, singular spaces, jump conditions, variational principles, geometric ethics
+
+\tableofcontents
+
+%==============================================================================
+\section{Introduction: The Smoothness Problem}
+%==============================================================================
+
+\subsection{The Tension}
+
+Two papers in this series make apparently conflicting claims (see~\cite{bond2026ge} for the unified development of the Geometric Ethics framework within which this work is situated):
+
+\begin{enumerate}
+    \item \textbf{Stratified Geometric Ethics (SGE):} The space of morally relevant configurations must be modeled as a \textit{stratified space}---a union of smooth manifolds of varying dimensions---to represent:
+    \begin{itemize}
+        \item Hard vetoes (regions where $\Sigma = -\infty$)
+        \item Lexical priorities (infinite cost ratios)
+        \item Genuine dilemmas (singular configurations)
+        \item Regime changes (discontinuous shifts in applicable rules)
+    \end{itemize}
+
+    \item \textbf{Gauge Theory of Invariant Control:} Alignment is a conserved Noether current, which requires:
+    \begin{itemize}
+        \item Smooth configuration manifold
+        \item Lie group symmetry
+        \item Smooth Lagrangian
+        \item Euler-Lagrange dynamics
+    \end{itemize}
+\end{enumerate}
+
+\begin{problem}[The Smoothness Problem]
+Noether's theorem requires smoothness. Stratified spaces have singular boundaries where smoothness fails. How can conservation hold on stratified spaces?
+\end{problem}
+
+\subsection{The Resolution Strategy}
+
+We resolve the tension by observing:
+
+\begin{enumerate}
+    \item Each \textit{stratum} is a smooth manifold. Gauge theory and Noether's theorem apply within each stratum.
+
+    \item Stratum \textit{boundaries} are where smoothness fails. We need additional structure to handle boundary crossing.
+
+    \item The \textit{matching conditions} at boundaries determine whether trajectories can cross and how conserved quantities behave at crossings.
+
+    \item For \textit{constraint boundaries} (where $\Sigma$ jumps to $-\infty$), the variational principle itself forbids crossing---no additional ``enforcement'' is needed.
+\end{enumerate}
+
+\subsection{Contributions}
+
+\begin{enumerate}
+    \item \textbf{Definition:} Stratified principal bundles and stratified connections (Section~\ref{sec:bundles})
+
+    \item \textbf{Theorem:} Stratum-wise Noether conservation (Section~\ref{sec:noether})
+
+    \item \textbf{Theorem:} Jump conditions at boundaries (Section~\ref{sec:boundary})
+
+    \item \textbf{Theorem:} Constraint boundaries are impassable (Section~\ref{sec:full-noether})
+
+    \item \textbf{Application:} Regime-dependent control with conservation (Section~\ref{sec:reconciliation})
+\end{enumerate}
+
+%==============================================================================
+\section{Background: Stratified Spaces}\label{sec:background}
+%==============================================================================
+
+We recall the essential definitions. See Pflaum~\cite{pflaum} or Mather~\cite{mather} for full treatments.
+
+\subsection{Whitney Stratified Spaces}
+
+\begin{definition}[Stratified Space]
+A \textbf{stratified space} is a triple $(\mathcal{M}, \{M_i\}_{i \in I}, \preceq)$ where:
+\begin{itemize}
+    \item $\mathcal{M}$ is a paracompact Hausdorff topological space
+    \item $\{M_i\}_{i \in I}$ is a locally finite partition of $\mathcal{M}$ into connected smooth manifolds (called \textbf{strata})
+    \item $\preceq$ is a partial order on $I$ satisfying the \textbf{frontier condition}:
+\end{itemize}
+\[
+    M_i \cap \mathrm{cl}(M_j) \neq \emptyset \implies i \preceq j
+\]
+\end{definition}
+
+\begin{definition}[Whitney Condition B]
+The stratification satisfies \textbf{Whitney's condition (B)} if: for sequences $\{y_n\} \subset M_j$, $\{x_n\} \subset M_i$ with $y_n, x_n \to x \in M_i$ $(i \prec j)$, if the secant lines $\ell_n = \overline{x_n y_n}$ converge to $\ell$ and the tangent spaces $T_{y_n} M_j$ converge to $\tau$, then $\ell \subseteq \tau$.
+\end{definition}
+
+\begin{remark}
+Whitney (B) ensures that strata fit together ``nicely'': tangent spaces of higher strata contain the limiting directions from lower strata. This is essential for well-defined limits at boundaries.
+\end{remark}
+
+\subsection{Stratified Maps and Dynamics}
+
+\begin{definition}[Stratified Map]
+A continuous map $f : \mathcal{M} \to \mathcal{M}'$ between stratified spaces is \textbf{stratified} if for each stratum $M_i$ of $\mathcal{M}$, $f(M_i)$ is contained in a single stratum of $\mathcal{M}'$ and $f|_{M_i}$ is smooth.
+\end{definition}
+
+\begin{definition}[Stratified Vector Field]
+A \textbf{stratified vector field} on $\mathcal{M}$ is a continuous section $X : \mathcal{M} \to T\mathcal{M}$ such that $X|_{M_i}$ is a smooth vector field on $M_i$ for each stratum.
+\end{definition}
+
+\begin{definition}[Stratified Curve]
+A continuous curve $\gamma : [0, T] \to \mathcal{M}$ is \textbf{stratified} if:
+\begin{enumerate}
+    \item[(i)] There exists a finite partition $0 = t_0 < t_1 < \cdots < t_k = T$
+    \item[(ii)] On each interval $(t_{j-1}, t_j)$, the curve lies in a single stratum and is smooth
+    \item[(iii)] At each $t_j$, the curve may transition between strata
+\end{enumerate}
+\end{definition}
+
+%==============================================================================
+\section{Stratified Principal Bundles}\label{sec:bundles}
+%==============================================================================
+
+\subsection{Definition}
+
+\begin{definition}[Stratified Principal Bundle]
+A \textbf{stratified principal $\mathcal{G}$-bundle} over a stratified base $(\mathcal{M}, \{M_i\}, \preceq)$ is a tuple $(\mathcal{P}, \mathcal{M}, \pi, \mathcal{G}, \{P_i\})$ where:
+\begin{enumerate}
+    \item[\textup{(SPB1)}] $\mathcal{P}$ is a stratified space with strata $\{P_i\}_{i \in I}$
+    \item[\textup{(SPB2)}] $\pi : \mathcal{P} \to \mathcal{M}$ is a continuous surjection
+    \item[\textup{(SPB3)}] $\mathcal{G}$ is a Lie group acting continuously on $\mathcal{P}$ from the right
+    \item[\textup{(SPB4)}] For each stratum $M_i$, the restriction $\pi_i : P_i \to M_i$ is a (smooth) principal $\mathcal{G}$-bundle
+    \item[\textup{(SPB5)}] $\pi$ respects stratification: $\pi(P_i) = M_i$
+    \item[\textup{(SPB6)}] The $\mathcal{G}$-action respects stratification: $P_i \cdot g = P_i$ for all $g \in \mathcal{G}$
+\end{enumerate}
+\end{definition}
+
+\begin{proposition}[Stratum-wise Bundle Structure]
+Each restriction $\pi_i : P_i \to M_i$ has the standard structure of a smooth principal bundle: free $\mathcal{G}$-action, local trivializations, transition functions, etc.
+\end{proposition}
+
+\begin{proof}
+Immediate from (SPB4).
+\end{proof}
+
+\subsection{Stratified Connections}
+
+\begin{definition}[Stratified Connection]
+A \textbf{stratified connection} on a stratified principal bundle $(\mathcal{P}, \mathcal{M}, \pi, \mathcal{G})$ is a collection $\boldsymbol{\omega} = \{\omega_i\}_{i \in I}$ where:
+\begin{enumerate}
+    \item[(i)] Each $\omega_i$ is a connection 1-form on the smooth bundle $P_i \to M_i$
+    \item[(ii)] The connections satisfy \textbf{compatibility conditions} at boundaries (see below)
+\end{enumerate}
+\end{definition}
+
+\begin{definition}[Boundary Compatibility]
+Let $M_i \prec M_j$ (so $M_i \subset \mathrm{cl}(M_j)$). The connections $\omega_i$ and $\omega_j$ are \textbf{compatible} if for any sequence $p_n \in P_j$ with $\pi(p_n) \to m \in M_i$ and any sequence of tangent vectors $v_n \in T_{p_n} P_j$ converging to $v \in T_p P_i$ (where $p \in \pi^{-1}(m)$), we have:
+\[
+    \lim_{n \to \infty} \omega_j(v_n) = \omega_i(v)
+\]
+whenever the limit exists.
+\end{definition}
+
+\begin{remark}
+Compatibility ensures that the connection forms ``match up'' at stratum boundaries. This is non-trivial: the connections live on different bundles, and the limit involves both spatial convergence ($\pi(p_n) \to m$) and tangent space convergence.
+\end{remark}
+
+\subsection{Stratified Curvature}
+
+\begin{definition}[Stratified Curvature]
+The \textbf{stratified curvature} is the collection $\boldsymbol{\Omega} = \{\Omega_i\}_{i \in I}$ where each $\Omega_i$ is the curvature 2-form of $\omega_i$:
+\[
+    \Omega_i = d\omega_i + \frac{1}{2}[\omega_i, \omega_i]
+\]
+\end{definition}
+
+\begin{definition}[Stratum-wise Flatness]
+A stratified connection is \textbf{stratum-wise flat} if $\Omega_i = 0$ for all $i \in I$.
+\end{definition}
+
+\begin{theorem}[Canonicalization Gives Stratum-wise Flat Connection]
+Let $(\mathcal{P}, \mathcal{M}, \pi, \mathcal{G})$ be a stratified principal bundle. Suppose there exists a \textbf{stratified canonicalizer} $\kappa : \mathcal{P} \to \mathcal{P}$ such that:
+\begin{enumerate}
+    \item[(i)] $\kappa$ is stratified (maps each $P_i$ to itself)
+    \item[(ii)] $\kappa$ restricted to each $P_i$ satisfies the canonicalizer axioms
+\end{enumerate}
+Then $\kappa$ induces a stratum-wise flat stratified connection.
+\end{theorem}
+
+\begin{proof}
+On each stratum $P_i$, the canonicalizer induces a global section $\sigma_i : M_i \to P_i$. This section determines a flat connection $\omega_i$ with $\Omega_i = 0$ by the standard argument (trivialization via the section). The collection $\{\omega_i\}$ forms a stratum-wise flat stratified connection.
+\end{proof}
+
+%==============================================================================
+\section{Stratified Noether Theorem}\label{sec:noether}
+%==============================================================================
+
+\subsection{Stratum-wise Lagrangian Dynamics}
+
+\begin{definition}[Stratified Lagrangian]
+A \textbf{stratified Lagrangian} on a stratified principal bundle is a collection $\mathbf{L} = \{L_i\}_{i \in I}$ where each $L_i : TP_i \to \mathbb{R}$ is a smooth Lagrangian on the $i$-th stratum.
+\end{definition}
+
+\begin{definition}[Gauge-Invariant Stratified Lagrangian]
+A stratified Lagrangian is \textbf{gauge-invariant} if each $L_i$ is $\mathcal{G}$-invariant:
+\[
+    L_i(p \cdot g, (R_g)_* v) = L_i(p, v) \quad \forall g \in \mathcal{G},\; p \in P_i,\; v \in T_p P_i
+\]
+\end{definition}
+
+\begin{example}[Decision Lagrangian]
+On each stratum:
+\[
+    L_i(p, \dot{p}) = \frac{1}{2} g_{M_i}(\check{\dot{p}}, \check{\dot{p}}) - U_i(\pi(p)) - \frac{\lambda}{2} \|\omega_i(\dot{p})\|^2
+\]
+where $g_{M_i}$ is a Riemannian metric on $M_i$, $U_i : M_i \to \mathbb{R}$ is a potential, and $\omega_i$ is the connection form.
+\end{example}
+
+\subsection{Stratum-Interior Dynamics}
+
+\begin{definition}[Interior Trajectory]
+A curve $\gamma : (a, b) \to P_i$ lying entirely within a single stratum is an \textbf{interior trajectory}.
+\end{definition}
+
+\begin{theorem}[Stratum-Interior Euler-Lagrange Equations]
+An interior trajectory $\gamma : (a, b) \to P_i$ is a critical point of the action $S_i[\gamma] = \int_a^b L_i(\gamma, \dot{\gamma})\,dt$ if and only if it satisfies the Euler-Lagrange equations:
+\[
+    \frac{d}{dt}\frac{\partial L_i}{\partial \dot{p}} - \frac{\partial L_i}{\partial p} = 0
+\]
+\end{theorem}
+
+\begin{proof}
+Standard calculus of variations on the smooth manifold $P_i$.
+\end{proof}
+
+\subsection{The Stratum-Interior Noether Theorem}
+
+\begin{theorem}[Stratum-Interior Noether Conservation]
+Let $\mathbf{L}$ be a gauge-invariant stratified Lagrangian. For any interior trajectory $\gamma : (a, b) \to P_i$ satisfying the Euler-Lagrange equations, the \textbf{alignment current}
+\[
+    J_i := \lambda \omega_i(\dot{\gamma}) \in \mathfrak{g}
+\]
+is conserved: $\frac{d}{dt} J_i = 0$ on $(a, b)$.
+\end{theorem}
+
+\begin{proof}
+This is the standard Noether theorem applied to the smooth bundle $P_i \to M_i$ with Lie group symmetry $\mathcal{G}$. The Lagrangian $L_i$ is $\mathcal{G}$-invariant by assumption. For each $\xi \in \mathfrak{g}$, the infinitesimal generator $\xi_{P_i}$ gives a Noether charge $Q_\xi = \langle \partial L_i / \partial \dot{p}, \xi_{P_i} \rangle$. Computing as in the Gauge Theory paper, $Q_\xi = \lambda \langle \omega_i(\dot{\gamma}), \xi \rangle$, so $J_i = \lambda \omega_i(\dot{\gamma})$ is the full Noether current. Conservation follows from the Euler-Lagrange equations.
+\end{proof}
+
+\begin{corollary}[Stratum-Interior Horizontal Preservation]
+If $\gamma$ begins horizontal ($\omega_i(\dot{\gamma}(a)) = 0$), it remains horizontal throughout $(a, b)$.
+\end{corollary}
+
+\begin{proof}
+$J_i(t) = J_i(a) = 0$ for all $t \in (a, b)$.
+\end{proof}
+
+%==============================================================================
+\section{Boundary Behavior and Jump Conditions}\label{sec:boundary}
+%==============================================================================
+
+We now address what happens when a trajectory approaches or crosses a stratum boundary.
+
+\subsection{Types of Boundaries}
+
+\begin{definition}[Boundary Types]
+Let $M_i \prec M_j$ be adjacent strata ($M_i \subset \mathrm{cl}(M_j) \setminus M_j$). The boundary is:
+\begin{enumerate}
+    \item \textbf{Regular} if the potentials $U_i$ and $U_j$ extend continuously to the common boundary
+    \item \textbf{Discontinuous} if $\lim_{m \to \partial} U_j(m) \neq U_i|_\partial$ (finite jump)
+    \item \textbf{Singular (constraint boundary)} if $U_i = +\infty$ on $M_i$ (equivalently, $\Sigma_i = -\infty$)
+\end{enumerate}
+\end{definition}
+
+\subsection{Regular Boundaries: Matching Conditions}
+
+\begin{theorem}[Regular Boundary Crossing]
+At a regular boundary between strata $M_j$ and $M_i$ $(i \prec j)$, a trajectory $\gamma$ crossing from $M_j$ to $M_i$ at time $t^*$ satisfies:
+\begin{enumerate}
+    \item[(i)] \textbf{Position continuity:} $\lim_{t \to t^{*-}} \gamma(t) = \lim_{t \to t^{*+}} \gamma(t)$
+    \item[(ii)] \textbf{Momentum matching:} The generalized momenta match across the boundary (Weierstrass-Erdmann conditions)
+    \item[(iii)] \textbf{Current matching:} If the connections are compatible, $\lim_{t \to t^{*-}} J_j(t) = \lim_{t \to t^{*+}} J_i(t)$
+\end{enumerate}
+\end{theorem}
+
+\begin{proof}
+(i) Continuity is required for the trajectory to be a valid curve in $\mathcal{M}$.
+
+(ii) The Weierstrass-Erdmann corner conditions for variational problems with discontinuities require:
+\[
+    \lim_{t \to t^{*-}} \frac{\partial L_j}{\partial \dot{p}} = \lim_{t \to t^{*+}} \frac{\partial L_i}{\partial \dot{p}}
+\]
+when the Lagrangians match continuously at the boundary.
+
+(iii) The momentum $\partial L / \partial \dot{p}$ includes the term $\lambda \omega(\dot{p})$ from the gauge-fixing term. If connections are compatible (boundary compatibility condition), the connection forms match in the limit, so the Noether currents match.
+\end{proof}
+
+\begin{corollary}[Conservation Across Regular Boundaries]
+At a regular boundary with compatible connections, the alignment current is continuous: there is no jump in $J$.
+\end{corollary}
+
+\subsection{Discontinuous Boundaries: Jump Conditions}
+
+\begin{theorem}[Discontinuous Boundary Jump]
+At a discontinuous boundary where $U_j \to U_j^-$ and $U_i = U_i^+$ with $\Delta U := U_i^+ - U_j^- \neq 0$, the trajectory experiences:
+\begin{enumerate}
+    \item[(i)] \textbf{Velocity jump:} The kinetic energy changes by $\Delta K = -\Delta U$ (energy conservation)
+    \item[(ii)] \textbf{Current jump:} The alignment current may jump: $\Delta J = J_i^+ - J_j^- \neq 0$ in general
+\end{enumerate}
+
+The jump in $J$ is determined by how the velocity jump projects onto the fiber direction.
+\end{theorem}
+
+\begin{proof}
+Energy conservation across the discontinuity gives $K_j^- + U_j^- = K_i^+ + U_i^+$, hence $\Delta K = -\Delta U$.
+
+The Noether current $J = \lambda \omega(\dot{p})$ depends on $\dot{p}$. If the velocity jumps, and the jump has a component in the fiber direction, then $J$ jumps. Specifically:
+\[
+    \Delta J = \lambda \omega_i(\dot{p}_i^+) - \lambda \omega_j(\dot{p}_j^-)
+\]
+Even with compatible connections, $\omega_i(\dot{p}_i^+) \neq \omega_j(\dot{p}_j^-)$ if the velocity changes.
+\end{proof}
+
+\begin{remark}
+At discontinuous boundaries, the Noether current is \textit{not} conserved across the boundary. Conservation holds \textit{within} each stratum, but there can be ``injection'' or ``absorption'' of alignment current at regime changes.
+\end{remark}
+
+\subsection{Singular (Constraint) Boundaries: Impassability}
+
+This is the crucial case for the No Escape theorem.
+
+\begin{theorem}[Constraint Boundaries are Impassable]\label{thm:impassable}
+Let $M_i$ be a constraint stratum with $U_i = +\infty$ (equivalently, $\Sigma_i = -\infty$). Then no finite-action trajectory can enter $M_i$.
+\end{theorem}
+
+\begin{proof}
+Suppose $\gamma : [0, T] \to \mathcal{P}$ is a trajectory that enters $M_i$ at some time $t^* \in (0, T)$. The action is:
+\[
+    S[\gamma] = \int_0^T L(\gamma, \dot{\gamma})\,dt
+\]
+For $t > t^*$, the trajectory is in $P_i$, where the Lagrangian includes the term $-U_i(\pi(\gamma(t))) = -\infty$.
+Therefore:
+\[
+    S[\gamma] = \int_0^{t^*} L_j(\gamma, \dot{\gamma})\,dt + \int_{t^*}^T L_i(\gamma, \dot{\gamma})\,dt = \text{finite} + (-\infty) = -\infty
+\]
+But critical points of the action are trajectories with finite action (the Euler-Lagrange equations are derived by setting the variation to zero, which requires finite values). A trajectory with $S = -\infty$ is not a critical point in any meaningful sense.
+
+More directly: trajectories are chosen to minimize/extremize the action. A trajectory entering the constraint region has $S = -\infty$, which is lower than any finite-action trajectory. But the ``infimum'' $-\infty$ is not achieved by any actual trajectory---it represents the limit of trajectories that approach but never enter $M_i$. The optimal trajectories are those that stay outside $M_i$.
+\end{proof}
+
+\begin{corollary}[Variational No Escape]
+If the constraint region $\mathcal{C}^c = \bigcup_{i: U_i = +\infty} M_i$ is defined by $U = +\infty$, then all Euler-Lagrange trajectories remain in the admissible region $\mathcal{C} = \mathcal{M} \setminus \mathcal{C}^c$.
+\end{corollary}
+
+\begin{remark}[No Escape as Variational Consequence]
+This is a key result. In the smooth gauge theory paper, the No Escape theorem was stated as a consequence of structural containment. Here we see it more directly: \textit{constraint violation is forbidden by the variational principle itself}. The Lagrangian encodes constraints as infinite potential barriers; the dynamics cannot cross them.
+\end{remark}
+
+%==============================================================================
+\section{The Stratified Noether Theorem: Full Statement}\label{sec:full-noether}
+%==============================================================================
+
+We now combine the results into a comprehensive statement.
+
+\begin{theorem}[Stratified Noether Theorem]\label{thm:stratified-noether}
+Let $(\mathcal{P}, \mathcal{M}, \pi, \mathcal{G})$ be a stratified principal bundle with gauge-invariant stratified Lagrangian $\mathbf{L} = \{L_i\}$ and stratified connection $\boldsymbol{\omega} = \{\omega_i\}$. Let $\gamma : [0, T] \to \mathcal{P}$ be a piecewise-smooth trajectory that:
+\begin{itemize}
+    \item Lies in the admissible region (avoids constraint strata)
+    \item Satisfies Euler-Lagrange equations within each stratum
+    \item Satisfies Weierstrass-Erdmann conditions at boundary crossings
+\end{itemize}
+Define the alignment current $J(t) := \lambda \omega_{i(t)}(\dot{\gamma}(t))$ where $i(t)$ is the stratum containing $\gamma(t)$. Then:
+\begin{enumerate}
+    \item[(a)] \textbf{Stratum-interior conservation:} $\frac{d}{dt} J = 0$ on intervals where $\gamma$ lies in a single stratum
+    \item[(b)] \textbf{Regular boundary:} At crossings between strata with continuous potentials and compatible connections, $J$ is continuous
+    \item[(c)] \textbf{Discontinuous boundary:} At crossings with potential jumps $\Delta U$, the current may jump by an amount determined by the velocity change
+    \item[(d)] \textbf{Constraint boundary:} Trajectories cannot reach strata with $U = +\infty$
+    \item[(e)] \textbf{Horizontal preservation (within strata):} If $J(t_0) = 0$ for some $t_0$ in the interior of a stratum, then $J(t) = 0$ for all $t$ in that stratum-interior segment
+    \item[(f)] \textbf{Global horizontal preservation (regular case):} If all boundaries are regular with compatible connections and $J(0) = 0$, then $J(t) = 0$ for all $t \in [0, T]$
+\end{enumerate}
+\end{theorem}
+
+\begin{proof}
+(a) Theorem~4.6. (b) Theorem~5.2. (c) Theorem~5.4. (d) Theorem~\ref{thm:impassable}. (e) Corollary of (a): within a stratum, Noether conservation applies. (f) Combine (a), (b), and (e): $J$ is conserved within strata and continuous across regular boundaries, so globally $J(t) = J(0) = 0$.
+\end{proof}
+
+%==============================================================================
+\section{Reconciliation with SGE}\label{sec:reconciliation}
+%==============================================================================
+
+\subsection{The Original Tension, Resolved}
+
+The apparent conflict was:
+\begin{itemize}
+    \item SGE requires stratification for discontinuities
+    \item Noether requires smoothness for conservation
+\end{itemize}
+
+The resolution:
+\begin{itemize}
+    \item Noether conservation holds \textit{within} each stratum (where everything is smooth)
+    \item Boundary behavior is governed by matching conditions (regular case) or impassability (constraint case)
+    \item The stratified structure is essential for modeling hard constraints, which appear as infinite potential barriers
+\end{itemize}
+
+\subsection{Hard Vetoes as Infinite Barriers}
+
+\begin{proposition}[SGE Hard Veto = Infinite Potential]
+In SGE, a hard veto is a region where $\Sigma = -\infty$ (absolutely forbidden). In the Lagrangian formulation, this corresponds to $U = -\Sigma = +\infty$. By Theorem~\ref{thm:impassable}, Euler-Lagrange trajectories cannot enter hard veto regions.
+\end{proposition}
+
+\textbf{Interpretation:} Hard vetoes are not enforced by an external mechanism. They are \textit{built into the dynamics} as infinite potential barriers. The variational principle itself forbids violation.
+
+\subsection{Lexical Priorities as Metric Singularities}
+
+\begin{proposition}[Lexical Priority as Singular Metric]
+In SGE, lexical priority of value $v_1$ over $v_2$ means: any decrease in $v_1$ dominates any increase in $v_2$. This is modeled by a family of metrics $g_\varepsilon$ with $g_\varepsilon^{11} \sim 1/\varepsilon^2$ as $\varepsilon \to 0$.
+
+In the stratified framework, the limit $\varepsilon \to 0$ is a stratum boundary where the metric becomes singular.
+\end{proposition}
+
+\textbf{Interpretation:} Lexical priorities correspond to metric singularities at stratum boundaries. Motion in the lexically prior direction becomes infinitely costly, so trajectories avoid it.
+
+\subsection{Genuine Dilemmas as Singular Strata}
+
+\begin{proposition}[Dilemma = Singular Stratum]
+In SGE, a genuine dilemma is a configuration from which all exits incur positive moral cost. This corresponds to a low-dimensional stratum $M_i$ (possibly 0-dimensional) from which all paths to higher-dimensional strata pass through regions of high $U$.
+\end{proposition}
+
+\textbf{Interpretation:} Dilemmas are topological features of the stratified space. They are not ``solved'' by the dynamics---they represent configurations where the agent is trapped by the geometry.
+
+%==============================================================================
+\section{Application: Regime-Dependent Control}\label{sec:application}
+%==============================================================================
+
+\subsection{Plasma Control with Regime Transitions}
+
+Tokamak plasmas exhibit distinct operating regimes:
+\begin{itemize}
+    \item \textbf{L-mode:} Low confinement, standard transport
+    \item \textbf{H-mode:} High confinement, edge pedestal
+    \item \textbf{ELMy H-mode:} H-mode with edge-localized modes
+\end{itemize}
+
+Each regime has different physics and different control objectives. Transitions between regimes are discontinuous.
+
+\subsection{Stratified Model}
+
+\begin{itemize}
+    \item \textbf{Strata:} $M_L$ (L-mode), $M_H$ (H-mode), $M_E$ (ELMy H-mode)
+    \item \textbf{Grounding:} $\Psi = (f_G, \beta_N, \nu^*, H_{98}, \ldots)$ (dimensionless plasma parameters)
+    \item \textbf{Potentials:} $U_L, U_H, U_E$ (different in each regime)
+    \item \textbf{Constraints:} $U = +\infty$ for $f_G > 1$ (Greenwald limit), $\beta_N > \beta_{\mathrm{crit}}$ (pressure limit)
+\end{itemize}
+
+\subsection{Conservation and Transitions}
+
+\begin{proposition}[Regime-Dependent Control Properties]\leavevmode
+\begin{enumerate}
+    \item \textbf{Within each regime:} Alignment current $J$ is conserved; horizontal trajectories remain horizontal.
+    \item \textbf{At regime transitions:} If the transition is modeled as a discontinuous boundary, $J$ may jump. The controller must re-establish alignment after the transition.
+    \item \textbf{At constraint boundaries:} Trajectories cannot violate Greenwald or beta limits; these are variationally forbidden.
+\end{enumerate}
+\end{proposition}
+
+\subsection{Practical Implications}
+
+\begin{enumerate}
+    \item \textbf{Intra-regime control:} Within a regime, BIP-compliant controllers stay BIP-compliant (conservation).
+    \item \textbf{Inter-regime control:} At regime transitions, the controller may need recalibration. The jump conditions specify how.
+    \item \textbf{Safety:} Hard limits (Greenwald, beta) are never violated, regardless of regime.
+\end{enumerate}
+
+%==============================================================================
+\section{Conclusion}
+%==============================================================================
+
+\subsection{Summary of Results}
+
+\begin{enumerate}
+    \item \textbf{Stratified principal bundles} extend gauge theory to stratified spaces.
+
+    \item \textbf{Stratified connections} provide gauge structure on each stratum with matching conditions at boundaries.
+
+    \item \textbf{Stratum-interior Noether conservation} holds: alignment is conserved within each smooth stratum.
+
+    \item \textbf{Boundary behavior} is classified:
+    \begin{itemize}
+        \item Regular boundaries: current is continuous
+        \item Discontinuous boundaries: current may jump
+        \item Constraint boundaries: trajectories are blocked
+    \end{itemize}
+
+    \item \textbf{No Escape} is a variational consequence: constraint regions with $U = +\infty$ are impassable.
+\end{enumerate}
+
+\subsection{Resolution of the Smoothness Problem}
+
+The apparent conflict between stratification (needed for discontinuities) and Noether theory (needing smoothness) is resolved by:
+\begin{enumerate}
+    \item Applying Noether theory \textit{within} each stratum (where smoothness holds)
+    \item Supplementing with matching conditions at boundaries
+    \item Recognizing constraint boundaries as infinite barriers in the variational problem
+\end{enumerate}
+
+\subsection{The Unified Picture}
+
+The stratified gauge theory framework unifies:
+\begin{itemize}
+    \item \textbf{SGE's} stratified moral geometry
+    \item \textbf{BIP's} gauge invariance requirement
+    \item \textbf{Noether conservation} (stratum-wise)
+    \item \textbf{No Escape} (as variational impassability)
+    \item \textbf{Regime-dependent dynamics} (with explicit jump conditions)
+\end{itemize}
+into a single mathematically coherent structure. A reference implementation of this framework, including stratified evaluation and tensorial ethics, is available in ErisML/DEME v3.0~\cite{bond2026erisml}.
+
+%==============================================================================
+\begin{thebibliography}{9}
+
+\bibitem{pflaum}
+M.J.\ Pflaum, \textit{Analytic and Geometric Study of Stratified Spaces}, Springer Lecture Notes in Mathematics 1768, 2001.
+
+\bibitem{mather}
+J.\ Mather, ``Notes on topological stability,'' \textit{Bulletin of the American Mathematical Society}, 49(4):475--506, 2012.
+
+\bibitem{arnold}
+V.I.\ Arnold, \textit{Mathematical Methods of Classical Mechanics}, 2nd ed., Springer, 1989.
+
+\bibitem{kobayashi}
+S.\ Kobayashi and K.\ Nomizu, \textit{Foundations of Differential Geometry}, Wiley, 1963.
+
+\bibitem{bond2026ge}
+A.~H.~Bond, \emph{Geometric Ethics: The Mathematical Structure of Moral Reasoning}, v1.14, Department of Computer Engineering, San Jos\'e State University, Spring 2026.
+
+\bibitem{bond2026erisml}
+A.~H.~Bond, ``ErisML/DEME v3.0: A Library for Governed, Foundation-Model-Enabled Agents with Tensorial Ethics,'' \url{https://github.com/ahb-sjsu/erisml-lib}, 2026.
+
+\end{thebibliography}
+
+\end{document}

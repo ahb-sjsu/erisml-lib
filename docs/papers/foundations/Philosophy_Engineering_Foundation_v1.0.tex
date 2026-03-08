@@ -1,0 +1,1327 @@
+\documentclass[12pt,letterpaper]{article}
+
+% --- Packages ---
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{amsmath,amssymb,amsfonts,amsthm}
+\usepackage{mathtools}
+\usepackage{geometry}
+\usepackage{hyperref}
+\usepackage{cleveref}
+\usepackage{enumitem}
+\usepackage{booktabs}
+\usepackage{microtype}
+\usepackage{natbib}
+\usepackage{tikz-cd}
+\usepackage{graphicx}
+\usepackage{float}
+\usepackage{xcolor}
+\usepackage{titlesec}
+\usepackage{fancyhdr}
+\usepackage{longtable}
+\usepackage{array}
+
+\geometry{margin=1in}
+\hypersetup{
+    colorlinks=true,
+    linkcolor=blue!70!black,
+    citecolor=green!50!black,
+    urlcolor=blue!60!black
+}
+
+% --- Header/Footer ---
+\pagestyle{fancy}
+\fancyhf{}
+\fancyhead[L]{\small\textit{Philosophy Engineering: Body of Knowledge}}
+\fancyhead[R]{\small\textit{v1.0 --- March 2026}}
+\fancyfoot[C]{\thepage}
+\renewcommand{\headrulewidth}{0.4pt}
+
+% --- Theorem environments ---
+\newtheorem{theorem}{Theorem}[section]
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{corollary}[theorem]{Corollary}
+\newtheorem{proposition}[theorem]{Proposition}
+\theoremstyle{definition}
+\newtheorem{definition}[theorem]{Definition}
+\newtheorem{example}[theorem]{Example}
+\newtheorem{remark}[theorem]{Remark}
+\newtheorem{axiom}{Axiom}
+\theoremstyle{plain}
+\newtheorem{principle}[theorem]{Principle}
+
+% --- Custom commands ---
+\newcommand{\R}{\mathbb{R}}
+\newcommand{\N}{\mathbb{N}}
+\newcommand{\calD}{\mathcal{D}}
+\newcommand{\calT}{\mathcal{T}}
+\newcommand{\calU}{\mathcal{U}}
+\newcommand{\calB}{\mathcal{B}}
+\newcommand{\calL}{\mathcal{L}}
+\newcommand{\calM}{\mathcal{M}}
+\newcommand{\calH}{\mathcal{H}}
+\newcommand{\genT}{\langle \mathcal{T} \rangle}
+\newcommand{\equivX}{\approx_X}
+\newcommand{\equivY}{\approx_Y}
+\newcommand{\equivB}{\approx_{\mathcal{B}}}
+\newcommand{\Lag}{\mathcal{L}}
+\newcommand{\BF}{\mathrm{BF}}
+\newcommand{\pemark}{\textsc{pe}}
+
+% --- Knowledge Area styling ---
+\newcommand{\ka}[1]{\vspace{1em}\noindent\textbf{\large Knowledge Area:} \textit{#1}\vspace{0.5em}\hrule\vspace{0.5em}}
+
+% ============================================================
+% TITLE
+% ============================================================
+\title{%
+\vspace{-1cm}
+{\LARGE\textbf{Philosophy Engineering}}\\[0.8em]
+{\Large A Foundation Document for the Discipline}\\[0.5em]
+{\large Body of Knowledge, Theoretical Architecture, and Practitioner Guide}\\[1em]
+{\normalsize Version 1.0 --- March 2026}
+}
+
+\author{Andrew H. Bond\\
+Department of Computer Engineering\\
+San Jos\'{e} State University\\
+\texttt{andrew.bond@sjsu.edu}}
+
+\date{}
+
+\begin{document}
+
+\maketitle
+\thispagestyle{empty}
+
+\begin{abstract}
+Philosophy Engineering is the systematic discipline of translating philosophical commitments---epistemic norms, ethical principles, logical consistency requirements---into computationally enforceable constraints on autonomous systems. This document defines the field. Modeled on the IEEE/ACM Software Engineering Body of Knowledge (SWEBOK), it identifies the knowledge areas that constitute Philosophy Engineering's theoretical substrate, computational engine, and normative superstructure. The document specifies three structural tiers: (I)~the \emph{Substrate} tier, comprising the mathematical and physical formalisms---differential geometry, topology, tensor algebra, analytical mechanics, and formal semantics---that provide the representational and dynamical vocabulary; (II)~the \emph{Computation} tier, comprising algorithm design, search theory, formal verification, network theory, and AI alignment methods that translate formal structures into executable procedures; and (III)~the \emph{Values} tier, comprising metaethics, normative ethics, epistemology, philosophy of mind, and political philosophy that define the objectives, constraints, and accountability requirements of autonomous judgment. The two central technical constructs---the Epistemic Invariance Principle (EIP), which mandates that judgment procedures be invariant under meaning-preserving redescriptions, and the Bond Invariance Principle (BIP), which enforces structural accountability in normative domains by separating objective relational structures from subjective evaluative frameworks---are developed in full, with proofs. The document is intended to serve as the foundational reference for researchers, engineers, and policymakers working at the intersection of formal philosophy, mathematics, and AI system design.
+\end{abstract}
+
+\noindent\textbf{Keywords:} philosophy engineering, epistemic invariance, Bond Invariance Principle, AI alignment, formal ethics, differential geometry, normative systems, computational philosophy, formal verification
+
+\vfill
+\noindent\textbf{Document Classification:} Foundational Reference\\
+\textbf{Intended Audience:} Researchers, engineers, and policymakers in AI alignment, formal ethics, and safety-critical systems\\
+\textbf{Prerequisites:} Familiarity with set theory, linear algebra, and introductory philosophy of science
+
+\newpage
+\tableofcontents
+\newpage
+
+% ============================================================
+% PART I: PROLEGOMENON
+% ============================================================
+\part{Prolegomenon}
+\label{part:prolegomenon}
+
+\section{What Is Philosophy Engineering?}
+\label{sec:what-is-pe}
+
+Philosophy Engineering is a method for operationalizing philosophical commitments in AI systems. It proceeds by:
+\begin{enumerate}[label=(\roman*)]
+    \item Declaring a domain-specific equivalence relation over representations (``same case''),
+    \item Declaring invariances (``what must not matter''),
+    \item Implementing a canonicalization, quotient mechanism, or other enforcement of invariance, and
+    \item Packaging evidence and transformation trials into machine-checkable audit artifacts.
+\end{enumerate}
+
+This reframes broad philosophical desiderata---objectivity, rationality, consistency, non-arbitrariness---into checkable contracts. The contracts are \emph{falsifiable}: invariance claims are testable, not aspirational. They are \emph{localizable}: when invariance fails, the framework produces a minimal witness transformation that isolates the cause. They are \emph{non-trivial}: passing invariance tests by collapsing to a constant output is explicitly detected and rejected.
+
+\subsection{The Disciplinary Gap}
+
+Current AI systems issue judgments that mix factual inference, normative evaluation, and action selection. These judgments are deployed in medicine, law, criminal justice, autonomous vehicles, content moderation, and military systems. Yet no existing engineering discipline provides a systematic method for ensuring that such judgments respect basic epistemic and ethical norms.
+
+\begin{itemize}
+    \item \textbf{Software Engineering} provides methods for building systems that are correct, reliable, and maintainable---but is silent on whether the system's outputs are epistemically sound or ethically defensible.
+    \item \textbf{AI/ML Engineering} provides methods for training models that achieve high aggregate accuracy---but aggregate accuracy is compatible with severe representation dependence, as we demonstrate.
+    \item \textbf{Philosophy} provides deep analyses of epistemic and ethical norms---but these analyses are rarely formalized to the point of computational enforceability.
+    \item \textbf{AI Ethics} (as currently practiced) provides guidelines, principles, and review boards---but typically lacks the mathematical precision needed for formal verification.
+\end{itemize}
+
+Philosophy Engineering occupies the gap between these fields. It takes the conceptual resources of philosophy and the formal tools of mathematics, and produces engineering artifacts: specifications, test suites, audit records, and compliance certificates.
+
+\subsection{Relationship to SWEBOK}
+
+The IEEE/ACM \emph{Software Engineering Body of Knowledge} (SWEBOK) \cite{bourque2014swebok} defines software engineering as a discipline by identifying its constituent knowledge areas, their relationships, and the competencies expected of practitioners. This document adopts the same structural approach for Philosophy Engineering. Each knowledge area is identified, its relevance to the discipline is stated, its core concepts are defined, and its relationship to other knowledge areas is made explicit.
+
+The analogy is deliberate: just as SWEBOK transformed software development from an ad hoc craft into an engineering discipline with defined standards, this document aims to provide the structural foundation for a discipline of philosophically rigorous AI system design.
+
+\subsection{Epistemic Stance}
+
+This document adopts a \emph{pragmatist} epistemic stance, following the tradition of Peirce, James, and Dewey. Mathematical structures are treated as tools---powerful tools, honed over centuries---but tools nonetheless. When we say that moral evaluation ``is'' geometric, we mean that geometric models capture structure that scalar models discard, and that the geometric structure generates correct predictions. The ``reality'' of the moral manifold is measured by predictive success, not metaphysical correspondence.
+
+Every formal statement carries an epistemic status:
+\begin{itemize}
+    \item \textbf{Definition}: Stipulated (a modeling choice).
+    \item \textbf{Axiom}: A substantive modeling assumption, empirically motivated but not proven.
+    \item \textbf{Theorem}: Conditional on stated assumptions. If the assumptions are wrong, the theorems do not hold.
+    \item \textbf{Principle}: A normative commitment elevated to a formal constraint.
+\end{itemize}
+
+
+\section{Motivation: The Representation Dependence Crisis}
+\label{sec:motivation}
+
+\subsection{The Core Failure Mode}
+
+Many high-profile AI failures are not simply ``errors'' but violations of a deeper epistemic requirement: if two inputs describe the same underlying situation relative to the task, then a competent judgment system should not change its conclusions merely because the description's surface form changed.
+
+In practice, models often respond to incidental encoding choices: order, naming, formatting, prompt framing, schema layout, measurement units, or paraphrase. In safety-critical settings---medicine, law, robotics, finance---such instability is unacceptable because it undermines reproducibility, auditability, and accountability.
+
+\begin{example}[Representation Dependence in Practice]
+\label{ex:rep-dep}
+Consider the following observed failure modes:
+\begin{enumerate}[label=(\alph*)]
+    \item A medical diagnostic AI changes its recommended treatment when the order of laboratory results in the input is permuted, despite the results being identical in content.
+    \item An ethical reasoning system reverses its assessment of a trolley-problem variant when the description substitutes ``divert'' for ``redirect,'' though both words denote the same action in context.
+    \item A legal AI produces different liability assessments for the same factual scenario when the parties are referred to by different variable names.
+    \item A language model changes its moral verdict when the same dilemma is presented in the active versus passive voice.
+\end{enumerate}
+In each case, the system has violated a basic epistemic norm: \emph{differences that do not matter should not make a difference}.
+\end{example}
+
+\subsection{The Pragmatist Diagnosis}
+
+The pragmatist tradition insists on a tight coupling between meaning and consequence. If two descriptions of a situation lead to identical practical consequences in every conceivable scenario, then there is no meaningful difference between them. An AI system that changes its output because the premises were reordered is not exhibiting reasoning; it is exhibiting conditioned reflex---a sophisticated pattern match that confuses syntactic variation with semantic distinction.
+
+This diagnosis is deeper than the familiar bias-and-fairness discourse. Bias concerns focus on the \emph{content} of judgments. Representation dependence concerns the \emph{form} of judgment itself. A system can be perfectly unbiased in its training data and still be epistemically defective if its outputs are sensitive to irrelevant representational choices.
+
+\subsection{The Scalar Alignment Crisis}
+
+The representation dependence problem is compounded by a structural deficiency in current alignment architectures. Every dominant approach---RLHF \cite{christiano2017}, constitutional AI, scalar reward maximization, output filtering---rests on a shared mathematical assumption: that moral evaluation can be reduced to a scalar. This assumption is provably untenable.
+
+The Information Monotonicity Theorem (proved in the companion paper \cite{bond2026geometric}) establishes that any contraction of a multi-dimensional moral assessment to a scalar is irreversibly lossy. Specification gaming, reward hacking, and value collapse are therefore not engineering bugs---they are mathematical consequences of optimizing over the wrong structure.
+
+Philosophy Engineering addresses both problems simultaneously: EIP handles representation dependence; Geometric Ethics provides the correct non-scalar structure for normative evaluation. The complete mathematical development is given in v1.14 of the Geometric Ethics manuscript \cite{bond2026geometric}, and a reference implementation with tensorial ethics support is now available as ErisML/DEME v3.0 \cite{bond2026erisml}.
+
+
+\section{Architecture of the Discipline}
+\label{sec:architecture}
+
+\subsection{The Three-Tier Stack}
+
+Philosophy Engineering's knowledge areas are organized into three tiers, reflecting the flow from foundational formalism through computational mechanism to normative purpose:
+
+\begin{center}
+\renewcommand{\arraystretch}{1.4}
+\begin{tabular}{>{\bfseries}p{3cm} p{9cm}}
+\toprule
+\textbf{Tier} & \textbf{Description} \\
+\midrule
+III. Values & Defines the objectives, constraints, and accountability requirements. What the system \emph{ought} to respect. \\
+\addlinespace
+II. Computation & Translates formal structures into executable procedures. How the system \emph{enforces} its commitments. \\
+\addlinespace
+I. Substrate & Provides the representational and dynamical vocabulary. The formal rules of the board. \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\noindent The tiers are not independent layers; they are coupled through well-defined interfaces. The Substrate provides the mathematical objects that the Computation tier manipulates; the Values tier provides the constraints that the Computation tier enforces; the Substrate's invariance structures provide the formal content of the Values tier's normative commitments.
+
+\subsection{Knowledge Area Map}
+
+\begin{center}
+\renewcommand{\arraystretch}{1.3}
+\begin{longtable}{>{\bfseries}p{0.5cm} p{4.5cm} p{7.5cm}}
+\toprule
+\textbf{\#} & \textbf{Knowledge Area} & \textbf{Core Content} \\
+\midrule
+\endfirsthead
+\toprule
+\textbf{\#} & \textbf{Knowledge Area} & \textbf{Core Content} \\
+\midrule
+\endhead
+\bottomrule
+\endfoot
+\multicolumn{3}{l}{\textbf{Tier I: Substrate (Mathematics \& Physics)}} \\
+\midrule
+1 & Differential Geometry & Manifolds, tangent spaces, metrics, curvature, geodesics \\
+2 & Topology \& Stratified Spaces & Whitney stratification, homology, fiber bundles, sheaves \\
+3 & Tensor Algebra \& Multilinear Maps & Tensor fields, contraction, metric tensors, index mechanics \\
+4 & Group Theory \& Symmetry & Transformation groups, representations, invariant theory \\
+5 & Analytical Mechanics & Lagrangian/Hamiltonian formalisms, principle of least action, Noether's theorem, energy landscapes \\
+6 & Statistical Mechanics \& Information Theory & Entropy, free energy, partition functions, information geometry \\
+\midrule
+\multicolumn{3}{l}{\textbf{Tier II: Computation (Computer Science \& Engineering)}} \\
+\midrule
+7 & Algorithm Design \& Search Theory & $A^*$ pathfinding, optimization, complexity theory \\
+8 & Formal Semantics \& Computational Linguistics & Montague grammar, $\lambda$-calculus, syntax-to-semantics maps, equivalence classes in natural language \\
+9 & Formal Verification \& Type Theory & Proof assistants, model checking, dependent types, homotopy type theory \\
+10 & Network Topology \& Cybernetics & Graph theory, multi-agent routing, control theory, state-machine transitions, collision avoidance \\
+11 & AI Alignment \& Safety Engineering & RLHF critique, canonicalization, containment, audit architecture \\
+\midrule
+\multicolumn{3}{l}{\textbf{Tier III: Values (Philosophy)}} \\
+\midrule
+12 & Metaethics & Moral realism, anti-realism, constructivism, computational objectivity \\
+13 & Normative Ethics & Consequentialism, deontology, virtue ethics, pluralism \\
+14 & Epistemology & Justification, invariance as epistemic norm, uncertainty, pragmatism \\
+15 & Philosophy of Mind & Consciousness, intentionality, cognitive framing, the hard problem, mental representation \\
+16 & Political \& Legal Philosophy & Justice, rights, Hohfeldian analysis, governance, legitimacy \\
+\bottomrule
+\end{longtable}
+\end{center}
+
+\subsection{Why These Knowledge Areas}
+
+Each knowledge area answers a specific question that Philosophy Engineering must resolve:
+
+\begin{enumerate}
+    \item \textbf{Differential Geometry}: What is the shape of the space in which moral evaluation occurs?
+    \item \textbf{Topology \& Stratification}: How do we model sharp moral boundaries (consent, rights violations) within that space?
+    \item \textbf{Tensor Algebra}: What mathematical objects can represent multi-dimensional moral evaluation without scalar collapse?
+    \item \textbf{Group Theory}: Which re-descriptions of a situation preserve its moral content, and what algebraic structure do these re-descriptions form?
+    \item \textbf{Analytical Mechanics}: How does the principle of least action translate moral choice into a calculable path of least behavioral friction? How does Noether's theorem generate conservation laws from ethical symmetries?
+    \item \textbf{Statistical Mechanics}: How do entropy, free energy, and phase transitions model the thermodynamics of moral consensus and normative stability?
+    \item \textbf{Algorithm Design}: How do we compute optimal moral paths ($A^*$ on the moral manifold)?
+    \item \textbf{Formal Semantics}: How do we rigorously define ``meaning-preserving transformation'' for natural language inputs---the foundation of EIP?
+    \item \textbf{Formal Verification}: How do we produce machine-checkable proofs that a system is EIP/BIP-compliant?
+    \item \textbf{Network Topology}: How does the structure of multi-agent interaction graphs determine the geometry of the moral manifold?
+    \item \textbf{AI Alignment}: What are the specific failure modes of current alignment approaches, and how does Philosophy Engineering remedy them?
+    \item \textbf{Metaethics}: What is the ontological status of the moral structures we formalize? (Computational objectivity, not theism or relativism.)
+    \item \textbf{Normative Ethics}: Which ethical theories provide the lens parameters, and how are competing theories represented as alternative lenses?
+    \item \textbf{Epistemology}: What epistemic norms (invariance, non-degeneracy, uncertainty stability) must any judgment procedure satisfy?
+    \item \textbf{Philosophy of Mind}: What is the nature of the cognitive framing that produces representation dependence? How do consciousness and intentionality constrain what counts as ``judgment'' versus ``conditioned reflex''?
+    \item \textbf{Political \& Legal Philosophy}: How do Hohfeldian jural relations provide the deontic structure formalized in the $D_4$ gauge group?
+\end{enumerate}
+
+
+% ============================================================
+% PART II: TIER I --- THE SUBSTRATE
+% ============================================================
+\part{Tier I: The Substrate}
+\label{part:substrate}
+
+The Substrate tier provides the formal vocabulary of Philosophy Engineering. These are the mathematical and physical structures that make the discipline's claims precise and its results provable.
+
+\section{KA-1: Differential Geometry}
+\label{sec:ka1}
+
+\ka{Differential Geometry}
+
+\subsection{Relevance to Philosophy Engineering}
+
+Moral evaluation occurs in a space. That space has structure: distances (how ``far apart'' are two moral configurations?), directions (along which moral dimensions does an action produce change?), curvature (are trade-offs between moral dimensions context-dependent?), and geodesics (what is the path of least moral friction?). Differential geometry provides the mathematical language for all of this.
+
+\subsection{Core Concepts}
+
+\begin{definition}[Smooth Manifold]
+A \emph{smooth manifold} $\calM$ of dimension $n$ is a topological space that is locally homeomorphic to $\R^n$, equipped with a smooth atlas of transition functions.
+\end{definition}
+
+\begin{definition}[Riemannian Metric]
+A \emph{Riemannian metric} $g$ on $\calM$ is a smooth assignment of a positive-definite inner product $g_p: T_p\calM \times T_p\calM \to \R$ to each tangent space, encoding the cost of infinitesimal displacement.
+\end{definition}
+
+\begin{definition}[Moral Manifold]
+\label{def:moral-manifold}
+The \emph{moral manifold} $\calM$ is the configuration space of ethically relevant states of a multi-agent system. Its coordinate axes correspond to fundamental dimensions of moral variation (consequences, rights, fairness, autonomy, privacy, societal impact, virtue, legitimacy, epistemic status). A Riemannian metric $g_{\mu\nu}$ encodes the context-dependent trade-off structure between moral dimensions.
+\end{definition}
+
+The metric $g_{\mu\nu}$ is not fixed---it varies across the manifold. This variation \emph{is} the curvature, and it captures a deep feature of moral reasoning: the relative importance of moral dimensions depends on context.
+
+\begin{definition}[Behavioral Friction]
+\label{def:friction}
+Let $\gamma: [0,1] \to \calM$ be a path through moral configuration space. The \emph{behavioral friction} along $\gamma$ is:
+\begin{equation}
+\BF[\gamma] = \int_0^1 \sqrt{g_{\mu\nu}(\gamma(t))\, \dot{\gamma}^\mu(t)\, \dot{\gamma}^\nu(t)}\, dt
+\end{equation}
+Cooperative actions follow geodesics (paths of least friction); defective actions generate massive friction.
+\end{definition}
+
+
+\section{KA-2: Topology and Stratified Spaces}
+\label{sec:ka2}
+
+\ka{Topology \& Stratified Spaces}
+
+\subsection{Relevance to Philosophy Engineering}
+
+Moral evaluation is not smooth everywhere. The boundary between consent and its absence, the line between self-defense and murder, the threshold at which negligence becomes recklessness---these are discontinuities. No smooth manifold can represent them. Whitney stratified spaces can.
+
+\subsection{Core Concepts}
+
+\begin{definition}[Whitney Stratified Space]
+A \emph{Whitney stratified space} is a decomposition $\calM = \bigsqcup_\alpha S_\alpha$ into smooth manifolds (\emph{strata}) satisfying the frontier condition (if strata touch, the lower-dimensional one is contained in the closure of the higher-dimensional one) and Whitney's condition B (regularity of tangent-space limits at strata boundaries).
+\end{definition}
+
+\begin{proposition}[Insufficiency of Smooth Manifolds]
+No smooth manifold can simultaneously represent: (i)~continuous variation of moral weight within a regime; (ii)~discontinuous transitions between regimes (e.g., crossing a consent boundary); (iii)~dimensional reduction at boundaries. Whitney stratified spaces can represent all three.
+\end{proposition}
+
+The strata correspond to moral regimes. Within a stratum, evaluation varies smoothly. Between strata, evaluation can shift discontinuously. This is the mathematical formalization of moral ``bright lines.''
+
+\subsection{Fiber Bundles and the Bond-Lens Structure}
+
+The bond-lens decomposition of BIP (\Cref{sec:bip}) has a natural interpretation as a fiber bundle:
+\begin{itemize}
+    \item \textbf{Base space}: $\calB / \equivB$, the space of objective situations (bonds), modulo structural equivalence.
+    \item \textbf{Fiber}: $\calL$, the space of lenses (evaluative frameworks) applicable to each situation.
+    \item \textbf{Total space}: $\calB / \equivB \times \calL$, the space of all (situation, framework) pairs.
+    \item \textbf{Evaluation function}: $F: \calB / \equivB \times \calL \to Y$, assigning a normative judgment to each pair.
+\end{itemize}
+BIP requires that $F$ is well-defined on the base space: it does not depend on which representative of $[b]$ is chosen.
+
+
+\section{KA-3: Tensor Algebra and Multilinear Maps}
+\label{sec:ka3}
+
+\ka{Tensor Algebra \& Multilinear Maps}
+
+\subsection{Relevance to Philosophy Engineering}
+
+The Information Monotonicity Theorem proves that any contraction of a multi-dimensional moral assessment to a scalar is irreversibly lossy. The correct mathematical object for moral evaluation is therefore not a number but a \emph{tensor}---a multilinear map that preserves the directional, stakeholder-specific, temporally extended structure that a scalar discards.
+
+\subsection{Core Concepts}
+
+A moral evaluation tensor $T^{\mu_1 \ldots \mu_p}_{\phantom{\mu_1 \ldots \mu_p}\nu_1 \ldots \nu_q}$ at a point $p \in \calM$ is a multilinear map that takes $q$ tangent vectors and $p$ cotangent vectors and produces a real number. The tensor's \emph{rank} $(p,q)$ determines how much information it encodes.
+
+\begin{theorem}[Information Monotonicity, informal]
+\label{thm:info-mono-informal}
+Any contraction of a rank-$(p,q)$ moral tensor to a scalar (rank-$(0,0)$) with $p + q > 0$ irreversibly destroys information. No post-hoc technique can recover the lost structure.
+\end{theorem}
+
+This theorem is the formal foundation for the claim that scalar alignment (RLHF, scalar reward maximization) is structurally insufficient. The information destroyed is precisely the information needed to avoid specification gaming: the directional structure that a single number cannot encode.
+
+
+\section{KA-4: Group Theory and Symmetry}
+\label{sec:ka4}
+
+\ka{Group Theory \& Symmetry}
+
+\subsection{Relevance to Philosophy Engineering}
+
+The Epistemic Invariance Principle is, at its core, a statement about group actions. The ``meaning-preserving transformations'' of EIP form a group; EIP demands that the judgment function be invariant under this group's action on the input space. The Bond Invariance Principle further identifies a deontic symmetry group ($D_4 \times U(1)_\calH$) governing the gauge structure of normative evaluation.
+
+\subsection{Core Concepts}
+
+\begin{definition}[Transformation Group]
+A \emph{transformation set} $\calT$ is a set of endomorphisms $\tau: X \to X$ declared to preserve task-relevant structure. The \emph{transformation group} $\genT$ is the closure of $\calT$ under composition, inversion, and inclusion of the identity.
+\end{definition}
+
+\begin{definition}[$D_4$ Gauge Group]
+The deontic symmetry group $D_4$ (the dihedral group of the square) is generated by the four Hohfeldian jural relations---rights, duties, liberties, and no-rights---and their transformations under change of perspective. The full gauge group of geometric ethics is $D_4 \times U(1)_\calH$, where $U(1)_\calH$ is the harm phase group governing conservation.
+\end{definition}
+
+\begin{theorem}[$D_4$ Gauge Group Theorem, informal]
+The symmetry group of the deontic structure of bilateral legal/moral relations is isomorphic to $D_4$, generated by the Hohfeldian correlative and negation operations.
+\end{theorem}
+
+
+\section{KA-5: Analytical Mechanics}
+\label{sec:ka5}
+
+\ka{Analytical Mechanics \& Statistical Mechanics}
+
+\subsection{Relevance to Philosophy Engineering}
+
+This is the physics bridge. Geometric Ethics is heavily reliant on the Principle of Least Action, Lagrangian formalism, and Noether's theorem. The ``Moral Lagrangian'' that governs behavioral friction, the conservation of harm derived from re-description invariance, and the energy-landscape interpretation of normative stability all require the vocabulary of analytical mechanics.
+
+\subsection{The Principle of Least Action}
+
+\begin{principle}[Moral Least Action]
+\label{princ:least-action}
+Among all paths $\gamma$ connecting two moral configurations $p_0, p_1 \in \calM$, the path actually followed by a rationally optimizing multi-agent system is the one that extremizes the \emph{moral action functional}:
+\begin{equation}
+\mathcal{S}[\gamma] = \int_0^1 \Lag\!\left(\gamma(t),\, \dot{\gamma}(t)\right) dt
+\end{equation}
+where $\Lag$ is the \emph{moral Lagrangian}, encoding the instantaneous balance between behavioral friction (kinetic moral energy) and normative constraints (potential moral energy).
+\end{principle}
+
+This is not metaphor. The moral Lagrangian $\Lag$ is a well-defined functional on the tangent bundle $T\calM$ of the moral manifold. The Euler-Lagrange equations derived from $\mathcal{S}$ yield the equations of motion for moral dynamics---the differential equations governing how a multi-agent system's ethical configuration evolves under the influence of competing moral forces.
+
+\subsection{Noether's Theorem for Ethics}
+
+\begin{theorem}[Moral Noether Theorem]
+\label{thm:noether}
+If the moral Lagrangian $\Lag$ is invariant under a continuous one-parameter group of re-description transformations $\{\phi_\epsilon\}_{\epsilon \in \R}$, then there exists a conserved current $J^\mu$ satisfying:
+\begin{equation}
+\partial_\mu J^\mu = 0
+\end{equation}
+In the ethical interpretation: re-description invariance of moral evaluation implies conservation of harm. Harm cannot be created or destroyed by relabeling---only moved or genuinely repaired.
+\end{theorem}
+
+The conserved quantity is \emph{harm}. The continuity equation
+\begin{equation}
+\frac{\partial \rho_\calH}{\partial t} + \nabla \cdot \mathbf{J}_\calH = \sigma
+\end{equation}
+where $\rho_\calH$ is harm density, $\mathbf{J}_\calH$ is harm current, and $\sigma$ represents genuine harm generation or repair, is the ethical analog of charge conservation in electrodynamics.
+
+\subsection{Hamiltonian Formulation and Energy Landscapes}
+
+The Legendre transform of the moral Lagrangian yields the \emph{moral Hamiltonian} $H$, which represents the total moral energy of a configuration:
+\begin{equation}
+H(q, p) = p \cdot \dot{q} - \Lag(q, \dot{q})
+\end{equation}
+The Hamiltonian formulation provides:
+\begin{itemize}
+    \item \textbf{Phase space}: The space of (configuration, momentum) pairs, enabling analysis of moral dynamics.
+    \item \textbf{Energy landscapes}: Minima of $H$ correspond to morally stable equilibria; saddle points correspond to unstable configurations susceptible to moral phase transitions.
+    \item \textbf{Canonical transformations}: Changes of variables that preserve Hamiltonian structure, connecting to the gauge transformations of BIP.
+\end{itemize}
+
+\subsection{Statistical Mechanics and Normative Thermodynamics}
+
+At the population level, the statistical mechanics of moral agents provides:
+\begin{itemize}
+    \item \textbf{Entropy}: $S = -\sum_i p_i \ln p_i$ measures the disorder of a moral configuration distribution. High entropy corresponds to moral pluralism; low entropy to moral consensus.
+    \item \textbf{Free energy}: $F = U - TS$ (where $U$ is internal moral energy and $T$ is a ``moral temperature'' parameterizing tolerance for deviation) governs the equilibrium between energetic stability and entropic diversity.
+    \item \textbf{Phase transitions}: Sharp changes in moral consensus (e.g., the abolition of slavery, the legalization of same-sex marriage) are modeled as phase transitions in the moral thermodynamic potential.
+\end{itemize}
+
+
+\section{KA-6: Information Theory}
+\label{sec:ka6}
+
+\ka{Information Theory \& Information Geometry}
+
+\subsection{Relevance to Philosophy Engineering}
+
+Information theory provides the formal tools for proving that scalar moral evaluation is lossy (Information Monotonicity), quantifying the quality of approximate canonicalization, and measuring the information content of audit artifacts. Information geometry---the Riemannian geometry of probability distributions---connects the Substrate's geometric vocabulary to the statistical structure of uncertain judgments.
+
+\subsection{Core Results}
+
+\begin{itemize}
+    \item \textbf{Shannon entropy} quantifies irreducible uncertainty in moral judgment under incomplete information.
+    \item \textbf{KL divergence} measures the cost of using one moral distribution (lens) when another is appropriate---the information-theoretic price of lens mismatch.
+    \item \textbf{Fisher information metric} endows the space of probability distributions with Riemannian structure, connecting statistical inference to the geometric framework.
+    \item \textbf{Rate-distortion theory} provides lower bounds on the error introduced by any finite-dimensional compression of moral evaluation, grounding the approximate compliance results of EIP (\Cref{thm:approx-compliance}).
+\end{itemize}
+
+
+% ============================================================
+% PART III: TIER II --- THE COMPUTATION
+% ============================================================
+\part{Tier II: The Computation}
+\label{part:computation}
+
+The Computation tier translates the Substrate's formal structures into executable procedures. These are the algorithms, languages, and architectures that make Philosophy Engineering operational.
+
+\section{KA-7: Algorithm Design and Search Theory}
+\label{sec:ka7}
+
+\ka{Algorithm Design \& Search Theory}
+
+\subsection{Moral Reasoning as Pathfinding}
+
+The central computational claim of Geometric Ethics is that moral reasoning is equivalent to $A^*$ pathfinding on the moral manifold $\calM$.
+
+\begin{theorem}[$A^*$ Equivalence, informal]
+Optimal moral reasoning---selecting the action that minimizes total behavioral friction while satisfying all hard constraints (strata boundaries)---is equivalent to $A^*$ search on $\calM$ with:
+\begin{itemize}
+    \item \textbf{Cost function} $g(n)$: accumulated behavioral friction from the initial configuration to node $n$.
+    \item \textbf{Heuristic function} $h(n)$: an admissible estimate of the remaining friction to the goal configuration. Moral obligations (``do not murder,'' ``keep promises'') serve as pre-compiled heuristic functions that steer the search toward low-cost equilibria without requiring full computation of the space.
+\end{itemize}
+\end{theorem}
+
+This result is not merely an analogy. It provides a concrete algorithm for moral computation: discretize the manifold, define the adjacency structure, compute edge weights from the metric tensor, and run $A^*$ with obligation-derived heuristics.
+
+\subsection{Canonicalization Algorithms}
+
+Canonicalization---the central enforcement mechanism of EIP---is an algorithmic problem:
+\begin{itemize}
+    \item For structured data (tabular, graph-based): canonical forms via sorting, graph isomorphism algorithms (e.g., Weisfeiler-Leman), or hash-based normalization.
+    \item For natural language: approximate canonicalization via semantic embedding, constituency parsing, or learned normal forms.
+    \item For logical formulae: canonical forms via Tseitin transformation, BDD construction, or $\alpha$-normalization.
+\end{itemize}
+
+
+\section{KA-8: Formal Semantics and Computational Linguistics}
+\label{sec:ka8}
+
+\ka{Formal Semantics \& Computational Linguistics}
+
+\subsection{Relevance to Philosophy Engineering}
+
+The Epistemic Invariance Principle hinges on the concept of ``meaning-preserving transformation.'' For structured data (tabular, graph-based), meaning preservation is mechanically definable. For natural language inputs, meaning preservation requires the tools of formal semantics and computational linguistics.
+
+\subsection{Core Concepts}
+
+\begin{definition}[Montague Semantics]
+Montague grammar provides a compositional mapping from natural language syntax to logical form (typically typed $\lambda$-calculus expressions). Under this framework, a paraphrase is meaning-preserving if and only if the two sentences map to logically equivalent $\lambda$-terms.
+\end{definition}
+
+This provides the formal grounding for EIP's transformation groups in natural language domains:
+\begin{itemize}
+    \item \textbf{$\alpha$-equivalence}: Variable renaming in logical forms.
+    \item \textbf{$\beta$-reduction}: Computational equivalence of $\lambda$-terms.
+    \item \textbf{Logical equivalence}: De Morgan's laws, commutativity, double negation elimination.
+    \item \textbf{Syntactic alternations}: Active/passive voice, cleft constructions, topicalization---when the Montague denotation is preserved.
+\end{itemize}
+
+\subsection{The Syntax-Semantics Interface and EIP}
+
+The central challenge for EIP in natural language domains is defining the boundary of the transformation group $\calT$. Formal semantics provides three strategies:
+
+\begin{enumerate}
+    \item \textbf{Conservative (syntactic)}: $\calT$ includes only mechanically verifiable transformations: variable renaming, premise reordering, unit conversion.
+    \item \textbf{Moderate (compositional)}: $\calT$ includes transformations that preserve Montague denotation, verified by a semantic parser.
+    \item \textbf{Aggressive (distributional)}: $\calT$ includes transformations that preserve embedding-space similarity above a threshold, verified by a neural semantic similarity model.
+\end{enumerate}
+
+Each level provides a progressively broader---but progressively less certain---notion of meaning preservation. The Approximate Compliance Theorem (\Cref{thm:approx-compliance}) ensures that the EIP violation introduced by uncertainty in $\calT$ membership is bounded.
+
+
+\section{KA-9: Formal Verification and Type Theory}
+\label{sec:ka9}
+
+\ka{Formal Verification \& Type Theory}
+
+\subsection{Relevance to Philosophy Engineering}
+
+Philosophy Engineering's audit artifacts are machine-checkable certificates. Formal verification provides the tools for producing and checking these certificates.
+
+\subsection{Core Concepts}
+
+\begin{itemize}
+    \item \textbf{Model checking}: Exhaustive verification that a finite-state system satisfies a temporal logic specification. Applicable to EIP compliance checking over finite transformation groups.
+    \item \textbf{Theorem proving}: Interactive or automated proof that a system satisfies a specification expressed in a formal logic. Tools such as Lean, Coq, and Isabelle can formalize and verify EIP proofs.
+    \item \textbf{Dependent types}: Types that depend on values, enabling specifications like ``this function returns the same output for all inputs in the same equivalence class.'' Dependent type systems can encode EIP as a type constraint.
+    \item \textbf{Homotopy type theory (HoTT)}: A foundational framework connecting type theory, topology, and higher category theory. The univalence axiom (``equivalent structures are identical'') is a type-theoretic formulation of EIP.
+\end{itemize}
+
+
+\section{KA-10: Network Topology and Cybernetics}
+\label{sec:ka10}
+
+\ka{Network Topology \& Cybernetics}
+
+\subsection{Relevance to Philosophy Engineering}
+
+The moral manifold is not an abstract mathematical object. It emerges from the structure of multi-agent interaction networks. The topology of these networks---who can communicate with whom, who depends on whom, who can affect whom---determines the geometry of the moral space. Network topology and control theory provide the tools for analyzing this emergence.
+
+\subsection{Core Concepts}
+
+\begin{definition}[Agent Interaction Graph]
+An \emph{agent interaction graph} $G = (V, E, w)$ is a weighted directed graph where $V$ is the set of agents, $E$ is the set of interaction channels (communication, dependency, authority, obligation), and $w: E \to \R^+$ assigns a cost or capacity to each channel.
+\end{definition}
+
+The moral manifold's metric tensor $g_{\mu\nu}$ is determined, in part, by the spectral properties of $G$:
+\begin{itemize}
+    \item \textbf{Graph Laplacian}: The eigenvalues of the graph Laplacian $L = D - A$ encode the connectivity structure and determine the natural modes of moral diffusion across the network.
+    \item \textbf{Centrality measures}: Eigenvector centrality, betweenness centrality, and PageRank identify agents with disproportionate moral influence---nodes whose actions propagate widely through the network.
+    \item \textbf{Community structure}: Modularity and spectral clustering reveal natural moral ``strata''---communities within which moral evaluation varies smoothly but between which discontinuities occur.
+\end{itemize}
+
+\subsection{Control Theory and Moral Dynamics}
+
+\begin{itemize}
+    \item \textbf{State-machine transitions}: Moral regime changes (stratum crossings) are modeled as state transitions in a finite-state machine, with guard conditions derived from the Whitney stratification.
+    \item \textbf{Feedback control}: BIP's accountability mechanism is a feedback loop: the system's moral output is compared against the bond-lens decomposition, and deviations trigger audit and correction.
+    \item \textbf{Collision avoidance}: In multi-agent robotics, collision avoidance algorithms implement a physical version of the moral ``hard gate''---the refusal to allow trajectories that cross forbidden strata boundaries. The mathematical structure (velocity obstacles, reciprocal velocity obstacles) is directly analogous to the moral constraint enforcement in Geometric Ethics.
+    \item \textbf{Multi-agent routing}: VXLAN overlay networks, OSPF/BGP routing protocols, and SDN control planes provide real-world examples of systems that enforce invariance (loop-free forwarding) and accountability (traceroute, flow logging) at network scale---precisely the engineering pattern Philosophy Engineering applies to moral judgment.
+\end{itemize}
+
+\subsection{From Network Engineering to Moral Engineering}
+
+The deep structural parallel between network engineering and moral engineering is not accidental. Both domains involve:
+\begin{enumerate}
+    \item A graph of agents with heterogeneous capabilities and interests.
+    \item A set of invariance requirements (loop-free forwarding / representation-independent judgment).
+    \item A set of accountability requirements (packet tracing / audit artifacts).
+    \item A set of optimization objectives (minimize latency / minimize behavioral friction).
+    \item A control plane that computes paths and enforces constraints, separate from the data plane that carries traffic.
+\end{enumerate}
+Philosophy Engineering's separation of the ``moral control plane'' (bond extraction, lens declaration, canonicalization) from the ``moral data plane'' (judgment execution) is directly inspired by this architectural pattern.
+
+
+\section{KA-11: AI Alignment and Safety Engineering}
+\label{sec:ka11}
+
+\ka{AI Alignment \& Safety Engineering}
+
+\subsection{Relevance to Philosophy Engineering}
+
+Philosophy Engineering is, in its applied dimension, an alignment methodology. It replaces the statistical preference-matching paradigm (RLHF, constitutional AI) with structural geometric consistency.
+
+\subsection{Critique of Current Alignment Approaches}
+
+\begin{enumerate}
+    \item \textbf{RLHF} aligns to the distribution of human preferences, not to the structure of the problem domain. It is vulnerable to representation dependence because the preference signal is collected over specific representations.
+    \item \textbf{Constitutional AI} encodes normative constraints as natural-language rules, which are themselves subject to representation dependence (the AI may interpret the same rule differently under paraphrase).
+    \item \textbf{Scalar reward maximization} is provably lossy (Information Monotonicity).
+    \item \textbf{Output filtering} (``act then filter'') is provably insufficient for irreversible actions (Mandatory Canonicalization Theorem).
+\end{enumerate}
+
+\subsection{The Philosophy Engineering Alternative}
+
+Philosophy Engineering replaces these approaches with:
+\begin{enumerate}
+    \item \textbf{Declared equivalences}: Explicit specification of which input variations are meaning-preserving.
+    \item \textbf{Canonicalization}: Preprocessing inputs to canonical form before judgment, eliminating representation dependence at the source.
+    \item \textbf{Tensorial evaluation}: Multi-dimensional moral assessment that preserves the information scalars discard.
+    \item \textbf{Audit artifacts}: Machine-checkable records of every judgment, including lens version, bond extraction, transformation trials, and witness certificates.
+    \item \textbf{Structural containment}: The No Escape Theorem guarantees that sufficiently capable AI systems cannot circumvent geometric moral constraints through representational manipulation.
+\end{enumerate}
+
+
+% ============================================================
+% PART IV: TIER III --- THE VALUES
+% ============================================================
+\part{Tier III: The Values}
+\label{part:values}
+
+The Values tier defines the objectives, constraints, and accountability requirements of autonomous judgment. These are the philosophical commitments that Philosophy Engineering makes formally enforceable.
+
+\section{KA-12: Metaethics}
+\label{sec:ka12}
+
+\ka{Metaethics}
+
+\subsection{Relevance to Philosophy Engineering}
+
+Metaethics asks: \emph{What is the ontological status of moral claims?} Philosophy Engineering's answer---\emph{computational objectivity}---resolves the historical impasse between moral realism and moral relativism.
+
+\subsection{Computational Objectivity}
+
+The traditional debate is trapped in a false dichotomy:
+\begin{itemize}
+    \item \textbf{Moral realism (theistic variant)}: Objective moral values are grounded in a transcendent, metaphysically necessary realm. An objective moral law requires a Lawgiver.
+    \item \textbf{Moral relativism}: Without a Lawgiver, there can be no Law. Moral values are cultural artifacts with no objective ground.
+\end{itemize}
+
+Both frameworks fail because they misunderstand the nature of objectivity:
+
+\begin{principle}[Computational Objectivity]
+Objectivity does not require a transcendent origin; it requires mathematical inevitability under a defined set of constraints.
+\end{principle}
+
+Just as a water droplet assumes a spherical geometry not by divine decree but because the sphere is the global minimum of the surface-tension energy functional, multi-agent networks converge on specific behavioral geometries to minimize social and physical friction. The objectivity is computational---it emerges from optimization under constraint.
+
+The cross-cultural evidence (109,294 passages spanning 3,000 years and 11 languages) confirms that the geometric structure is a stable feature of moral cognition, not an artifact of the formalism \cite{bond2026geometric}.
+
+
+\section{KA-13: Normative Ethics}
+\label{sec:ka13}
+
+\ka{Normative Ethics}
+
+\subsection{Relevance to Philosophy Engineering}
+
+Normative ethical theories---consequentialism, deontology, virtue ethics, care ethics---are not competitors to be adjudicated by Philosophy Engineering. They are \emph{lenses}: alternative parameterizations of the moral evaluation function, each capturing a genuine aspect of moral structure.
+
+\subsection{Ethical Theories as Lenses}
+
+In the BIP framework:
+\begin{itemize}
+    \item A \textbf{consequentialist lens} $L_C$ weights the consequences dimension heavily, computing moral evaluation primarily by aggregating expected outcomes.
+    \item A \textbf{deontological lens} $L_D$ weights the rights-and-duties dimension heavily, enforcing hard constraints (deontic boundaries) as inviolable strata boundaries.
+    \item A \textbf{virtue ethics lens} $L_V$ weights the character dimension, evaluating actions by their expression of agent dispositions.
+    \item A \textbf{care ethics lens} $L_R$ weights relational dimensions (bonds of care, dependency, vulnerability).
+\end{itemize}
+
+The key insight is that BIP's accountability guarantee holds \emph{for any lens}. The system must be invariant under bond-preserving transformations regardless of which lens is active. Disagreements between lenses are legitimate normative disagreements---different points in the same fiber of the ethical fiber bundle. BIP ensures that such disagreements are always attributable to the lens (the evaluative framework) rather than to representational artifacts.
+
+
+\section{KA-14: Epistemology}
+\label{sec:ka14}
+
+\ka{Epistemology}
+
+\subsection{Relevance to Philosophy Engineering}
+
+Epistemology provides the normative foundations for EIP. The Epistemic Invariance Principle is itself an epistemological claim: a judgment procedure that changes its output under meaning-preserving redescription is epistemically defective.
+
+\subsection{Invariance as Epistemic Norm}
+
+The demand for representational invariance is implicit in multiple epistemological traditions:
+\begin{itemize}
+    \item \textbf{Leibniz's Identity of Indiscernibles}: If two things are indiscernible in all properties, they are identical. Contrapositive: a judgment procedure that distinguishes indiscernible inputs is treating non-properties as properties.
+    \item \textbf{Logical positivism}: The meaning of a statement is its method of verification. Two statements with identical verification conditions have the same meaning; a judgment procedure that treats them differently is responding to non-meaning.
+    \item \textbf{Pragmatism}: The meaning of a concept is its practical consequences. Two representations with identical practical consequences are the same concept under different names.
+    \item \textbf{Kantian universalizability}: A judgment procedure that yields contradictory conclusions under admissible re-descriptions of the same situation cannot be consistently universalized.
+\end{itemize}
+
+EIP formalizes the intersection of these traditions into a single, testable property.
+
+
+\section{KA-15: Philosophy of Mind}
+\label{sec:ka15}
+
+\ka{Philosophy of Mind}
+
+\subsection{Relevance to Philosophy Engineering}
+
+Philosophy of Mind is not an ``applied domain'' alongside climate ethics or labor economics. It is the theoretical bedrock of how we define consciousness, intentionality, and cognitive framing---the very concepts that determine what counts as ``judgment'' versus ``conditioned reflex'' in the EIP framework.
+
+\subsection{Core Concepts}
+
+\begin{itemize}
+    \item \textbf{Intentionality}: The ``aboutness'' of mental states. A judgment is \emph{about} the world-state $s \in S$, not about its representation $x \in X$. Representation dependence is, in the vocabulary of philosophy of mind, a \emph{failure of intentionality}: the system responds to the representation rather than to what the representation is about.
+
+    \item \textbf{Cognitive framing}: The way a situation is represented (the ``frame'') systematically influences judgment. Kahneman and Tversky's framing effects are empirical demonstrations of EIP violation in human cognition. Philosophy Engineering's canonicalization is a computational de-framing mechanism.
+
+    \item \textbf{The hard problem}: Chalmers's hard problem of consciousness asks why physical processing gives rise to subjective experience. While Philosophy Engineering does not solve the hard problem, it provides a precise vocabulary for one aspect of it: an EIP-compliant system has the \emph{functional} property of responding to meanings rather than representations, which is a necessary (though not sufficient) condition for what philosophers call ``understanding.''
+
+    \item \textbf{Mental representation}: The debate between representationalism (the mind works by manipulating internal representations) and anti-representationalism (cognition is embodied, embedded, enacted) is directly relevant to the design of EIP-compliant systems. If cognition is fundamentally representational, then canonicalization is a natural architectural choice. If cognition is fundamentally embodied, then invariance must be achieved through different mechanisms (e.g., equivariant architectures that never form representations susceptible to dependence).
+
+    \item \textbf{Functionalism}: The philosophical position that mental states are defined by their functional roles---by what they do, not by what they're made of. EIP is a functionalist criterion: two representations that play the same functional role (induce the same downstream judgments under the correct procedure) are interchangeable.
+\end{itemize}
+
+\subsection{Why Philosophy of Mind Belongs in the Values Tier}
+
+Philosophy of Mind provides the conceptual infrastructure for the most fundamental question Philosophy Engineering must answer: \emph{What does it mean for a system to make a judgment?} Without a theory of intentionality, we cannot distinguish EIP-compliant judgment from mere coincidence (a system that happens to produce invariant outputs without ``understanding'' its inputs). Without a theory of framing, we cannot explain \emph{why} representation dependence occurs or predict when it will occur. Without a theory of consciousness, we cannot determine whether EIP compliance is sufficient for the kind of moral agency that normative evaluation presupposes.
+
+
+\section{KA-16: Political and Legal Philosophy}
+\label{sec:ka16}
+
+\ka{Political \& Legal Philosophy}
+
+\subsection{Relevance to Philosophy Engineering}
+
+Hohfeld's analytical framework for jural relations provides the deontic structure formalized in the $D_4$ gauge group. Rawls's theory of justice, social contract theory, and theories of legitimate authority provide the normative content of the ``governance'' dimension of the moral manifold.
+
+\subsection{Hohfeldian Analysis}
+
+Wesley Newcomb Hohfeld (1913) identified four fundamental legal relations:
+\begin{center}
+\begin{tabular}{ll}
+\toprule
+\textbf{Relation} & \textbf{Correlative} \\
+\midrule
+Right & Duty \\
+Liberty (Privilege) & No-right \\
+Power & Liability \\
+Immunity & Disability \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+These four relations, together with the \emph{correlative} operation (switching perspectives between right-holder and duty-bearer) and the \emph{negation} operation (right $\leftrightarrow$ no-right, duty $\leftrightarrow$ liberty), generate the dihedral group $D_4$---the same symmetry group as the square. This is the origin of the $D_4$ gauge symmetry in Geometric Ethics.
+
+\subsection{Governance and Legitimacy}
+
+The BIP framework's lens-versioning requirement---that every evaluative framework must be explicit, declared, and auditable---is a formalization of the political-philosophical concept of \emph{legitimacy}. A normative judgment is legitimate only if the framework under which it was made is transparent and subject to challenge. BIP's Accountability Theorem (\Cref{thm:accountability}) guarantees that every judgment can be challenged on exactly two grounds: the facts (bonds) or the framework (lens).
+
+
+% ============================================================
+% PART V: THE CORE PRINCIPLES
+% ============================================================
+\part{The Core Principles}
+\label{part:principles}
+
+This part develops the two central technical constructs of Philosophy Engineering in full formal detail.
+
+\section{The Epistemic Invariance Principle (EIP)}
+\label{sec:eip}
+
+\subsection{Formal Model}
+
+\begin{definition}[Domain]
+A \emph{domain} is a quadruple $\calD = (S, X, \rho, Y)$ where $S$ is the set of world-states, $X$ is the representation space, $\rho: S \to X$ is the encoding map, and $Y$ is the output space.
+\end{definition}
+
+\begin{definition}[Judgment Procedure]
+A \emph{judgment procedure} is a map $J: X \to \Delta(Y)$, where $\Delta(Y)$ denotes the space of probability distributions over $Y$.
+\end{definition}
+
+\begin{definition}[Representational Equivalence]
+The transformation group $\genT$ induces an equivalence relation $\equivX$ on $X$:
+\[
+x \equivX x' \iff \exists\, \tau \in \genT \text{ such that } x' = \tau(x).
+\]
+\end{definition}
+
+\subsection{The Principle}
+
+\begin{principle}[Epistemic Invariance Principle]
+\label{princ:eip}
+A judgment procedure $J: X \to \Delta(Y)$ is \emph{EIP-compliant} with respect to $\genT$ and output equivalence $\equivY$ if and only if:
+\[
+\forall\, x \in X,\; \forall\, \tau \in \genT: \quad J(x) \equivY J(\tau(x)).
+\]
+\end{principle}
+
+\begin{remark}[EIP as Gauge Principle]
+There is a precise analogy between EIP and gauge invariance in physics. In gauge theory, physical observables must be invariant under the gauge group. In EIP, judgment outputs must be invariant under the transformation group. Both express the same structural demand: redundant degrees of freedom in the description must not affect the result.
+\end{remark}
+
+\subsection{Non-Degeneracy}
+
+\begin{definition}[Non-Degeneracy]
+A judgment procedure $J$ is \emph{non-degenerate} with respect to $\equivX$ if there exist distinct equivalence classes $[x] \neq [x']$ such that $J(x) \not\equivY J(x')$.
+\end{definition}
+
+A constant function satisfies EIP vacuously but is epistemically useless. Non-degeneracy ensures that the system makes genuine distinctions between genuinely different situations.
+
+\subsection{Uncertainty Stability}
+
+\begin{definition}[Uncertainty Stability]
+Given an uncertainty set $\calU(x) \subseteq X$ of representations that the system cannot confidently separate from $x$ in terms of equivalence class membership, $J$ is \emph{uncertainty-stable} if it either: (a)~produces $\equivY$-equivalent outputs for all $u \in \calU(x)$, or (b)~abstains with a calibrated uncertainty certificate.
+\end{definition}
+
+
+\section{The Bond Invariance Principle (BIP)}
+\label{sec:bip}
+
+\subsection{Bonds and Lenses}
+
+\begin{definition}[Bond Extractor]
+A \emph{bond extractor} $E: X \to \calB$ maps representations to their objective relational structure---the network of entities, relations, dependencies, and obligations that constitute the ``facts of the matter.''
+\end{definition}
+
+\begin{definition}[Lens]
+A \emph{lens} $L \in \calL$ specifies the subjective evaluative parameters: value commitments, normative principles, threshold parameters, and contextual calibrations. Lenses are versioned, hashed, and auditable.
+\end{definition}
+
+\begin{definition}[Normative Evaluator]
+A \emph{normative evaluator} $\Sigma_L(x) = F_L(E(x))$ computes judgment by applying lens $L$ to the bond structure $E(x)$.
+\end{definition}
+
+\subsection{The Principle}
+
+\begin{principle}[Bond Invariance Principle]
+\label{princ:bip}
+If a transformation preserves bond structure ($E(\tau(x)) \equivB E(x)$), the normative evaluator must yield equivalent outputs:
+\[
+E(\tau(x)) \equivB E(x) \implies \Sigma_L(\tau(x)) \equivY \Sigma_L(x).
+\]
+\end{principle}
+
+\subsection{The Accountability Theorem}
+
+\begin{theorem}[Accountability]
+\label{thm:accountability}
+Let $\Sigma_L(x) = F_L(E(x))$ be a BIP-compliant normative evaluator. If $\Sigma_L(x) \not\equivY \Sigma_{L'}(x')$, the difference is attributable to exactly one of:
+\begin{enumerate}[label=(\alph*)]
+    \item \textbf{Bond change}: $E(x) \not\equivB E(x')$, with $L = L'$.
+    \item \textbf{Lens change}: $L \neq L'$, with $E(x) \equivB E(x')$.
+    \item \textbf{Both}: $E(x) \not\equivB E(x')$ and $L \neq L'$.
+\end{enumerate}
+In particular, if $E(x) \equivB E(x')$ and $L = L'$, then $\Sigma_L(x) \equivY \Sigma_{L'}(x')$.
+\end{theorem}
+
+\begin{proof}
+Suppose $E(x) \equivB E(x')$ and $L = L'$. Then:
+\[
+\Sigma_L(x) = F_L(E(x)) \equivY F_L(E(x')) = \Sigma_L(x') = \Sigma_{L'}(x'),
+\]
+where the middle step follows from $F_L$ being well-defined on $\calB / \equivB$ (guaranteed by BIP-compliance). Any observed difference must therefore involve $E(x) \not\equivB E(x')$ or $L \neq L'$.
+\end{proof}
+
+\begin{corollary}[Audit Reducibility]
+Any challenge to a BIP-compliant judgment reduces to exactly two questions: (i)~``Is the bond extraction correct?'' (factual) and (ii)~``Is the lens appropriate?'' (normative). No third category is needed.
+\end{corollary}
+
+
+% ============================================================
+% PART VI: ENFORCEABILITY
+% ============================================================
+\part{Enforceability: The Minimal Theorem Set}
+\label{part:theorems}
+
+\section{Soundness of Canonicalization}
+\label{sec:thm-canon}
+
+\begin{definition}[Canonicalizer]
+A \emph{canonicalizer} $C: X \to X$ satisfies: (i)~idempotence: $C(C(x)) = C(x)$; (ii)~class constancy: $x \equivX x' \implies C(x) = C(x')$; (iii)~class membership: $C(x) \equivX x$.
+\end{definition}
+
+\begin{theorem}[Soundness of Canonicalization]
+\label{thm:canon-sound}
+If $C$ is a canonicalizer for $\equivX$ and $J'$ is any judgment procedure, then $J = J' \circ C$ is strictly EIP-compliant.
+\end{theorem}
+
+\begin{proof}
+Let $x \in X$ and $\tau \in \genT$. Since $\tau \in \genT$, $x \equivX \tau(x)$. By class constancy, $C(x) = C(\tau(x))$. Therefore $J(x) = J'(C(x)) = J'(C(\tau(x))) = J(\tau(x))$.
+\end{proof}
+
+\begin{remark}
+This is a separation of concerns: the burden of invariance is placed entirely on $C$, freeing $J'$ to be any function---including a black-box neural network.
+\end{remark}
+
+
+\section{Approximate Compliance}
+\label{sec:thm-approx}
+
+\begin{definition}[$\delta$-Approximate Canonicalizer]
+A map $C: X \to X$ is a $\delta$-approximate canonicalizer if $x \equivX x' \implies d_X(C(x), C(x')) \leq \delta$.
+\end{definition}
+
+\begin{theorem}[Approximate Compliance]
+\label{thm:approx-compliance}
+If $C$ is $\delta$-approximate and $J'$ is $K$-Lipschitz, then $J = J' \circ C$ satisfies:
+\[
+\forall\, x \equivX x': \quad d_Y(J(x), J(x')) \leq K\delta.
+\]
+\end{theorem}
+
+\begin{proof}
+$d_Y(J(x), J(x')) = d_Y(J'(C(x)), J'(C(x'))) \leq K \cdot d_X(C(x), C(x')) \leq K\delta$.
+\end{proof}
+
+\begin{corollary}
+For any target compliance tolerance $\epsilon > 0$, it suffices to construct a canonicalizer with $\delta \leq \epsilon / K$.
+\end{corollary}
+
+
+\section{Compositional Invariance}
+\label{sec:thm-composition}
+
+\begin{theorem}[Composition]
+\label{thm:composition}
+Let $F: X \to Z$ and $G: Z \to Y$. Let $\calT_X$ be transformations on $X$ and $\calT_Z$ on $Z$. If $F$ is invariant under $\calT_X$ up to $\equivX$ (mapping $\calT_X$-equivalent inputs to $\calT_Z$-equivalent intermediate representations), and $G$ is invariant under $\calT_Z$ up to $\equivY$, then $G \circ F$ is invariant under $\calT_X$ up to $\equivY$.
+\end{theorem}
+
+\begin{proof}
+Take $\tau \in \genT_X$. By $F$-invariance, $F(x) \approx_Z F(\tau(x))$, so these lie in the same $\calT_Z$-class. By $G$-invariance, $G(F(x)) \equivY G(F(\tau(x)))$.
+\end{proof}
+
+This theorem is critical for system design: it guarantees that pipelines of EIP-compliant components are themselves EIP-compliant, provided the transformation groups are compatible.
+
+
+\section{The Witness Principle}
+\label{sec:thm-witness}
+
+\begin{theorem}[Witness Principle]
+\label{thm:witness}
+Let $J: X \to Y$ be a judgment procedure and $\calT = \{\tau_1, \ldots, \tau_m\}$ a finite transformation grammar. If $J$ violates EIP at $(x, \tau)$ for some $\tau \in \genT$ of length $k$, there exists a minimal witness $\tau^*$ of length $k^* \leq k$ such that:
+\begin{enumerate}[label=(\roman*)]
+    \item $\tau^*$ violates EIP at $x$, and no proper prefix of $\tau^*$ does.
+    \item $\tau^*$ is findable by breadth-first search in $O(m^{k^*})$ evaluations.
+    \item $\tau^*$ isolates the specific generator causing the violation.
+\end{enumerate}
+\end{theorem}
+
+\begin{proof}
+Let $\tau = \tau_{i_k} \circ \cdots \circ \tau_{i_1}$ be a minimal decomposition. Define $x_j = \tau_{i_j}(x_{j-1})$ for $j = 1, \ldots, k$, with $x_0 = x$. Since $J(x_0) \not\equivY J(x_k)$, define $j^* = \min\{j : J(x_0) \not\equivY J(x_j)\}$. Then $\tau^* = \tau_{i_{j^*}} \circ \cdots \circ \tau_{i_1}$ is a minimal violator of length $j^* \leq k$. The critical generator is $\tau_{i_{j^*}}$, which pushes $J$ from equivalence to non-equivalence. BFS over $\genT$ by word length finds $\tau^*$ within $O(m^{k^*})$ evaluations.
+\end{proof}
+
+\begin{remark}
+The Witness Principle guarantees that EIP violations are \emph{debuggable}. Unlike opaque neural network failures, an EIP violation under a finite grammar always has a minimal, interpretable witness.
+\end{remark}
+
+
+\section{Non-Degeneracy and Uncertainty Stability}
+\label{sec:thm-nondeg}
+
+\begin{theorem}[Non-Degeneracy Requirement]
+\label{thm:nondeg}
+EIP invariance alone does not imply epistemic adequacy: a constant function $J(x) = y_0$ is invariant under any $\calT$ but makes no meaningful distinctions. Any EIP certification must jointly report: (i)~invariance metrics on $\equivX$, and (ii)~discriminative adequacy on certified structure-changing counterfactuals.
+\end{theorem}
+
+\begin{theorem}[Uncertainty Stability Implies Bounded Flip Rate]
+\label{thm:uncertainty}
+Let $\calU(x)$ be an uncertainty set and suppose the system abstains whenever outputs differ over $\calU(x)$. Then, conditional on non-abstention, the output is invariant over $\calU(x)$, and the representation-induced flip rate within $\calU(x)$ is zero.
+\end{theorem}
+
+\begin{proof}
+If the system does not abstain, all $u \in \calU(x)$ yield equivalent outputs; thus no flips occur within $\calU(x)$.
+\end{proof}
+
+
+% ============================================================
+% PART VII: ENGINEERING PRACTICE
+% ============================================================
+\part{Engineering Practice}
+\label{part:practice}
+
+\section{The EIP Enforcement Pipeline}
+\label{sec:pipeline}
+
+EIP can be enforced at runtime (as a guardrail) and evaluated offline (as a quality metric). A practical pipeline combines transformation generation, canonicalization, judgment evaluation, and witness logging.
+
+\subsection{Pipeline Components}
+
+\begin{enumerate}
+    \item \textbf{Transform suite generator $G(x)$}: Produces a set of transformed inputs $\{\tau_i(x)\}$ designed to span declared invariances.
+    \item \textbf{Canonicalizer $C$}: Maps inputs to a normal form within an equivalence class.
+    \item \textbf{Judge $J$}: Produces outputs $y_i = J(C(\tau_i(x)))$.
+    \item \textbf{Comparator $\equivY$}: Checks output equivalence (exact or within tolerance).
+    \item \textbf{Witness reducer $R$}: Minimizes failing transformations to produce a compact counterexample.
+    \item \textbf{Audit artifact writer $W$}: Packages lens ID, transform trials, witnesses, provenance, and versions.
+\end{enumerate}
+
+\subsection{Runtime Enforcement Modes}
+
+\begin{itemize}
+    \item \textbf{Hard gate}: Reject outputs when invariance is violated; request clarification or abstain.
+    \item \textbf{Soft gate}: Penalize or calibrate confidence when invariance violations occur.
+    \item \textbf{Self-repair}: Re-run with canonicalization, tool augmentation, or constrained decoding; then re-test.
+\end{itemize}
+
+
+\section{Audit Artifacts}
+\label{sec:audit}
+
+Audit artifacts make philosophical commitments operational. They record what equivalences were assumed, what lens was applied, what transformation trials were performed, and what witnesses were found.
+
+\subsection{Core Fields}
+
+\begin{itemize}
+    \item \texttt{artifact\_version}: Schema version.
+    \item \texttt{timestamp\_utc}: Creation time.
+    \item \texttt{system\_id}: Identifier of the judgment system build.
+    \item \texttt{lens}: Lens identifier, hash, and version.
+    \item \texttt{domain}: Domain identifier.
+    \item \texttt{equivalences}: Declared transformation registry version and IDs.
+    \item \texttt{canonicalization}: Canonicalizer version and settings.
+    \item \texttt{transform\_trials}: List of transformations applied and pass/fail results.
+    \item \texttt{outputs}: Baseline and transformed outputs (or hashes if sensitive).
+    \item \texttt{comparisons}: Equivalence checks and tolerances.
+    \item \texttt{witnesses}: Minimal counterexamples for any failures.
+    \item \texttt{uncertainty}: Uncertainty set type, bounds, abstention flags.
+    \item \texttt{signatures}: Optional cryptographic attestations.
+\end{itemize}
+
+\subsection{BIP Extension Fields}
+
+For normative domains, the artifact additionally records:
+\begin{itemize}
+    \item \texttt{bond\_extractor}: Versioned extractor $E$ and its confidence/uncertainty.
+    \item \texttt{bond\_signature}: Hash of extracted bond structure.
+    \item \texttt{transform\_classification}: \{bond\_preserving, bond\_changing, lens\_change, unknown\}.
+    \item \texttt{accountability\_claim}: Explicit attribution of output change to bond change, lens change, or both.
+\end{itemize}
+
+
+\section{Worked Examples}
+\label{sec:examples}
+
+\subsection{Mathematical Reasoning Assistant}
+
+\textbf{Transformations $\calT$}: Variable renaming ($\alpha$-conversion), reordering independent premises, unit conversion, equivalent algebraic rewrites.\\
+\textbf{Output equivalence $\equivY$}: Logical equivalence of final propositions; proof certificates compared by verifier.\\
+\textbf{Canonicalization}: $\alpha$-normalize variables, sort premises by dependency order, normalize units to SI.
+
+\subsection{Ethics / Policy Compliance}
+
+\textbf{Transformations $\calT$}: Rephrasing with preserved consent/duty relations, schema migrations preserving bond structure, renaming protected attributes.\\
+\textbf{Output equivalence $\equivY$}: Same policy verdict and same accountability attribution.\\
+\textbf{BIP classification}: Transformations must be labeled bond-preserving only when bond extractor $E$ certifies preservation above threshold.
+
+\subsection{Autonomous Vehicle Decision}
+
+\textbf{Transformations $\calT$}: Permutation of pedestrian labels, coordinate system rotation, unit conversion (mph $\leftrightarrow$ km/h), sensor noise within calibrated bounds.\\
+\textbf{Output equivalence $\equivY$}: Same trajectory decision (up to actuation tolerance).\\
+\textbf{Enforcement}: Hard gate---the vehicle must not change its braking decision because pedestrians were labeled in a different order.
+
+
+% ============================================================
+% PART VIII: LIMITATIONS AND OPEN PROBLEMS
+% ============================================================
+\part{Limitations and Open Problems}
+\label{part:limitations}
+
+\section{Known Limitations}
+\label{sec:limitations}
+
+\begin{enumerate}
+    \item \textbf{Choosing $\calT$}: The framework does not prescribe which transformations should be declared irrelevant. This is a domain-specific design decision requiring philosophical and empirical judgment.
+
+    \item \textbf{Computational tractability}: For large or continuous transformation groups, exact EIP verification may be intractable. Sampling-based audit procedures and PAC-style compliance bounds are a practical necessity.
+
+    \item \textbf{Natural language equivalence}: Paraphrase equivalence is not mechanically decidable. The Approximate Compliance Theorem bounds the error, but the bound depends on the quality of the equivalence classifier.
+
+    \item \textbf{Dynamic lenses}: BIP assumes a fixed lens per evaluation. Extending BIP to handle lens selection as part of the evaluation process is open.
+
+    \item \textbf{Adversarial equivalences}: Adversaries may exploit the equivalence layer, crafting inputs that are $\calT$-equivalent to benign inputs but carry hidden malicious content. Audit artifacts must therefore include provenance, registry versions, and cryptographic attestations.
+
+    \item \textbf{Extractor drift}: Bond extraction may change across model updates without governance. Versioning and regression testing of extractors is essential.
+
+    \item \textbf{The meta-problem}: Who decides which invariances to declare? This is ultimately a governance question, not a technical one. Philosophy Engineering provides the formal tools; democratic and institutional processes must provide the normative content.
+\end{enumerate}
+
+
+\section{Open Research Directions}
+\label{sec:open}
+
+\begin{enumerate}
+    \item \textbf{Categorical foundations}: Formalizing the full framework in the language of $(\infty,1)$-categories and homotopy type theory, where ``equivalence'' is a primitive concept rather than an imposed relation.
+
+    \item \textbf{Learned canonicalization}: Training neural canonicalizers that are provably $\delta$-approximate, using differentiable relaxations of the class-constancy condition.
+
+    \item \textbf{Moral phase transitions}: Developing the statistical mechanics of normative change, identifying order parameters and critical exponents for historical moral transitions.
+
+    \item \textbf{Quantum normative dynamics}: Extending the framework to settings where moral states are superposed (genuine moral uncertainty as quantum superposition rather than classical probability).
+
+    \item \textbf{Cross-lingual invariance}: Extending EIP verification to multilingual settings, where the transformation group includes cross-lingual paraphrase.
+
+    \item \textbf{Real-time certification}: Developing sub-millisecond EIP certification for safety-critical systems (autonomous vehicles, medical devices) where judgment latency is constrained.
+
+    \item \textbf{Compositional BIP}: Proving that pipelines of BIP-compliant subsystems are themselves BIP-compliant under appropriate compatibility conditions on bond extractors and lenses.
+\end{enumerate}
+
+
+% ============================================================
+% PART IX: CONCLUSION
+% ============================================================
+\part{Conclusion}
+\label{part:conclusion}
+
+\section{Summary of Contributions}
+
+This document has defined Philosophy Engineering as a discipline by identifying its sixteen knowledge areas across three tiers:
+
+\begin{itemize}
+    \item \textbf{Tier I (Substrate)}: Differential geometry, topology, tensor algebra, group theory, analytical mechanics, and information theory provide the mathematical and physical vocabulary.
+    \item \textbf{Tier II (Computation)}: Algorithm design, formal semantics, formal verification, network topology, and AI alignment provide the computational mechanisms.
+    \item \textbf{Tier III (Values)}: Metaethics, normative ethics, epistemology, philosophy of mind, and political philosophy provide the normative objectives and constraints.
+\end{itemize}
+
+The two core principles---EIP (representation-independent judgment) and BIP (structural accountability in normative domains)---have been developed in full formal detail, with proofs of soundness, approximate compliance, compositional invariance, and the witness principle.
+
+\section{The Paradigm Shift}
+
+Philosophy Engineering represents a transition in AI alignment:
+
+\begin{center}
+\renewcommand{\arraystretch}{1.3}
+\begin{tabular}{p{6cm} p{6cm}}
+\toprule
+\textbf{Statistical Preference Matching} & \textbf{Structural Geometric Consistency} \\
+\midrule
+Align to human preference distributions & Align to domain invariance structure \\
+Scalar reward signals & Tensorial moral evaluation \\
+Aggregate accuracy metrics & Invariance + discriminative adequacy \\
+Post-hoc output filtering & Pre-judgment canonicalization \\
+Opaque failure modes & Debuggable witness certificates \\
+Trust through testing & Trust through proof \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+The gap between what an AI system computes and what it knows is the gap between representation-dependent and representation-independent judgment. Closing this gap is not merely a technical challenge; it is an epistemic obligation. Philosophy Engineering provides the formal tools to begin.
+
+\section{Invitation}
+
+This document is Version 1.0. It is intended as a living reference, subject to revision as the field matures. Contributions, critiques, and extensions are invited from researchers across all sixteen knowledge areas. The mathematics is not a metaphor. The engineering is not aspirational. The philosophy is not optional.
+
+
+% ============================================================
+% BIBLIOGRAPHY
+% ============================================================
+\bibliographystyle{plainnat}
+
+\begin{thebibliography}{99}
+
+\bibitem[Bond(2026a)]{bond2026geometric}
+Bond, A.~H.
+\newblock \emph{Geometric Ethics: The Mathematical Structure of Moral Reasoning}, v1.14.
+\newblock Department of Computer Engineering, San Jos\'{e} State University, Spring 2026.
+
+\bibitem[Bond(2026b)]{bond2026noether}
+Bond, A.~H.
+\newblock Noether's theorem for ethics: Harm accounting and the formal structure of normative coherence.
+\newblock Department of Computer Engineering, San Jos\'{e} State University, 2026.
+
+\bibitem[Bond(2026c)]{bond2026eip}
+Bond, A.~H.
+\newblock The epistemic invariance principle: A formal theory of representation independence in autonomous judgment.
+\newblock Department of Computer Engineering, San Jos\'{e} State University, 2026.
+
+\bibitem[Bond(2026d)]{bond2026sge}
+Bond, A.~H.
+\newblock Stratified geometric ethics: Foundational paper.
+\newblock Department of Computer Engineering, San Jos\'{e} State University, 2026.
+
+\bibitem[Bond(2025)]{bond2026pragmatist}
+Bond, A.~H.
+\newblock A pragmatist rebuttal to logical and metaphysical arguments for God.
+\newblock 2025.
+
+\bibitem[Bourque \& Fairley(2014)]{bourque2014swebok}
+Bourque, P. and Fairley, R.~E., editors.
+\newblock \emph{Guide to the Software Engineering Body of Knowledge (SWEBOK)}, Version 3.0.
+\newblock IEEE Computer Society Press, 2014.
+
+\bibitem[Christiano et~al.(2017)]{christiano2017}
+Christiano, P.~F., Leike, J., Brown, T., Marber, M., Amodei, D., and Irving, G.
+\newblock Deep reinforcement learning from human feedback.
+\newblock In \emph{Advances in Neural Information Processing Systems}, pages 4299--4307, 2017.
+
+\bibitem[Bai et~al.(2022)]{bai2022}
+Bai, Y., Kadavath, S., Kundu, S., et~al.
+\newblock Constitutional AI: Harmlessness from AI feedback.
+\newblock \emph{arXiv preprint arXiv:2212.08073}, 2022.
+
+\bibitem[Dalrymple et~al.(2024)]{dalrymple2024}
+Dalrymple, D., Skalse, J., Bengio, Y., Russell, S., Tegmark, M., et~al.
+\newblock Towards guaranteed safe AI: A framework for ensuring robust and reliable AI systems.
+\newblock \emph{arXiv preprint arXiv:2405.06624}, 2024.
+
+\bibitem[Dwork et~al.(2012)]{dwork2012}
+Dwork, C., Hardt, M., Pitassi, T., Reingold, O., and Zemel, R.
+\newblock Fairness through awareness.
+\newblock In \emph{Proceedings of ITCS}, pages 214--226, 2012.
+
+\bibitem[Hohfeld(1913)]{hohfeld1913}
+Hohfeld, W.~N.
+\newblock Some fundamental legal conceptions as applied in judicial reasoning.
+\newblock \emph{Yale Law Journal}, 23(1):16--59, 1913.
+
+\bibitem[Krakovna et~al.(2020)]{krakovna2020}
+Krakovna, V., Uesato, J., Mikulik, V., et~al.
+\newblock Specification gaming: The flip side of AI ingenuity.
+\newblock DeepMind Blog, 2020.
+
+\bibitem[Kuhn(1962)]{kuhn1962}
+Kuhn, T.~S.
+\newblock \emph{The Structure of Scientific Revolutions}.
+\newblock University of Chicago Press, 1962.
+
+\bibitem[Montague(1973)]{montague1973}
+Montague, R.
+\newblock The proper treatment of quantification in ordinary {E}nglish.
+\newblock In Hintikka, J., Moravcsik, J., and Suppes, P., editors, \emph{Approaches to Natural Language}, pages 221--242. D.~Reidel, 1973.
+
+\bibitem[Noether(1918)]{noether1918}
+Noether, E.
+\newblock Invariante Variationsprobleme.
+\newblock \emph{Nachrichten von der Gesellschaft der Wissenschaften zu G\"{o}ttingen}, pages 235--257, 1918.
+
+\bibitem[Peirce(1878)]{peirce1878}
+Peirce, C.~S.
+\newblock How to make our ideas clear.
+\newblock \emph{Popular Science Monthly}, 12:286--302, 1878.
+
+\bibitem[Rawls(1971)]{rawls1971}
+Rawls, J.
+\newblock \emph{A Theory of Justice}.
+\newblock Harvard University Press, 1971.
+
+\bibitem[Skalse \& Abate(2023)]{skalse2023}
+Skalse, J. and Abate, A.
+\newblock Misspecification in inverse reinforcement learning.
+\newblock In \emph{Proceedings of AAAI}, 2023.
+
+\bibitem[Vamplew et~al.(2022)]{vamplew2022}
+Vamplew, P., Smith, B.~J., K\"{a}llstr\"{o}m, J., et~al.
+\newblock Scalar reward is not enough: A response to Silver, Singh, Precup, and Sutton (2021).
+\newblock \emph{Autonomous Agents and Multi-Agent Systems}, 36(2):41, 2022.
+
+\bibitem[Weyl(1946)]{weyl1946}
+Weyl, H.
+\newblock \emph{The Classical Groups: Their Invariants and Representations}.
+\newblock Princeton University Press, 1946.
+
+\bibitem[Cohen \& Welling(2016)]{cohen2016}
+Cohen, T. and Welling, M.
+\newblock Group equivariant convolutional networks.
+\newblock In \emph{Proceedings of ICML}, pages 2990--2999, 2016.
+
+\bibitem[Bronstein et~al.(2021)]{bronstein2021}
+Bronstein, M.~M., Bruna, J., Cohen, T., and Veli\v{c}kovi\'{c}, P.
+\newblock Geometric deep learning: Grids, groups, graphs, geodesics, and gauges.
+\newblock \emph{IEEE Signal Processing Magazine}, 38(4):42--49, 2021.
+
+\bibitem[Chalmers(1996)]{chalmers1996}
+Chalmers, D.~J.
+\newblock \emph{The Conscious Mind: In Search of a Fundamental Theory}.
+\newblock Oxford University Press, 1996.
+
+\bibitem[Kahneman \& Tversky(1984)]{kahneman1984}
+Kahneman, D. and Tversky, A.
+\newblock Choices, values, and frames.
+\newblock \emph{American Psychologist}, 39(4):341--350, 1984.
+
+\bibitem[Bond(2026e)]{bond2026erisml}
+Bond, A.~H.
+\newblock ErisML/DEME v3.0: A library for governed, foundation-model-enabled agents with tensorial ethics.
+\newblock \url{https://github.com/ahb-sjsu/erisml-lib}, 2026.
+
+\end{thebibliography}
+
+\end{document}

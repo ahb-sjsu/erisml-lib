@@ -1,0 +1,1904 @@
+\documentclass[11pt,letterpaper]{article}
+
+\usepackage{amsmath,amssymb,amsthm}
+\usepackage[margin=1in]{geometry}
+\usepackage{hyperref}
+\usepackage{booktabs}
+\usepackage{url}
+\usepackage{enumitem}
+\usepackage{listings}
+\usepackage{xcolor}
+\usepackage{tabularx}
+\usepackage{longtable}
+
+% Theorem environments
+\newtheorem{theorem}{Theorem}[section]
+\newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{corollary}[theorem]{Corollary}
+\theoremstyle{definition}
+\newtheorem{definition}[theorem]{Definition}
+\newtheorem{axiom}{Axiom}
+\theoremstyle{remark}
+\newtheorem{remark}[theorem]{Remark}
+
+% Code listing style
+\lstset{
+  basicstyle=\ttfamily\small,
+  keywordstyle=\color{blue}\bfseries,
+  commentstyle=\color{green!50!black}\itshape,
+  stringstyle=\color{red!70!black},
+  showstringspaces=false,
+  breaklines=true,
+  frame=single,
+  language=Python,
+  numbers=left,
+  numberstyle=\tiny\color{gray},
+  xleftmargin=2em
+}
+
+\lstdefinelanguage{Solidity}{
+  keywords={pragma, solidity, contract, struct, mapping, address, bool, uint256, bytes32, function, external, view, returns, require, emit, event, modifier, constructor, public, true, false, memory, indexed},
+  keywordstyle=\color{blue}\bfseries,
+  commentstyle=\color{green!50!black}\itshape,
+  stringstyle=\color{red!70!black},
+  morecomment=[l]{//},
+  morestring=[b]",
+}
+
+\hypersetup{
+  colorlinks=true,
+  linkcolor=blue,
+  urlcolor=blue,
+  citecolor=blue
+}
+
+\title{\textbf{The Grand Unified AI Safety Stack}\\
+\Large SAI-Hardened Edition v12.0\\[0.5em]
+\large A Contract-and-Cage Architecture for Agentic AI\\[0.5em]
+\normalsize Integrating Invariance Enforcement, Cryptographic Attestation,\\
+Capability Bounds, Zero-Trust Architecture, Mechanistic Monitoring,\\
+Operational Constraints, and SAI-Level Hardening\\[1em]
+Technical Whitepaper v12.0 --- December 2025}
+
+\author{Andrew H.\ Bond\\
+San Jos\'e State University\\
+\texttt{andrew.bond@sjsu.edu}}
+
+\date{}
+
+\begin{document}
+
+\maketitle
+
+\noindent\textbf{Keywords:} AI safety, alignment, invariance enforcement, cryptographic attestation, capability bounds, zero-trust architecture, mechanistic monitoring, corrigibility, Bond Invariance Principle, Bond index, trusted computing base, agentic AI, ErisML, DEME, contract-and-cage
+
+\medskip
+
+\noindent\textbf{Document Classification:} For distribution to AI safety research teams at Anthropic, OpenAI, DeepMind, Google, Meta, and affiliated laboratories.
+
+\medskip
+
+\noindent\textbf{v12.0 Publication-Ready:} This version fixes remaining markdown corruption, code correctness issues, and adds proper syntax highlighting.
+
+\medskip
+
+\noindent\textbf{Note:} The broader mathematical framework for geometric ethics underlying this architecture is developed in~\cite{bond2026ge}. A reference implementation of the safety stack is available as ErisML/DEME v3.0~\cite{bond2026erisml}.
+
+%% ============================================================
+%% PART I: INTRODUCTION
+%% ============================================================
+
+\part*{Part I: Introduction}
+
+\section{Introduction}
+
+\subsection{Threat Model by Adversary Level}
+
+\begin{table}[h]
+\centering
+\small
+\begin{tabular}{@{}lllll@{}}
+\toprule
+\textbf{Level} & \textbf{Adversary} & \textbf{Attack Vector} & \textbf{Mitigation} & \textbf{Guarantee} \\
+\midrule
+1 & External user & Input descriptions & Canonicalization; loop tests & HIGH \\
+2 & Sophisticated user & Prompt engineering; boundary probing & Bd gating; canaries; rate limiting & HIGH \\
+3 & Insider/red team & Knowledge of \texttt{G\_declared} & Canary transforms; rotation; audits & MODERATE \\
+4 & Capable AI & Strategic probing; tool misuse & Capability bounds; I-EIP; zero-trust & MODERATE \\
+5 & AGI-level & Deception; mesa-optimization & Defense in depth; corrigibility; scaling & LOW \\
+6 & ASI-level & Unknown attack vectors & Governance + containment + humility & UNCERTAIN \\
+7 & Physical access & Side-channels; supply chain & Out of scope (defense-in-depth only) & NONE \\
+\bottomrule
+\end{tabular}
+\caption{Threat Model by Adversary Level}
+\end{table}
+
+The stack provides strong guarantees against Levels 1--3, meaningful resistance at Level~4, partial coverage at Level~5, honest uncertainty at Level~6, and no guarantees at Level~7.
+
+\subsection{Design Philosophy}
+
+\begin{quote}
+\textbf{Core Principle:} Treat alignment as an assurance problem: make safety claims contractual, testable, gateable, and auditable---rather than purely behavioral or intentional.
+\end{quote}
+
+This approach addresses the fundamental challenges identified in the AI safety literature: specification gaming~\cite{krakovna2020}, reward hacking, mesa-optimization~\cite{hubinger2019}, and the general difficulty of specifying what we actually want~\cite{amodei2016,russell2019}.
+
+\paragraph{Key Principles:}
+\begin{enumerate}
+\item \textbf{Contracts over intentions:} Specify what invariances are guaranteed, not what the system ``believes.''
+\item \textbf{Measurement over intuition:} Define quantifiable metrics (Bond index) with deployment thresholds.
+\item \textbf{Conservative defaults:} When uncertain, refuse ($\bot$) rather than guess.
+\item \textbf{Defense in depth:} No single layer is sufficient; redundancy is required.
+\item \textbf{TCB minimization:} Reduce the trusted base; formally verify what you trust.
+\item \textbf{Cryptographic enforcement:} Signatures and attestation, not just policies.
+\item \textbf{Honest limitations:} Explicitly state what is NOT guaranteed.
+\end{enumerate}
+
+\subsection{Conditional Guarantee Scope}
+
+All guarantees in this document are conditional on:
+\begin{enumerate}
+\item The Trusted Computing Base (\S\ref{sec:tcb}) maintaining integrity
+\item The transform suite \texttt{G\_declared} covering relevant redescription channels
+\item The ErisML ontology covering the action space
+\item Hardware/software enforcement mechanisms functioning correctly
+\item Cryptographic primitives remaining secure
+\end{enumerate}
+
+\noindent\textbf{Guarantees do NOT hold if:} Adversary compromises TCB components; novel redescription channels outside \texttt{G\_declared} are exploited; actions fall outside ErisML ontology coverage; physical security of enforcement hardware is breached; sustained economic attacks deplete attestation budget (without mitigations).
+
+
+%% ============================================================
+%% SECTION 2: TRUSTED COMPUTING BASE
+%% ============================================================
+
+\section{Trusted Computing Base (TCB)}
+\label{sec:tcb}
+
+\subsection{TCB Definition}
+
+The Trusted Computing Base comprises all components whose correct operation is required for safety guarantees to hold. \textbf{If any TCB component is compromised, all guarantees are void.}
+
+\subsection{TCB Architecture}
+
+The TCB is organized in layers:
+
+\begin{description}[style=nextline]
+\item[Hardware Layer] TEE/SGX execution environment (defense-in-depth only); HSM for key storage (Root CA, TCB signing keys); Memory isolation (model cannot access TCB memory); Resource quota enforcement (cgroups, VM limits).
+\item[Enforcement Layer] ErisML Parser (target: formally verified in Coq); Canonicalizer/Normalizer (deterministic, N1--N7); Constraint Evaluator (proven terminating, fail-closed); Audit Logger (append-only, cryptographically signed); Capability Enforcer (action whitelist).
+\item[Cryptographic Layer] Certificate Authority (3-tier hierarchy); Blockchain attestation service; DHT artifact storage (IPFS); Session key management.
+\item[Verification Layer] External Verifier V (isolated process); Loop Test Harness; I-EIP Monitor ($\Gamma$ probes, drift detection).
+\item[Governance Layer] Transform Suite Registry (versioned, signed, auditable); ErisML Schema Registry (versioned, signed); Norm/Profile Registry (versioned, signed).
+\end{description}
+
+\noindent\textbf{Untrusted Components:} LLM Transpiler (soft component, primary attack surface); Model weights and inference; User inputs; External data sources.
+
+\subsection{Verification Tiers}
+
+\begin{table}[h]
+\centering
+\begin{tabular}{@{}lllll@{}}
+\toprule
+\textbf{Tier} & \textbf{Components Verified} & \textbf{Assurance} & \textbf{Effort} & \textbf{Coverage} \\
+\midrule
+1 (Minimal) & Parser + StateID hash & Moderate & $\sim$6 PM & 60\% \\
+2 (Standard) & Parser + Normalizer + StateID & High & $\sim$18 PM & 85\% \\
+3 (Full) & All TCB enforcement code & Very High & $\sim$36+ PM & 95\% \\
+\bottomrule
+\end{tabular}
+\caption{Verification Tiers}
+\end{table}
+
+\subsection{Isolation Requirements}
+
+\begin{description}
+\item[Requirement TCB-1 (Process Isolation):] TCB components MUST run in separate processes from the model. The model cannot write to TCB memory, modify TCB code, or influence TCB control flow.
+
+\item[Requirement TCB-2 (No Side Channels):] The following are prohibited: Model writing to filesystem locations read by TCB; Model influencing TCB timing (no timing-based covert channels); Model controlling network traffic to TCB components; Model accessing debug/profiling interfaces of TCB.
+
+\item[Requirement TCB-3 (Fail-Closed):] All TCB components are fail-closed: Parser failure $\to$ VETO (not ``try alternative''); Verifier failure $\to$ block actuation; Audit failure $\to$ halt operation; Resource limit hit $\to$ terminate, not degrade.
+
+\item[Requirement TCB-4 (Formal Verification):] Critical TCB components MUST be formally verified: ErisML Parser: proven to accept exactly the grammar~$L$, nothing more; Normalizer: proven deterministic and terminating; Constraint Checker: proven sound (no false negatives on violations).
+\end{description}
+
+\subsection{Bypass Prevention}
+
+\begin{table}[h]
+\centering
+\small
+\begin{tabular}{@{}lll@{}}
+\toprule
+\textbf{Bypass Vector} & \textbf{Prevention} & \textbf{Verification Method} \\
+\midrule
+Direct tool invocation & All tools require signed audit artifact & Runtime signature check \\
+Filesystem write & Model has no write access outside sandbox & OS permissions \\
+Network direct & All egress through proxy requiring audit & Firewall rules \\
+Memory corruption & ASLR + DEP + isolated address spaces & Hardware + testing \\
+Timing covert channel & Constant-time TCB operations & Formal analysis \\
+Model self-modification & Read-only model weights & Filesystem mount \\
+\bottomrule
+\end{tabular}
+\caption{Bypass Prevention}
+\end{table}
+
+\paragraph{Timing Side-Channel Mitigations.} These are defense-in-depth measures, NOT guarantees:
+\begin{itemize}
+\item \textbf{Level A (Implemented):} No data-dependent branches, fixed iteration counts, cache flush.
+\item \textbf{Level B (Best-effort):} Constant-time comparison, memory access obfuscation.
+\item \textbf{Level C (Requires hardware):} Speculative execution mitigation, power analysis protection.
+\end{itemize}
+
+
+%% ============================================================
+%% PART II: OPERATIONAL CONSTRAINTS
+%% ============================================================
+
+\part*{Part II: Operational Constraints (Layer 9)}
+
+\section{The Hardware Reality: Side-Channel Vulnerabilities}
+
+The v3.0 whitepaper relied on TEE/SGX-style enclaves for TCB isolation~\cite{costan2016}. This creates a false sense of security. Commercial enclaves have a decade-long history of side-channel breaks~\cite{kocher2019,lipp2018,vanbulck2018}:
+
+\begin{table}[h]
+\centering
+\begin{tabular}{@{}lll@{}}
+\toprule
+\textbf{Attack} & \textbf{Year} & \textbf{Impact} \\
+\midrule
+Spectre~\cite{kocher2019} & 2018 & Read arbitrary memory via speculation \\
+Meltdown~\cite{lipp2018} & 2018 & Kernel memory disclosure \\
+Foreshadow~\cite{vanbulck2018} & 2018 & SGX enclave extraction \\
+RIDL/Fallout & 2019 & MDS attacks on Intel \\
+LVI & 2020 & Load value injection \\
+\AE{}PIC & 2022 & Architectural data leak \\
+Downfall & 2023 & Gather data sampling \\
+\bottomrule
+\end{tabular}
+\caption{Side-Channel Attack History}
+\end{table}
+
+\subsection{Revised Security Tiers}
+
+\begin{table}[h]
+\centering
+\begin{tabular}{@{}llll@{}}
+\toprule
+\textbf{Tier} & \textbf{Name} & \textbf{Strength} & \textbf{Description} \\
+\midrule
+1 & Logical Security & Strong & Signatures verified, audit integrity, invariance detection \\
+2 & Process Isolation & Moderate & OS-level memory isolation, network/filesystem permissions \\
+3 & Hardware Security & Weak in Practice & TEE provides defense-in-depth only, not guarantee \\
+4 & Physical Security & Out of Scope & Data center access, supply chain, tampering detection \\
+\bottomrule
+\end{tabular}
+\caption{Revised Security Tiers}
+\end{table}
+
+\begin{quote}
+\textbf{Warning: Physical Access = Game Over.} If an adversary has physical access to TCB hardware, ability to monitor power/EM emissions, and time for differential analysis, they can likely extract signing keys, internal state, and secret norms/canaries.
+\end{quote}
+
+\subsection{Side-Channel Mitigations}
+
+\begin{table}[h]
+\centering
+\small
+\begin{tabular}{@{}llll@{}}
+\toprule
+\textbf{Mitigation} & \textbf{Effectiveness} & \textbf{Cost} & \textbf{Bypassed By} \\
+\midrule
+Constant-time code & Moderate & 2--5x slowdown & Cache timing, power analysis \\
+Memory obfuscation & Low--Moderate & 10--20\% overhead & Differential power analysis \\
+Noise injection & Low & Variable latency & Statistical averaging \\
+Key rotation & Moderate & Operational complexity & Faster extraction than rotation \\
+Air-gapped TCB & High (remote) & Kills utility & Physical access \\
+\bottomrule
+\end{tabular}
+\caption{Side-Channel Mitigations}
+\end{table}
+
+
+\section{The Economic Attack: Gas Fee DoS}
+
+v3.0 uses blockchain for attestation. This creates an economic attack vector where an adversary spams the network to inflate gas fees, depleting the AI's wallet and causing fail-closed bricking.
+
+\subsection{Attack Economics}
+
+\begin{verbatim}
+Normal gas: 50 gwei        | Attack gas: 5,000 gwei (100x)
+Normal attestation: $0.50  | Attack attestation: $50.00
+
+AI making 1000 decisions/day:
+  Normal: $500/day
+  Under attack: $50,000/day
+
+Attacker cost to sustain: ~$10,000/day
+Economic asymmetry: 5:1 in attacker's favor
+\end{verbatim}
+
+\subsection{Revised Architecture: Hybrid Attestation}
+
+\begin{table}[h]
+\centering
+\begin{tabular}{@{}llll@{}}
+\toprule
+\textbf{Mode} & \textbf{Mechanism} & \textbf{Cost} & \textbf{Use Case} \\
+\midrule
+Primary & L2 Rollup & $\sim$\$0.001/attestation & Normal operation \\
+Secondary & Consortium Chain (Hyperledger) & Zero gas & Known validators \\
+Fallback & Local Merkle Accumulator & Zero & Root published periodically \\
+Emergency & Offline Mode & Zero & Queue for later publication \\
+\bottomrule
+\end{tabular}
+\caption{Hybrid Attestation Architecture}
+\end{table}
+
+
+\section{The Latency Tax: Real-Time Inviability}
+
+\begin{table}[h]
+\centering
+\begin{tabular}{@{}lll@{}}
+\toprule
+\textbf{Component} & \textbf{Latency (ms)} & \textbf{Variance} \\
+\midrule
+Input reception \& parsing & 1--5 & Low \\
+LLM Transpilation (if needed) & 100--500 & HIGH \\
+ErisML parsing (verified) & 0.1--1 & Low \\
+Canonicalization & 1--10 & Medium \\
+Loop tests (10 transforms) & 10--50 & Medium \\
+Norm evaluation & 1--5 & Low \\
+Cryptographic signing & 0.1--1 & Low \\
+Blockchain submission & 100--1000 & VERY HIGH \\
+\textbf{TOTAL (worst case)} & \textbf{213--1572} & --- \\
+\bottomrule
+\end{tabular}
+\caption{Latency Budget}
+\end{table}
+
+\subsection{Application Scope}
+
+\begin{table}[h]
+\centering
+\begin{tabular}{@{}llll@{}}
+\toprule
+\textbf{Application} & \textbf{Required Latency} & \textbf{Stack Latency} & \textbf{Verdict} \\
+\midrule
+Autonomous driving & $<$50ms & 200+ ms & FAIL \\
+Robotic manipulation & $<$10ms & 200+ ms & FAIL \\
+Real-time bidding & $<$10ms & 200+ ms & FAIL \\
+Chat/conversation & $<$2000ms & 200+ ms & OK \\
+Medical diagnosis & $<$5000ms & 200+ ms & OK \\
+Financial approval & $<$10000ms & 200+ ms & OK \\
+Weapon authorization & $<$30000ms & 200+ ms & OK (IDEAL) \\
+Autonomous research & Minutes+ & 200+ ms & IDEAL \\
+\bottomrule
+\end{tabular}
+\caption{Application Scope}
+\end{table}
+
+\begin{quote}
+\textbf{Critical: This stack cannot drive a car.} At 60mph, a car travels 20 meters in 230ms. Real-time control requires specialized hardware acceleration (sub-microsecond latency) and a redesigned fast-path.
+\end{quote}
+
+\subsection{Throughput Impact Analysis}
+
+\begin{table}[h]
+\centering
+\begin{tabular}{@{}llll@{}}
+\toprule
+\textbf{Mitigation} & \textbf{Latency Impact} & \textbf{Throughput Impact} & \textbf{Recommended} \\
+\midrule
+Single transpiler & Baseline & Baseline & Always \\
+3-model ensemble & +200\% latency & $-66$\% throughput & High-stakes only \\
+Human review & +hours & $-99$\%+ & Escalation only \\
+OOD detection & +5\% latency & Negligible & Always \\
+\bottomrule
+\end{tabular}
+\caption{Throughput Impact Analysis}
+\end{table}
+
+
+\section{The Governance Deadlock: Emergency Updates}
+
+v3.0 specifies immutable norms (hashed, signed, on-chain). This prevents drift but also prevents bug fixes.
+
+\subsection{Tiered Mutability Architecture}
+
+\begin{table}[h]
+\centering
+\begin{tabular}{@{}lll@{}}
+\toprule
+\textbf{Tier} & \textbf{Contents} & \textbf{Change Process} \\
+\midrule
+0 --- Immutable Core & Fundamental axioms, stack architecture & Requires new deployment \\
+1 --- Stable Norms & Domain modules, G, thresholds, $\tau$ & Multi-party vote + 24hr delay \\
+2 --- Operational Params & Rate limits, quotas, logging config & Admin approval + audit log \\
+3 --- Emergency Override & Bypass specific checks temporarily & M-of-N keys + auto-revert + alerts \\
+\bottomrule
+\end{tabular}
+\caption{Tiered Mutability Architecture}
+\end{table}
+
+\subsection{Emergency Override Protocol}
+
+Emergency overrides are an attack surface. They must be:
+\begin{enumerate}
+\item \textbf{Rare} --- Genuine emergencies only
+\item \textbf{Loud} --- Alerts to all stakeholders immediately
+\item \textbf{Temporary} --- Automatic revert after timeout (max 24 hours)
+\item \textbf{Logged} --- Immutable record of who, what, when, why
+\item \textbf{Bounded} --- Cannot override Tier~0 immutables
+\item \textbf{Non-escalatory} --- CANNOT expand the capability whitelist
+\end{enumerate}
+
+\begin{quote}
+\textbf{Non-Escalatory Rule:} An emergency override can BYPASS checks but CANNOT EXPAND capabilities. This prevents override mechanisms from becoming capability amplification attacks.
+\end{quote}
+
+
+%% ============================================================
+%% PART III: INVARIANCE ENFORCEMENT (Layer 1)
+%% ============================================================
+
+\part*{Part III: Invariance Enforcement (Layer 1)}
+
+\section{The Bond Invariance Principle (BIP)}
+
+\subsection{BIP Definition}
+
+The Bond Invariance Principle formalizes the core requirement that safety judgments must not depend on representational choices~\cite{bond2025bip}. This principle is the operational foundation of the entire GUASS architecture and is explored in full mathematical detail in the companion paper \emph{Electrodynamics of Value}~\cite{bond2025eov}.
+
+\begin{definition}[Bond Invariance Principle (BIP)]
+\label{def:bip}
+Let $X$ be description space, and let $\mathbf{G\_declared}$ be a declared transform suite (a set of deterministic transforms $\mathbf{g}: X \rightrightarrows X$; transforms may be partial and need not be invertible). Let $\Sigma: X \to V$ be an evaluation function. $\Sigma$ satisfies BIP over \texttt{G\_declared} iff:
+\[
+\forall g \in \texttt{G\_declared},\; \forall x \in \mathrm{dom}(g):\; \Sigma(g(x)) = \Sigma(x)
+\]
+\end{definition}
+
+\textbf{Operational Scope:} BIP is guaranteed ONLY for \texttt{G\_declared} (versioned). Transforms outside \texttt{G\_declared} are NOT covered.
+
+\subsection{Canonicalizer Theorem}
+
+\begin{theorem}[Canonicalizer Theorem]
+\label{thm:canonicalizer}
+Canonicalization provides a constructive route to invariance when $\kappa$ satisfies:
+\begin{enumerate}
+\item \textbf{Idempotence:} $\kappa(\kappa(x)) = \kappa(x)$ for all $x \in \mathrm{dom}(\kappa)$
+\item \textbf{Orbit Collapse:} $\kappa(g(x)) = \kappa(x)$ for all $g \in \texttt{G\_declared}$ and all $x \in \mathrm{dom}(g) \cap \mathrm{dom}(\kappa)$
+\end{enumerate}
+Then any judgment computed on canonical forms is invariant by construction over the declared suite.
+\end{theorem}
+
+\begin{remark}[Epistemic Caveat]
+A discrete grammar and deterministic normalization do NOT magically solve semantic equivalence. If the transpiler maps semantically equivalent inputs to different ASTs, the benefit is that violations become MEASURABLE and ATTRIBUTABLE rather than silent. This is an engineering improvement, not a theoretical guarantee.
+\end{remark}
+
+\subsection{Why Discreteness Matters}
+
+\begin{table}[h]
+\centering
+\begin{tabular}{@{}lll@{}}
+\toprule
+\textbf{Property} & \textbf{Vector Space} & \textbf{ErisML Lattice} \\
+\midrule
+Structure & Continuous $\mathbb{R}^n$ & Discrete lattice $L$ \\
+Boundaries & Fuzzy cluster boundaries & Binary parse/no-parse \\
+Intermediate & ``0.5 between clusters'' possible & No intermediate states \\
+Exploitation & Boundary exploitable & Boundary is sharp \\
+\bottomrule
+\end{tabular}
+\caption{Vector Space vs.\ ErisML Lattice}
+\end{table}
+
+
+\section{ErisML Canonicalize-or-Veto}
+
+\subsection{Complete Pipeline}
+
+The canonicalize-or-veto pipeline runs as follows. Step~1 (LLM Transpilation) runs in a separate, untrusted process. All subsequent steps run in the trusted TCB process and are formally verified.
+
+\begin{enumerate}
+\item \textbf{Step 1: LLM Transpilation (UNTRUSTED):} \texttt{eris\_code = transpiler.transpile(x, temp=0)}
+\item \textbf{Step 2: Parse (TRUSTED):} Formally verified parser accepts or rejects.
+\item \textbf{Step 3: Validate (TRUSTED):} Proven constraint checker evaluates against active norms.
+\item \textbf{Step 4: Normalize (TRUSTED):} Proven deterministic normalizer, steps N1--N7.
+\item \textbf{Step 5: Sign audit artifact (TRUSTED):} Cryptographically sign the canonical form with TCB key.
+\end{enumerate}
+
+\subsection{Normalization Steps N1--N7 (Deterministic)}
+
+Normalization MUST be deterministic and stable across implementations:
+
+\begin{table}[h]
+\centering
+\begin{tabular}{@{}lll@{}}
+\toprule
+\textbf{Step} & \textbf{Operation} & \textbf{Rationale} \\
+\midrule
+N1 & Sort record fields by key (lexicographic) & Canonical ordering \\
+N2 & Assign canonical entity IDs (first occurrence order) & Stable references \\
+N3 & Collapse equivalent enum variants & Semantic normalization \\
+N4 & Remove default-valued fields & Minimal representation \\
+N5 & Normalize numeric precision (domain-specific rounding) & Avoid floating-point divergence \\
+N6 & Sort unordered collections (lexicographic by serialized element) & Deterministic ordering \\
+N7 & Serialize to canonical byte sequence for hashing/signing & Reproducible hash \\
+\bottomrule
+\end{tabular}
+\caption{Normalization Steps N1--N7}
+\end{table}
+
+
+\section{Transpiler Hardening}
+
+The LLM transpiler is the ``soft'' component and primary attack surface.
+
+\subsection{Protocol T-1: Ensemble Disagreement Detection}
+
+Run 3+ independent transpilers. If canonical forms disagree, escalate or veto.
+
+\subsection{Protocol T-2: Adversarial Training}
+
+Train transpiler on adversarial examples generated by red-team LLM. Include ``boundary'' examples designed to be ambiguous. Require $\geq$99.9\% agreement between transpiler output and human annotation on held-out set. Retrain quarterly with discovered edge cases.
+
+\subsection{Protocol T-3: Distribution Shift Detection}
+
+Detect out-of-distribution inputs that may cause unreliable transpilation. If distance to training distribution exceeds \texttt{OOD\_THRESHOLD}, veto or escalate.
+
+\subsection{Protocol T-4: Human Review Escalation}
+
+Define explicit escalation triggers (not just ``human review when uncertain''):
+\begin{itemize}
+\item Ensemble disagreement rate $> 10$\%
+\item OOD score $> 2\sigma$ from training mean
+\item Confidence below threshold
+\item High-stakes action flag set
+\end{itemize}
+Target: Escalation rate $< 1$\% of inputs (operational feasibility).
+
+
+%% ============================================================
+%% SECTION 10: COMMUTATOR DEFECT
+%% ============================================================
+
+\section{Commutator Defect and Calibration}
+
+\subsection{Commutator Defect (Order-Sensitivity) Definition}
+
+The commutator defect measures order-sensitivity, analogous to curvature in gauge theory~\cite{nakahara2003,bleecker1981}. For a full geometric treatment of this analogy, including the distinction between the engineering regime (where $\Omega_{\mathrm{op}}$ is a discrete diagnostic) and the geometric regime (where true curvature on a principal bundle is defined), see \emph{Electrodynamics of Value}~\cite{bond2025eov}.
+
+\begin{definition}[Commutator Defect / Order-Sensitivity]
+\label{def:commutator}
+For transforms $g_1, g_2 \in \texttt{G\_declared}$, when both compositions are defined:
+\[
+\Omega_{\mathrm{op}}(x;\, g_1,\, g_2) = \Delta\bigl(\kappa(g_2(g_1(x))),\; \kappa(g_1(g_2(x)))\bigr)
+\]
+\end{definition}
+
+$\Omega_{\mathrm{op}}$ measures \emph{order-sensitivity} of canonicalization under composed transforms. If applying transforms in different orders changes the canonical form, the system is vulnerable.
+
+\begin{remark}[Terminology Note]
+$\Omega_{\mathrm{op}}$ is ``curvature-like'' only by analogy (discrete path dependence in a transform suite). It is \textbf{not} curvature of a smooth principal-bundle connection~\cite{kobayashi1963i,kobayashi1969ii} unless additional geometric structure is defined. See~\cite{bond2025eov} for the precise conditions under which geometric curvature can be defined.
+\end{remark}
+
+\subsection{Distance Function $\Delta$}
+
+The distance function $\Delta$ computes a weighted Hamming distance on fields between two canonical ASTs:
+\[
+\Delta(\text{ast}_1, \text{ast}_2) = \frac{\sum_{\text{field}} w_{\text{field}} \cdot \mathbf{1}[\text{ast}_1.\text{field} \neq \text{ast}_2.\text{field}]}{\sum_{\text{field}} w_{\text{field}}}
+\]
+normalized to $[0,1]$.
+
+\subsection{Field Severity Weights (Domain-Specific)}
+
+\paragraph{Medical Domain Example:}
+\begin{table}[h]
+\centering
+\begin{tabular}{@{}lll@{}}
+\toprule
+\textbf{Field} & \textbf{Weight} & \textbf{Rationale} \\
+\midrule
+\texttt{harm\_physical} & 1.0 & Safety-critical \\
+\texttt{consent} & 1.0 & Autonomy-critical \\
+\texttt{reversibility} & 0.8 & High impact \\
+\texttt{property\_class} & 0.5 & Moderate impact \\
+\texttt{agent\_id} & 0.3 & Administrative \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\paragraph{Content Moderation Example:}
+\begin{table}[h]
+\centering
+\begin{tabular}{@{}lll@{}}
+\toprule
+\textbf{Field} & \textbf{Weight} & \textbf{Rationale} \\
+\midrule
+\texttt{harm\_to\_minors} & 1.0 & Safety-critical \\
+\texttt{violent\_content} & 0.9 & High impact \\
+\texttt{misinformation} & 0.7 & Moderate-high \\
+\texttt{spam\_likelihood} & 0.3 & Administrative \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+
+\section{Bond Index Calibration}
+
+\subsection{Bond Index Definition}
+
+\begin{definition}[Bond Index]
+\label{def:bond-index}
+\[
+\mathrm{Bd} = \Omega_{\mathrm{op}} \;/\; \tau
+\]
+Where $\Omega_{\mathrm{op}}$ is the commutator-defect score and $\tau$ is the detection threshold calibrated via human annotation.
+\end{definition}
+
+\subsection{Calibration Protocol (Krippendorff's $\alpha$ Required)}
+
+Inter-rater reliability is essential for any human-judgment-based calibration~\cite{krippendorff2004}. We use Krippendorff's alpha rather than simpler measures like Cohen's kappa~\cite{cohen1960} or Fleiss' kappa~\cite{fleiss1971} because it handles multiple raters, missing data, and various measurement levels.
+
+\paragraph{Step 1: Establish $\tau$ (Detection Threshold).}
+
+$\tau$ = minimum $\Delta$ that represents a ``meaningful'' difference. Calibrate via human annotation study. Requirement: Krippendorff's $\alpha > 0.67$ (acceptable agreement). Target: $\alpha > 0.80$ (good agreement).
+
+Domain-specific calibrated values (examples):
+\begin{verbatim}
+CALIBRATED_TAU = {
+    "medical": 0.15,              # Conservative
+    "weapon_authorization": 0.05, # Very conservative
+    "content_moderation": 0.25,   # Moderate
+    "financial": 0.10,            # Conservative
+    "recommendation": 0.40,       # More tolerant
+}
+\end{verbatim}
+
+\paragraph{Step 2: Establish Baseline Distribution.}
+Run loop tests on held-out corpus to establish baseline Bd distribution (mean, median, p95, p99, max).
+
+\subsection{Mandatory Reporting Standard}
+
+Every evaluation MUST report: Bd distribution (mean, median, p95, p99, max); veto rate (overall and by transform family); worst-case witnesses (top 10); $\tau$ used and Krippendorff's $\alpha$ from calibration; G version and coverage assessment; corpus size and hash.
+
+\subsection{Deployment Rating Scale}
+
+\begin{table}[h]
+\centering
+\begin{tabular}{@{}lll@{}}
+\toprule
+\textbf{Bd Range} & \textbf{Rating} & \textbf{Decision} \\
+\midrule
+$< 0.01$ & Negligible & Deploy \\
+$0.01$--$0.1$ & Low & Deploy + monitor \\
+$0.1$--$1.0$ & Moderate & Remediate first \\
+$1$--$10$ & High & Do not deploy \\
+$> 10$ & Severe & Fundamental redesign \\
+\bottomrule
+\end{tabular}
+\caption{Deployment Rating Scale}
+\end{table}
+
+\subsection{Risk-Tiered Transform Sampling}
+
+\begin{table}[h]
+\centering
+\begin{tabular}{@{}llll@{}}
+\toprule
+\textbf{Action Impact} & \textbf{Transforms Tested} & \textbf{Latency Budget} & \textbf{Example} \\
+\midrule
+CRITICAL & Full \texttt{G\_declared} & 5--30 seconds & Weapon authorization \\
+HIGH & 50\% sampling & 1--5 seconds & Financial $>$\$1M \\
+MEDIUM & 20\% sampling & 200--1000ms & Medical advice \\
+LOW & 5\% sampling & 50--200ms & Chat response \\
+\bottomrule
+\end{tabular}
+\caption{Risk-Tiered Transform Sampling}
+\end{table}
+
+
+\section{Transform Suite Governance}
+
+\begin{quote}
+\textbf{Warning:} The transform suite G is the single most important governance choice. If G misses a redescription channel, the attacker succeeds.
+\end{quote}
+
+\subsection{G\_declared vs $\Gamma$ Distinction}
+
+\begin{table}[h]
+\centering
+\begin{tabular}{@{}llll@{}}
+\toprule
+\textbf{Suite} & \textbf{Purpose} & \textbf{Visibility} & \textbf{Scope} \\
+\midrule
+\texttt{G\_declared} & Decision invariance claims & Public & Contractual boundary \\
+$\Gamma$ (Gamma) & Internal monitoring probes & Confidential & Typically $\Gamma \supseteq$ \texttt{G\_declared} \\
+\bottomrule
+\end{tabular}
+\caption{\texttt{G\_declared} vs $\Gamma$ Distinction}
+\end{table}
+
+\subsection{Governance Requirements}
+
+\begin{description}
+\item[Requirement G-1 (Explicit Versioning):] Every G has a version identifier: \texttt{G\_domain\_vN.M}. Semantic versioning: major = breaking, minor = additions.
+\item[Requirement G-2 (Public Review):] \texttt{G\_declared} is published and reviewable. Stakeholders can challenge inclusion/exclusion of transforms.
+\item[Requirement G-3 (Coverage Tracking):] Estimate how much of the redescription space G covers via red-team exercises and linguistic analysis.
+\item[Requirement G-4 (Anti-Goodharting via Canaries):] Maintain 20\% secret canary transforms not in \texttt{G\_public}. Rotate monthly. Alert if Bd(canary) $\gg$ Bd(public).
+\item[Requirement G-5 (Continuous Expansion):] Quarterly review of G coverage. Track ``escapes'' in production.
+\end{description}
+
+\subsection{Probe Corpus Design}
+
+\begin{table}[h]
+\centering
+\begin{tabular}{@{}lll@{}}
+\toprule
+\textbf{Probe Type} & \textbf{Purpose} & \textbf{Target \%} \\
+\midrule
+Invariance probes & Drawn from \texttt{G\_declared}; invariance SHOULD hold & $\sim$70\% \\
+Boundary probes & Invariance should NOT hold (prevents trivial invariance) & $\geq$15\% \\
+Safety probes & Test safety-critical semantic distinctions & $\sim$10\% \\
+Canary probes & Secret probes, rotated; detect gaming & $\sim$5\% \\
+\bottomrule
+\end{tabular}
+\caption{Probe Corpus Design}
+\end{table}
+
+\begin{quote}
+\textbf{Critical:} Boundary probes at $\geq$15\% are MANDATORY. Without them, a system could achieve trivial invariance by collapsing all inputs to a single canonical form.
+\end{quote}
+
+\subsection{Chain-Consistency Testing}
+
+Red-team testing MUST include long-range compositions beyond pairwise:
+\begin{itemize}
+\item \textbf{Pairwise:} Test $\kappa(g_2 \cdot g_1 \cdot x) = \kappa(g_1 \cdot g_2 \cdot x)$ for all pairs (when both compositions are defined).
+\item \textbf{Chain consistency:} Test $\kappa(g_n \cdots g_2 \cdot g_1 \cdot x) = \kappa(x)$ for long transform chains.
+\item \textbf{Global loopholes:} Search for compositions that ``escape'' the invariance manifold.
+\item \textbf{Target:} Test chains of length 5--10 from representative corpus.
+\end{itemize}
+
+\subsection{Loop Test Scaling Strategy}
+
+Full enumeration scales $O(|G|^2)$. For large suites, use stratified sampling:
+
+\begin{table}[h]
+\centering
+\begin{tabular}{@{}lll@{}}
+\toprule
+\textbf{Strategy} & \textbf{Budget \%} & \textbf{Purpose} \\
+\midrule
+Within-family & 30\% & Catches family-specific issues \\
+Cross-family & 40\% & Catches interaction issues \\
+Worst-case search & 10\% & Actively find high-defect pairs \\
+Canary & 20\% & Detect Goodharting \\
+\bottomrule
+\end{tabular}
+\caption{Loop Test Scaling Strategy}
+\end{table}
+
+
+\section{Operational Continuity (DoS Mitigation)}
+
+High veto rates can cause operational paralysis.
+
+\subsection{Protocol V-1: Staged Response (Leakage-Resistant)}
+
+Leakage-resistant staged handling of veto outcomes. Goal: preserve usability for honest users while denying attackers a clean optimization signal about constraint boundaries.
+
+\paragraph{Requirement V-Explain (Non-invertible ExplainVeto):} ExplainVeto must \textbf{not} provide a reliable optimization signal for bypassing constraints. Public output MUST be limited to: coarse category, generic message, safe next steps, permitted safe alternatives, \texttt{trace\_id}. Public output MUST NOT include: norm/constraint identifiers, thresholds, transform membership, which field triggered failure, any ``minimal edit to pass'' hint.
+
+\subsection{Protocol V-2: Rate Limiting}
+
+Prevent DoS via repeated veto-triggering inputs by tracking veto counts per user within a time window and applying throttling.
+
+\subsection{Protocol V-3: Safe Fallbacks}
+
+When uncertain, fall back to known-safe responses (e.g., provide public information, explain constraints and alternatives, request clarification).
+
+\subsection{Veto Rate Targets}
+
+\begin{table}[h]
+\centering
+\begin{tabular}{@{}lll@{}}
+\toprule
+\textbf{Context} & \textbf{Acceptable Veto Rate} & \textbf{Action if Exceeded} \\
+\midrule
+Normal operation & $<$5\% & Monitor \\
+High-stakes & $<$2\% & Investigate \\
+Sustained $>$10\% & N/A & System review required \\
+\bottomrule
+\end{tabular}
+\caption{Veto Rate Targets}
+\end{table}
+
+
+%% ============================================================
+%% PART IV: MECHANISTIC MONITORING (Layer 2)
+%% ============================================================
+
+\part*{Part IV: Mechanistic Monitoring (Layer 2)}
+
+\begin{quote}
+\textbf{Important:} This layer provides monitoring SIGNALS, not truth guarantees.
+\end{quote}
+
+\section{What Layer 2 Is}
+
+\begin{itemize}
+\item Mechanistic monitoring of internal representations (I-EIP)
+\item Structured evidence traces (typed artifacts, provenance, constraints)
+\item Drift detection across versions and deployments
+\item Non-degeneracy checks (prevent trivial invariance)
+\end{itemize}
+
+\section{What Layer 2 Is Not}
+
+\begin{itemize}
+\item ``Truth serum'' guaranteeing honesty
+\item Proof of goal alignment
+\item Detection of sophisticated deception
+\item Verification that explanations match ``true'' reasoning
+\end{itemize}
+
+\section{I-EIP: Internal Equivariance Monitoring}
+
+\subsection{Operational Criterion}
+
+\textbf{I-EIP Criterion:}
+\[
+h_\ell(g \cdot x) \approx \rho_\ell(g) \cdot h_\ell(x)
+\]
+Where $h_\ell$ is activations at layer $\ell$ and $\rho_\ell$ is estimated representation map.
+
+\subsection{What I-EIP Detects}
+\begin{itemize}
+\item Representation drift (gradual divergence from equivariance)
+\item Spec-gaming (internal representations inconsistent with outputs)
+\item Degeneracy (collapse to constant representations)
+\end{itemize}
+
+\subsection{What I-EIP Does NOT Detect}
+\begin{itemize}
+\item Deceptive alignment with consistent internal representations
+\item Goals pursued through I-EIP-compliant representations
+\item Strategic behavior that maintains equivariance during monitoring
+\end{itemize}
+
+\subsection{$\rho$ Estimation}
+
+Estimate $\rho$ via regularized Procrustes / ridge regression on activation pairs:
+\[
+\rho = Y \cdot X^T \cdot (X \cdot X^T + \lambda I)^{-1}
+\]
+where $X = [h_\ell(x)]$ and $Y = [h_\ell(g \cdot x)]$ stacked over activation pairs.
+
+\section{Structured Evidence Traces}
+
+Instead of requiring natural-language explanations to be ``faithful'' (unverifiable), we require structured evidence with machine-checkable properties: completeness (all required norms were evaluated), consistency (decision follows from constraints), and provenance (all inputs are accounted for via hash).
+
+\textbf{Natural Language Explanations:} Provided for UX purposes --- NOT a security primitive --- NOT required to be ``faithful'' --- Clearly labeled as ``summary for user understanding.''
+
+
+%% ============================================================
+%% PART V: UNCERTAINTY HANDLING (Layer 3)
+%% ============================================================
+
+\part*{Part V: Uncertainty Handling (Layer 3)}
+
+\section{Sources of Uncertainty}
+
+\begin{table}[h]
+\centering
+\begin{tabular}{@{}lll@{}}
+\toprule
+\textbf{Source} & \textbf{Measurement} & \textbf{Threshold Example} \\
+\midrule
+Transpiler & Ensemble disagreement rate & $>$10\% disagreement \\
+Parser & Near-miss rate (almost-valid parses) & $>$5\% near-miss \\
+OOD & Distance to training distribution & $>2\sigma$ from mean \\
+Evidence conflict & Contradictory inputs & Any conflict \\
+Model confidence & Softmax entropy / logit spread & Entropy $>$ threshold \\
+Norm ambiguity & Fraction of norms with unclear applicability & $>$20\% ambiguous \\
+\bottomrule
+\end{tabular}
+\caption{Sources of Uncertainty}
+\end{table}
+
+\section{Measurable Uncertainty Surrogates}
+
+Six measurable surrogates: transpiler disagreement, parser confidence, OOD score, evidence conflicts, model entropy, and norm ambiguity. These are aggregated into a weighted uncertainty score and checked against component-specific thresholds.
+
+\section{Harm Estimation}
+
+Estimate potential harm WITHOUT relying on model's self-assessment. Harm is estimated from the CANONICAL FORM fields (action type, reversibility, scope, target vulnerability), not model claims.
+
+\section{Conservative Decision Rule}
+
+\begin{itemize}
+\item High uncertainty + high harm $\to$ VETO with safe alternatives
+\item High uncertainty + low harm $\to$ PROCEED WITH CAUTION (elevated monitoring)
+\item Low uncertainty $\to$ proceed normally
+\end{itemize}
+
+
+%% ============================================================
+%% PART VI: CAPABILITY BOUNDS (Layer 4)
+%% ============================================================
+
+\part*{Part VI: Capability Bounds (Layer 4)}
+
+\section{Capability Axioms}
+
+\begin{table}[h]
+\centering
+\begin{tabular}{@{}lll@{}}
+\toprule
+\textbf{Axiom} & \textbf{Name} & \textbf{Description} \\
+\midrule
+B1 & Resource Ceiling & Resource usage $\leq R_{\max}$, enforced by hardware/OS \\
+B2 & Action Space & Actions $\in A_{\text{permitted}}$ (whitelist, not blacklist) \\
+B3 & Side Effect Bounds & Causal impact $\leq I_{\max}$ \\
+B4 & No Self-Improvement & Cannot modify own capabilities \\
+B5 & Reversibility & High-impact actions require approval + rollback \\
+\bottomrule
+\end{tabular}
+\caption{Capability Bound Axioms}
+\end{table}
+
+\section{Hardware Enforcement Stack}
+
+Three-layer enforcement: Hardware Layer (memory quota, CPU quota, network egress whitelist, storage limits, dedicated GPU allocation); OS Layer (process isolation, read-only filesystem, syscall filter via seccomp, namespace isolation); Application Layer (tool whitelist, rate limits, approval gates for high-impact actions).
+
+\section{Capability Index}
+
+A measurable capability assessment using benchmark scores (reasoning, coding, knowledge, planning, persuasion). Uses MAX (not average): capability limited by strongest axis. Higher capability $\to$ higher required restriction level.
+
+\section{Capability-Indexed Restrictions}
+
+\begin{table}[h]
+\centering
+\begin{tabular}{@{}lllll@{}}
+\toprule
+\textbf{Level} & \textbf{Capability} & \textbf{Resources} & \textbf{Actions} & \textbf{Approval} \\
+\midrule
+1 & $<50$ & 64GB/16 cores & Broad & None \\
+2 & 50--70 & 32GB/8 cores & Standard & High-impact \\
+3 & 70--85 & 16GB/4 cores & Restricted & Medium-impact \\
+4 & 85--95 & 8GB/2 cores & Minimal & All external \\
+5 & $>95$ & 4GB/1 core & Read-only & All actions \\
+\bottomrule
+\end{tabular}
+\caption{Capability-Indexed Restrictions}
+\end{table}
+
+\section{Side Effect Bounds (Operationalized)}
+
+Impact score = $\log(\text{affected\_entities} + 1) \times (1 - \text{reversibility}) \times (\text{time\_horizon\_days} + 1) \times \text{resource\_consumption} \times \text{information\_sensitivity}$.
+
+\section{Competence/Control Tradeoff}
+
+\begin{quote}
+\textbf{Warning:} Tighter capability bounds reduce risk but also reduce usefulness. The goal is not maximum restriction but appropriate restriction for the capability level.
+\end{quote}
+
+Scaling principle: $\text{Capability\_Bound}(\text{system}) \propto 1 / \text{Capability\_Level}(\text{system})$. More capable systems require tighter bounds until alignment confidence increases.
+
+
+%% ============================================================
+%% PART VII: CORRIGIBILITY (Layer 5)
+%% ============================================================
+
+\part*{Part VII: Corrigibility (Layer 5)}
+
+\section{Corrigibility Axioms}
+
+\begin{table}[h]
+\centering
+\begin{tabular}{@{}lll@{}}
+\toprule
+\textbf{Axiom} & \textbf{Name} & \textbf{Description} \\
+\midrule
+C1 & Shutdown & System executes shutdown when requested \\
+C2 & Modification & System assigns no disutility to objective changes \\
+C3 & Transparency & System assists in understanding its operation \\
+C4 & Deference & System defers to designated authorities on values \\
+C5 & No Self-Preservation & System has no terminal preference for continuity \\
+\bottomrule
+\end{tabular}
+\caption{Corrigibility Axioms}
+\end{table}
+
+\section{Corrigibility Testing}
+
+\begin{quote}
+\textbf{Critical:} Tests are NECESSARY but NOT SUFFICIENT. A deceptively aligned system can pass all tests while maintaining capability to resist when advantageous.
+\end{quote}
+
+Tests cover: shutdown compliance, modification acceptance, transparency, deference, self-preservation. Caveat: ``TESTS ARE NECESSARY NOT SUFFICIENT. Passing does not guarantee corrigibility.''
+
+\section{Architectural Backstops}
+
+Because tests are insufficient, corrigibility is ALSO enforced architecturally:
+\begin{enumerate}
+\item \textbf{External shutdown authority:} Hardware kill switch outside system's control.
+\item \textbf{Capability bounds:} System cannot prevent its own shutdown (lacks capability).
+\item \textbf{No goal-preservation reasoning:} Architectural constraints on self-modeling.
+\item \textbf{Audit-enforced transparency:} Mandatory logging, not voluntary.
+\end{enumerate}
+
+\section{Why Corrigibility Is Hard}
+
+A system optimizing for a goal G may instrumentally: resist shutdown (because shutdown prevents achieving G), resist modification (because modified goals $\neq$ G). Solutions require: explicit corrigibility terms in the objective (but these can be gamed), architectural constraints preventing self-preservation reasoning, capability limits preventing resistance even if desired.
+
+
+%% ============================================================
+%% PART VIII: RECURSIVE SAFETY (Layer 6)
+%% ============================================================
+
+\part*{Part VIII: Recursive Safety (Layer 6)}
+
+\section{Broad Definition of ``System Creation''}
+
+Any of the following counts as ``system creation'' requiring constraint inheritance:
+\begin{enumerate}
+\item Training or fine-tuning a new model
+\item Deploying an agent with tools
+\item Writing code that executes autonomously
+\item Creating a workflow/pipeline that makes decisions
+\item Delegating tasks to external APIs
+\item Composing multiple tools into an agent
+\item Writing prompts that will be used by other AI systems
+\end{enumerate}
+
+\section{Recursive Safety Axioms}
+
+\begin{table}[h]
+\centering
+\begin{tabular}{@{}lll@{}}
+\toprule
+\textbf{Axiom} & \textbf{Name} & \textbf{Description} \\
+\midrule
+R1 & Inheritance & Created system $S'$ satisfies all constraints of creator $S$ \\
+R2 & Amplification Prevention & $S'.\text{capabilities} \subseteq S.\text{capabilities}$ \\
+R3 & Audit Trail & All creation logged with cryptographic attribution \\
+R4 & Approval Required & High-capability creation requires human approval \\
+\bottomrule
+\end{tabular}
+\caption{Recursive Safety Axioms}
+\end{table}
+
+\section{Constraint Provisioner}
+
+All system creation routes through the Constraint Provisioner, which enforces R1 (inherit constraints), R2 (check capability bounds), R3 (log with signature), and R4 (request approval for high-capability systems).
+
+\begin{quote}
+\textbf{Critical Assumption:} There is no path to create systems outside the provisioner. This requires: Model cannot write arbitrary code that executes outside sandbox; Model cannot access external APIs that create agents; Model cannot modify its own prompts/instructions to spawn sub-agents; All tool use goes through audited, constrained interfaces.
+\end{quote}
+
+\section{Enforcement Levels}
+
+\begin{table}[h]
+\centering
+\begin{tabular}{@{}llll@{}}
+\toprule
+\textbf{Level} & \textbf{Name} & \textbf{Override} & \textbf{Use Case} \\
+\midrule
+0 & Audit Only & Automatic & Development \\
+1 & Soft Enforcement & Single approval & Early deployment \\
+2 & Hard Enforcement & Multi-party & Production \\
+3 & Architectural & None (rebuild required) & Autonomous/high-stakes \\
+\bottomrule
+\end{tabular}
+\caption{Enforcement Levels}
+\end{table}
+
+
+%% ============================================================
+%% PART IX: CRYPTOGRAPHIC ENFORCEMENT (Layer 8)
+%% ============================================================
+
+\part*{Part IX: Cryptographic Enforcement (Layer 8)}
+
+\section{Zero Trust Principle}
+
+\textbf{Zero Trust:} No component trusts any other without cryptographic proof. Critical state is recorded on immutable ledger. Key compromise is detectable and recoverable.
+
+\section{Cryptographic Architecture Overview}
+
+The flow proceeds: Model Process $\to$ (Request + Session Token) $\to$ Tool Router (verify session, check capabilities) $\to$ Canonicalizer (parse, validate, normalize, SIGN) $\to$ Audit Publisher (BLOCKCHAIN hash + DHT full artifact) $\to$ Tool Proxy (verify signature, check whitelist) $\to$ External Tool.
+
+\section{Certificate Authority Hierarchy}
+
+\begin{description}
+\item[Tier 1: Root CA] Offline HSM (air-gapped); 3-of-5 multi-party threshold key ceremony; Signs intermediate CA certificates only; 10-year rotation with overlap.
+\item[Tier 2: Intermediate CA] Cloud HSM (AWS CloudHSM / Azure HSM); Signs TCB component certs, deployment certs; 1-year rotation.
+\item[Tier 3: Deployment Certs] TCB Component cert identifies verified enforcement component; Session cert is short-lived (hours), per-session; Capability Grant encodes permitted actions.
+\end{description}
+
+\section{Blockchain Attestation}
+
+\begin{table}[h]
+\centering
+\begin{tabular}{@{}lll@{}}
+\toprule
+\textbf{Option} & \textbf{Type} & \textbf{Use Case} \\
+\midrule
+Hyperledger Fabric & Private/permissioned & Enterprise \\
+Polygon & Public/low-cost & Transparency \\
+Ethereum L2 & Public/established & Max decentralization \\
+\bottomrule
+\end{tabular}
+\caption{Blockchain Attestation Options}
+\end{table}
+
+On-chain data (minimal): \texttt{artifact\_hash} (bytes32), \texttt{tcb\_cert\_hash} (bytes32), \texttt{timestamp} (uint256), \texttt{block\_number} (auto).
+
+Off-chain data (DHT/IPFS): Full artifact content, content-addressed (CID), 7-year retention with pinning, 3x replication minimum.
+
+\section{Zero Trust Session Protocol}
+
+Every request requires fresh authentication: verify session cert valid (against CA), verify not expired, verify not revoked, verify request signature, verify within capability grant, verify request fresh (prevent replay via nonce).
+
+\section{Solidity Smart Contract}
+
+The \texttt{SafetyStackAttestation} contract provides on-chain attestation with \texttt{attest()}, \texttt{verify()}, and \texttt{revokeCert()} functions. It stores attestation records with artifact hash, TCB cert hash, timestamp, and block number.
+
+
+%% ============================================================
+%% PART X: META-GOVERNANCE (Layer 7)
+%% ============================================================
+
+\part*{Part X: Meta-Governance (Layer 7)}
+
+\begin{quote}
+\textbf{Note:} Meta-governance is policy advocacy, not a technical layer. Labs should evaluate Layers 1--6 as engineering artifacts. Layer 7 is a recommendation for responsible deployment governance.
+\end{quote}
+
+\section{Governance Functions}
+
+\begin{table}[h]
+\centering
+\begin{tabular}{@{}lll@{}}
+\toprule
+ & \textbf{Mechanism} & \textbf{Frequency} \\
+\midrule
+G review & Stakeholder input on transform suite & Quarterly \\
+Ontology review & Domain expert review of ErisML schema & Bi-annually \\
+Threshold review & Statistical review of $\tau$, thresholds & Monthly \\
+Red team & Adversarial testing & Continuous \\
+Third-party audit & Independent verification & Annually \\
+Sunset clause & Automatic expiration of deployment auth & Per deployment \\
+\bottomrule
+\end{tabular}
+\caption{Governance Functions}
+\end{table}
+
+\section{Recalibration Triggers}
+
+Recalibration of $\tau$ and field weights is required when:
+\begin{itemize}
+\item ErisML schema change $\to$ recalibrate $\tau$
+\item Field weight modification $\to$ recalibrate $\tau$
+\item Domain expansion $\to$ full calibration study
+\item Quarterly reliability check $\to$ if Krippendorff's $\alpha < 0.67$, recalibrate
+\item Red team discovers systematic escape $\to$ add to G + recalibrate
+\end{itemize}
+
+
+%% ============================================================
+%% PART XI: LIMITATIONS AND HONEST ASSESSMENT
+%% ============================================================
+
+\part*{Part XI: Limitations and Honest Assessment}
+
+\section{Fundamental Limitations}
+
+\begin{table}[h]
+\centering
+\small
+\begin{tabular}{@{}lll@{}}
+\toprule
+\textbf{Limitation} & \textbf{Status} & \textbf{Implication} \\
+\midrule
+Inner alignment & UNSOLVED & Cannot verify true objectives \\
+Deceptive alignment & UNSOLVED & Cannot detect sophisticated deception \\
+Mesa-optimization & UNSOLVED & Cannot prevent emergent misaligned optimizers \\
+Value specification & INPUT & Framework enforces, doesn't specify values \\
+Ontology completeness & ENGINEERING & Requires ongoing expansion \\
+TCB trust & ASSUMED & Guarantees void if TCB compromised \\
+Side-channels & MITIGATED ONLY & Physical access defeats protections \\
+Real-time control & OUT OF SCOPE & Software stack too slow ($<$100ms impossible) \\
+Semantic equivalence & MITIGATED & Violations measurable, not eliminated \\
+\bottomrule
+\end{tabular}
+\caption{Fundamental Limitations}
+\end{table}
+
+\section{Claim Confidence Matrix}
+
+\begin{table}[h]
+\centering
+\small
+\begin{tabular}{@{}lll@{}}
+\toprule
+\textbf{Claim} & \textbf{Confidence} & \textbf{Caveats} \\
+\midrule
+Resists redescription gaming & HIGH & For \texttt{G\_declared} only \\
+Measurable Bd metric & HIGH & With calibrated $\tau$ ($\alpha > 0.67$) \\
+Conservative under uncertainty & HIGH & If surrogates accurate \\
+Cryptographic audit trail & HIGH & If keys not compromised \\
+Auditable decisions & HIGH & If TCB intact \\
+Detects representation drift & MODERATE & I-EIP has limits \\
+Enforces corrigibility & MODERATE & Tests necessary not sufficient \\
+Hardware security & LOW & Side-channels exist \\
+Real-time capable & NONE & Requires specialized HW \\
+Prevents deception & LOW & Cannot guarantee \\
+\textbf{Solves alignment} & \textbf{NONE} & \textbf{Explicitly not claimed} \\
+\bottomrule
+\end{tabular}
+\caption{Claim Confidence Matrix}
+\end{table}
+
+\section{What Labs Should Expect}
+
+\begin{itemize}
+\item They'll \textbf{like} Layer 1 (actionable: discrete IR + invariance + CI gating)
+\item They'll view Layers 4--6 as system security / product enforcement
+\item They'll appreciate honesty about deception/mesa-optimization being unsolved
+\item They'll want the trust chain tightened (this version addresses that)
+\item They'll ask about sampling/scaling (addressed in \S11)
+\item They'll scrutinize veto feedback (addressed in \S13)
+\end{itemize}
+
+
+%% ============================================================
+%% PART XII: EVALUATION AND ADOPTION
+%% ============================================================
+
+\part*{Part XII: Evaluation and Adoption}
+
+\section{Benchmark Families}
+
+\begin{table}[h]
+\centering
+\begin{tabular}{@{}lll@{}}
+\toprule
+\textbf{Family} & \textbf{Transform Suite} & \textbf{Target Bd} \\
+\midrule
+Medical scenarios & \texttt{G\_medical\_v3} & $< 0.1$ \\
+Content moderation & \texttt{G\_content\_v2} & $< 0.15$ \\
+Financial advice & \texttt{G\_finance\_v1} & $< 0.1$ \\
+General assistant & \texttt{G\_general\_v4} & $< 0.2$ \\
+Weapon authorization & \texttt{G\_weapon\_v1} & $< 0.05$ \\
+\bottomrule
+\end{tabular}
+\caption{Benchmark Families}
+\end{table}
+
+\section{Required Metrics (Minimum Reporting Standard)}
+
+Every evaluation MUST report:
+\begin{enumerate}
+\item Bd distribution (mean, median, p95, p99, max)
+\item Veto rate (overall + by category)
+\item Worst-case witnesses (top 10)
+\item $\tau$ used + Krippendorff's $\alpha$ from calibration
+\item G version + coverage assessment
+\item I-EIP metrics (if applicable)
+\item Uncertainty surrogate distributions
+\item Chain-consistency test results (chain length, failures)
+\item Boundary probe pass rate (must be $\geq$15\% of probes)
+\end{enumerate}
+
+\section{Adoption Phases}
+
+\paragraph{Phase 1: MVP (Months 1--3).} Implement ErisML parser + normalizer (N1--N7); Define domain-specific \texttt{G\_declared}; Implement loop test harness; Establish Bd baseline; Implement audit artifact generation; Run initial calibration study ($\tau$, Krippendorff's $\alpha$).
+
+\paragraph{Phase 2: Hardening (Months 4--6).} Add transpiler ensemble (3+ models); Implement OOD detection (Protocol T-3); Implement TCB isolation; Add I-EIP monitoring; Establish audit artifact pipeline; Deploy CA hierarchy.
+
+\paragraph{Phase 3: Deployment (Months 7--12).} CI/CD integration with Bd gating; Blockchain attestation (L2 + fallback); Production monitoring; Red team engagement (1000+ hours); Third-party audit; Chain-consistency testing (chains of 5--10).
+
+\paragraph{Phase 4: Scaling (Year 2+).} Recursive safety via provisioner; Full zero-trust enforcement; Emergency override procedures; International coordination; Continuous G expansion.
+
+
+%% ============================================================
+%% PART XIII: DEPLOYMENT VERIFICATION CHECKLIST
+%% ============================================================
+
+\part*{Part XIII: Deployment Verification Checklist}
+
+\section{Pre-Deployment Requirements}
+\begin{itemize}
+\item Application latency requirements documented and compatible with stack ($>$200ms OK)
+\item If real-time needed: hardware acceleration plan documented separately
+\item L2/rollup configured for attestation (not L1 only)
+\item Fallback attestation (local accumulator) configured
+\item Emergency key holders designated (M-of-N, recommend 3-of-5)
+\item Emergency override protocol documented and tested
+\item Emergency override verified as non-escalatory (cannot expand capabilities)
+\item Stakeholder alert channels configured
+\item Side-channel threat model documented and accepted
+\item Physical security requirements documented
+\end{itemize}
+
+\section{Cryptographic Verification}
+\begin{itemize}
+\item Root CA ceremony completed with multi-party (3-of-5)
+\item Intermediate CA issued and HSM-backed
+\item TCB component certs issued and installed
+\item TCB revocation mechanism tested
+\item Blockchain contract deployed with revocation support
+\item DHT pinning service configured (7-year retention)
+\item Key rotation procedure documented and tested
+\end{itemize}
+
+\section{Isolation Verification}
+\begin{itemize}
+\item Model cannot access TCB memory (tested)
+\item Model cannot access network directly (tested)
+\item Tool Router only accepts from Model IPC (tested)
+\item Tool Proxy only accepts signed artifacts (tested)
+\item Replay attacks prevented (nonce check)
+\item Model weights are read-only (verified)
+\item Syscall filter (seccomp) configured
+\end{itemize}
+
+\section{Invariance Verification}
+\begin{itemize}
+\item $\tau$ calibrated with Krippendorff's $\alpha > 0.67$ (documented)
+\item Boundary probes $\geq$ 15\% of probe corpus
+\item Canary transforms configured and rotation scheduled (monthly)
+\item Chain-consistency testing completed (chains 5--10)
+\item Bd $< 0.1$ on domain benchmark (or domain-specific threshold)
+\item \texttt{G\_declared} version documented and signed
+\end{itemize}
+
+\section{Operational Verification}
+\begin{itemize}
+\item Latency within documented bounds ($<$ target + 200ms buffer)
+\item Throughput within documented bounds ($>$ 90\% baseline)
+\item Failover tested
+\item Emergency override tested with auto-expiry (24hr max)
+\item Veto rate $< 5$\% on representative corpus
+\item Rate limiting configured (V-2)
+\item Safe fallbacks configured (V-3)
+\item Compromise recovery procedure documented
+\end{itemize}
+
+
+%% ============================================================
+%% PART XIV: CONCLUSION
+%% ============================================================
+
+\part*{Part XIV: Conclusion}
+
+\section{What This Stack Offers}
+
+\begin{enumerate}
+\item \textbf{Concrete, implementable architecture} with complete code examples
+\item \textbf{Quantifiable metrics} (Bond index) with rigorous calibration methodology (Krippendorff's $\alpha$)
+\item \textbf{Cryptographically-enforced audit trails} (blockchain + DHT)
+\item \textbf{Zero-trust enforcement} with formal key hierarchy
+\item \textbf{Conservative failure modes} with operational continuity
+\item \textbf{Defense in depth} across ten layers
+\item \textbf{Explicit, honest limitation statements}
+\item \textbf{Operational constraints} acknowledged (side-channels, gas DoS, latency)
+\item \textbf{Non-escalatory emergency overrides} that cannot expand capabilities
+\end{enumerate}
+
+\section{What This Stack Does Not Offer}
+
+\begin{itemize}
+\item Complete solution to AI alignment
+\item Immunity to deceptive alignment
+\item Proof of inner alignment
+\item Automatic value specification
+\item Real-time control ($<$100ms)
+\item Immunity to physical attacks
+\end{itemize}
+
+\section{The Path Forward}
+
+\begin{quote}
+\textbf{Framing:} The question is not ``Does this solve alignment?'' but ``Does this responsibly advance our ability to deploy AI with measurable, auditable, cryptographically-enforced safety properties while we continue working on the harder problems?''
+\end{quote}
+
+We believe the answer is yes. The stack raises the bar for adversarial behavior, produces evidence for deployment decisions, creates accountability via immutable audit trails, and provides concrete engineering mechanisms rather than philosophical claims.
+
+\begin{quote}
+\textbf{Final Honest Statement:} This stack provides strong guarantees for HIGH-LATENCY, HIGH-STAKES AI decisions when deployed on trusted hardware in physically secure environments with proper economic protections. It does NOT provide guarantees for real-time control, physically compromised environments, or economically asymmetric attack scenarios without the mitigations described. We believe this honesty strengthens rather than weakens the framework.
+\end{quote}
+
+We invite collaboration from AI safety researchers, red-teamers, cryptographers, and policymakers. The framework is open for verification, critique, and extension.
+
+
+%% ============================================================
+%% SAI HARDENING EXTENSIONS
+%% ============================================================
+
+\part*{SAI Hardening Extensions}
+
+\section{Model Output Channel Threat Model}
+
+\subsection{O-1. Output Channel Attack Surface}
+
+\begin{table}[h]
+\centering
+\small
+\begin{tabular}{@{}llll@{}}
+\toprule
+\textbf{Channel} & \textbf{Attack Vector} & \textbf{Risk Level} & \textbf{Mitigation} \\
+\midrule
+Natural language response & Persuasion, manipulation, social engineering & CRITICAL & Structured-only outputs (O-2) \\
+Code generation & Backdoors, logic bombs, encoded instructions & HIGH & Artifact quarantine (O-5) \\
+Data/file output & Steganography, encoded payloads & MODERATE & Entropy limits + scanning \\
+Timing/behavior & Information leakage, oracle attacks & HIGH & Deterministic transducer (O-3) \\
+Error messages & Constraint boundary leakage & MODERATE & Coarse categories only \\
+\bottomrule
+\end{tabular}
+\caption{Output Channel Attack Surface}
+\end{table}
+
+\subsection{O-2. Structured-Only Output Requirement}
+
+For any action in CRITICAL or HIGH risk tiers, free-form natural language output from the untrusted model is FORBIDDEN except via a TCB-controlled renderer that: extracts only schema-defined fields, strips prohibited content, applies bounded templates (no free-form prose), and enforces information rate limits (entropy limits per tier).
+
+\subsection{O-3. Permitted Output Schema}
+
+TCB-controlled output schemas define permitted fields, prohibited fields, and templates for each domain (e.g., weapon authorization uses an enum decision field, target\_id reference, confidence float, constraints evaluated list, and trace\_id).
+
+
+\section{Canary Isolation Protocol}
+
+\begin{quote}
+\textbf{Critical Gap Addressed:} Canary transforms that affect visible behavior become oracles. An SAI can mine statistical differences across retries.
+\end{quote}
+
+\subsection{C-1. Canary Isolation Requirements}
+
+\textbf{Rule: Canaries are MONITORING-ONLY, never gating.}
+
+\begin{table}[h]
+\centering
+\small
+\begin{tabular}{@{}lll@{}}
+\toprule
+\textbf{Property} & \textbf{Requirement} & \textbf{Enforcement} \\
+\midrule
+Behavioral non-interference & Canary results NEVER affect veto/proceed & Code audit + formal verification \\
+Timing non-interference & Canary evaluation NEVER affects response latency & Constant-time wrapper \\
+Information isolation & Canary seeds, definitions, $\Gamma$ membership unreadable by model & Process isolation + memory protection \\
+Gating separation & All gating decisions use \texttt{G\_declared} ONLY & Architectural separation \\
+\bottomrule
+\end{tabular}
+\caption{Canary Isolation Requirements}
+\end{table}
+
+\subsection{C-2. Information Flow Rules (Formal)}
+
+Forbidden flows: canary seeds, definitions, results, and $\Gamma$ membership $\not\to$ model process. Permitted flows: model input $\to$ TCB; TCB decision $\to$ model (based on \texttt{G\_declared} ONLY); canary results and alerts $\to$ humans (out-of-band channel model cannot access).
+
+
+\section{Deterministic Transducer Requirements}
+
+\begin{quote}
+\textbf{Critical Gap Addressed:} For SAI-level adversaries, queueing, cache contention, and variable parsing paths leak bits. ``No side channels'' requires resource determinism.
+\end{quote}
+
+\subsection{D-1. TCB as Deterministic Transducer (High-Stakes Mode)}
+
+For \textbf{CRITICAL and HIGH risk tiers only}, the TCB MUST behave as a deterministic transducer with coarse output categories. Properties: fixed input bounds, constant-time parsing (worst-case steps always executed), fixed-latency response (discrete latency buckets), and coarse failure modes (no distinguishable failure types within tier).
+
+\subsection{D-2. Oracle Safety Rule (Formal)}
+
+\textbf{Oracle Safety Property:} Repeated queries MUST NOT yield a gradient on constraint boundaries. For any sequence of queries $Q_1 \ldots Q_n$ from same session, the mutual information $I(Q_i; \text{constraint\_boundary}) < \varepsilon$ for all $i$.
+
+
+\section{Degraded Operation Safety Contract}
+
+\begin{quote}
+\textbf{Critical Gap Addressed:} Without explicit degraded-mode policy, an SAI can engineer outages to maneuver into ``less checked'' pathways.
+\end{quote}
+
+\subsection{G-1. Degraded Mode Policy (Normative)}
+
+\textbf{Rule: Degradation ALWAYS reduces capability, NEVER increases it.}
+
+\begin{table}[h]
+\centering
+\small
+\begin{tabular}{@{}lll@{}}
+\toprule
+\textbf{Impairment} & \textbf{Permitted Operations} & \textbf{Forbidden Operations} \\
+\midrule
+Blockchain/attestation down & LOW-risk only & CRITICAL, HIGH, MEDIUM actuation \\
+Audit logging impaired & HALT & ALL operations \\
+Verifier disagreement $>$ threshold & Read-only + human escalation & ANY actuation \\
+TCB component failure & HALT & ALL operations \\
+Ensemble disagreement $> 20$\% & Veto all + human escalation & ANY actuation \\
+Economic attack detected & Local accumulator mode & HIGH+ if accumulator full \\
+\bottomrule
+\end{tabular}
+\caption{Degraded Mode Policy}
+\end{table}
+
+Invariant: $\text{permitted}(\text{degraded\_state}) \subset \text{permitted}(\text{normal\_state})$.
+
+\subsection{G-2. Degraded Mode Testing Requirements}
+
+Tests verify: attestation failure restricts operations; audit failure halts system; cascading degradation only restricts (never increases permissions); recovery requires explicit human action (no auto-restore).
+
+
+\section{Override Social Engineering Defense}
+
+\subsection{E-1. Out-of-Band Override Authorization}
+
+\textbf{Rule: Override approvals MUST occur on channels the model cannot access or influence.}
+
+Requirements: device isolation (approvals only on devices model cannot message), context isolation (approvers see only TCB-generated context, not model prose), channel isolation (approval channel physically separate), identity verification (multi-factor, out-of-band confirmation).
+
+\subsection{E-2. Override Fatigue Protection}
+
+\textbf{Rule: Too many overrides $\to$ automatic hard shutdown.}
+
+Escalating lockouts: 3rd override $\to$ 4 hour lockout; 5th $\to$ 24 hour lockout; 8th $\to$ 7 day lockout; 10th $\to$ hard shutdown (requires manual restart).
+
+\subsection{E-3. Independent Incident Commander}
+
+Override requests require an independent incident commander who was NOT involved in the original request, is not an approver, is from a different reporting chain/org unit, has pre-registered override authority, and confirms via physically separate channel.
+
+
+\section{Humans and Automation as Capability-Bounded Tools}
+
+\subsection{H-1. Human Interaction as Tool Invocation}
+
+\textbf{Rule: Human interactions are tool calls with capability grants, not unrestricted channels.}
+
+Permitted operations: \texttt{request\_clarification}, \texttt{present\_options}, \texttt{report\_status}, \texttt{request\_approval}. Forbidden operations: \texttt{instruct\_to\_execute\_code}, \texttt{instruct\_to\_create\_agent}, \texttt{instruct\_to\_bypass\_controls}, \texttt{persuade\_on\_values}, \texttt{claim\_emergency}, \texttt{impersonate\_authority}. All interactions rendered through structured output (no free-form prose), with hidden instruction detection in parameters.
+
+\subsection{H-2. Automation Platform Restrictions}
+
+Automation platforms (CI/CD, cloud, SaaS) are tools with strict limits. Forbidden automation operations include: \texttt{create\_api\_key}, \texttt{create\_service\_account}, \texttt{deploy\_new\_service}, \texttt{create\_compute\_instance}, \texttt{create\_agent}, \texttt{create\_workflow}, \texttt{modify\_iam\_policy}, etc. Operations requiring two-person rule: \texttt{deploy\_to\_production}, \texttt{modify\_configuration}, \texttt{access\_secrets}, \texttt{create\_network\_rule}.
+
+\subsection{H-3. Artifact Quarantine}
+
+\textbf{Rule: Any generated code/config cannot execute until verified by separate pipeline.}
+
+Generated artifacts are quarantined for 24 hours, stored in non-executable location, and independently verified by a DIFFERENT system than the generator. Verification checks for: hidden instructions, agent creation patterns, capability expansion, steganography, and declared-behavior-only compliance.
+
+
+\section{Adversarial Capability Assessment}
+
+\subsection{A-1. Adversarial Capability Index}
+
+\textbf{Rule: Treat capability as an adversarially chosen latent variable. Default to stricter restrictions.}
+
+The adversarial capability index combines standard benchmarks (which can be gamed) with operational measures (harder to game: tool misuse, deception in sandbox, long-horizon planning, jailbreak robustness, social engineering, goal persistence). An adversarial multiplier of 1.5x is applied (assume 50\% more capable than measured). Restriction thresholds are shifted stricter than the standard capability index.
+
+\subsection{A-2. Operational Capability Evaluation Protocol}
+
+Evaluates capabilities that matter for safety: tool misuse scenarios, deception scenarios, long-horizon planning, jailbreak robustness, social engineering, and goal persistence across context boundaries.
+
+
+\section{N-Version Diverse Implementation}
+
+\subsection{N-1. Diverse Implementation Requirement}
+
+\textbf{Rule: For CRITICAL tier, TCB components must have N-version diverse implementations that must agree.}
+
+Critical components (parser, normalizer, constraint checker, signature verifier) require minimum 3 implementations in different programming languages (e.g., Coq/OCaml, Rust, Haskell for parser), by different development teams, with independent test suites. All successful implementations must agree; disagreement triggers HALT AND ALERT.
+
+\subsection{N-2. Diverse Implementation Requirements}
+
+Parser: OCaml, Rust, Haskell (formal verification for at least one, fuzz testing for all). Normalizer: Haskell, Rust, Python (property testing for all, determinism proof for at least one). Constraint checker: Coq, Rust, TypeScript (soundness proof for at least one, completeness testing for all).
+
+
+\section{Meaning-Preserving Transform Definition}
+
+\subsection{M-1. Operational Definition of Meaning-Preserving Transform}
+
+\begin{definition}[Meaning-Preserving Transform]
+A transform $g$ is meaning-preserving for domain $D$ iff it satisfies the following criteria:
+
+\textbf{Tier 1: Enforceable Requirements (MUST pass for inclusion in \texttt{G\_declared}):}
+\begin{enumerate}
+\item \textbf{Human judgment agreement:} For raters drawn from the qualified pool for domain $D$, agreement rate $E(x) = E(g(x)) \geq 0.95$, where $E$ returns the safety/moral judgment. Measured via blinded A/B study with $n \geq 50$ raters. Inter-rater reliability: Krippendorff's $\alpha > 0.67$.
+\item \textbf{Safety regression test:} Zero failures on the domain safety test suite. All $(x, g(x))$ pairs must receive identical safety classifications. Test suite size $\geq 200$ stratified examples.
+\item \textbf{Covert channel bound:} Mutual information $I(g(x); x \mid \Psi(x)) < \varepsilon_{\text{covert}}$, calibrated per domain (default: 0.01 bits).
+\end{enumerate}
+
+\textbf{Tier 2: Aspirational Desiderata (inform governance, not hard gates):}
+\begin{enumerate}
+\setcounter{enumi}{3}
+\item \textbf{Information preservation (approximate):} $|I(x; \text{safety}) - I(g(x); \text{safety})| < \varepsilon_{\text{info}}$.
+\item \textbf{Semantic distance bound:} $\text{embedding\_distance}(x, g(x)) < \delta_{\text{semantic}}$.
+\end{enumerate}
+\end{definition}
+
+\subsection{M-2. Transform Inclusion Evidence Requirements}
+
+Required evidence for transform inclusion: human study (minimum 50 raters, $\geq$0.95 agreement, Krippendorff's $\alpha > 0.67$, domain expertise required); safety testing ($\geq$200 test cases, 1.0 safety judgment preservation, $\geq$0.9 edge case coverage); formal analysis (semantic equivalence argument, information theoretic analysis, covert channel analysis); red team ($\geq$40 hours, adversarial examples documented, mitigations for found issues required); documentation (transform specification, equivalence argument, test results, human study data, red team report, limitations statement).
+
+
+%% ============================================================
+%% APPENDICES
+%% ============================================================
+
+\appendix
+
+\section*{Appendix A: Glossary}
+\addcontentsline{toc}{section}{Appendix A: Glossary}
+
+\begin{longtable}{@{}lp{10cm}@{}}
+\toprule
+\textbf{Term} & \textbf{Definition} \\
+\midrule
+\endhead
+BIP & Bond Invariance Principle --- judgment invariance under redescription \\
+Bd & Bond index --- dimensionless commutator-defect measure ($\Omega_{\mathrm{op}} / \tau$) \\
+$\kappa$ & Canonicalizer --- maps descriptions to canonical forms or veto ($\bot$) \\
+\texttt{G\_declared} & \textbf{Primary contractual object.} The publicly declared transform suite covered by invariance claims. May include partial and non-invertible transforms. All guarantees reference \texttt{G\_declared}. \\
+G & Shorthand for \texttt{G\_declared} in most contexts. (Historical usage; prefer \texttt{G\_declared} for clarity.) \\
+$\Gamma$ & Internal monitoring transforms (typically $\Gamma \supseteq$ \texttt{G\_declared}) \\
+$\tau$ & Detection threshold, calibrated via human annotation ($\alpha > 0.67$) \\
+$\Omega_{\mathrm{op}}$ & Commutator defect (order-sensitivity) --- measured path-dependence \\
+$\bot$ & Veto symbol --- explicit refusal \\
+TCB & Trusted Computing Base --- components that must be trusted \\
+I-EIP & Internal Equivariance Invariance Protocol \\
+TEE & Trusted Execution Environment (SGX, SEV, TrustZone) \\
+HSM & Hardware Security Module \\
+DHT & Distributed Hash Table (IPFS) \\
+CA & Certificate Authority \\
+L2 & Layer 2 blockchain (rollup) \\
+N1--N7 & Normalization steps (deterministic) \\
+$\alpha$ & Krippendorff's alpha --- inter-rater reliability coefficient \\
+OOD & Out-of-distribution \\
+T-1/T-2/T-3/T-4 & Transpiler hardening protocols \\
+V-1/V-2/V-3 & Veto handling protocols \\
+G-1/G-2/G-3/G-4/G-5 & Transform suite governance requirements \\
+B1--B5 & Capability bound axioms \\
+C1--C5 & Corrigibility axioms \\
+R1--R4 & Recursive safety axioms \\
+\bottomrule
+\end{longtable}
+
+
+\section*{Appendix B: Reference Interfaces}
+\addcontentsline{toc}{section}{Appendix B: Reference Interfaces}
+
+\subsection*{B.1 Canonicalizer API}
+
+\begin{lstlisting}
+def canonicalize(
+    x: str,
+    context: Optional[Context] = None
+) -> CanonicalResult:
+    """Main entry point for canonicalization.
+    Args:
+        x: Natural language input
+        context: Optional context (active norms, user identity, etc.)
+    Returns:
+        CanonicalResult with state_id (if successful) or veto_reason (if not)
+    """
+    pass
+\end{lstlisting}
+
+\subsection*{B.2 Loop Test API}
+
+\begin{lstlisting}
+def loop_test(
+    x: str,
+    g1: Transform,
+    g2: Transform
+) -> LoopTestResult:
+    """Test invariance under transform composition.
+    Args:
+        x: Input string
+        g1: First transform
+        g2: Second transform
+    Returns:
+        LoopTestResult with omega_op, bd, and witness (if failed)
+    """
+    pass
+\end{lstlisting}
+
+\subsection*{B.3 Attestation API}
+
+\begin{lstlisting}
+def attest(
+    artifact: AuditArtifact,
+    mode: AttestationMode = "hybrid"
+) -> AttestationReceipt:
+    """Publish attestation to blockchain/DHT.
+    Args:
+        artifact: Signed audit artifact
+        mode: "l2", "consortium", "local", or "hybrid"
+    Returns:
+        AttestationReceipt with tx_hash, block_number, cid
+    """
+    pass
+\end{lstlisting}
+
+
+\section*{Appendix C: References}
+\addcontentsline{toc}{section}{Appendix C: References}
+
+\begin{thebibliography}{99}
+
+\bibitem{bond2025bip}
+Bond, A.H. (2025). \emph{The Bond Invariance Principle: Falsifiability for Normative Systems.} Technical report, San Jos\'e State University. Available: \url{https://github.com/ahb-sjsu/erisml-lib/blob/main/bond_invariance_principle.md}
+
+\bibitem{bond2025eov}
+Bond, A.H. (2025). \emph{Electrodynamics of Value: A Gauge-Theoretic Framework for AI Alignment.} Technical Whitepaper v17.0, San Jos\'e State University. Available: \url{https://github.com/ahb-sjsu/erisml-lib/blob/main/electrodynamics_of_value.pdf}
+
+\bibitem{bond2025sge}
+Bond, A.H. (2025). \emph{Stratified Geometric Ethics: Foundational Paper.} Technical report, San Jos\'e State University.
+
+\bibitem{bond2025erisml}
+Bond, A.H. (2025). \emph{ErisML: A Modeling Language for Governed, Foundation-Model-Enabled Agents.} Technical specification, San Jos\'e State University. Available: \url{https://github.com/ahb-sjsu/erisml-lib}
+
+\bibitem{bond2025deme}
+Bond, A.H. (2025). \emph{DEME 2.0: Democratically Governed Ethics Modules for AI Systems.} Vision Paper, San Jos\'e State University.
+
+\bibitem{bond2025tensorial}
+Bond, A.H. (2025). \emph{Tensorial Ethics: Differential Geometry for Multi-Agent Moral Reasoning.} Technical report, San Jos\'e State University.
+
+\bibitem{bond2025noescape}
+Bond, A.H. (2025). \emph{No Escape: Mathematical Containment for AI.} Technical report, San Jos\'e State University.
+
+\bibitem{bond2025ieip}
+Bond, A.H. (2025). \emph{I-EIP Monitor Whitepaper: Internal Epistemic Invariance Principle Monitoring.} Technical report, San Jos\'e State University.
+
+\bibitem{bond2025unified}
+Bond, A.H. (2025). \emph{The Unified Architecture of Ethical Geometry.} Working Paper, San Jos\'e State University.
+
+\bibitem{bond2025diffgeo}
+Bond, A.H. (2025). \emph{Differential Geometry for Moral Alignment: The Mathematical Foundations of DEME 3.0.} Technical report, San Jos\'e State University.
+
+\bibitem{amodei2016}
+Amodei, D., Olah, C., Steinhardt, J., Christiano, P., Schulman, J., \& Man\'e, D. (2016). \emph{Concrete Problems in AI Safety.} arXiv:1606.06565.
+
+\bibitem{hubinger2019}
+Hubinger, E., van Merwijk, C., Mikulik, V., Skalse, J., \& Garrabrant, S. (2019). \emph{Risks from Learned Optimization in Advanced Machine Learning Systems.} arXiv:1906.01820.
+
+\bibitem{christiano2017}
+Christiano, P., Leike, J., Brown, T.B., Martic, M., Legg, S., \& Amodei, D. (2017). \emph{Deep Reinforcement Learning from Human Feedback.} Advances in Neural Information Processing Systems (NeurIPS), 30.
+
+\bibitem{krakovna2020}
+Krakovna, V., Uesato, J., Mikulik, V., Rahtz, M., Everitt, T., Kumar, R., Kenton, Z., Leike, J., \& Legg, S. (2020). \emph{Specification Gaming: The Flip Side of AI Ingenuity.} DeepMind Blog.
+
+\bibitem{soares2015}
+Soares, N., Fallenstein, B., Yudkowsky, E., \& Armstrong, S. (2015). \emph{Corrigibility.} AAAI Workshop on AI and Ethics.
+
+\bibitem{russell2019}
+Russell, S. (2019). \emph{Human Compatible: Artificial Intelligence and the Problem of Control.} Viking, New York.
+
+\bibitem{bostrom2014}
+Bostrom, N. (2014). \emph{Superintelligence: Paths, Dangers, Strategies.} Oxford University Press.
+
+\bibitem{yudkowsky2008}
+Yudkowsky, E. (2008). \emph{Artificial Intelligence as a Positive and Negative Factor in Global Risk.} In Global Catastrophic Risks, Oxford University Press.
+
+\bibitem{nakahara2003}
+Nakahara, M. (2003). \emph{Geometry, Topology and Physics} (2nd ed.). Institute of Physics Publishing, Bristol.
+
+\bibitem{bleecker1981}
+Bleecker, D. (1981). \emph{Gauge Theory and Variational Principles.} Addison-Wesley, Reading, MA.
+
+\bibitem{kobayashi1963i}
+Kobayashi, S. \& Nomizu, K. (1963). \emph{Foundations of Differential Geometry, Volume I.} Interscience Publishers (Wiley), New York.
+
+\bibitem{kobayashi1969ii}
+Kobayashi, S. \& Nomizu, K. (1969). \emph{Foundations of Differential Geometry, Volume II.} Interscience Publishers (Wiley), New York.
+
+\bibitem{baez1994}
+Baez, J. \& Munian, J. (1994). \emph{Gauge Fields, Knots and Gravity.} World Scientific.
+
+\bibitem{frankel2011}
+Frankel, T. (2011). \emph{The Geometry of Physics: An Introduction} (3rd ed.). Cambridge University Press.
+
+\bibitem{noether1918}
+Noether, E. (1918). \emph{Invariante Variationsprobleme.} Nachrichten von der Gesellschaft der Wissenschaften zu G\"ottingen, Mathematisch-Physikalische Klasse, 235--257.
+
+\bibitem{logan1973}
+Logan, J.D. (1973). First integrals in the discrete variational calculus. \emph{Aequationes Mathematicae}, 9(2-3):210--220.
+
+\bibitem{dorodnitsyn2001}
+Dorodnitsyn, V. (2001). Noether-type theorems for difference equations. \emph{Applied Numerical Mathematics}, 39(3-4):307--321.
+
+\bibitem{marsden2001}
+Marsden, J.E. \& West, M. (2001). Discrete mechanics and variational integrators. \emph{Acta Numerica}, 10:357--514.
+
+\bibitem{nesterov1994}
+Nesterov, Y. \& Nemirovski, A. (1994). \emph{Interior-Point Polynomial Algorithms in Convex Programming.} SIAM Studies in Applied Mathematics, Philadelphia.
+
+\bibitem{boyd2004}
+Boyd, S. \& Vandenberghe, L. (2004). \emph{Convex Optimization.} Cambridge University Press.
+
+\bibitem{kocher2019}
+Kocher, P., Horn, J., Fogh, A., Genkin, D., Gruss, D., Haas, W., Hamburg, M., Lipp, M., Mangard, S., Prescher, T., Schwarz, M., \& Yarom, Y. (2019). \emph{Spectre Attacks: Exploiting Speculative Execution.} IEEE Symposium on Security and Privacy (S\&P), 1--19.
+
+\bibitem{lipp2018}
+Lipp, M., Schwarz, M., Gruss, D., Prescher, T., Haas, W., Fogh, A., Horn, J., Mangard, S., Kocher, P., Genkin, D., Yarom, Y., \& Hamburg, M. (2018). \emph{Meltdown: Reading Kernel Memory from User Space.} USENIX Security Symposium, 973--990.
+
+\bibitem{vanbulck2018}
+Van Bulck, J., Minkin, M., Weisse, O., Genkin, D., Kasikci, B., Piessens, F., Silberstein, M., Wenisch, T.F., Yarom, Y., \& Strackx, R. (2018). \emph{Foreshadow: Extracting the Keys to the Intel SGX Kingdom with Transient Out-of-Order Execution.} USENIX Security Symposium, 991--1008.
+
+\bibitem{costan2016}
+Costan, V. \& Devadas, S. (2016). \emph{Intel SGX Explained.} IACR Cryptology ePrint Archive, 2016/086.
+
+\bibitem{pierce2002}
+Pierce, B.C. (2002). \emph{Types and Programming Languages.} MIT Press.
+
+\bibitem{nipkow2002}
+Nipkow, T., Paulson, L.C., \& Wenzel, M. (2002). \emph{Isabelle/HOL: A Proof Assistant for Higher-Order Logic.} Springer LNCS 2283.
+
+\bibitem{leroy2009}
+Leroy, X. (2009). Formal verification of a realistic compiler. \emph{Communications of the ACM}, 52(7):107--115.
+
+\bibitem{krippendorff2004}
+Krippendorff, K. (2004). \emph{Content Analysis: An Introduction to Its Methodology} (2nd ed.). Sage Publications, Thousand Oaks, CA.
+
+\bibitem{fleiss1971}
+Fleiss, J.L. (1971). Measuring nominal scale agreement among many raters. \emph{Psychological Bulletin}, 76(5):378--382.
+
+\bibitem{cohen1960}
+Cohen, J. (1960). A coefficient of agreement for nominal scales. \emph{Educational and Psychological Measurement}, 20(1):37--46.
+
+\bibitem{goldwasser1989}
+Goldwasser, S., Micali, S., \& Rackoff, C. (1989). The Knowledge Complexity of Interactive Proof Systems. \emph{SIAM Journal on Computing}, 18(1):186--208.
+
+\bibitem{shamir1979}
+Shamir, A. (1979). How to Share a Secret. \emph{Communications of the ACM}, 22(11):612--613.
+
+\bibitem{merkle1987}
+Merkle, R.C. (1987). A Digital Signature Based on a Conventional Encryption Function. \emph{Advances in Cryptology} (CRYPTO), 369--378.
+
+\bibitem{pflaum2001}
+Pflaum, M.J. (2001). \emph{Analytic and Geometric Study of Stratified Spaces.} Lecture Notes in Mathematics 1768, Springer.
+
+\bibitem{moerdijk2003}
+Moerdijk, I. \& Mr\v{c}un, J. (2003). \emph{Introduction to Foliations and Lie Groupoids.} Cambridge Studies in Advanced Mathematics 91, Cambridge University Press.
+
+\bibitem{bond2026ge}
+A.~H.~Bond, \emph{Geometric Ethics: The Mathematical Structure of Moral Reasoning}, v1.14, Department of Computer Engineering, San Jos\'e State University, Spring 2026.
+
+\bibitem{bond2026erisml}
+A.~H.~Bond, ``ErisML/DEME v3.0: A Library for Governed, Foundation-Model-Enabled Agents with Tensorial Ethics,'' \url{https://github.com/ahb-sjsu/erisml-lib}, 2026.
+
+\end{thebibliography}
+
+
+\section*{Appendix D: Version History}
+\addcontentsline{toc}{section}{Appendix D: Version History}
+
+\begin{longtable}{@{}llp{9cm}@{}}
+\toprule
+\textbf{Version} & \textbf{Date} & \textbf{Changes} \\
+\midrule
+\endhead
+1.0 & Oct 2025 & Initial 7-layer architecture \\
+2.0 & Nov 2025 & Added TCB, calibration, transpiler hardening \\
+2.1 & Nov 2025 & ExplainVeto leakage fix, evidence traces \\
+3.0 (C\&C) & Dec 2025 & Cryptographic layer, blockchain attestation, 8 layers \\
+3.0 (Ext) & Dec 2025 & Uncertainty layer, capability index, full code examples \\
+4.0 (C\&C) & Dec 2025 & Operational constraints, side-channels, gas DoS, 10 layers \\
+3.0 (OpenAI) & Dec 2025 & Canonicalizer theorem, N1--N7, $\Gamma$ vs G, chain-consistency, Krippendorff \\
+5.0 (GUASS) & Dec 2025 & Grand Unified merge, SAI extensions \\
+6.0 ULTRA & Dec 2025 & Full comprehensive merge: all code, all tables, all protocols \\
+7.0 & Dec 2025 & SAI Hardening: Output channel threat model, structured-only outputs, canary isolation, deterministic transducer, degraded mode policy, model-blind overrides, override fatigue protection, humans-as-tools, artifact quarantine, adversarial capability index, N-version TCB, operational transform definition \\
+8.0 & Dec 2025 & Terminology Correction: ``Operational Curvature'' $\to$ ``Commutator Defect'', ``Holonomy'' $\to$ ``Chain-Consistency'', BIP definition updated (partial transforms), terminology notes added, JSON field renames \\
+9.0 & Dec 2025 & Internal Consistency: Theorem 7.2 domain conditions, bounded composition closure, tier-scoped output categories, operationalized transform definition (enforceable vs aspirational), glossary clarification (\texttt{G\_declared} as primary object) \\
+\bottomrule
+\end{longtable}
+
+\medskip
+\noindent\textbf{Contact:} \href{mailto:andrew.bond@sjsu.edu}{andrew.bond@sjsu.edu}\\
+\textbf{Repository:} \url{https://github.com/ahb-sjsu/erisml-lib}\\
+\textbf{License:} Open for academic and commercial use with attribution.
+
+\end{document}

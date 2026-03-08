@@ -1,0 +1,913 @@
+\documentclass[12pt]{article}
+
+% Packages
+\usepackage{amsmath,amssymb,amsfonts,amsthm}
+\usepackage{geometry}
+\usepackage{hyperref}
+\usepackage{booktabs}
+\usepackage{enumitem}
+\usepackage{graphicx}
+\usepackage{float}
+\usepackage{xcolor}
+\usepackage{mathrsfs}
+
+\geometry{margin=1in}
+
+% Theorem environments
+\newtheorem{theorem}{Theorem}[section]
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{corollary}[theorem]{Corollary}
+\newtheorem{conjecture}[theorem]{Conjecture}
+\theoremstyle{definition}
+\newtheorem{definition}[theorem]{Definition}
+\newtheorem{example}[theorem]{Example}
+\newtheorem{axiom}{Axiom}
+\theoremstyle{remark}
+\newtheorem{remark}[theorem]{Remark}
+
+% Custom commands
+\newcommand{\C}{\mathcal{C}}               % Clinical decision complex
+\newcommand{\M}{\mathcal{M}}               % General manifold
+\newcommand{\R}{\mathbb{R}}
+\newcommand{\Z}{\mathbb{Z}}
+\newcommand{\CF}{\mathrm{CF}}              % Clinical friction
+\newcommand{\BI}{\mathrm{BI}}              % Bond Index
+\newcommand{\MI}{\mathrm{MI}}              % Moral injury index
+
+\title{\textbf{Geometric Clinical Ethics:\\Medical Decision-Making as Pathfinding on the Moral Manifold,\\and the Mathematical Structure of Moral Injury}}
+
+\author{Andrew H. Bond\\
+Department of Computer Engineering\\
+San Jos\'{e} State University\\
+\texttt{andrew.bond@sjsu.edu}\\
+ORCID: 0009-0003-2599-6158}
+
+\date{March 2026}
+
+\begin{document}
+
+\maketitle
+
+\noindent\textbf{Keywords:} clinical ethics, moral injury, medical decision-making, triage, informed consent, QALY, resource allocation, A* pathfinding, geometric ethics, moral manifold
+
+\begin{abstract}
+Clinical medicine is saturated with moral reasoning.  Every triage decision, every informed-consent conversation, every resource-allocation judgment, every end-of-life conference is a moral act embedded in a clinical act.  Yet the dominant quantitative framework for medical decision-making---the quality-adjusted life year (QALY)---collapses this multi-dimensional moral reality to a single scalar, committing the same dimensional-projection error that classical economics commits with utility maximization.
+
+We provide the mathematical framework that clinical ethics has lacked.  Drawing on the Geometric Ethics programme \cite{bond2026geometric}, we construct the \emph{clinical decision complex} $\C$: a nine-dimensional weighted simplicial complex on which clinical decisions are pathfinding problems.  The clinician's decision is modeled as $A^*$ search with evaluation function $f(n) = g(n) + h(n)$, where $g(n)$ is the accumulated clinical cost (evidence-based outcome calculation) and $h(n)$ is the \emph{moral-heuristic cost} (the clinician's trained ethical intuition: do no harm, respect autonomy, maintain trust).  The optimal clinical path---the \emph{clinical geodesic}---minimizes total cost on the full manifold, not on the scalar projection.
+
+The framework yields six results.  (1)~The four principles of biomedical ethics (Beauchamp and Childress) are not independent axioms but \emph{dimensions of the clinical manifold}, and principlism's inability to resolve conflicts between them is a consequence of treating dimensions as incommensurable axioms rather than as components of a metric.  (2)~The QALY is a scalar projection that destroys irrecoverable moral information (Scalar Irrecoverability Theorem); QALY-optimal policies can be manifold-suboptimal.  (3)~Informed consent is the requirement that the patient's epistemic dimension $d_9$ and autonomy dimension $d_4$ be calibrated before the clinical geodesic is computed---a gauge-invariance condition, not a bureaucratic formality.  (4)~Moral injury in healthcare workers is mathematically characterized as \emph{forced boundary crossing}: the institution requires the clinician to traverse a path whose moral-heuristic cost $h(n)$ exceeds the clinician's boundary tolerance, producing cumulative manifold damage that is distinct from burnout and distinct from PTSD.  (5)~Triage is $A^*$ search under catastrophic resource constraints, where the manifold's edge weights shift dynamically as scarcity increases---and the framework predicts when utilitarian triage (maximize lives saved) diverges from manifold-optimal triage (minimize total moral friction).  (6)~The clinical Bond Index provides a quantitative measure of the moral cost imposed on patients by institutional policies, enabling empirical detection of structural injustice in healthcare delivery.
+
+The framework is immediately testable: it generates falsifiable predictions about clinician decision-making, moral distress scores, and patient-reported ethical experience that differ from predictions of standard bioethics and QALY-based health economics.
+\end{abstract}
+
+\newpage
+\tableofcontents
+\newpage
+
+
+%==============================================================================
+\section{Introduction}
+\label{sec:intro}
+%==============================================================================
+
+\subsection{The Problem: Clinical Ethics Without Mathematics}
+
+Medicine is the most ethically dense of all human professions.
+
+A physician who prescribes a chemotherapy regimen is simultaneously making a clinical judgment (will this treatment extend survival?), an ethical judgment (does the patient understand the risks?), a resource-allocation judgment (is this the best use of a scarce drug?), a relational judgment (does the patient trust me?), and a legal judgment (have I met the standard of care?).  These judgments are not separable.  They are not sequential.  They are \emph{simultaneous dimensions of a single decision}.
+
+Yet clinical ethics has no mathematics.  The dominant frameworks are:
+
+\begin{enumerate}
+    \item \textbf{Principlism} \cite{beauchamp2019}: Four principles---autonomy, beneficence, non-maleficence, justice---provide a checklist for ethical analysis.  But when principles conflict (as they almost always do in hard cases), principlism offers no resolution mechanism.  It is a taxonomy, not a calculus.
+
+    \item \textbf{QALY-based health economics} \cite{weinstein1977,drummond2015}: The quality-adjusted life year reduces health outcomes to a scalar.  One year of perfect health $= 1.0$ QALY.  Policies are ranked by cost per QALY gained.  This is Homo economicus applied to human lives: mathematically tractable, morally catastrophic.  A QALY-maximizing policy can deny treatment to the elderly (low remaining QALYs), the disabled (low quality weight), and the poor (high cost per QALY)---not because these populations matter less, but because the scalar projection has destroyed the dimensions on which they matter.
+
+    \item \textbf{Casuistry} \cite{jonsen1988}: Case-based reasoning by analogy.  Powerful in practice, impossible to formalize, and unable to handle genuinely novel cases.
+
+    \item \textbf{Narrative ethics} \cite{charon2006}: The patient's story is the unit of ethical analysis.  Rich, humane, and completely non-quantitative.
+\end{enumerate}
+
+Each of these captures something real.  None provides a unified mathematical framework that can \emph{compute} clinical ethical decisions, \emph{predict} moral injury, or \emph{measure} structural injustice in healthcare systems.
+
+This paper provides that framework.
+
+\subsection{The Proposal: Clinical Decision as Manifold Pathfinding}
+
+We port the Geometric Ethics framework \cite{bond2026geometric}---validated across 20,030 texts, 11 languages, and independently replicated \cite{thiele2026}---into clinical medicine.  The core claim:
+
+\begin{quote}
+\emph{A clinical decision is not a utility calculation.  It is not a principles checklist.  It is pathfinding on a multi-dimensional moral manifold, and the clinician's trained ethical intuition is the heuristic function that makes the search tractable.}
+\end{quote}
+
+The clinician at the bedside is computing $f(n) = g(n) + h(n)$:
+\begin{itemize}
+    \item $g(n)$: the accumulated clinical evidence---survival data, complication rates, Number Needed to Treat, Bayesian posterior over diagnoses.  This is the evidence-based medicine component.  It is slow, deliberate, data-driven.
+    \item $h(n)$: the moral-heuristic estimate---``this feels wrong,'' ``the patient isn't ready,'' ``we should wait,'' ``I can't do this to a child.''  This is the clinical wisdom component.  It is fast, automatic, and the product of years of training and experience.
+\end{itemize}
+
+The path that minimizes $f(n)$ on the full clinical manifold is the \emph{clinical geodesic}: the best available action given \emph{all} morally relevant dimensions of the decision, not just the clinical outcome dimension.
+
+\subsection{What This Paper Contributes}
+
+\begin{enumerate}
+    \item \textbf{The Clinical Decision Complex $\C$:} a formal construction of the space on which clinical decisions are actually made---a nine-dimensional weighted simplicial complex with Mahalanobis edge weights and moral-clinical boundary penalties.
+
+    \item \textbf{The QALY Critique:} a proof (Scalar Irrecoverability Theorem) that QALY-based evaluation destroys morally relevant information that is mathematically irrecoverable, and that QALY-optimal policies can be manifold-suboptimal.
+
+    \item \textbf{The Mathematical Theory of Moral Injury:} a formal characterization of moral injury as cumulative forced boundary crossing, with a computable Moral Injury Index that predicts clinician distress from institutional policy structure.
+
+    \item \textbf{Geometric Informed Consent:} a reformulation of informed consent as a gauge-invariance condition on the clinical manifold, with a formal criterion for when consent is valid (the patient's manifold is calibrated) versus when it is procedurally satisfied but ethically vacuous.
+
+    \item \textbf{Geometric Triage:} a formal theory of triage as $A^*$ search under dynamic resource constraints, with predictions about when utilitarian and manifold-optimal triage diverge.
+
+    \item \textbf{The Clinical Bond Index:} a quantitative measure of the moral cost imposed on patients and clinicians by institutional structures, enabling empirical detection and measurement of structural healthcare injustice.
+\end{enumerate}
+
+
+%==============================================================================
+\section{Related Work}
+\label{sec:related}
+%==============================================================================
+
+\subsection{Principlism and Its Limits}
+
+Beauchamp and Childress's four principles of biomedical ethics \cite{beauchamp2019}---respect for autonomy, beneficence, non-maleficence, and justice---have dominated clinical ethics education since 1979.  The framework is widely taught, clinically intuitive, and deliberately non-hierarchical: no principle automatically overrides another, and conflicts must be resolved by ``balancing'' in context.
+
+The strength of principlism is accessibility.  The weakness is precisely the non-hierarchical balancing: when autonomy conflicts with beneficence (the patient refuses life-saving treatment), or justice conflicts with non-maleficence (scarce resources force harmful rationing), principlism provides no resolution algorithm.  As Clouser and Gert \cite{clouser1990} argued, the four principles are ``not action guides'' but ``chapter headings''---categories for organizing moral considerations, not a calculus for resolving them.
+
+Our framework dissolves this problem.  The four principles are not independent axioms requiring ad hoc ``balancing.''  They are dimensions of the clinical manifold:
+
+\begin{center}
+\begin{tabular}{ll}
+\toprule
+\textbf{Beauchamp--Childress Principle} & \textbf{Manifold Dimension} \\
+\midrule
+Respect for autonomy & $d_4$ (Autonomy) \\
+Beneficence & $d_1$ (Consequences/Outcomes) \\
+Non-maleficence & $d_2$ (Rights) + boundary penalty $\beta_{\text{harm}}$ \\
+Justice & $d_3$ (Fairness) \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+When principles ``conflict,'' they are not in logical contradiction---they are pulling the clinical geodesic in different directions on the manifold.  The resolution is not ad hoc balancing but \emph{pathfinding}: the Mahalanobis metric determines the cost of each dimension, the boundary penalties encode the weight of each principle, and the minimum-cost path is the clinical geodesic that optimally balances all dimensions simultaneously.  The ``balancing'' that principlism asks clinicians to do intuitively is precisely the $A^*$ search that the framework formalizes.
+
+\subsection{QALY-Based Health Economics}
+
+The quality-adjusted life year (QALY), introduced by Weinstein and Stason \cite{weinstein1977} and systematized in health technology assessment by Drummond et al.\ \cite{drummond2015}, is the dominant metric for cost-effectiveness analysis in healthcare.  One QALY equals one year lived in perfect health; health states are assigned quality weights between 0 (dead) and 1 (perfect health), and interventions are ranked by cost per QALY gained.
+
+The QALY framework has real virtues: it enables systematic comparison across interventions, forces explicit valuation of health states, and provides a common currency for resource allocation.  The UK's National Institute for Health and Care Excellence (NICE) uses a threshold of \pounds20,000--\pounds30,000 per QALY gained as the standard for treatment approval \cite{nice2013}.
+
+The QALY framework also has a fundamental mathematical flaw: it is a scalar projection.  A QALY reduces the multi-dimensional clinical reality---survival, function, pain, autonomy, dignity, social connection, epistemic clarity, trust, institutional legitimacy---to a single number.  By the Scalar Irrecoverability Theorem (Theorem~\ref{thm:irrecoverability}), this projection destroys information that is mathematically irrecoverable.  Specifically:
+
+\begin{itemize}
+    \item Two patients with the same QALY score may have radically different clinical-moral profiles (e.g., one has high function but no autonomy; the other has low function but full autonomy).
+    \item An intervention that improves QALYs while degrading autonomy ($d_4$) or dignity ($d_7$) registers as beneficial under the scalar but is manifold-suboptimal.
+    \item The QALY threshold systematically disadvantages patients whose primary health deficits are on non-outcome dimensions (trust, epistemic status, institutional access).
+\end{itemize}
+
+Harris \cite{harris1987} and others have criticized QALYs on philosophical grounds (age discrimination, disability discrimination).  Our framework provides the \emph{mathematical} basis for these critiques: the discrimination arises not from malice but from dimensional collapse.  A scalar that discards 8 of 9 morally relevant dimensions will systematically disadvantage populations whose needs are concentrated on the discarded dimensions.
+
+\subsection{Moral Distress and Moral Injury in Healthcare}
+
+Jameton \cite{jameton1984} introduced the concept of \emph{moral distress} in nursing: the suffering experienced when a clinician knows the ethically correct action but is constrained from taking it by institutional, legal, or hierarchical barriers.  Subsequent work by Epstein and Hamric \cite{epstein2009}, Rushton \cite{rushton2018}, and others has documented the prevalence, severity, and consequences of moral distress across nursing, medicine, and allied health professions.
+
+Dean, Talbot, and Dean \cite{dean2019} proposed the term \emph{moral injury} to describe the damage that occurs when clinicians are ``perpetrating, failing to prevent, or bearing witness to acts that transgress deeply held moral beliefs and expectations.''  The term, borrowed from military psychology (Litz et al.\ \cite{litz2009}), captures something that ``burnout'' does not: the distress is not from overwork but from \emph{moral violation}.
+
+Our framework provides the first mathematical characterization of moral injury.  Burnout is resource depletion (the $g(n)$ computation becomes degraded from overuse).  Moral injury is something structurally different: it is cumulative manifold damage from forced boundary crossing---the institution requires the clinician to traverse paths whose $h(n)$ cost exceeds the clinician's boundary tolerance.  This distinction has concrete, testable implications (Section~\ref{sec:moral_injury}).
+
+\subsection{Shared Decision-Making and Informed Consent}
+
+The informed consent doctrine, codified in law and medical ethics since the Nuremberg Code (1947) and the Declaration of Helsinki (1964), requires that patients give voluntary, informed authorization before undergoing medical interventions.  The contemporary model of \emph{shared decision-making} \cite{charles1997,elwyn2012} extends this to a collaborative process in which clinician and patient jointly navigate treatment options.
+
+Our framework formalizes shared decision-making as \emph{manifold alignment}: the clinician and patient must have sufficiently similar calibrations of the relevant manifold dimensions ($d_1$ through $d_9$) for the clinical geodesic to be jointly valid.  Informed consent is the procedural mechanism for achieving this alignment---it calibrates the patient's epistemic dimension ($d_9$: ``do I understand what is being proposed?'') and autonomy dimension ($d_4$: ``am I choosing freely?'').  When consent is ``informed'' in the legal sense but the patient's manifold remains uncalibrated (e.g., the patient signed the form but does not understand the procedure), the gauge-invariance condition is violated and the clinical geodesic computed by the clinician is not the geodesic the patient would choose on their own manifold.
+
+\subsection{Triage Systems}
+
+Modern triage systems---from the Emergency Severity Index (ESI) \cite{gilboy2011} to pandemic allocation frameworks \cite{emanuel2020}---formalize the process of prioritizing patients under resource constraints.  Most triage algorithms are explicitly utilitarian: maximize lives saved, maximize life-years saved, or maximize QALYs saved.
+
+The COVID-19 pandemic exposed the moral limits of utilitarian triage.  Crisis standards of care that maximized population survival sometimes required withdrawing ventilators from patients already receiving them---an action that many clinicians experienced as a boundary violation so severe that it constituted moral injury \cite{greenberg2020}.  The framework explains why: the utilitarian calculus operates on $d_1$ (maximize clinical outcomes), but withdrawing a ventilator from a specific patient crosses boundaries on $d_2$ (violation of the patient's right to ongoing treatment), $d_5$ (breach of the trust relationship), and $d_7$ (violation of the clinician's identity as a healer).  The total manifold cost of withdrawal may exceed the manifold benefit of reallocation, even when the QALY arithmetic favors reallocation.
+
+
+%==============================================================================
+\section{The Clinical Decision Complex}
+\label{sec:manifold}
+%==============================================================================
+
+\subsection{Dimensions of Clinical Decision-Making}
+
+Clinical decisions are evaluated on nine dimensions---the same nine dimensions of the moral manifold \cite{bond2026geometric}, re-interpreted for clinical contexts:
+
+\begin{enumerate}
+    \item $d_1$: \textbf{Clinical Outcomes} --- survival, morbidity, functional status, symptom burden.  This is the dimension that evidence-based medicine measures and that QALYs attempt to capture.
+    \item $d_2$: \textbf{Rights and Obligations} --- the patient's right to treatment, the clinician's duty of care, Hippocratic non-maleficence (``first, do no harm''), the right to refuse treatment.
+    \item $d_3$: \textbf{Justice and Fairness} --- equitable access, distributive justice in resource allocation, non-discrimination, proportionality of treatment burden.
+    \item $d_4$: \textbf{Autonomy} --- the patient's right to self-determination, voluntariness of consent, freedom from coercion, the right to make ``bad'' decisions.
+    \item $d_5$: \textbf{Trust} --- the therapeutic relationship, fiduciary duty, confidentiality, institutional trustworthiness.
+    \item $d_6$: \textbf{Social and Relational Impact} --- effects on family and caregivers, community health consequences, social determinants of health, the patient's social role and responsibilities.
+    \item $d_7$: \textbf{Dignity and Identity} --- the patient's sense of self, bodily integrity, personal values, quality of dying, the clinician's professional identity.
+    \item $d_8$: \textbf{Institutional Legitimacy} --- standard of care, clinical guidelines, regulatory compliance, institutional protocols, legal defensibility.
+    \item $d_9$: \textbf{Epistemic Status} --- diagnostic certainty, prognostic accuracy, the patient's understanding, health literacy, information quality.
+\end{enumerate}
+
+\begin{remark}[Why Nine Dimensions, Not Four]
+Beauchamp and Childress's four principles map onto dimensions $d_1$--$d_4$ (approximately).  But clinical reality activates all nine.  A physician deciding whether to intubate an elderly patient with advanced dementia is simultaneously evaluating: clinical outcome ($d_1$: will intubation extend meaningful life?), rights ($d_2$: does the advance directive prohibit this?), justice ($d_3$: is this the best use of an ICU bed?), autonomy ($d_4$: what would the patient have wanted?), trust ($d_5$: what did I promise the family?), social impact ($d_6$: how will this affect the family's grief?), dignity ($d_7$: is this consistent with a dignified death?), institutional protocol ($d_8$: what does the hospital ethics committee recommend?), and epistemic status ($d_9$: how certain am I of the prognosis?).  Reducing this to four principles discards five dimensions.  Reducing it to a QALY discards eight.
+\end{remark}
+
+\subsection{The Clinical Decision Complex: Formal Construction}
+
+\begin{definition}[Clinical Decision Complex]
+\label{def:clinical_complex}
+The \emph{clinical decision complex} $\C$ is a weighted simplicial complex constructed as follows:
+\begin{itemize}
+    \item \textbf{Vertices (0-simplices):} Each vertex $v_i$ represents a \emph{clinical state}---a configuration of the patient's condition, the available interventions, the clinician's knowledge, and the institutional context.  The vertex carries an \emph{attribute vector} $\mathbf{a}(v_i) \in \R^9$, whose components are scores along the nine clinical-moral dimensions.
+    \item \textbf{Edges (1-simplices):} An edge $(v_i, v_j)$ represents an available \emph{clinical action}---a treatment decision, a diagnostic test, a referral, a conversation, a decision to wait.  The edge carries a weight $w(v_i, v_j) \geq 0$ representing the \emph{total cost} of the action on the full clinical manifold.
+    \item \textbf{Higher simplices:} A $k$-simplex $[v_0, \ldots, v_k]$ represents a \emph{care bundle}---a set of jointly administered interventions (e.g., a chemotherapy protocol: drug + antiemetic + hydration + counseling).
+\end{itemize}
+\end{definition}
+
+\begin{definition}[Clinical Edge Weights]
+\label{def:clinical_weights}
+The weight of a clinical action $(v_i, v_j)$ on $\C$ is:
+\begin{equation}
+w(v_i, v_j) = \underbrace{\Delta \mathbf{a}^T\, \Sigma^{-1}\, \Delta \mathbf{a}}_{\text{Mahalanobis distance}} + \underbrace{\sum_k \beta_k \cdot \mathbf{1}[\text{clinical-moral boundary } k \text{ crossed}]}_{\text{boundary penalties}}
+\label{eq:clinical_weight}
+\end{equation}
+where $\Delta \mathbf{a} = \mathbf{a}(v_j) - \mathbf{a}(v_i)$ is the change in the patient's attribute vector, $\Sigma$ is the $9 \times 9$ \emph{clinical-moral covariance matrix} estimated from observed clinical decision-making, and $\beta_k$ is the penalty for crossing clinical-moral boundary $k$.
+\end{definition}
+
+The covariance matrix $\Sigma$ captures the cross-dimensional dependencies that make clinical ethics hard:
+\begin{itemize}
+    \item $\Sigma_{15}$ (outcomes $\times$ trust): a treatment with uncertain outcomes ($d_1$) is more costly when the trust relationship is fragile ($d_5$).
+    \item $\Sigma_{49}$ (autonomy $\times$ epistemic): respecting autonomy ($d_4$) requires that the patient has adequate understanding ($d_9$); when $d_9$ is low, the effective cost of invoking $d_4$ increases.
+    \item $\Sigma_{37}$ (justice $\times$ dignity): a resource-allocation decision that is fair ($d_3$) but strips dignity ($d_7$) from the patient (e.g., means-testing for treatment) has high cross-dimensional cost.
+\end{itemize}
+
+\subsection{Clinical-Moral Boundaries}
+
+\begin{definition}[Clinical-Moral Boundaries]
+\label{def:clinical_boundaries}
+A \emph{clinical-moral boundary} is a threshold on $\C$ where the clinical decision regime changes discontinuously:
+
+\begin{itemize}
+    \item \textbf{The harm boundary ($\beta_{\text{harm}}$):} ``First, do no harm'' (Hippocratic non-maleficence).  Actions that directly cause patient harm cross this boundary.  For most clinicians, $\beta_{\text{harm}}$ is very high but finite---clinicians accept iatrogenic harm when the alternative (untreated disease) is worse.  This is why surgery exists: the harm boundary is crossed, but the clinical geodesic's total cost is lower with surgery than without.
+
+    \item \textbf{The futility boundary ($\beta_{\text{futile}}$):} Continuing aggressive treatment when the clinical outcome is hopeless.  Crossing this boundary (treating a patient who cannot benefit) imposes costs on $d_3$ (justice: wasting scarce resources), $d_7$ (dignity: subjecting the patient to suffering without benefit), and $d_5$ (trust: promising what medicine cannot deliver).
+
+    \item \textbf{The consent boundary ($\beta_{\text{consent}}$):} Treating a competent patient without valid consent.  For most clinicians, $\beta_{\text{consent}} \approx \infty$ for non-emergency interventions.  The boundary drops to a finite value in genuine emergencies (implied consent) and for patients who lack decision-making capacity (surrogate consent).
+
+    \item \textbf{The abandonment boundary ($\beta_{\text{abandon}}$):} Withdrawing care from a patient who is dependent on the clinician.  The fiduciary nature of the therapeutic relationship ($d_5$) makes abandonment one of the highest-cost boundary crossings in clinical ethics.
+
+    \item \textbf{The sacred-value boundary ($\beta_{\text{sacred}} = \infty$):}  Certain clinical actions are absolutely prohibited regardless of consequences: performing non-consensual experimentation, participating in execution, deliberately hastening death for non-palliative purposes.  These have $\beta = \infty$---no clinical benefit can offset them.
+\end{itemize}
+\end{definition}
+
+
+%==============================================================================
+\section{Clinical Decision as $A^*$ Search}
+\label{sec:search}
+%==============================================================================
+
+\subsection{The Clinical Pathfinding Model}
+
+\begin{definition}[Clinical Decision as Pathfinding]
+\label{def:clinical_pathfinding}
+A clinical decision is a pathfinding problem on $\C$:
+\begin{itemize}
+    \item \textbf{Start node $v_0$:} The patient's current clinical-moral state (diagnosis, prognosis, current treatments, relationships, institutional context).
+    \item \textbf{Goal region $G$:} The set of acceptable clinical-moral outcomes (not just ``survival'' but survival with adequate function, autonomy, dignity, and trust).
+    \item \textbf{Path $\gamma$:} A sequence of clinical actions (treatments, tests, conversations, decisions to wait) that moves the patient from $v_0$ toward $G$.
+    \item \textbf{Cost function:} $f(n) = g(n) + h(n)$, where:
+    \begin{itemize}
+        \item $g(n)$: the \emph{accumulated clinical cost} from $v_0$ to the current state $n$---the sum of edge weights along the clinical path so far.  This is the \textbf{evidence-based medicine} component: slow, deliberate, data-driven, based on clinical trials, Bayesian updating, and outcome data.
+        \item $h(n)$: the \emph{moral-heuristic estimate} of the remaining cost from $n$ to the nearest acceptable outcome in $G$---the clinician's trained ethical intuition about ``how far we still have to go'' and ``what moral costs remain.''  This is the \textbf{clinical wisdom} component: fast, automatic, based on experience, training, and internalized professional norms.
+    \end{itemize}
+\end{itemize}
+\end{definition}
+
+\begin{center}
+\begin{tabular}{ll}
+\toprule
+\textbf{$A^*$ Component} & \textbf{Clinical Decision Counterpart} \\
+\midrule
+Start node $v_0$ & Patient's presenting condition \\
+Goal region $G$ & Acceptable clinical-moral outcome \\
+Edge cost $w(v_i, v_j)$ & Full cost of clinical action (all 9 dimensions) \\
+$g(n)$: accumulated cost & Evidence-based medicine (EBM) \\
+$h(n)$: heuristic estimate & Clinical wisdom / ethical intuition \\
+Boundary penalty $\beta_k$ & Professional ethical norm (``do no harm'') \\
+Open list & Treatment options under consideration \\
+Closed list & Options already evaluated and dismissed \\
+Optimal path $\gamma^*$ & Clinical geodesic: the recommended plan of care \\
+Path not found & Clinical-moral impasse / ethics consultation \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\begin{definition}[Clinical Geodesic]
+\label{def:clinical_geodesic}
+The \emph{clinical geodesic} $\gamma^*$ from a patient's initial state $v_0$ to a goal region $G$ on the clinical decision complex $\C$ is the minimum-cost path:
+\begin{equation}
+\gamma^* = \arg\min_\gamma \sum_{i=0}^{m-1} w(v_i, v_{i+1}) \quad \text{subject to } \gamma(0) = v_0,\; \gamma(\text{end}) \in G
+\label{eq:clinical_geodesic}
+\end{equation}
+where $w$ is the full multi-dimensional clinical edge weight (Equation~\ref{eq:clinical_weight}).
+\end{definition}
+
+\subsection{Clinical Heuristics as Admissible Search Heuristics}
+
+Clinical training produces moral heuristics that function as $A^*$ search heuristics:
+
+\begin{theorem}[Clinical Heuristic Admissibility]
+\label{thm:clinical_admissibility}
+Let $h_C(n)$ be a \emph{clinical moral heuristic}---a function that assigns high cost to actions violating professional ethical norms and low cost to actions consistent with them:
+\begin{equation}
+h_C(n) = \sum_{k} \beta_k \cdot P(\text{clinical action from } n \text{ crosses boundary } k)
+\end{equation}
+If the boundary penalties $\beta_k$ are calibrated by clinical training and professional socialization to be lower bounds on the true moral cost of boundary crossing (i.e., $\beta_k \leq \beta_k^*$, where $\beta_k^*$ includes malpractice liability, professional censure, patient harm, and psychological distress), then $h_C$ is admissible and $A^*$ search finds the optimal clinical path.
+\end{theorem}
+
+\begin{proof}
+Follows from the general Heuristic Truncation Theorem \cite{bond2026geometric}: $h_C(n) \leq h^*(n)$ because $\beta_k \leq \beta_k^*$ and all remaining cost components (Mahalanobis distance to goal) are non-negative.
+\end{proof}
+
+\begin{remark}[Clinical Training as Heuristic Calibration]
+Medical education, clinical rotations, and professional socialization are, in this framework, a \emph{heuristic calibration process}: the trainee's $h(n)$ function is being tuned to approximate the boundary penalties and cost estimates that experienced clinicians have internalized.  An attending physician's ``clinical judgment'' is a well-calibrated $h(n)$.  A medical student's ``gut feeling'' is an uncalibrated $h(n)$.  The goal of clinical training is not to teach the student to compute $g(n)$ (that is the role of medical school didactics and evidence-based medicine training) but to calibrate $h(n)$: to develop the moral-clinical intuition that allows fast, accurate assessment of the remaining cost to acceptable outcomes.
+\end{remark}
+
+\subsection{When Clinical Heuristics Overestimate: The $\varepsilon$-Admissibility Spectrum}
+\label{sec:epsilon_admissibility}
+
+A natural objection: human moral intuition is prone to systematic overestimation.  Omission bias causes clinicians to judge harmful actions as worse than equally harmful inactions.  Extreme risk aversion inflates $\beta_{\text{harm}}$ beyond its true value.  Trauma and moral injury produce hypervigilance, further inflating boundary penalties.  If $h_C(n) > h^*(n)$, the heuristic is inadmissible and the clinical geodesic is suboptimal.
+
+This objection is correct---and the framework accommodates it precisely.
+
+\begin{definition}[$\varepsilon$-Admissible Clinical Heuristic]
+A clinical heuristic $h_C(n)$ is \emph{$\varepsilon$-admissible} if $h_C(n) \leq (1 + \varepsilon)\, h^*(n)$ for all $n$.  When $A^*$ uses an $\varepsilon$-admissible heuristic, the returned path has cost at most $(1 + \varepsilon)$ times the optimal path cost \cite{hart1968}.
+\end{definition}
+
+\begin{theorem}[The Clinical Heuristic Hierarchy]
+\label{thm:clinical_hierarchy}
+Clinical moral heuristics fall into four categories with distinct clinical signatures:
+\begin{enumerate}
+    \item \textbf{Strictly admissible} ($\beta_k \leq \beta_k^*$): The heuristic underestimates or correctly estimates the true boundary cost.  The clinical geodesic is optimal.  Examples: the prohibition on non-consensual treatment, where the true cost (legal liability, license revocation, criminal prosecution) genuinely exceeds any finite heuristic estimate.
+    \item \textbf{$\varepsilon$-admissible} ($\beta_k \leq (1+\varepsilon)\beta_k^*$, small $\varepsilon$): The heuristic slightly overestimates.  The clinical geodesic is near-optimal.  This is the \emph{normal operating range} of well-trained clinicians.  Examples: a slight overweighting of harm avoidance that makes the clinician marginally more conservative than the manifold-optimal path---producing the well-documented phenomenon that experienced clinicians are slightly more cautious than pure Bayesian decision-makers, at negligible cost to outcomes.
+    \item \textbf{Inadmissible} ($\beta_k \gg \beta_k^*$): The heuristic substantially overestimates boundary costs.  The clinical geodesic misses genuinely beneficial paths.  \emph{This is the clinical signature of moral injury, trauma, and defensive medicine.}  A traumatized ICU nurse whose $\beta_{\text{harm}}$ has been inflated by repeated forced boundary crossings will avoid clinically indicated interventions that carry any risk of harm---not because the interventions are wrong but because the heuristic is miscalibrated.  Similarly, defensive medicine (ordering unnecessary tests to avoid malpractice) is $\beta_{\text{legal}} \gg \beta_{\text{legal}}^*$.
+    \item \textbf{Gauge-variant}: The heuristic's output depends on framing rather than on the clinical state.  Examples: omission bias (harmful action judged worse than equally harmful inaction, even when the attribute vectors are identical), status quo bias, and anchoring to initial diagnosis.  These are the only phenomena that genuinely deserve the label ``clinical cognitive bias.''
+\end{enumerate}
+\end{theorem}
+
+\begin{remark}[Peer Review and Ethics Consultation as Heuristic Recalibration]
+The framework explains why clinical peer review, Morbidity \& Mortality conferences, and ethics consultations improve clinical decision-making: they \emph{recalibrate $h(n)$}.  When a clinician's heuristic is inadmissible (overestimating boundary costs due to trauma, hypervigilance, or defensive practice), exposure to peers' calibrated heuristics corrects the miscalibration.  An ethics consultation is not a second opinion on the \emph{decision}---it is a recalibration of the \emph{heuristic function} so that the clinician's $A^*$ search operates with a more accurate $h(n)$.  This is why ethics consultations are most valuable when the clinician feels ``stuck'' (the inflated $h(n)$ has made all available paths appear too costly)---the consultation reduces the inflated boundary penalties to their true values, reopening paths that the miscalibrated heuristic had foreclosed.
+\end{remark}
+
+\subsection{The Scalar Irrecoverability Theorem in Clinical Context}
+
+\begin{theorem}[QALY Irrecoverability]
+\label{thm:irrecoverability}
+Let $Q: \R^9 \to \R$ be any function that maps a 9-dimensional clinical-moral attribute vector to a scalar QALY value.  Then:
+\begin{enumerate}
+    \item $Q$ is not injective: multiple clinically and morally distinct states map to the same QALY score.
+    \item The information destroyed by $Q$ is irrecoverable: there exists no function $\psi: \R \to \R^9$ such that $\psi \circ Q = \mathrm{id}$.
+    \item The clinical geodesic on $\C$ is in general different from the QALY-maximizing path, and the difference is not bounded by any function of $Q$ alone.
+\end{enumerate}
+\end{theorem}
+
+\begin{proof}
+Identical to the Scalar Irrecoverability Theorem for economic utility \cite{bond2026geometric}: $Q$ maps $\R^9$ to $\R$; by the rank-nullity theorem, the kernel of $dQ$ has dimension $\geq 8$ at every regular point; information in the kernel is irrecoverable by the data processing inequality.
+\end{proof}
+
+\begin{corollary}[QALY Discrimination Is Mathematical, Not Moral]
+\label{cor:qaly_discrimination}
+The well-documented biases of QALY-based allocation against the elderly, the disabled, and minority populations \cite{harris1987,nord1999} are not failures of implementation.  They are mathematical consequences of dimensional collapse: populations whose health needs are concentrated on non-outcome dimensions ($d_4$: autonomy for disabled patients, $d_5$: trust for minority patients, $d_7$: dignity for elderly patients) are systematically disadvantaged by any scalar projection that weights $d_1$ (outcomes) most heavily.
+\end{corollary}
+
+\begin{proposition}[When QALYs Are Adequate]
+\label{prop:qaly_adequate}
+QALY-based analysis is an adequate approximation when and only when:
+\begin{enumerate}
+    \item The clinical decision activates primarily dimension $d_1$ (clinical outcomes), with negligible activation of $d_2$--$d_9$.
+    \item The patient population is homogeneous on dimensions $d_2$--$d_9$ (no systematic variation in autonomy, trust, dignity, or justice concerns).
+    \item No moral boundaries are crossed by any available action.
+\end{enumerate}
+These conditions are approximately satisfied for routine cost-effectiveness comparisons of pharmacologically similar drugs for a well-defined condition in a homogeneous population.  They are violated in every case involving: end-of-life care, mental health, disability, resource rationing, vulnerable populations, or cross-cultural care.
+\end{proposition}
+
+
+%==============================================================================
+\section{The Mathematical Theory of Moral Injury}
+\label{sec:moral_injury}
+%==============================================================================
+
+\subsection{Moral Injury Is Not Burnout}
+
+Burnout is characterized by emotional exhaustion, depersonalization, and reduced personal accomplishment \cite{maslach1981}.  It is a \emph{resource depletion} phenomenon: the clinician's cognitive and emotional resources for computing $g(n)$ and $h(n)$ are exhausted by overuse.
+
+Moral injury is structurally different.  It is not resource depletion but \emph{manifold damage}: the clinician is forced to traverse paths that cross moral boundaries, and the cumulative boundary-crossing cost produces lasting harm to the clinician's moral-psychological architecture.
+
+\begin{definition}[Moral Injury as Forced Boundary Crossing]
+\label{def:moral_injury}
+A clinician experiences \emph{moral injury} at time $t$ if the institutional clinical geodesic $\gamma_{\text{inst}}^*$ (the path mandated by institutional policy, resource constraints, or hierarchical authority) crosses a moral boundary $k$ that the clinician's personal moral manifold assigns a boundary penalty $\beta_k^{(\text{clin})} > \tau$, where $\tau$ is the clinician's threshold for tolerable moral cost.  The \emph{moral injury increment} at time $t$ is:
+\begin{equation}
+\Delta \MI(t) = \sum_k \max\bigl(0,\; \beta_k^{(\text{clin})} - \tau\bigr) \cdot \mathbf{1}[\text{boundary } k \text{ crossed at time } t]
+\label{eq:moral_injury}
+\end{equation}
+The \emph{cumulative moral injury} is:
+\begin{equation}
+\MI(T) = \sum_{t=1}^{T} \Delta \MI(t)
+\label{eq:cumulative_mi}
+\end{equation}
+\end{definition}
+
+\begin{theorem}[Moral Injury Accumulation]
+\label{thm:mi_accumulation}
+Moral injury is:
+\begin{enumerate}
+    \item \textbf{Cumulative:} $\MI(T)$ is monotonically non-decreasing in $T$.  Each forced boundary crossing adds to the total; no subsequent event subtracts from it.
+    \item \textbf{Irreversible above threshold:} Once $\MI(T) > \MI_{\text{crit}}$ (a clinician-specific critical threshold), the clinician's heuristic function $h(n)$ is permanently altered---boundary penalties shift, trust in institutional legitimacy ($d_8$) degrades, and professional identity ($d_7$) is damaged.  This manifests clinically as the moral residue that Epstein and Hamric \cite{epstein2009} describe.
+    \item \textbf{Structurally distinct from burnout:} A clinician can have high $\MI$ with low burnout (the work is sustainable but morally damaging---e.g., a well-rested ICU physician forced to implement a triage protocol that violates their ethical commitments) or low $\MI$ with high burnout (the work is exhausting but morally acceptable---e.g., a rural physician working excessive hours in an ethically supportive environment).
+\end{enumerate}
+\end{theorem}
+
+\begin{proof}
+(1) follows from the definition: $\Delta \MI(t) \geq 0$ for all $t$, so $\MI(T)$ is a non-decreasing sum.  (2) follows from the manifold-damage interpretation: forced boundary crossing does not merely impose a transient cost but permanently alters the topology of the clinician's decision manifold.  Boundaries that have been crossed involuntarily become either more sensitive (hypervigilance---the clinician becomes risk-averse on the violated dimension) or less sensitive (moral numbing---the boundary penalty decreases through repeated violation).  Both alterations are forms of lasting damage to $h(n)$.  (3) follows from the structural distinction between $g(n)$-depletion (burnout: the computation degrades) and $h(n)$-damage (moral injury: the heuristic itself is altered).
+\end{proof}
+
+\subsection{The Moral Injury Index}
+
+\begin{definition}[Moral Injury Index]
+\label{def:mi_index}
+The \emph{Moral Injury Index} of an institutional policy $P$ is the expected cumulative moral injury imposed on a clinician operating under $P$:
+\begin{equation}
+\MI(P) = \mathbb{E}\left[\sum_{t} \sum_k \max\bigl(0,\; \beta_k^{(\text{clin})} - \tau\bigr) \cdot \mathbf{1}[P \text{ requires crossing boundary } k \text{ at } t]\right]
+\label{eq:mi_index}
+\end{equation}
+where the expectation is over the distribution of clinical scenarios encountered under normal operations.
+\end{definition}
+
+\begin{proposition}[Institutional Moral Injury Is Predictable]
+\label{prop:mi_predictable}
+The Moral Injury Index $\MI(P)$ can be estimated \emph{before} a policy is implemented, by:
+\begin{enumerate}
+    \item Surveying clinicians to estimate $\beta_k^{(\text{clin})}$ (the boundary penalties in the clinician population's moral manifold).
+    \item Analyzing the policy $P$ to identify which clinical scenarios require boundary crossing.
+    \item Computing the expected frequency of those scenarios from historical case-mix data.
+\end{enumerate}
+A policy with $\MI(P) > \MI_{\text{crit}}$ is predicted to produce moral injury in the clinician workforce.  This prediction is testable against moral distress scores (e.g., the Moral Distress Scale--Revised, MDS-R \cite{hamric2012}).
+\end{proposition}
+
+\subsection{Pandemic Triage and the COVID-19 Moral Injury Crisis}
+
+The COVID-19 pandemic produced a natural experiment in moral injury.  Crisis standards of care required clinicians to:
+
+\begin{enumerate}
+    \item Deny ventilators to patients who would have received them under normal conditions (crossing $\beta_{\text{abandon}}$ and $\beta_{\text{harm}}$).
+    \item Apply utilitarian triage algorithms that deprioritized elderly and comorbid patients (crossing $\beta_{\text{justice}}$ for clinicians whose manifold weights fairness heavily).
+    \item Restrict family visitation for dying patients (crossing $\beta_{\text{dignity}}$ and $\beta_{\text{social}}$).
+    \item Make allocation decisions under extreme epistemic uncertainty (degraded $d_9$, increasing the Mahalanobis distance for all actions).
+\end{enumerate}
+
+\begin{proposition}[COVID-19 Moral Injury Prediction]
+\label{prop:covid_mi}
+The framework predicts that moral injury during the pandemic should be:
+\begin{enumerate}
+    \item Higher among ICU clinicians than among clinicians in specialties that did not face triage decisions (more boundary crossings).
+    \item Higher among clinicians who personally disagreed with the triage protocol (higher $\beta_k^{(\text{clin})} - \tau$).
+    \item Correlated with the \emph{number} of triage decisions, not just the \emph{severity} of each decision (cumulative $\MI$ is a sum, not a maximum).
+    \item Structurally different from pandemic burnout: clinicians working long hours without triage dilemmas should show burnout but not moral injury, while clinicians making few triage decisions with high moral cost should show moral injury but not burnout.
+    \item Partially predictable from pre-pandemic survey data on clinician moral profiles ($\beta_k^{(\text{clin})}$ values).
+\end{enumerate}
+Predictions (1)--(4) are consistent with the emerging empirical literature \cite{greenberg2020,rushton2018}.  Prediction (5) is novel and testable.
+\end{proposition}
+
+
+%==============================================================================
+\section{Geometric Informed Consent}
+\label{sec:consent}
+%==============================================================================
+
+\subsection{Consent as Gauge Invariance}
+
+The standard legal test for valid informed consent requires: (a) disclosure of material risks, (b) patient comprehension, (c) voluntariness, and (d) decision-making capacity.  These four requirements are typically treated as a checklist: if all four boxes are checked, consent is valid.
+
+Our framework provides a deeper characterization.
+
+\begin{definition}[Informed Consent as Manifold Calibration]
+\label{def:consent_calibration}
+Valid informed consent requires that the patient's clinical decision complex $\C_{\text{patient}}$ be \emph{calibrated}---that the patient's attribute vectors, edge weights, and boundary penalties approximate the true clinical-moral costs closely enough that the patient's clinical geodesic is a good approximation of the geodesic they would compute with perfect information.  Formally:
+\begin{equation}
+\|w_{\text{patient}}(v_i, v_j) - w_{\text{true}}(v_i, v_j)\| < \epsilon \quad \text{for all relevant edges } (v_i, v_j)
+\label{eq:consent_calibration}
+\end{equation}
+where $\epsilon$ is the tolerance for manifold miscalibration.
+\end{definition}
+
+\begin{theorem}[Consent as Gauge Invariance]
+\label{thm:consent_gauge}
+Valid informed consent is equivalent to a \emph{gauge-invariance condition}: the patient's clinical decision should be invariant under changes in the \emph{description} of the options, dependent only on the \emph{attribute vectors} of the options.  Formally, if $\tau$ is a meaning-preserving transformation of the clinical information (e.g., reframing ``90\% survival rate'' as ``10\% mortality rate''), then consent is valid only if:
+\begin{equation}
+\gamma^*_{\text{patient}}(\tau(x)) = \gamma^*_{\text{patient}}(x) \quad \text{for all meaning-preserving } \tau
+\end{equation}
+If the patient's decision changes under reframing ($\tau$), then either $d_9$ (understanding) or $d_4$ (voluntariness) is inadequately calibrated, and consent is not genuinely informed.
+\end{theorem}
+
+\begin{proof}
+The Bond Invariance Principle \cite{bond2026geometric} requires that ethical evaluations be invariant under meaning-preserving transformations.  If the patient's decision varies under $\tau$, the heuristic function $h_{\text{patient}}(n)$ is gauge-variant---it depends on the framing rather than on the underlying clinical reality.  This implies that $d_9$ (the patient's understanding of the options) is not calibrated to the true attribute vectors but is instead sensitive to surface features of the presentation.  Equivalently, the patient is not making an informed decision; they are making a \emph{framed} decision.
+\end{proof}
+
+\begin{corollary}[The Consent Paradox in Low Health Literacy]
+\label{cor:consent_paradox}
+Patients with low health literacy can sign consent forms (satisfying the legal checklist) while having $d_9$ values so low that their manifold is grossly miscalibrated.  The consent is legally valid but ethically vacuous: the patient's clinical geodesic on their miscalibrated manifold may be radically different from the geodesic they would compute with adequate understanding.  The gauge-invariance test detects this: if the patient's decision would change under reframing, the consent is not genuinely informed regardless of what the form says.
+\end{corollary}
+
+\subsection{Shared Decision-Making as Manifold Alignment}
+
+\begin{definition}[Manifold Alignment]
+\label{def:manifold_alignment}
+Shared decision-making between clinician and patient is \emph{manifold alignment}: the process of bringing the patient's clinical decision complex $\C_{\text{patient}}$ into sufficient agreement with the clinician's complex $\C_{\text{clin}}$ on the relevant edges and vertices that a jointly computed clinical geodesic is acceptable to both parties.  This requires:
+\begin{enumerate}
+    \item \textbf{Epistemic alignment ($d_9$):} The patient understands the clinical facts (diagnosis, prognosis, treatment options, risks) with sufficient accuracy that their $d_1$ attribute vectors approximate the clinician's.
+    \item \textbf{Value alignment ($d_2$--$d_8$):} The clinician understands the patient's boundary penalties ($\beta_k^{(\text{patient})}$) well enough that the clinical geodesic respects the patient's moral manifold, not just the clinician's.
+    \item \textbf{Goal alignment:} The patient and clinician agree on the goal region $G$---what counts as an acceptable outcome.
+\end{enumerate}
+\end{definition}
+
+\begin{remark}[When Alignment Fails]
+Manifold alignment failure has three distinct clinical presentations:
+\begin{enumerate}
+    \item \textbf{Epistemic misalignment} ($d_9$ gap): The patient does not understand the clinical situation.  Treatment: better communication, health literacy support, decision aids.
+    \item \textbf{Value misalignment} ($d_2$--$d_8$ gap): The clinician and patient have different boundary penalties---the clinician recommends a path that crosses a boundary the patient considers inviolable.  Treatment: elicit the patient's values explicitly; recompute the geodesic on the patient's manifold, not the clinician's.
+    \item \textbf{Goal misalignment} ($G$ disagreement): The clinician and patient disagree about what constitutes an acceptable outcome (e.g., the clinician's goal is survival; the patient's goal is comfort).  Treatment: negotiate a shared $G$ through explicit values conversation.
+\end{enumerate}
+Each failure mode has a different intervention.  Lumping them under ``poor communication'' (as current practice often does) conflates three structurally distinct problems.
+\end{remark}
+
+
+%==============================================================================
+\section{Geometric Triage}
+\label{sec:triage}
+%==============================================================================
+
+\subsection{Triage as Constrained Multi-Agent Pathfinding}
+
+Triage is not a single-patient clinical decision.  It is a \emph{multi-agent constrained pathfinding problem}: the clinician must compute clinical geodesics for multiple patients simultaneously, subject to resource constraints that make it impossible to place all patients on their individually optimal paths.
+
+\begin{definition}[Triage Problem]
+\label{def:triage}
+A \emph{triage problem} is a tuple $(N, \C, R, G)$ where:
+\begin{itemize}
+    \item $N = \{p_1, \ldots, p_n\}$ is a set of patients.
+    \item $\C = \{\C_1, \ldots, \C_n\}$ is the set of clinical decision complexes (one per patient).
+    \item $R$ is a resource constraint: a bound on the total number of clinical actions (ventilators, ICU beds, surgical hours, medications) available.
+    \item $G = \{G_1, \ldots, G_n\}$ is the set of goal regions (acceptable outcomes for each patient).
+\end{itemize}
+The triage decision is a feasible allocation of resources that minimizes total clinical-moral friction:
+\begin{equation}
+(\gamma_1^*, \ldots, \gamma_n^*) = \arg\min_{\gamma_1, \ldots, \gamma_n} \sum_{i=1}^n \CF(\gamma_i) \quad \text{subject to } \sum_{i=1}^n r(\gamma_i) \leq R
+\label{eq:triage}
+\end{equation}
+where $\CF(\gamma_i)$ is the clinical friction (total path cost) for patient $i$'s path, and $r(\gamma_i)$ is the resource cost of that path.
+\end{definition}
+
+\begin{remark}[Computational Tractability of Triage]
+\label{rem:triage_tractability}
+A natural objection: general multi-agent pathfinding (MAPF) is NP-hard, and ICU clinicians cannot solve NP-hard problems during a crisis surge.  This objection conflates the \emph{formal problem} with the \emph{clinical approximation}.  Three observations:
+
+First, clinical triage is not unconstrained MAPF.  The resource types are few (ventilators, ICU beds, medications), the patient count is bounded (a single ICU has $\sim$20--50 beds), and the action space per patient is small (treat/palliate/transfer/waitlist).  The resulting combinatorial space, while exponential in principle, is tractable for the problem sizes that arise in practice.
+
+Second, real triage systems already use greedy heuristic algorithms, not exact optimization.  The ESI \cite{gilboy2011} assigns patients to 5 severity levels and allocates resources level-by-level.  Our framework does not propose replacing these heuristics with exact solvers.  It proposes that the \emph{objective function} being approximately optimized should be total manifold cost $\sum_i \CF(\gamma_i)$, not total scalar outcome $\sum_i d_1(\gamma_i)$.  The existing greedy algorithms can be used with the manifold objective---the change is in the \emph{cost function}, not in the \emph{algorithm}.
+
+Third, the framework's primary value for triage is not real-time computation but \emph{policy design}: crisis standards of care can be evaluated prospectively against the manifold objective, identifying policies whose utilitarian and manifold-optimal allocations diverge most severely (Theorem~\ref{thm:triage_divergence}).  This analysis is performed offline, before the crisis, with ample computational resources.
+\end{remark}
+
+\subsection{Utilitarian Triage vs.\ Manifold-Optimal Triage}
+
+\begin{theorem}[Divergence of Utilitarian and Manifold-Optimal Triage]
+\label{thm:triage_divergence}
+Let $\gamma_U^*$ be the utilitarian triage allocation (minimize total $d_1$ cost: maximize lives or life-years saved) and let $\gamma_\C^*$ be the manifold-optimal allocation (minimize total clinical friction on all nine dimensions).  Then:
+\begin{enumerate}
+    \item $\gamma_U^* = \gamma_\C^*$ when the triage decisions activate only $d_1$ and no moral boundaries are crossed.
+    \item $\gamma_U^* \neq \gamma_\C^*$ when triage decisions cross moral boundaries or activate non-outcome dimensions.  Specifically:
+    \begin{enumerate}
+        \item Withdrawing a ventilator from a current patient to give it to a new patient with better prognosis is utilitarian-optimal but may be manifold-suboptimal, because the withdrawal crosses the abandonment boundary ($\beta_{\text{abandon}}$) and trust boundary ($\beta_{\text{trust}}$) for the current patient.
+        \item Age-based deprioritization (younger patients first) is utilitarian-optimal (maximizes life-years) but manifold-suboptimal when it violates $d_3$ (justice: equal moral worth regardless of age) for agents whose manifold weights fairness heavily.
+        \item Lottery allocation (random assignment when prognoses are similar) is utilitarian-equivalent (no outcome difference) but manifold-superior: it preserves $d_3$ (fairness: procedural justice) and $d_8$ (legitimacy: transparent, rule-based process) while avoiding boundary crossings on $d_7$ (dignity: the patient is not devalued by the allocation criterion).
+    \end{enumerate}
+\end{enumerate}
+\end{theorem}
+
+\begin{proof}
+(1) follows from the Mahalanobis distance reducing to the $d_1$ component when all other dimensions have zero activation.  (2a--2c) follow from the edge-weight structure: boundary penalties on $d_2$, $d_3$, $d_5$, $d_7$, and $d_8$ add positive cost to the utilitarian-optimal allocation, making the total manifold cost exceed that of an alternative allocation that avoids the boundary crossings.
+\end{proof}
+
+\begin{remark}[Why Clinicians Resist Utilitarian Triage]
+The widespread clinician resistance to utilitarian crisis standards of care during COVID-19 \cite{greenberg2020,emanuel2020} is not irrationality and not squeamishness.  It is the clinician's $h(n)$ function correctly identifying that the utilitarian triage path crosses moral boundaries whose cost exceeds the utilitarian benefit.  The clinicians are right---on the full manifold.  The utilitarian algorithms are right---on the scalar projection.  The conflict is not ethical disagreement.  It is dimensional mismatch.
+\end{remark}
+
+
+%==============================================================================
+\section{The Clinical Bond Index}
+\label{sec:bond_index}
+%==============================================================================
+
+\subsection{Measuring Structural Healthcare Injustice}
+
+\begin{definition}[Clinical Bond Index]
+\label{def:clinical_bi}
+The \emph{clinical Bond Index} $\BI(P, S)$ of an institutional policy $P$ with respect to a patient population $S$ is the expected deviation between the clinical geodesic on the full manifold and the path mandated by the policy:
+\begin{equation}
+\BI(P, S) = \mathbb{E}_{s \in S}\left[\CF(\gamma_P^*(s)) - \CF(\gamma_\C^*(s))\right]
+\label{eq:clinical_bi}
+\end{equation}
+where $\gamma_P^*(s)$ is the path mandated by policy $P$ for patient $s$, $\gamma_\C^*(s)$ is the clinical geodesic for patient $s$ on the full manifold, and the expectation is over the patient population.
+\end{definition}
+
+\begin{proposition}[Bond Index Detects Structural Injustice]
+\label{prop:structural_injustice}
+If $\BI(P, S_1) \gg \BI(P, S_2)$ for two patient populations $S_1$ and $S_2$, then policy $P$ imposes systematically higher moral cost on population $S_1$.  This is a quantitative, measurable definition of structural healthcare injustice:
+\begin{enumerate}
+    \item \textbf{Racial disparities:} If Black patients have systematically lower trust ($d_5$) due to historical institutional betrayal \cite{washington2006}, and the policy assumes uniform trust, the clinical geodesic for Black patients is more costly than the policy recognizes.  The Bond Index detects this: $\BI(P, S_{\text{Black}}) > \BI(P, S_{\text{White}})$.
+    \item \textbf{Disability discrimination:} If QALY-based allocation assigns lower quality weights to disabled patients (underweighting $d_4$: autonomy and $d_7$: dignity relative to $d_1$: function), disabled patients bear systematically higher manifold cost.  The Bond Index detects this.
+    \item \textbf{Age discrimination:} If age-based triage criteria discount elderly patients' outcomes (lower remaining QALYs), the policy underweights $d_3$ (equal moral worth) and $d_7$ (dignity in aging).  The Bond Index detects this.
+\end{enumerate}
+\end{proposition}
+
+\begin{remark}[The Bond Index Is Not a Subjective Judgment]
+The clinical Bond Index is computed from measurable quantities: edge weights estimated from clinical decision data, boundary penalties estimated from clinician surveys, and population-level covariance matrices estimated from behavioral data.  The claim ``policy $P$ is structurally unjust toward population $S$'' becomes an empirical claim with a specific numerical value, not a philosophical opinion.  This enables evidence-based health equity policy: measure $\BI(P, S)$ for all relevant populations, identify policies with high $\BI$, and redesign them to reduce manifold cost.
+\end{remark}
+
+
+%==============================================================================
+\section{Worked Examples}
+\label{sec:examples}
+%==============================================================================
+
+\subsection{Example 1: The Competent Patient Who Refuses Treatment}
+
+\textbf{Problem:} A 45-year-old Jehovah's Witness with acute gastrointestinal bleeding needs a blood transfusion.  Without transfusion, the probability of death is approximately 40\%.  The patient, competent and informed, refuses transfusion on religious grounds.
+
+\textbf{Principlism:} Autonomy (respect the refusal) conflicts with beneficence (save the life).  Principlism says ``balance'' them but provides no algorithm.
+
+\textbf{QALY analysis:} Transfusion gains $\sim$20 QALYs (remaining life expectancy).  Cost per QALY is negligible.  QALY-optimal action: transfuse.
+
+\textbf{Clinical geodesic analysis:}
+\begin{enumerate}
+    \item \textbf{Path A (transfuse against refusal):} $\Delta d_1 = +\text{large}$ (survival), but $\Delta d_4 = -\infty$ (violating a competent refusal is an absolute autonomy violation), $\Delta d_2 = -\infty$ (violating the legal right to refuse treatment), $\Delta d_5 = -\text{large}$ (destroying the trust relationship), $\Delta d_7 = -\text{large}$ (violating the patient's deepest identity).  Edge weight: $w_A = \infty$.
+    \item \textbf{Path B (respect refusal, optimize alternatives):} $\Delta d_1 = -\text{moderate}$ (higher mortality risk), but $\Delta d_4 = 0$ (autonomy intact), $\Delta d_2 = 0$ (rights respected), $\Delta d_5 = +\text{moderate}$ (trust reinforced by respecting the refusal), $\Delta d_7 = 0$ (identity intact).  Edge weight: $w_B = (\text{mortality risk})^2 / \sigma_1^2$.
+    \item The clinical geodesic is Path B.  It is not ``ethically suboptimal'' or a ``concession to autonomy.''  It is the minimum-cost path on the full manifold.  Path A has infinite cost because $\beta_{\text{consent}} = \infty$.
+    \item The framework also computes: explore alternative paths (erythropoietin, cell salvage, volume expanders) that reduce $\Delta d_1$ while maintaining zero cost on $d_2$--$d_9$.  The clinical geodesic includes aggressive pursuit of transfusion alternatives---not as a compromise but as the manifold-optimal strategy.
+\end{enumerate}
+
+\subsection{Example 2: Withdrawing Life Support}
+
+\textbf{Problem:} An 82-year-old patient with end-stage heart failure, on mechanical ventilation for 3 weeks with no neurological recovery, has no advance directive.  The family is divided: one adult child wants ``everything done''; another wants comfort care.
+
+\textbf{Clinical geodesic analysis:}
+\begin{enumerate}
+    \item The clinician's manifold shows:
+    \begin{itemize}
+        \item $d_1$ (outcomes): Continued ventilation offers negligible survival benefit.  Estimated $\Delta d_1 \approx 0$ for continued treatment vs.\ comfort care.
+        \item $d_2$ (rights): No advance directive means no clear patient preference.  The patient's right to self-determination ($d_4$) cannot be exercised directly.
+        \item $d_7$ (dignity): Continued invasive treatment in a dying patient degrades dignity.  $\Delta d_7 < 0$ for continued ventilation.
+        \item $d_6$ (social/family): The divided family creates high cost on $d_6$ for \emph{any} action.  Both ``continue'' and ``withdraw'' impose family distress.
+        \item $d_5$ (trust): The clinician must maintain trust with \emph{both} family members.
+    \end{itemize}
+    \item The clinical geodesic is \emph{not} an immediate binary decision (continue vs.\ withdraw).  It is a \emph{path through time}: (a) family meeting to align manifolds (epistemic alignment: ensure both children understand the prognosis), (b) values conversation (value alignment: what would the patient have wanted?), (c) time-limited trial with clear criteria (maintains $d_8$: institutional process), (d) transition to comfort care when criteria are met (minimizes $d_7$ cost while maintaining $d_5$: trust with both parties).
+    \item The geodesic optimizes the \emph{process}, not just the endpoint.  A utilitarian analysis would jump to ``withdraw---no benefit to continuing.''  The clinical geodesic recognizes that the \emph{path} to withdrawal (through family alignment and process) has lower total manifold cost than the immediate decision, even though the endpoint is the same.
+\end{enumerate}
+
+\subsection{Example 3: The NICE Threshold and the Rare Disease Patient}
+
+\textbf{Problem:} A 30-year-old patient with a rare genetic disorder has access to a new treatment costing \pounds300,000 per year.  The treatment extends life by approximately 5 years with moderate quality improvement.  Cost per QALY: $\sim$\pounds80,000---four times the NICE threshold of \pounds20,000--\pounds30,000 per QALY.  Under standard cost-effectiveness analysis, the treatment is denied.
+
+\textbf{Clinical geodesic analysis:}
+\begin{enumerate}
+    \item The QALY calculation computes on $d_1$ alone: the cost per unit of health outcome is too high.
+    \item The full manifold includes:
+    \begin{itemize}
+        \item $d_3$ (justice): The patient has a rare disease through no fault of their own.  Denying treatment because the disease is rare (and therefore the drug is expensive due to small market size) violates the principle that moral worth is independent of actuarial category.  $\Delta d_3 < 0$ for denial.
+        \item $d_4$ (autonomy): The patient has no alternative.  Denial forecloses the only available path to continued life.  $\Delta d_4 < 0$.
+        \item $d_7$ (dignity): Being told ``your life is not cost-effective'' is a dignity violation.  $\Delta d_7 < 0$.
+        \item $d_8$ (legitimacy): The patient may perceive the NICE threshold as an arbitrary bureaucratic rule rather than a legitimate moral judgment.  $\Delta d_8 < 0$ if the process lacks democratic legitimacy in the patient's view.
+    \end{itemize}
+    \item The Bond Index $\BI(\text{NICE threshold}, S_{\text{rare disease}})$ is high: the policy imposes systematically higher manifold cost on rare-disease patients because the cost-per-QALY metric penalizes small patient populations (where per-unit drug costs are necessarily high) regardless of the moral dimensions of denial.
+    \item The manifold-optimal policy: maintain the NICE threshold for common conditions (where $d_3$ costs are low because alternatives exist and the threshold treats similar patients similarly) but create an explicit rare-disease pathway that weights $d_3$ and $d_4$ more heavily---which is, in fact, exactly what NICE's Highly Specialised Technologies programme attempts to do, but without the mathematical framework to determine the appropriate weights.
+\end{enumerate}
+
+
+%==============================================================================
+\section{Falsifiable Predictions}
+\label{sec:predictions}
+%==============================================================================
+
+The framework generates predictions that are specific, testable, and distinct from predictions of standard bioethics, QALY-based health economics, and existing moral distress research:
+
+\begin{enumerate}
+    \item \textbf{Prediction 1 (Dimensional Moral Distress):} Clinician moral distress (measured by MDS-R \cite{hamric2012}) should correlate with the \emph{number of manifold dimensions} activated in the distressing situation, not just with the severity on any single dimension.  \emph{Specific test:} Present clinicians with vignettes matched for clinical severity ($d_1$) but varying in the number of moral dimensions engaged.  Predicted: distress increases monotonically with dimension count.  \emph{What would falsify:} No correlation between dimension count and distress.
+
+    \item \textbf{Prediction 2 (Moral Injury vs.\ Burnout Dissociation):} Moral injury (measured by the Moral Injury Symptom Scale, MISS-HP \cite{zhizhong2019}) and burnout (measured by the Maslach Burnout Inventory, MBI \cite{maslach1981}) should be statistically dissociable: high MI with low burnout should occur in clinicians facing frequent boundary-crossing decisions with adequate staffing, and low MI with high burnout should occur in clinicians facing high volume without boundary-crossing decisions.  \emph{What would falsify:} Perfect correlation between MI and burnout (they are not distinct constructs).
+
+    \item \textbf{Prediction 3 (Consent Gauge-Invariance Test):} Patients with genuinely informed consent should show framing invariance: their treatment preferences should not change when clinically equivalent information is reframed (e.g., ``90\% survival'' vs.\ ``10\% mortality'').  Patients who show framing effects have inadequate $d_9$ calibration regardless of whether they signed the consent form.  \emph{Specific test:} Administer framing-variant and framing-invariant versions of consent information.  Measure treatment choice consistency.  Predicted: framing-variant patients have lower health literacy scores and lower self-reported understanding.  \emph{What would falsify:} No correlation between framing invariance and comprehension.
+
+    \item \textbf{Prediction 4 (Bond Index Predicts Disparities):} The clinical Bond Index $\BI(P, S)$ computed from institutional policy analysis should predict patient-reported experience disparities across demographic groups.  \emph{Specific test:} Compute $\BI$ for a hospital's triage, consent, and discharge policies.  Correlate with HCAHPS patient experience scores stratified by race, age, and disability status.  Predicted: groups with higher $\BI$ report worse experience on trust, communication, and respect dimensions.  \emph{What would falsify:} No correlation between $\BI$ and patient experience disparities.
+
+    \item \textbf{Prediction 5 (Triage Resistance Correlates):} Clinician resistance to utilitarian triage protocols should correlate with the clinician's $\beta_k$ profile (boundary penalty weights), measurable pre-crisis.  Clinicians with high $\beta_{\text{abandon}}$ and $\beta_{\text{justice}}$ should resist withdrawal-and-reallocation protocols more strongly.  \emph{What would falsify:} No correlation between pre-crisis $\beta_k$ profiles and crisis triage resistance.
+
+    \item \textbf{Prediction 6 (Process-Path vs.\ Endpoint Equivalence):} In end-of-life decisions, patient and family satisfaction should be higher when the clinical geodesic includes process steps (family meetings, values conversations, time-limited trials) than when the same clinical endpoint (e.g., transition to comfort care) is reached by a shorter path, \emph{even though the clinical outcome is identical}.  \emph{What would falsify:} No satisfaction difference between process-path and direct-path groups when the endpoint is the same.
+\end{enumerate}
+
+\subsection{What Would Kill the Framework}
+
+\begin{enumerate}
+    \item Evidence that clinician moral distress is purely a function of clinical outcome severity ($d_1$ alone) with no contribution from non-outcome dimensions.
+    \item Evidence that moral injury and burnout are empirically indistinguishable (same construct, same predictors, same interventions).
+    \item Evidence that QALY-based allocation produces no systematic disparities across demographic groups (the scalar projection is lossless in practice).
+    \item Evidence that informed consent framing invariance has no correlation with patient comprehension or decision quality.
+    \item Discovery of a clinical ethical dilemma that cannot be decomposed into the nine-dimensional attribute space.
+\end{enumerate}
+
+
+%==============================================================================
+\section{Discussion}
+\label{sec:discussion}
+%==============================================================================
+
+\subsection{What Changes for Clinical Practice}
+
+If this framework is correct:
+
+\begin{enumerate}
+    \item \textbf{The QALY is supplemented, not abandoned.}  QALY analysis remains valid for the narrow class of decisions that activate primarily $d_1$ (Proposition~\ref{prop:qaly_adequate}).  For all other decisions---which is to say, for most of the decisions that actually trouble clinicians---the full manifold must be considered.  Health technology assessment agencies should report multi-dimensional clinical-moral impact profiles alongside cost-per-QALY ratios.
+
+    \item \textbf{Moral injury becomes predictable and preventable.}  The Moral Injury Index (Definition~\ref{def:mi_index}) enables prospective evaluation of institutional policies \emph{before} they damage the clinician workforce.  Hospitals can compute $\MI(P)$ for proposed policies and reject or modify policies whose moral injury cost exceeds a threshold---just as they already reject policies whose financial cost exceeds a budget.
+
+    \item \textbf{Informed consent is testable, not just documentable.}  The gauge-invariance criterion (Theorem~\ref{thm:consent_gauge}) provides a functional test of consent quality: does the patient's decision survive reframing?  If not, consent is procedurally but not ethically valid, and additional epistemic calibration is needed.
+
+    \item \textbf{Health equity becomes measurable.}  The Bond Index provides a quantitative tool for detecting, measuring, and comparing structural injustice across institutions, policies, and populations.  ``This hospital's triage policy imposes $\BI = 3.7$ on Black patients and $\BI = 1.2$ on White patients'' is a more actionable statement than ``this hospital has racial disparities.''
+
+    \item \textbf{Ethics consultation becomes computation.}  An ethics consultation that currently relies on narrative deliberation and consensus-building can be supplemented by manifold analysis: map the clinical decision complex, identify the boundary crossings, compute the clinical geodesic, and present the result alongside the traditional ethical analysis.  The computation does not replace judgment---it makes the structure of the judgment explicit.
+\end{enumerate}
+
+\subsection{Limitations}
+
+\begin{enumerate}
+    \item \textbf{Calibration.}  The $9 \times 9$ clinical-moral covariance matrix $\Sigma$ has not been estimated from clinical data.  This is the central empirical challenge.  The calibration will require large-scale surveys of clinician decision-making, patient preference elicitation, and observational studies of clinical choices.  The methodology exists (conjoint analysis, discrete choice experiments, clinical vignette studies); the application to this framework's specific dimensional structure has not been performed.
+
+    \item \textbf{Cultural and institutional variation.}  The boundary penalties $\beta_k$ are not universal.  Clinical cultures vary: a physician in the US may have different $\beta_{\text{autonomy}}$ from a physician in Japan, where family-centered decision-making is normative.  The framework accommodates this variation (different populations have different $\Sigma$ and $\beta_k$), but the variation must be empirically mapped.
+
+    \item \textbf{Computational tractability.}  Computing the clinical geodesic in real time at the bedside is not the intended use case.  The framework is a \emph{theoretical structure} that explains clinical ethical reasoning and generates testable predictions.  It may also inform decision support tools, policy analysis, and training curricula---but it is not a bedside calculator.
+
+    \item \textbf{The ``is-ought'' boundary.}  The framework describes how clinical ethical decisions \emph{are} made (on a multi-dimensional manifold with heuristic search).  It does not, by itself, prescribe how they \emph{should} be made.  However, it does provide normative leverage: if the framework is descriptively correct, then policies that force clinicians off the clinical geodesic (e.g., QALY-only allocation) are imposing unnecessary moral cost, which is an ``ought'' derived from an ``is'' via the principle that unnecessary harm should be avoided.
+\end{enumerate}
+
+\subsection{Open Problems}
+
+\begin{enumerate}
+    \item \textbf{Estimating $\Sigma$ from clinical behavioral data.}  The highest-priority empirical task.  A concrete study design is proposed in \S\ref{sec:sigma_study} below.  Additional approaches include revealed-preference analysis of clinical decisions in electronic health records (observing which dimensions predict actual choices) and physiological correlates (moral distress biomarkers as proxies for boundary-crossing cost).
+
+    \item \textbf{The dynamics of moral injury recovery.}  If moral injury is cumulative manifold damage (Theorem~\ref{thm:mi_accumulation}), what does recovery look like?  Is the damage truly irreversible, or can boundary penalties be recalibrated through therapeutic intervention?  The framework predicts that recovery involves recalibration of $h(n)$---restoring boundary penalties to pre-injury values---which is distinct from burnout recovery (restoring the capacity to compute $g(n)$).
+
+    \item \textbf{Cross-cultural calibration.}  Mapping the variation in $\Sigma$ and $\beta_k$ across medical cultures (Western vs.\ East Asian, individual-autonomy vs.\ family-centered, public-health vs.\ individual-rights) is a large but tractable empirical programme.
+
+    \item \textbf{AI clinical decision support.}  If clinical decisions are pathfinding on a manifold, AI clinical decision support tools should be built on the manifold, not on scalar outcome metrics.  An AI that recommends treatment options should present the multi-dimensional attribute profile of each option, not just the survival probability.  This connects directly to the AI alignment programme in Geometric Ethics \cite{bond2026geometric}: a well-aligned clinical AI is one whose manifold is calibrated to the patient's, not to the institution's or the developer's.
+\end{enumerate}
+
+
+\subsection{A Concrete Study Design for Estimating $\Sigma$}
+\label{sec:sigma_study}
+
+The $9 \times 9$ clinical-moral covariance matrix $\Sigma$ is the central empirical unknown.  We propose a three-phase study design using existing institutional data supplemented by prospective vignette experiments.
+
+\textbf{Phase 1: Retrospective Ethics Consult Analysis.}  Select a large academic medical center with $\geq 500$ documented ethics committee consultations over 5~years.  For each consultation, two trained coders independently classify the case along the nine manifold dimensions $d_1, \ldots, d_9$, assigning each a severity score on a validated ordinal scale (0 = not activated, 1 = minor concern, 2 = moderate, 3 = dominant).  The $9 \times 9$ sample covariance matrix of these coded scores provides a first-pass estimate of $\Sigma$.  Inter-rater reliability (Cohen's $\kappa$) establishes measurement quality.  The key hypothesis: off-diagonal entries are non-negligible---i.e., dimensions co-activate in structured patterns (e.g., autonomy-trust coupling in end-of-life cases, justice-dignity coupling in resource allocation).
+
+\textbf{Phase 2: Prospective Discrete Choice Experiment.}  Design a set of 36 clinical vignettes using a fractional factorial design that orthogonally varies three dimensions at a time (holding six constant).  Present each vignette to $n \geq 200$ clinicians (stratified by specialty, seniority, and cultural background) and elicit forced-choice preferences between paired treatment options that differ on specified dimensions.  Conditional logit regression on the choice data estimates the marginal rate of substitution between dimensions---i.e., the off-diagonal structure of $\Sigma$.  This is standard discrete choice methodology \cite{drummond2015} applied to the manifold's dimensional structure.
+
+\textbf{Phase 3: Cross-Validation.}  Use the $\Sigma$ estimated in Phases 1--2 to compute predicted clinical geodesics for a held-out set of 50 ethics consultations.  Compare the predicted path (the manifold-optimal decision) with the actual committee recommendation.  The framework is empirically viable if the predicted and actual paths agree in $\geq 70\%$ of cases; it is strongly supported if agreement exceeds that of a QALY-only prediction model applied to the same cases.
+
+This design requires no new instruments, no patient enrollment, and no IRB-regulated intervention---it uses existing consult records and standard survey methodology.  The primary resource requirement is coder training and clinician survey time.
+
+\subsection{Measuring Latent Dimensions for the Clinical Bond Index}
+\label{sec:dimension_measurement}
+
+The Bond Index $\BI(P, S)$ requires quantitative measurement of all nine dimensions for each patient-policy interaction.  Dimensions $d_1$ (clinical outcome), $d_2$ (safety/non-maleficence), $d_6$ (institutional legitimacy), and $d_8$ (legal compliance) are routinely measured in clinical quality registries.  The remaining dimensions require validated proxy instruments:
+
+\begin{itemize}
+    \item \textbf{$d_3$ (Justice/Fairness):}  Measured by the patient-reported Perceived Fairness of Care scale, or computed from policy-level disparities in wait times, denial rates, and resource allocation across demographic strata.
+
+    \item \textbf{$d_4$ (Autonomy):}  Measured by the Decision-Making Participation scale (a component of shared decision-making instruments \cite{elwyn2012}) and by the framing-invariance test proposed in Prediction~3.  A patient whose preferences are framing-variant has low effective $d_4$ regardless of consent documentation.
+
+    \item \textbf{$d_5$ (Trust):}  Measured by the Wake Forest Trust in Physician Scale or the HCAHPS communication composite.  For population-level Bond Index computation, institutional trust can be measured by the proportion of patients who report ``I trust that my doctors have my best interests at heart'' on post-discharge surveys.
+
+    \item \textbf{$d_7$ (Dignity):}  Measured by the Patient Dignity Inventory (PDI) \cite{chochinov2008} for individual patients, or by proxy indicators at the institutional level: use of chemical restraints, involuntary holds as a fraction of psychiatric admissions, and patient-reported experience of being ``treated with respect and dignity'' (an existing HCAHPS item).
+
+    \item \textbf{$d_9$ (Epistemic status):}  Measured by health literacy instruments (e.g., REALM, NVS) combined with disease-specific comprehension assessments.  The gauge-invariance test (framing consistency) provides a behavioral rather than self-report measure.
+\end{itemize}
+
+For each dimension, the measurement yields a score $x_i \in [0, 1]$.  The Bond Index is then $\BI(P, S) = \sum_{i=1}^{9} w_i \cdot \Delta x_i(P, S)$, where $\Delta x_i$ is the dimension-specific cost imposed by policy $P$ on population $S$, and the weights $w_i$ are the diagonal entries of $\Sigma^{-1}$ (so that dimensions with low variance---i.e., dimensions on which there is normative consensus---receive higher weight).  A hospital can compute $\BI$ using data it already collects, supplemented by a single additional survey instrument for the three dimensions (trust, dignity, epistemic status) not in standard quality registries.
+
+
+%==============================================================================
+\section{Conclusion}
+\label{sec:conclusion}
+%==============================================================================
+
+Clinical medicine has operated for decades with a gap between its ethical sophistication and its mathematical tools.  Clinicians reason on a multi-dimensional moral manifold every day---weighing outcomes against autonomy, justice against efficiency, dignity against survival.  The quantitative frameworks available to them (QALYs, utilitarian triage algorithms, cost-effectiveness ratios) operate on a scalar projection that discards most of the moral information they are trying to process.
+
+This paper closes the gap.  The clinical decision complex $\C$ provides the formal structure.  The $A^*$ pathfinding model provides the computational architecture.  The clinical geodesic provides the solution concept.  The Moral Injury Index provides the workforce protection tool.  The clinical Bond Index provides the health equity measurement tool.
+
+Clinical ethics is not a soft science that resists quantification.  It is a geometric science whose geometry has not, until now, been written down.
+
+The manifold exists.  The clinicians are already pathfinding on it.  Now there is a mathematics for what they do.
+
+
+%==============================================================================
+% References
+%==============================================================================
+\begin{thebibliography}{99}
+
+\bibitem{bond2026geometric}
+A.~H. Bond, \emph{Geometric Ethics: The Mathematical Structure of Moral Reasoning}, v1.15, Department of Computer Engineering, San Jos\'{e} State University, Spring 2026.
+
+\bibitem{thiele2026}
+L.~Thiele, ``Independent Replication of MoralVector Decodability and Cross-Lingual Transfer in LaBSE Embeddings,'' Dept.\ Computer Science, UCLA, Tech.\ Rep., 2026.
+
+\bibitem{beauchamp2019}
+T.~L. Beauchamp and J.~F. Childress, \emph{Principles of Biomedical Ethics}, 8th ed.  Oxford University Press, 2019.
+
+\bibitem{weinstein1977}
+M.~C. Weinstein and W.~B. Stason, ``Foundations of Cost-Effectiveness Analysis for Health and Medical Practices,'' \emph{New England Journal of Medicine}, vol.~296, no.~13, pp.~716--721, 1977.
+
+\bibitem{drummond2015}
+M.~F. Drummond, M.~J. Sculpher, K.~Claxton, G.~L. Stoddart, and G.~W. Torrance, \emph{Methods for the Economic Evaluation of Health Care Programmes}, 4th ed.  Oxford University Press, 2015.
+
+\bibitem{jonsen1988}
+A.~R. Jonsen and S.~Toulmin, \emph{The Abuse of Casuistry: A History of Moral Reasoning}.  University of California Press, 1988.
+
+\bibitem{charon2006}
+R.~Charon, \emph{Narrative Medicine: Honoring the Stories of Illness}.  Oxford University Press, 2006.
+
+\bibitem{clouser1990}
+K.~D. Clouser and B.~Gert, ``A Critique of Principlism,'' \emph{The Journal of Medicine and Philosophy}, vol.~15, no.~2, pp.~219--236, 1990.
+
+\bibitem{nice2013}
+National Institute for Health and Care Excellence, ``Guide to the Methods of Technology Appraisal 2013,'' NICE Process and Methods Guides, London, 2013.
+
+\bibitem{harris1987}
+J.~Harris, ``QALYfying the Value of Life,'' \emph{Journal of Medical Ethics}, vol.~13, no.~3, pp.~117--123, 1987.
+
+\bibitem{nord1999}
+E.~Nord, J.~L. Pinto, J.~Richardson, P.~Menzel, and P.~Ubel, ``Incorporating Societal Concerns for Fairness in Numerical Valuations of Health Programmes,'' \emph{Health Economics}, vol.~8, no.~1, pp.~25--39, 1999.
+
+\bibitem{jameton1984}
+A.~Jameton, \emph{Nursing Practice: The Ethical Issues}.  Prentice-Hall, 1984.
+
+\bibitem{epstein2009}
+E.~G. Epstein and A.~B. Hamric, ``Moral Distress, Moral Residue, and the Crescendo Effect,'' \emph{The Journal of Clinical Ethics}, vol.~20, no.~4, pp.~330--342, 2009.
+
+\bibitem{rushton2018}
+C.~H. Rushton, \emph{Moral Resilience: Transforming Moral Suffering in Healthcare}.  Oxford University Press, 2018.
+
+\bibitem{dean2019}
+W.~Dean, S.~Talbot, and A.~Dean, ``Reframing Clinician Distress: Moral Injury Not Burnout,'' \emph{Federal Practitioner}, vol.~36, no.~9, pp.~400--402, 2019.
+
+\bibitem{litz2009}
+B.~T. Litz, N.~Stein, E.~Delaney, L.~Lebowitz, W.~P. Nash, C.~Silva, and S.~Maguen, ``Moral Injury and Moral Repair in War Veterans: A Preliminary Model and Intervention Strategy,'' \emph{Clinical Psychology Review}, vol.~29, no.~8, pp.~695--706, 2009.
+
+\bibitem{charles1997}
+C.~Charles, A.~Gafni, and T.~Whelan, ``Shared Decision-Making in the Medical Encounter: What Does It Mean? (or It Takes at Least Two to Tango),'' \emph{Social Science \& Medicine}, vol.~44, no.~5, pp.~681--692, 1997.
+
+\bibitem{elwyn2012}
+G.~Elwyn, D.~Frosch, R.~Thomson, N.~Joseph-Williams, A.~Lloyd, P.~Kinnersley, E.~Cording, D.~Tomson, C.~Dodd, S.~Rollnick, A.~Edwards, and M.~Barry, ``Shared Decision Making: A Model for Clinical Practice,'' \emph{Journal of General Internal Medicine}, vol.~27, no.~10, pp.~1361--1367, 2012.
+
+\bibitem{gilboy2011}
+N.~Gilboy, T.~Tanabe, D.~Travers, and A.~M. Rosenau, ``Emergency Severity Index (ESI): A Triage Tool for Emergency Department Care,'' Version~4, AHRQ Publication No.\ 12-0014, 2011.
+
+\bibitem{emanuel2020}
+E.~J. Emanuel, G.~Persad, R.~Upshur, B.~Thome, M.~Parker, A.~Glickman, C.~Zhang, C.~Boyle, M.~Smith, and J.~P. Phillips, ``Fair Allocation of Scarce Medical Resources in the Time of Covid-19,'' \emph{New England Journal of Medicine}, vol.~382, no.~21, pp.~2049--2055, 2020.
+
+\bibitem{greenberg2020}
+N.~Greenberg, M.~Docherty, S.~Gnanapragasam, and S.~Wessely, ``Managing Mental Health Challenges Faced by Healthcare Workers During Covid-19 Pandemic,'' \emph{BMJ}, vol.~368, m1211, 2020.
+
+\bibitem{maslach1981}
+C.~Maslach and S.~E. Jackson, ``The Measurement of Experienced Burnout,'' \emph{Journal of Organizational Behavior}, vol.~2, no.~2, pp.~99--113, 1981.
+
+\bibitem{hamric2012}
+A.~B. Hamric, C.~T. Borchers, and E.~G. Epstein, ``Development and Testing of an Instrument to Measure Moral Distress in Healthcare Professionals,'' \emph{AJOB Primary Research}, vol.~3, no.~2, pp.~1--9, 2012.
+
+\bibitem{zhizhong2019}
+W.~Zhizhong, J.~Koenig, S.~G.~Y. Yan, C.~Al Shohaib, and H.~G. Koenig, ``Psychometric Properties of the Moral Injury Symptom Scale Among Chinese Health Professionals During the COVID-19 Pandemic,'' \emph{Frontiers in Psychiatry}, vol.~11, 571354, 2020.
+
+\bibitem{washington2006}
+H.~A. Washington, \emph{Medical Apartheid: The Dark History of Medical Experimentation on Black Americans from Colonial Times to the Present}.  Doubleday, 2006.
+
+\bibitem{hart1968}
+P.~E. Hart, N.~J. Nilsson, and B.~Raphael, ``A Formal Basis for the Heuristic Determination of Minimum Cost Paths,'' \emph{IEEE Transactions on Systems Science and Cybernetics}, vol.~4, no.~2, pp.~100--107, 1968.
+
+\bibitem{chochinov2008}
+H.~M. Chochinov, T.~Hassard, S.~McClement, T.~Hack, L.~J. Kristjanson, M.~Harlos, S.~Sinclair, and A.~Murray, ``The Patient Dignity Inventory: A Novel Way of Measuring Dignity-Related Distress in Palliative Care,'' \emph{Journal of Pain and Symptom Management}, vol.~36, no.~6, pp.~559--571, 2008.
+
+\end{thebibliography}
+
+\end{document}

@@ -1,0 +1,805 @@
+\documentclass[12pt]{article}
+
+% Standard math and formatting packages
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{amsmath,amssymb,amsthm}
+\usepackage{mathrsfs}
+\usepackage{geometry}
+\usepackage{hyperref}
+\usepackage{url}
+\usepackage{cleveref}
+\usepackage{enumitem}
+\usepackage{booktabs}
+\usepackage{tabularx}
+
+\geometry{margin=1in}
+
+% Theorem environments
+\newtheorem{theorem}{Theorem}[section]
+\newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{corollary}[theorem]{Corollary}
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{claim}{Claim}
+
+\theoremstyle{definition}
+\newtheorem{definition}[theorem]{Definition}
+\newtheorem{axiom}{Axiom}
+
+\theoremstyle{remark}
+\newtheorem{remark}[theorem]{Remark}
+
+% Custom commands
+\newcommand{\calX}{\mathcal{X}}
+\newcommand{\calM}{\mathcal{M}}
+\newcommand{\calG}{\mathcal{G}}
+\newcommand{\Sigmabar}{\bar{\Sigma}}
+\newcommand{\fg}{\mathfrak{g}}
+
+\title{\textbf{Foundations of Invariant Evaluation:\\
+A Conservative Framework for\\
+Representation-Independent Reasoning}\\[10pt]
+\large Grounding, Canonicalization, and Invariance as\\
+Design Principles for Trustworthy Systems}
+
+\author{Anonymous Author(s)}
+
+\date{}
+
+\begin{document}
+
+\maketitle
+
+\noindent\textbf{Keywords:} representation-independence, gauge theory, grounding axiom, canonicalization, invariant evaluation, fiber bundles, Noether's theorem, AI safety, alignment, ethics
+
+\begin{abstract}
+We develop a framework for evaluation systems---whether ethical, safety-critical, or
+physical---that must produce consistent outputs regardless of how inputs are represented.
+We do \emph{not} claim to solve the alignment problem, prove metaphysical theses, or provide
+guarantees independent of implementation. Rather, we identify \emph{necessary conditions} for
+representation-independence and show these conditions have the mathematical structure
+of gauge theory. Specifically: (1) evaluation must factor through a declared grounding in
+observables; (2) equivalent representations must be identified via canonicalization; (3) evaluation must be invariant under the resulting equivalence relation. When a system satisfies
+these conditions and the Lagrangian formulation applies, Noether's theorem implies conservation of a quantity we call the ``alignment current.'' The framework's guarantees are
+\emph{conditional} on adequate grounding, correct implementation, and applicability of the continuous symmetry assumptions. We make explicit what the framework does and does not
+establish.
+\end{abstract}
+
+\tableofcontents
+
+\newpage
+
+%=============================================================================
+\section{Introduction}
+%=============================================================================
+
+\subsection{The Problem}
+
+Consider systems that must evaluate configurations, actions, or states:
+
+\begin{itemize}
+    \item An AI system evaluating whether an action is safe
+    \item A control system evaluating whether a state satisfies constraints
+    \item An ethical reasoning system evaluating whether an action is permissible
+\end{itemize}
+
+A common failure mode: the evaluation depends not only on the \emph{situation} but also on how
+the situation is \emph{represented}. Changing labels, reordering options, or reformulating descriptions
+changes the output, even when the underlying situation is unchanged.
+
+\begin{definition}[Representation-Dependence]\label{def:rep-dep}
+An evaluation function $\Sigma : \calX \to V$ is \textbf{representation-dependent} if there exist $x, x' \in \calX$ such that:
+\begin{enumerate}
+    \item $x$ and $x'$ represent the same underlying situation (by some criterion)
+    \item $\Sigma(x) \neq \Sigma(x')$
+\end{enumerate}
+\end{definition}
+
+\textbf{Goal:} Identify conditions under which evaluation is \emph{representation-independent}. The broader Geometric Ethics framework, which develops these ideas into a full tensorial theory of moral reasoning, is presented in~\cite{bond2026ge}; a reference implementation is available as ErisML/DEME v3.0~\cite{bond2026erisml}.
+
+\subsection{Scope and Limitations}
+
+\textbf{Scope Limitation:} This paper provides \emph{sufficient conditions} for representation-independence
+within a specified formal framework. It does \emph{not}:
+
+\begin{itemize}
+    \item Prove that these conditions are the \emph{only} way to achieve representation-independence
+    \item Guarantee correct behavior if the grounding is inadequate or implementation is faulty
+    \item Establish metaphysical claims about the nature of reality, logic, or causation
+    \item Solve the ``hard problem'' of choosing which features are morally or physically relevant
+\end{itemize}
+
+The framework tells you: \emph{if} you can specify adequate grounding and \emph{if} you implement
+correctly, \emph{then} certain guarantees follow.
+
+\subsection{Structure of the Paper}
+
+Section 2 motivates the framework by examining why purely formal approaches face limitations.
+Section 3 presents the core definitions and axioms. Section 4 develops the mathematical structure. Section 5 states and proves the main results. Section 6 discusses applications. Section 7
+addresses limitations explicitly.
+
+%=============================================================================
+\section{Motivation: Limitations of Purely Formal Approaches}
+%=============================================================================
+
+We present three observations that motivate the need for grounding. These are not metaphysical
+claims but observations about the structure of formal systems.
+
+\subsection{Observation 1: Formal Systems Do Not Determine Their Own Interpretation}
+
+\begin{claim}[Interpretation Underdetermination]\label{claim:interp}
+A formal system $F$ consisting of symbols and
+inference rules does not, by itself, determine what its symbols refer to or whether its theorems
+are true of any particular domain.
+\end{claim}
+
+\textbf{Support:} This is a standard result in mathematical logic. Any consistent first-order theory
+with infinite models has models of every infinite cardinality (L\"{o}wenheim--Skolem). The same
+axioms can be satisfied by vastly different structures. The formal system alone does not pick
+out the ``intended'' model.
+
+\textbf{Consequence:} Derivability within a formal system ($F \vdash \phi$) does not establish truth in any
+particular domain without an additional specification of how the system is interpreted.
+
+\begin{quote}
+\textbf{Scope Limitation:} We are not claiming formal systems are useless or that logic is arbitrary.
+We are claiming that formal derivability alone is insufficient to establish claims about specific
+domains without interpretation.
+\end{quote}
+
+\subsection{Observation 2: G\"{o}del's Theorems Limit Self-Certification}
+
+\begin{theorem}[G\"{o}del's Second Incompleteness Theorem]\label{thm:godel}
+If $F$ is a consistent formal system
+capable of expressing basic arithmetic, then $F$ cannot prove its own consistency.
+\end{theorem}
+
+\textbf{Consequence for our purposes:} A formal system cannot, from within, certify that its
+axioms are consistent or that its theorems correspond to truths about an intended domain.
+External verification or grounding is required.
+
+\begin{quote}
+\textbf{Scope Limitation:} G\"{o}del's theorems apply to sufficiently powerful formal systems (those
+capable of expressing arithmetic). They do not apply to all formal systems. We cite them
+to illustrate a general point: formal systems have inherent limitations on self-certification.
+\end{quote}
+
+\subsection{Observation 3: Multiple Logics Are Internally Coherent}
+
+Classical logic, intuitionistic logic, relevant logic, and various modal logics are all internally
+coherent formal systems. They differ in their theorems (e.g., excluded middle is a theorem of
+classical but not intuitionistic logic).
+
+\textbf{Consequence:} There is no purely formal argument establishing that one logic is the ``correct'' logic for all domains. The choice of logic is, in part, a choice of tool for a purpose.
+
+\begin{quote}
+\textbf{Scope Limitation:} We are not endorsing global logical relativism. Classical logic may well
+be correct for most purposes. The point is that the choice cannot be made on purely formal
+grounds; it requires some criterion external to the formalisms being compared.
+\end{quote}
+
+\subsection{The Upshot}
+
+These observations suggest that trustworthy evaluation requires something beyond formal derivability: a specification of \emph{what the formal system is about} and \emph{how it connects to the domain of
+application}. We call this specification \textbf{grounding}.
+
+%=============================================================================
+\section{The Formal Framework}
+%=============================================================================
+
+We now present the framework precisely. All claims in this section are definitions or axioms,
+not empirical claims about the world.
+
+\subsection{Basic Structures}
+
+\begin{definition}[Representation Space]\label{def:rep-space}
+A \textbf{representation space} is a set $\calX$ whose elements are
+representations (descriptions, encodings, formulations) of situations in some domain of interest.
+\end{definition}
+
+\begin{definition}[Value Space]\label{def:val-space}
+A \textbf{value space} is a set $V$ (typically $\mathbb{R}$, $\{0,1\}$, or a partial order)
+representing possible evaluation outputs.
+\end{definition}
+
+\begin{definition}[Evaluation Function]\label{def:eval-func}
+An \textbf{evaluation function} is a map $\Sigma : \calX \to V$ assigning
+evaluations to representations.
+\end{definition}
+
+\subsection{The Grounding Axiom}
+
+The key idea: evaluation should depend on \emph{what is measured}, not on \emph{how it is described}.
+
+\begin{axiom}[Grounding]\label{ax:grounding}
+There exists:
+\begin{enumerate}[label=(\alph*)]
+    \item A \textbf{measurement space} $\calM \subseteq \mathbb{R}^N$ for some $N \in \mathbb{N}$
+    \item A \textbf{grounding map} $\Psi : \calX \to \calM$
+    \item A \textbf{grounded evaluation} $\Sigmabar : \calM \to V$
+\end{enumerate}
+such that for all $x \in \calX$:
+\[
+    \Sigma(x) = \Sigmabar(\Psi(x))
+\]
+\end{axiom}
+
+\textbf{Interpretation:}
+\begin{itemize}
+    \item $\calM$ represents measurement outcomes (what sensors report)
+    \item $\Psi$ extracts measurements from representations
+    \item $\Sigmabar$ operates on measurements, not descriptions
+    \item The axiom requires that $\Sigma$ factors through $\Psi$
+\end{itemize}
+
+\begin{remark}[What Grounding Does Not Guarantee]\label{rem:grounding-limit}
+The Grounding Axiom does not guarantee that $\Psi$ captures all relevant features. If $\Psi$ omits morally or physically relevant aspects
+of the situation, evaluation may be ``grounded'' but still inadequate. The adequacy of $\Psi$ is a
+domain-specific question outside the scope of the formal framework.
+\end{remark}
+
+\subsection{The Equivalence Relation}
+
+Grounding induces an equivalence relation on representations.
+
+\begin{definition}[Grounding Equivalence]\label{def:grounding-equiv}
+Two representations $x, x' \in \calX$ are \textbf{grounding-equivalent}, written $x \sim_\Psi x'$, if and only if $\Psi(x) = \Psi(x')$.
+\end{definition}
+
+\begin{proposition}[Invariance Under Equivalence]\label{prop:inv-equiv}
+If Axiom~\ref{ax:grounding} holds, then $\Sigma$ is constant on
+equivalence classes:
+\[
+    x \sim_\Psi x' \implies \Sigma(x) = \Sigma(x')
+\]
+\end{proposition}
+
+\begin{proof}
+$x \sim_\Psi x'$ means $\Psi(x) = \Psi(x')$. By Axiom~\ref{ax:grounding}, $\Sigma(x) = \Sigmabar(\Psi(x)) = \Sigmabar(\Psi(x')) = \Sigma(x')$.
+\end{proof}
+
+\subsection{The Canonicalization Axiom}
+
+A canonicalizer selects a unique representative from each equivalence class.
+
+\begin{axiom}[Canonicalization]\label{ax:canon}
+There exists a \textbf{canonicalizer} $\kappa : \calX \to \calX$ satisfying:
+\begin{enumerate}[label=(\alph*)]
+    \item \textbf{Idempotence:} $\kappa(\kappa(x)) = \kappa(x)$ for all $x \in \calX$
+    \item \textbf{Equivalence-class collapse:} $x \sim_\Psi x' \implies \kappa(x) = \kappa(x')$
+    \item \textbf{Grounding preservation:} $\Psi(\kappa(x)) = \Psi(x)$ for all $x \in \calX$
+\end{enumerate}
+\end{axiom}
+
+\begin{proposition}[Canonicalization Yields Representative]\label{prop:canon-rep}
+Under Axiom~\ref{ax:canon}, $\kappa(x)$ is a well-defined representative of the equivalence class $[x]_\Psi$.
+\end{proposition}
+
+\begin{proof}
+By (b), $\kappa$ maps all elements of $[x]_\Psi$ to the same element. By (c), this element is in $[x]_\Psi$.
+By (a), it is a fixed point of $\kappa$.
+\end{proof}
+
+\subsection{The Transformation Group}
+
+\begin{definition}[Structure-Preserving Transformations]\label{def:struct-group}
+The \textbf{structure group} $\calG$ is the set of
+bijections $g : \calX \to \calX$ that preserve grounding:
+\[
+    \calG := \{g : \calX \to \calX \mid g \text{ is a bijection and } \Psi(g(x)) = \Psi(x) \text{ for all } x\}
+\]
+\end{definition}
+
+\begin{proposition}[$\calG$ is a Group]\label{prop:group}
+$\calG$ forms a group under composition.
+\end{proposition}
+
+\begin{proof}
+Identity: $\mathrm{id} \in \calG$ (trivially preserves $\Psi$). Closure: if $g, h \in \calG$, then $\Psi(gh(x)) = \Psi(h(x)) =
+\Psi(x)$. Inverse: if $g \in \calG$ and $y = g(x)$, then $\Psi(g^{-1}(y)) = \Psi(x) = \Psi(g(x)) = \Psi(y)$.
+\end{proof}
+
+\subsection{The Invariance Theorem}
+
+\begin{theorem}[Invariance]\label{thm:invariance}
+If Axiom~\ref{ax:grounding} holds, then $\Sigma$ is $\calG$-invariant:
+\[
+    \Sigma(g(x)) = \Sigma(x) \quad \forall g \in \calG,\; x \in \calX
+\]
+\end{theorem}
+
+\begin{proof}
+Let $g \in \calG$. By definition, $\Psi(g(x)) = \Psi(x)$. By Axiom~\ref{ax:grounding}, $\Sigma(g(x)) = \Sigmabar(\Psi(g(x))) =
+\Sigmabar(\Psi(x)) = \Sigma(x)$.
+\end{proof}
+
+\begin{remark}[Converse]\label{rem:converse}
+The converse is also true under mild conditions: if $\Sigma$ is $\calG$-invariant
+and $\calG$ acts transitively on $\Psi$-equivalence classes, then $\Sigma$ factors through $\Psi$.
+\end{remark}
+
+%=============================================================================
+\section{The Geometric Structure}
+%=============================================================================
+
+We now show that the framework has the structure of a principal fiber bundle. This section
+assumes familiarity with differential geometry; readers primarily interested in applications may
+skip to Section~5.
+
+\subsection{Bundle Structure}
+
+\begin{definition}[Principal Bundle Conditions]\label{def:bundle-cond}
+The quadruple $(\calX, \calM, \Psi, \calG)$ satisfies \textbf{principal
+bundle conditions} if:
+\end{definition}
+
+\begin{enumerate}[label=(PB\arabic*)]
+    \item $\calG$ acts freely on $\calX$: $g(x) = x \implies g = \mathrm{id}$
+    \item $\calG$ acts transitively on fibers: $\Psi(x) = \Psi(x') \implies \exists g \in \calG : g(x) = x'$
+    \item $\Psi : \calX \to \calM$ is surjective
+    \item (Smoothness, if applicable): $\calX$, $\calM$ are smooth manifolds; $\calG$ is a Lie group; $\Psi$ is a smooth submersion
+\end{enumerate}
+
+\begin{theorem}[Bundle Structure]\label{thm:bundle}
+Under conditions (PB1)--(PB3), $\Psi : \calX \to \calM$ is a principal
+$\calG$-bundle in the topological sense. Under (PB1)--(PB4), it is a smooth principal bundle.
+\end{theorem}
+
+\begin{proof}
+(PB1) gives freeness. (PB2) implies orbits equal fibers. (PB3) gives surjectivity. The
+quotient $\calX/\calG \cong \calM$ follows. For the smooth case, (PB4) plus standard results on Lie group
+actions give local triviality.
+\end{proof}
+
+\begin{quote}
+\textbf{Scope Limitation:} The bundle structure requires (PB1)--(PB2), which are substantive
+assumptions. Not all grounding setups satisfy them. When they fail, the geometric picture
+is only partially applicable.
+\end{quote}
+
+\subsection{Connection and Curvature}
+
+\begin{definition}[Connection via Section]\label{def:connection}
+A global section $\sigma : \calM \to \calX$ satisfying $\Psi \circ \sigma = \mathrm{id}_\calM$
+determines a connection on the bundle.
+\end{definition}
+
+\begin{theorem}[Canonicalization Gives Section]\label{thm:canon-section}
+Under Axioms~\ref{ax:grounding} and~\ref{ax:canon}, if the bundle conditions
+(PB1)--(PB2) hold, then $\kappa$ induces a global section $\sigma : \calM \to \calX$ defined by:
+\[
+    \sigma(m) := \kappa(x) \quad \text{for any } x \in \Psi^{-1}(m)
+\]
+\end{theorem}
+
+\begin{proof}
+By Axiom~\ref{ax:canon}(b), $\kappa(x) = \kappa(x')$ whenever $\Psi(x) = \Psi(x')$, so $\sigma$ is well-defined. By Axiom~\ref{ax:canon}(c), $\Psi(\sigma(m)) = \Psi(\kappa(x)) = \Psi(x) = m$, so $\Psi \circ \sigma = \mathrm{id}_\calM$.
+\end{proof}
+
+\begin{theorem}[Flatness]\label{thm:flatness}
+The connection determined by a global section has zero curvature.
+\end{theorem}
+
+\begin{proof}
+A global section trivializes the bundle: $\calX \cong \calM \times \calG$ via $(m, g) \mapsto \sigma(m) \cdot g$. In a trivial
+bundle, the canonical flat connection has curvature $\Omega = d\omega + \frac{1}{2}[\omega, \omega] = 0$ (Maurer--Cartan
+equation on the $\calG$ factor).
+\end{proof}
+
+\begin{remark}[Interpretation of Flatness]\label{rem:flatness}
+Flatness means parallel transport is path-independent:
+representations can be ``moved'' between fibers without holonomy. Physically, this reflects that
+representational choices have no intrinsic structure---they are ``pure gauge.''
+\end{remark}
+
+%=============================================================================
+\section{Conservation Results}
+%=============================================================================
+
+This section shows that, under additional assumptions, invariance implies conservation. The
+results require a Lagrangian formulation, which may not apply in all contexts.
+
+\subsection{The Lagrangian Setting}
+
+\begin{definition}[Decision Lagrangian]\label{def:lagrangian}
+Suppose $\calX$ and $\calM$ are smooth manifolds. A \textbf{decision
+Lagrangian} is a function $L : T\calX \to \mathbb{R}$ of the form:
+\begin{equation}\label{eq:lagrangian}
+    L(x, \dot{x}) = K(\dot{x}) - U(\Psi(x)) - \frac{\lambda}{2}\|\omega(\dot{x})\|^2_\fg
+\end{equation}
+where:
+\begin{itemize}
+    \item $K$ is a kinetic term (cost of deliberation)
+    \item $U : \calM \to \mathbb{R}$ is a potential (negative of grounded evaluation)
+    \item $\omega$ is the connection form
+    \item $\lambda > 0$ is a coupling constant
+    \item $\|\cdot\|_\fg$ is an -invariant norm on the Lie algebra $\fg$
+\end{itemize}
+\end{definition}
+
+\begin{quote}
+\textbf{Scope Limitation:} The Lagrangian formulation assumes continuous dynamics on smooth
+manifolds. It applies to systems whose evolution can be described by differential equations.
+Discrete systems, non-smooth dynamics, and systems without natural ``kinetic'' interpretations require separate analysis.
+\end{quote}
+
+\subsection{Noether's Theorem}
+
+\begin{theorem}[Noether]\label{thm:noether}
+Let $L : TQ \to \mathbb{R}$ be a Lagrangian on configuration space $Q$. If a
+one-parameter group $\{\phi_s\}_{s \in \mathbb{R}}$ satisfies $L \circ d\phi_s = L$ (symmetry), then the quantity
+\[
+    Q_\xi := \left\langle \frac{\partial L}{\partial \dot{q}}, \xi \right\rangle
+\]
+is constant along solutions of the Euler--Lagrange equations, where $\xi = \frac{d}{ds}\big|_{s=0} \phi_s(q)$ is the infinitesimal generator.
+\end{theorem}
+
+\begin{proof}
+Standard. See Arnold, \emph{Mathematical Methods of Classical Mechanics}, Chapter 4.
+\end{proof}
+
+\subsection{Conservation of Alignment}
+
+\begin{theorem}[Alignment Current]\label{thm:alignment}
+For the Lagrangian~\eqref{eq:lagrangian}, the gauge symmetry $x \mapsto x \cdot g$
+implies a conserved current:
+\[
+    J := \lambda\omega(\dot{x}) \in \fg
+\]
+satisfying $\frac{d}{dt}J = 0$ along Euler--Lagrange trajectories.
+\end{theorem}
+
+\begin{proof}
+The Lagrangian is $\calG$-invariant by construction: $K$ depends only on velocity magnitude;
+$U$ depends only on $\Psi(x)$ which is $\calG$-invariant; $\|\omega(\dot{x})\|$ is -invariant. Apply Theorem~\ref{thm:noether} to the
+one-parameter subgroups of $\calG$.
+\end{proof}
+
+\begin{corollary}[Horizontal Trajectories are Preserved]\label{cor:horizontal}
+If $\omega(\dot{x}(0)) = 0$ (trajectory starts horizontal), then $\omega(\dot{x}(t)) = 0$ for all $t$.
+\end{corollary}
+
+\begin{proof}
+$J(t) = \lambda\omega(\dot{x}(t)) = J(0) = 0$ by conservation.
+\end{proof}
+
+\begin{remark}[Interpretation]\label{rem:horizontal}
+``Horizontal'' means the trajectory has no component in the
+fiber direction---it moves only in the base (physical) directions. Corollary~\ref{cor:horizontal} says: \emph{a system
+that starts responding only to physical states, not to representational artifacts, continues to do
+so}.
+\end{remark}
+
+\begin{quote}
+\textbf{Scope Limitation:} Conservation requires: (1) the Lagrangian formulation applies, (2) the
+symmetry is continuous (Lie group), (3) dynamics follow Euler--Lagrange equations. For
+discrete symmetry groups (e.g., permutations) or non-Lagrangian dynamics, conservation in
+this form does not apply. The invariance results (Section 4) still hold; only the dynamical
+conservation fails.
+\end{quote}
+
+%=============================================================================
+\section{Applications}
+%=============================================================================
+
+\subsection{Application to Ethics: The Bond Invariance Principle}
+
+\begin{definition}[Bond]\label{def:bond}
+A \textbf{bond} is a morally relevant relationship between entities, represented
+as a tuple $b = (a, p, r, c)$ where $a$ is an agent, $p$ is a patient, $r$ is a relation type, and $c$ is context.
+\end{definition}
+
+\begin{definition}[Bond Structure]\label{def:bond-structure}
+The \textbf{bond structure} $B(x)$ of a representation $x$ is the set
+of all bonds encoded in $x$.
+\end{definition}
+
+\textbf{Instantiation of the framework:}
+\begin{itemize}
+    \item $\Psi(x) := B(x)$ (grounding in bond structure)
+    \item $\calG :=$ bond-preserving transformations (relabeling, reordering that preserve $B$)
+    \item $\Sigma :=$ moral evaluation function
+\end{itemize}
+
+\begin{corollary}[Bond Invariance Principle]\label{cor:bip}
+If moral evaluation satisfies Axiom~\ref{ax:grounding} with $\Psi = B$,
+then:
+\[
+    B(x) = B(x') \implies \Sigma(x) = \Sigma(x')
+\]
+Moral judgments are invariant under bond-preserving transformations.
+\end{corollary}
+
+\begin{quote}
+\textbf{Scope Limitation:} This does not tell us \emph{which} relationships are morally relevant (the
+content of $B$). It says: \emph{whatever you count as morally relevant, evaluation should depend
+only on that, not on representational choices}. The choice of $B$ is a substantive ethical
+question outside the formal framework.
+\end{quote}
+
+\subsection{Application to Control Systems}
+
+\textbf{Instantiation for plasma control:}
+\begin{itemize}
+    \item $\Psi(x) := (\bar{n}, I_p, \beta_N, \ldots)$ (measured plasma parameters)
+    \item $\calG :=$ unit changes, coordinate transformations
+    \item $\Sigma :=$ control objective / safety score
+\end{itemize}
+
+\begin{corollary}[Unit Invariance]\label{cor:unit-inv}
+If a controller satisfies Axiom~\ref{ax:grounding}, its outputs are independent
+of unit conventions.
+\end{corollary}
+
+\begin{corollary}[Dimensionless Transfer]\label{cor:dimless}
+If $\Psi$ consists of dimensionless quantities, controllers
+transfer across systems with different physical scales.
+\end{corollary}
+
+\subsection{Application to AI Safety}
+
+\textbf{Instantiation for AI containment:}
+\begin{itemize}
+    \item $\Psi(x) :=$ sensor readings, physical observables
+    \item $\calG :=$ representational manipulations (relabeling, redescription)
+    \item $\Sigma :=$ safety/alignment score
+\end{itemize}
+
+\begin{theorem}[Representation Attack Immunity]\label{thm:attack-immune}
+If an AI system's evaluation satisfies Axiom~\ref{ax:grounding}, then for any $\Psi$-preserving manipulation $g \in \calG$:
+\[
+    \Sigma(g(x)) = \Sigma(x)
+\]
+The manipulation does not change the evaluation.
+\end{theorem}
+
+\begin{proof}
+Immediate from Theorem~\ref{thm:invariance}.
+\end{proof}
+
+\begin{quote}
+\textbf{Scope Limitation:} Theorem~\ref{thm:attack-immune} blocks \emph{representational} attacks (relabeling, redescription).
+It does \emph{not} block:
+\begin{itemize}
+    \item Physical attacks (sensor spoofing)
+    \item Attacks that change $\Psi$-values (actual physical manipulation)
+    \item Attacks on the implementation of $\kappa$, $\Psi$, or $\Sigma$
+    \item Inadequacy of $\Psi$ (missing relevant features)
+\end{itemize}
+The theorem's scope is precisely: \emph{given correct implementation and adequate grounding,
+representational evasion fails}.
+\end{quote}
+
+%=============================================================================
+\section{Limitations and Non-Claims}
+%=============================================================================
+
+We explicitly state what the framework does \emph{not} establish.
+
+\subsection{The Framework Does Not Solve the Grounding Problem}
+
+\begin{claim}[Grounding is Assumed, Not Derived]\label{claim:grounding-assumed}
+The framework assumes a grounding map $\Psi$
+is given. It provides no procedure for:
+\begin{itemize}
+    \item Determining which features are morally/physically relevant
+    \item Verifying that $\Psi$ is adequate for the domain
+    \item Discovering that $\Psi$ is missing important features
+\end{itemize}
+\end{claim}
+
+\textbf{Consequence:} A system can satisfy all formal requirements of the framework while being
+inadequately grounded. The framework makes explicit \emph{what must be specified} ($\Psi$) and \emph{what
+properties follow if it is specified correctly}, but the correctness of $\Psi$ itself is a domain-specific
+judgment.
+
+\subsection{The Framework Does Not Guarantee Implementation Correctness}
+
+\begin{claim}[Implementation is Assumed, Not Verified]\label{claim:impl}
+The framework's guarantees are conditional on:
+\begin{itemize}
+    \item Correct implementation of $\kappa$, $\Psi$, and $\Sigma$
+    \item Correct implementation of the trusted computing base
+    \item Physical security of sensors and actuators
+\end{itemize}
+\end{claim}
+
+\textbf{Consequence:} Bugs, hardware failures, or security breaches can violate the guarantees.
+The framework is a design specification, not a correctness proof for any particular implementation.
+
+\subsection{Conservation Requires Continuous Symmetry and Lagrangian Dynamics}
+
+\begin{claim}[Conservation Has Preconditions]\label{claim:conservation}
+The conservation results (Theorem~\ref{thm:alignment}, Corollary~\ref{cor:horizontal}) require:
+\begin{itemize}
+    \item $\calG$ is a Lie group (continuous symmetry)
+    \item Dynamics are governed by a Lagrangian
+    \item The system evolves according to Euler--Lagrange equations
+\end{itemize}
+\end{claim}
+
+For discrete $\calG$ (e.g., permutation groups) or non-Lagrangian dynamics, conservation in this form
+does not hold.
+
+\textbf{Consequence:} The invariance results (Theorem~\ref{thm:invariance}) are more general than the conservation results. Invariance holds whenever Axiom~\ref{ax:grounding} holds; conservation requires additional
+structure.
+
+\subsection{The Framework Does Not Establish Metaphysical Claims}
+
+\begin{claim}[No Metaphysical Commitments]\label{claim:metaphysics}
+The framework does not establish:
+\begin{itemize}
+    \item That reality has any particular structure
+    \item That logic, causation, or modality work in any particular way
+    \item That grounding in observables is the only way to achieve trustworthiness
+\end{itemize}
+\end{claim}
+
+The framework is a \emph{conditional}: if you want representation-independence, and if you can
+specify adequate grounding, then these mathematical structures provide it. The framework is
+compatible with many metaphysical views.
+
+\subsection{Summary of Claims}
+
+\begin{table}[h]
+\centering
+\begin{tabular}{lll}
+\toprule
+\textbf{Claim} & \textbf{Established?} & \textbf{Requires} \\
+\midrule
+Grounding $\Rightarrow$ Invariance & Yes & Axiom~\ref{ax:grounding} \\
+Bundle structure exists & Yes & (PB1)--(PB3) \\
+Canonicalization gives section & Yes & Axioms~\ref{ax:grounding},~\ref{ax:canon}, (PB1)--(PB2) \\
+Connection is flat & Yes & Global section exists \\
+Alignment current is conserved & Yes & Lagrangian, Lie group $\calG$, E-L dynamics \\
+$\Psi$ is adequate & \textbf{No} & Domain expertise \\
+Implementation is correct & \textbf{No} & Verification \\
+All attacks are blocked & \textbf{No} & Only representational attacks \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+%=============================================================================
+\section{Conclusion}
+%=============================================================================
+
+\subsection{What We Have Established}
+
+\begin{enumerate}
+    \item \textbf{Definition:} Representation-independence means evaluation factors through a grounding
+    map.
+    \item \textbf{Sufficient conditions:} Axioms~\ref{ax:grounding} and~\ref{ax:canon} suffice for representation-independence.
+    \item \textbf{Mathematical structure:} Under principal bundle conditions, the framework has gauge-theoretic structure with flat connection.
+    \item \textbf{Conservation:} Under Lagrangian dynamics with continuous symmetry, alignment is
+    conserved.
+    \item \textbf{Applications:} The framework instantiates in ethics (BIP), control (unit invariance), and
+    AI safety (representation attack immunity).
+\end{enumerate}
+
+\subsection{What Remains Open}
+
+\begin{enumerate}
+    \item \textbf{Grounding selection:} How to choose $\Psi$ for a given domain.
+    \item \textbf{Adequacy verification:} How to determine if $\Psi$ is adequate.
+    \item \textbf{Implementation:} How to correctly implement $\kappa$, $\Psi$, $\Sigma$.
+    \item \textbf{Discrete symmetries:} Conservation-like results for non-Lie groups.
+    \item \textbf{Non-Lagrangian systems:} Dynamical guarantees without variational structure.
+\end{enumerate}
+
+\subsection{The Conservative Claim}
+
+We make a conservative claim:
+
+\begin{quote}
+\textbf{If} you can specify a grounding map $\Psi$ that captures the relevant features of your domain, \textbf{and if} you correctly implement canonicalization and grounded evaluation, \textbf{then} your
+evaluation will be representation-independent in the precise sense that $\calG$-transformations
+do not change outputs.
+
+Under additional assumptions (Lagrangian dynamics, continuous symmetry), alignment
+is conserved: systems that start responding only to grounded features continue to do so.
+
+The framework does not tell you what to ground in, does not verify your implementation,
+and does not block non-representational attacks. It provides structure, not magic.
+\end{quote}
+
+%=============================================================================
+\appendix
+%=============================================================================
+
+\section{Proof of Theorem~\ref{thm:bundle}}\label{app:bundle-proof}
+
+\begin{proof}
+We verify the principal bundle axioms.
+
+\textbf{Free action:} (PB1) states $g(x) = x \implies g = \mathrm{id}$, which is the definition of free action.
+
+\textbf{Transitive action on fibers:} (PB2) states that for any $x, x'$ with $\Psi(x) = \Psi(x')$, there
+exists $g$ with $g(x) = x'$. This means $\calG$ acts transitively on each fiber $\Psi^{-1}(m)$.
+
+\textbf{Orbits equal fibers:} If $x' = g(x)$ for some $g \in \calG$, then $\Psi(x') = \Psi(g(x)) = \Psi(x)$ (since $g$
+preserves $\Psi$). So orbits are contained in fibers. By (PB2), fibers are contained in orbits. Hence
+orbits equal fibers.
+
+\textbf{Base space:} $\calM = \calX/\calG$ follows from orbits equaling fibers. (PB3) ensures $\Psi$ is surjective.
+
+\textbf{Local triviality (smooth case):} Under (PB4), $\Psi$ is a smooth submersion with $\calG$ a Lie
+group acting freely and properly. Standard results (e.g., Lee, \emph{Introduction to Smooth Manifolds},
+Theorem 21.10) give local triviality.
+\end{proof}
+
+\section{Relationship to Physics Literature}\label{app:physics}
+
+The gauge-theoretic structure we describe is standard in differential geometry and mathematical
+physics:
+
+\begin{itemize}
+    \item \textbf{Principal bundles:} Kobayashi \& Nomizu, \emph{Foundations of Differential Geometry}
+    \item \textbf{Connections and curvature:} Nakahara, \emph{Geometry, Topology and Physics}
+    \item \textbf{Noether's theorem:} Arnold, \emph{Mathematical Methods of Classical Mechanics}
+    \item \textbf{Gauge theory in physics:} Bleecker, \emph{Gauge Theory and Variational Principles}
+\end{itemize}
+
+Our contribution is not to the mathematics of gauge theory but to its application as a
+framework for representation-independent evaluation.
+
+\section{Glossary}\label{app:glossary}
+
+\begin{table}[h]
+\centering
+\begin{tabularx}{\textwidth}{lX}
+\toprule
+\textbf{Term} & \textbf{Definition} \\
+\midrule
+Grounding map $\Psi$ & Function extracting measurements from representations \\
+Canonicalizer $\kappa$ & Function selecting unique representative per equivalence class \\
+Structure group $\calG$ & Group of $\Psi$-preserving transformations \\
+Grounding equivalence $\sim_\Psi$ & $x \sim_\Psi x'$ iff $\Psi(x) = \Psi(x')$ \\
+Principal bundle & Fiber bundle where fibers are group orbits \\
+Connection & Specification of ``horizontal'' directions in bundle \\
+Flat connection & Connection with zero curvature \\
+Noether current & Conserved quantity from continuous symmetry \\
+BIP & Bond Invariance Principle: moral invariance under bond-preserving transformations \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+%=============================================================================
+% Bibliography
+%=============================================================================
+
+\begin{thebibliography}{9}
+
+\bibitem{arnold}
+V.~I. Arnold.
+\newblock \emph{Mathematical Methods of Classical Mechanics}.
+\newblock Springer, 2nd edition, 1989.
+
+\bibitem{bleecker}
+D.~Bleecker.
+\newblock \emph{Gauge Theory and Variational Principles}.
+\newblock Dover, 2005.
+
+\bibitem{kobayashi}
+S.~Kobayashi and K.~Nomizu.
+\newblock \emph{Foundations of Differential Geometry}, Volumes I and II.
+\newblock Wiley, 1963/1969.
+
+\bibitem{lee}
+J.~M. Lee.
+\newblock \emph{Introduction to Smooth Manifolds}.
+\newblock Springer, 2nd edition, 2012.
+
+\bibitem{nakahara}
+M.~Nakahara.
+\newblock \emph{Geometry, Topology and Physics}.
+\newblock CRC Press, 2nd edition, 2003.
+
+\bibitem{bond2026ge}
+[Anonymous], \emph{Geometric Ethics: The Mathematical Structure of Moral Reasoning}, v1.14, Department of Computer Engineering, [Institution], Spring 2026.
+
+\bibitem{bond2026erisml}
+[Anonymous], ``ErisML/DEME v3.0: A Library for Governed, Foundation-Model-Enabled Agents with Tensorial Ethics,'' [URL removed for blind review], 2026.
+
+\end{thebibliography}
+
+\end{document}
