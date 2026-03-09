@@ -1573,7 +1573,7 @@ footer p {
 }
 .pred-status.confirmed { background: rgba(27,158,119,0.15); color: var(--cb-teal); }
 .pred-status.open { background: rgba(230,171,2,0.15); color: var(--cb-gold); }
-.pred-status.falsified { background: rgba(255,107,107,0.15); color: #ff6b6b; }
+.pred-status.falsified { background: rgba(140,110,90,0.15); color: #a08878; }
 .prediction h4 {
   font-size: 15px;
   margin-bottom: 4px;
@@ -1665,4 +1665,269 @@ footer p {
 .nav-discord {
   color: #5865F2 !important;
   font-weight: 600 !important;
+}
+
+/* ==========================================================================
+   Design Refinement: Restrained Palette & Interactive States
+   ========================================================================== */
+
+/* --- Palette cleanup: remove garish gradients, use solid refined colors --- */
+.section-header h2 {
+  background: none;
+  -webkit-background-clip: unset;
+  -webkit-text-fill-color: var(--text-primary);
+  background-clip: unset;
+}
+
+.title-line {
+  background: linear-gradient(135deg, #e8ecf0 30%, #a8d0c4);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.brand-symbol {
+  background: var(--cb-teal);
+}
+
+.step-num {
+  background: var(--cb-teal);
+}
+
+/* Tone down body em from gold to subtle */
+em { color: var(--text-secondary); font-style: italic; }
+.hero-tagline em,
+.parable-insight em,
+.insight-conclusion { color: var(--accent-light) !important; }
+
+/* Softer section accent backgrounds */
+.section-accent {
+  background: rgba(15,31,46,0.6);
+  border-top: 1px solid rgba(102,194,165,0.08);
+  border-bottom: 1px solid rgba(102,194,165,0.08);
+}
+
+/* Remove colored top bar on object cards */
+.object-card::before {
+  display: none;
+}
+
+/* Softer equation gradient */
+.eq-main {
+  background: linear-gradient(135deg, var(--accent-light), #c0d8d0);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* More restrained hover effects */
+.argument-card:hover,
+.object-card:hover,
+.theorem-card:hover,
+.path-card:hover,
+.tutorial-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(0,0,0,0.15);
+}
+
+/* --- Styles for new interactive elements --- */
+
+/* Object cards expanded state */
+.object-card {
+  cursor: pointer;
+}
+.object-card.expanded {
+  border-color: var(--border-medium);
+}
+
+/* Theorem cards interactive */
+.theorem-card {
+  cursor: pointer;
+}
+.theorem-card.expanded {
+  border-color: var(--accent-light);
+}
+.theorem-detail {
+  border-top: 1px solid var(--border-subtle);
+  margin-top: 12px;
+  padding-top: 12px;
+}
+.theorem-detail p {
+  font-size: 13px;
+  color: var(--text-secondary);
+  line-height: 1.7;
+}
+.theorem-hint {
+  font-size: 11px;
+  color: var(--text-muted);
+}
+
+/* App cards active + detail panel */
+.app-hex {
+  cursor: pointer;
+}
+.app-hex.active {
+  border-color: var(--accent-light) !important;
+  background: var(--bg-hover);
+  transform: translateY(-4px) scale(1.02);
+  box-shadow: 0 8px 24px rgba(0,0,0,0.2);
+}
+.app-detail-inner {
+  padding: 24px;
+  background: var(--bg-card);
+  border-radius: 12px;
+  border: 1px solid var(--border-medium);
+}
+.app-detail-inner h4 {
+  font-size: 18px;
+  margin-bottom: 8px;
+  color: var(--text-primary);
+  font-family: 'Crimson Pro', Georgia, serif;
+}
+.app-detail-inner p {
+  font-size: 14px;
+  color: var(--text-secondary);
+  line-height: 1.7;
+}
+.app-ch-badge {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 12px;
+  padding: 2px 8px;
+  border-radius: 4px;
+  background: rgba(27,158,119,0.15);
+  color: var(--accent-light);
+  margin-left: 8px;
+  font-weight: 400;
+}
+
+/* Reading paths */
+.path-card {
+  cursor: pointer;
+}
+
+/* Chapter highlighting from reading paths */
+.chapter-item {
+  transition: background 0.3s ease, padding 0.3s ease;
+  border-radius: 8px;
+}
+.chapter-item.highlighted {
+  background: rgba(27,158,119,0.08);
+  padding-left: 12px;
+  border-left: 3px solid var(--accent-light);
+}
+
+/* DEME architecture tooltip */
+.deme-tooltip {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  bottom: -8px;
+  max-width: 420px;
+  padding: 16px 20px;
+  background: var(--bg-card);
+  border: 1px solid var(--accent-light);
+  border-radius: 10px;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  pointer-events: none;
+  z-index: 10;
+}
+.deme-tooltip.visible {
+  opacity: 1;
+  pointer-events: auto;
+}
+.deme-tooltip h4 {
+  margin: 0 0 6px;
+  font-size: 15px;
+  color: var(--text-primary);
+  font-family: 'Crimson Pro', Georgia, serif;
+}
+.deme-tooltip p {
+  margin: 0;
+  font-size: 13px;
+  color: var(--text-secondary);
+  line-height: 1.6;
+}
+
+/* Conservation interactive */
+.consequence {
+  cursor: pointer;
+  transition: background 0.3s ease;
+  border-radius: 8px;
+}
+.consequence.active {
+  background: rgba(27,158,119,0.06);
+}
+
+/* Epistemic cards */
+.epistemic-card {
+  cursor: pointer;
+  transition: border-color 0.3s ease;
+}
+.epistemic-card.expanded {
+  border-color: var(--border-medium);
+}
+.epistemic-detail p {
+  font-size: 13px;
+  color: var(--text-muted);
+  line-height: 1.6;
+  margin-top: 12px;
+  padding-top: 10px;
+  border-top: 1px solid var(--border-subtle);
+}
+
+/* Dear Ethicist game result */
+.game-result-inner {
+  padding: 12px 16px;
+  border-radius: 8px;
+  border: 1px solid var(--border-subtle);
+  transition: all 0.3s ease;
+}
+.game-result-inner.result-good {
+  background: rgba(27,158,119,0.08);
+  border-color: rgba(27,158,119,0.3);
+}
+.game-result-inner.result-warn {
+  background: rgba(217,95,2,0.06);
+  border-color: rgba(217,95,2,0.2);
+}
+.result-text {
+  font-size: 13px;
+  color: var(--text-secondary);
+  margin: 0;
+  line-height: 1.6;
+}
+
+/* Bell test slider controls */
+.bell-controls {
+  padding: 16px 0 0;
+}
+.bell-slider-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+.bell-slider-label {
+  font-size: 13px;
+  color: var(--text-secondary);
+}
+.bell-slider {
+  width: 200px;
+  accent-color: var(--cb-teal);
+  cursor: pointer;
+}
+.bell-s-display {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 14px;
+  color: var(--accent-light);
+  min-width: 70px;
+}
+.bell-verdict {
+  text-align: center;
+  font-size: 13px;
+  margin-top: 8px;
+  color: var(--text-muted);
+  line-height: 1.5;
 }
