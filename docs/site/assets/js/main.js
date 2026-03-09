@@ -19,7 +19,7 @@ document.addEventListener('DOMContentLoaded', () => {
   initEquationHighlight();
   initConservationInteractive();
   initEpistemicCards();
-  initGameDemo();
+  if (window.initDearEthicistGame) window.initDearEthicistGame();
   initBellTestSlider();
 });
 
@@ -417,96 +417,9 @@ function initTheoremCards() {
   });
 }
 
-/* --- Application Cards (click to expand domain detail) --- */
-function initAppCards() {
-  const details = {
-    economics: {
-      title: 'Geometric Economics',
-      chapter: 20,
-      detail: 'The Bond Geodesic Equilibrium replaces Nash equilibrium with geodesic paths on the moral manifold. The 2008 financial crisis is analyzed as a manifold failure where the metric collapsed. Prospect theory\u2019s reference-dependence is a gauge choice.'
-    },
-    clinical: {
-      title: 'Geometric Clinical Ethics',
-      chapter: 21,
-      detail: 'The QALY Irrecoverability Theorem: converting quality-adjusted life-years to a scalar necessarily destroys clinically relevant information. Triage as optimal pathfinding on the emergency stratum of the moral manifold.'
-    },
-    law: {
-      title: 'Geometric Jurisprudence',
-      chapter: 22,
-      detail: 'The Hohfeldian octad (O, C, L, N and their opposites) forms a D\u2084 gauge symmetry group. Legal disputes become A* pathfinding problems. Constitutional law provides topological constraints. Precedent operates as parallel transport.'
-    },
-    finance: {
-      title: 'Geometric Finance',
-      chapter: 23,
-      detail: 'Flash crashes are dimensional collapse events where the market metric degenerates. Option pricing as scalar projection loses hedging structure. Market microstructure analyzed on the decision manifold.'
-    },
-    theology: {
-      title: 'Geometric Theology',
-      chapter: 24,
-      detail: 'The Euthyphro dilemma dissolves as a gauge ambiguity \u2014 different gauge choices correspond to different theological positions on the same underlying moral geometry. Theodicy analyzed as dimensional projection failure.'
-    },
-    environment: {
-      title: 'Geometric Environmental Ethics',
-      chapter: 25,
-      detail: 'Climate change as intergenerational obligation across temporal boundaries. The discount rate controversy is dimensional collapse \u2014 reducing future welfare to a present scalar. Species extinction as irreversible boundary crossing.'
-    },
-    ai: {
-      title: 'Geometric AI Ethics',
-      chapter: 26,
-      detail: 'The paperclip maximizer is dimensional collapse: an AI projecting the full moral tensor to a single scalar. Alignment = geodesic preservation. Algorithmic bias as scalar projection. The No Escape Theorem prevents circumvention via re-framing.'
-    },
-    bioethics: {
-      title: 'Geometric Bioethics',
-      chapter: 27,
-      detail: 'CRISPR as irreversible boundary crossing: germline editing crosses an absorbing stratum. Research ethics requires the double consent condition \u2014 both current participants AND affected future populations must be considered.'
-    },
-    military: {
-      title: 'Geometric Military Ethics',
-      chapter: 28,
-      detail: 'Proportionality as multi-dimensional cost-benefit on the moral manifold. The doctrine of double effect as decomposition into intended and unintended dimensional components. Moral injury formalized as manifold damage.'
-    }
-  };
-
-  const section = document.getElementById('applications');
-  if (!section) return;
-  const container = section.querySelector('.container');
-
-  const detailPanel = document.createElement('div');
-  detailPanel.className = 'app-detail-panel';
-  detailPanel.style.cssText = 'max-height:0;overflow:hidden;opacity:0;transition:max-height 0.4s ease,opacity 0.3s ease,margin-top 0.3s ease;margin-top:0;';
-  container.appendChild(detailPanel);
-
-  document.querySelectorAll('.app-hex').forEach(hex => {
-    hex.style.cursor = 'pointer';
-    const app = hex.dataset.app;
-
-    hex.addEventListener('click', () => {
-      const wasActive = hex.classList.contains('active');
-
-      document.querySelectorAll('.app-hex.active').forEach(h => h.classList.remove('active'));
-
-      if (wasActive) {
-        detailPanel.style.maxHeight = '0';
-        detailPanel.style.opacity = '0';
-        detailPanel.style.marginTop = '0';
-        return;
-      }
-
-      hex.classList.add('active');
-      const info = details[app];
-      if (info) {
-        detailPanel.innerHTML =
-          '<div class="app-detail-inner">' +
-            '<h4>' + info.title + ' <span class="app-ch-badge">Chapter ' + info.chapter + '</span></h4>' +
-            '<p>' + info.detail + '</p>' +
-          '</div>';
-        detailPanel.style.maxHeight = '300px';
-        detailPanel.style.opacity = '1';
-        detailPanel.style.marginTop = '28px';
-      }
-    });
-  });
-}
+/* --- Application Cards --- */
+/* Interactive domain demos are in domain-demos.js */
+function initAppCards() { /* handled by domain-demos.js */ }
 
 /* --- Reading Paths (click to navigate to chapters) --- */
 function initReadingPaths() {
@@ -719,87 +632,8 @@ function initEpistemicCards() {
   });
 }
 
-/* --- Dear Ethicist Game Demo (functional mini-game) --- */
-function initGameDemo() {
-  const choicesDiv = document.querySelector('.game-choices');
-  if (!choicesDiv) return;
-
-  const positions = ['O', 'C', 'L', 'N'];
-  const labels = { O: 'Obligation', C: 'Claim', L: 'Liberty', N: 'No-claim' };
-
-  let neighborChoice = null;
-  let writerChoice = null;
-
-  choicesDiv.innerHTML =
-    '<div class="choice-row">' +
-      '<span class="choice-label">Neighbor\u2019s position:</span>' +
-      '<div class="choice-buttons" data-party="neighbor">' +
-        positions.map(p =>
-          '<button class="choice-btn" data-choice="' + p + '">' + p + ' <small>' + labels[p] + '</small></button>'
-        ).join('') +
-      '</div>' +
-    '</div>' +
-    '<div class="choice-row">' +
-      '<span class="choice-label">Writer\u2019s claim:</span>' +
-      '<div class="choice-buttons" data-party="writer">' +
-        positions.map(p =>
-          '<button class="choice-btn" data-choice="' + p + '">' + p + ' <small>' + labels[p] + '</small></button>'
-        ).join('') +
-      '</div>' +
-    '</div>' +
-    '<div class="game-result" style="padding:12px 0 0;display:none">' +
-      '<div class="game-result-inner">' +
-        '<p class="result-text"></p>' +
-      '</div>' +
-    '</div>';
-
-  function updateResult() {
-    const result = choicesDiv.querySelector('.game-result');
-    const text = choicesDiv.querySelector('.result-text');
-    const inner = choicesDiv.querySelector('.game-result-inner');
-    if (!neighborChoice || !writerChoice) {
-      result.style.display = 'none';
-      return;
-    }
-
-    result.style.display = 'block';
-
-    const isCorrelative =
-      (neighborChoice === 'O' && writerChoice === 'C') ||
-      (neighborChoice === 'C' && writerChoice === 'O') ||
-      (neighborChoice === 'L' && writerChoice === 'N') ||
-      (neighborChoice === 'N' && writerChoice === 'L');
-
-    if (isCorrelative) {
-      text.innerHTML =
-        '<strong style="color:var(--cb-teal)">Correlative symmetry holds.</strong> ' +
-        neighborChoice + ' \u2194 ' + writerChoice + ' is a valid Hohfeldian correlative pair. Bond Index contribution: 0 (perfect structural consistency).';
-      inner.className = 'game-result-inner result-good';
-    } else {
-      const violation = (0.3 + Math.random() * 0.5).toFixed(2);
-      text.innerHTML =
-        '<strong style="color:var(--cb-orange)">' + neighborChoice + ' \u2194 ' + writerChoice + '</strong>' +
-        ' is not a correlative pair. The Hohfeldian correlatives are O\u2194C and L\u2194N. ' +
-        'Bond Index contribution: ' + violation + ' (structural violation detected).';
-      inner.className = 'game-result-inner result-warn';
-    }
-  }
-
-  choicesDiv.querySelectorAll('.choice-buttons').forEach(group => {
-    const party = group.dataset.party;
-    group.querySelectorAll('.choice-btn').forEach(btn => {
-      btn.addEventListener('click', () => {
-        group.querySelectorAll('.choice-btn').forEach(b => b.classList.remove('active-choice'));
-        btn.classList.add('active-choice');
-
-        if (party === 'neighbor') neighborChoice = btn.dataset.choice;
-        if (party === 'writer') writerChoice = btn.dataset.choice;
-
-        updateResult();
-      });
-    });
-  });
-}
+/* --- Dear Ethicist Game --- */
+/* Full interactive game is in dear-ethicist-game.js */
 
 /* --- Bell Test Interactive Slider --- */
 function initBellTestSlider() {
