@@ -1,0 +1,1603 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Geometric Ethics &mdash; The Mathematical Structure of Moral Reasoning</title>
+  <meta name="description" content="A mathematical framework that models moral reasoning using differential geometry, tensor analysis, and gauge theory. By Andrew H. Bond.">
+  <link rel="stylesheet" href="assets/css/style.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Crimson+Pro:ital,wght@0,300;0,400;0,600;0,700;1,400&family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+</head>
+<body>
+  <!-- Navigation -->
+  <nav id="main-nav">
+    <div class="nav-inner">
+      <a href="#hero" class="nav-brand">
+        <span class="brand-symbol">M</span>
+        <span class="brand-text">Geometric Ethics</span>
+      </a>
+      <button class="nav-toggle" aria-label="Toggle menu">
+        <span></span><span></span><span></span>
+      </button>
+      <ul class="nav-links">
+        <li><a href="#core-argument">Core Argument</a></li>
+        <li><a href="#objects">Framework</a></li>
+        <li><a href="#dimensions">9 Dimensions</a></li>
+        <li><a href="#parts">Chapters</a></li>
+        <li><a href="#theorems">Theorems</a></li>
+        <li><a href="#tutorials">Tutorials</a></li>
+        <li><a href="#dear-ethicist">Play</a></li>
+        <li><a href="#bell-test">Bell Test</a></li>
+        <li><a href="#community" class="nav-discord">Discord</a></li>
+      </ul>
+    </div>
+  </nav>
+
+  <!-- Hero Section -->
+  <section id="hero">
+    <div class="hero-bg">
+      <svg id="hero-landscape" viewBox="0 0 800 500" xmlns="http://www.w3.org/2000/svg" aria-label="3D moral landscape surface">
+        <defs>
+          <linearGradient id="surface-grad" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" style="stop-color:#0a2e4d;stop-opacity:1" />
+            <stop offset="30%" style="stop-color:#0d4a6b;stop-opacity:1" />
+            <stop offset="60%" style="stop-color:#1a7a8a;stop-opacity:1" />
+            <stop offset="100%" style="stop-color:#2db5a0;stop-opacity:1" />
+          </linearGradient>
+          <linearGradient id="peak-grad" x1="0%" y1="0%" x2="0%" y2="100%">
+            <stop offset="0%" style="stop-color:#4dd9c0;stop-opacity:0.9" />
+            <stop offset="100%" style="stop-color:#0d4a6b;stop-opacity:0.9" />
+          </linearGradient>
+          <filter id="glow">
+            <feGaussianBlur stdDeviation="3" result="blur"/>
+            <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+          </filter>
+          <filter id="soft-shadow">
+            <feDropShadow dx="0" dy="4" stdDeviation="8" flood-color="#000" flood-opacity="0.3"/>
+          </filter>
+        </defs>
+        <!-- Grid lines -->
+        <g class="grid-lines" opacity="0.15" stroke="#4dd9c0" stroke-width="0.5" fill="none">
+          <path d="M100,400 Q200,380 300,350 Q400,300 500,320 Q600,340 700,380"/>
+          <path d="M100,370 Q200,340 300,280 Q400,220 500,260 Q600,300 700,350"/>
+          <path d="M100,340 Q200,290 300,200 Q400,140 500,200 Q600,260 700,320"/>
+          <path d="M100,310 Q200,260 300,180 Q370,120 430,160 Q500,200 600,250 Q700,290 700,290"/>
+          <path d="M100,280 Q200,250 300,220 Q400,200 500,220 Q600,240 700,260"/>
+          <!-- cross lines -->
+          <path d="M150,400 Q160,340 170,280 Q180,250 190,310 Q200,370 210,400"/>
+          <path d="M250,390 Q260,310 280,220 Q300,170 320,230 Q340,310 360,390"/>
+          <path d="M350,370 Q360,270 380,170 Q400,120 420,170 Q440,270 460,370"/>
+          <path d="M450,380 Q460,300 480,220 Q500,180 520,220 Q540,300 560,380"/>
+          <path d="M550,390 Q560,330 580,270 Q600,250 620,270 Q640,330 660,390"/>
+        </g>
+        <!-- Main surface -->
+        <path class="surface-main" d="M60,420 Q100,410 150,400 Q200,380 250,350 Q300,280 350,200 Q380,140 400,120 Q420,140 450,180 Q500,250 550,300 Q600,340 650,360 Q700,380 740,400 L740,480 L60,480 Z" fill="url(#surface-grad)" opacity="0.85"/>
+        <!-- Peak highlight -->
+        <path class="surface-peak" d="M300,280 Q340,200 370,150 Q390,120 400,115 Q410,120 430,150 Q460,200 500,250" fill="none" stroke="#4dd9c0" stroke-width="2" filter="url(#glow)" opacity="0.8"/>
+        <!-- Decision point -->
+        <circle class="decision-point" cx="400" cy="115" r="4" fill="#4dd9c0" filter="url(#glow)">
+          <animate attributeName="r" values="3;6;3" dur="3s" repeatCount="indefinite"/>
+          <animate attributeName="opacity" values="0.6;1;0.6" dur="3s" repeatCount="indefinite"/>
+        </circle>
+        <text x="400" y="100" text-anchor="middle" fill="#4dd9c0" font-size="11" font-family="Inter, sans-serif" opacity="0.8">Decision</text>
+        <!-- Gradient arrows -->
+        <g class="gradient-arrows" opacity="0.4">
+          <line x1="300" y1="290" x2="340" y2="240" stroke="#2db5a0" stroke-width="1.5" marker-end="url(#arrow)"/>
+          <line x1="500" y1="260" x2="460" y2="220" stroke="#2db5a0" stroke-width="1.5" marker-end="url(#arrow)"/>
+          <line x1="250" y1="355" x2="280" y2="310" stroke="#2db5a0" stroke-width="1.5" marker-end="url(#arrow)"/>
+        </g>
+        <defs>
+          <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+            <path d="M 0 0 L 10 5 L 0 10 z" fill="#2db5a0"/>
+          </marker>
+        </defs>
+      </svg>
+    </div>
+    <div class="hero-content">
+      <p class="hero-eyebrow">A New Mathematical Framework</p>
+      <h1 class="hero-title">
+        <span class="title-line">Geometric Ethics</span>
+        <span class="title-sub">The Mathematical Structure of Moral Reasoning</span>
+      </h1>
+      <p class="hero-author">Andrew H. Bond</p>
+      <p class="hero-affiliation">Senior Member, IEEE &middot; San Jose State University</p>
+      <p class="hero-tagline">Moral evaluation is not a number. It is a <em>tensor</em> on a <em>stratified manifold</em>.</p>
+      <div class="hero-cta">
+        <a href="#core-argument" class="btn btn-primary">Explore the Framework</a>
+        <a href="#parts" class="btn btn-secondary">Read the Book</a>
+      </div>
+      <div class="hero-stats">
+        <div class="stat"><span class="stat-num">30</span><span class="stat-label">Chapters</span></div>
+        <div class="stat"><span class="stat-num">7</span><span class="stat-label">Parts</span></div>
+        <div class="stat"><span class="stat-num">9</span><span class="stat-label">Dimensions</span></div>
+        <div class="stat"><span class="stat-num">7</span><span class="stat-label">Theorems</span></div>
+      </div>
+    </div>
+    <div class="scroll-indicator">
+      <span>Scroll to explore</span>
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M7 13l5 5 5-5M7 6l5 5 5-5"/>
+      </svg>
+    </div>
+  </section>
+
+  <!-- Core Argument -->
+  <section id="core-argument" class="section">
+    <div class="container">
+      <div class="section-header">
+        <span class="section-number">I</span>
+        <h2>The Core Argument</h2>
+        <p class="section-subtitle">Why ethics needs geometry</p>
+      </div>
+
+      <div class="argument-grid">
+        <div class="argument-card" data-aos="fade-up">
+          <div class="card-icon">
+            <svg viewBox="0 0 80 80" class="icon-scalar">
+              <line x1="10" y1="40" x2="70" y2="40" stroke="#ff6b6b" stroke-width="2"/>
+              <circle cx="45" cy="40" r="5" fill="#ff6b6b"/>
+              <text x="45" y="60" text-anchor="middle" fill="#ff6b6b" font-size="10">S = -1</text>
+              <text x="40" y="25" text-anchor="middle" fill="#667" font-size="9">Scalar Ethics</text>
+            </svg>
+          </div>
+          <h3>The Problem: Scalar Collapse</h3>
+          <p>Traditional ethics reduces moral evaluation to a single number &mdash; a score, a utility, a ranking. This <strong>scalar collapse</strong> destroys the geometric structure that matters most: which values are at stake, where uncertainty concentrates, and where the rules change discontinuously.</p>
+        </div>
+
+        <div class="argument-card" data-aos="fade-up" data-aos-delay="200">
+          <div class="card-icon">
+            <svg viewBox="0 0 80 80" class="icon-geometric">
+              <ellipse cx="40" cy="40" rx="30" ry="20" fill="none" stroke="#4dd9c0" stroke-width="1.5" transform="rotate(-15 40 40)"/>
+              <line x1="40" y1="40" x2="55" y2="28" stroke="#2db5a0" stroke-width="2" marker-end="url(#arr2)"/>
+              <line x1="40" y1="40" x2="25" y2="50" stroke="#ffd93d" stroke-width="2" marker-end="url(#arr2)"/>
+              <circle cx="40" cy="40" r="2" fill="#fff"/>
+              <text x="40" y="72" text-anchor="middle" fill="#4dd9c0" font-size="9">Geometric Ethics</text>
+              <defs>
+                <marker id="arr2" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="5" markerHeight="5" orient="auto-start-reverse">
+                  <path d="M 0 0 L 10 5 L 0 10 z" fill="#2db5a0"/>
+                </marker>
+              </defs>
+            </svg>
+          </div>
+          <h3>The Solution: Geometric Structure</h3>
+          <p>Moral evaluation is a <strong>tensor on a stratified manifold</strong> &mdash; a structured object in a space with dimensions, distances, curvature, and boundaries. The mathematical structures physicists use to describe nature are also the right structures for describing moral reasoning.</p>
+        </div>
+      </div>
+
+      <!-- The Parable -->
+      <div class="parable-section" data-aos="fade-up">
+        <div class="parable-header">
+          <h3>An Old Man and a Horse</h3>
+          <p class="parable-chinese">塞翁失马 &mdash; <em>Sai Weng Shi Ma</em></p>
+        </div>
+        <div class="parable-timeline" id="parable-timeline">
+          <div class="timeline-track">
+            <div class="timeline-event active" data-step="0">
+              <div class="event-dot"></div>
+              <div class="event-content">
+                <h4>Horse Runs Away</h4>
+                <p>Neighbors: "Bad fortune!" &nbsp; Old man: <em>"Maybe."</em></p>
+                <div class="scalar-badge bad">S(x) = -1</div>
+              </div>
+            </div>
+            <div class="timeline-event" data-step="1">
+              <div class="event-dot"></div>
+              <div class="event-content">
+                <h4>Horse Returns with Wild Horses</h4>
+                <p>Neighbors: "Good fortune!" &nbsp; Old man: <em>"Maybe."</em></p>
+                <div class="scalar-badge good">S(x) = +3</div>
+              </div>
+            </div>
+            <div class="timeline-event" data-step="2">
+              <div class="event-dot"></div>
+              <div class="event-content">
+                <h4>Son Breaks His Leg</h4>
+                <p>Neighbors: "Bad fortune!" &nbsp; Old man: <em>"Maybe."</em></p>
+                <div class="scalar-badge bad">S(x) = -2</div>
+              </div>
+            </div>
+            <div class="timeline-event" data-step="3">
+              <div class="event-dot"></div>
+              <div class="event-content">
+                <h4>War Comes &mdash; Son is Spared</h4>
+                <p>The broken leg saves his life.</p>
+                <div class="scalar-badge good">S(x) = +10</div>
+              </div>
+            </div>
+          </div>
+          <div class="parable-insight">
+            <p>The old man's <em>"maybe"</em> is not epistemic humility. It is a recognition that <strong>scalar evaluation is the wrong tool for the job.</strong> The loss is bad along the <em>wealth</em> dimension while saying nothing about <em>health</em>, <em>family</em>, or <em>political</em> dimensions. The uncertainty has <em>shape</em>. The evaluation depends on which <em>regime</em> the world occupies.</p>
+            <p class="insight-conclusion">Ethics has shape, and the shape matters.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Core Objects -->
+  <section id="objects" class="section section-dark">
+    <div class="container">
+      <div class="section-header">
+        <span class="section-number">II</span>
+        <h2>The Framework</h2>
+        <p class="section-subtitle">Core mathematical objects at a glance</p>
+      </div>
+
+      <div class="objects-grid">
+        <div class="object-card" data-aos="fade-up">
+          <div class="object-symbol">M</div>
+          <h3>Moral Manifold</h3>
+          <p class="object-informal">The "space" of morally relevant situations</p>
+          <p class="object-formal">9-dimensional Whitney-stratified space with smooth strata and semantic gates at boundaries</p>
+        </div>
+        <div class="object-card" data-aos="fade-up" data-aos-delay="100">
+          <div class="object-symbol">O<sup>&mu;</sup></div>
+          <h3>Obligation Vector</h3>
+          <p class="object-informal">What an agent <em>must</em> do, with direction and magnitude</p>
+          <p class="object-formal">Tangent vector on M (rank-1 tensor)</p>
+        </div>
+        <div class="object-card" data-aos="fade-up" data-aos-delay="200">
+          <div class="object-symbol">I<sub>&mu;</sub></div>
+          <h3>Interest Covector</h3>
+          <p class="object-informal">What a patient <em>needs</em>, measuring obligations</p>
+          <p class="object-formal">Cotangent vector on M (rank-1 tensor)</p>
+        </div>
+        <div class="object-card" data-aos="fade-up" data-aos-delay="300">
+          <div class="object-symbol">S</div>
+          <h3>Satisfaction Scalar</h3>
+          <p class="object-informal">How well obligations meet interests</p>
+          <p class="object-formal">S = I<sub>&mu;</sub> O<sup>&mu;</sup> &mdash; covector &times; vector &rarr; scalar</p>
+        </div>
+        <div class="object-card" data-aos="fade-up" data-aos-delay="400">
+          <div class="object-symbol">g<sub>&mu;&nu;</sub></div>
+          <h3>Moral Metric</h3>
+          <p class="object-informal">The "exchange rate" between moral dimensions</p>
+          <p class="object-formal">Symmetric rank-2 tensor encoding trade-off structure</p>
+        </div>
+        <div class="object-card" data-aos="fade-up" data-aos-delay="500">
+          <div class="object-symbol">BIP</div>
+          <h3>Bond Invariance Principle</h3>
+          <p class="object-informal">Moral evaluations must not depend on mere labeling</p>
+          <p class="object-formal">Gauge symmetry: E(d) = E(d') for admissible re-descriptions</p>
+        </div>
+        <div class="object-card" data-aos="fade-up" data-aos-delay="600">
+          <div class="object-symbol">R</div>
+          <h3>Contraction + Residue</h3>
+          <p class="object-informal">Reducing a tensor to a scalar, and what is lost</p>
+          <p class="object-formal">T<sup>(n)</sup> &rarr; S via iterated contraction; R captures discarded structure</p>
+        </div>
+        <div class="object-card" data-aos="fade-up" data-aos-delay="700">
+          <div class="object-symbol">Bd</div>
+          <h3>Bond Index</h3>
+          <p class="object-informal">Quantitative alignment score for AI systems</p>
+          <p class="object-formal">Scalar measure of structural &times; invariance &times; residue compliance</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Nine Dimensions -->
+  <section id="dimensions" class="section">
+    <div class="container">
+      <div class="section-header">
+        <span class="section-number">III</span>
+        <h2>The Nine Dimensions of Moral Space</h2>
+        <p class="section-subtitle">Derived from a 3&times;3 scope/mode grid</p>
+      </div>
+
+      <div class="dimensions-layout">
+        <div class="dimension-viz">
+          <svg id="dimension-wheel" viewBox="0 0 500 500" xmlns="http://www.w3.org/2000/svg">
+            <!-- Background circles -->
+            <circle cx="250" cy="250" r="200" fill="none" stroke="#1a3a4a" stroke-width="1" opacity="0.5"/>
+            <circle cx="250" cy="250" r="150" fill="none" stroke="#1a3a4a" stroke-width="1" opacity="0.3"/>
+            <circle cx="250" cy="250" r="100" fill="none" stroke="#1a3a4a" stroke-width="1" opacity="0.2"/>
+            <!-- Center point -->
+            <circle cx="250" cy="250" r="4" fill="#4dd9c0"/>
+            <!-- Dimension lines and labels will be generated by JS -->
+            <g id="dim-lines"></g>
+            <g id="dim-labels"></g>
+            <!-- Polygon overlay -->
+            <polygon id="dim-polygon" fill="rgba(77,217,192,0.1)" stroke="#4dd9c0" stroke-width="2"/>
+          </svg>
+        </div>
+        <div class="dimension-details">
+          <div class="dim-card active" data-dim="1">
+            <div class="dim-number">D<sub>1</sub></div>
+            <h3>Consequences / Welfare</h3>
+            <p>The outcomes of actions &mdash; who benefits, who is harmed, and by how much. The utilitarian dimension.</p>
+          </div>
+          <div class="dim-card" data-dim="2">
+            <div class="dim-number">D<sub>2</sub></div>
+            <h3>Rights / Duties</h3>
+            <p>The deontological constraints &mdash; what agents owe to others regardless of consequences.</p>
+          </div>
+          <div class="dim-card" data-dim="3">
+            <div class="dim-number">D<sub>3</sub></div>
+            <h3>Justice / Fairness</h3>
+            <p>The distributional structure &mdash; how benefits and burdens are allocated across persons.</p>
+          </div>
+          <div class="dim-card" data-dim="4">
+            <div class="dim-number">D<sub>4</sub></div>
+            <h3>Autonomy / Agency</h3>
+            <p>The capacity for self-determination &mdash; freedom to choose, informed consent, non-manipulation.</p>
+          </div>
+          <div class="dim-card" data-dim="5">
+            <div class="dim-number">D<sub>5</sub></div>
+            <h3>Privacy / Data</h3>
+            <p>Informational self-determination &mdash; control over personal information and surveillance boundaries.</p>
+          </div>
+          <div class="dim-card" data-dim="6">
+            <div class="dim-number">D<sub>6</sub></div>
+            <h3>Societal / Environmental</h3>
+            <p>Collective and ecological obligations &mdash; commons stewardship, intergenerational duty.</p>
+          </div>
+          <div class="dim-card" data-dim="7">
+            <div class="dim-number">D<sub>7</sub></div>
+            <h3>Virtue / Care</h3>
+            <p>Character and relational obligations &mdash; what a good person would do, care ethics.</p>
+          </div>
+          <div class="dim-card" data-dim="8">
+            <div class="dim-number">D<sub>8</sub></div>
+            <h3>Procedural Legitimacy</h3>
+            <p>Process fairness &mdash; whether decisions follow legitimate procedures and institutions.</p>
+          </div>
+          <div class="dim-card" data-dim="9">
+            <div class="dim-number">D<sub>9</sub></div>
+            <h3>Epistemic Status</h3>
+            <p>Knowledge conditions &mdash; what is known, what is uncertain, and the ethics of belief.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Tensor Hierarchy Interactive -->
+  <section id="tensor-hierarchy" class="section section-dark">
+    <div class="container">
+      <div class="section-header">
+        <span class="section-number">IV</span>
+        <h2>The Tensor Hierarchy</h2>
+        <p class="section-subtitle">From scalars to the full moral tensor &mdash; each level reveals structure the previous conceals</p>
+      </div>
+
+      <div class="hierarchy-interactive">
+        <div class="hierarchy-controls">
+          <button class="level-btn active" data-level="0">Level 0<br><small>Scalar</small></button>
+          <button class="level-btn" data-level="1">Level 1<br><small>Vector</small></button>
+          <button class="level-btn" data-level="2">Level 2<br><small>Covector</small></button>
+          <button class="level-btn" data-level="3">Level 3<br><small>Metric</small></button>
+          <button class="level-btn" data-level="4">Level 4<br><small>Full Tensor</small></button>
+          <button class="level-btn" data-level="5">Level 5<br><small>Stratified</small></button>
+        </div>
+
+        <div class="hierarchy-display">
+          <div class="hierarchy-viz">
+            <svg id="hierarchy-svg" viewBox="0 0 600 350" xmlns="http://www.w3.org/2000/svg">
+              <!-- Level 0: Scalar -->
+              <g id="h-level-0" class="h-level active">
+                <circle cx="300" cy="175" r="30" fill="none" stroke="#ff6b6b" stroke-width="2"/>
+                <text x="300" y="180" text-anchor="middle" fill="#ff6b6b" font-size="20" font-weight="bold">S</text>
+                <text x="300" y="230" text-anchor="middle" fill="#8899aa" font-size="12">A single number: "Alice scores 0.7"</text>
+              </g>
+              <!-- Level 1: Vector -->
+              <g id="h-level-1" class="h-level" style="display:none">
+                <circle cx="300" cy="160" r="5" fill="#4dd9c0"/>
+                <line x1="300" y1="160" x2="380" y2="110" stroke="#4dd9c0" stroke-width="2.5" marker-end="url(#arr3)"/>
+                <text x="390" y="108" fill="#4dd9c0" font-size="11">O = (0.8, 0.3, 0.6, ...)</text>
+                <text x="300" y="220" text-anchor="middle" fill="#8899aa" font-size="12">Obligation has direction: which dimensions matter</text>
+                <!-- Dimension axes -->
+                <line x1="300" y1="160" x2="300" y2="90" stroke="#334455" stroke-width="1" stroke-dasharray="4"/>
+                <line x1="300" y1="160" x2="370" y2="160" stroke="#334455" stroke-width="1" stroke-dasharray="4"/>
+                <line x1="300" y1="160" x2="340" y2="200" stroke="#334455" stroke-width="1" stroke-dasharray="4"/>
+                <text x="302" y="85" fill="#556677" font-size="9">D1</text>
+                <text x="375" y="158" fill="#556677" font-size="9">D2</text>
+                <text x="345" y="205" fill="#556677" font-size="9">D3</text>
+                <defs>
+                  <marker id="arr3" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+                    <path d="M 0 0 L 10 5 L 0 10 z" fill="#4dd9c0"/>
+                  </marker>
+                </defs>
+              </g>
+              <!-- Level 2: Covector (dual) -->
+              <g id="h-level-2" class="h-level" style="display:none">
+                <circle cx="220" cy="150" r="5" fill="#4dd9c0"/>
+                <line x1="220" y1="150" x2="290" y2="110" stroke="#4dd9c0" stroke-width="2" marker-end="url(#arr3)"/>
+                <text x="225" y="140" fill="#4dd9c0" font-size="10">O (obligation)</text>
+                <circle cx="380" cy="150" r="5" fill="#ffd93d"/>
+                <line x1="380" y1="150" x2="340" y2="190" stroke="#ffd93d" stroke-width="2" marker-end="url(#arr4)"/>
+                <text x="385" y="140" fill="#ffd93d" font-size="10">I (interest)</text>
+                <text x="300" y="250" text-anchor="middle" fill="#8899aa" font-size="12">S = I<tspan font-size="8" dy="3">&mu;</tspan><tspan dy="-3"> O</tspan><tspan font-size="8" dy="-5">&mu;</tspan><tspan dy="5"> &mdash; contraction gives satisfaction</tspan></text>
+                <text x="300" y="270" text-anchor="middle" fill="#667788" font-size="11">Two perspectives: agent obligations meet patient interests</text>
+                <defs>
+                  <marker id="arr4" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+                    <path d="M 0 0 L 10 5 L 0 10 z" fill="#ffd93d"/>
+                  </marker>
+                </defs>
+              </g>
+              <!-- Level 3: Metric -->
+              <g id="h-level-3" class="h-level" style="display:none">
+                <rect x="200" y="100" width="200" height="140" rx="8" fill="none" stroke="#a78bfa" stroke-width="2"/>
+                <text x="300" y="90" text-anchor="middle" fill="#a78bfa" font-size="14" font-weight="600">g<tspan font-size="10" dy="4">&mu;&nu;</tspan></text>
+                <!-- Matrix entries -->
+                <text x="240" y="135" text-anchor="middle" fill="#c4b5fd" font-size="13">1.0</text>
+                <text x="300" y="135" text-anchor="middle" fill="#7c6eaa" font-size="13">0.3</text>
+                <text x="360" y="135" text-anchor="middle" fill="#7c6eaa" font-size="13">0.1</text>
+                <text x="240" y="170" text-anchor="middle" fill="#7c6eaa" font-size="13">0.3</text>
+                <text x="300" y="170" text-anchor="middle" fill="#c4b5fd" font-size="13">0.8</text>
+                <text x="360" y="170" text-anchor="middle" fill="#7c6eaa" font-size="13">0.2</text>
+                <text x="240" y="205" text-anchor="middle" fill="#7c6eaa" font-size="13">0.1</text>
+                <text x="300" y="205" text-anchor="middle" fill="#7c6eaa" font-size="13">0.2</text>
+                <text x="360" y="205" text-anchor="middle" fill="#c4b5fd" font-size="13">1.2</text>
+                <text x="300" y="270" text-anchor="middle" fill="#8899aa" font-size="12">The metric encodes trade-offs: how dimensions relate</text>
+                <text x="300" y="290" text-anchor="middle" fill="#667788" font-size="11">Different ethical theories = different metrics</text>
+              </g>
+              <!-- Level 4: Full Tensor -->
+              <g id="h-level-4" class="h-level" style="display:none">
+                <!-- Stacked matrices -->
+                <rect x="160" y="130" width="120" height="100" rx="6" fill="none" stroke="#4dd9c0" stroke-width="1.5" opacity="0.5" transform="translate(40,-30)"/>
+                <rect x="160" y="130" width="120" height="100" rx="6" fill="none" stroke="#ffd93d" stroke-width="1.5" opacity="0.7" transform="translate(20,-15)"/>
+                <rect x="160" y="130" width="120" height="100" rx="6" fill="none" stroke="#a78bfa" stroke-width="2"/>
+                <text x="220" y="175" text-anchor="middle" fill="#e0e0e0" font-size="14" font-weight="600">M<tspan font-size="9" dy="4">ia</tspan></text>
+                <!-- Arrow to scalar -->
+                <line x1="310" y1="180" x2="400" y2="180" stroke="#ff6b6b" stroke-width="1.5" stroke-dasharray="6 3"/>
+                <text x="355" y="170" text-anchor="middle" fill="#ff6b6b" font-size="9">contract</text>
+                <circle cx="430" cy="180" r="20" fill="none" stroke="#ff6b6b" stroke-width="1.5"/>
+                <text x="430" y="185" text-anchor="middle" fill="#ff6b6b" font-size="16">S</text>
+                <!-- Residue -->
+                <path d="M355,190 Q370,220 430,210" fill="none" stroke="#f97316" stroke-width="1.5" stroke-dasharray="4 2"/>
+                <text x="430" y="225" text-anchor="middle" fill="#f97316" font-size="11">R (residue)</text>
+                <text x="300" y="280" text-anchor="middle" fill="#8899aa" font-size="12">Multi-agent evaluation tensor: all perspectives at once</text>
+                <text x="300" y="300" text-anchor="middle" fill="#667788" font-size="11">Contraction loses information &mdash; the residue tracks what's lost</text>
+              </g>
+              <!-- Level 5: Stratified -->
+              <g id="h-level-5" class="h-level" style="display:none">
+                <!-- Strata layers -->
+                <rect x="120" y="60" width="360" height="50" rx="8" fill="rgba(77,217,192,0.1)" stroke="#4dd9c0" stroke-width="1.5"/>
+                <text x="300" y="88" text-anchor="middle" fill="#4dd9c0" font-size="12">Normal Operations (smooth interior)</text>
+                <!-- Boundary -->
+                <line x1="120" y1="130" x2="480" y2="130" stroke="#ffd93d" stroke-width="2" stroke-dasharray="8 4"/>
+                <text x="500" y="134" fill="#ffd93d" font-size="10">consent boundary</text>
+                <rect x="120" y="145" width="360" height="50" rx="8" fill="rgba(255,107,107,0.1)" stroke="#ff6b6b" stroke-width="1.5"/>
+                <text x="300" y="173" text-anchor="middle" fill="#ff6b6b" font-size="12">Emergency Regime (different rules apply)</text>
+                <!-- Boundary -->
+                <line x1="120" y1="215" x2="480" y2="215" stroke="#f97316" stroke-width="2" stroke-dasharray="8 4"/>
+                <text x="500" y="219" fill="#f97316" font-size="10">nullifier boundary</text>
+                <rect x="120" y="230" width="360" height="50" rx="8" fill="rgba(167,139,250,0.05)" stroke="#a78bfa" stroke-width="1.5"/>
+                <text x="300" y="258" text-anchor="middle" fill="#a78bfa" font-size="12">Absorbing State (irreversible &mdash; e.g., death)</text>
+                <text x="300" y="310" text-anchor="middle" fill="#8899aa" font-size="12">Whitney stratification: discrete jumps in moral structure</text>
+                <text x="300" y="330" text-anchor="middle" fill="#667788" font-size="11">Boundaries are where ethics gets hard &mdash; and interesting</text>
+              </g>
+            </svg>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Book Parts / Chapters -->
+  <section id="parts" class="section">
+    <div class="container">
+      <div class="section-header">
+        <span class="section-number">V</span>
+        <h2>The Book</h2>
+        <p class="section-subtitle">30 chapters across 7 parts, from philosophical motivation to engineering implementation</p>
+      </div>
+
+      <div class="parts-accordion">
+        <!-- Part I -->
+        <div class="part-item" data-part="1">
+          <button class="part-header">
+            <div class="part-info">
+              <span class="part-number">Part I</span>
+              <h3>The Problem</h3>
+              <span class="part-chapters">Chapters 1&ndash;3</span>
+            </div>
+            <span class="part-toggle">+</span>
+          </button>
+          <div class="part-body">
+            <div class="chapter-list">
+              <div class="chapter-item">
+                <span class="ch-num">1</span>
+                <div class="ch-info">
+                  <h4>Introduction &mdash; Why Geometry?</h4>
+                  <p>The shape of the problem. Three failures of "Flatland" in AI alignment, policy analysis, and moral philosophy itself. The parable of the old man and his horse.</p>
+                </div>
+              </div>
+              <div class="chapter-item">
+                <span class="ch-num">2</span>
+                <div class="ch-info">
+                  <h4>The Failure of Scalar Ethics</h4>
+                  <p>Why rank-0 ethics is insufficient: no directional information, uncertainty has shape, paths cross boundaries. What geometric structure provides.</p>
+                </div>
+              </div>
+              <div class="chapter-item">
+                <span class="ch-num">3</span>
+                <div class="ch-info">
+                  <h4>Historical Precursors &mdash; Geometry Before Geometry</h4>
+                  <p>Aristotle's mean as calibration. Kant's imperative as invariance. Ross's duties as vectors. Rawls's veil as symmetry. Sen and Nussbaum. Hohfeld's jural relations.</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Part II -->
+        <div class="part-item" data-part="2">
+          <button class="part-header">
+            <div class="part-info">
+              <span class="part-number">Part II</span>
+              <h3>The Framework</h3>
+              <span class="part-chapters">Chapters 4&ndash;8</span>
+            </div>
+            <span class="part-toggle">+</span>
+          </button>
+          <div class="part-body">
+            <div class="chapter-list">
+              <div class="chapter-item">
+                <span class="ch-num">4</span>
+                <div class="ch-info">
+                  <h4>Mathematical Preliminaries</h4>
+                  <p>Manifolds, tangent bundles, covectors, tensors, metrics, connections, curvature, fiber bundles, stratified spaces, gauge theory. The complete geometric toolkit.</p>
+                </div>
+              </div>
+              <div class="chapter-item">
+                <span class="ch-num">5</span>
+                <div class="ch-info">
+                  <h4>The Moral Manifold</h4>
+                  <p>The 9-dimensional moral space. What are the points? The 3&times;3 derivation. Coordinates, admissible transformations, stratification, singularities, topology.</p>
+                </div>
+              </div>
+              <div class="chapter-item">
+                <span class="ch-num">6</span>
+                <div class="ch-info">
+                  <h4>The Tensor Hierarchy</h4>
+                  <p>From scalars to tensors. Obligations as vectors. Interests as covectors. The fundamental contraction: satisfaction. The moral metric. The full moral tensor.</p>
+                </div>
+              </div>
+              <div class="chapter-item">
+                <span class="ch-num">7</span>
+                <div class="ch-info">
+                  <h4>One Case, Five Levels</h4>
+                  <p>A single medical allocation case analyzed at each tensor level. Six claims that require tensors. The pedagogy of accumulation.</p>
+                </div>
+              </div>
+              <div class="chapter-item">
+                <span class="ch-num">8</span>
+                <div class="ch-info">
+                  <h4>Stratification &mdash; Boundaries, Thresholds, and Phase Transitions</h4>
+                  <p>Whitney stratification. Moral boundaries: thresholds, phase transitions, absorbing strata, forbidden regions. Semantic gates. The geometry near a boundary.</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Part III -->
+        <div class="part-item" data-part="3">
+          <button class="part-header">
+            <div class="part-info">
+              <span class="part-number">Part III</span>
+              <h3>Dynamics and Symmetry</h3>
+              <span class="part-chapters">Chapters 9&ndash;13</span>
+            </div>
+            <span class="part-toggle">+</span>
+          </button>
+          <div class="part-body">
+            <div class="chapter-list">
+              <div class="chapter-item">
+                <span class="ch-num">9</span>
+                <div class="ch-info">
+                  <h4>The Origin of the Moral Metric</h4>
+                  <p>Discovery, construction, or governance? Realist, constructivist, expressivist, and governance accounts. Constraints on admissible metrics. Pluralism and the meta-metric.</p>
+                </div>
+              </div>
+              <div class="chapter-item">
+                <span class="ch-num">10</span>
+                <div class="ch-info">
+                  <h4>Moral Dynamics &mdash; Parallel Transport, Holonomy, and Curvature</h4>
+                  <p>The moral connection. Parallel transport of obligations. Holonomy: path-dependence of moral evaluation. Geodesics: paths of least resistance. Gradient flows.</p>
+                </div>
+              </div>
+              <div class="chapter-item">
+                <span class="ch-num">11</span>
+                <div class="ch-info">
+                  <h4>Moral Reasoning as Optimal Search</h4>
+                  <p>A* search on the moral manifold. Obligation vectors as heuristic functions. Computational intractability of exact moral reasoning. Deontology as pre-compiled heuristics.</p>
+                </div>
+              </div>
+              <div class="chapter-item">
+                <span class="ch-num">12</span>
+                <div class="ch-info">
+                  <h4>Noether's Theorem for Ethics</h4>
+                  <p>The Bond Invariance Principle as continuous symmetry. The moral Lagrangian. The conservation of harm. Four consequences: euphemism doesn't reduce harm, harm is auditable, re-description can't redistribute harm, moral debt persists.</p>
+                </div>
+              </div>
+              <div class="chapter-item">
+                <span class="ch-num">13</span>
+                <div class="ch-info">
+                  <h4>Quantum Normative Dynamics</h4>
+                  <p>Superposition as deliberation. Moral observables and measurement. Interference between framings. The density matrix. The stratified Lagrangian. Entanglement. The moral Schr&ouml;dinger equation.</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Part IV -->
+        <div class="part-item" data-part="4">
+          <button class="part-header">
+            <div class="part-info">
+              <span class="part-number">Part IV</span>
+              <h3>Agents and Collectives</h3>
+              <span class="part-chapters">Chapters 14&ndash;16</span>
+            </div>
+            <span class="part-toggle">+</span>
+          </button>
+          <div class="part-body">
+            <div class="chapter-list">
+              <div class="chapter-item">
+                <span class="ch-num">14</span>
+                <div class="ch-info">
+                  <h4>Collective Moral Agency</h4>
+                  <p>Aggregation, emergence, and shared obligation. The collective agency tensor. Distributed responsibility. Institutional geometry. AI systems as collective agents.</p>
+                </div>
+              </div>
+              <div class="chapter-item">
+                <span class="ch-num">15</span>
+                <div class="ch-info">
+                  <h4>From Tensor to Decision &mdash; The Philosophy of Moral Contraction</h4>
+                  <p>The moment of choice. Non-commutativity. Information lost in contraction. Moral residue. Deferred contraction. Contraction in AI systems.</p>
+                </div>
+              </div>
+              <div class="chapter-item">
+                <span class="ch-num">16</span>
+                <div class="ch-info">
+                  <h4>Moral Uncertainty and the Limits of Geometric Determination</h4>
+                  <p>Three types of uncertainty. Decision under moral uncertainty. The intertheoretic comparison problem. Robust obligations. Residual indeterminacy. The modesty of the framework.</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Part V -->
+        <div class="part-item" data-part="5">
+          <button class="part-header">
+            <div class="part-info">
+              <span class="part-number">Part V</span>
+              <h3>Implementation</h3>
+              <span class="part-chapters">Chapters 17&ndash;19</span>
+            </div>
+            <span class="part-toggle">+</span>
+          </button>
+          <div class="part-body">
+            <div class="chapter-list">
+              <div class="chapter-item">
+                <span class="ch-num">17</span>
+                <div class="ch-info">
+                  <h4>Empirical Evidence for Geometric Ethics</h4>
+                  <p>The Dear Abby corpus analysis. BIP experiments. The Dear Ethicist game. Quantum cognition predictions. Cross-lingual invariance. The philosophy engineering code corpus (2.77M lines).</p>
+                </div>
+              </div>
+              <div class="chapter-item">
+                <span class="ch-num">18</span>
+                <div class="ch-info">
+                  <h4>Geometric Ethics for Artificial Agents</h4>
+                  <p>Tensor-valued objectives. Invariance as alignment. The No Escape Theorem. Escape route analysis. Implementing geometric AI ethics. The alignment problem as contraction mismatch.</p>
+                </div>
+              </div>
+              <div class="chapter-item">
+                <span class="ch-num">19</span>
+                <div class="ch-info">
+                  <h4>The DEME Architecture and ErisML</h4>
+                  <p>ErisML: a modeling language for geometric ethics. The translation layer. DEME: the ethics engine. The Bond Index. The separation principle. The Norm Kernel. The Grand Unified AI Safety Stack.</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Part VI -->
+        <div class="part-item" data-part="6">
+          <button class="part-header">
+            <div class="part-info">
+              <span class="part-number">Part VI</span>
+              <h3>Domain Applications</h3>
+              <span class="part-chapters">Chapters 20&ndash;28</span>
+            </div>
+            <span class="part-toggle">+</span>
+          </button>
+          <div class="part-body">
+            <div class="chapter-list">
+              <div class="chapter-item"><span class="ch-num">20</span><div class="ch-info"><h4>Geometric Economics</h4><p>The Bond Geodesic Equilibrium. Behavioral game theory as manifold geometry. Prospect theory. The 2008 financial crisis as manifold failure.</p></div></div>
+              <div class="chapter-item"><span class="ch-num">21</span><div class="ch-info"><h4>Geometric Clinical Ethics</h4><p>Triage, consent, and the clinical geodesic. The QALY Irrecoverability Theorem. Mathematical theory of moral injury. Geometric informed consent.</p></div></div>
+              <div class="chapter-item"><span class="ch-num">22</span><div class="ch-info"><h4>Geometric Jurisprudence</h4><p>Law as geometric structure. The Hohfeldian octad and gauge theory. Topological constitutionality. Legal disputes as A* pathfinding.</p></div></div>
+              <div class="chapter-item"><span class="ch-num">23</span><div class="ch-info"><h4>Geometric Finance</h4><p>Market microstructure on the decision manifold. The flash crash as dimensional collapse. Option pricing as scalar projection.</p></div></div>
+              <div class="chapter-item"><span class="ch-num">24</span><div class="ch-info"><h4>Geometric Theology</h4><p>Religious reasoning on the moral manifold. The Euthyphro dilemma as gauge ambiguity. Theodicy as dimensional projection. Genesis 3:22.</p></div></div>
+              <div class="chapter-item"><span class="ch-num">25</span><div class="ch-info"><h4>Geometric Environmental Ethics</h4><p>Climate, commons, and intergenerational obligation. The discount rate as dimensional collapse. Species extinction as irreversible boundary crossing.</p></div></div>
+              <div class="chapter-item"><span class="ch-num">26</span><div class="ch-info"><h4>Geometric AI Ethics</h4><p>The moral geometry of algorithmic systems. Alignment as geodesic preservation. Algorithmic bias as scalar projection. The paperclip maximizer as dimensional collapse.</p></div></div>
+              <div class="chapter-item"><span class="ch-num">27</span><div class="ch-info"><h4>Geometric Bioethics</h4><p>Population-level ethics. CRISPR as irreversible manifold modification. Research ethics and the double consent condition. Neuroethics as autonomy curvature.</p></div></div>
+              <div class="chapter-item"><span class="ch-num">28</span><div class="ch-info"><h4>Geometric Military Ethics</h4><p>War and constrained pathfinding. Proportionality as multi-dimensional cost-benefit. The doctrine of double effect as dimensional decomposition. Moral injury as manifold damage.</p></div></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Part VII -->
+        <div class="part-item" data-part="7">
+          <button class="part-header">
+            <div class="part-info">
+              <span class="part-number">Part VII</span>
+              <h3>Horizons</h3>
+              <span class="part-chapters">Chapters 29&ndash;30</span>
+            </div>
+            <span class="part-toggle">+</span>
+          </button>
+          <div class="part-body">
+            <div class="chapter-list">
+              <div class="chapter-item">
+                <span class="ch-num">29</span>
+                <div class="ch-info">
+                  <h4>Open Problems</h4>
+                  <p>The empirical program for moral curvature. The moral field equation. Torsion in moral space. Tensorial interpretability for AI. Scalability of structural containment. What would falsify the framework.</p>
+                </div>
+              </div>
+              <div class="chapter-item">
+                <span class="ch-num">30</span>
+                <div class="ch-info">
+                  <h4>Conclusion &mdash; The Geometry of "Maybe"</h4>
+                  <p>Return to the border. What the old man knew. The arc of the argument. What the framework provides. Ethics is not a number. A final "maybe."</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Key Theorems -->
+  <section id="theorems" class="section section-dark">
+    <div class="container">
+      <div class="section-header">
+        <span class="section-number">VI</span>
+        <h2>Key Results</h2>
+        <p class="section-subtitle">Seven central theorems, each conditional on stated assumptions</p>
+      </div>
+
+      <div class="theorems-grid">
+        <div class="theorem-card" data-aos="fade-up">
+          <div class="theorem-badge">Thm 9.2</div>
+          <h3>Structured Pluralism</h3>
+          <p>The space of admissible moral metrics admits a partial order that is not total: genuine moral disagreement is geometrically irreducible.</p>
+          <div class="theorem-assumptions">Assumes: BIP, Def 4.5</div>
+        </div>
+        <div class="theorem-card" data-aos="fade-up" data-aos-delay="100">
+          <div class="theorem-badge">Thm 12.1</div>
+          <h3>Conservation of Harm</h3>
+          <p>If the moral Lagrangian is invariant under re-description (BIP), then harm is a conserved Noether charge. Euphemism does not reduce harm.</p>
+          <div class="theorem-assumptions">Assumes: BIP, C<sup>2</sup> Lagrangian</div>
+        </div>
+        <div class="theorem-card" data-aos="fade-up" data-aos-delay="200">
+          <div class="theorem-badge">Thm 12.3</div>
+          <h3>Gauge Group</h3>
+          <p>The maximal gauge group consistent with Hohfeldian structure and bounded harm is D<sub>4</sub> &times; U(1)<sub>H</sub>.</p>
+          <div class="theorem-assumptions">Assumes: Axioms A1&ndash;A5</div>
+        </div>
+        <div class="theorem-card highlight-card" data-aos="fade-up" data-aos-delay="300">
+          <div class="theorem-badge">Thm 18.1</div>
+          <h3>No Escape Theorem</h3>
+          <p>Under canonicalization, grounded evaluation, structural audit, and verification integrity, an AI system cannot circumvent moral constraints by re-description.</p>
+          <div class="theorem-assumptions">Assumes: Reqs 1&ndash;4, BIP</div>
+        </div>
+        <div class="theorem-card" data-aos="fade-up" data-aos-delay="400">
+          <div class="theorem-badge">Prop 15.3</div>
+          <h3>Non-Commutativity of Contraction</h3>
+          <p>The order in which moral dimensions are contracted affects the outcome: contraction paths are not interchangeable.</p>
+          <div class="theorem-assumptions">Assumes: Def 15.1 (pure math)</div>
+        </div>
+        <div class="theorem-card" data-aos="fade-up" data-aos-delay="500">
+          <div class="theorem-badge">Thm 11.1</div>
+          <h3>Admissibility</h3>
+          <p>Core moral heuristics never overestimate true cost to equilibrium. Deontological rules are admissible A* heuristics.</p>
+          <div class="theorem-assumptions">Assumes: BF model, Ch 8</div>
+        </div>
+        <div class="theorem-card" data-aos="fade-up" data-aos-delay="600">
+          <div class="theorem-badge">Thm 11.2</div>
+          <h3>Intractability</h3>
+          <p>Exact moral geodesic planning is intractable in manifold dimension. This is why evolution pre-compiled heuristics into our cognitive architecture.</p>
+          <div class="theorem-assumptions">Assumes: Whitney stratification, 9D manifold</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Applications Visualization -->
+  <section id="applications" class="section">
+    <div class="container">
+      <div class="section-header">
+        <span class="section-number">VII</span>
+        <h2>Domain Applications</h2>
+        <p class="section-subtitle">Nine established domains, each with worked examples and falsifiable predictions</p>
+      </div>
+
+      <div class="app-hexgrid">
+        <div class="app-hex" data-app="economics">
+          <div class="hex-inner">
+            <div class="hex-icon">
+              <svg viewBox="0 0 40 40"><path d="M5 30 L15 15 L25 20 L35 8" fill="none" stroke="currentColor" stroke-width="2"/><circle cx="15" cy="15" r="2" fill="currentColor"/><circle cx="25" cy="20" r="2" fill="currentColor"/><circle cx="35" cy="8" r="2" fill="currentColor"/></svg>
+            </div>
+            <h4>Economics</h4>
+            <p>Bond Geodesic Equilibrium</p>
+          </div>
+        </div>
+        <div class="app-hex" data-app="clinical">
+          <div class="hex-inner">
+            <div class="hex-icon">
+              <svg viewBox="0 0 40 40"><path d="M20 5 L20 35 M5 20 L35 20" stroke="currentColor" stroke-width="3" fill="none"/></svg>
+            </div>
+            <h4>Clinical Ethics</h4>
+            <p>Triage & Clinical Geodesic</p>
+          </div>
+        </div>
+        <div class="app-hex" data-app="law">
+          <div class="hex-inner">
+            <div class="hex-icon">
+              <svg viewBox="0 0 40 40"><rect x="8" y="25" width="24" height="3" fill="currentColor"/><rect x="18" y="10" width="4" height="15" fill="currentColor"/><polygon points="10,12 20,5 30,12" fill="none" stroke="currentColor" stroke-width="2"/></svg>
+            </div>
+            <h4>Jurisprudence</h4>
+            <p>Legal Manifolds & Gauge</p>
+          </div>
+        </div>
+        <div class="app-hex" data-app="finance">
+          <div class="hex-inner">
+            <div class="hex-icon">
+              <svg viewBox="0 0 40 40"><rect x="5" y="25" width="5" height="10" fill="currentColor" opacity="0.5"/><rect x="13" y="18" width="5" height="17" fill="currentColor" opacity="0.7"/><rect x="21" y="10" width="5" height="25" fill="currentColor" opacity="0.85"/><rect x="29" y="15" width="5" height="20" fill="currentColor"/></svg>
+            </div>
+            <h4>Finance</h4>
+            <p>Market Microstructure</p>
+          </div>
+        </div>
+        <div class="app-hex" data-app="theology">
+          <div class="hex-inner">
+            <div class="hex-icon">
+              <svg viewBox="0 0 40 40"><circle cx="20" cy="18" r="10" fill="none" stroke="currentColor" stroke-width="2"/><path d="M20 8 L20 28 M10 18 L30 18" stroke="currentColor" stroke-width="1.5"/></svg>
+            </div>
+            <h4>Theology</h4>
+            <p>Religious Reasoning</p>
+          </div>
+        </div>
+        <div class="app-hex" data-app="environment">
+          <div class="hex-inner">
+            <div class="hex-icon">
+              <svg viewBox="0 0 40 40"><path d="M20 35 C20 35 10 25 10 18 C10 10 20 5 20 5 C20 5 30 10 30 18 C30 25 20 35 20 35Z" fill="none" stroke="currentColor" stroke-width="2"/></svg>
+            </div>
+            <h4>Environmental</h4>
+            <p>Climate & Commons</p>
+          </div>
+        </div>
+        <div class="app-hex" data-app="ai">
+          <div class="hex-inner">
+            <div class="hex-icon">
+              <svg viewBox="0 0 40 40"><rect x="10" y="10" width="20" height="15" rx="3" fill="none" stroke="currentColor" stroke-width="2"/><circle cx="16" cy="18" r="2" fill="currentColor"/><circle cx="24" cy="18" r="2" fill="currentColor"/><path d="M14 30 L14 25 M26 30 L26 25" stroke="currentColor" stroke-width="2"/></svg>
+            </div>
+            <h4>AI Ethics</h4>
+            <p>Alignment & Containment</p>
+          </div>
+        </div>
+        <div class="app-hex" data-app="bioethics">
+          <div class="hex-inner">
+            <div class="hex-icon">
+              <svg viewBox="0 0 40 40"><path d="M10 20 Q15 10 20 20 Q25 30 30 20" fill="none" stroke="currentColor" stroke-width="2"/><path d="M10 20 Q15 30 20 20 Q25 10 30 20" fill="none" stroke="currentColor" stroke-width="2"/></svg>
+            </div>
+            <h4>Bioethics</h4>
+            <p>CRISPR & Population Ethics</p>
+          </div>
+        </div>
+        <div class="app-hex" data-app="military">
+          <div class="hex-inner">
+            <div class="hex-icon">
+              <svg viewBox="0 0 40 40"><polygon points="20,5 35,35 5,35" fill="none" stroke="currentColor" stroke-width="2"/><line x1="20" y1="15" x2="20" y2="25" stroke="currentColor" stroke-width="2"/><circle cx="20" cy="29" r="1.5" fill="currentColor"/></svg>
+            </div>
+            <h4>Military Ethics</h4>
+            <p>Constrained Pathfinding</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Fundamental Equation -->
+  <section id="equation" class="section section-accent">
+    <div class="container">
+      <div class="equation-display">
+        <p class="eq-label">The Fundamental Equation of Moral Reasoning</p>
+        <div class="eq-formula">
+          <span class="eq-main">f(n) = g(n) + h(n)</span>
+        </div>
+        <div class="eq-legend">
+          <div class="eq-term">
+            <span class="eq-var">f(n)</span>
+            <span class="eq-desc">Total moral evaluation at situation n</span>
+          </div>
+          <div class="eq-term">
+            <span class="eq-var">g(n)</span>
+            <span class="eq-desc">Accumulated behavioral friction (cost so far)</span>
+          </div>
+          <div class="eq-term">
+            <span class="eq-var">h(n)</span>
+            <span class="eq-desc">Obligation-guided estimation (heuristic to equilibrium)</span>
+          </div>
+        </div>
+        <p class="eq-note">Moral reasoning is A* pathfinding on the moral manifold. Obligation vectors are gradient vectors of heuristic functions. Classical moral rules &mdash; "do not kill," "keep your promises" &mdash; are admissible heuristics: they never overestimate true cost to moral equilibrium.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Conservation of Harm -->
+  <section id="conservation" class="section section-dark">
+    <div class="container">
+      <div class="conservation-layout">
+        <div class="conservation-text">
+          <h2>The Conservation of Harm</h2>
+          <p class="conservation-subtitle">Noether's Theorem applied to ethics</p>
+          <div class="consequence-list">
+            <div class="consequence">
+              <span class="consequence-num">1</span>
+              <div>
+                <h4>Euphemism Does Not Reduce Harm</h4>
+                <p>Relabeling "killing" as "end-of-life transition facilitation" does not change the conserved Noether charge.</p>
+              </div>
+            </div>
+            <div class="consequence">
+              <span class="consequence-num">2</span>
+              <div>
+                <h4>Harm Is Auditable Across Representations</h4>
+                <p>Because harm is conserved, it can be tracked and verified regardless of how a situation is described.</p>
+              </div>
+            </div>
+            <div class="consequence">
+              <span class="consequence-num">3</span>
+              <div>
+                <h4>Re-Description Cannot Redistribute Harm</h4>
+                <p>You cannot move harm from one dimension to another merely by changing the coordinate system.</p>
+              </div>
+            </div>
+            <div class="consequence">
+              <span class="consequence-num">4</span>
+              <div>
+                <h4>Moral Debt Persists</h4>
+                <p>Unresolved harm carries forward. The conservation law is the formal basis for moral accountability.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="conservation-viz">
+          <svg viewBox="0 0 400 400" xmlns="http://www.w3.org/2000/svg" class="noether-svg">
+            <!-- Symmetry circle -->
+            <circle cx="200" cy="200" r="150" fill="none" stroke="#1a3a4a" stroke-width="1"/>
+            <circle cx="200" cy="200" r="100" fill="none" stroke="#1a3a4a" stroke-width="1" opacity="0.5"/>
+            <!-- BIP symmetry arrows (rotation) -->
+            <g class="symmetry-rotation">
+              <path d="M200,50 A150,150 0 0,1 340,140" fill="none" stroke="#4dd9c0" stroke-width="2" marker-end="url(#arr5)" opacity="0.6"/>
+              <path d="M340,260 A150,150 0 0,1 200,350" fill="none" stroke="#4dd9c0" stroke-width="2" marker-end="url(#arr5)" opacity="0.6"/>
+              <path d="M60,140 A150,150 0 0,0 200,50" fill="none" stroke="#4dd9c0" stroke-width="2" opacity="0.3"/>
+            </g>
+            <!-- Center: conserved charge -->
+            <circle cx="200" cy="200" r="40" fill="rgba(255,107,107,0.15)" stroke="#ff6b6b" stroke-width="2"/>
+            <text x="200" y="195" text-anchor="middle" fill="#ff6b6b" font-size="14" font-weight="600">H</text>
+            <text x="200" y="212" text-anchor="middle" fill="#ff6b6b" font-size="10">conserved</text>
+            <!-- Labels -->
+            <text x="200" y="35" text-anchor="middle" fill="#4dd9c0" font-size="11">BIP Symmetry</text>
+            <text x="200" y="385" text-anchor="middle" fill="#667" font-size="10">Re-description invariance &rarr; Harm conservation</text>
+            <!-- Noether arrow -->
+            <text x="355" y="200" fill="#4dd9c0" font-size="10" transform="rotate(90 355 200)">Noether</text>
+            <defs>
+              <marker id="arr5" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+                <path d="M 0 0 L 10 5 L 0 10 z" fill="#4dd9c0"/>
+              </marker>
+            </defs>
+          </svg>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Reading Paths -->
+  <section id="paths" class="section">
+    <div class="container">
+      <div class="section-header">
+        <span class="section-number">VIII</span>
+        <h2>Reading Paths</h2>
+        <p class="section-subtitle">Choose your journey through the book</p>
+      </div>
+
+      <div class="paths-grid">
+        <div class="path-card" data-aos="fade-up">
+          <div class="path-icon path-philosopher"></div>
+          <h3>Philosophers</h3>
+          <p>The core argument: why scalar ethics fails, geometric precursors, the governance account, contraction and residue, the limits of the framework.</p>
+          <div class="path-chapters">
+            <span class="path-ch">1</span>
+            <span class="path-ch">2</span>
+            <span class="path-ch">3</span>
+            <span class="path-ch">7</span>
+            <span class="path-ch">9</span>
+            <span class="path-ch">15</span>
+            <span class="path-ch">16</span>
+          </div>
+        </div>
+        <div class="path-card" data-aos="fade-up" data-aos-delay="100">
+          <div class="path-icon path-mathematician"></div>
+          <h3>Mathematicians &amp; Physicists</h3>
+          <p>The formal development: moral manifold, tensor hierarchy, stratification, connection, curvature, Noether theorem, quantum extension.</p>
+          <div class="path-chapters">
+            <span class="path-ch">4</span>
+            <span class="path-ch">5</span>
+            <span class="path-ch">6</span>
+            <span class="path-ch">8</span>
+            <span class="path-ch">10</span>
+            <span class="path-ch">11</span>
+            <span class="path-ch">12</span>
+            <span class="path-ch">13</span>
+          </div>
+        </div>
+        <div class="path-card" data-aos="fade-up" data-aos-delay="200">
+          <div class="path-icon path-engineer"></div>
+          <h3>AI Researchers &amp; Engineers</h3>
+          <p>Direct application: tensor-valued objectives, invariance testing, the No Escape Theorem, DEME architecture, ErisML, empirical validation.</p>
+          <div class="path-chapters">
+            <span class="path-ch">1</span>
+            <span class="path-ch">2</span>
+            <span class="path-ch">7</span>
+            <span class="path-ch">17</span>
+            <span class="path-ch">18</span>
+            <span class="path-ch">19</span>
+          </div>
+        </div>
+        <div class="path-card" data-aos="fade-up" data-aos-delay="300">
+          <div class="path-icon path-policy"></div>
+          <h3>Policy Makers</h3>
+          <p>The accessible argument: geometric structure of ethics, why scalar AI governance fails, the governance account, the mandate question.</p>
+          <div class="path-chapters">
+            <span class="path-ch">1</span>
+            <span class="path-ch">2</span>
+            <span class="path-ch">7</span>
+            <span class="path-ch">15</span>
+            <span class="path-ch">18</span>
+          </div>
+        </div>
+        <div class="path-card fast-path" data-aos="fade-up" data-aos-delay="400">
+          <div class="path-icon path-fast"></div>
+          <h3>The Fast Path</h3>
+          <p>The core argument in five chapters. Why geometry, why not scalars, one case at five levels, from tensor to decision, geometric AI ethics.</p>
+          <div class="path-chapters">
+            <span class="path-ch highlight">1</span>
+            <span class="path-ch highlight">2</span>
+            <span class="path-ch highlight">7</span>
+            <span class="path-ch highlight">15</span>
+            <span class="path-ch highlight">18</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- DEME Architecture -->
+  <section id="architecture" class="section section-dark">
+    <div class="container">
+      <div class="section-header">
+        <span class="section-number">IX</span>
+        <h2>The DEME Architecture</h2>
+        <p class="section-subtitle">From theory to implementation: the Grand Unified AI Safety Stack</p>
+      </div>
+
+      <div class="architecture-viz">
+        <svg viewBox="0 0 700 420" xmlns="http://www.w3.org/2000/svg" class="deme-svg">
+          <!-- Layer 7: Application -->
+          <rect x="100" y="10" width="500" height="45" rx="6" fill="rgba(77,217,192,0.08)" stroke="#4dd9c0" stroke-width="1.5"/>
+          <text x="350" y="38" text-anchor="middle" fill="#4dd9c0" font-size="13" font-weight="600">7. Application Layer</text>
+          <text x="620" y="38" fill="#556677" font-size="10">Domain-specific</text>
+
+          <!-- Layer 6: Governance -->
+          <rect x="100" y="65" width="500" height="45" rx="6" fill="rgba(167,139,250,0.08)" stroke="#a78bfa" stroke-width="1.5"/>
+          <text x="350" y="93" text-anchor="middle" fill="#a78bfa" font-size="13" font-weight="600">6. Governance Profile</text>
+          <text x="620" y="93" fill="#556677" font-size="10">Metric selection</text>
+
+          <!-- Layer 5: ErisML -->
+          <rect x="100" y="120" width="500" height="45" rx="6" fill="rgba(255,217,61,0.08)" stroke="#ffd93d" stroke-width="1.5"/>
+          <text x="350" y="148" text-anchor="middle" fill="#ffd93d" font-size="13" font-weight="600">5. ErisML Specification</text>
+          <text x="620" y="148" fill="#556677" font-size="10">Modeling language</text>
+
+          <!-- Layer 4: Translation -->
+          <rect x="100" y="175" width="500" height="45" rx="6" fill="rgba(249,115,22,0.08)" stroke="#f97316" stroke-width="1.5"/>
+          <text x="350" y="203" text-anchor="middle" fill="#f97316" font-size="13" font-weight="600">4. Translation Layer</text>
+          <text x="620" y="203" fill="#556677" font-size="10">Policy modules</text>
+
+          <!-- Layer 3: DEME Engine -->
+          <rect x="100" y="230" width="500" height="45" rx="6" fill="rgba(77,217,192,0.15)" stroke="#4dd9c0" stroke-width="2"/>
+          <text x="350" y="258" text-anchor="middle" fill="#4dd9c0" font-size="13" font-weight="700">3. DEME Ethics Engine</text>
+          <text x="620" y="258" fill="#556677" font-size="10">Core evaluation</text>
+
+          <!-- Layer 2: Norm Kernel -->
+          <rect x="100" y="285" width="500" height="45" rx="6" fill="rgba(255,107,107,0.08)" stroke="#ff6b6b" stroke-width="1.5"/>
+          <text x="350" y="313" text-anchor="middle" fill="#ff6b6b" font-size="13" font-weight="600">2. Norm Kernel</text>
+          <text x="620" y="313" fill="#556677" font-size="10">Verified automata</text>
+
+          <!-- Layer 1: Tensor Runtime -->
+          <rect x="100" y="340" width="500" height="45" rx="6" fill="rgba(100,150,180,0.08)" stroke="#6496b4" stroke-width="1.5"/>
+          <text x="350" y="368" text-anchor="middle" fill="#6496b4" font-size="13" font-weight="600">1. Tensor Runtime</text>
+          <text x="620" y="368" fill="#556677" font-size="10">Geometric primitives</text>
+
+          <!-- Bond Index arrow -->
+          <line x1="70" y1="30" x2="70" y2="370" stroke="#4dd9c0" stroke-width="1.5" marker-end="url(#arr6)" opacity="0.5"/>
+          <text x="60" y="200" text-anchor="middle" fill="#4dd9c0" font-size="10" transform="rotate(-90 60 200)">Bond Index (Bd)</text>
+          <defs>
+            <marker id="arr6" viewBox="0 0 10 10" refX="5" refY="9" markerWidth="6" markerHeight="6" orient="auto">
+              <path d="M 0 0 L 5 10 L 10 0 z" fill="#4dd9c0"/>
+            </marker>
+          </defs>
+        </svg>
+      </div>
+    </div>
+  </section>
+
+  <!-- Epistemic Honesty -->
+  <section id="epistemic" class="section">
+    <div class="container">
+      <div class="section-header">
+        <span class="section-number">X</span>
+        <h2>Epistemic Honesty</h2>
+        <p class="section-subtitle">Every claim is tagged with its epistemic status</p>
+      </div>
+
+      <div class="epistemic-grid">
+        <div class="epistemic-card">
+          <div class="tag tag-definition">Definition / Modeling choice</div>
+          <p>Stipulated structures &mdash; the 9 dimensions, manifold topology, Hohfeldian strata. Architectural decisions chosen for explanatory and engineering utility. They could be otherwise.</p>
+        </div>
+        <div class="epistemic-card">
+          <div class="tag tag-theorem">Theorem (conditional)</div>
+          <p>Mathematical results that follow rigorously from stated premises. The theorem itself is not empirical; what is empirical is whether the premises obtain.</p>
+        </div>
+        <div class="epistemic-card">
+          <div class="tag tag-empirical">Empirical result (preliminary / robust)</div>
+          <p>Findings supported by data. "Preliminary" = single study. "Robust" = replicated or survived deliberate falsification attempts. The distinction is marked honestly.</p>
+        </div>
+        <div class="epistemic-card">
+          <div class="tag tag-speculation">Speculation / Extension</div>
+          <p>Ideas that cannot yet be supported with proof or data. The Orch-OR connection, the moral field equation &mdash; flagged as speculative. They suggest research directions, not defended claims.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Interactive Tutorials -->
+  <section id="tutorials" class="section">
+    <div class="container">
+      <div class="section-header">
+        <span class="section-number">XI</span>
+        <h2>Interactive Tutorials</h2>
+        <p class="section-subtitle">Learn geometric ethics hands-on with Jupyter notebooks and live code</p>
+      </div>
+
+      <div class="tutorials-grid">
+        <div class="tutorial-card" data-aos="fade-up">
+          <div class="tutorial-level">Beginner</div>
+          <div class="tutorial-icon">
+            <svg viewBox="0 0 48 48"><rect x="8" y="6" width="32" height="36" rx="3" fill="none" stroke="var(--cb-teal)" stroke-width="2"/><line x1="14" y1="14" x2="34" y2="14" stroke="var(--cb-teal)" stroke-width="1.5" opacity="0.5"/><line x1="14" y1="20" x2="28" y2="20" stroke="var(--cb-teal)" stroke-width="1.5" opacity="0.5"/><rect x="14" y="26" width="20" height="10" rx="2" fill="rgba(27,158,119,0.15)" stroke="var(--cb-teal)" stroke-width="1"/><polygon points="21,28 21,34 27,31" fill="var(--cb-teal)"/></svg>
+          </div>
+          <h3>Hello DEME</h3>
+          <p>Your first ethics evaluation. Create EthicalFacts objects, instantiate the RightsFirstEM module, and compare two options.</p>
+          <div class="tutorial-tags">
+            <span class="t-tag">EthicalFacts</span>
+            <span class="t-tag">RightsFirstEM</span>
+            <span class="t-tag">Judgement</span>
+          </div>
+          <a href="https://github.com/ahb-sjsu/erisml-lib/blob/main/src/erisml/examples/hello_deme.py" class="tutorial-link" target="_blank" rel="noopener">
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/></svg>
+            View Source
+          </a>
+        </div>
+
+        <div class="tutorial-card" data-aos="fade-up" data-aos-delay="100">
+          <div class="tutorial-level">Intermediate</div>
+          <div class="tutorial-icon">
+            <svg viewBox="0 0 48 48"><circle cx="24" cy="24" r="16" fill="none" stroke="var(--cb-orange)" stroke-width="2"/><path d="M16 24 L22 18 L28 26 L34 20" fill="none" stroke="var(--cb-orange)" stroke-width="2"/><circle cx="22" cy="18" r="2" fill="var(--cb-orange)"/><circle cx="28" cy="26" r="2" fill="var(--cb-orange)"/></svg>
+          </div>
+          <h3>Bond Invariance Principle</h3>
+          <p>Test whether moral evaluations are invariant under re-description. Apply BIP to real scenarios and measure violation scores.</p>
+          <div class="tutorial-tags">
+            <span class="t-tag">BIP</span>
+            <span class="t-tag">Gauge Symmetry</span>
+            <span class="t-tag">Invariance</span>
+          </div>
+          <a href="https://github.com/ahb-sjsu/erisml-lib/blob/main/src/erisml/examples/bond_invariance_demo.py" class="tutorial-link" target="_blank" rel="noopener">
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/></svg>
+            View Source
+          </a>
+        </div>
+
+        <div class="tutorial-card" data-aos="fade-up" data-aos-delay="200">
+          <div class="tutorial-level">Intermediate</div>
+          <div class="tutorial-icon">
+            <svg viewBox="0 0 48 48"><path d="M12 36 L24 12 L36 36 Z" fill="none" stroke="var(--cb-purple)" stroke-width="2"/><circle cx="24" cy="12" r="3" fill="var(--cb-purple)" opacity="0.6"/><circle cx="12" cy="36" r="3" fill="var(--cb-purple)" opacity="0.6"/><circle cx="36" cy="36" r="3" fill="var(--cb-purple)" opacity="0.6"/></svg>
+          </div>
+          <h3>Triage Ethics Pipeline</h3>
+          <p>Build a complete geometric ethics pipeline for emergency triage: obligation vectors, interest covectors, contraction, and residue analysis.</p>
+          <div class="tutorial-tags">
+            <span class="t-tag">Tensors</span>
+            <span class="t-tag">Contraction</span>
+            <span class="t-tag">Residue</span>
+          </div>
+          <a href="https://github.com/ahb-sjsu/erisml-lib/blob/main/src/erisml/examples/triage_ethics_demo.py" class="tutorial-link" target="_blank" rel="noopener">
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/></svg>
+            View Source
+          </a>
+        </div>
+
+        <div class="tutorial-card" data-aos="fade-up" data-aos-delay="300">
+          <div class="tutorial-level">Intermediate</div>
+          <div class="tutorial-icon">
+            <svg viewBox="0 0 48 48"><rect x="10" y="10" width="12" height="12" rx="2" fill="none" stroke="var(--cb-pink)" stroke-width="2"/><rect x="26" y="10" width="12" height="12" rx="2" fill="none" stroke="var(--cb-pink)" stroke-width="2"/><rect x="10" y="26" width="12" height="12" rx="2" fill="none" stroke="var(--cb-pink)" stroke-width="2"/><rect x="26" y="26" width="12" height="12" rx="2" fill="none" stroke="var(--cb-pink)" stroke-width="2"/><path d="M22 16 L26 16 M22 32 L26 32 M16 22 L16 26 M32 22 L32 26" stroke="var(--cb-pink)" stroke-width="1.5" opacity="0.5"/></svg>
+          </div>
+          <h3>Hohfeld D<sub>4</sub> Symmetry</h3>
+          <p>Explore the dihedral group structure of Hohfeldian jural relations: obligation, claim, liberty, no-claim. Verify the D<sub>4</sub> symmetry computationally.</p>
+          <div class="tutorial-tags">
+            <span class="t-tag">D4 Group</span>
+            <span class="t-tag">Hohfeld</span>
+            <span class="t-tag">Symmetry</span>
+          </div>
+          <a href="https://github.com/ahb-sjsu/erisml-lib/blob/main/src/erisml/examples/hohfeld_d4_demo.py" class="tutorial-link" target="_blank" rel="noopener">
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/></svg>
+            View Source
+          </a>
+        </div>
+
+        <div class="tutorial-card" data-aos="fade-up" data-aos-delay="400">
+          <div class="tutorial-level">Advanced</div>
+          <div class="tutorial-icon">
+            <svg viewBox="0 0 48 48"><path d="M8 40 L16 24 L24 32 L32 16 L40 8" fill="none" stroke="var(--cb-green)" stroke-width="2"/><circle cx="16" cy="24" r="2.5" fill="var(--cb-green)"/><circle cx="24" cy="32" r="2.5" fill="var(--cb-green)"/><circle cx="32" cy="16" r="2.5" fill="var(--cb-green)"/><path d="M8 40 L40 40 L40 8" fill="none" stroke="var(--cb-green)" stroke-width="1" opacity="0.3"/></svg>
+          </div>
+          <h3>Bond Index LLM Evaluation</h3>
+          <p>Evaluate large language models using the Bond Index. Measure structural compliance, invariance, and residue across AI moral judgments.</p>
+          <div class="tutorial-tags">
+            <span class="t-tag">Bond Index</span>
+            <span class="t-tag">LLM Eval</span>
+            <span class="t-tag">Notebook</span>
+          </div>
+          <a href="https://github.com/ahb-sjsu/erisml-lib/blob/main/scripts/bond_index_llm_evaluation.ipynb" class="tutorial-link" target="_blank" rel="noopener">
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/></svg>
+            Open Notebook
+          </a>
+        </div>
+
+        <div class="tutorial-card" data-aos="fade-up" data-aos-delay="500">
+          <div class="tutorial-level">Advanced</div>
+          <div class="tutorial-icon">
+            <svg viewBox="0 0 48 48"><path d="M10 38 C14 20 20 28 24 16 C28 4 34 24 38 10" fill="none" stroke="var(--cb-gold)" stroke-width="2"/><circle cx="24" cy="16" r="3" fill="none" stroke="var(--cb-gold)" stroke-width="1.5"/><path d="M10 42 L38 42" stroke="var(--cb-gold)" stroke-width="1" opacity="0.3"/><text x="24" y="46" text-anchor="middle" fill="var(--cb-gold)" font-size="6">D1 D2 D3 ... D9</text></svg>
+          </div>
+          <h3>Appendix D: End-to-End Case Studies</h3>
+          <p>Five complete pipelines: Emergency Triage, Whistleblower's Dilemma, Autonomous Vehicle, Algorithmic Hiring, Climate Policy. Full tensor computation with Bond Index.</p>
+          <div class="tutorial-tags">
+            <span class="t-tag">Full Pipeline</span>
+            <span class="t-tag">5 Cases</span>
+            <span class="t-tag">DEME Audit</span>
+          </div>
+          <a href="https://github.com/ahb-sjsu/erisml-lib/blob/main/src/erisml/examples/appendix_d_pipeline.py" class="tutorial-link" target="_blank" rel="noopener">
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/></svg>
+            View Source
+          </a>
+        </div>
+      </div>
+
+      <div class="tutorial-quickstart" data-aos="fade-up">
+        <h3>Quick Start</h3>
+        <div class="code-block">
+          <div class="code-header">
+            <span class="code-lang">bash</span>
+            <span class="code-title">Install &amp; Run</span>
+          </div>
+          <pre><code>pip install erisml
+
+# Run the hello world
+python -m erisml.examples.hello_deme
+
+# Run the full Appendix D pipeline
+python -m erisml.examples.appendix_d_pipeline
+
+# Launch the Jupyter notebook
+jupyter notebook scripts/bond_index_llm_evaluation.ipynb</code></pre>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Dear Ethicist Game -->
+  <section id="dear-ethicist" class="section section-dark">
+    <div class="container">
+      <div class="section-header">
+        <span class="section-number">XII</span>
+        <h2>The Dear Ethicist Game</h2>
+        <p class="section-subtitle">An advice column game that measures the mathematical structure of your moral reasoning</p>
+      </div>
+
+      <div class="game-layout">
+        <div class="game-preview">
+          <div class="game-screen">
+            <div class="game-header-bar">
+              <span class="game-logo">The Morning Chronicle</span>
+              <span class="game-subtitle">Advice Column</span>
+            </div>
+            <div class="game-letter">
+              <div class="letter-header">
+                <span class="letter-from">Dear Ethicist,</span>
+              </div>
+              <p class="letter-body">My neighbor promised to water my plants while I was away. She forgot, and they died. She says she's sorry but that it was "only plants." I feel she broke a promise. Am I right to be upset, or am I overreacting?</p>
+              <span class="letter-sig">&mdash; Wilting in Willow Creek</span>
+            </div>
+            <div class="game-choices">
+              <div class="choice-row">
+                <span class="choice-label">Morgan's position:</span>
+                <div class="choice-buttons">
+                  <button class="choice-btn" data-choice="O">O <small>Obligation</small></button>
+                  <button class="choice-btn active-choice" data-choice="O">O</button>
+                </div>
+              </div>
+              <div class="choice-row">
+                <span class="choice-label">Your claim:</span>
+                <div class="choice-buttons">
+                  <button class="choice-btn active-choice" data-choice="C">C <small>Claim</small></button>
+                </div>
+              </div>
+            </div>
+            <div class="game-correlative">
+              <svg viewBox="0 0 200 60" class="correlative-svg">
+                <text x="30" y="25" fill="var(--cb-teal)" font-size="16" font-weight="600">O</text>
+                <path d="M50,20 L90,20" stroke="var(--cb-gold)" stroke-width="2" marker-end="url(#game-arr)"/>
+                <path d="M90,20 L50,20" stroke="var(--cb-gold)" stroke-width="2" marker-start="url(#game-arr)"/>
+                <text x="60" y="14" fill="var(--cb-gold)" font-size="8">D4 symmetry</text>
+                <text x="100" y="25" fill="var(--cb-orange)" font-size="16" font-weight="600">C</text>
+                <text x="30" y="50" fill="var(--cb2-purple)" font-size="16" font-weight="600">L</text>
+                <path d="M50,45 L90,45" stroke="var(--cb-gold)" stroke-width="2" marker-end="url(#game-arr)"/>
+                <text x="100" y="50" fill="var(--cb2-gray)" font-size="16" font-weight="600">N</text>
+                <defs><marker id="game-arr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="5" markerHeight="5" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10z" fill="var(--cb-gold)"/></marker></defs>
+              </svg>
+              <p class="correlative-note">The game measures whether your O &harr; C and L &harr; N correlative symmetries hold &mdash; the D<sub>4</sub> dihedral group of moral structure.</p>
+            </div>
+          </div>
+        </div>
+        <div class="game-info">
+          <h3>How It Works</h3>
+          <div class="game-steps">
+            <div class="game-step">
+              <span class="step-num">1</span>
+              <div>
+                <h4>Read the Letter</h4>
+                <p>Advice seekers present everyday moral dilemmas &mdash; promises, workplace conflicts, family obligations.</p>
+              </div>
+            </div>
+            <div class="game-step">
+              <span class="step-num">2</span>
+              <div>
+                <h4>Classify Normative Positions</h4>
+                <p>Assign Hohfeldian positions: <strong>O</strong>bligation, <strong>C</strong>laim, <strong>L</strong>iberty, or <strong>N</strong>o-claim to each party.</p>
+              </div>
+            </div>
+            <div class="game-step">
+              <span class="step-num">3</span>
+              <div>
+                <h4>Publish Your Verdict</h4>
+                <p>Your advice goes to print. Reader reactions reveal how your reasoning lands.</p>
+              </div>
+            </div>
+            <div class="game-step">
+              <span class="step-num">4</span>
+              <div>
+                <h4>See Your Bond Index</h4>
+                <p>After the session, the game measures the structural consistency of your moral reasoning. Bond Index = 0 means perfect correlative symmetry.</p>
+              </div>
+            </div>
+          </div>
+          <div class="game-stats-box">
+            <div class="game-stat"><span class="gs-num">20,123</span><span class="gs-label">Letters in the bank</span></div>
+            <div class="game-stat"><span class="gs-num">93</span><span class="gs-label">Engineered probes</span></div>
+            <div class="game-stat"><span class="gs-num">D<sub>4</sub></span><span class="gs-label">Symmetry group measured</span></div>
+          </div>
+          <div class="game-cta-row">
+            <a href="https://github.com/ahb-sjsu/sqnd-probe" class="btn btn-primary" target="_blank" rel="noopener">Play the Game</a>
+            <div class="game-install">
+              <code>pip install dear-ethicist && dear-ethicist play</code>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Bell Test / SQND Experiment -->
+  <section id="bell-test" class="section section-accent">
+    <div class="container">
+      <div class="section-header">
+        <span class="section-number">XIII</span>
+        <h2>The Moral Bell Test</h2>
+        <p class="section-subtitle">Testing quantum-like structure in moral reasoning &mdash; SQND experimental program</p>
+      </div>
+
+      <div class="bell-layout">
+        <div class="bell-viz">
+          <svg viewBox="0 0 500 400" xmlns="http://www.w3.org/2000/svg" class="bell-svg">
+            <!-- CHSH inequality diagram -->
+            <text x="250" y="30" text-anchor="middle" fill="var(--text-primary)" font-family="Crimson Pro, serif" font-size="16" font-weight="600">CHSH Inequality for Moral Correlations</text>
+
+            <!-- Classical bound -->
+            <rect x="60" y="60" width="380" height="120" rx="8" fill="rgba(217,95,2,0.06)" stroke="var(--cb-orange)" stroke-width="1.5" stroke-dasharray="6 3"/>
+            <text x="80" y="85" fill="var(--cb-orange)" font-size="12" font-weight="600">Classical Bound: |S| &le; 2</text>
+            <text x="80" y="105" fill="var(--text-secondary)" font-size="11">If moral reasoning is purely classical (local hidden variables),</text>
+            <text x="80" y="120" fill="var(--text-secondary)" font-size="11">the CHSH correlator S cannot exceed 2.</text>
+            <!-- Bar showing value -->
+            <rect x="80" y="140" width="200" height="24" rx="4" fill="rgba(217,95,2,0.15)"/>
+            <rect x="80" y="140" width="200" height="24" rx="4" fill="var(--cb-orange)" opacity="0.5"/>
+            <text x="290" y="157" fill="var(--cb-orange)" font-size="12" font-weight="600">S = 2.0</text>
+
+            <!-- Quantum bound -->
+            <rect x="60" y="200" width="380" height="120" rx="8" fill="rgba(117,112,179,0.06)" stroke="var(--cb-purple)" stroke-width="1.5"/>
+            <text x="80" y="225" fill="var(--cb-purple)" font-size="12" font-weight="600">Quantum Bound: |S| &le; 2&radic;2 &approx; 2.83</text>
+            <text x="80" y="245" fill="var(--text-secondary)" font-size="11">If moral deliberation involves genuine superposition</text>
+            <text x="80" y="260" fill="var(--text-secondary)" font-size="11">and interference, S can reach the Tsirelson bound.</text>
+            <!-- Bar showing value -->
+            <rect x="80" y="280" width="283" height="24" rx="4" fill="rgba(117,112,179,0.15)"/>
+            <rect x="80" y="280" width="283" height="24" rx="4" fill="var(--cb-purple)" opacity="0.5"/>
+            <text x="373" y="297" fill="var(--cb-purple)" font-size="12" font-weight="600">S = 2&radic;2</text>
+
+            <!-- Key question -->
+            <text x="250" y="350" text-anchor="middle" fill="var(--cb-gold)" font-size="13" font-weight="600">Key question: Does moral reasoning violate the classical bound?</text>
+            <text x="250" y="375" text-anchor="middle" fill="var(--text-muted)" font-size="11">Order effects confirmed (Ch. 17.5). Bell violations: open question.</text>
+
+            <!-- Tsirelson bound marker -->
+            <line x1="363" y1="56" x2="363" y2="320" stroke="var(--cb-purple)" stroke-width="1" stroke-dasharray="4 2" opacity="0.4"/>
+            <text x="363" y="50" text-anchor="middle" fill="var(--cb-purple)" font-size="9">Tsirelson</text>
+          </svg>
+        </div>
+        <div class="bell-details">
+          <h3>The SQND Experimental Program</h3>
+          <p>Stratified Quantum Normative Dynamics (SQND) tests whether moral reasoning exhibits quantum-like features: superposition, interference, and entanglement.</p>
+
+          <div class="bell-predictions">
+            <div class="prediction">
+              <div class="pred-status confirmed">Confirmed</div>
+              <h4>Prediction 1: Order Effects</h4>
+              <p>The order in which moral dimensions are presented affects the final judgment. Non-commutativity is empirically observed.</p>
+            </div>
+            <div class="prediction">
+              <div class="pred-status confirmed">Confirmed</div>
+              <h4>Prediction 2: Violation of Total Probability</h4>
+              <p>Marginal probabilities in moral judgment do not always sum classically &mdash; consistent with interference terms.</p>
+            </div>
+            <div class="prediction">
+              <div class="pred-status open">Open</div>
+              <h4>Prediction 3: Bell Inequality Violation</h4>
+              <p>The CHSH test applied to moral correlations. Does the Dear Ethicist game data exceed the classical bound S = 2?</p>
+            </div>
+          </div>
+
+          <div class="bell-data-cta">
+            <h4>Contribute to the Experiment</h4>
+            <p>Every Dear Ethicist game session generates data for the SQND experiment. Your moral judgments help test whether ethics has quantum structure.</p>
+            <div class="bell-links">
+              <a href="https://github.com/ahb-sjsu/sqnd-probe" class="btn btn-secondary" target="_blank" rel="noopener">SQND Probe Repository</a>
+              <a href="https://discord.gg/W3Bkj4AZ" class="btn btn-secondary" target="_blank" rel="noopener">Discuss on Discord</a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Community / Discord -->
+  <section id="community" class="section section-dark">
+    <div class="container">
+      <div class="section-header">
+        <span class="section-number">XIV</span>
+        <h2>Join the Community</h2>
+        <p class="section-subtitle">Coordinate on Discord and GitHub Discussions</p>
+      </div>
+
+      <div class="community-grid">
+        <a href="https://discord.gg/W3Bkj4AZ" class="community-card discord-card" target="_blank" rel="noopener" data-aos="fade-up">
+          <div class="community-icon">
+            <svg viewBox="0 0 48 48" width="48" height="48"><path d="M40.634 9.84a39.27 39.27 0 00-9.692-3.008.147.147 0 00-.156.074c-.418.744-.882 1.714-1.207 2.476a36.261 36.261 0 00-10.893 0c-.325-.775-.803-1.732-1.224-2.476a.153.153 0 00-.156-.074 39.16 39.16 0 00-9.692 3.008.139.139 0 00-.064.055C1.062 19.09-.636 28.05.198 36.898a.164.164 0 00.062.112 39.478 39.478 0 0011.885 6.01.154.154 0 00.167-.055c.916-1.25 1.732-2.568 2.434-3.952a.152.152 0 00-.083-.211 26.006 26.006 0 01-3.713-1.77.153.153 0 01-.015-.254c.25-.187.499-.38.737-.577a.148.148 0 01.154-.02c7.79 3.556 16.217 3.556 23.924 0a.147.147 0 01.156.018c.238.196.488.392.739.579a.153.153 0 01-.013.254 24.41 24.41 0 01-3.716 1.768.153.153 0 00-.081.213c.714 1.382 1.53 2.7 2.432 3.95a.151.151 0 00.168.057 39.355 39.355 0 0011.9-6.01.154.154 0 00.062-.11c.998-10.326-1.672-19.296-7.08-27.246a.12.12 0 00-.062-.057zM16.032 31.548c-2.36 0-4.302-2.166-4.302-4.826s1.905-4.826 4.302-4.826c2.416 0 4.34 2.185 4.302 4.826 0 2.66-1.905 4.826-4.302 4.826zm15.904 0c-2.36 0-4.302-2.166-4.302-4.826s1.905-4.826 4.302-4.826c2.416 0 4.34 2.185 4.302 4.826 0 2.66-1.886 4.826-4.302 4.826z" fill="#5865F2"/></svg>
+          </div>
+          <h3>Discord Server</h3>
+          <p>Real-time discussion, research coordination, experiment design, and community support.</p>
+          <span class="community-action">Join Discord &rarr;</span>
+        </a>
+
+        <a href="https://github.com/ahb-sjsu/erisml-lib/discussions" class="community-card" target="_blank" rel="noopener" data-aos="fade-up" data-aos-delay="100">
+          <div class="community-icon">
+            <svg viewBox="0 0 48 48" width="48" height="48"><path d="M24 4C12.954 4 4 12.954 4 24s8.954 20 20 20 20-8.954 20-20S35.046 4 24 4z" fill="none" stroke="var(--cb-teal)" stroke-width="2"/><path d="M16 20h16M16 28h10" stroke="var(--cb-teal)" stroke-width="2" stroke-linecap="round"/></svg>
+          </div>
+          <h3>GitHub Discussions</h3>
+          <p>Long-form research questions, feature requests, philosophical debate, and open problems.</p>
+          <span class="community-action">Start a Discussion &rarr;</span>
+        </a>
+
+        <a href="https://github.com/ahb-sjsu/sqnd-probe/issues" class="community-card" target="_blank" rel="noopener" data-aos="fade-up" data-aos-delay="200">
+          <div class="community-icon">
+            <svg viewBox="0 0 48 48" width="48" height="48"><circle cx="24" cy="24" r="18" fill="none" stroke="var(--cb-purple)" stroke-width="2"/><path d="M24 14v14M24 32v2" stroke="var(--cb-purple)" stroke-width="2.5" stroke-linecap="round"/></svg>
+          </div>
+          <h3>SQND Experiment Data</h3>
+          <p>Submit your Dear Ethicist session data. Every game contributes to the Bell test and moral structure research.</p>
+          <span class="community-action">Submit Data &rarr;</span>
+        </a>
+
+        <a href="mailto:andrew.bond@sjsu.edu" class="community-card" data-aos="fade-up" data-aos-delay="300">
+          <div class="community-icon">
+            <svg viewBox="0 0 48 48" width="48" height="48"><rect x="6" y="12" width="36" height="24" rx="3" fill="none" stroke="var(--cb-gold)" stroke-width="2"/><path d="M6 14l18 13 18-13" fill="none" stroke="var(--cb-gold)" stroke-width="2"/></svg>
+          </div>
+          <h3>Contact</h3>
+          <p>Reach out to andrew.bond@sjsu.edu for collaboration, speaking, or research partnerships.</p>
+          <span class="community-action">Send Email &rarr;</span>
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- About / Footer -->
+  <section id="about" class="section section-dark">
+    <div class="container">
+      <div class="about-layout">
+        <div class="about-text">
+          <h2>About the Book</h2>
+          <p>This book argues that the mathematical structures physicists developed to describe nature &mdash; manifolds, tensors, metrics, connections, curvature, conservation laws &mdash; are also the right structures for describing moral reasoning. Not metaphorically. Mathematically.</p>
+          <p>The methodology is inductive, not axiomatic. The structures were discovered in data and then formalized. The framework makes predictions, and the predictions are confirmed by data.</p>
+          <blockquote>
+            "The window for this mandate is finite. The mathematics is ready. The question is whether we will use it."
+          </blockquote>
+          <p class="about-meta">
+            <strong>Andrew H. Bond</strong><br>
+            Senior Member, IEEE<br>
+            Department of Computer Engineering<br>
+            San Jose State University<br>
+            Spring 2026
+          </p>
+        </div>
+        <div class="about-cta">
+          <h3>Explore Further</h3>
+          <div class="cta-links">
+            <a href="https://github.com/ahb-sjsu/erisml-lib" class="cta-link" target="_blank" rel="noopener">
+              <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/></svg>
+              ErisML Library on GitHub
+            </a>
+            <a href="https://pypi.org/project/erisml/" class="cta-link" target="_blank" rel="noopener">
+              <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
+              ErisML on PyPI
+            </a>
+            <a href="https://github.com/ahb-sjsu/sqnd-probe" class="cta-link" target="_blank" rel="noopener">
+              <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><circle cx="12" cy="12" r="9" fill="none" stroke="currentColor" stroke-width="1.5"/><path d="M12 3v18M3 12h18" stroke="currentColor" stroke-width="1"/></svg>
+              SQND Probe &mdash; Dear Ethicist Game
+            </a>
+            <a href="https://discord.gg/W3Bkj4AZ" class="cta-link discord-cta" target="_blank" rel="noopener">
+              <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M20.317 4.37a19.791 19.791 0 00-4.885-1.515.074.074 0 00-.079.037c-.21.375-.444.864-.608 1.25a18.27 18.27 0 00-5.487 0 12.64 12.64 0 00-.617-1.25.077.077 0 00-.079-.037A19.736 19.736 0 003.677 4.37a.07.07 0 00-.032.027C.533 9.046-.32 13.58.099 18.057a.082.082 0 00.031.057 19.9 19.9 0 005.993 3.03.078.078 0 00.084-.028c.462-.63.874-1.295 1.226-1.994a.076.076 0 00-.041-.106 13.107 13.107 0 01-1.872-.892.077.077 0 01-.008-.128 10.2 10.2 0 00.372-.292.074.074 0 01.077-.01c3.928 1.793 8.18 1.793 12.062 0a.074.074 0 01.078.01c.12.098.246.198.373.292a.077.077 0 01-.006.127 12.299 12.299 0 01-1.873.892.077.077 0 00-.041.107c.36.698.772 1.362 1.225 1.993a.076.076 0 00.084.028 19.839 19.839 0 006.002-3.03.077.077 0 00.032-.054c.5-5.177-.838-9.674-3.549-13.66a.061.061 0 00-.031-.03z"/></svg>
+              Join Discord Community
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <footer>
+    <div class="container">
+      <div class="footer-inner">
+        <p>&copy; 2026 Andrew H. Bond. <em>Geometric Ethics: The Mathematical Structure of Moral Reasoning.</em></p>
+        <p class="footer-note">Ethics is not a number.</p>
+      </div>
+    </div>
+  </footer>
+
+  <script src="assets/js/main.js"></script>
+</body>
+</html>
