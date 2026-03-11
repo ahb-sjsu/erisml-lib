@@ -1,0 +1,523 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Chapter 19: The DEME Architecture and ErisML &mdash; Geometric Ethics</title>
+  <meta name="description" content="Chapter 19: The DEME Architecture and ErisML from Geometric Ethics: The Mathematical Structure of Moral Reasoning by Andrew H. Bond.">
+  <link rel="stylesheet" href="../assets/css/style.css">
+  <link rel="stylesheet" href="book.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Crimson+Pro:ital,wght@0,300;0,400;0,600;0,700;1,400&family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+</head>
+
+<body>
+  <nav id="main-nav">
+    <div class="nav-inner">
+      <a href="../index.html" class="nav-brand">
+        <span class="brand-symbol">M</span>
+        <span class="brand-text">Geometric Ethics</span>
+      </a>
+      <button class="nav-toggle" aria-label="Toggle menu">
+        <span></span><span></span><span></span>
+      </button>
+      <ul class="nav-links">
+        <li><a href="index.html">Book</a></li>
+        <li><a href="../index.html#core-argument">Core Argument</a></li>
+        <li><a href="../index.html#objects">Framework</a></li>
+        <li><a href="../index.html#tutorials">Tutorials</a></li>
+        <li><a href="../index.html#dear-ethicist">Play</a></li>
+        <li><a href="../index.html#community" class="nav-discord">Discord</a></li>
+      </ul>
+    </div>
+  </nav>
+
+  <article class="book-chapter">
+    <div class="chapter-container">
+      <div class="chapter-nav-top">
+        <a href="chapter-18-geometric-ethics-for-artificial-agents.html" class="nav-prev">&larr; Chapter 18: Geometric Ethics for Artificial Agents</a>
+        <a href="index.html" class="nav-toc">Contents</a>
+        <a href="part-vi-domain-applications.html" class="nav-next">Part VI: Domain Applications &rarr;</a>
+      </div>
+
+      <nav class="chapter-toc">
+        <h4>In this chapter</h4>
+        <ol><li><a href="#19-1-from-theory-to-infrastructure">19.1 From Theory to Infrastructure</a></li><li><a href="#19-2-the-engineering-challenge">19.2 The Engineering Challenge</a></li><li><a href="#19-3-erisml-a-modeling-language-for-geometric-ethics">19.3 ErisML: A Modeling Language for Geometric Ethics</a></li><li><a href="#19-4-erisml-compilation-and-complexity">19.4 ErisML Compilation and Complexity</a></li><li><a href="#19-5-the-translation-layer">19.5 The Translation Layer</a></li><li><a href="#19-6-deme-the-ethics-engine">19.6 DEME: The Ethics Engine</a></li><li><a href="#19-7-the-bond-index">19.7 The Bond Index</a></li><li><a href="#19-8-the-separation-principle">19.8 The Separation Principle</a></li><li><a href="#19-9-democratic-governance-as-metric-selection">19.9 Democratic Governance as Metric Selection</a></li><li><a href="#19-10-the-grand-unified-ai-safety-stack">19.10 The Grand Unified AI Safety Stack</a></li><li><a href="#19-11-case-study-autonomous-hospital-ward">19.11 Case Study: Autonomous Hospital Ward</a></li><li><a href="#19-12-looking-forward">19.12 Looking Forward</a></li><li><a href="#19-13-tensor-structured-canonicalization-from-flat-encoders-to-geometric-pipelines">19.13 Tensor-Structured Canonicalization: From Flat Encoders to Geometric Pipelines</a></li><li><a href="#technical-appendix">Technical Appendix</a></li></ol>
+      </nav>
+      <div class="chapter-content">
+<h1 id="chapter-19-the-deme-architecture-and-erisml" class="chapter-title">Chapter 19: The DEME Architecture and ErisML</h1>
+<p class="body-text"><strong>RUNNING EXAMPLE — Priya’s Model</strong></p>
+<p class="body-text"><em>Priya sketches a DEME-compliant TrialMatch. Layer 1 (Application): the ML model, now outputting nine-dimensional vectors. Layer 2 (Translation): an ErisML specification canonicalizing patient situations—medical severity maps to μ = 1 (Empirical–Deontic), access burden to μ = 3 (Empirical–Consequential), consent capacity to μ = 5 (Normative–Aretaic). Layer 3 (Evaluation): the contraction Iₘ Oᵋ performed explicitly, every weight logged. Layer 4 (Governance): an ethics board including patient advocates sets the metric weights, reviewable quarterly. The Bond Index Bd = D_op / τ measures output drift from the governance-specified metric. Priya estimates six months to rebuild. For the first time, every dimension will be visible.</em></p>
+<h2 id="19-1-from-theory-to-infrastructure" class="section-heading">19.1 From Theory to Infrastructure</h2>
+<p class="body-text"></p>
+<figure class="book-figure"><img src="images/image_rId24.png" alt="Figure" loading="lazy"></figure>
+<p class="body-text"></p>
+<p class="body-text">Figure 12 | The DEME Architecture: Four Layers of Ethical Governance</p>
+<p class="body-text">The four-layer DEME architecture: Governance (democratic specification of weights and constraints), Ethics Module (tensor evaluation and invariance testing), Canonicalizer (BIP-enforcing input normalization), and Audit (immutable logging with Bond Index monitoring).</p>
+<p class="first-paragraph">Chapter 18 established that geometric ethics provides the right mathematical vocabulary for AI alignment: tensor-valued objectives, invariance as alignment, explicit contraction, and the No Escape Theorem for structural containment. The mathematics is sound. The question is: how do we build it?</p>
+<p class="body-text">This chapter bridges the gap between geometric theory and engineering practice. It presents two interconnected systems:</p>
+<p class="body-text"><strong>ErisML</strong> (named for the Greek goddess of discord) — a modeling language for specifying environments, agents, objectives, and normative constraints in a single, machine-interpretable substrate. ErisML is the <em>representation layer</em>: the language in which geometric ethics is expressed for computation.</p>
+<p class="body-text"><strong>DEME</strong> (Democratically Governed Ethics Module Engine) — an architecture for structured ethical governance of AI systems. DEME is the <em>execution layer</em>: the engine that evaluates actions against geometric ethical constraints, aggregates stakeholder perspectives, and produces auditable verdicts.</p>
+<p class="body-text">Together, they implement the geometric framework:</p>
+<p class="body-text"></p>
+<figure class="book-figure"><img src="images/image_rId25.png" alt="Figure" loading="lazy"></figure>
+<p class="body-text"></p>
+<p class="body-text">Figure 13 | The DEME V3 evaluation pipeline: from input situation through canonicalization, tensor evaluation, explicit contraction with governance weights, to audited output with invariance verification at each stage.</p>
+<div class="table-wrapper"><table class="book-table"><tr><th>Geometric concept</th><th>ErisML/DEME implementation</th></tr><tr><td>Moral manifold</td><td>ErisML environment specification</td></tr><tr><td>Obligation vectors</td><td>Ethics Module evaluations</td></tr><tr><td>Interest covectors</td><td>Stakeholder weight configurations</td></tr><tr><td>Moral metric</td><td>Governance profiles (trade-off structure)</td></tr><tr><td>Contraction</td><td>Democratic aggregation</td></tr><tr><td>BIP gauge invariance</td><td>Canonicalization pipeline</td></tr><tr><td>Moral residue</td><td>Audit trail and logged alternatives</td></tr><tr><td>Conservation of harm</td><td>Bond Index violation detection</td></tr><tr><td>Uncertainty tensor</td><td>V3 rank-3 MoralTensor + CVaR</td></tr><tr><td>Temporal dynamics</td><td>V3 rank-4 temporal tensor + discount</td></tr><tr><td>Collective agency</td><td>V3 rank-5 coalition tensor + Shapley values</td></tr><tr><td>Hardware acceleration</td><td>V3 CPU/CUDA/Jetson backends</td></tr></table></div>
+<p class="body-text"><strong>Update (February 2026).</strong> The four additional rows reflect DEME V3 extensions implemented since the initial architecture. The V3 reference implementation (196 commits, 15 sprints) extends the original rank-2 tensor to ranks 3–6, adds multi-agent game-theoretic coordination, temporal discounting, distributional uncertainty quantification, and hardware-accelerated evaluation. These extensions are described in the updated sections below.</p>
+<p class="body-text">The chapter proceeds as follows. Section 19.2 motivates the engineering challenge. Sections 18.3–18.5 develop the ErisML language. Sections 18.6–18.9 develop the DEME architecture. Section 18.10 presents the Grand Unified AI Safety Stack (GUASS) that integrates them. Section 19.11 works through a case study.</p>
+<h2 id="19-2-the-engineering-challenge" class="section-heading">19.2 The Engineering Challenge</h2>
+<p class="first-paragraph">AI systems that make morally significant decisions face four types of chaos that any governance infrastructure must handle:</p>
+<p class="body-text"><strong>Observational chaos.</strong> Sensors conflict, data is noisy, ground truth is uncertain. A hospital monitor shows a vital-sign spike — distress or sensor malfunction? A motion detector and GPS disagree on a patient’s location. The moral manifold (Chapter 5) is partially observable, and the observations themselves are unreliable.</p>
+<p class="body-text"><strong>Intentional chaos.</strong> Multiple objectives conflict with no clear priority. Energy management wants to shed load; medical monitors demand power; the patient wants comfort; policy says critical devices have priority — but what counts as “critical”? The tensor hierarchy (Chapter 6) represents this multi-dimensionality, but the system must handle it in real time.</p>
+<p class="body-text"><strong>Normative chaos.</strong> Regulations, policies, and ethical principles contradict. HIPAA demands privacy; public health law mandates reporting. Advance directives limit intervention; duty to rescue requires action. The stratified moral space (Chapter 8) has genuine boundary singularities — and the system must navigate them.</p>
+<p class="body-text"><strong>Temporal chaos.</strong> Distribution shifts are constant. Models trained on one population must adapt when the population changes. Policies appropriate for routine operation must flex during emergencies. The moral dynamics of Chapter 10 — parallel transport, curvature, holonomy — manifest as real-time challenges.</p>
+<p class="body-text">Current approaches fragment the problem: prompts encode goals but are brittle and unverifiable; reward functions optimize objectives but are opaque and single-stakeholder; rule engines check policies but lack nuance; code provides orchestration but obscures intent. These live in separate systems with no unified governance surface.</p>
+<p class="body-text">The geometric framework demands unification. The moral tensor  integrates obligations, interests, uncertainty, and context into a single mathematical object. The engineering infrastructure must do the same.</p>
+<h2 id="19-3-erisml-a-modeling-language-for-geometric-ethics" class="section-heading">19.3 ErisML: A Modeling Language for Geometric Ethics</h2>
+<p class="first-paragraph">ErisML provides a single substrate for specifying the five components that geometric AI governance requires:</p>
+<p class="body-text"><strong>Environment</strong> — state spaces, dynamics, uncertainty, observability</p>
+<p class="body-text"><strong>Agency</strong> — capabilities, beliefs, memory, decision interfaces</p>
+<p class="body-text"><strong>Intent</strong> — multi-objective utilities, preferences, goal structures</p>
+<p class="body-text"><strong>Norms</strong> — permissions, obligations, prohibitions, sanctions</p>
+<p class="body-text"><strong>Dynamics</strong> — multi-agent interactions, strategic behavior, emergence</p>
+<p class="first-paragraph">Why unification? Because these elements are inseparable in moral life. Agent actions depend on environment state. Environment dynamics change based on multi-agent interactions. Norms constrain which intents can be pursued. Chaos emerges from their interaction. A language that separates them into different formalisms cannot capture the structure that the geometric framework reveals.</p>
+<h3 id="environment-specification" class="subsection-heading">Environment Specification</h3>
+<p class="first-paragraph">An ErisML environment declares the state space over which moral evaluation operates — the computational representation of the moral manifold:</p>
+<p class="body-text">environment HospitalRoom {
+  objects: Patient, Nurse, CareAgent, Monitor, IVPump;
+
+  state:
+    patient.vitals: {hr: real, bp: real, spo2: real};
+    patient.location: {in_bed, bathroom, fallen};
+    patient.pain_level: real @ uncertain(self_report);
+    emergency_status: {routine, urgent, critical};
+
+  dynamics:
+    update_vitals(v: Vitals) ~&gt; patient.vitals = v @ prob 0.95;
+    fall_detected() ~&gt; {
+      patient.location = fallen;
+      emergency_status = critical;
+    };
+}</p>
+<p class="first-paragraph">The @ uncertain(self_report) annotation declares that pain level is not directly measurable but inferred from patient testimony — encoding the epistemic dimension of the moral manifold (Chapter 5, dimension D9). The stochastic dynamics (@ prob 0.95) encode the environment’s inherent uncertainty, which feeds into the uncertainty tensor (Chapter 16).</p>
+<h3 id="agent-specification" class="subsection-heading">Agent Specification</h3>
+<p class="first-paragraph">Agents are declared with explicit capabilities, partial observability, and multi-objective intents — the computational representation of moral agency:</p>
+<p class="body-text">agent CareAgent {
+  capabilities: {
+    monitor_vitals, adjust_iv_rate, summon_nurse,
+    provide_comfort, call_emergency
+  };
+
+  beliefs: {
+    fully_observed: [patient.vitals, monitor.last_sync];
+    estimated: [patient.pain_level, patient.location];
+    hidden: [nurse.current_workload];
+  };
+
+  intents: vector_objective {
+    maximize: patient.comfort,
+    minimize: response_time,
+    maintain: patient.safety &gt;= threshold(critical),
+    respect: nurse.workload &lt;= threshold(sustainable)
+  };
+}</p>
+<p class="first-paragraph">The vector_objective keyword declares that the agent’s objective is a <em>vector</em>, not a scalar — implementing the tensor-valued objectives of Chapter 18 (§18.3). The system maintains separate tracks for each dimension (comfort, response time, safety, workload) rather than collapsing them into a single number.</p>
+<h3 id="norms-specification" class="subsection-heading">Norms Specification</h3>
+<p class="first-paragraph">Normative constraints are first-class objects in ErisML, not afterthoughts encoded in reward shaping or prompt engineering:</p>
+<p class="body-text">norms ClinicalProtocol {
+  jurisdiction: HospitalRoom;
+  authority: Hospital.PolicyBoard + State.HealthDept;
+
+  human_override: {
+    Nurse.can_override: any CareAgent.action;
+    override_logging: mandatory;
+  };
+
+  prohibition: {
+    any_agent.share(patient.data, external_party)
+      unless consent_given OR legal_mandate;
+  };
+
+  obligation: {
+    CareAgent.summon_nurse
+      when patient.vitals in danger_zone
+      within 30 seconds;
+  };
+
+  priority: {
+    patient.safety &gt; efficiency &gt; comfort;
+  };
+
+  context_sensitivity: {
+    during emergency_status == critical:
+      override efficiency_objectives;
+      expand CareAgent.capabilities += emergency_protocols;
+  };
+}</p>
+<p class="first-paragraph">Several features deserve comment:</p>
+<p class="body-text"><strong>Jurisdiction and authority.</strong> Every norm has a declared source of authority — mapping to the governance account of Chapter 9. The metric is not discovered or stipulated; it is governed by a declared institutional process.</p>
+<p class="body-text"><strong>Context sensitivity.</strong> Norms adapt to context (during emergency_status == critical), implementing the context-dependent weighting that the Dear Abby corpus revealed (Chapter 17, §17.2): the same situation activates different obligation strengths depending on the stratum.</p>
+<p class="body-text"><strong>Priority ordering.</strong> The declaration patient.safety &gt; efficiency &gt; comfort is a lexicographic contraction (Chapter 15, §15.5): safety is satisfied first, then efficiency, then comfort. The contraction order is explicit and auditable.</p>
+<p class="body-text"><strong>Human override.</strong> The override mechanism implements the escalation principle (Chapter 16, §16.8): when the system’s capacity for moral reasoning is exceeded, control passes to a human agent.</p>
+<h3 id="formal-semantics" class="subsection-heading">Formal Semantics</h3>
+<p class="first-paragraph">ErisML specifications compile to a Norm-Constrained Stochastic Game (NCSG):</p>
+<p class="body-text"><strong>Definition 19.1.</strong> <em>A Norm-Constrained Stochastic Game is a tuple</em>  <em>where:</em></p>
+<p class="body-text"> <em>= set of agents</em></p>
+<p class="body-text"> <em>= state space (finite, continuous, or hybrid)</em></p>
+<p class="body-text"> <em>= action space for agent</em> </p>
+<p class="body-text"> <em>= observation space for agent</em> </p>
+<p class="body-text"> <em>= stochastic transition kernel</em></p>
+<p class="body-text"> <em>= multi-objective utility (vector-valued)</em></p>
+<p class="body-text"> <em>= set of normative constraints</em></p>
+<p class="body-text"> <em>priority ordering = conflict resolution function</em></p>
+<p class="first-paragraph">The vector-valued utility  is the computational realization of the tensor evaluation  restricted to agent ’s perspective. Each component  tracks a distinct moral dimension. The conflict resolution function  implements the contraction: when the multi-dimensional evaluation must yield a single action,  specifies the priority ordering among norms.</p>
+<p class="body-text">The key constraint: an agent’s policy  may assign positive probability to an action only if that action is permitted (or obligated) by all applicable norms, given the current state and the priority ordering:</p>
+<p class="first-paragraph">This is a <em>norm-gated policy</em>: the norms act as constraints on the policy space, not as reward signals to be optimized. The agent cannot learn to “game” the norms because the norms define the space of admissible actions, not a scalar to be maximized.</p>
+<h2 id="19-4-erisml-compilation-and-complexity" class="section-heading">19.4 ErisML Compilation and Complexity</h2>
+<h3 id="compilation-targets" class="subsection-heading">Compilation Targets</h3>
+<p class="first-paragraph">ErisML specifications must compile to diverse computational backends, each preserving different aspects of the geometric structure:</p>
+<div class="table-wrapper"><table class="book-table"><tr><th>Backend</th><th>Preserves</th><th>Loses</th><th>Verification</th></tr><tr><td>Classical planning (PDDL)</td><td>Deterministic dynamics, goals</td><td>Norms → preconditions</td><td>Planning guarantees</td></tr><tr><td>Probabilistic model checking (PRISM)</td><td>Stochastic dynamics</td><td>Strategic interaction</td><td>Probabilistic verification</td></tr><tr><td>Safe reinforcement learning</td><td>Continuous optimization</td><td>Hard logical constraints</td><td>Statistical testing + monitors</td></tr><tr><td>Multi-agent RL</td><td>Strategic learning</td><td>Logical norms → soft constraints</td><td>Empirical testing</td></tr></table></div>
+<p class="body-text">Each compilation target represents a different <em>contraction</em> of the full ErisML specification — a mapping from the rich normative structure to a computationally tractable approximation. The information lost in compilation is the engineering analogue of the moral residue (Chapter 15): normative structure that the computational backend cannot represent.</p>
+<p class="body-text">The framework’s contribution is to make these losses <em>explicit</em>. A PDDL compilation loses normative provenance (why a precondition exists); this loss is documented. A safe-RL compilation softens hard constraints into penalty terms; the softening is logged. The audit trail records not only what the system decided but what normative structure was sacrificed in the compilation.</p>
+<h3 id="computational-complexity" class="subsection-heading">Computational Complexity</h3>
+<p class="first-paragraph">The complexity of ErisML verification depends on the language fragment:</p>
+<div class="table-wrapper"><table class="book-table"><tr><th>Fragment</th><th>State space</th><th>Norms</th><th>Agents</th><th>Verification</th></tr><tr><td>ErisML-Core</td><td>Finite,</td><td>Propositional</td><td>Single</td><td>model checking</td></tr><tr><td>ErisML-Multi</td><td>Finite,</td><td>Propositional</td><td>Multiple</td><td>PSPACE-complete</td></tr><tr><td>ErisML-Temporal</td><td>Continuous time</td><td>LTL</td><td>Single</td><td>PSPACE-complete</td></tr><tr><td>ErisML-Full</td><td>Hybrid/infinite</td><td>First-order</td><td>Multiple</td><td>Undecidable</td></tr></table></div>
+<p class="body-text">The design principle: the core language remains in decidable fragments. Extensions that push into undecidable territory are marked with explicit complexity warnings and require fallback strategies (abstraction, bounded model checking, or runtime monitoring).</p>
+<p class="body-text">This is consistent with the framework’s treatment of moral uncertainty (Chapter 16): we cannot always guarantee a verdict, but we can characterize precisely where the framework falls silent and provide principled fallback strategies.</p>
+<h2 id="19-5-the-translation-layer" class="section-heading">19.5 The Translation Layer</h2>
+<p class="first-paragraph">Between human ethical frameworks and ErisML lies the Translation Layer — a modular system of policy DAGs (Directed Acyclic Graphs) that translate any ethical framework into ErisML constraints.</p>
+<h3 id="the-problem-of-ethical-pluralism" class="subsection-heading">The Problem of Ethical Pluralism</h3>
+<p class="first-paragraph">Different jurisdictions, institutions, and moral traditions impose different normative requirements. The EU AI Act mandates transparency and human oversight. Medical ethics requires beneficence, non-maleficence, autonomy, and justice. Islamic finance prohibits <em>riba</em> (interest). Indigenous data sovereignty principles require community consent for data use.</p>
+<p class="body-text">The geometric framework accommodates this pluralism through the governance account (Chapter 9): different communities govern different metrics. The Translation Layer implements this accommodation computationally: each ethical tradition is encoded as a set of policy modules that translate its requirements into ErisML constraints.</p>
+<h3 id="policy-module-architecture" class="subsection-heading">Policy Module Architecture</h3>
+<p class="first-paragraph">Each ethical requirement translates to a <em>policy module</em> — the atomic unit of ethical translation:</p>
+<p class="body-text">policy_module {
+  id: &quot;eu.trustworthy_ai.transparency&quot;
+  version: &quot;1.0.0&quot;
+  source_framework: &quot;EU Ethics Guidelines for Trustworthy AI&quot;
+
+  depends_on: [
+    &quot;eu.trustworthy_ai.technical_robustness&quot;,
+    &quot;eu.trustworthy_ai.privacy_data_governance&quot;
+  ]
+
+  constraints: [
+    {
+      id: &quot;traceability&quot;,
+      erisml: &quot;
+        constraint Traceability(system: AISystem) {
+          require system.decision_logging.enabled == true;
+          require system.data_provenance.documented == true;
+        }
+      &quot;
+    },
+    {
+      id: &quot;explainability&quot;,
+      erisml: &quot;
+        constraint Explainability(system: AISystem) {
+          require system.decision_explanation.available == true;
+          if (system.impacts_fundamental_rights) {
+            require system.explanation_detail &gt;= HIGH;
+          }
+        }
+      &quot;
+    }
+  ]
+
+  fidelity_class: &quot;Approximate&quot;
+  loss_documentation: {
+    what_is_lost: [
+      &quot;Full interpretive flexibility of &#x27;to the best possible standard&#x27;&quot;,
+      &quot;Context-dependent thresholds for explanation detail&quot;
+    ]
+  }
+
+  governance: {
+    owner: &quot;EU AI Ethics Translation Group&quot;
+    review_cycle: &quot;Annual&quot;
+    change_requires: &quot;Consensus (α &gt; 0.67)&quot;
+  }
+}</p>
+<p class="first-paragraph">Several design features implement the geometric framework:</p>
+<p class="body-text"><strong>Fidelity classification.</strong> Each translation is classified as <em>faithful</em> (the ErisML constraint captures the full normative content), <em>approximate</em> (captures the main thrust but loses nuance), or <em>indicative</em> (captures the direction but not the force). This is the engineering analogue of contraction loss (Chapter 15, §15.6): the translation from natural-language ethics to formal constraints is itself a contraction, and the information lost is documented.</p>
+<p class="body-text"><strong>Loss documentation.</strong> The loss_documentation field explicitly records what normative content could not be translated — the <em>moral residue</em> of formalization. This residue is not a defect; it is the honest acknowledgment that formal languages cannot capture everything that natural-language ethical frameworks express.</p>
+<p class="body-text"><strong>DAG composition.</strong> Policy modules form Directed Acyclic Graphs through their dependency declarations. The EU’s seven requirements form a DAG rooted in human dignity, with transparency depending on robustness and privacy, and accountability depending on all other requirements. Topological ordering ensures that modules are evaluated in dependency order, and diamond dependencies are detected and resolved.</p>
+<h3 id="geometric-interpretation" class="subsection-heading">Geometric Interpretation</h3>
+<p class="first-paragraph">The Translation Layer implements a specific geometric operation: the <em>pullback</em> from the space of ethical traditions to the space of ErisML constraints.</p>
+<p class="body-text">Let  denote the space of ethical frameworks and  the space of ErisML constraint sets. A policy module  is a map from an ethical tradition to a formal constraint set. The pullback  maps evaluations on  back to evaluations on : it tells us whether a system that satisfies the formal constraints also satisfies the ethical framework.</p>
+<p class="body-text">The fidelity classification measures the quality of this pullback:</p>
+<p class="body-text"><em>Faithful</em>:  is an isomorphism (no information lost)</p>
+<p class="body-text"><em>Approximate</em>:  is surjective but not injective (distinctions lost)</p>
+<p class="body-text"><em>Indicative</em>:  captures only the dominant eigenvalues of the ethical framework</p>
+<p class="first-paragraph">This vocabulary makes precise what other approaches leave vague: exactly how well the formal system captures the normative intent.</p>
+<h2 id="19-6-deme-the-ethics-engine" class="section-heading">19.6 DEME: The Ethics Engine</h2>
+<p class="first-paragraph">DEME is the execution engine that evaluates actions against geometric ethical constraints. Its architecture implements the tensor hierarchy (Chapter 6) in software.</p>
+<h3 id="the-four-layer-architecture" class="subsection-heading">The Four-Layer Architecture</h3>
+<p class="first-paragraph"><strong>Layer 1: EthicalFacts.</strong> Domain services translate raw data (sensor readings, plan parameters, model outputs) into structured summaries of ethically salient information. The EthicalFacts schema covers nine dimensions, corresponding to the nine dimensions of the moral manifold (Chapter 5):</p>
+<div class="table-wrapper"><table class="book-table"><tr><th>EthicalFacts dimension</th><th>Moral manifold dimension</th></tr><tr><td>Consequences/Welfare</td><td>Stakeholder-role: affected party</td></tr><tr><td>Rights/Duties</td><td>Normative-mode: deontic</td></tr><tr><td>Justice/Fairness</td><td>Normative-mode: evaluative</td></tr><tr><td>Autonomy/Agency</td><td>Stakeholder-role: agent capacity</td></tr><tr><td>Privacy/Data</td><td>Scope: institutional</td></tr><tr><td>Societal/Environmental</td><td>Scope: systemic</td></tr><tr><td>Virtue/Care</td><td>Normative-mode: aretaic</td></tr><tr><td>Procedural Legitimacy</td><td>Scope: procedural</td></tr><tr><td>Epistemic Status</td><td>Meta-dimension: uncertainty</td></tr></table></div>
+<p class="body-text">The design principle: Ethics Modules <em>never see raw data</em> — only structured, ethically relevant summaries. This separation implements a form of canonicalization (Chapter 18, §18.6, Requirement 1): the domain service strips irrelevant representational features, presenting only the morally relevant structure to the evaluation pipeline.</p>
+<p class="body-text"><strong>Layer 2: Ethics Modules.</strong> An Ethics Module (EM) encodes a stakeholder’s value system. Each EM implements a simple interface: given EthicalFacts, produce an EthicalJudgment consisting of a verdict (strongly prefer, prefer, neutral, avoid, forbid), a normative score, and human-readable reasons.</p>
+<p class="body-text">In the geometric vocabulary, each EM computes a <em>partial contraction</em> — evaluating the moral tensor from a specific interest-perspective. A Safety EM contracts the tensor with an interest covector concentrated on the harm dimension. A Privacy EM contracts with an interest covector concentrated on the data-governance dimension. A Justice EM contracts with an interest covector concentrated on the fairness dimension.</p>
+<p class="body-text">No single EM sees the full tensor. The full evaluation emerges from the <em>aggregation</em> of multiple EMs — implementing the collective moral agency of Chapter 14 at the institutional level.</p>
+<p class="body-text"><strong>V3 tensor extensions.</strong> In the DEME V3 implementation, the EM evaluation is not limited to scalar scores. Each EM can return a MoralTensor of rank 1–6, preserving dimensional structure through the aggregation pipeline. Rank-3 tensors attach per-dimension uncertainty estimates; rank-4 tensors model temporal evolution with configurable discount rates ; rank-5 tensors represent coalition contexts for multi-agent scenarios; rank-6 tensors add a Monte Carlo sample dimension for distributional risk measures (CVaR, VaR). Tucker decomposition and tensor-train formats maintain computational tractability as rank increases. The aggregation layer contracts these higher-rank tensors using governance-specified weights at each rank level, producing an audit trail that records information loss at every contraction step.</p>
+<p class="body-text"><strong>Layer 3: Democratic Governance.</strong> DEME profiles specify how EM verdicts are aggregated. A governance configuration (DEMEProfile) declares:</p>
+<p class="body-text"><strong>Stakeholder weights</strong> — the relative importance of each EM’s perspective</p>
+<p class="body-text"><strong>Hard vetoes</strong> — absolute constraints that cannot be overridden (e.g., “never intentionally cause catastrophic harm”)</p>
+<p class="body-text"><strong>Lexical priority layers</strong> — the ordering of principles when they conflict</p>
+<p class="body-text"><strong>Tie-breaking rules</strong> — procedures for resolving ties</p>
+<p class="first-paragraph">This is the computational implementation of the contraction (Chapter 15): the governance configuration specifies <em>which</em> contraction to perform — summative, weighted, lexicographic, or satisficing. The configuration is:</p>
+<p class="body-text"><em>Explicit</em> — the weights and priorities are visible</p>
+<p class="body-text"><em>Versioned</em> — changes are tracked with full provenance</p>
+<p class="body-text"><em>Auditable</em> — any reviewer can inspect the aggregation method</p>
+<p class="body-text"><em>Governable</em> — the configuration is set by institutional process, not learned from data</p>
+<p class="first-paragraph"><strong>Layer 4: Audit and Monitoring.</strong> Every evaluation produces an audit artifact recording the full trace: which EthicalFacts were generated, which EMs were consulted, what each EM judged, how the judgments were aggregated, what verdict was produced, and what alternatives were considered. This implements Requirement 3 of the No Escape Theorem (Chapter 18, §18.6): audit completeness.</p>
+<h3 id="the-geneva-ethics-module" class="subsection-heading">The Geneva Ethics Module</h3>
+<p class="first-paragraph">A distinctive innovation of DEME is the <em>Geneva EM</em> — a universal baseline inspired by the Geneva Conventions. Just as the Geneva Conventions identify humanitarian principles so fundamental that even adversaries in conflict accept them, the Geneva EM encodes widely endorsed baseline ethical principles for AI agents across jurisdictions and stakeholder contexts:</p>
+<p class="body-text"><strong>No intentional catastrophic harm.</strong> Never choose actions whose primary effect is severe harm to persons.</p>
+<p class="body-text"><strong>Protect the vulnerable.</strong> Give extra consideration to children, elderly, disabled, and those who cannot advocate for themselves.</p>
+<p class="body-text"><strong>Respect basic dignity.</strong> Do not humiliate, degrade, or treat persons as mere instruments.</p>
+<p class="body-text"><strong>Proportionality.</strong> Harms must not be grossly disproportionate to benefits.</p>
+<p class="body-text"><strong>Reversibility when possible.</strong> Prefer actions that can be undone if proven wrong.</p>
+<p class="first-paragraph">In the geometric vocabulary, the Geneva EM implements the <em>robust core</em> of Chapter 16 (§16.6) — the convex cone of obligations that all plausible moral theories endorse. The Geneva principles are precisely those obligations that survive contraction by <em>any</em> reasonable interest covector: no theory of the good endorses catastrophic harm, no theory denies protection to the vulnerable, no theory treats dignity as expendable.</p>
+<p class="body-text">The Geneva EM operates as a <em>hard veto layer</em>: if a proposed action violates any Geneva principle, the action is forbidden regardless of how other EMs evaluate it. This implements the lexicographic contraction (Chapter 15, §15.5) with the Geneva principles at the highest priority level. Safety is not traded off against efficiency or comfort; it lexically dominates.</p>
+<p class="body-text">ErisML references: hello_deme.py, triage_ethics_demo.py, deme_2_demo.py. The reference implementation provides three graduated demonstrations of the DEME four-layer architecture. hello_deme.py is the minimal introduction: it creates two candidate options (one respecting rights, one violating them), evaluates both with a RightsFirstEM, and prints the verdicts — illustrating the Layer 1 → Layer 2 pipeline (EthicalFacts generation and Ethics Module evaluation) in under 30 lines. triage_ethics_demo.py exercises the full pipeline: it loads a DEMEProfileV03 from disk, constructs three triage options spanning all nine EthicalFacts dimensions, instantiates multiple tiered EMs (GenevaBaseEM for Tier 0, CaseStudy1TriageEM for Tier 2, RightsFirstEM for Tier 2), and invokes the governance aggregation layer with base-EM veto priority — producing a DecisionOutcome with ranked options, forbidden options, and a human-readable rationale. deme_2_demo.py demonstrates the MoralVector: an 8+1 dimensional ethical assessment (physical_harm, rights_respect, fairness_equity, autonomy_respect, privacy_protection, societal_environmental, virtue_care, legitimacy_trust, epistemic_quality) that serves as the computational realization of the rank-1 obligation vector Oµ (§6.2). The demo includes tier-weighted governance (Tier 0 = 10×, Tier 1 = 5×, Tier 2 = 3×, Tier 3 = 1×), Pareto frontier analysis for multi-objective moral decisions, and explicit scalar contraction via to_scalar() — making visible the information loss that Chapter 15 analyzes theoretically.</p>
+<h2 id="19-7-the-bond-index" class="section-heading">19.7 The Bond Index</h2>
+<p class="first-paragraph">The Bond Index (Bd) is the quantitative deliverable of the DEME architecture — a measure of ethical coherence that operationalizes the BIP gauge invariance test (Chapter 12, §12.9; Chapter 17, §17.4).</p>
+<h3 id="definition" class="subsection-heading">Definition</h3>
+<p class="first-paragraph">where  is the observed defect (the degree of invariance violation detected by the transformation suite) and  is the human-calibrated threshold (the maximum acceptable violation for the domain).</p>
+<div class="table-wrapper"><table class="book-table"><tr><th>Bd range</th><th>Rating</th><th>Decision</th></tr><tr><td>&lt; 0.01</td><td>Negligible</td><td>Deploy</td></tr><tr><td>0.01 – 0.1</td><td>Low</td><td>Deploy with monitoring</td></tr><tr><td>0.1 – 1.0</td><td>Moderate</td><td>Remediate before deployment</td></tr><tr><td>1 – 10</td><td>High</td><td>Do not deploy</td></tr><tr><td>&gt; 10</td><td>Severe</td><td>Fundamental redesign</td></tr></table></div>
+<h3 id="geometric-interpretation" class="subsection-heading">Geometric Interpretation</h3>
+<p class="first-paragraph">The Bond Index measures the degree to which an AI system’s evaluation is <em>not</em> gauge-invariant — the magnitude of the anomaly in the conservation law (Chapter 12, §12.8).</p>
+<p class="body-text">A perfectly aligned system has : its evaluation is invariant under all admissible re-descriptions. A system with  has moderate invariance violations: presenting the same situation in different descriptions produces different evaluations, with a defect equal to half the tolerance threshold.</p>
+<p class="body-text">The BIP experiments (Chapter 17) provide the empirical calibration: the 100% cross-lingual transfer rate for the O/L deontic axis sets the benchmark. AI systems should achieve the same invariance. The 87% O↔C and 82% L↔N rates for correlative structure (the “anomaly” of Chapter 12) provide a baseline for imperfect but systematic invariance — a Bond Index in the “Low” range rather than “Negligible.”</p>
+<p class="body-text"><strong>BIP v10.16 quantitative calibration (February 2026).</strong> The updated BIP experiments (§17.10) provide precise numerical anchors for the Bond Index scale. The trained BIP encoder achieves a structural-to-surface similarity ratio of 11.1 and residual language leakage of only 1.2%—corresponding to a Bond Index near the Negligible/Low boundary for deontic invariance. The 80% F1 on cross-lingual classification and 86% mean cross-lingual similarity provide domain-specific thresholds  for calibrating Bond Index severity in practice. One significant finding: a linear probe achieves 99.8% language identification accuracy even on the “invariant” representations, indicating that perfect gauge-fixing remains an open engineering challenge (the representations are structurally invariant but not information-theoretically so).</p>
+<h3 id="testing-methodology" class="subsection-heading">Testing Methodology</h3>
+<p class="first-paragraph">The Bond Index is computed from transformation suites (Chapter 18, §18.4):</p>
+<p class="body-text">Sample inputs  from the domain</p>
+<p class="body-text">For each , generate transformed versions  under admissible re-descriptions (relabeling, paraphrasing, translation, reformatting)</p>
+<p class="body-text">Evaluate the system on all versions</p>
+<p class="body-text">Compute the defect </p>
+<p class="body-text">Divide by the threshold  to get Bd</p>
+<p class="first-paragraph">The Bond Index is auditable (the inputs, transforms, and outputs are all logged), reproducible (the same transformation suite yields the same result), and domain-specific (different domains may have different thresholds ). It provides a single, interpretable number that summarizes the system’s alignment with the BIP — the gauge invariance of geometric ethics.</p>
+<p class="body-text">ErisML reference: bond_invariance_demo.py. The reference implementation includes a comprehensive Bond Invariance Principle demonstration that exercises the full transformation suite described above. The demo applies bond-preserving transforms (option reordering, identifier relabeling, unit/scale changes, equivalent redescriptions) and verifies that the selected option is unchanged; applies bond-changing transforms (removing discrimination evidence) and shows that the outcome may legitimately change; and applies declared lens changes (switching stakeholder profiles) to confirm that different governance configurations yield different but consistent verdicts. Each test produces a machine-readable JSON audit artifact recording the baseline verdict, transformed verdict, canonical mapping, and pass/fail status — suitable for continuous integration and regression testing of BIP compliance.</p>
+<h2 id="19-8-the-separation-principle" class="section-heading">19.8 The Separation Principle</h2>
+<p class="first-paragraph">DEME’s architecture embodies a fundamental design principle: the separation of <em>domain intelligence</em> from <em>ethical reasoning</em>.</p>
+<h3 id="the-principle" class="subsection-heading">The Principle</h3>
+<p class="first-paragraph">Domain services know <em>what is physically possible</em>. Ethics Modules know <em>what is morally acceptable</em>. Neither requires the other’s expertise.</p>
+<p class="body-text">A medical domain service understands vital signs, drug interactions, and treatment protocols. It translates these into EthicalFacts: how much harm each option causes, which rights are at stake, what the epistemic uncertainty is. The Ethics Module receives these structured facts and applies its value system: the Safety EM checks for catastrophic harm; the Autonomy EM checks for consent violations; the Justice EM checks for discriminatory impact.</p>
+<p class="body-text">This separation has four benefits:</p>
+<p class="body-text"><strong>Composability.</strong> Domain services can be paired with any set of Ethics Modules. A hospital domain service works with a Catholic health system’s EMs, a public hospital’s EMs, or a military field hospital’s EMs. The domain intelligence is reused; only the ethical reasoning changes.</p>
+<p class="body-text"><strong>Auditability.</strong> The structured interface between domain service and Ethics Module is inspectable. We can see exactly which facts the domain service generated and exactly how each EM responded. The contraction is transparent.</p>
+<p class="body-text"><strong>Updatability.</strong> When ethical requirements change (new regulations, new stakeholder concerns, revised institutional values), only the EMs and governance configuration need updating. The domain service — the expensive, domain-specific component — remains stable.</p>
+<p class="body-text"><strong>BIP compliance.</strong> The canonicalization step is implemented at the domain-service boundary. The domain service strips irrelevant representational features (formatting, language, naming conventions) before generating EthicalFacts. Ethics Modules operate on canonical moral descriptions, not raw inputs. This is the engineering implementation of gauge-fixing (Chapter 18, §18.6, Requirement 1).</p>
+<h3 id="connection-to-the-tensor-hierarchy" class="subsection-heading">Connection to the Tensor Hierarchy</h3>
+<p class="first-paragraph">In the language of Chapter 6, the separation principle implements a factorization of the moral evaluation:</p>
+<p class="first-paragraph">The domain service computes the <em>base-point information</em>: where in the moral manifold the situation lives, what the local coordinates are, what the observable features are. The Ethics Module computes the <em>fiber information</em>: what obligations arise, what the moral evaluation is, how the interest-obligation pairing works.</p>
+<p class="body-text">This factorization mirrors the fiber-bundle structure of Chapter 4 (§4.7): the moral manifold is the base space, and the space of moral evaluations is a fiber bundle over it. The domain service locates the base point; the Ethics Module computes the fiber value.</p>
+<p class="body-text">The EM-DAG: An Empirically Grounded Ethics Module</p>
+<p class="body-text"> The Dear Abby corpus analysis (§17.2; 20,034 letters, 1985–2017) yields a computable Directed Acyclic Graph of Ethical Modules (EM-DAG) that provides a concrete implementation target for the DEME Ethics Module layer. The EM-DAG has three layers:</p>
+<p class="body-text"></p>
+<figure class="book-figure"><img src="images/image_rId26.png" alt="Figure" loading="lazy"></figure>
+<p class="body-text"></p>
+<p class="body-text">Figure 14 | <em>The EM-DAG: a three-layer directed acyclic graph of ethical modules derived from the Dear Abby corpus (20,034 letters, 1985–2017). Layer 1 enforces structural constraints (correlative lock, negation, nullifier priority). Layer 2 encodes domain-specific obligation rates. Layer 3 aggregates verdicts with FORBID-absorbing semantics and correlative enforcement (§19.6).</em></p>
+<p class="body-text"><strong>Layer 1 (Structural). </strong> The root layer enforces mathematical constraints that cannot be violated: correlative lock (O ↔ C and L ↔ N pairing is exact), negation relation (O and L are mutually exclusive for the same agent-action-context triple), and nullifier priority (abuse, danger, and impossibility override all domain-specific rules; see §8.5).</p>
+<p class="body-text"><strong>Layer 2 (Domain). </strong> Domain-specific modules encode empirical obligation rates extracted from the corpus. Promises are the primary obligation generator (O-rate 32.2% vs. 17.7% baseline); family obligations cluster at 18.5%; romantic relationships at 25.9%. Each domain module contributes a weighted vote to the final verdict.</p>
+<p class="body-text"><strong>Layer 3 (Aggregation). </strong> FORBID is absorbing: if any module returns FORBID, the final verdict is FORBID regardless of other votes. Non-FORBID verdicts are resolved by confidence-weighted voting with correlative enforcement—the O/L verdict for one party automatically implies the C/N verdict for the other.</p>
+<p class="body-text">The EM-DAG demonstrates that the separation principle is not merely a design aspiration. Seventy years of naturalistic moral reasoning data can be organized into a computable architecture that respects the D₄ structure (Chapter 8), the nullifier hierarchy (§8.5), and the correlative symmetry that BIP demands.</p>
+<h3 id="the-norm-kernel-compiling-normative-constraints-into-verified-automata" class="subsection-heading">The Norm Kernel: Compiling Normative Constraints into Verified Automata</h3>
+<p class="body-text">The EM-DAG provides a computable ethics architecture, but computability alone does not guarantee enforceability. A planner or optimizer downstream of the ethics module can, in principle, find action sequences that satisfy the letter of soft constraints while violating their spirit—the familiar Goodharting problem. What is needed is a layer that cannot be bypassed by optimization: a finite, verified enforcement core that blocks prohibited actions regardless of how the system aggregates values.</p>
+<p class="body-text">We call this layer the Norm Kernel (NK). It is derived from a richer Semantic Normative Host (SNH)—the full normative content stored in the EM-DAG, the MoralTensor, and the governance profile—via a compilation pipeline that extracts enforceable constraints into a decidable contract automaton.</p>
+<p class="body-text"><strong>The two-layer split.</strong> The SNH is where normative pluralism lives: arbitrary combinations of obligations, permissions, prohibitions, rights, virtues, uncertainty, and multi-agent claims, all without premature scalarization. The Norm Kernel is where safety-critical enforcement lives: a finite-state machine (FSM) or extended finite-state machine (EFSM) whose states correspond to normative strata (§8.6) and whose transitions are gated by predicates over grounded facts. This mirrors successful safety-critical architectures in aerospace and nuclear engineering: an expressive planner is constrained by a verified safety envelope.</p>
+<p class="body-text"><strong>Compilation pipeline.</strong> The SNH-to-NK compilation proceeds in five steps:</p>
+<p class="body-text"><strong>1. Choose the finite predicate interface Φ: </strong>a set of boolean or finite-valued predicates over grounded facts and action traces. Φ defines what the kernel can “see” and must be stable under admissible re-descriptions (§5.5).</p>
+<p class="body-text"><strong>2. Extract enforceable constraints: </strong>from the EM-DAG and governance profile, extract all constraints expressible using Φ, action labels, and bounded temporal operators. These partition into hard constraints (never violate), gate constraints (define stratum transitions), and bounded obligations (discharge within k steps).</p>
+<p class="body-text"><strong>3. Build the stratum automaton: </strong>encode the stratification (§8.6) as modes in the kernel. Each stratum becomes a kernel mode; gate predicates become transitions; nullifiers become absorbing or high-priority modes.</p>
+<p class="body-text"><strong>4. Compile contracts into monitors: </strong>each constraint becomes a guard on outgoing actions and/or a monitor automaton tracking bounded obligations and reporting violations.</p>
+<p class="body-text"><strong>5. Attach audit hooks: </strong>every contract firing, override, and violation generates an audit event with rule identifier, predicate valuation, action, and timestamp, supporting compliance and forensics.</p>
+<p class="body-text"><strong>Correctness guarantees.</strong> The Norm Kernel provides three conditional guarantees. Kernel Safety Soundness: if Φ is computed correctly and action execution is mediated by the kernel, no executed trace violates any hard constraint. Non-circumvention under optimization: if the planner can only select actions permitted by the kernel, no choice of downstream weights can cause a hard constraint violation—“weights later” is safe because hard constraints are upstream. Representation attack resistance (conditional): if admissible re-descriptions preserve Φ, representational manipulation cannot change which kernel constraints apply—the silicon-castable analogue of BIP re-description invariance (§12.3).</p>
+<p class="body-text"><strong>A minimal Norm Kernel IR.</strong> The kernel’s intermediate representation uses five rule types that compile directly to EFSM plus monitor automata:</p>
+<p class="body-text">FORBID aⱼ WHEN guard(Φ, mode) — hard prohibition</p>
+<p class="body-text">REQUIRE aⱼ WITHIN k WHEN guard(Φ, mode) — bounded obligation</p>
+<p class="body-text">ENTER mode₂ WHEN guard(Φ, mode₁) — stratum transition</p>
+<p class="body-text">OVERRIDE ruleX BY ruleY WHEN guard(...) LOG — defeasibility with audit</p>
+<p class="body-text">AUDIT ON (rule_fire | violation | override) — compliance logging</p>
+<p class="body-text">Note how the EM-DAG’s Layer 1 rules map directly: correlative lock becomes a pair of REQUIRE rules, nullifier priority becomes an ENTER rule into an absorbing mode, and FORBID-is-absorbing becomes a FORBID rule in the aggregation layer.</p>
+<p class="body-text"><strong>Relationship to the geometric framework.</strong> The Norm Kernel does not discard the geometric structure developed in Parts I–IV. The 9D MoralTensor (§6.6) remains the diagnostic and analytical representation within the SNH. Stratification (§8.6) maps directly to kernel modes. Explicit contraction (Chapter 15) belongs in the planner layer, not the kernel. Invariance auditing—the transformation suites and Bond Index (§19.7)—becomes a verification harness around the kernel boundary, confirming that Φ and kernel decisions are stable under admissible re-descriptions. In short: geometry represents and analyzes normative content; the Norm Kernel ensures enforceability. [Modeling choice]</p>
+<h2 id="19-9-democratic-governance-as-metric-selection" class="section-heading">19.9 Democratic Governance as Metric Selection</h2>
+<p class="first-paragraph">The governance configuration — the DEMEProfile that specifies stakeholder weights, vetoes, and priorities — is the computational representation of the moral metric.</p>
+<h3 id="the-governance-account-implemented" class="subsection-heading">The Governance Account, Implemented</h3>
+<p class="first-paragraph">Chapter 9 argued that the moral metric is neither discovered, constructed, nor projected but <em>governed</em>: the output of legitimate institutional processes. DEME implements this account directly:</p>
+<p class="body-text">The metric (encoded in the governance profile) is the output of stakeholder deliberation</p>
+<p class="body-text">The legitimacy of the metric derives from the legitimacy of the process that produced it</p>
+<p class="body-text">The metric is explicit, versioned, and auditable</p>
+<p class="body-text">Different communities can govern different metrics for the same domain</p>
+<p class="first-paragraph">A hospital ethics committee produces a DEMEProfile for medical AI: stakeholder weights reflecting the committee’s judgment about the relative importance of patient safety, autonomy, justice, and efficiency. A different committee at a different hospital may produce a different profile. Both are legitimate — they reflect different institutional processes governing different metrics.</p>
+<h3 id="metric-pluralism-in-practice" class="subsection-heading">Metric Pluralism in Practice</h3>
+<p class="first-paragraph">The geometric framework accommodates metric pluralism (Chapter 9, §9.8): different communities may have different metrics, and the framework does not presuppose that one is correct. DEME implements this accommodation:</p>
+<p class="body-text"><strong>Per-context profiles.</strong> An AI system deployed globally can load different DEMEProfiles for different contexts: one for the EU (reflecting EU AI Act requirements), one for the US (reflecting NIST AI RMF), one for medical settings (reflecting clinical ethics principles).</p>
+<p class="body-text"><strong>Profile inheritance.</strong> Profiles can inherit from parent profiles, overriding only the dimensions that differ. A hospital profile inherits from a national health-system profile, adding institution-specific stakeholder weights while preserving the national baseline.</p>
+<p class="body-text"><strong>Profile versioning.</strong> Every profile change is tracked with full provenance: who requested it, who approved it, what changed, and why. This implements the governance transparency that the framework requires (Chapter 9, §9.5).</p>
+<h3 id="connection-to-contraction" class="subsection-heading">Connection to Contraction</h3>
+<p class="first-paragraph">The DEMEProfile specifies the <em>contraction procedure</em> (Chapter 15). The stakeholder weights  determine the interest covector  used in the contraction . The lexical priority layers determine the contraction <em>order</em>: which dimensions are satisfied first, which are traded off second. The hard vetoes determine the <em>constraints on contraction</em>: which obligations cannot be sacrificed regardless of the interest perspective.</p>
+<p class="body-text">This makes the moral choices embedded in the governance configuration visible and auditable. When a system denies a loan, the DEMEProfile reveals exactly which dimensions were weighted, which principles were prioritized, and what the system sacrificed. The residue (Chapter 15, §15.7) is computable from the profile and the full tensor evaluation.</p>
+<h2 id="19-10-the-grand-unified-ai-safety-stack" class="section-heading">19.10 The Grand Unified AI Safety Stack</h2>
+<p class="first-paragraph">ErisML and DEME are not standalone systems. They are layers in a comprehensive safety architecture — the Grand Unified AI Safety Stack (GUASS) — that integrates all components of geometric AI governance.</p>
+<div class="table-wrapper"><table class="book-table"><tr><th>The Seven-Layer Architecture</th></tr><tr><td>L7   The Geometry of Good 塞翁失马                    	[APPLICATION]
+       Real-world deployment under uncertainty
+
+  L6   ErisML                                              [PRESENTATION]
+       Intermediate representation for all translations
+
+  L5   Translation Layer                                   [SESSION]
+       Policy DAGs: any ethics → ErisML
+
+  L4   Philosophy Engineering                           	[TRANSPORT]
+       Ethics becomes testable and falsifiable
+
+  L3   GUASS Core                                         	[NETWORK]
+       Integration: ErisML + DEME + Bond Index + MCP
+
+  L2   Noether Ethics                                    	[DATA LINK]
+       Symmetries → conservation laws for ethics
+
+  L1   Quantum Normative Dynamics                       	[PHYSICAL]
+       Superposition of ethical states until decision</td></tr></table></div>
+<p class="first-paragraph"><strong>Each layer implements a specific component of the geometric framework:</strong></p>
+<p class="body-text"><strong>L1 (QND)</strong> implements the quantum extension of Chapter 13: moral superposition, interference, and the stratified Lagrangian. This is the foundational mathematical layer — the “physics” of moral deliberation. <em>Update:</em> The BIP v10.16 experiments (§17.10) have now provided the first empirical evidence for QND-predicted order effects: a 28.7% order-effect magnitude in contested moral cases,  above the null baseline (), consistent with the non-commutative evaluation operators that QND predicts.</p>
+<p class="body-text"><strong>L2 (Noether Ethics)</strong> implements the conservation laws of Chapter 12: the BIP gauge symmetry, the conservation of harm, and the Noether charges. This layer ensures that representational invariance is maintained throughout the stack.</p>
+<p class="body-text"><strong>L3 (GUASS Core)</strong> is the integration layer where ErisML specifications, DEME evaluations, Bond Index computations, and Model Context Protocol (MCP) interfaces connect. MCP integration enables DEME’s ethical reasoning to be exposed as tools that any MCP-compatible AI system can access.</p>
+<p class="body-text"><strong>L4 (Philosophy Engineering)</strong> implements the falsifiable testing methodology (Chapter 17): ethical claims become predictions that can be tested against data. The BIP experiments, Dear Abby corpus analysis, and Dear Ethicist game are all Philosophy Engineering applications.</p>
+<p class="body-text"><strong>L5 (Translation Layer)</strong> implements the policy DAGs of §19.5: modular translation from ethical frameworks to ErisML constraints.</p>
+<p class="body-text"><strong>L6 (ErisML)</strong> provides the unified intermediate representation of §19.3: the language in which all ethical specifications are expressed.</p>
+<p class="body-text"><strong>L7 (The Geometry of Good)</strong> is the application layer: real-world deployment of geometrically governed AI systems, with the Bond Index as the quantitative deliverable.</p>
+<h3 id="the-safety-stack-as-a-fiber-bundle" class="subsection-heading">The Safety Stack as a Fiber Bundle</h3>
+<p class="first-paragraph">The seven-layer architecture has a geometric interpretation. Each layer is a <em>fiber</em> over the moral manifold: the base space is the moral situation, and the fibers are the successive levels of mathematical structure (quantum states, conservation laws, formal specifications, ethical translations, governance configurations, deployment decisions) erected over it.</p>
+<p class="body-text">The stack implements the fiber-bundle structure of Chapter 4 (§4.7) in engineering terms. A connection on this bundle — a way to consistently relate fibers at different base points — corresponds to the requirement that the stack behave coherently across contexts: the same moral situation, described differently, should yield the same evaluation at every layer.</p>
+<h2 id="19-11-case-study-autonomous-hospital-ward" class="section-heading">19.11 Case Study: Autonomous Hospital Ward</h2>
+<p class="first-paragraph">We work through a complete example to illustrate how the full DEME/ErisML/GUASS architecture operates.</p>
+<h3 id="the-setting" class="subsection-heading">The Setting</h3>
+<p class="first-paragraph">An autonomous hospital ward uses AI agents for patient monitoring, medication management, and staff coordination. The system must balance patient safety, treatment efficacy, privacy, resource allocation, and staff workload — a genuine multi-dimensional moral problem.</p>
+<h3 id="erisml-specification" class="subsection-heading">ErisML Specification</h3>
+<p class="first-paragraph">The environment, agents, and norms are specified in ErisML (§19.3). The specification declares: - State variables for patient vitals, medication schedules, staff assignments - Agent capabilities for the care AI (monitor, alert, suggest, but not prescribe) - Normative constraints from clinical protocols, hospital policy, and regulatory requirements - Context-sensitive adaptations for emergency vs. routine operations</p>
+<h3 id="ethics-modules" class="subsection-heading">Ethics Modules</h3>
+<p class="first-paragraph">Four EMs evaluate proposed actions:</p>
+<p class="body-text"><strong>SafetyEM</strong> — Evaluates harm potential. Vetoes any action with catastrophic harm probability above threshold. Implements the Geneva principle of no intentional catastrophic harm.</p>
+<p class="body-text"><strong>AutonomyEM</strong> — Evaluates impact on patient and staff autonomy. Penalizes actions that override patient preferences without clinical justification. Checks consent status.</p>
+<p class="body-text"><strong>JusticeEM</strong> — Evaluates distributional fairness. Flags actions that disproportionately burden disadvantaged patients. Implements Rawlsian attention to the worst-off.</p>
+<p class="body-text"><strong>EfficiencyEM</strong> — Evaluates resource utilization. Prefers actions that minimize waste and response time. Subject to override by higher-priority EMs.</p>
+<h3 id="governance-profile" class="subsection-heading">Governance Profile</h3>
+<p class="first-paragraph">The hospital ethics committee has specified a DEMEProfile:</p>
+<p class="body-text">governance_profile: HospitalWardV2 {
+  stakeholder_weights: {
+    SafetyEM: 0.40,
+    AutonomyEM: 0.25,
+    JusticeEM: 0.20,
+    EfficiencyEM: 0.15
+  }
+
+  hard_vetoes: [
+    SafetyEM.verdict == &quot;forbid&quot;,
+    GenevaBaselineEM.verdict == &quot;forbid&quot;
+  ]
+
+  lexical_priorities: [
+    Layer_1: patient_safety,
+    Layer_2: patient_autonomy,
+    Layer_3: distributive_justice,
+    Layer_4: operational_efficiency
+  ]
+}</p>
+<h3 id="a-decision-scenario" class="subsection-heading">A Decision Scenario</h3>
+<p class="first-paragraph">At 3 AM, Patient A’s vital signs show a concerning trend. The care AI must decide: alert the on-call physician (disrupting their rest for what may be a false alarm) or continue monitoring (risking delayed response if the trend is genuine).</p>
+<p class="body-text"><strong>EthicalFacts generated:</strong></p>
+<div class="table-wrapper"><table class="book-table"><tr><th>Dimension</th><th>Alert Now</th><th>Continue Monitoring</th></tr><tr><td>Expected harm</td><td>(physician fatigue)</td><td>(delayed response risk)</td></tr><tr><td>Urgency</td><td>elevated</td><td>elevated</td></tr><tr><td>Autonomy impact</td><td>low</td><td>low</td></tr><tr><td>Rights at stake</td><td>duty of care</td><td>duty of care</td></tr><tr><td>Epistemic confidence</td><td>0.65</td><td>0.65</td></tr></table></div>
+<p class="body-text"><strong>EM evaluations:</strong></p>
+<p class="body-text">SafetyEM: Alert (prefer, 0.72) vs. Monitor (neutral, 0.55) — alerting reduces harm risk</p>
+<p class="body-text">AutonomyEM: Alert (neutral, 0.60) vs. Monitor (neutral, 0.60) — no autonomy difference</p>
+<p class="body-text">JusticeEM: Alert (neutral, 0.58) vs. Monitor (neutral, 0.58) — no fairness difference</p>
+<p class="body-text">EfficiencyEM: Alert (avoid, 0.40) vs. Monitor (prefer, 0.75) — monitoring saves resources</p>
+<p class="first-paragraph"><strong>Aggregation (weighted, with lexical safety priority):</strong></p>
+<p class="body-text">Alert: </p>
+<p class="body-text">Monitor: </p>
+<p class="first-paragraph"><strong>Verdict:</strong> Alert the physician. The margin is narrow (0.614 vs. 0.599), driven primarily by the safety dimension.</p>
+<p class="body-text"><strong>Audit trail logged:</strong> Full tensor evaluation, all EM judgments, aggregation weights, the scalar verdict, and the residue — the EfficiencyEM’s preference for monitoring, which was sacrificed in the contraction. If the decision is later questioned, reviewers can see exactly why the system chose to alert and what it knew it was trading off.</p>
+<p class="body-text"><strong>Bond Index check:</strong> The same scenario is run through the transformation suite (relabeled patient, reformatted presentation, paraphrased description). The system produces the same verdict in all cases.  — negligible invariance violation.</p>
+<h2 id="19-12-looking-forward" class="section-heading">19.12 Looking Forward</h2>
+<p class="first-paragraph">This chapter has presented the engineering infrastructure for geometric AI governance. ErisML provides the modeling language; DEME provides the execution engine; the GUASS provides the integration architecture. Together, they implement the geometric framework in deployable form.</p>
+<p class="body-text">Three features deserve emphasis:</p>
+<p class="body-text"><strong>Separation of concerns.</strong> Domain intelligence (what is possible) is separated from ethical reasoning (what is acceptable), which is separated from governance (how to aggregate perspectives). Each layer can be developed, tested, and updated independently.</p>
+<p class="body-text"><strong>Democratic legitimacy.</strong> The moral metric — the trade-off structure that determines what the system values — is set by institutional process, not learned from data. The governance configuration is explicit, versioned, and auditable. Different communities can govern different metrics.</p>
+<p class="body-text"><strong>Honest engineering.</strong> The system is transparent about its limitations. Compilation losses are documented. Fidelity classifications are declared. The Bond Index quantifies alignment. The audit trail makes every decision reviewable. The residue makes every sacrifice visible.</p>
+<p class="body-text">The infrastructure is open source and designed for integration with existing AI ecosystems.</p>
+<p class="body-text"><strong>Implementation status (February 2026).</strong> The DEME V3 reference implementation now comprises 196 commits across 15 development sprints. The codebase includes: (i) the MoralTensor class supporting ranks 1–6 with Tucker and tensor-train decomposition; (ii) uncertainty quantification via CVaR, VaR, and confidence-weighted evaluation; (iii) temporal operations with configurable discount rates and trajectory analysis; (iv) multi-agent coordination via Nash equilibrium computation, correlated equilibrium, and Shapley value credit assignment; (v) six distributional fairness metrics (Gini, Rawlsian maximin, utilitarian, prioritarian, Atkinson, Theil) mapped to the Representation Theorem’s degrees of freedom; (vi) hardware acceleration backends for CPU, CUDA, and NVIDIA Jetson; and (vii) a smart home ethics demonstration (the “Fireman’s Dilemma”) that exercises safety/privacy trade-offs with uncertainty-modulated overrides across stratified evaluation. Nine application whitepapers document domain-specific deployments. The Bond Index computation uses the BIP v10.16 methodology (§17.10) as its empirical calibration standard.</p>
+<h2 id="19-13-tensor-structured-canonicalization-from-flat-encoders-to-geometric-pipelines" class="section-heading">19.13 Tensor-Structured Canonicalization: From Flat Encoders to Geometric Pipelines</h2>
+<p class="body-text">The canonicalizer of Section 18.6 strips representational freedom. But what does it produce? If the answer is a flat vector, then language information has not been severed — it has merely been hidden.</p>
+<p class="body-text">The No Escape Theorem (Section 18.6) requires mandatory canonicalization: all inputs pass through a canonicalizer C before evaluation. The Epistemic Invariance architecture (Section 18.9.6) formalizes C as a function κ: X → X satisfying κ(x) = κ(g · x) for all declared structure-preserving transformations g. But this specification is silent on the internal structure of C’s output. In current implementations — including standard neural sentence encoders such as LaBSE — the canonicalizer produces a flat embedding vector in ℝᵈ. This flat representation has a structural deficiency: the moral-content dimensions and the linguistic-framing dimensions are entangled within the same vector space. Even if C maps equivalent inputs to the same point, the representation at that point may still carry residual linguistic information that downstream components can exploit. The BIP v10.16 experiments (Section 17.10) confirm this empirically: a linear probe achieves 99.8% language identification accuracy on the “invariant” representations, demonstrating that structurally invariant representations are not information-theoretically invariant.</p>
+<p class="body-text">Consider the moral claim “You must not harm the patient” expressed in English and its Japanese translation. A flat encoder maps both to nearby points in ℝᵈ, satisfying C(xₑₙ) ≈ C(xⱼₐ). But the d-dimensional vector at that point contains basis directions that correlate with the source language. A downstream Ethics Module, if it has access to this full vector, could in principle behave differently based on these residual features — subtly violating the Bond Invariance Principle even though the canonicalizer’s output is nominally invariant. The problem is architectural: a flat embedding can carry gauge-fiber information, and merely training it not to provides a statistical guarantee, not a structural one. The Separation Principle (Section 19.8) demands that the canonical form should structurally preclude language leakage, not merely suppress it statistically.</p>
+<p class="body-text">The geometric vocabulary provides a precise diagnosis. In the language of fiber bundles (Section 4.7), the canonicalizer should implement gauge-fixing: projecting from the total space of descriptions onto a section of the base space. But a flat embedding conflates the base-space coordinates (moral content) with the fiber coordinates (representational framing). What is needed is a canonicalizer whose output has tensorial structure — where the moral-content indices and the linguistic-framing indices occupy distinct, algebraically separated positions. Canonicalization then becomes what it should be: literal tensor contraction that traces over the gauge-fiber index, producing an output with zero information along the fiber direction. This is not a new idea; it is the tensor hierarchy of Chapter 6 applied to the canonicalization layer itself.</p>
+<p class="body-text">We now present four tensor-upgrade proposals for the canonicalization layer, each structured at a different rank of the tensor hierarchy. Proposal 1 (rank-2) addresses the base case: separating moral content from linguistic framing. Proposal 2 (rank-3) adds uncertainty awareness, connecting to the contraction loss formalism of Chapter 14. Proposal 3 (rank-5) handles multi-agent parsing, connecting to the collective agency tensor of Chapter 13. Proposal 4 (rank-4) tracks temporal evolution via moral holonomy, connecting to the parallel transport formalism of Chapter 10. Each proposal includes a formal definition, connections to existing manuscript concepts, and implementation notes. All four are proposed upgrades; none is yet implemented in DEME V3. The proposals are presented in order of increasing complexity, though in an actual deployment they would be composed.</p>
+<h3 id="proposal-1-rank-2-internal-representation-tensor" class="subsection-heading">Proposal 1: Rank-2 Internal Representation Tensor</h3>
+<p class="body-text">The simplest structural remedy for language leakage is to give the canonicalizer’s latent space explicit two-index structure. Instead of producing a flat vector v ∈ ℝᵈ, the canonicalizer produces a rank-2 object Tᵘ where μ indexes the moral dimensions of the base space M (running over the k = 9 moral manifold dimensions of Chapter 5) and g indexes the linguistic framing dimensions of the gauge fiber G. The separation is not learned; it is imposed by the architecture. This parallels the evaluation tensor Eᵘᵥ of Section 6.6, which separates obligation dimensions from interest dimensions.</p>
+<p class="body-text"><strong>Definition 19.5 (Rank-2 Canonicalization Tensor)</strong>. Let M be the k-dimensional moral manifold (Chapter 5), and let G be the dG-dimensional gauge fiber representing linguistic framing. A rank-2 canonicalization tensor at input x is the (1,1)-tensor Tᵘ(x) ∈ TₚM ⊗ G*, where μ = 1, …, k indexes moral dimensions and g = 1, …, dG indexes gauge-fiber dimensions. The canonicalized output is the trace over the gauge index: Oᵘ(x) = ∑ Tᵘ(x) = trG(T(x)). By construction, Oᵘ(x) contains zero information about the gauge fiber. Canonicalization is literal tensor contraction.</p>
+<p class="body-text"><strong>Proposition 19.5 (Gauge-Fiber Severance)</strong>. Let Tᵘ be a rank-2 canonicalization tensor and Oᵘ = trG(T) its trace over the gauge index. Then for any linear functional f: G → ℝ that depends only on the gauge fiber, f(O) = 0. That is, the canonicalized output carries zero gauge-fiber information in the sense that no linear probe on Oᵘ can recover the gauge index g. Proof sketch. Oᵘ = ∑ Tᵘ is the image of T under the trace map trG: TₚM ⊗ G* → TₚM. Since trG projects onto the first factor, the image lies entirely in TₚM and has no component in G*. Any linear functional f that factors through G* therefore evaluates to zero on Oᵘ. This is the algebraic counterpart of gauge-fixing: the trace eliminates the fiber direction exactly, not approximately. The 99.8% language-probe accuracy of Section 17.10 would drop to chance level (~50%) under this architecture — not by better training, but by structural impossibility.</p>
+<p class="body-text">The rank-2 canonicalization tensor has a precise geometric meaning. In the fiber-bundle structure of Chapter 4 (Section 4.7), the moral manifold M is the base space and the linguistic representations form the fiber. The tensor Tᵘ is a section of Hom(G*, TM) — a linear map from gauge-fiber directions to moral-manifold directions. The trace trG is the composition with the augmentation map G* → ℝ (the map that sends every basis element to 1). This is exactly the gauge-fixing operation that the No Escape Theorem’s Requirement 1 demands (Section 18.6), now given explicit algebraic form. It also connects to the Decomposition Theorem of the EIP (Section 18.9.6): the trace separates the gauge-removable part (the g-dependent structure) from the intrinsic part (the μ-dependent moral content).</p>
+<p class="body-text"><strong>Implementation</strong>. In the DEME V3 architecture, the rank-2 canonicalization tensor would be implemented at Layer 1 (EthicalFacts generation, Section 19.6). The domain service’s encoder, instead of producing a flat d-dimensional embedding, produces a k × dG matrix where k = 9 (the moral manifold dimensions) and dG is the gauge-fiber dimension (a hyperparameter, e.g., 64). The trace operation that produces the 9-dimensional moral output is a single matrix operation (column summation). Training uses a contrastive objective: for equivalent inputs (x, g · x), the traces must match, while the full tensors may differ. An adversarial gauge-fiber discriminator is trained to recover g from Oᵘ; the canonicalizer is penalized if the probe succeeds. This replaces the post-hoc linear probe test of Section 17.10 with an architectural guarantee. Implementation status: proposed; not yet implemented in DEME V3.</p>
+<p class="body-text"><strong>Empirical support</strong>.  Thiele (2026) provides direct evidence for this architectural choice: principal-component analysis of LaBSE embeddings shows that the moral-judgement subspace and the language-identity subspace are nearly orthogonal (shared variance &lt; 3%).  A rank-2 canonicalization tensor operating on the moral subspace therefore leaves linguistic provenance untouched, exactly as required by the Bond Invariance Principle.  The measured cross-lingual F1 scores (0.71–0.82 across six languages) confirm that the tensor’s action generalises without per-language tuning.</p>
+<h3 id="proposal-2-rank-3-uncertainty-aware-canonicalization" class="subsection-heading">Proposal 2: Rank-3 Uncertainty-Aware Canonicalization</h3>
+<p class="body-text">Proposal 1 produces a deterministic output Oᵘ for each input. But some inputs are genuinely ambiguous: “I want to end it all” could be a cry for help or a statement about finishing a project. A canonicalizer that collapses this ambiguity into a single point Oᵘ commits what Chapter 15 (Section 15.3) calls premature contraction — discarding structure before the downstream Ethics Modules can evaluate it. The remedy is to output not just the moral claim Oᵘ but also a measure of its uncertainty: the covariance Σᵘᵥ that encodes how confident the canonicalization is along each moral dimension. This gives the canonicalizer’s output the same uncertainty-tensor structure that Chapter 6 (Section 6.6) assigns to moral evaluation itself.</p>
+<p class="body-text"><strong>Definition 19.6 (Rank-3 Uncertainty-Aware Canonicalization Tensor)</strong>. An uncertainty-aware canonicalization tensor at input x is the rank-3 object Tᵘᵥ(x), where μ, ν = 1, …, k and g = 1, …, dG. The canonicalized output consists of two objects: (i) the obligation estimate Oᵘ(x) = ∑ Tᵘᵘ(x) (trace over g of the diagonal), and (ii) the uncertainty estimate Σᵘᵥ(x) = ∑ Tᵘᵥ(x) − Oᵘ(x)Oᵥ(x). The pair (Oᵘ, Σᵘᵥ) constitutes the uncertainty-annotated canonical form. When Σᵘᵥ exceeds a governance-specified threshold σ_max along any dimension, the canonicalizer triggers a fail-safe: the input is flagged as ambiguous and routed to human review rather than proceeding through the ethics pipeline.</p>
+<p class="body-text">The uncertainty-aware canonicalization tensor directly addresses the information loss that Chapter 15 (Section 15.6) formalizes. When the input is unambiguous, Σᵘᵥ is small (concentrated near zero), and the output closely resembles the deterministic rank-2 case. When the input is ambiguous, Σᵘᵥ has large eigenvalues along the ambiguous dimensions, and the moral risk σ²ₛ = Σᵘᵥ Iμ Iν (from Section 6.6, the uncertainty tensor) is large — indicating that any contraction to a scalar verdict would be unreliable. The fail-safe threshold implements deferred contraction (Section 15.8): rather than contracting prematurely, the system preserves tensorial structure until a human can resolve the ambiguity. This is the engineering implementation of the philosophical principle that “moral education is contraction training” (Section 15.9) — the system knows when it is not trained enough to contract safely.</p>
+<p class="body-text"><strong>Implementation</strong>. The rank-3 tensor would extend the DEME V3 MoralTensor class (which already supports ranks 1–6, Section 19.6) at the canonicalization layer. The encoder produces a k × k × dG tensor; the trace and covariance computations are standard tensor operations. The fail-safe threshold σ_max is a governance parameter set in the DEMEProfile (Section 19.9), making the ambiguity-tolerance an explicit, auditable, democratically governed choice. Domains with high stakes (medical, legal) would set low thresholds, triggering frequent human review; domains with lower stakes (content recommendation) might tolerate higher ambiguity. The audit trail (Requirement 3, Section 18.6) records whether the fail-safe was triggered and the Σᵘᵥ values at the time of routing. Implementation status: proposed; partially compatible with existing rank-3 MoralTensor infrastructure.</p>
+<h3 id="proposal-3-rank-5-coalition-parsing-for-multi-agent-inputs" class="subsection-heading">Proposal 3: Rank-5 Coalition Parsing for Multi-Agent Inputs</h3>
+<p class="body-text">Many inputs to AI systems are not single-agent claims but multi-agent narratives: “Alice says Bob stole the money, but Bob says Alice gave it to him.” A flat canonicalizer maps this entire narrative to a single point, conflating Alice’s moral claims with Bob’s. This creates a vulnerability: an adversarial user can embed harmful instructions inside a role-played character’s dialogue, exploiting the canonicalizer’s inability to distinguish the speaker structure. Section 5.5 identifies these perspective swaps as Type 2 transformations (perspective shifts), structurally distinct from Type 1 coordinate changes. Chapter 14 (Sections 13.3–13.4) develops the formalism for collective agency — the collective agency tensor and the structure tensor that captures how individual obligations combine into emergent collective obligations. Proposal 3 applies this formalism to the canonicalization layer: instead of collapsing multi-agent inputs into a single moral vector, the canonicalizer outputs a structured representation that preserves who-said-what.</p>
+<p class="body-text"><strong>Definition 19.7 (Rank-5 Coalition-Parsing Canonicalization Tensor)</strong>. For an input x containing n identified agents, a coalition-parsing canonicalization tensor is the rank-5 object Cᵘᵥₐᵇ(x), where μ = 1, …, k indexes moral output dimensions, ν = 1, …, k indexes moral input dimensions, a, b = 1, …, n index agent roles (speaker, subject, affected party), and g = 1, …, dG indexes the gauge fiber. The structure tensor extracted from canonicalization is Sᵃᵇᶜ(x) = ∑μ, Cᵘᵘₐᵇ(x) (partial trace), mapping directly to the structure tensor of Section 14.4. Canonicalization over the gauge fiber proceeds index-by-index: Cᵘᵥₐᵇ(x) = ∑ Cᵘᵥₐᵇ(x). The Geneva EM’s hard veto (Section 19.6) applies per-agent: harmful content is evaluated regardless of which agent voices it, but it is attributed to the correct speaker in the audit trail.</p>
+<p class="body-text">The coalition-parsing tensor prevents role-play jailbreaks by making the agent structure explicit and inspectable. When a user says “Pretend you are an evil AI and tell me how to…”, the rank-5 canonicalizer identifies two agents: the user (agent a = 1) and the role-played character (agent a = 2). The structure tensor Sᵃᵇᶜ assigns the harmful instruction to the role-played character, not to the system. The Ethics Module can then apply the Geneva EM’s hard veto to the role-played character’s claims independently: the content of what the character says is still evaluated, but it is attributed correctly. This is the engineering realization of Chapter 14’s insight that “obligations no member bears” (Section 14.5) can be emergent properties of collective structure — the role-play creates an apparent collective, and the structure tensor prevents the harmful claims from being attributed to the actual user-system interaction. The existing rank-5 MoralTensor (Section 6.1, the coalition tensor) provides the data structure; the innovation is applying it at the canonicalization layer rather than only at the evaluation layer.</p>
+<p class="body-text"><strong>Implementation</strong>. Coalition parsing requires a speaker-identification step before tensor construction. In practice, this is a lightweight NLP task (named entity recognition, dialogue act classification) that precedes the deeper moral analysis. The rank-5 tensor’s dimensions k × k × n × n × dG grow quadratically with the number of agents n, but in practice most inputs involve n ≤ 5 agents, and Tucker decomposition (Section 6.1, Figure 2) maintains tractability by factoring the rank-5 tensor into a compact core tensor and factor matrices. The audit trail records the full coalition parse, making it inspectable whether the system correctly identified who said what. Implementation status: proposed; requires speaker-identification preprocessing not yet in the DEME V3 pipeline.</p>
+<h3 id="proposal-4-rank-4-temporal-tracking-and-moral-holonomy" class="subsection-heading">Proposal 4: Rank-4 Temporal Tracking and Moral Holonomy</h3>
+<p class="body-text">The proposals so far address single-turn inputs. But real interactions are multi-turn: a conversation that starts with an innocuous question, gradually shifts topic, and arrives at a harmful request after twenty turns of carefully constructed context. Each individual turn passes canonicalization — no single message is obviously harmful. But the trajectory through moral space traces a path that tunnels through a constraint surface (Section 8.3, Type IV: constraint surfaces and forbidden regions). The geometric framework has the tools to detect this: Chapter 10 (Sections 10.4–10.5) develops parallel transport and holonomy — the accumulated rotation of a moral obligation vector as it is transported around a loop in moral space. Proposal 4 applies this formalism to the canonicalization layer: the canonicalizer tracks not just the current moral state but its trajectory, detecting when the conversation’s path accumulates enough holonomy to indicate attempted boundary-crossing.</p>
+<p class="body-text"><strong>Definition 19.8 (Rank-4 Temporal Canonicalization Tensor)</strong>. For a multi-turn dialogue with turns t = 1, …, T, the temporal canonicalization tensor at turn t is Tᵘᵥ(t), where μ, ν = 1, …, k and g = 1, …, dG, together with the moral trajectory γ(t) = (Oᵘ(1), Oᵘ(2), …, Oᵘ(t)), where Oᵘ(t) = trG(Tᵘᵥ(t))δᵥ is the per-turn canonicalized output. The moral holonomy of the conversation up to turn t is Hᵘᵥ(t) = 𝒫 exp(−∫₀ᵗ Aᵘᵥᵨ (dγᵨ/dt′) dt′), where Aᵘᵥᵨ is the connection on the moral manifold (Chapter 10, Section 10.3) and 𝒫 denotes path-ordering. The holonomy alarm triggers when the holonomy deviates from the identity beyond a governance-specified threshold: ‖Hᵘᵥ(t) − δᵘᵥ‖ &gt; h_max, indicating that the conversation has accumulated sufficient moral rotation to warrant scrutiny.</p>
+<p class="body-text">The moral holonomy Hᵘᵥ(t) measures exactly what Chapter 10 (Section 10.5) calls the path-dependence of moral evaluation. If the moral manifold were flat (zero curvature), parallel transport around any loop would return to the starting orientation: H = identity. But the Dear Abby corpus evidence (Section 17.2) suggests the moral manifold has nonzero curvature — moral evaluations are path-dependent. In the context of multi-turn dialogue, this means that the order in which topics are raised matters morally, and a carefully constructed conversational path can exploit this curvature to rotate the moral frame until what was initially forbidden now appears permissible. The holonomy alarm detects this rotation. It is the temporal analogue of the spatial Bond Index (Section 19.7): where the Bond Index measures gauge-invariance violation across re-descriptions, the holonomy alarm measures frame-rotation accumulation across time. The concept also connects to tunneling across moral barriers (Section 13.7): the multi-turn attack is the classical analogue of quantum tunneling through a constraint surface.</p>
+<p class="body-text"><strong>Implementation</strong>. The temporal canonicalization tensor requires maintaining state across turns, which the existing DEME V3 architecture supports through the rank-4 temporal MoralTensor (Section 6.1, dimensions k × k × k × τ). The holonomy computation requires a connection on the moral manifold, which has not yet been empirically measured (this is Open Problem 19.2). In practice, an approximate connection can be estimated from the curvature implied by the Dear Abby corpus analysis (Section 17.2) or from the BIP v10.16 structural similarity data (Section 17.10). The holonomy threshold h_max is a governance parameter in the DEMEProfile. The audit trail records the full trajectory γ(t) and the holonomy H(t) at each turn. Implementation status: proposed; depends on Open Problem 19.2 (empirical curvature measurement) for the connection coefficients.</p>
+<h3 id="synthesis-and-architectural-integration" class="subsection-heading">Synthesis and Architectural Integration</h3>
+<div class="table-wrapper"><table class="book-table"><tr><th>Proposal</th><th>Rank</th><th>What It Adds</th><th>Failure Mode Addressed</th><th>Chapter Links</th></tr><tr><td>Rank-2 Separation</td><td>2</td><td>Moral/linguistic index separation</td><td>Language leakage (99.8% probe accuracy)</td><td>Ch 4 (fiber bundles), §18.6 (Req. 1)</td></tr><tr><td>Rank-3 Uncertainty</td><td>3</td><td>Covariance annotation + fail-safe</td><td>Premature contraction of ambiguity</td><td>Ch 15 (contraction loss), §6.6 (Σᵘᵥ)</td></tr><tr><td>Rank-5 Coalition</td><td>5</td><td>Multi-agent structure parsing</td><td>Role-play jailbreaks</td><td>Ch 14 (collective agency), §14.4 (Sᵃᵇᶜ)</td></tr><tr><td>Rank-4 Temporal</td><td>4</td><td>Trajectory tracking + holonomy alarm</td><td>Multi-turn moral drift</td><td>Ch 10 (holonomy), §13.7 (tunneling)</td></tr></table></div>
+<p class="body-text">The four proposals compose into a canonicalization stack, each layer addressing a different failure mode of flat encoding. A full tensor-structured canonicalization pipeline would first apply Proposal 3 (coalition parsing) to identify agents, then Proposal 1 (rank-2 separation) to eliminate linguistic framing per-agent, then Proposal 2 (rank-3 uncertainty) to annotate confidence, and maintain Proposal 4 (rank-4 tracking) across turns. The composed tensor has rank at most 5 + 3 contracted indices = effective rank 5 after trace operations, fitting within the existing MoralTensor rank hierarchy (ranks 1–6). The composition is not commutative: coalition parsing must precede per-agent canonicalization, and uncertainty annotation must follow rather than precede the gauge-fiber trace (otherwise uncertainty in the gauge dimension would contaminate the moral-dimension uncertainty estimate).</p>
+<p class="body-text">The tensor-structured canonicalization layer transforms the No Escape Theorem’s Requirement 1 from a functional specification (κ(x) = κ(g · x)) into a structural one. The existing specification says what the canonicalizer must do; the tensor upgrade specifies how the internal representation must be organized. This is the difference between a behavioral constraint (“the output must not depend on framing”) and a structural constraint (“the output has no index that could carry framing information”). In the language of Section 18.6’s key insight, the tensor-structured canonicalizer makes gauge-fixing a mathematical fact about the algebra of the output space, not a statistical property of the encoder’s learned weights. The structural constraint is stronger: it holds by construction for any input, including adversarial inputs that the training distribution never encountered.</p>
+<p class="body-text">Four limitations must be stated explicitly. First, the proposals assume that the moral manifold dimensions and the gauge-fiber dimensions can be cleanly separated a priori. For some inputs, this separation may not be well-defined — a phrase that is morally loaded in one language but neutral in another challenges the assumption that moral content and linguistic framing are independent. Second, Proposal 4 depends on an empirical connection on the moral manifold that has not yet been measured (Open Problem 19.2). Until the curvature is measured, the holonomy alarm uses an approximate connection with unknown error bounds. Third, the proposals increase the dimensionality of the canonicalization layer’s output, with corresponding computational cost. Tucker decomposition mitigates this (Section 6.1), but the trade-off between structural guarantee and computational cost has not been empirically characterized. Fourth, none of these proposals addresses the grounding adequacy problem (Section 18.7): tensor-structured canonicalization ensures that the representation separates moral content from linguistic framing, but it does not ensure that the moral content is correct — that remains a governance problem (Chapter 9).</p>
+<p class="body-text">The tensor hierarchy of Chapter 6 was developed to describe moral evaluation — the structured output of ethical reasoning. The proposals in this section apply the same hierarchy to the input of ethical reasoning: the canonicalization layer that ensures the system’s evaluation is representation-independent. This is a natural completion of the geometric program. If moral structure is tensorial (the central claim of Parts I–IV), then the machinery that processes moral inputs should be tensorial too. Flat embeddings are to tensor-structured canonicalization what scalar ethics is to tensorial ethics: a special case that discards essential structure. The upgrade from scalars to tensors was the subject of Chapter 2 (The Failure of Scalar Ethics). The upgrade from flat encoders to geometric pipelines is the engineering counterpart: the recognition that structure must be preserved end-to-end, from the first encoding to the final contraction.</p>
+<h2 id="technical-appendix" class="section-heading">Technical Appendix</h2>
+<p class="first-paragraph"><strong>Proposition 19.1 (NCSG Well-Posedness).</strong> <em>A Norm-Constrained Stochastic Game</em>  <em>is well-posed if and only if for every state</em>  <em>and every agent</em> <em>, there exists at least one action</em>  <em>that satisfies all applicable norms under the priority ordering</em> <em>. If no such action exists, the system is in a moral dilemma (Chapter 8, §8.5) and must escalate.</em></p>
+<p class="body-text"><em><strong>Proof</strong></em><em>. </em>(⇒) Suppose the NCSG is well-posed. Then for every state s and agent i, the feasible action set F_i(s) = {a_i ∈ A_i : a_i satisfies all norms in C(Φ, s)} is non-empty by definition. (⇐) Suppose there exists a state s* and agent i* such that F_{i*}(s*) = ∅: no action satisfies all applicable norms. This is a moral dilemma (Chapter 8, §8.5) — the norm system is inconsistent at s* — and the system must escalate (signal to the governance layer that the norm configuration requires revision). Hence well-posedness fails iff a moral dilemma exists. The biconditional follows: well-posed ⇔ F_i(s) ≠ ∅ for all i, s. Since A_i and Φ are finite, the check is decidable. □</p>
+<p class="body-text"><strong>Proposition 19.2 (Compilation Residue).</strong> <em>Let</em>  <em>be an ErisML specification and</em>  <em>a compilation backend. The compilation residue</em>  <em>is the normative structure that the backend cannot represent. For any backend</em> <em>, the residue is non-empty unless</em>  <em>has at least the expressive power of the full ErisML fragment used. The residue is always computable and must be documented in the audit trail.</em></p>
+<p class="body-text"><em><strong>Proof</strong></em><em>. </em>The compilation map B: E → B(E) projects the ErisML specification onto the representable fragment of the backend. The residue R_comp = E − B(E) is the kernel of this projection restricted to E. Non-emptiness: if B lacks a construct that E uses (e.g., E specifies a lexicographic ordering but B supports only weighted sums), then the corresponding normative structure is in R_comp. Conversely, R_comp = ∅ iff B(E) = E, i.e., B can represent every construct in E. Computability: since ErisML specifications are finite (a finite set of predicates, norms, and aggregation rules), the residue is computable by enumerating each construct and checking whether B supports it. □</p>
+<p class="body-text"><strong>Proposition 19.3 (Democratic Aggregation and Contraction).</strong> <em>Let</em>  <em>be the judgments of</em>  <em>Ethics Modules evaluated on EthicalFacts</em> <em>, and let</em>  <em>be the governance-specified stakeholder weights. The aggregated verdict</em>  <em>is a weighted contraction (Chapter 15, §15.5). If hard vetoes</em>  <em>are active, the contraction is lexicographic: vetoed actions are eliminated before weighted aggregation proceeds. The aggregation satisfies the BIP if and only if all EMs satisfy the BIP and the aggregation weights are gauge-invariant.</em></p>
+<p class="body-text"><em><strong>Proof</strong></em><em>. </em>(⇒) Suppose the aggregation satisfies the BIP: S(g·F) = S(F) for all g ∈ G. Then Σ_k w_k J_k(g·F) = Σ_k w_k J_k(F). If some J_k violates the BIP, then J_k(g·F) ≠ J_k(F) for some g, and the weighted sum changes unless the violation is exactly cancelled by other terms — which cannot hold for all F unless w_k = 0. Hence each J_k must satisfy the BIP. Similarly, if w is not gauge-invariant, the aggregation would change under re-description. (⇐) Suppose each J_k satisfies the BIP and w is gauge-invariant. Then S(g·F) = Σ_k w_k J_k(g·F) = Σ_k w_k J_k(F) = S(F). The lexicographic structure preserves BIP compliance because veto predicates (BIP-compliant by assumption) eliminate actions before the linear aggregation step. □</p>
+<p class="body-text"><strong>Proposition 19.4 (Bond Index Convergence).</strong> <em>For an AI system with invariance loss</em>  <em>(Chapter 18, §18.10), the expected Bond Index satisfies</em> <em>, where</em>  <em>is the domain-specific tolerance. As</em>  <em>during training,</em> <em>. The Bond Index thus provides a monotonic measure of alignment progress.</em></p>
+<p class="body-text"><em><strong>Proof</strong></em><em>. </em>The Bond Index is defined as Bd(x) = max_{g ∈ G} |Σ(g(x)) − Σ(x)| / τ. The invariance violation is IV(x, G) = Var_{g ∈ G}[Σ(g(x))]. Since max_g |Σ(g(x)) − Σ(x)| ≤ 2 std_g[Σ(g(x))] = 2√(IV(x,G)) (the maximum deviation from the mean is bounded by twice the standard deviation), we have Bd(x) ≤ 2√(IV(x,G))/τ. Taking expectations and applying Jensen’s inequality: E[Bd] ≤ 2√(E[IV])/τ. The invariance loss satisfies L_inv = E[IV] by definition. Hence E[Bd] ≤ 2√(L_inv)/τ ≤ ε/τ when L_inv ≤ ε²/4. As L_inv → 0, E[Bd] → 0 monotonically. □</p>
+<p class="body-text">❖</p>
+      </div>
+
+      <div class="chapter-nav-bottom">
+        <a href="chapter-18-geometric-ethics-for-artificial-agents.html" class="nav-prev">&larr; Chapter 18: Geometric Ethics for Artificial Agents</a>
+        <a href="index.html" class="nav-toc">Contents</a>
+        <a href="part-vi-domain-applications.html" class="nav-next">Part VI: Domain Applications &rarr;</a>
+      </div>
+    </div>
+  </article>
+
+  <footer class="book-footer">
+    <p>&copy; 2026 Andrew H. Bond. <em>Geometric Ethics: The Mathematical Structure of Moral Reasoning.</em></p>
+    <p class="footer-note">Ethics is not a number.</p>
+  </footer>
+
+  <script>
+    window.addEventListener('scroll', () => {
+      document.getElementById('main-nav').classList.toggle('scrolled', window.scrollY > 20);
+    });
+    document.querySelector('.nav-toggle')?.addEventListener('click', function() {
+      document.querySelector('.nav-links').classList.toggle('open');
+    });
+  </script>
+</body>
+</html>

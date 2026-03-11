@@ -1,0 +1,463 @@
+/* ==========================================================================
+   Geometric Ethics — Book Reader
+   Extends the main site's design system for long-form reading.
+   Uses the same CSS variables, card patterns, and type scale.
+   ========================================================================== */
+
+/* ── Article Shell ──────────────────────────────────────────────────── */
+.book-chapter {
+  min-height: 100vh;
+  padding-top: 60px;                /* room for fixed nav */
+}
+
+.chapter-container {
+  max-width: 820px;
+  margin: 0 auto;
+  padding: clamp(32px, 6vw, 80px) clamp(20px, 5vw, 48px) 60px;
+}
+
+/* ── Chapter Navigation ─────────────────────────────────────────────── */
+.chapter-nav-top,
+.chapter-nav-bottom {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+  font-family: 'Inter', -apple-system, sans-serif;
+  font-size: 13px;
+}
+
+.chapter-nav-top {
+  padding-bottom: 20px;
+  margin-bottom: 32px;
+  border-bottom: 1px solid var(--border-subtle);
+}
+
+.chapter-nav-bottom {
+  margin-top: 48px;
+  padding-top: 24px;
+  border-top: 1px solid var(--border-subtle);
+}
+
+.nav-prev,
+.nav-next {
+  color: var(--text-secondary);
+  max-width: 40%;
+  transition: color 0.2s;
+  font-weight: 500;
+}
+.nav-prev:hover,
+.nav-next:hover { color: var(--accent-light); }
+
+.nav-next { text-align: right; margin-left: auto; }
+
+.nav-toc {
+  color: var(--accent-light);
+  font-weight: 600;
+  padding: 6px 16px;
+  border: 1px solid var(--border-medium);
+  border-radius: 8px;
+  transition: all 0.25s;
+  white-space: nowrap;
+}
+.nav-toc:hover {
+  background: rgba(27,158,119,0.1);
+  border-color: var(--accent-light);
+  color: var(--accent-light);
+}
+
+/* ── In-Chapter TOC ─────────────────────────────────────────────────── */
+.chapter-toc {
+  background: var(--bg-card);
+  border: 1px solid var(--border-subtle);
+  border-radius: 12px;
+  padding: 24px 28px;
+  margin-bottom: 40px;
+  position: relative;
+  overflow: hidden;
+}
+.chapter-toc::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 3px;
+  background: linear-gradient(90deg, var(--cb-teal), var(--cb-purple));
+}
+.chapter-toc h4 {
+  font-family: 'Inter', sans-serif;
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  color: var(--text-muted);
+  margin-bottom: 14px;
+}
+.chapter-toc ol {
+  margin: 0;
+  padding-left: 1.3em;
+  columns: 2;
+  column-gap: 28px;
+}
+.chapter-toc li {
+  font-family: 'Inter', sans-serif;
+  font-size: 0.875rem;
+  margin-bottom: 6px;
+  break-inside: avoid;
+  line-height: 1.5;
+}
+.chapter-toc a { color: var(--text-secondary); transition: color 0.2s; }
+.chapter-toc a:hover { color: var(--accent-light); }
+
+/* ── Chapter Content ────────────────────────────────────────────────── */
+.chapter-content {
+  font-family: 'Crimson Pro', Georgia, 'Times New Roman', serif;
+  font-size: 1.125rem;
+  line-height: 1.9;
+  color: var(--text-primary);
+}
+
+.chapter-content p {
+  margin-bottom: 1.25em;
+}
+
+.chapter-content .first-paragraph::first-line {
+  font-variant: small-caps;
+  letter-spacing: 0.03em;
+}
+
+/* ── Headings ───────────────────────────────────────────────────────── */
+h1.chapter-title {
+  font-size: clamp(2rem, 5vw, 2.8rem);
+  font-weight: 700;
+  background: linear-gradient(135deg, var(--text-primary), var(--accent-light));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  margin-bottom: 0.6em;
+  padding-bottom: 0.5em;
+  border-bottom: 2px solid var(--border-medium);
+  line-height: 1.2;
+}
+
+h2.section-heading {
+  font-size: clamp(1.35rem, 3vw, 1.7rem);
+  font-weight: 600;
+  color: var(--accent-light);
+  margin-top: 2.8em;
+  margin-bottom: 0.7em;
+  padding-bottom: 0.35em;
+  border-bottom: 1px solid var(--border-subtle);
+}
+
+h3.subsection-heading {
+  font-size: clamp(1.1rem, 2.5vw, 1.35rem);
+  font-weight: 600;
+  color: var(--cb2-gold);
+  margin-top: 2.2em;
+  margin-bottom: 0.6em;
+}
+
+h4.subsubsection-heading {
+  font-size: 1.05rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+  margin-top: 1.6em;
+  margin-bottom: 0.5em;
+}
+
+/* ── Block Quotes (same as main site) ───────────────────────────────── */
+.book-blockquote {
+  border-left: 3px solid var(--cb-gold);
+  padding: 16px 24px;
+  margin: 1.6em 0;
+  background: rgba(230,171,2,0.05);
+  border-radius: 0 8px 8px 0;
+  color: var(--cb2-gold);
+  font-family: 'Crimson Pro', serif;
+  font-size: 1.05rem;
+  font-style: italic;
+}
+
+/* ── Lists ──────────────────────────────────────────────────────────── */
+.book-list {
+  margin: 1em 0 1.5em 1.5em;
+  padding: 0;
+}
+.book-list li {
+  margin-bottom: 0.65em;
+  padding-left: 0.3em;
+}
+
+/* ── Tables (same card + border pattern as main site) ───────────────── */
+.table-wrapper {
+  overflow-x: auto;
+  margin: 1.8em 0;
+  border-radius: 12px;
+  border: 1px solid var(--border-subtle);
+  background: var(--bg-card);
+}
+.book-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-family: 'Inter', sans-serif;
+  font-size: 0.875rem;
+  line-height: 1.6;
+}
+.book-table th,
+.book-table td {
+  padding: 12px 16px;
+  text-align: left;
+  border-bottom: 1px solid var(--border-subtle);
+}
+.book-table th {
+  background: var(--bg-hover);
+  color: var(--accent-light);
+  font-weight: 600;
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+.book-table tr:last-child td { border-bottom: none; }
+.book-table tr:hover td { background: rgba(27,158,119,0.04); }
+
+/* ── Figures ────────────────────────────────────────────────────────── */
+.book-figure {
+  margin: 2.5em auto;
+  text-align: center;
+}
+.book-figure img {
+  max-width: 100%;
+  height: auto;
+  border-radius: 12px;
+  border: 1px solid var(--border-subtle);
+  background: #fff;
+  padding: 12px;
+  transition: transform 0.3s, box-shadow 0.3s;
+}
+.book-figure img:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 32px rgba(0,0,0,0.4);
+}
+.book-figure figcaption {
+  margin-top: 10px;
+  font-family: 'Inter', sans-serif;
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  font-style: italic;
+}
+
+/* ── Math Blocks ────────────────────────────────────────────────────── */
+.math-block {
+  display: block;
+  margin: 1.5em 0;
+  padding: 20px 24px;
+  background: var(--bg-card);
+  border: 1px solid var(--border-subtle);
+  border-radius: 12px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.9rem;
+  overflow-x: auto;
+  white-space: pre-wrap;
+  color: var(--cb2-gold);
+  text-align: center;
+  position: relative;
+}
+.math-block::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 2px;
+  background: linear-gradient(90deg, var(--cb2-gold), var(--cb-purple));
+  border-radius: 12px 12px 0 0;
+}
+
+/* ── Epistemic Tags (inline) ────────────────────────────────────────── */
+.chapter-content strong {
+  color: var(--accent-light);
+}
+
+/* ── Book Index Page ────────────────────────────────────────────────── */
+.book-index {
+  min-height: 100vh;
+  padding-top: 60px;
+}
+
+.book-main-title {
+  font-size: clamp(2.5rem, 6vw, 3.6rem);
+  font-weight: 700;
+  background: linear-gradient(135deg, #e8ecf0, var(--cb2-teal));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  text-align: center;
+  margin-top: 0.5em;
+  margin-bottom: 0.15em;
+}
+
+.book-subtitle {
+  font-size: clamp(1.1rem, 2.5vw, 1.5rem);
+  font-weight: 300;
+  color: var(--text-secondary);
+  text-align: center;
+  margin-bottom: 1.5em;
+  font-style: italic;
+  font-family: 'Crimson Pro', serif;
+}
+
+.book-author {
+  text-align: center;
+  font-family: 'Crimson Pro', serif;
+  font-size: 1.15rem;
+  color: var(--text-primary);
+  margin-bottom: 0.3em;
+}
+.author-affiliation {
+  font-family: 'Inter', sans-serif;
+  font-size: 0.85rem;
+  color: var(--text-muted);
+}
+
+.book-date {
+  text-align: center;
+  font-family: 'Inter', sans-serif;
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  margin-bottom: 3em;
+}
+
+/* ── TOC Grid — mirrors the parts-accordion pattern ─────────────────── */
+.toc-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  max-width: 850px;
+  margin: 0 auto;
+}
+
+.toc-part {
+  background: var(--bg-card);
+  border: 1px solid var(--border-subtle);
+  border-radius: 12px;
+  overflow: hidden;
+  transition: border-color 0.3s;
+}
+.toc-part:hover { border-color: var(--border-medium); }
+
+.toc-part h3 {
+  font-family: 'Crimson Pro', serif;
+  font-size: 1.15rem;
+  font-weight: 600;
+  padding: 18px 24px;
+  margin: 0;
+  background: var(--bg-card);
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  border-bottom: 1px solid var(--border-subtle);
+}
+.toc-part h3 a { color: var(--accent-light); }
+.toc-part h3 a:hover { color: var(--cb2-gold); }
+
+/* Part label tag (uses same badge pattern as theorems) */
+.toc-part h3::before {
+  display: none;  /* override if we add part numbers */
+}
+
+.toc-chapters {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+.toc-chapters li {
+  border-bottom: 1px solid rgba(102,194,165,0.08);
+}
+.toc-chapters li:last-child { border-bottom: none; }
+
+.toc-chapters a {
+  display: flex;
+  align-items: center;
+  padding: 14px 24px;
+  color: var(--text-secondary);
+  font-family: 'Crimson Pro', serif;
+  font-size: 1.05rem;
+  transition: all 0.25s;
+}
+.toc-chapters a:hover {
+  color: var(--accent-light);
+  background: rgba(27,158,119,0.05);
+  padding-left: 30px;
+}
+
+/* Chapter number prefix (injected via counter) */
+.toc-chapters {
+  counter-reset: chapter-counter;
+}
+.toc-chapters li {
+  counter-increment: chapter-counter;
+}
+
+/* ── Footer ─────────────────────────────────────────────────────────── */
+.book-footer {
+  padding: 40px 0;
+  border-top: 1px solid var(--border-subtle);
+  text-align: center;
+}
+.book-footer p {
+  font-family: 'Inter', sans-serif;
+  font-size: 14px;
+  color: var(--text-muted);
+}
+.book-footer .footer-note {
+  font-family: 'Crimson Pro', serif;
+  font-style: italic;
+  color: var(--accent-light);
+  font-size: 16px;
+  margin-top: 8px;
+}
+
+/* ── Responsive ─────────────────────────────────────────────────────── */
+@media (max-width: 768px) {
+  .chapter-container {
+    padding-top: 24px;
+    padding-bottom: 32px;
+  }
+  .chapter-toc ol { columns: 1; }
+  .nav-prev, .nav-next {
+    max-width: 38%;
+    font-size: 0.8rem;
+  }
+  .toc-chapters a { padding: 12px 16px; }
+  .toc-part h3 { padding: 14px 16px; }
+}
+
+@media (max-width: 500px) {
+  .chapter-content { font-size: 1rem; }
+  h1.chapter-title { font-size: 1.6rem; }
+}
+
+/* ── Print ──────────────────────────────────────────────────────────── */
+@media print {
+  #main-nav,
+  .chapter-nav-top,
+  .chapter-nav-bottom,
+  .chapter-toc,
+  .book-footer { display: none; }
+
+  .chapter-container { max-width: 100%; padding: 0; }
+  .chapter-content { font-size: 11pt; color: #000; line-height: 1.6; }
+
+  h1.chapter-title {
+    font-size: 22pt;
+    -webkit-text-fill-color: #000;
+    color: #000;
+    border-color: #000;
+  }
+  h2.section-heading { font-size: 16pt; color: #333; }
+  h3.subsection-heading { font-size: 13pt; color: #333; }
+
+  .book-table th, .book-table td { border: 1px solid #ccc; }
+  .book-figure img { border: 1px solid #999; padding: 4px; }
+  .math-block { border: 1px solid #999; color: #333; }
+  .math-block::before { display: none; }
+}
