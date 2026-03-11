@@ -13,6 +13,30 @@ python3 src/erisml/examples/hello_deme.py
 ```
 
 ---
+
+## Read the Book
+
+The full text of **Geometric Ethics: The Mathematical Structure of Moral Reasoning** (v1.19, Spring 2026) is available online:
+
+**[Read the Full Book Online](https://ahb-sjsu.github.io/erisml-lib/book/)**
+
+30 chapters across 7 parts, with all figures, tables, and appendices:
+
+| Part | Chapters | Topics |
+|------|----------|--------|
+| **[I: The Problem](https://ahb-sjsu.github.io/erisml-lib/book/part-i-the-problem.html)** | [1](https://ahb-sjsu.github.io/erisml-lib/book/chapter-1-introduction-why-geometry.html)–[3](https://ahb-sjsu.github.io/erisml-lib/book/chapter-3-historical-precursors-geometry-before-geometry.html) | Why geometry, scalar collapse, historical precursors |
+| **[II: The Framework](https://ahb-sjsu.github.io/erisml-lib/book/part-ii-the-framework.html)** | [4](https://ahb-sjsu.github.io/erisml-lib/book/chapter-4-mathematical-preliminaries.html)–[8](https://ahb-sjsu.github.io/erisml-lib/book/chapter-8-stratification-boundaries-thresholds-and-phase-tra.html) | Manifolds, tensors, moral metric, stratification |
+| **[III: Dynamics & Symmetry](https://ahb-sjsu.github.io/erisml-lib/book/part-iii-dynamics-and-symmetry.html)** | [9](https://ahb-sjsu.github.io/erisml-lib/book/chapter-9-the-origin-of-the-moral-metric-discovery-construct.html)–[13](https://ahb-sjsu.github.io/erisml-lib/book/chapter-13-quantum-normative-dynamics-superposition-measurem.html) | Moral metric, curvature, Noether's theorem, QND |
+| **[IV: Agents & Collectives](https://ahb-sjsu.github.io/erisml-lib/book/part-iv-agents-and-collectives.html)** | [14](https://ahb-sjsu.github.io/erisml-lib/book/chapter-14-collective-moral-agency-aggregation-emergence-and.html)–[16](https://ahb-sjsu.github.io/erisml-lib/book/chapter-16-moral-uncertainty-and-the-limits-of-geometric-det.html) | Collective agency, contraction, moral uncertainty |
+| **[V: Implementation](https://ahb-sjsu.github.io/erisml-lib/book/part-v-implementation.html)** | [17](https://ahb-sjsu.github.io/erisml-lib/book/chapter-17-empirical-evidence-for-geometric-ethics.html)–[19](https://ahb-sjsu.github.io/erisml-lib/book/chapter-19-the-deme-architecture-and-erisml.html) | Empirical evidence, AI agents, DEME & ErisML |
+| **[VI: Domain Applications](https://ahb-sjsu.github.io/erisml-lib/book/part-vi-domain-applications.html)** | [20](https://ahb-sjsu.github.io/erisml-lib/book/chapter-20-geometric-economics-the-bond-geodesic-equilibrium.html)–[28](https://ahb-sjsu.github.io/erisml-lib/book/chapter-28-geometric-military-ethics-war-and-constrained-pat.html) | Economics, clinical, law, finance, theology, environment, AI, bioethics, military |
+| **[VII: Horizons](https://ahb-sjsu.github.io/erisml-lib/book/part-vii-horizons.html)** | [29](https://ahb-sjsu.github.io/erisml-lib/book/chapter-29-open-problems.html)–[30](https://ahb-sjsu.github.io/erisml-lib/book/chapter-30-conclusion-the-geometry-of-maybe.html) | Open problems, conclusion |
+
+Plus [6 appendices](https://ahb-sjsu.github.io/erisml-lib/book/appendix-a-related-work-and-differentiation.html) and [bibliography](https://ahb-sjsu.github.io/erisml-lib/book/bibliography.html).
+
+**[Explore the interactive companion site](https://ahb-sjsu.github.io/erisml-lib/)** — includes the Dear Ethicist Game, Moral Bell Test, domain demos, and tutorials.
+
+---
 # ErisML/DEME Research Repository and Library 🍎
 
 ***Ordo ex Chāōnā; Ethos ex Māchinā***
