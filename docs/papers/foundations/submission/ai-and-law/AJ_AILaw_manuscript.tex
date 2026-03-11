@@ -1,0 +1,1271 @@
+% Algorithmic Jurisprudence — Artificial Intelligence and Law Submission (Double-Blind)
+% Uses article class with thebibliography. For final production,
+% Springer may request conversion to sn-jnl.cls, available at:
+% https://www.overleaf.com/latex/templates/springer-nature-latex-template/myxmhdsbzkyd
+
+\documentclass[12pt]{article}
+
+% Packages
+\usepackage{amsmath,amssymb,amsfonts,amsthm}
+\usepackage{geometry}
+\usepackage{hyperref}
+\usepackage{booktabs}
+\usepackage{enumitem}
+\usepackage{graphicx}
+\usepackage{float}
+\usepackage{xcolor}
+\usepackage{mathrsfs}
+\usepackage{tikz-cd}
+
+\geometry{margin=1in}
+
+% Theorem environments
+\newtheorem{theorem}{Theorem}[section]
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{corollary}[theorem]{Corollary}
+\newtheorem{conjecture}[theorem]{Conjecture}
+\theoremstyle{definition}
+\newtheorem{definition}[theorem]{Definition}
+\newtheorem{example}[theorem]{Example}
+\newtheorem{axiom}{Axiom}
+\theoremstyle{remark}
+\newtheorem{remark}[theorem]{Remark}
+
+% Custom commands
+\newcommand{\J}{\mathcal{J}}               % Judicial manifold
+\newcommand{\C}{\mathcal{C}}               % Constitutional space
+\newcommand{\M}{\mathcal{M}}               % General manifold
+\newcommand{\Lw}{\mathcal{L}}              % Law / Lagrangian
+\newcommand{\R}{\mathbb{R}}
+\newcommand{\Z}{\mathbb{Z}}
+\newcommand{\harm}{\mathcal{H}}
+\newcommand{\BF}{\mathrm{BF}}
+\newcommand{\BI}{\mathrm{BI}}              % Bond Index
+\newcommand{\LBI}{\mathrm{LBI}}            % Legal Bond Index
+\newcommand{\Ho}{\mathfrak{H}}             % Hohfeldian structure
+
+\title{\textbf{Algorithmic Jurisprudence:\\The Topology of Law, Constitutionality as Homology,\\and Legal Reasoning as Optimal Pathfinding}}
+
+% No author information (double-blind review)
+\author{}
+\date{}
+
+\begin{document}
+
+\maketitle
+
+\noindent\textbf{Keywords:} algorithmic jurisprudence, judicial complex, path homology, directed algebraic topology, gauge invariance, Hohfeldian analysis, constitutional topology, computational law, AI and law
+
+\begin{abstract}
+Legal reasoning---statutory interpretation, constitutional review, common-law adjudication---is currently conducted in natural language, where ambiguity is a feature, not a bug, and where ``arguing semantics'' is literally the professional activity.  We propose \emph{Algorithmic Jurisprudence}: a mathematical framework in which the space of legal states is a weighted simplicial complex $\mathcal{K}$ (the \emph{judicial complex}), legal disputes are pathfinding problems on $\mathcal{K}$, and constitutionality is a topological invariant computable via path homology on directed graphs.
+
+The framework extends the Geometric Ethics programme---the Bond Invariance Principle (BIP), the Epistemic Invariance Principle (EIP), conservation laws, and gauge symmetry---from the moral domain to the legal domain.  We define two legal invariance principles: the \emph{Legal Invariance Principle} (LIP), requiring that legal judgments be unchanged under legally irrelevant transformations, and the \emph{Judicial Bond Invariance Principle} (JBIP), requiring invariance under transformations that preserve Hohfeldian bond structure.  We prove that equal protection is a gauge symmetry enforcing bilateral entitlement balance; that due process is the well-definedness of the evaluation map on the quotient space; that liability and damages are conserved within closed bilateral disputes; and that a new statute is constitutional if and only if it preserves the path homology of the constitutional subcomplex.  We provide a concrete NLP pipeline for calibrating the complex's edge weights from case text.  Three worked examples---a Fourteenth Amendment challenge, a statutory conflict, and a precedent-overruling scenario---demonstrate the framework's analytical power.
+
+The framework does not replace judicial judgment.  It provides a \emph{calculus of legal structure} that makes implicit reasoning explicit, detects hidden inconsistencies, and offers a formal criterion for constitutionality that is machine-checkable.
+\end{abstract}
+
+\newpage
+\tableofcontents
+\newpage
+
+
+%==============================================================================
+\section{Introduction}
+\label{sec:intro}
+%==============================================================================
+
+\subsection{The Problem: Law as Unstructured Text}
+
+The legal system of every modern democracy rests on a paradox: the most consequential decisions---who goes to prison, who keeps their property, which laws survive constitutional review---are made by \emph{parsing natural language}.  Statutes are texts.  Constitutions are texts.  Judicial opinions are texts about texts.  The entire edifice of ``the rule of law'' depends on the assumption that these texts have determinate meanings that can be consistently applied.
+
+They do not.  The history of jurisprudence is a history of semantic disputes: What does ``equal protection'' \emph{mean}?  Does ``arms'' in the Second Amendment include assault rifles?  Does ``commerce among the several states'' cover wheat grown for personal consumption?  Every landmark case in American constitutional law turns on the interpretation of a phrase.
+
+This is not a deficiency that better legal writing could fix.  It is a \emph{structural property} of natural language: natural language is representation-dependent.  The same legal situation, described differently, can trigger different legal conclusions.  This is precisely the failure mode that the Epistemic Invariance Principle (EIP) was designed to detect and prevent \cite{anon2025c}.
+
+\subsection{The Proposal: Law as Geometry}
+
+We propose that legal reasoning has \emph{geometric structure} that natural-language practice obscures but cannot eliminate---just as moral reasoning has geometric structure that scalar alignment discards \cite{anon2026a}.  Specifically:
+
+\begin{enumerate}[label=(\roman*)]
+    \item The space of legal states is a \emph{weighted simplicial complex} $\mathcal{K}$ (the \emph{judicial complex}), whose vertices are decided cases, whose edges are doctrinal relationships, and whose attribute vectors encode eight fundamental dimensions of legal analysis.
+    \item Legal disputes are \emph{pathfinding problems} on $\mathcal{K}$: the plaintiff occupies a start node, the desired remedy is a goal node, legal arguments are proposed paths, and the court's task is to find the optimal (minimum-cost) path consistent with the constraints of the complex.
+    \item The Constitution defines a \emph{topological constraint subcomplex} $\C \subset \mathcal{K}$.  A statute is constitutional if and only if it preserves the homology of $\C$---that is, it does not create cycles in the constitutional subcomplex that cannot be contracted.
+    \item Precedent (\emph{stare decisis}) creates \emph{weight deformation}: each binding decision modifies the edge weights of $\mathcal{K}$, making legal reasoning in that region path-dependent.  Overruling a precedent is a discontinuous change in the weights---a legal phase transition.
+    \item The Hohfeldian legal relations---the full octad of right, duty, liberty, no-right, power, immunity, liability, disability---define a \emph{gauge group} whose symmetries constrain which legal transformations preserve the structure of legal relationships.
+\end{enumerate}
+
+\subsection{Relationship to Geometric Ethics}
+
+This paper extends the Geometric Ethics programme \cite{anon2026a,anon2025a,anon2025b,anon2025c} from ethics to law.  The extension is natural: Hohfeld's fundamental legal conceptions \cite{hohfeld1913} are already the gauge group of the moral manifold (the $D_4$ dihedral group acts on the first four positions).  Law is where the Hohfeldian structure originated; we are returning it to its native domain while equipping it with the full apparatus of differential geometry, topology, and gauge theory.
+
+The key conceptual moves are:
+
+\begin{center}
+\begin{tabular}{lll}
+\toprule
+\textbf{Concept} & \textbf{Geometric Ethics} & \textbf{Algorithmic Jurisprudence} \\
+\midrule
+Space & Moral manifold $\M$ & Judicial complex $\mathcal{K}$ \\
+Dimensions & 9 moral dimensions & 8 legal dimensions \\
+Stratification & Consent boundaries, deontic triggers & Regime filtration \\
+Invariance & BIP (bond-preserving) & JBIP (Hohfeldian bond-preserving) \\
+Gauge group & $D_4$ (tetrad) & $D_4 \rtimes D_4$ (full octad) \\
+Conservation & Harm conservation & Liability--damages balance \\
+Pathfinding & Moral reasoning as $A^*$ & Legal reasoning as $A^*$ on $\mathcal{K}$ \\
+Metric source & Empirical moral weights & NLP-calibrated edge weights \\
+Curvature source & Context-dependence & Precedential weight deformation \\
+Phase transitions & Deontic shifts & Overruling (graph surgery) \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\subsection{What This Paper Does Not Claim}
+
+\begin{enumerate}
+    \item The framework does not claim to \emph{replace} judges, lawyers, or legislatures.  It claims to make the \emph{structure} of their reasoning explicit and machine-checkable.
+    \item The framework does not adjudicate contested values.  It identifies \emph{structural inconsistencies}---cases where the legal system contradicts itself, violates its own symmetries, or fails its own invariance requirements.
+    \item The framework does not resolve the ``hard cases'' of jurisprudence (Dworkin's sense).  It converts hard cases from semantic disputes into \emph{geometric disputes}---which dimensions are relevant, what metric applies, where the stratum boundaries lie---which are at least amenable to empirical calibration.
+\end{enumerate}
+
+
+%==============================================================================
+\section{Related Work}
+\label{sec:related}
+%==============================================================================
+
+This work intersects four established literatures: computational law, Hohfeldian analysis, legal formalism, and AI and law.
+
+\subsection{Computational Approaches to Law}
+
+The programme of formalizing legal reasoning computationally dates to Sergot et al.\ \cite{sergot1986}, who encoded the British Nationality Act as a logic programme, demonstrating that statutory interpretation could be mechanized when the statute's structure was made explicit.  This work established a precedent: legal rules \emph{can} be represented in formal systems, and the formal representation can reveal ambiguities invisible in natural language.
+
+More recently, Surden \cite{surden2014} surveyed machine learning applications to law, identifying prediction tasks (case outcome prediction, document classification) where statistical methods outperform human baselines.  Ashley \cite{ashley2017} developed a comprehensive framework for legal analytics using AI, demonstrating that case-based reasoning---the core methodology of common law---has a natural computational formalization.
+
+Our work differs from these approaches in a specific respect: prior computational-law research uses formal systems as \emph{tools for applying} existing legal rules, whereas we use formal systems to characterize the \emph{structure} of legal reasoning itself.  The judicial complex is not a tool for deciding cases; it is a model of the space in which legal reasoning operates.  The distinction is analogous to the difference between using calculus to solve a physics problem and using differential geometry to characterize the structure of spacetime.
+
+\subsection{Hohfeldian Analysis and Formal Deontic Logic}
+
+Hohfeld's fundamental legal conceptions \cite{hohfeld1913,hohfeld1917} have been the subject of extensive formal analysis.  Sergot et al.\ \cite{sergot1986} and subsequent work by Sergot and others formalized Hohfeldian positions in logic programming.  McNamara \cite{mcnamara2014} provides a comprehensive survey of deontic logic---the logic of obligation, permission, and prohibition---which formalizes the normative dimension of legal reasoning.
+
+Our contribution to this literature is \emph{geometric}: we show that Hohfeldian positions are not merely logical relations but components of a \emph{gauge group}---a symmetry structure that constrains which legal transformations are permissible and that generates conservation laws via Noether's theorem.  This is a genuinely new claim: prior Hohfeldian formalization has been \emph{logical} (what follows from what?), not \emph{geometric} (what symmetries constrain the space of legal states?).  The gauge-theoretic perspective explains why Hohfeldian analysis has been so durable---it captures the symmetry structure of legal relations, which is invariant under changes in formalization---and extends it by deriving testable predictions (conservation laws, Wilson loops) that the logical formalization does not produce.
+
+\subsection{Legal Formalism and Legal Realism}
+
+The proposal to impose mathematical structure on legal reasoning touches the oldest debate in jurisprudence: the tension between legal formalism (the view that legal outcomes are determined by logical application of rules) and legal realism (the view that legal outcomes are determined by human judgment, policy considerations, and social context).  Hart's \cite{hart1961} distinction between the ``core'' and ``penumbra'' of legal rules, Posner's \cite{posner1990} pragmatic jurisprudence, and Sunstein's \cite{sunstein1996} ``incompletely theorized agreements'' each attempt to navigate this tension.
+
+We position this framework as \emph{neither} formalist nor realist but \emph{structuralist}: the judicial complex is the space in which both formal rules (regime boundaries, constitutional constraints) and contextual factors (edge weights, precedential deformation) operate.  The formalist insight---that legal reasoning has structure---is preserved.  The realist insight---that context, policy, and judgment shape outcomes---is captured by the \emph{edge weights}, which are context-dependent and calibrated by human practice.  The framework does not claim to eliminate judicial discretion; it claims to give discretion a \emph{structure}---to make visible the space within which discretion operates and the constraints that bound it.
+
+Hart's core/penumbra distinction maps naturally onto the stratified structure: the ``core'' of a legal rule corresponds to the interior of a stratum (where the rule's application is smooth and uncontested), while the ``penumbra'' corresponds to the neighborhood of a stratum boundary (where the rule's application is uncertain and the metric is poorly calibrated).  Sunstein's incompletely theorized agreements correspond to regions where parties agree on the stratum structure but disagree on the metric---they agree on \emph{which} legal dimensions are relevant but disagree on \emph{how much} each matters.
+
+This is consistent with Dworkin's \cite{dworkin1986} ``law as integrity'' programme, which seeks to identify the principles that best fit and justify existing legal practice.  In our framework, ``integrity'' is \emph{topological consistency}: the legal system satisfies integrity when its constitutional constraint manifold has the expected fundamental group and all Wilson loops are trivial.
+
+\subsection{AI, Law, and Fairness}
+
+The growing literature on algorithmic fairness---testing whether AI systems treat legally equivalent individuals differently based on protected attributes---is a practical implementation of the LIP.  Our framework provides the mathematical foundation: algorithmic fairness is gauge invariance under the equal-protection symmetry group, the Legal Bond Index is the quantitative measure, and violations are detectable by the Wilson loop test.  This gives the fairness literature a formal structure it currently lacks: rather than debating competing fairness metrics (each of which captures a different aspect of the LIP), the framework provides a single invariance requirement from which specific fairness criteria can be derived as special cases.
+
+
+%==============================================================================
+\section{The Judicial Complex}
+\label{sec:manifold}
+%==============================================================================
+
+\subsection{Legal Dimensions}
+
+Legal analysis, across both common-law and civil-law traditions, has converged on a finite set of fundamental categories.  We identify eight \emph{legal dimensions}, each representing an axis along which a legal state can be characterized:
+
+\begin{enumerate}
+    \item $d_1$: \textbf{Entitlement structure} --- the configuration of Hohfeldian positions (rights, duties, liberties, no-rights, powers, immunities, liabilities, disabilities) among the parties.
+    \item $d_2$: \textbf{Factual nexus} --- causal, evidentiary, and material connections between parties, actions, and harms.
+    \item $d_3$: \textbf{Procedural posture} --- standing, jurisdiction (personal, subject-matter, territorial), timeliness, exhaustion of remedies.
+    \item $d_4$: \textbf{Statutory authority} --- the legislative basis for claims and defenses; the statutory framework governing the dispute.
+    \item $d_5$: \textbf{Constitutional conformity} --- the degree to which the legal configuration respects fundamental rights, structural provisions, and separation-of-powers constraints.
+    \item $d_6$: \textbf{Precedential constraint} --- the weight of stare decisis; binding versus persuasive authority; degree of factual similarity to controlling precedent.
+    \item $d_7$: \textbf{Remedial scope} --- the available relief (compensatory damages, injunctive relief, specific performance, declaratory judgment, punitive damages).
+    \item $d_8$: \textbf{Public interest} --- societal implications, third-party effects, institutional consequences, regulatory impact.
+\end{enumerate}
+
+\begin{remark}[Dimensionality]
+The choice of eight dimensions is a modeling decision whose adequacy is empirical.  The framework accommodates additional dimensions (e.g., international-law compliance, indigenous-law considerations) without modifying the core theory.
+\end{remark}
+
+\subsection{The Judicial Complex: Primary Construction}
+
+The space of legal states is fundamentally discrete: there are finitely many decided cases, finitely many statutes, and finitely many constitutional provisions.  We therefore take a \emph{simplicial complex} as the primary mathematical object, rather than a continuous manifold.
+
+\begin{definition}[Judicial Complex]
+\label{def:judicial_complex}
+The \emph{judicial complex} $\mathcal{K}$ is a \emph{directed} weighted simplicial complex constructed as follows:
+\begin{itemize}
+    \item \textbf{Vertices (0-simplices):} Each decided case $c_i$ is a vertex.  The vertex carries an \emph{attribute vector} $\mathbf{v}(c_i) \in \R^8$, whose components are scores along the eight legal dimensions, and metadata including the deciding court's level $\ell(c_i) \in \{\text{trial}, \text{appellate}, \text{supreme}\}$ and the decision date $\tau(c_i)$.
+    \item \textbf{Directed edges (1-simplices):} A directed edge $c_i \to c_j$ exists when case $c_j$ cites case $c_i$ (i.e., the later case relies on the earlier one).  Directionality encodes both \emph{temporal precedence} ($\tau(c_i) < \tau(c_j)$, since a case cannot cite a future decision) and \emph{hierarchical authority} ($\ell(c_i) \geq \ell(c_j)$ for binding precedent).  The edge carries an \emph{asymmetric} weight $w(c_i \to c_j) \geq 0$.
+    \item \textbf{Higher simplices:} A $k$-simplex $[c_0, \ldots, c_k]$ exists when the cases form a \emph{doctrinal cluster}---a set of mutually citing cases that collectively establish a legal doctrine.  The simplex inherits a partial order from the temporal and hierarchical ordering of its vertices.
+\end{itemize}
+\end{definition}
+
+The directionality is essential.  Legal reasoning is strictly asymmetric in two respects:
+
+\begin{enumerate}
+    \item \textbf{Temporal asymmetry:}  A case decided in 2020 can cite a 1954 precedent, but not vice versa.  The citation graph is a DAG (directed acyclic graph) with respect to time.
+    \item \textbf{Hierarchical asymmetry:}  A district court \emph{must} follow a Supreme Court precedent (low traversal cost), but the Supreme Court is not bound by the district court (high or infinite cost in the reverse direction).  The edge weight from a higher court to a lower court is small (binding authority); the reverse edge weight is large (merely persuasive authority).
+\end{enumerate}
+
+The judicial complex $\mathcal{K}$ is a concrete, constructible object: its vertices come from case databases (e.g., Westlaw, LexisNexis), its directed edges from citation networks (which are inherently directed: case $B$ cites case $A$, not vice versa), and its attribute vectors from the scoring procedure defined in Section~\ref{sec:calibration}.
+
+\begin{definition}[Asymmetric Edge Weights]
+\label{def:edge_weights}
+The weight of a directed edge $c_i \to c_j$ in $\mathcal{K}$ is:
+\begin{equation}
+w(c_i \to c_j) = \underbrace{\Delta \mathbf{v}(c_i, c_j)^T\, \Sigma^{-1}\, \Delta \mathbf{v}(c_i, c_j)}_{\text{Mahalanobis distance}} + \underbrace{\beta \cdot \mathbf{1}[\text{regime boundary}]}_{\text{boundary penalty}} + \underbrace{h(\ell(c_i), \ell(c_j))}_{\text{hierarchical cost}}
+\label{eq:edge_weight}
+\end{equation}
+where $\Delta \mathbf{v}(c_i, c_j) = \mathbf{v}(c_j) - \mathbf{v}(c_i)$ is the attribute-vector difference, $\Sigma$ is the \emph{dimensional covariance matrix} (see below), and $h$ is the \emph{hierarchical cost function}:
+\begin{equation}
+h(\ell_i, \ell_j) = \begin{cases}
+0 & \text{if } \ell_i > \ell_j \text{ (binding: higher court to lower)} \\
+\eta & \text{if } \ell_i = \ell_j \text{ (persuasive: same level)} \\
+\infty & \text{if } \ell_i < \ell_j \text{ and direction is ``reverse''} \\
+\end{cases}
+\label{eq:hierarchical_cost}
+\end{equation}
+where $\eta > 0$ is a persuasive-authority penalty.  The edge weight is \emph{asymmetric}: $w(c_i \to c_j) \neq w(c_j \to c_i)$ in general, reflecting the directional structure of legal authority.
+\end{definition}
+
+\begin{remark}[The Dimensional Covariance Matrix]
+\label{rem:covariance}
+The use of the Mahalanobis distance $\Delta \mathbf{v}^T \Sigma^{-1} \Delta \mathbf{v}$ rather than an $L_1$ norm $\sum \alpha_k |v_k(c_i) - v_k(c_j)|$ is critical.  Legal dimensions are \emph{not independent}: statutory authority ($d_4$) heavily constrains remedial scope ($d_7$); procedural posture ($d_3$) gates access to the merits ($d_2$); constitutional conformity ($d_5$) interacts with entitlement structure ($d_1$).  An $L_1$ or diagonal-$L_2$ metric treats dimensions as orthogonal, overcounting the distance between cases that differ on correlated dimensions.
+
+The covariance matrix $\Sigma \in \R^{8 \times 8}$ captures these cross-dimensional dependencies.  Its off-diagonal entries $\Sigma_{kl}$ encode how much dimensions $d_k$ and $d_l$ co-vary across the case corpus.  The matrix is estimated empirically from the attribute vectors:
+\begin{equation}
+\hat{\Sigma} = \frac{1}{N-1} \sum_{i=1}^{N} (\mathbf{v}(c_i) - \bar{\mathbf{v}})(\mathbf{v}(c_i) - \bar{\mathbf{v}})^T
+\label{eq:covariance}
+\end{equation}
+The Mahalanobis distance de-correlates the dimensions before measuring distance, so that two cases differing on the highly correlated pair $(d_4, d_7)$ are not double-counted.
+
+In the special case where $\Sigma = \text{diag}(\sigma_1^2, \ldots, \sigma_8^2)$ (dimensions empirically independent), the Mahalanobis distance reduces to a weighted $L_2$ norm $\sum_k (v_k(c_i) - v_k(c_j))^2 / \sigma_k^2$, recovering the diagonal metric.  The general case allows the data to determine whether and how the dimensions interact.
+\end{remark}
+
+\begin{remark}[Relationship to the Continuous Manifold]
+\label{rem:continuum}
+In the limit of dense case law---when decided cases tile the space of legal configurations finely---the weighted simplicial complex $\mathcal{K}$ approximates a continuous Riemannian manifold $\J$ with metric $g_{ij}$.  The edge weights $w(c_i, c_j)$ converge to geodesic distances $ds^2 = g_{ij}\, dx^i\, dx^j$, and the simplicial homology $H_n(\mathcal{K}; \Z)$ converges to the singular homology $H_n(\J; \Z)$.  We use the continuous notation where it clarifies the theoretical structure (e.g., for stating Noether-type balance principles), but the computational framework is discrete throughout.
+\end{remark}
+
+\subsection{Regime Boundaries as Filtration}
+
+Not all transitions between legal states are smooth.  The shift from ``no liability'' to ``strict liability'' when a statutory threshold is crossed, the jurisdictional boundary between state and federal court, the constitutional line between protected and unprotected speech---these are \emph{discontinuous}.
+
+In the simplicial complex framework, regime boundaries appear naturally as a \emph{filtration}:
+
+\begin{definition}[Regime Filtration]
+\label{def:filtration}
+The judicial complex admits a filtration $\emptyset = \mathcal{K}_0 \subset \mathcal{K}_1 \subset \cdots \subset \mathcal{K}_m = \mathcal{K}$, where each $\mathcal{K}_\alpha$ is a subcomplex corresponding to a distinct legal regime.  The inclusion $\mathcal{K}_\alpha \hookrightarrow \mathcal{K}_{\alpha+1}$ introduces edges that cross a regime boundary:
+\begin{itemize}
+    \item \textbf{Jurisdictional boundaries} --- edges between state-court and federal-court vertices.
+    \item \textbf{Statutory thresholds} --- edges between vertices on opposite sides of a statutory trigger (e.g., the ``meeting of the minds'' that converts negotiation into contract).
+    \item \textbf{Constitutional limits} --- edges between vertices inside and outside the domain of a fundamental right.
+    \item \textbf{Precedential boundaries} --- edges between vertices inside and outside the factual scope of a controlling holding.
+\end{itemize}
+The boundary penalty $\beta$ in the edge weight (Equation~\ref{eq:edge_weight}) makes crossing these boundaries costly, modeling the sharp legal transitions that characterize regime shifts.
+\end{definition}
+
+This filtration structure enables \emph{persistent homology} analysis \cite{edelsbrunner2010}: by varying the boundary penalty $\beta$, we can identify which topological features of the legal landscape are robust (persist across a range of penalties) and which are artifacts of a particular threshold choice.
+
+
+%==============================================================================
+\section{Legal Invariance Principles}
+\label{sec:invariance}
+%==============================================================================
+
+\subsection{The Legal Invariance Principle (LIP)}
+
+\begin{axiom}[Legal Invariance Principle]
+\label{axiom:lip}
+A legal judgment procedure $J_{\text{law}}$ is \emph{epistemically well-posed} if and only if it is invariant under all legally irrelevant transformations:
+\begin{equation}
+J_{\text{law}}(\tau(x)) = J_{\text{law}}(x) \quad \forall\, \tau \in \mathcal{T}_{\text{irrelevant}}
+\label{eq:lip}
+\end{equation}
+where $\mathcal{T}_{\text{irrelevant}}$ includes:
+\begin{enumerate}
+    \item Renaming the parties (``Smith v.\ Jones'' $\to$ ``Doe v.\ Roe'')
+    \item Changing the race, gender, religion, or national origin of the parties
+    \item Rephrasing the legal arguments without changing their logical content
+    \item Changing the order of presentation of evidence or arguments
+    \item Translating between natural languages (for multilingual jurisdictions)
+\end{enumerate}
+\end{axiom}
+
+The LIP is the Epistemic Invariance Principle (EIP) of \cite{anon2025c} specialized to the legal domain.  It formalizes what the law already demands in principle---equal protection, blindfolded justice---but rarely achieves in practice.
+
+\begin{remark}[The LIP Is Already Law]
+The LIP is not a new requirement imposed on the legal system from outside.  It is a \emph{formalization} of requirements the legal system already imposes on itself:
+\begin{itemize}
+    \item \textbf{Equal Protection Clause (14th Amendment):} ``No State shall ... deny to any person within its jurisdiction the equal protection of the laws.'' --- This \emph{is} invariance under transformation (2) above.
+    \item \textbf{Due Process Clause (5th/14th Amendments):} Procedural due process requires that the judgment depend on the merits, not on procedurally irrelevant features. --- This \emph{is} invariance under transformations (3)--(4).
+    \item \textbf{The Rule of Law itself:} The principle that ``like cases should be decided alike'' (Dworkin) is precisely the statement that the judgment function is invariant under transformations that preserve the legally relevant structure.
+\end{itemize}
+\end{remark}
+
+\subsection{The Judicial Bond Invariance Principle (JBIP)}
+
+\begin{axiom}[Judicial Bond Invariance Principle]
+\label{axiom:jbip}
+Let $\tau$ be a transformation of a legal dispute description that preserves the \emph{Hohfeldian bond structure}---the configuration of rights, duties, liberties, no-rights, powers, immunities, liabilities, and disabilities among the parties.  Then the legal evaluation must be unchanged:
+\begin{equation}
+J_{\text{law}}(\tau(x)) = J_{\text{law}}(x) \quad \forall\, \tau \in \mathcal{T}_{\text{bond-preserving}}
+\label{eq:jbip}
+\end{equation}
+\end{axiom}
+
+The JBIP is the Bond Invariance Principle (BIP) of Geometric Ethics \cite{anon2026a} specialized to law.  Where the LIP requires invariance under \emph{all} legally irrelevant transformations, the JBIP specifies the \emph{structural content}: the ``bonds'' that must be preserved are the Hohfeldian legal relations.  The JBIP is stronger than the LIP: it identifies the specific mathematical structure whose preservation defines legal equivalence.
+
+\begin{definition}[Legal Bond Index]
+\label{def:lbi}
+The \emph{Legal Bond Index} $\LBI \in [0, 1]$ quantifies the degree to which a legal judgment system violates the JBIP:
+\begin{equation}
+\LBI = \frac{1}{|S|} \sum_{s \in S} \| J_{\text{law}}(\tau(s)) - J_{\text{law}}(s) \|
+\label{eq:lbi}
+\end{equation}
+where $S$ is a set of test cases and $\tau$ ranges over bond-preserving transformations (renaming parties, rephrasing without changing Hohfeldian structure, translating, etc.).
+\end{definition}
+
+The Legal Bond Index provides a \emph{quantitative test for judicial consistency}: a court system with high LBI is treating equivalent cases differently.  This is not a theoretical abstraction---it is an empirically measurable quantity that could be computed from existing case databases.
+
+
+%==============================================================================
+\section{The Hohfeldian Octad and Gauge Structure}
+\label{sec:gauge}
+%==============================================================================
+
+\subsection{From Tetrad to Octad}
+
+In Geometric Ethics, the gauge group $D_4$ was derived from the first four Hohfeldian positions: right, duty, liberty, no-right \cite{anon2026a}.  Law requires the \emph{full} Hohfeldian octad:
+
+\begin{center}
+\begin{tabular}{lccc}
+\toprule
+\textbf{Jural Relation} & \textbf{Correlative} & \textbf{Opposite} & \textbf{Square} \\
+\midrule
+Right & Duty & No-right & First \\
+Duty & Right & Liberty & First \\
+Liberty & No-right & Duty & First \\
+No-right & Liberty & Right & First \\
+\midrule
+Power & Liability & Disability & Second \\
+Liability & Power & Immunity & Second \\
+Immunity & Disability & Liability & Second \\
+Disability & Immunity & Power & Second \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+The first square captures \emph{first-order} legal relations (``$A$ has a right that $B$ do $\varphi$'').  The second square captures \emph{second-order} legal relations (``$A$ has the power to alter $B$'s legal position'')---the relations that govern legal \emph{change}: legislation, adjudication, contract formation, delegation.
+
+\subsection{The Full Gauge Group}
+
+\begin{theorem}[Octahedral Gauge Group]
+\label{thm:gauge_group}
+The symmetry group of the full Hohfeldian octad is the \emph{semi-direct product}:
+\begin{equation}
+G_{\Ho} = D_4 \rtimes_\varphi D_4
+\label{eq:semidirect}
+\end{equation}
+where the first factor $D_4$ acts on first-order relations (right--duty--liberty--no-right), the second factor $D_4$ acts on second-order relations (power--liability--immunity--disability), and the homomorphism $\varphi: D_4 \to \operatorname{Aut}(D_4)$ encodes how second-order operations act on first-order positions.
+\end{theorem}
+
+\begin{proof}[Proof sketch]
+Each Hohfeldian square admits $D_4$ symmetry by the same argument as in \cite{anon2026a}: the four positions form two correlative pairs connected by jural opposition (negation) and correlative swap (agent-swap), generating $D_4$.
+
+However, the two squares are \emph{not} independent.  Second-order positions actively constrain and transform first-order positions: exercising a \emph{power} creates or destroys rights and duties; holding an \emph{immunity} prevents another party's power from altering one's first-order position.  Formally: a second-order gauge transformation $g_2 \in D_4$ (e.g., relabeling power $\leftrightarrow$ liability) induces a corresponding transformation on the first-order square (e.g., the right that the power would create is relabeled as the duty that the liability would impose).  This is precisely the structure of a semi-direct product: the second factor acts on the first via the homomorphism $\varphi$.
+
+The group $G_{\Ho} = D_4 \rtimes_\varphi D_4$ has order at most 64 (the same as the direct product), but its multiplication rule encodes the coupling:
+\begin{equation}
+(g_1, g_2) \cdot (h_1, h_2) = (g_1 \cdot \varphi(g_2)(h_1),\; g_2 \cdot h_2)
+\label{eq:semidirect_mult}
+\end{equation}
+The first-order transformation $h_1$ is ``twisted'' by the second-order transformation $g_2$ before being composed.  This captures the legal reality that the meaning of a first-order operation (e.g., creating a right) depends on the second-order context (e.g., whether the creating party has the power to do so).
+\end{proof}
+
+\begin{remark}[Why Semi-Direct, Not Direct]
+In Geometric Ethics \cite{anon2026a}, the gauge group was stated as $D_4 \times D_4$ because the moral domain typically involves only first-order Hohfeldian positions (rights, duties, liberties, no-rights) without explicit second-order legal operations.  In the legal domain, second-order positions are essential---legislation, adjudication, and contract formation are all exercises of second-order Hohfeldian positions that \emph{create, modify, or destroy} first-order positions.  The semi-direct product captures this asymmetric coupling.  When the coupling homomorphism $\varphi$ is trivial (each $\varphi(g_2)$ is the identity), the semi-direct product reduces to the direct product, recovering the Geometric Ethics result as a special case.
+\end{remark}
+
+\begin{definition}[Legal Gauge Transformation]
+A \emph{legal gauge transformation} $g \in G_{\Ho}$ acts on a vertex $c \in \mathcal{K}$ by:
+\begin{enumerate}
+    \item Permuting the Hohfeldian labels of the parties (e.g., swapping right-holder and duty-bearer while preserving the bond).
+    \item Rotating through the correlative-opposite structure (e.g., viewing a right from the correlative duty perspective).
+    \item Composing first- and second-order transformations (e.g., asking whether the power to create a right is itself subject to an immunity).
+\end{enumerate}
+A legal evaluation $J_{\text{law}}$ is \emph{gauge-invariant} if:
+\begin{equation}
+J_{\text{law}}(g \cdot p) = J_{\text{law}}(p) \quad \forall\, g \in G_{\Ho}
+\label{eq:gauge_inv}
+\end{equation}
+\end{definition}
+
+The gauge invariance requirement has immediate practical content: a legal system that reaches different conclusions when the same dispute is viewed from the correlative perspective (right-holder vs.\ duty-bearer) is \emph{gauge-variant}---it is sensitive to a choice of description that should not affect the outcome.
+
+\subsection{Wilson Loops: Detecting Judicial Inconsistency}
+
+\begin{definition}[Legal Wilson Loop]
+A \emph{legal Wilson loop} $W(\gamma)$ is the holonomy of the legal connection around a closed path $\gamma$ in $\mathcal{K}$:
+\begin{equation}
+W(\gamma) = \mathcal{P} \exp\left( \oint_\gamma A_\mu\, dx^\mu \right)
+\label{eq:wilson}
+\end{equation}
+where $A_\mu$ is the legal connection (encoding how Hohfeldian positions change under parallel transport through the case law) and $\mathcal{P}$ denotes path ordering.
+\end{definition}
+
+A non-trivial Wilson loop ($W(\gamma) \neq \mathbf{1}$) means that traversing a cycle of legal reasoning---applying a sequence of legal principles that returns to the same factual configuration---changes the Hohfeldian structure.  This is a \emph{legal inconsistency}: the system of precedents contains a hidden contradiction.
+
+\begin{proposition}[Wilson Loop Test for Consistency]
+\label{prop:wilson}
+A body of case law is internally consistent if and only if all Wilson loops in the precedent-defined connection are trivial.  Non-trivial Wilson loops identify specific circuits of legal reasoning that produce contradictions.
+\end{proposition}
+
+
+%==============================================================================
+\section{Constitutional Topology}
+\label{sec:topology}
+%==============================================================================
+
+\subsection{The Constitution as Topological Constraint}
+
+The Constitution does not merely add rules to the legal system.  It defines the \emph{topology}---the global shape---of the space of permissible legal states.  Statutes must exist \emph{within} this topology; a statute that violates the Constitution is one that requires the legal space to have a shape that the Constitution prohibits.
+
+\begin{definition}[Constitutional Subcomplex]
+\label{def:const_manifold}
+The \emph{constitutional subcomplex} $\C$ is a subcomplex of $\mathcal{K}$ consisting of all vertices and simplices that satisfy the constitutional constraints:
+\begin{equation}
+\C = \{ \sigma \in \mathcal{K} \mid \Phi_k(\sigma) = \text{true},\; k = 1, \ldots, K \}
+\label{eq:const_manifold}
+\end{equation}
+where each $\Phi_k$ is a Boolean predicate encoding a constitutional provision:
+\begin{itemize}
+    \item $\Phi_{\text{EP}}$: Equal Protection --- $J_{\text{law}}$ is invariant under protected-class transformations at the vertices of $\sigma$.
+    \item $\Phi_{\text{DP}}$: Due Process --- $J_{\text{law}}$ is well-defined on the quotient space (procedural regularity).
+    \item $\Phi_{\text{1A}}$: First Amendment --- the speech dimension is unconstrained by government action (within established exceptions).
+    \item $\Phi_{\text{SoP}}$: Separation of Powers --- the legislative, executive, and judicial components are in their proper domains.
+\end{itemize}
+\end{definition}
+
+\subsection{Constitutionality as Topological Invariance}
+
+Since the judicial complex $\mathcal{K}$ is \emph{directed} (Section~\ref{sec:manifold}), the appropriate homology theory is not standard simplicial homology---which is defined on undirected complexes and would ``forget'' the temporal and hierarchical structure we have built---but \emph{path homology}, developed by Grigor'yan, Lin, Muranov, and Yau \cite{grigoryan2012,grigoryan2014}.  Path homology is defined on directed graphs and digraphs: its cycles are directed paths that return to their starting vertex, and two directed cycles are homologous if they can be deformed into each other through directed homotopies.  This is exactly the structure needed for legal reasoning, where the order of citations matters and temporal flow is irreversible.
+
+\begin{definition}[Path Homology of the Judicial Complex]
+\label{def:path_homology}
+An \emph{elementary $p$-path} in $\mathcal{K}$ is a sequence of vertices $e_{i_0 i_1 \cdots i_p} = (c_{i_0}, c_{i_1}, \ldots, c_{i_p})$ such that each consecutive pair is connected by a directed edge $c_{i_k} \to c_{i_{k+1}}$.  The \emph{path complex} $\Omega_p(\mathcal{K})$ is the free abelian group generated by all elementary $p$-paths.  The \emph{boundary operator} $\partial_p: \Omega_p \to \Omega_{p-1}$ is the alternating sum of face maps (omitting each intermediate vertex in turn), restricted to \emph{allowed paths}---those whose faces are themselves paths in $\mathcal{K}$.  The \emph{path homology groups} are:
+\begin{equation}
+\widetilde{H}_n^{\text{path}}(\mathcal{K}; \Z) = \ker \partial_n / \operatorname{im} \partial_{n+1}
+\label{eq:path_homology}
+\end{equation}
+\end{definition}
+
+\begin{theorem}[Topological Constitutionality]
+\label{thm:topological_const}
+Let $\C$ be the constitutional subcomplex and let $\ell$ be a proposed statute that modifies the judicial complex $\mathcal{K}$ to $\mathcal{K}_\ell$.  The statute $\ell$ is \emph{constitutional} if and only if the inclusion $\C \hookrightarrow \mathcal{K}_\ell$ preserves the path homology:
+\begin{equation}
+\widetilde{H}_n^{\text{path}}(\C; \Z) \cong \widetilde{H}_n^{\text{path}}(\C_\ell; \Z) \quad \forall\, n \geq 0
+\label{eq:const_test}
+\end{equation}
+where $\C_\ell = \C \cap \mathcal{K}_\ell$ is the constitutional subcomplex in the modified judicial complex.  Equivalently: $\ell$ is constitutional if and only if it does not create new non-trivial \emph{directed} cycles in the constitutional subcomplex.
+\end{theorem}
+
+\begin{proof}[Proof sketch]
+A non-trivial directed cycle in $\C_\ell$ that does not exist in $\C$ represents a \emph{directed} sequence of legal reasoning---applications of the statute combined with constitutional provisions, following the temporal and hierarchical order of legal authority---that returns to the starting vertex but with altered Hohfeldian structure.  This is a legal contradiction: a sequence of legally valid steps, each following proper authority, whose net effect violates a constitutional guarantee.
+
+More precisely: let $\gamma = (c, c_1, \ldots, c_m, c)$ be a directed 1-cycle in $\C_\ell$ that is not a boundary in $\C$.  Then $\gamma$ represents a legal path that:
+\begin{enumerate}
+    \item Starts at a vertex $c$ satisfying all constitutional constraints;
+    \item Follows directed edges (each respecting temporal and hierarchical order) corresponding to the statute $\ell$ and existing provisions;
+    \item Returns to $c$;
+    \item But the Hohfeldian labels transported around $\gamma$ have changed---non-trivial directed holonomy.
+\end{enumerate}
+Because the cycle is \emph{directed}, it cannot be dismissed as an artifact of ignoring legal hierarchy: each step follows proper authority.  This is a genuine inconsistency.
+\end{proof}
+
+\begin{remark}[Why Path Homology, Not Simplicial Homology]
+\label{rem:path_homology}
+Standard simplicial homology (and persistent-homology software such as Ripser) operates on \emph{undirected} complexes.  Computing standard homology on a directed citation network requires ``forgetting'' edge directions---which destroys the temporal and hierarchical constraints that are legally essential.  A directed cycle detected by path homology may disappear when directions are forgotten (it may become a boundary in the undirected complex), meaning standard homology would miss a genuine legal inconsistency.  Conversely, standard homology may detect undirected cycles that are not traversable in the directed graph (they require following a citation backward in time), producing false positives.
+
+Path homology avoids both failure modes.  Its computational cost is comparable to simplicial homology for sparse graphs \cite{grigoryan2014}, and implementations are available for directed graphs.
+\end{remark}
+
+\begin{remark}[Topological Obstructions as Constitutional Violations]
+The theorem gives a precise mathematical meaning to ``unconstitutional'':
+\begin{itemize}
+    \item An \emph{unconstitutional statute} creates a \emph{topological obstruction}---a non-trivial element of $\widetilde{H}_1^{\text{path}}(\C_\ell) / \widetilde{H}_1^{\text{path}}(\C)$.
+    \item A \emph{constitutional amendment} is a \emph{topological surgery}---it modifies $\C$ itself, potentially creating or destroying path-homology classes.
+    \item \emph{Judicial review} is the process of computing $\widetilde{H}_n^{\text{path}}(\C_\ell)$ and checking whether it equals $\widetilde{H}_n^{\text{path}}(\C)$.  For a finite directed graph, this is a finite linear-algebra computation.
+\end{itemize}
+\end{remark}
+
+\subsection{Higher Path-Homological Invariants}
+
+The first path homology group $\widetilde{H}_1^{\text{path}}$ detects the simplest directed obstructions (directed cycles).  Higher groups detect subtler problems:
+
+\begin{itemize}
+    \item $\widetilde{H}_2^{\text{path}}(\C; \Z)$: Detects ``constitutional bubbles''---directed 2-cycles where a statute creates a closed directed surface of legal states that are internally consistent but globally incompatible with the Constitution.  Example: a statute that creates a self-contained regulatory regime whose internal directed reasoning is sound but whose boundary violates the Commerce Clause.
+    \item $\widetilde{H}_0^{\text{path}}(\C; \Z)$: Counts the directed-path-connected components.  A statute that makes some constitutional states unreachable from others \emph{via directed paths} (respecting legal hierarchy) creates an $\widetilde{H}_0^{\text{path}}$ violation---even if the undirected graph remains connected.
+\end{itemize}
+
+\begin{conjecture}[Completeness of Path-Homological Review]
+\label{conj:complete}
+The full set of path homology groups $\{\widetilde{H}_n^{\text{path}}(\C; \Z)\}_{n \geq 0}$ provides a complete invariant for constitutionality: a statute is constitutional if and only if it preserves all path homology groups of the constitutional subcomplex.  Since $\mathcal{K}$ is a finite directed graph, all $\widetilde{H}_n^{\text{path}}$ are finitely generated abelian groups and are exactly computable.
+\end{conjecture}
+
+
+%==============================================================================
+\section{Conservation Laws in Legal Systems}
+\label{sec:noether}
+%==============================================================================
+
+\subsection{From Noether to Discrete Balance Principles}
+
+In physics, Noether's theorem \cite{noether1918} derives conservation laws from continuous symmetries of a Lagrangian.  The Moral Noether Theorem \cite{anon2025b} adapts this to ethics.  In the legal domain, however, a direct application of the continuous Noether theorem faces a structural obstacle: the judicial complex is discrete, and the ``symmetries'' of the legal system (equal protection, due process) are not continuous symmetries of a differentiable action functional---they are \emph{constraints on a graph}.
+
+We therefore adopt a different strategy: we derive \emph{discrete balance principles} directly from the structural symmetries of the judicial complex, without passing through a continuous Lagrangian.  These balance principles are the legal analogues of Noether conservation laws, but they are stated and proved in the natural mathematical language of the domain---graph theory and algebraic topology---rather than in the language of variational calculus.
+
+\subsection{Liability Conservation in Closed Disputes}
+
+The strongest conservation principle arises in \emph{closed} legal subsystems: bilateral disputes where the parties and their entitlements form a complete Hohfeldian network and the governing legal framework is fixed.
+
+\begin{definition}[Closed Legal Subsystem]
+\label{def:closed}
+A \emph{closed legal subsystem} is a subcomplex $\mathcal{K}_S \subset \mathcal{K}$ consisting of:
+\begin{enumerate}
+    \item A fixed set of parties $\{A, B\}$ (bilateral) or $\{A_1, \ldots, A_n\}$ (multilateral);
+    \item A fixed governing legal framework $\mathcal{F}$ (statutes, precedents, constitutional provisions);
+    \item All Hohfeldian positions among the parties under $\mathcal{F}$.
+\end{enumerate}
+The subsystem is ``closed'' in the sense that no external party or legal rule enters or leaves during the proceeding.
+\end{definition}
+
+\begin{theorem}[Liability--Damages Conservation]
+\label{thm:liability_conservation}
+In a closed bilateral tort dispute between plaintiff $A$ and defendant $B$, the total \emph{liability--damages balance} is conserved:
+\begin{equation}
+L(A) + L(B) = 0
+\label{eq:liability_conservation}
+\end{equation}
+where $L(X)$ is the net liability of party $X$, defined as the signed sum of obligations imposed by adjudication.  Equivalently: every dollar of damages awarded to $A$ imposes exactly one dollar of liability on $B$; every Hohfeldian right created for $A$ imposes a correlative duty on $B$.
+\end{theorem}
+
+\begin{proof}
+The proof follows from the correlative structure of Hohfeldian positions.  In a closed bilateral system under a fixed framework $\mathcal{F}$:
+\begin{enumerate}
+    \item Every right of $A$ is a correlative duty of $B$ (Hohfeld's first correlative pair).
+    \item Every liability of $B$ is a correlative power of $A$ (Hohfeld's second correlative pair).
+    \item Adjudication does not create Hohfeldian positions \emph{ex nihilo}; it \emph{recognizes} or \emph{assigns} positions that already exist within $\mathcal{F}$.
+    \item Therefore, the net entitlement change $\Delta E(A) + \Delta E(B) = 0$ at every step of the proceeding.
+\end{enumerate}
+For damages specifically: compensatory damages transfer wealth from $B$ to $A$, so $\Delta D(A) = -\Delta D(B)$.  Punitive damages are an apparent exception, but they are grounded in a duty $B$ owes to the \emph{public interest} (dimension $d_8$), extending the closed system to include the state as a third party; within the extended system $\{A, B, \text{State}\}$, the balance $L(A) + L(B) + L(\text{State}) = 0$ is restored.
+\end{proof}
+
+\begin{remark}[Scope and Limitations]
+Liability conservation holds within a fixed legal framework.  Three operations break the conservation law:
+\begin{enumerate}
+    \item \textbf{Legislation:} A new statute can create causes of action \emph{ex nihilo}, generating rights without corresponding prior duties.  This is a symmetry-breaking event---it changes the rules $\mathcal{F}$, not the dynamics within $\mathcal{F}$.
+    \item \textbf{Constitutional amendment:} Alters the topological constraint space $\C$ (Section~\ref{sec:topology}), potentially creating or destroying entire classes of entitlements.
+    \item \textbf{Third-party intervention:} Adding a new party to the dispute breaks the closure condition.  Conservation is restored by extending the subsystem to include all parties.
+\end{enumerate}
+\end{remark}
+
+\begin{example}[Conservation in a Negligence Tort]
+\label{ex:tort_conservation}
+In a standard negligence action ($A$ sues $B$), the initial state has $A$ holding a right to be free from unreasonable harm and $B$ holding a correlative duty of care.  If the court finds $B$ breached the duty and caused damages $D$:
+\begin{itemize}
+    \item $A$'s position changes: right $\to$ right + damages award $D$.  Net entitlement change: $+D$.
+    \item $B$'s position changes: duty $\to$ duty + liability $D$.  Net entitlement change: $-D$.
+    \item System total: $+D + (-D) = 0$.  Liability is conserved.
+\end{itemize}
+Under comparative negligence (say $A$ is 30\% at fault): $A$ receives $0.7D$, and $B$ pays $0.7D$.  The balance still holds: $+0.7D + (-0.7D) = 0$.  The apportionment changes the \emph{distribution} of liability, not its conservation.
+\end{example}
+
+\subsection{The Symmetry--Conservation Correspondence}
+
+While we avoid claiming a direct continuous Noether theorem, the structural correspondence between symmetries and conserved quantities persists in the discrete setting.  The key insight is that each invariance requirement on $J_{\text{law}}$ implies a balance constraint:
+
+\begin{center}
+\begin{tabular}{lll}
+\toprule
+\textbf{Symmetry} & \textbf{Legal Source} & \textbf{Conserved Quantity} \\
+\midrule
+Party-identity invariance & Equal Protection (14th Amdt.) & Liability--damages balance \\
+Temporal translation & Prospectivity (Ex Post Facto Clause) & Reliance interest \\
+Re-description invariance & Rule of Law & Outcome consistency \\
+Hohfeldian correlative structure & Common-law structure & Entitlement balance \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+The formal connection is: if $J_{\text{law}}$ is invariant under a transformation $\tau$, then the \emph{difference} $J_{\text{law}}(\tau(x)) - J_{\text{law}}(x) = 0$ constrains the possible outcomes.  In a bilateral system, this constraint takes the form of a balance law.  The correspondence is \emph{structural}---it follows from the symmetry of the evaluation, not from a variational principle---and therefore survives the passage from continuous to discrete.
+
+\subsection{Equal Protection as Gauge Symmetry}
+
+\begin{theorem}[Equal Protection as Invariance Constraint]
+\label{thm:equal_protection}
+The Equal Protection Clause requires that the legal evaluation be invariant under transformations of protected-class attributes.  In any closed bilateral dispute, this invariance implies the \emph{entitlement balance}: the signed sum of Hohfeldian positions, weighted by the edge weights of $\mathcal{K}$, is invariant under adjudication.
+\end{theorem}
+
+\begin{proof}[Proof sketch]
+Let $\tau_g$ be a transformation that changes a party's race, gender, religion, or national origin while preserving all legally relevant facts.  Equal protection requires $J_{\text{law}}(\tau_g(x)) = J_{\text{law}}(x)$.
+
+In the judicial complex, this means: for any two vertices $c_i, c_j$ that differ only in the protected-class attributes of the parties, $J_{\text{law}}(c_i) = J_{\text{law}}(c_j)$.  The outcome must be the same.  Combined with the Hohfeldian correlative structure (every right entails a duty, every power entails a liability), this forces the entitlement balance: whatever the court awards to one party, it must impose correlationally on the other.
+
+The balance is not that ``standing is conserved'' (standing can be created by legislation and is not a charge in the physics sense).  The balance is that \emph{within a fixed legal framework, adjudication redistributes entitlements without creating or destroying them}---the legal analogue of a zero-sum constraint enforced by the correlative structure of Hohfeldian positions.
+\end{proof}
+
+\subsection{Due Process as Well-Definedness}
+
+\begin{theorem}[Due Process as Quotient Regularity]
+\label{thm:due_process}
+Due process is the requirement that the legal evaluation map $J_{\text{law}}$ be \emph{well-defined on the quotient space} $\J / \mathcal{T}_{\text{irrelevant}}$---that is, the evaluation must factor through the equivalence classes defined by the LIP:
+\begin{equation}
+\begin{tikzcd}
+\J \arrow[r, "J_{\text{law}}"] \arrow[d, "\pi"'] & \mathcal{O} \\
+\J / \mathcal{T}_{\text{irrelevant}} \arrow[ur, "\bar{J}_{\text{law}}"']
+\end{tikzcd}
+\label{eq:due_process}
+\end{equation}
+where $\pi$ is the quotient projection and $\mathcal{O}$ is the space of legal outcomes.  Due process fails when $J_{\text{law}}$ does not factor through $\pi$---when the outcome depends on which representative of the equivalence class was presented.
+\end{theorem}
+
+\begin{proof}[Proof sketch]
+If $J_{\text{law}}$ depends on the representative (the specific description of the case rather than its equivalence class), then two descriptions of the same legal dispute can yield different outcomes.  This is precisely what procedural due process prohibits: outcomes must depend on the merits (the equivalence class) rather than on irrelevant features of presentation (the specific representative).
+\end{proof}
+
+
+%==============================================================================
+\section{Empirical Foundation}
+\label{sec:empirical}
+%==============================================================================
+
+The Algorithmic Jurisprudence framework does not start from zero.  It inherits a substantial body of empirical evidence from the Geometric Ethics programme, much of which was conducted on \emph{legal} and \emph{normative} texts and is directly applicable to the judicial complex.
+
+\subsection{Evidence Inherited from Geometric Ethics}
+
+The following empirical results, reported in \cite{anon2026a} and summarized here, provide the evidential base:
+
+\begin{enumerate}
+    \item \textbf{Cross-lingual invariance of normative structure (109,294 passages, 11 languages, 3,000 years).}  Analysis of ethical and legal texts from classical Chinese, Sanskrit, ancient Greek, biblical Hebrew, classical Arabic, Latin, Old English, classical Japanese, medieval Persian, Pali, and modern English demonstrates that the dimensional structure of normative evaluation is topologically stable across languages and historical periods.  The same nine axes emerge regardless of linguistic framing.  For the judicial complex, this means that the \emph{structural invariants of legal reasoning}---the Hohfeldian relations, the distinction between procedural and substantive claims, the hierarchy of remedies---are not artifacts of the common-law tradition but features of normative cognition that appear in every legal culture studied.
+
+    \item \textbf{Dimensional stability (20,030 Dear Abby letters, 1985--2017).}  The activation pattern of moral/normative dimensions is stable across three decades of American advice-column letters.  This three-decade stability supports the claim that the judicial complex's dimensionality is a structural feature, not a cultural contingency.
+
+    \item \textbf{Non-commutativity of normative frameworks (16,798 commutator measurements).}  The order in which normative frameworks are applied changes the outcome ($[U, D] \neq 0$).  This confirms non-abelian gauge structure---directly relevant to law, where the order of applying legal tests (e.g., standing before merits, jurisdiction before substance) produces different analytical paths.
+
+    \item \textbf{Semantic phase transitions (94\% trigger rate).}  The phrase ``you promised'' triggers a discontinuous shift in normative evaluation with 94\% effectiveness.  Legal reasoning is full of analogous triggers: the word ``hereby'' in contract formation, ``Miranda'' warnings in criminal procedure, the invocation of the Fifth Amendment privilege.  The Whitney stratification model captures these sharp transitions.
+
+    \item \textbf{Bond Index baseline (0.155).}  The empirically calibrated baseline for representational invariance violation---how much normative evaluations change under meaning-preserving transformations---provides a starting calibration for the Legal Bond Index.
+\end{enumerate}
+
+\subsection{Independent Replication}
+
+The framework's cross-lingual predictions have been independently replicated by Thiele \cite{thiele2026}, who confirmed all nine normative dimensions as linearly decodable from LaBSE embeddings (mean $F_1 = 0.83$) and demonstrated cross-lingual transfer across six languages ($F_1$ 0.71--0.82).  Most significantly, the moral-judgement subspace and the language-identity subspace were found to be nearly orthogonal (shared variance $< 3\%$).
+
+For Algorithmic Jurisprudence, this orthogonality result has a direct legal implication: \emph{legal structure is independent of the language in which it is expressed}.  A contract written in English and translated to Spanish should receive the same legal analysis---and the empirical evidence confirms that the representational substrate (multilingual embeddings) encodes this structure in a language-independent manner.
+
+\subsection{Direct Legal Evidence}
+
+Two elements of the Geometric Ethics evidence base are themselves \emph{legal} in character:
+
+\begin{itemize}
+    \item \textbf{The Hohfeldian structure.}  The $D_4$ gauge group was derived from Hohfeld's \emph{Fundamental Legal Conceptions} \cite{hohfeld1913}---a legal taxonomy developed for legal reasoning and validated by a century of jurisprudential practice.  The extension to $D_4 \rtimes D_4$ for the full octad (Theorem~\ref{thm:gauge_group}) incorporates the second-order relations (power, immunity, liability, disability) that govern legal \emph{change}---legislation, adjudication, delegation---and that are essential for modeling the judicial complex.
+
+    \item \textbf{The cross-lingual corpus includes legal texts.}  The 109,294-passage corpus analyzed in \cite{anon2026a} includes legal and quasi-legal texts: biblical law (Hebrew), dharma\'{s}\={a}stra (Sanskrit), Confucian legal-ethical precepts (classical Chinese), fiqh (classical Arabic), Roman legal maxims (Latin), and common-law precedents (English).  The structural invariance of normative dimensions across these sources is evidence that the judicial complex has a common structure across legal traditions.
+\end{itemize}
+
+\begin{center}
+\begin{tabular}{llc}
+\toprule
+\textbf{Evidence} & \textbf{Legal Relevance} & \textbf{Status} \\
+\midrule
+Cross-lingual invariance (11 languages) & Legal structure is language-independent & Confirmed \\
+Independent replication (6 languages) & Orthogonality of legal and linguistic structure & Confirmed \\
+Non-commutativity ($16{,}798$ measurements) & Order-dependence of legal tests & Confirmed \\
+Semantic phase transitions (94\%) & Sharp legal triggers (contract, Miranda) & Confirmed \\
+Hohfeldian $D_4$ gauge group & Legal symmetry structure & Derived \\
+Bond Index baseline (0.155) & Starting calibration for LBI & Calibrated \\
+Dear Abby stability (30 years) & Temporal stability of normative dimensions & Confirmed \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\subsection{Empirical Calibration: From Case Text to Edge Weights}
+\label{sec:calibration}
+
+The preceding evidence establishes that normative dimensions are decodable from text embeddings.  We now describe a concrete pipeline for translating natural-language case descriptions into the attribute vectors and edge weights that populate the judicial complex $\mathcal{K}$.
+
+\paragraph{Step 1: Embedding.}  Given the text $t_i$ of a judicial opinion (or a case summary from a legal database), compute a multilingual embedding $\mathbf{e}(t_i) \in \R^d$ using a pre-trained sentence encoder such as LaBSE \cite{feng2022}.  LaBSE produces 768-dimensional embeddings that are language-invariant---the same legal concept in English, Spanish, or Mandarin maps to the same region of embedding space.
+
+\paragraph{Step 2: Dimension scoring.}  Train eight linear probes $f_k: \R^d \to [0, 1]$ ($k = 1, \ldots, 8$), one for each legal dimension $d_k$.  Each probe is a logistic regression classifier trained on a labeled corpus of legal texts annotated for the presence or absence of each dimension.  The training data can be bootstrapped from legal ontologies: texts tagged with ``standing'' or ``jurisdiction'' activate $d_3$; texts tagged with ``damages'' or ``injunctive relief'' activate $d_7$.  The output is the attribute vector:
+\begin{equation}
+\mathbf{v}(c_i) = \bigl(f_1(\mathbf{e}(t_i)),\; f_2(\mathbf{e}(t_i)),\; \ldots,\; f_8(\mathbf{e}(t_i))\bigr) \in [0,1]^8
+\label{eq:attribute_vector}
+\end{equation}
+
+This architecture directly replicates the methodology validated in the parent framework, where nine moral-dimension probes achieved $F_1 = 0.74$--$0.91$ \cite{anon2026a}, independently confirmed at $F_1 = 0.74$--$0.91$ by Thiele \cite{thiele2026}.  The legal probes use the same architecture with legal dimension labels.
+
+\paragraph{Step 3: Covariance estimation.}  From the full corpus of $N$ scored cases, estimate the $8 \times 8$ covariance matrix $\hat{\Sigma}$ of the attribute vectors (Equation~\ref{eq:covariance}).  This matrix captures cross-dimensional dependencies (e.g., the correlation between statutory authority and remedial scope) and is used in the Mahalanobis edge-weight formula (Equation~\ref{eq:edge_weight}).
+
+\paragraph{Step 4: Directed edge-weight computation.}  Given two cases $c_i \to c_j$ connected by citation, compute the directed edge weight via Equation~\ref{eq:edge_weight}:
+\begin{equation}
+w(c_i \to c_j) = \Delta \mathbf{v}^T \hat{\Sigma}^{-1} \Delta \mathbf{v} + \beta \cdot \mathbf{1}[\text{regime boundary}] + h(\ell(c_i), \ell(c_j))
+\label{eq:edge_weight_nlp}
+\end{equation}
+where $\Delta \mathbf{v} = \mathbf{v}(c_j) - \mathbf{v}(c_i)$, the regime-boundary indicator is determined from metadata (different courts, different statutory bases), and $h$ encodes hierarchical cost (Equation~\ref{eq:hierarchical_cost}).  Edge weights are inherently asymmetric: the weight of traversing from a binding Supreme Court precedent to a district-court case ($h = 0$) differs from the reverse ($h = \infty$).
+
+\paragraph{Step 5: Metric calibration from outcomes.}  The covariance matrix $\hat{\Sigma}$ can be further refined by outcome-weighted estimation.  Given a corpus of $N$ decided cases with known outcomes $y_i \in \{0, 1\}$ (plaintiff wins/loses), fit a regularized logistic regression:
+\begin{equation}
+P(y_i = 1 \mid \mathbf{v}(c_i)) = \sigma\!\left(\mathbf{v}(c_i)^T W \mathbf{v}(c_i) + \mathbf{b}^T \mathbf{v}(c_i) + b_0\right)
+\label{eq:weight_calibration}
+\end{equation}
+where $W \in \R^{8 \times 8}$ is a symmetric weight matrix and $\mathbf{b} \in \R^8$ captures linear effects.  The fitted $W$ is a \emph{outcome-calibrated} inverse covariance matrix: it encodes not just the statistical co-occurrence of dimensions but their \emph{predictive} interaction.  The effective metric becomes $\Sigma_{\text{eff}}^{-1} = \lambda \hat{\Sigma}^{-1} + (1 - \lambda) W$, blending the corpus-derived covariance with outcome-derived predictive structure.  The mixing parameter $\lambda$ is set by cross-validation.
+
+\begin{example}[Proof-of-Concept: Title VII Metric from Data]
+\label{ex:title_vii_calibration}
+To make this concrete, consider calibrating the metric for Title VII disparate-treatment claims.  The pipeline would proceed as follows:
+\begin{enumerate}
+    \item Collect $N \approx 1{,}000$ Title VII opinions from a case database (e.g., CourtListener or Caselaw Access Project, both freely available).
+    \item Embed each opinion using LaBSE: $\mathbf{e}(t_i) \in \R^{768}$.
+    \item Score each opinion on eight dimensions using trained probes: $\mathbf{v}(c_i) \in [0,1]^8$.
+    \item Estimate $\hat{\Sigma}$ from the scored corpus.  \emph{Prediction}: the off-diagonal entry $\hat{\Sigma}_{4,7}$ (statutory authority--remedial scope) will be significantly positive, reflecting the well-known coupling between finding discrimination and the availability of back pay.
+    \item Fit $W$ to predict case outcomes.  \emph{Prediction}: the $(4,4)$ entry (discriminatory motive, quadratic term) will be the largest diagonal element, reflecting motive as the hardest element and strongest predictor.
+    \item Construct directed edges from the citation network (available from CourtListener's bulk data), compute Mahalanobis edge weights, and add hierarchical costs from court-level metadata.
+\end{enumerate}
+Both predictions are falsifiable.  If $\hat{\Sigma}_{4,7}$ is near zero, the framework's assumption of dimensional coupling is wrong for Title VII.  If the $(4,4)$ entry of $W$ is not dominant, the burden-structure assumptions are wrong.
+\end{example}
+
+\subsection{Validation: Preventing and Detecting Probe Hallucination}
+\label{sec:validation}
+
+A critical concern for any NLP-based scoring pipeline is \emph{probe hallucination}: the risk that the linear probes $f_k$ assign confident but incorrect dimension scores, producing attribute vectors that misrepresent the case's legal content.  This concern is especially acute because the probes are trained on embeddings from a foundation model, not on expert-annotated legal features.
+
+We address this risk through four mechanisms:
+
+\begin{enumerate}
+    \item \textbf{Ground-truth calibration.}  A validation set of $M \approx 200$ cases is scored by legal experts (law professors or experienced practitioners) on all eight dimensions.  The probes' $F_1$ scores against this ground truth provide the quality floor.  The analogous moral probes achieved $F_1 = 0.74$--$0.91$ against LLM-consensus labels; the legal pipeline requires validation against \emph{human expert} labels.
+
+    \item \textbf{Confidence thresholding.}  Each probe $f_k$ outputs a probability $p_k \in [0,1]$.  Scores near $0.5$ (low confidence) are flagged as uncertain.  Only cases where all eight probes exceed a confidence threshold $|p_k - 0.5| > \delta$ are used for metric calibration.  This prevents high-entropy (uncertain) predictions from corrupting the covariance estimate.
+
+    \item \textbf{Consistency checks.}  Legal dimensions have known structural constraints: procedural posture ($d_3$) should be high in cases that turn on standing or jurisdiction; remedial scope ($d_7$) should correlate with the presence of damages language.  These \emph{a priori} constraints can be tested against the probe outputs.  Systematic violations indicate probe failure.
+
+    \item \textbf{Ablation.}  Remove each probe in turn and measure the effect on downstream tasks (edge-weight computation, path ranking, outcome prediction).  Probes that contribute noise rather than signal are detected by ablation---removing them improves performance.
+\end{enumerate}
+
+\begin{remark}[Determinism and Reproducibility]
+\label{rem:determinism}
+A legally authoritative scoring system must be \emph{deterministic}: the same case text must produce the same attribute vector every time.  The pipeline achieves this through two design choices:
+
+\begin{enumerate}
+    \item \textbf{Fixed embeddings.}  The embedding model (LaBSE or equivalent) is frozen at a specific version.  Its weights are not updated during or after deployment.  The same input text always produces the same embedding vector $\mathbf{e}(t_i)$, eliminating stochastic variation.
+
+    \item \textbf{Linear probes.}  Logistic regression is a deterministic function: given fixed weights $\mathbf{w}_k$ and a fixed embedding $\mathbf{e}$, the score $f_k(\mathbf{e}) = \sigma(\mathbf{w}_k^T \mathbf{e} + b_k)$ is uniquely determined.  There is no sampling, temperature parameter, or non-deterministic decoding.
+\end{enumerate}
+
+This contrasts sharply with LLM-based scoring, where the same prompt can produce different outputs across runs (due to sampling), across model versions (due to weight updates), and across providers (due to different fine-tuning).  An LLM-scored attribute vector is a \emph{random variable}; a probe-scored attribute vector is a \emph{fixed function} of the input text.  For a system whose outputs may inform legal decisions, this distinction is dispositive.
+
+One limitation remains: the embedding model itself was trained on a specific corpus, and its representations may encode biases present in that corpus.  This is a known challenge in NLP fairness research.  We mitigate it through the LIP test (Section~\ref{sec:invariance}): probe outputs must be invariant under legally irrelevant transformations (party names, protected-class attributes).  Systematic LIP violations in the probe outputs indicate embedding bias that must be corrected before deployment.
+\end{remark}
+
+\begin{remark}[Status]
+This calibration and validation pipeline has not yet been executed on legal data.  The analogous pipeline for moral dimensions has been validated on 20,030 texts with independent replication \cite{thiele2026}.  Extending it to legal corpora is the immediate empirical priority (Section~\ref{sec:conclusion}).
+\end{remark}
+
+
+%==============================================================================
+\section{Legal Disputes as Optimal Pathfinding}
+\label{sec:pathfinding}
+%==============================================================================
+
+The central computational claim of this paper is that legal disputes are instances of \emph{optimal pathfinding on the judicial complex}.  We show that the formal structure of litigation maps exactly onto the $A^*$ search algorithm \cite{hart1968}, that legal doctrines correspond to heuristic functions, and that the adversarial structure of litigation corresponds to a two-player pathfinding game.
+
+\subsection{The Litigation Problem}
+
+\begin{definition}[Litigation as Pathfinding]
+A \emph{legal dispute} is a pathfinding problem on $\mathcal{K}$:
+\begin{itemize}
+    \item \textbf{Start node $c_0$:} The vertex corresponding to the plaintiff's current legal position (the alleged wrong, or the most factually similar decided case).
+    \item \textbf{Goal region $G$:} A set of vertices corresponding to the desired remedy (cases where similarly situated plaintiffs prevailed).
+    \item \textbf{Path $\gamma$:} A sequence of edges in $\mathcal{K}$---a chain of legal arguments, each corresponding to a doctrinal step from one case to the next.
+    \item \textbf{Cost function:} The \emph{legal friction} $\BF_{\text{law}}(\gamma)$, the total edge weight along the path.
+    \item \textbf{Constraints:} Regime boundaries (jurisdictional limits, constitutional constraints, statutory requirements) that impose edge penalties.
+\end{itemize}
+\end{definition}
+
+\begin{definition}[Legal Friction]
+\label{def:legal_friction}
+For a path $\gamma = (c_0, c_1, \ldots, c_m)$ through the judicial complex $\mathcal{K}$:
+\begin{equation}
+\BF_{\text{law}}(\gamma) = \underbrace{\sum_{i=0}^{m-1} w(c_i, c_{i+1})}_{\text{argument complexity}} + \underbrace{\sum_k \beta_k \cdot \mathbf{1}[(c_i, c_{i+1}) \text{ crosses regime } k]}_{\text{boundary penalties}} + \underbrace{\sum_j \omega_j \cdot \delta_j(\gamma)}_{\text{burden of proof}}
+\label{eq:legal_friction}
+\end{equation}
+where the three terms correspond to:
+\begin{enumerate}
+    \item The \emph{argument complexity}---the total edge weight along the path (more doctrinal steps and larger dimensional differences cost more).
+    \item \emph{Boundary penalties}---the cost of crossing regime boundaries (changing legal regimes, establishing jurisdiction, overcoming presumptions).
+    \item \emph{Burden of proof}---the cost of establishing facts along the path.  $\omega_j$ is the weight of the $j$-th evidentiary requirement; $\delta_j(\gamma)$ measures how far the path's evidence falls short of the threshold.
+\end{enumerate}
+\end{definition}
+
+\subsection{$A^*$ Search on the Judicial Complex}
+
+\begin{theorem}[Optimal Legal Argument]
+\label{thm:optimal_argument}
+The optimal legal argument is the minimum-cost path from $c_0$ to $G$ in the judicial complex $\mathcal{K}$:
+\begin{equation}
+\gamma^* = \arg\min_\gamma \BF_{\text{law}}(\gamma) \quad \text{subject to } \gamma(0) = c_0,\; \gamma(\text{end}) \in G,\; \gamma \text{ respects all constraints}
+\label{eq:optimal}
+\end{equation}
+This is an instance of $A^*$ search \cite{hart1968} on a weighted graph, with evaluation function $f(n) = g(n) + h(n)$, where $g(n)$ is the accumulated legal friction from $c_0$ to the current node $n$, and $h(n)$ is the heuristic estimate of remaining friction from $n$ to $G$.
+\end{theorem}
+
+The mapping between $A^*$ and legal reasoning is not approximate.  It is exact:
+
+\begin{center}
+\begin{tabular}{ll}
+\toprule
+\textbf{$A^*$ Component} & \textbf{Legal Counterpart} \\
+\midrule
+Start node $c_0$ & Plaintiff's legal position (complaint) \\
+Goal region $G$ & Desired remedy (prayer for relief) \\
+Successor function & Legal arguments available at each step \\
+Edge cost $c(n, n')$ & Difficulty of establishing the legal move \\
+Accumulated cost $g(n)$ & Argument built so far (partial brief) \\
+Heuristic $h(n)$ & Legal doctrine estimating remaining burden \\
+Open list & Arguments under consideration \\
+Closed list & Arguments already evaluated \\
+Optimal path $\gamma^*$ & Winning legal argument \\
+Path not found & Claim fails (no viable legal theory) \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\subsection{Legal Doctrines as Heuristic Functions}
+
+In $A^*$, the heuristic function $h(n)$ estimates the cost-to-go from node $n$ to the goal.  If $h$ is \emph{admissible} (never overestimates), $A^*$ is guaranteed to find the optimal path.  Legal doctrines serve precisely this role.
+
+\begin{definition}[Doctrinal Heuristic]
+A \emph{doctrinal heuristic} $h_D$ is a function $h_D: V(\mathcal{K}) \to \R_{\geq 0}$ defined on the vertices of $\mathcal{K}$, derived from an established legal doctrine $D$, that estimates the remaining legal friction to reach a goal region:
+\begin{equation}
+h_D(c) = \text{estimated remaining burden from } c \text{ to } G \text{ under doctrine } D
+\label{eq:doctrinal_heuristic}
+\end{equation}
+\end{definition}
+
+\begin{example}[Common Doctrinal Heuristics]
+\label{ex:heuristics}
+\begin{itemize}
+    \item \textbf{Prima facie case doctrine:} For a tort claim, the heuristic $h_{\text{tort}}(p)$ estimates the distance to establishing duty, breach, causation, and damages.  At any node $p$, it returns the estimated cost of the remaining unestablished elements.  This is admissible: the estimated cost of proving the remaining elements never exceeds the actual cost, because establishing them jointly may reveal shortcuts (e.g., res ipsa loquitur).
+
+    \item \textbf{Burden-shifting frameworks:} \emph{McDonnell Douglas} burden-shifting in employment discrimination defines a three-step heuristic: (1) estimate cost of establishing a prima facie case, (2) if established, estimate cost to the defendant of articulating a legitimate reason, (3) estimate cost of proving pretext.  The heuristic at each stage approximates the remaining path length.
+
+    \item \textbf{Strict scrutiny:} For constitutional challenges, $h_{\text{strict}}(p)$ estimates the distance to showing that a law is not narrowly tailored to a compelling government interest.  This heuristic assigns \emph{high} estimated cost to the government's path (it must overcome the presumption of unconstitutionality) and \emph{low} estimated cost to the challenger's path.
+
+    \item \textbf{Stare decisis:} Precedent provides a \emph{pattern database}---pre-computed optimal paths from previously solved nodes.  When the current case is factually close to a precedent ($d(p, p_P) < \epsilon$), the precedent's path provides a near-optimal heuristic.  This is why lawyers cite cases: they are importing pre-computed heuristics into the current search.
+\end{itemize}
+\end{example}
+
+\begin{theorem}[Admissibility of Doctrinal Heuristics]
+\label{thm:admissible}
+A doctrinal heuristic $h_D$ is admissible if the doctrine $D$ correctly identifies the elements of a legal claim and assigns non-negative estimated costs that do not exceed actual proving costs.  If $h_D$ is admissible, $A^*$ search using $h_D$ is guaranteed to find the optimal legal argument.
+\end{theorem}
+
+\begin{proof}[Proof sketch]
+Follows directly from the admissibility theorem for $A^*$ \cite{hart1968}.  The key observation is that legal doctrines that decompose claims into elements (e.g., duty $+$ breach $+$ causation $+$ damages) produce heuristics that sum estimated costs of remaining elements.  Each element's estimated cost is a lower bound (the element might be easier to prove than estimated), so the sum is a lower bound on the total remaining cost.
+\end{proof}
+
+\begin{remark}[Inadmissible Heuristics in Legal Practice]
+Not all legal strategies correspond to admissible heuristics.  An \emph{overaggressive} legal theory overestimates the ease of the path (underestimates cost), leading the search toward arguments that fail at trial.  An \emph{overconservative} theory overestimates the remaining cost, leading to settlement when litigation would have succeeded.  The admissibility framework provides a formal criterion for evaluating legal strategies: an admissible strategy is one that never overestimates ease and therefore never misses a winning argument.
+\end{remark}
+
+\subsection{Adversarial Pathfinding: Plaintiff vs.\ Defendant}
+
+Litigation is not single-agent pathfinding---it is \emph{adversarial}.  The plaintiff seeks a path from $c_0$ to $G$; the defendant seeks to block that path or show that a shorter path leads to a different goal $G_\delta$ (dismissal, judgment for defendant).
+
+\begin{definition}[Adversarial Legal Search]
+An \emph{adversarial legal search} is a two-player game on $\mathcal{K}$:
+\begin{itemize}
+    \item \textbf{Plaintiff (maximizer):} Seeks to minimize $\BF_{\text{law}}(\gamma_\pi)$ to $G_\pi$ (the desired remedy).
+    \item \textbf{Defendant (minimizer):} Seeks to either (a) show no path to $G_\pi$ exists (motion to dismiss), (b) increase $\BF_{\text{law}}(\gamma_\pi)$ above the burden-of-proof threshold, or (c) establish a shorter path to $G_\delta$ (affirmative defense, counterclaim).
+\end{itemize}
+The \emph{minimax value} of the dispute is:
+\begin{equation}
+V(c_0) = \min_{\gamma_\delta} \max_{\gamma_\pi} \left[ \BF_{\text{law}}(\gamma_\delta) - \BF_{\text{law}}(\gamma_\pi) \right]
+\label{eq:minimax}
+\end{equation}
+If $V(c_0) > 0$, the plaintiff prevails (the plaintiff's path is shorter than any defense); if $V(c_0) \leq 0$, the defendant prevails.
+\end{definition}
+
+\begin{remark}[Motions as Search Pruning]
+Procedural motions correspond to search-pruning operations:
+\begin{itemize}
+    \item \textbf{Motion to dismiss (12(b)(6)):} The defendant claims that even taking all facts as true, no path from $c_0$ to $G$ exists within the legal constraints.  This is a claim that $G$ is \emph{unreachable} from $c_0$ in $\mathcal{K}$---a graph-connectivity assertion.
+    \item \textbf{Summary judgment:} The defendant claims that on the undisputed facts, the shortest path from $c_0$ leads to $G_\delta$, not $G_\pi$.  No adversarial search is needed because the edge weights are determined by stipulated facts.
+    \item \textbf{Motion in limine:} Exclusion of evidence corresponds to removing edges from the judicial complex---eliminating argument paths that rely on the excluded evidence.
+\end{itemize}
+\end{remark}
+
+\subsection{Burden of Proof as Graph Distance}
+
+\begin{proposition}[Burden of Proof]
+\label{prop:burden}
+The \emph{burden of proof} in a legal proceeding is the shortest-path distance from the plaintiff's initial vertex $c_0$ to the nearest vertex in the goal region $G$:
+\begin{equation}
+\text{Burden}(c_0, G) = \min_{\gamma} \BF_{\text{law}}(\gamma) \quad \text{s.t. } \gamma \text{ starts at } c_0,\; \gamma \text{ ends in } G
+\label{eq:burden}
+\end{equation}
+Different standards of proof correspond to different thresholds on this distance:
+\begin{itemize}
+    \item \textbf{Preponderance of the evidence:} $\BF_{\text{law}}(\gamma^*_\pi) < \BF_{\text{law}}(\gamma^*_\delta)$ --- the plaintiff's optimal path is shorter than the defendant's.
+    \item \textbf{Clear and convincing evidence:} $\BF_{\text{law}}(\gamma^*_\pi) < \alpha \cdot \BF_{\text{law}}(\gamma^*_\delta)$ for some $\alpha < 1$ --- substantially shorter.
+    \item \textbf{Beyond reasonable doubt:} $\BF_{\text{law}}(\gamma^*_\pi) < \epsilon$ for small $\epsilon$ --- the path to guilt is so short (the evidence so strong) that no reasonable alternative path exists.
+\end{itemize}
+\end{proposition}
+
+\begin{remark}[Burden-Shifting as Weight Re-Assignment]
+When the burden shifts (e.g., under \emph{McDonnell Douglas}), the edge weights change: dimensions that the plaintiff previously had to traverse are now the defendant's responsibility.  Formally, burden-shifting re-assigns which party bears the cost of movement along each dimension.  The total path cost is conserved---only the allocation between parties changes.  This is consistent with the liability conservation principle (Theorem~\ref{thm:liability_conservation}).
+\end{remark}
+
+\subsection{Settlement as Shortcut}
+
+\begin{definition}[Settlement Region]
+A \emph{settlement} is a vertex $c_s \in \mathcal{K}$ (or a new point interpolated between vertices) that both parties prefer to the expected outcome of continued litigation:
+\begin{equation}
+c_s \in \{ c \in \mathcal{K} \mid U_\pi(c) > \mathbb{E}[U_\pi(\gamma^*_\pi)] \text{ and } U_\delta(c) > \mathbb{E}[U_\delta(\gamma^*_\delta)] \}
+\label{eq:settlement}
+\end{equation}
+where $U_\pi, U_\delta$ are the utility functions of plaintiff and defendant, and $\gamma^*_\pi, \gamma^*_\delta$ are their respective optimal paths.
+\end{definition}
+
+Settlement occurs when the graph distance from the current vertex to a mutually acceptable vertex is shorter than either party's litigation path.
+
+\begin{proposition}[Settlement Existence]
+\label{prop:settlement}
+A non-empty settlement region exists whenever the sum of both parties' expected litigation costs exceeds the graph distance between their goal regions:
+\begin{equation}
+\mathbb{E}[\BF_{\text{law}}(\gamma^*_\pi)] + \mathbb{E}[\BF_{\text{law}}(\gamma^*_\delta)] > d_{\mathcal{K}}(G_\pi, G_\delta)
+\label{eq:settlement_exists}
+\end{equation}
+This explains the empirical observation that the vast majority of legal disputes settle: litigation costs (path lengths) almost always exceed the distance between the parties' positions.
+\end{proposition}
+
+\subsection{Appeals as Path Re-Evaluation}
+
+An appeal is not a new search---it is a \emph{re-evaluation} of the trial court's path under modified edge weights:
+
+\begin{itemize}
+    \item \textbf{De novo review:} The appellate court re-runs the $A^*$ search from scratch with the same start and goal but potentially different heuristics (different legal interpretations).
+    \item \textbf{Abuse of discretion:} The appellate court checks only whether the trial court's path is \emph{within a neighborhood} of the optimal path---whether the chosen path's cost is within a tolerance $\epsilon$ of the shortest path.
+    \item \textbf{Clearly erroneous:} The appellate court checks whether the trial court's path crosses a regime boundary that it should not have crossed (factual error) or fails to cross one that it should have (missed element of the claim).
+\end{itemize}
+
+
+%==============================================================================
+\section{Stare Decisis as Weight Deformation}
+\label{sec:curvature}
+%==============================================================================
+
+\subsection{Precedent as Edge-Weight Modification}
+
+Each judicial decision modifies the edge weights in the neighborhood of the decided case's vertex:
+
+\begin{definition}[Precedential Weight Deformation]
+A binding precedent $P$ at vertex $c_P \in \mathcal{K}$ with holding $H_P$ modifies the edge weights of all edges incident to vertices near $c_P$:
+\begin{equation}
+w(c_i \to c_j) \to w(c_i \to c_j) + \Delta w(c_i \to c_j; P)
+\label{eq:precedent}
+\end{equation}
+where $\Delta w$ is concentrated on edges near $c_P$ (the precedent affects factually similar cases) and encodes the holding $H_P$.  The deformation's magnitude decays with graph distance from $c_P$:
+\begin{equation}
+|\Delta w(c_i \to c_j; P)| \sim \frac{w_P}{d_{\mathcal{K}}(c_i, c_P)^n}
+\label{eq:decay}
+\end{equation}
+where $w_P$ is the precedential weight (Supreme Court $>$ Circuit Court $>$ District Court) and $d_{\mathcal{K}}$ is the shortest-path distance in $\mathcal{K}$.
+\end{definition}
+
+\begin{remark}[Path-Dependence of Legal Reasoning]
+In a region of $\mathcal{K}$ with many precedents (high vertex density), the edge weights are heavily modified.  This means legal reasoning is \emph{path-dependent}: the order in which you traverse precedents matters.  Following a cycle of citations may yield a non-trivial holonomy---a ``legal Wilson loop'' detectable by the test of Proposition~\ref{prop:wilson}.
+
+In a sparse region (novel legal questions), the edge weights are close to their baseline values: there is more freedom (fewer precedential constraints) but also less guidance (fewer heuristic functions to steer the search).
+\end{remark}
+
+\subsection{Overruling as Graph Surgery}
+
+\begin{definition}[Legal Phase Transition]
+\emph{Overruling} a precedent $P$ is a discrete graph surgery on $\mathcal{K}$:
+\begin{equation}
+w(c_i \to c_j) \to w(c_i \to c_j) - \Delta w(c_i \to c_j; P) + \Delta w(c_i \to c_j; P')
+\label{eq:overrule}
+\end{equation}
+where $P'$ is the new precedent replacing $P$.  This is a \emph{legal phase transition}: the filtration structure changes, vertices that were previously on one side of a regime boundary may now be on the other, and the shortest-path structure of $\mathcal{K}$ is discontinuously altered.
+\end{definition}
+
+\begin{example}[Brown v.\ Board of Education]
+The overruling of \emph{Plessy v.\ Ferguson} (1896) by \emph{Brown v.\ Board of Education} (1954) is a phase transition in the equal-protection region of $\mathcal{K}$.  Under Plessy, edges connecting ``separate but equal'' vertices to the ``constitutional'' region had finite weight.  Under Brown, those edges acquired infinite weight (or were removed entirely): separation itself violates equal protection.  The entire neighborhood of racial-segregation vertices was disconnected from the constitutional subcomplex, and previously ``legal'' vertices became unreachable by any constitutionally valid path.
+\end{example}
+
+
+%==============================================================================
+\section{Worked Examples}
+\label{sec:examples}
+%==============================================================================
+
+\subsection{Example 1: Fourteenth Amendment Challenge}
+
+\textbf{Scenario:} A state enacts a statute $\ell$ that restricts voting access in a way that disproportionately affects a racial minority.
+
+\textbf{Analysis on $\mathcal{K}$:}
+\begin{enumerate}
+    \item \textbf{Start node $c_0$:} A vertex representing a voter from the affected minority who is prevented from voting.
+    \item \textbf{Goal region $G$:} Vertices representing restoration of voting access (the statute is struck down or enjoined).
+    \item \textbf{LIP test:} Apply the party-identity transformation $\tau_g$ (change the voter's race while preserving all other facts).  If the statute would not restrict voting access for the transformed party, the statute is LIP-violating.
+    \item \textbf{Topological test:} Compute $\widetilde{H}_1^{\text{path}}(\C_\ell; \Z)$ --- the first path homology group of the constitutional subcomplex with the statute.  The statute creates a new directed 1-cycle: a directed circuit where (a) the Equal Protection Clause guarantees equal voting rights, (b) the statute restricts those rights for a protected class, (c) the restriction survives strict scrutiny only if narrowly tailored to a compelling interest, and (d) the disproportionate impact prevents the cycle from being a boundary.  The non-trivial path-homology class flags the statute as unconstitutional.
+    \item \textbf{Balance violation:} The statute destroys entitlements for the affected minority (right to vote) without creating correlative entitlements elsewhere---a violation of the liability--damages balance within the closed system of the state's electoral framework.
+\end{enumerate}
+
+\subsection{Example 2: Statutory Conflict}
+
+\textbf{Scenario:} Federal statute $A$ requires companies to disclose certain data.  State statute $B$ prohibits disclosure of the same data.  A company operating in both jurisdictions faces contradictory obligations.
+
+\textbf{Analysis on $\mathcal{K}$:}
+\begin{enumerate}
+    \item \textbf{Start node:} The vertex representing the company's legal position (possesses data, subject to both jurisdictions).
+    \item \textbf{Goal region:} Vertices representing a legal state where the company is in compliance.
+    \item \textbf{The problem:} No path exists.  Compliance with $A$ requires traversing edges that $B$ blocks (assigns infinite weight); compliance with $B$ requires remaining at vertices that $A$ forbids.  The company's vertex is in a \emph{graph trap}---a connected component from which no path reaches any goal vertex.
+    \item \textbf{Wilson loop test:} The cycle $A \to B \to A$ in the citation graph produces a non-trivial holonomy: starting from ``in compliance,'' applying $A$'s requirement and then $B$'s prohibition returns to the same factual vertex but with contradictory Hohfeldian labels.  The non-trivial directed cycle in $\widetilde{H}_1^{\text{path}}(\mathcal{K}; \Z)$ identifies the specific conflict.
+    \item \textbf{Resolution:} The Supremacy Clause is a topological constraint: $\widetilde{H}_1^{\text{path}}(\C; \Z)$ requires that federal-law directed paths be traversable.  The state statute creates a directed cycle that is not a boundary in $\C$, flagging preemption.
+\end{enumerate}
+
+\subsection{Example 3: Precedent Overruling}
+
+\textbf{Scenario:} The Supreme Court considers overruling a 40-year-old precedent $P$ that established a particular interpretation of the Commerce Clause.
+
+\textbf{Analysis on $\mathcal{K}$:}
+\begin{enumerate}
+    \item \textbf{Current structure:} Precedent $P$ at vertex $c_P$ has modified edge weights throughout the Commerce Clause neighborhood.  Hundreds of subsequent cases ($c_1, \ldots, c_n$) have been decided with these modified weights, creating a web of reliance interests.
+    \item \textbf{Phase transition cost:} Overruling $P$ changes the edge weights discontinuously (Equation~\ref{eq:overrule}).  The cost is proportional to the number of cases that must be re-evaluated:
+    \begin{equation}
+    \text{Cost}_{\text{overrule}} = \sum_{i=1}^n w_{P_i} \cdot |\Delta w(c_i, \cdot\,; P)|
+    \label{eq:overrule_cost}
+    \end{equation}
+    \item \textbf{Stare decisis as inertia:} The doctrine of stare decisis corresponds to a \emph{cost barrier} around established precedents---the legal system's inertia against weight changes.  The height of the barrier is the accumulated reliance interest.
+    \item \textbf{Decision criterion:} The Court overrules $P$ when the topological benefit (removing a constitutional inconsistency, reducing Wilson loop complexity) exceeds the transition cost.  This is a graph optimization problem: find the weight perturbation that minimizes total re-evaluation cost while restoring topological consistency.
+\end{enumerate}
+
+
+%==============================================================================
+\section{Implementation Considerations}
+\label{sec:implementation}
+%==============================================================================
+
+\subsection{From Theory to Computation}
+
+Because the judicial complex $\mathcal{K}$ is a discrete object (a weighted simplicial complex), the framework is directly implementable using standard algorithms.  The key computational tasks are:
+
+\begin{enumerate}
+    \item \textbf{Complex construction:} Build $\mathcal{K}$ from case databases (vertices), citation networks (edges), and the NLP scoring pipeline of Section~\ref{sec:calibration} (attribute vectors and edge weights).
+
+    \item \textbf{LBI computation:} Compute the Legal Bond Index from existing case databases by applying bond-preserving transformations to case descriptions and measuring outcome variance.
+
+    \item \textbf{Topological constitutionality test:} Given a proposed statute, compute the path homology $\widetilde{H}_n^{\text{path}}(\C_\ell; \Z)$ of the modified constitutional subcomplex and compare with the baseline $\widetilde{H}_n^{\text{path}}(\C; \Z)$.  This is a finite linear-algebra computation on the directed path complex \cite{grigoryan2014}, analogous to Smith normal form for simplicial homology.
+
+    \item \textbf{Shortest-path computation:} Given a legal dispute, compute the minimum-cost path through $\mathcal{K}$ using $A^*$ with doctrinal heuristics.  This is a standard graph algorithm with well-understood complexity guarantees.
+
+    \item \textbf{Wilson loop computation:} Identify non-trivial cycles in the citation graph whose holonomy (change in Hohfeldian labels around the cycle) is non-trivial.  This is cycle enumeration plus label-transport computation on a finite graph.
+\end{enumerate}
+
+\subsection{Relationship to Existing Infrastructure}
+
+An existing open-source library \cite{anon2026b} provides the core infrastructure for the parent framework:
+
+\begin{itemize}
+    \item \textbf{Moral Tensors} generalize directly to \textbf{Legal Tensors}---8-dimensional vectors representing legal states.
+    \item \textbf{Bond Index} generalizes to the \textbf{Legal Bond Index} with no architectural change (only the transformation set and dimension definitions change).
+    \item \textbf{$D_4$ gauge operations} extend to $D_4 \rtimes D_4$ operations on the full Hohfeldian octad.
+    \item \textbf{Governance pipelines} adapt to \textbf{judicial governance}---a pipeline where legal evaluations occur before action in legal-AI systems.
+\end{itemize}
+
+An extension module would add statute parsing, precedent-graph construction, and the topological constitutionality test.
+
+\subsection{The Role of Continuous Mathematics}
+\label{sec:discrete}
+
+This paper takes the discrete judicial complex $\mathcal{K}$ as primary, but continuous differential geometry plays a supporting role in two ways:
+
+\begin{enumerate}
+    \item \textbf{Theoretical motivation.}  The concepts of gauge invariance, conservation laws, and topological obstruction originate in continuous mathematics (Noether's theorem, fiber bundles, homotopy theory).  These concepts \emph{transfer} to the discrete setting: path homology on directed graphs is the discrete analogue of de Rham cohomology on manifolds, and graph automorphisms are the discrete analogue of continuous gauge symmetries.  The continuous theory motivates the discrete constructions and provides intuition for what the algorithms compute.
+
+    \item \textbf{Continuum limit.}  As case law becomes dense (Remark~\ref{rem:continuum}), the judicial complex approximates a continuous Riemannian manifold.  This continuum limit may be useful for theoretical analysis (e.g., deriving scaling laws for the growth of the legal system, or proving asymptotic optimality results), even though the computational framework operates on finite graphs.
+\end{enumerate}
+
+An open question is whether discrete Ricci curvature \cite{ollivier2009}---a notion of curvature defined on graphs without reference to a continuous manifold---can capture the ``precedential curvature'' of Section~\ref{sec:curvature} in a way that enables quantitative measurement of how heavily precedent constrains legal reasoning in a given region of $\mathcal{K}$.  This is an active area of research in discrete geometry with direct legal applications.
+
+
+%==============================================================================
+\section{Conclusion}
+\label{sec:conclusion}
+%==============================================================================
+
+\subsection{Summary of Contributions}
+
+This paper makes seven contributions:
+
+\begin{enumerate}
+    \item \textbf{The Judicial Complex:} A formal construction of the space of legal states as a weighted simplicial complex $\mathcal{K}$ with eight legal dimensions, NLP-derived attribute vectors, and a filtration encoding regime boundaries.
+
+    \item \textbf{Legal Invariance Principles:} The LIP and JBIP, extending the EIP and BIP from ethics to law, with the demonstration that equal protection and due process are formally instances of these principles.
+
+    \item \textbf{The Octahedral Gauge Group:} Extension of the $D_4$ gauge group to $D_4 \rtimes D_4$ for the full Hohfeldian octad, with Wilson loop detection of judicial inconsistency.
+
+    \item \textbf{Topological Constitutionality:} A formal criterion---preservation of the path homology of the constitutional subcomplex---for determining whether a statute is constitutional.  This criterion is machine-checkable via finite linear algebra on the directed citation graph.
+
+    \item \textbf{Liability--Damages Conservation:} Discrete balance laws derived from the symmetries of the judicial complex, establishing that within closed bilateral disputes, Hohfeldian entitlements are conserved---adjudication redistributes rather than creates or destroys liability.
+
+    \item \textbf{Legal Disputes as Pathfinding:} Formalization of litigation as shortest-path computation on $\mathcal{K}$, with burden of proof as graph distance and settlement as shortcut.
+
+    \item \textbf{Empirical Calibration Pipeline:} A concrete NLP-based procedure (embedding, dimension scoring, outcome-based weight fitting) for translating case text into the computable edge weights of $\mathcal{K}$.
+\end{enumerate}
+
+\subsection{What Changes}
+
+If this framework is correct, several consequences follow:
+
+\begin{enumerate}
+    \item \textbf{Constitutional review becomes computational.}  Instead of debating what ``equal protection'' \emph{means}, we compute whether a statute preserves the path homology of the constitutional subcomplex.  Semantic arguments are replaced by topological calculations on a finite directed graph.
+
+    \item \textbf{Judicial consistency becomes measurable.}  The Legal Bond Index provides a quantitative metric for whether a court system treats equivalent cases equivalently.  This is not a subjective assessment---it is a number, computable from public records.
+
+    \item \textbf{Legal contradictions become detectable.}  Wilson loops identify specific cycles in the citation graph that produce contradictions.  These are bugs in the legal system---and they can be found systematically rather than waiting for a case to expose them.
+
+    \item \textbf{Precedent has a formal structure.}  Stare decisis is not a vague norm but a measurable weight deformation in $\mathcal{K}$.  The cost of overruling a precedent is computable.  The benefit of overruling is also computable (reduction of cycle complexity).
+
+    \item \textbf{Legal AI becomes governable.}  Any AI system that operates in the legal domain (contract drafting, case prediction, legal research) can be required to satisfy the JBIP---to produce outputs that are invariant under Hohfeldian-preserving transformations.  The Legal Bond Index provides the test.
+\end{enumerate}
+
+\subsection{Limitations and Objections}
+
+Several important limitations and potential objections must be acknowledged.
+
+\paragraph{The indeterminacy objection.}
+Critical legal studies scholars (and, differently, legal realists) argue that law is fundamentally indeterminate---that for any legal dispute, competent lawyers can construct plausible arguments for either side, and the outcome depends on extra-legal factors (ideology, power, social context) rather than on the structure of legal materials \cite{kennedy1986}.  If this is correct, then a framework that formalizes legal \emph{structure} misses the point.
+
+Our response is that indeterminacy is a property of the \emph{edge weights}, not of the \emph{complex}.  The judicial complex $\mathcal{K}$ and its topological constraints exist even when the weights are poorly calibrated or contested.  The framework does not claim to eliminate indeterminacy; it claims to \emph{localize} it.  When two competent arguments lead to different outcomes, the framework identifies where they diverge---which dimension of $\mathcal{K}$ they weight differently, which regime boundary they draw in different locations.  This is a gain even if the framework cannot resolve the disagreement.
+
+\paragraph{The dimensionality problem.}
+The choice of eight dimensions for the attribute vectors is a modeling decision, not a derivation.  Different legal traditions may require different dimensionalities, and within any tradition, reasonable analysts may disagree about which dimensions are fundamental.  The framework's validity does not depend on the specific choice of dimensions---the theorems hold for any finite-dimensional simplicial complex---but its \emph{utility} depends on a good choice.  The NLP calibration pipeline of Section~\ref{sec:calibration} provides a data-driven approach, but has not yet been validated on legal corpora.
+
+\paragraph{The operationalization gap.}
+While the discrete framework is closer to implementation than a continuous-manifold approach, significant work remains.  Computing path homology for a realistic constitutional subcomplex, calibrating edge weights from case-law corpora via the NLP pipeline, and building the citation-network complex are each substantial engineering tasks.  The framework provides the target architecture; filling it with data and validated algorithms is future work.
+
+\paragraph{The normative question.}
+Making legal structure explicit and machine-checkable raises normative concerns.  If constitutionality is ``reduced'' to a topological test, does that impoverish constitutional discourse?  We argue that it does not---just as making bridge loads computable does not impoverish structural engineering.  The computation \emph{supplements} rather than replaces human judgment, and the framework explicitly preserves the role of the metric (which encodes judicial discretion) as a site of human decision-making.
+
+\subsection{Open Problems}
+
+\begin{enumerate}
+    \item \textbf{Calibration of the judicial metric.}  The metric must be calibrated from statutory databases and case-law corpora.  This is a large-scale empirical programme analogous to calibrating the moral metric in the parent framework.
+
+    \item \textbf{Cross-jurisdictional invariance.}  The framework should exhibit invariance across legal systems (common law, civil law, Islamic law, customary law) at the level of structural features, just as the parent moral framework exhibits cross-lingual invariance.  Empirical testing is needed.
+
+    \item \textbf{Computability of $\pi_1(\C)$.}  For a realistic constitutional constraint manifold, computing the fundamental group may be intractable in general.  Approximation algorithms and sufficient conditions for constitutionality (simpler topological tests that imply $\pi_1$ preservation) are needed.
+
+    \item \textbf{Dynamic complexes.}  The judicial complex evolves as new statutes are enacted and new cases are decided.  A theory of complex dynamics---how $\mathcal{K}$ changes over time, and whether the changes preserve desirable topological properties---is needed.
+
+    \item \textbf{International law.}  Extension to the international legal order, where there is no single constitutional constraint manifold but rather a network of treaty obligations with their own topological structure.
+\end{enumerate}
+
+\subsection{The Stakes}
+
+Law is the operating system of civilization.  It runs on natural language---an expressive but ambiguous substrate that permits the very inconsistencies and manipulations the law is supposed to prevent.  Algorithmic Jurisprudence does not propose to replace natural language with mathematics.  It proposes to give the law a \emph{second representation}---a combinatorial and topological one---in which the structural properties that matter (consistency, invariance, constitutionality) are \emph{computable}.
+
+The legal system already demands what the framework formalizes: equal treatment, procedural regularity, constitutional conformity, consistent application of precedent.  It demands these properties in prose.  We propose to demand them in topology.
+
+The mathematics is the same mathematics that underlies network analysis, computational topology, and graph algorithms.  The application is new.  The stakes are as old as law itself.
+
+
+%==============================================================================
+% References
+%==============================================================================
+\begin{thebibliography}{99}
+
+\bibitem{anon2026a}
+[Anonymous], ``[Details omitted for double-blind review],'' 2026.
+
+\bibitem{anon2026b}
+[Anonymous], ``[Details omitted for double-blind review],'' 2026.
+
+\bibitem{anon2025a}
+[Anonymous], ``[Details omitted for double-blind review],'' 2025.
+
+\bibitem{anon2025b}
+[Anonymous], ``[Details omitted for double-blind review],'' 2025.
+
+\bibitem{anon2025c}
+[Anonymous], ``[Details omitted for double-blind review],'' 2025.
+
+\bibitem{hohfeld1913}
+W.~N. Hohfeld, ``Some Fundamental Legal Conceptions as Applied in Judicial Reasoning,'' \emph{Yale Law Journal}, vol.~23, no.~1, pp.~16--59, 1913.
+
+\bibitem{hohfeld1917}
+W.~N. Hohfeld, ``Fundamental Legal Conceptions as Applied in Judicial Reasoning---Second Article,'' \emph{Yale Law Journal}, vol.~26, no.~8, pp.~710--770, 1917.
+
+\bibitem{hart1968}
+P.~E. Hart, N.~J. Nilsson, and B.~Raphael, ``A Formal Basis for the Heuristic Determination of Minimum Cost Paths,'' \emph{IEEE Transactions on Systems Science and Cybernetics}, vol.~4, no.~2, pp.~100--107, 1968.
+
+\bibitem{dworkin1986}
+R.~Dworkin, \emph{Law's Empire}. Harvard University Press, 1986.
+
+\bibitem{sergot1986}
+M.~J. Sergot, F.~Sadri, R.~A. Kowalski, F.~Kriwaczek, P.~Hammond, and H.~T. Cory, ``The British Nationality Act as a Logic Program,'' \emph{Communications of the ACM}, vol.~29, no.~5, pp.~370--386, 1986.
+
+\bibitem{mcnamara2014}
+P.~McNamara, ``Deontic Logic,'' in \emph{The Stanford Encyclopedia of Philosophy} (E.~N. Zalta, ed.), Spring 2014 Edition.
+
+\bibitem{surden2014}
+H.~Surden, ``Machine Learning and Law,'' \emph{Washington Law Review}, vol.~89, no.~1, pp.~87--115, 2014.
+
+\bibitem{ashley2017}
+K.~D. Ashley, \emph{Artificial Intelligence and Legal Analytics: New Tools for Law Practice in the Digital Age}. Cambridge University Press, 2017.
+
+\bibitem{kennedy1986}
+D.~Kennedy, ``Freedom and Constraint in Adjudication: A Critical Phenomenology,'' \emph{Journal of Legal Education}, vol.~36, no.~4, pp.~518--562, 1986.
+
+\bibitem{hart1961}
+H.~L.~A. Hart, \emph{The Concept of Law}. Oxford University Press, 1961.
+
+\bibitem{posner1990}
+R.~A. Posner, \emph{The Problems of Jurisprudence}. Harvard University Press, 1990.
+
+\bibitem{sunstein1996}
+C.~R. Sunstein, \emph{Legal Reasoning and Political Conflict}. Oxford University Press, 1996.
+
+\bibitem{noether1918}
+E.~Noether, ``Invariante Variationsprobleme,'' \emph{Nachrichten von der Gesellschaft der Wissenschaften zu G\"{o}ttingen}, pp.~235--257, 1918.
+
+\bibitem{grigoryan2012}
+A.~Grigor'yan, Y.~Lin, Y.~Muranov, and S.-T. Yau, ``Homologies of Path Complexes and Digraphs,'' \emph{arXiv preprint arXiv:1207.2834}, 2012.
+
+\bibitem{grigoryan2014}
+A.~Grigor'yan, Y.~Lin, Y.~Muranov, and S.-T. Yau, ``Homotopy Theory for Digraphs,'' \emph{Pure and Applied Mathematics Quarterly}, vol.~10, no.~4, pp.~619--674, 2014.
+
+\bibitem{feng2022}
+F.~Feng, Y.~Yang, D.~Cer, N.~Arivazhagan, and W.~Wang, ``Language-agnostic BERT Sentence Embedding,'' in \emph{Proceedings of the 60th Annual Meeting of the Association for Computational Linguistics (ACL)}, pp.~878--891, 2022.
+
+\bibitem{edelsbrunner2010}
+H.~Edelsbrunner and J.~L. Harer, \emph{Computational Topology: An Introduction}. American Mathematical Society, 2010.
+
+\bibitem{ollivier2009}
+Y.~Ollivier, ``Ricci Curvature of Markov Chains on Metric Spaces,'' \emph{Journal of Functional Analysis}, vol.~256, no.~3, pp.~810--864, 2009.
+
+\bibitem{whitney1965}
+H.~Whitney, ``Tangents to an Analytic Variety,'' \emph{Annals of Mathematics}, vol.~81, no.~3, pp.~496--549, 1965.
+
+\bibitem{thiele2026}
+L.~Thiele, ``Independent Replication of MoralVector Decodability and Cross-Lingual Transfer in LaBSE Embeddings,'' Dept.\ Computer Science, UCLA, Tech.\ Rep., 2026.
+
+\end{thebibliography}
+
+\end{document}

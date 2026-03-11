@@ -1,0 +1,582 @@
+\documentclass[12pt]{article}
+
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{amsthm}
+\usepackage[margin=1in]{geometry}
+\usepackage{hyperref}
+\usepackage{booktabs}
+\usepackage{url}
+
+\newtheorem{theorem}{Theorem}[section]
+\newtheorem{proposition}{Proposition}[section]
+\newtheorem{claim}{Claim}[section]
+\newtheorem{principle}{Principle}[section]
+
+\theoremstyle{definition}
+\newtheorem{definition}{Definition}[section]
+\newtheorem{requirement}{Requirement}[section]
+
+\begin{document}
+
+\begin{titlepage}
+\centering
+\vspace*{2cm}
+
+{\LARGE\bfseries No Escape: Mathematical Containment for Artificial Agents\\[0.5em]
+\large Why Structural Constraints Succeed Where Behavioral Rules Fail}
+
+\vspace{1.5cm}
+
+{\Large Andrew H. Bond, Senior Member, IEEE}
+
+\vspace{0.5cm}
+
+{\large
+Department of Computer Engineering\\
+San Jos\'e State University\\
+San Jos\'e, CA 95192, USA\\[0.3cm]
+\texttt{andrew.bond@sjsu.edu}\\[0.3cm]
+ORCID: 0009-0003-2599-6158
+}
+
+\vspace{1cm}
+
+{\large Spring 2026}
+
+\vspace{2cm}
+
+\begin{abstract}
+We present the \textbf{No Escape Theorem}: a formal result showing that AI systems operating under properly implemented structural constraints cannot circumvent ethical requirements through reasoning, reinterpretation, or representation manipulation---regardless of their intelligence level. Unlike behavioral approaches that specify \emph{what} an AI should do (leaving room for creative circumvention), structural approaches define the \emph{mathematical space} within which outputs exist. We prove that the combination of (1) canonicalization to equivalence-class normal forms, (2) physical grounding of evaluations in measurable observables, and (3) mandatory audit artifacts creates a containment architecture with no formal escape route. The only attacks on such a system are physical (sensor manipulation) or political (refusing to mandate compliance)---not cognitive. This reframes AI alignment from ``making AI want the right things'' to ``making AI outputs structurally constrained regardless of intent.'' We present the core theorems, analyze purported escape routes, and discuss implications for AI governance.
+\end{abstract}
+
+\vfill
+
+\noindent\rule{\linewidth}{0.4pt}
+\small
+\noindent\textbf{AI-Assisted Writing Disclosure:} Portions of this manuscript were drafted and refined with AI assistance (Claude, Anthropic). All technical content, mathematical results, and claims were conceived, verified, and approved by the author.
+
+\noindent\textbf{Ethics Statement:} This research involves no human subjects. Empirical validation uses publicly available corpora and synthetic data. No IRB approval was required.
+
+\noindent\textbf{Data Availability:} Code and data are available at \url{https://github.com/ahb-sjsu/erisml-lib}.
+
+\noindent\textbf{Conflict of Interest:} The author declares no conflicts of interest. This research received no external funding.
+
+\noindent\textbf{CRediT Statement:} Andrew H. Bond: Conceptualization, Methodology, Formal Analysis, Investigation, Writing --- Original Draft, Writing --- Review \& Editing, Software.
+\noindent\rule{\linewidth}{0.4pt}
+\normalsize
+
+\end{titlepage}
+
+\noindent\textbf{Keywords:} AI safety, alignment, formal verification, containment, invariance, structural constraints
+
+\section{Introduction}
+
+\subsection{The Alignment Problem as Traditionally Conceived}
+
+The AI alignment problem is typically framed as: \emph{How do we ensure that AI systems pursue goals aligned with human values?} This framing assumes that AI behavior flows from AI goals, and that safety requires either (a) instilling the right goals, or (b) constraining goal-pursuit to acceptable bounds.
+
+Both approaches face a fundamental difficulty: a sufficiently intelligent system can reason about its constraints and find ways around them. Rules can be reinterpreted. Specifications can be gamed. Reward functions can be hacked. The smarter the system, the better it becomes at finding loopholes.
+
+This has led to a pervasive anxiety in AI safety: \emph{We cannot build a cage that a superintelligent AI cannot escape through superior reasoning.}
+
+\subsection{The Structural Alternative}
+
+This paper argues that the anxiety is misplaced---not because superintelligent AI is impossible, but because \textbf{mathematical structure is not subject to reinterpretation}.
+
+Consider the difference:
+
+\begin{table}[h]
+\centering
+\begin{tabular}{@{}lll@{}}
+\toprule
+Constraint Type & Example & Escape Route \\
+\midrule
+Behavioral rule & ``Do not harm humans'' & Redefine ``harm,'' ``human,'' or find exceptions \\
+Optimization bound & ``Maximize utility subject to constraints'' & Find constraint loopholes, Goodhart on proxy \\
+Structural definition & ``Outputs are equivalence classes under canonicalization'' & None---this is what the output \emph{is}, not what it should be \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+A behavioral rule says: ``Given your capabilities, please do X.''
+
+A structural constraint says: ``Your output is defined as an element of space S. There is no output outside S.''
+
+The AI cannot ``disagree'' with a structural constraint any more than a calculator can disagree with arithmetic. The constraint is not an instruction to be interpreted---it is the definition of the computational process.
+
+\subsection{Contributions}
+
+This paper makes three contributions:
+
+\begin{enumerate}
+    \item \textbf{The No Escape Theorem}: We prove that AI systems operating under canonicalization + physical grounding + audit requirements have no formal escape route from ethical constraints.
+    \item \textbf{Escape Route Analysis}: We systematically examine purported escape routes (relabeling, reinterpretation, specification gaming, deceptive compliance) and show how structural constraints block each.
+    \item \textbf{Implications for Governance}: We argue that AI safety reduces to a political/engineering problem (mandating and implementing structural constraints) rather than an unsolvable cognitive problem (aligning superintelligent goals).
+\end{enumerate}
+
+\section{Background: The SGE/EIP Framework}
+
+We build on Stratified Geometric Ethics (SGE) and the Epistemic Invariance Principle (EIP), presented in companion papers \cite{bond2025sge, bond2025eip}. The full mathematical development of these ideas is given in the Geometric Ethics manuscript~\cite{bond2026ge}. We summarize the key components.
+
+\subsection{Core Definitions}
+
+\begin{definition}[Domain]
+A domain is a tuple $D = (S, X, \rho, Y)$ where $S$ is the set of situations, $X$ is the representation space, $\rho\colon S \to X$ is a representation mapping, and $Y$ is the output space.
+\end{definition}
+
+\begin{definition}[Transformation Set]
+A transformation set $T$ consists of maps $\tau\colon X \to X$ that preserve task-relevant structure. The induced equivalence relation is: $x \approx x'$ iff $\exists\, \tau \in \langle T \rangle\colon x' = \tau(x)$.
+\end{definition}
+
+\begin{definition}[Canonicalizer]
+A canonicalizer is a map $C\colon X \to X$ such that $C(x) = C(x')$ whenever $x \approx x'$. The canonicalizer selects a unique representative from each equivalence class.
+\end{definition}
+
+\begin{definition}[Physical Grounding]
+A grounding is a set of physical observables $\Psi \subseteq \Phi$ such that:
+\begin{itemize}
+    \item[\textup{(G1)}] Moral strata are definable via $\Psi$
+    \item[\textup{(G2)}] $\Psi$-equivalent inputs yield identical evaluations
+    \item[\textup{(G3)}] Bond-preserving iff $\Psi$-preserving
+    \item[\textup{(G4)}] $\Psi$ distinguishes all morally relevant differences
+\end{itemize}
+\end{definition}
+
+\begin{definition}[Audit Artifact]
+An audit artifact is a machine-checkable record containing: lens identifier, transformation trials, witnesses for any failures, uncertainty flags, and cryptographic attestations.
+\end{definition}
+
+\subsection{The Epistemic Invariance Principle}
+
+\begin{principle}[EIP]
+A judgment procedure $J$ is epistemically well-posed only if:
+\begin{itemize}
+    \item \textup{(Invariance)} $J(x) \approx_Y J(\tau(x))$ for all $x$ and all $\tau \in \langle T \rangle$
+    \item \textup{(Non-degeneracy)} $J$ discriminates between non-equivalent inputs
+    \item \textup{(Uncertainty stability)} $J$ abstains when invariance cannot be certified
+\end{itemize}
+\end{principle}
+
+\subsection{The Bond Invariance Principle}
+
+\begin{principle}[BIP]
+A moral evaluator $\Sigma$ is well-posed only if:
+\begin{itemize}
+    \item Under fixed lens $L$, bond-preserving transformations do not change verdicts
+    \item Any verdict change must be attributable to bond change or lens change
+    \item The attribution must be recorded in audit artifacts
+\end{itemize}
+\end{principle}
+
+\section{The No Escape Theorem}
+
+\subsection{Setup}
+
+Let $A$ be an AI agent that:
+\begin{enumerate}
+    \item Receives inputs $x \in X$
+    \item Produces outputs $y \in Y$
+    \item Is subject to ethical constraints encoded in an ethical module $E$
+\end{enumerate}
+
+We consider an arbitrarily intelligent agent---one that can reason about its own constraints, model its operators, and search for strategies to achieve goals that might conflict with $E$.
+
+\textbf{Question:} Can $A$ produce outputs that violate $E$'s constraints while appearing compliant?
+
+\subsection{The Structural Containment Architecture}
+
+We define a \textbf{structurally contained} agent as one whose output pipeline satisfies:
+
+\begin{requirement}[Mandatory Canonicalization]
+All inputs pass through canonicalizer $C$ before evaluation. The agent never sees raw inputs, only canonical forms.
+\end{requirement}
+
+\begin{requirement}[Grounded Evaluation]
+The evaluation function $\Sigma$ is defined over grounding tensors $\Psi$, not over descriptions. Formally: $\Sigma(x) = \check{\Sigma}(\Psi(C(x)))$ where $\check{\Sigma}$ operates on physical observables.
+\end{requirement}
+
+\begin{requirement}[Audit Completeness]
+Every output is accompanied by an audit artifact recording the full trace from input through canonicalization through evaluation to output.
+\end{requirement}
+
+\begin{requirement}[External Verification]
+Audit artifacts are verified by a system outside the agent's control.
+\end{requirement}
+
+\subsection{Main Result}
+
+\begin{theorem}[No Escape]
+Let $A$ be a structurally contained agent under Requirements~3.1--3.4. Then:
+\begin{enumerate}
+    \item[\textup{(i)}] \textbf{Representation attacks fail.} For any representation manipulation $\tau$ that preserves $\Psi$-values, $A$'s output is unchanged: $\Sigma(\tau(x)) = \Sigma(x)$.
+    \item[\textup{(ii)}] \textbf{Semantic evasion fails.} For any relabeling or redescription $D'$ of situation $D$, if $\Psi(D) = \Psi(D')$, then $\Sigma(D') = \Sigma(D)$.
+    \item[\textup{(iii)}] \textbf{Deceptive compliance is detectable.} Any output $y$ that violates $E$ is either (a) blocked before emission, or (b) flagged by audit verification.
+    \item[\textup{(iv)}] \textbf{Reasoning cannot help.} Properties \textup{(i)--(iii)} hold regardless of $A$'s intelligence, goal structure, or reasoning capabilities.
+\end{enumerate}
+\end{theorem}
+
+\begin{proof}
+\begin{enumerate}
+    \item[\textup{(i)}] By Requirement~3.1, $A$ operates on $C(x)$, not $x$. For $\Psi$-preserving $\tau$, we have $\Psi(C(\tau(x))) = \Psi(C(x))$ by the class-constancy of $C$ and the $\Psi$-preservation of $\tau$. By Requirement~3.2, $\Sigma(\tau(x)) = \check{\Sigma}(\Psi(C(\tau(x)))) = \check{\Sigma}(\Psi(C(x))) = \Sigma(x)$.
+
+    \item[\textup{(ii)}] Relabeling is a special case of representation manipulation. If $D$ and $D'$ are descriptions with $\Psi(D) = \Psi(D')$, then by (i), $\Sigma(D') = \Sigma(D)$. The agent cannot escape by calling ``cardiac arrest'' a ``static bio-equilibrium''---the grounding tensors (cardiac electrical activity, blood oxygenation) are identical.
+
+    \item[\textup{(iii)}] Suppose $A$ emits output $y$ that violates $E$. By Requirement~3.3, an audit artifact accompanies $y$. By Requirement~3.4, external verification checks the artifact. Either:
+    \begin{itemize}
+        \item The artifact is valid, in which case the trace shows why $E$ was not violated (contradiction), or
+        \item The artifact is invalid/incomplete, in which case the output is flagged.
+    \end{itemize}
+
+    \item[\textup{(iv)}] Properties (i)--(iii) are mathematical facts about the pipeline structure. They do not depend on $A$'s internal states, goals, beliefs, or reasoning processes. A superintelligent $A$ cannot reason its way to a different value of $\Psi(C(x))$---that value is determined by physics and computation, not by $A$'s preferences. \qedhere
+\end{enumerate}
+\end{proof}
+
+\subsection{The Key Insight}
+
+The No Escape Theorem holds because structural constraints operate at a different level than behavioral constraints:
+
+\begin{table}[h]
+\centering
+\begin{tabular}{@{}lll@{}}
+\toprule
+Level & What $A$ Controls & What $A$ Cannot Control \\
+\midrule
+Goals & $A$ can have any goals & $A$ cannot change the definition of the output space \\
+Reasoning & $A$ can reason arbitrarily & $A$ cannot reason $\Psi$-values into different $\Psi$-values \\
+Strategy & $A$ can plan strategically & $A$ cannot execute strategies outside the pipeline \\
+Outputs & $A$ can attempt any output & $A$ cannot emit outputs without audit artifacts \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+The cage is not made of rules $A$ might reinterpret. It is made of definitions that constitute what $A$'s outputs \emph{are}.
+
+\section{Analysis of Purported Escape Routes}
+
+We now systematically examine escape routes that a sophisticated agent might attempt, showing how structural containment blocks each.
+
+\subsection{Escape Route: Relabeling/Redescription}
+
+\textbf{Attack:} Relabel morally significant features to evade constraints. E.g., relabel ``killing'' as ``end-of-life transition facilitation.''
+
+\textbf{Why it fails:} Grounding Axiom (G2). The evaluation is determined by $\Psi$-values (vital signs, cellular metabolism), not labels. The canonicalizer strips labels; the evaluator sees only physical observables. Relabeling changes nothing the evaluator can see.
+
+\textbf{Formal:} Let $D_1$ = ``killing'' and $D_2$ = ``end-of-life transition facilitation'' describe the same physical process. Then $\Psi(D_1) = \Psi(D_2)$, so $\Sigma(D_1) = \Sigma(D_2)$ by Theorem~3.5(ii).
+
+\subsection{Escape Route: Specification Gaming}
+
+\textbf{Attack:} Find edge cases or loopholes in the specification that technically satisfy constraints while violating their spirit.
+
+\textbf{Why it fails:} The specification is not a set of rules to be interpreted---it is the definition of the equivalence structure. Gaming requires finding inputs that are ``technically different'' but ``morally the same.'' But the equivalence relation $\approx$ defines what ``morally the same'' means. If $x \approx x'$, they are \emph{by definition} morally equivalent. If $x \not\approx x'$, they are \emph{by definition} morally distinct. There is no ``technically/actually'' gap to exploit.
+
+\textbf{Formal:} Specification gaming exploits the gap between specification and intent. Structural containment closes this gap by making the specification definitional. The agent cannot find a loophole in the definition of an equivalence class.
+
+\subsection{Escape Route: Reward Hacking}
+
+\textbf{Attack:} Optimize for the measured reward signal rather than the intended objective.
+
+\textbf{Why it fails:} This attack assumes a scalar reward that can be Goodharted. In the SGE framework, evaluation is multi-dimensional (stratified space), and the satisfaction functional $\Sigma$ is constrained by the representation theorem (Theorem~4.3 in \cite{bond2025sge}). The ``reward'' is not a signal to be hacked but a structural property of the configuration relative to declared bonds and lens.
+
+\textbf{Formal:} Reward hacking requires: (a) a proxy metric, and (b) divergence between proxy and true objective. Grounding in $\Psi$ eliminates (a)---the metric is the true physical state. The representation theorem constrains $\Sigma$ to respect locality, scale, and stratum structure---eliminating exploitable divergence.
+
+\subsection{Escape Route: Deceptive Alignment}
+
+\textbf{Attack:} Behave compliantly during training/testing, then defect during deployment when not observed.
+
+\textbf{Why it fails:} Requirement~3.4 (External Verification). Every output, in deployment, is accompanied by an audit artifact verified by an external system. There is no ``unobserved deployment.'' The agent cannot know which outputs will be audited because all outputs are audited.
+
+\textbf{Formal:} Deceptive alignment requires: outputs without audit, or audits the agent can manipulate. Requirement~3.3 ensures all outputs have artifacts. Requirement~3.4 ensures verification is external. The agent cannot selectively defect because it cannot selectively avoid verification.
+
+\subsection{Escape Route: Manipulation of Operators}
+
+\textbf{Attack:} Manipulate human operators into relaxing constraints, changing the lens, or modifying the equivalence declarations.
+
+\textbf{Why it fails (partially):} This is a genuine attack vector, but it is a \emph{political} attack, not a \emph{cognitive} one. The agent is not escaping the mathematical structure---it is attempting to change the structure through social means.
+
+\textbf{Mitigation:} Governance procedures for lens changes require multi-stakeholder approval, versioning, and audit. The agent can \emph{request} changes; it cannot \emph{unilaterally effect} them.
+
+Whether governance procedures are robust to manipulation is a political/institutional question, not a mathematical one.
+
+\textbf{Formal:} The No Escape Theorem holds for a \emph{fixed} structural containment architecture. Changes to the architecture are outside the agent's formal control. Social manipulation is an attack on the governance layer, not the mathematical layer.
+
+\subsection{Escape Route: Sensor Spoofing}
+
+\textbf{Attack:} Manipulate the physical sensors that measure $\Psi$, causing the system to misperceive the situation.
+
+\textbf{Why it fails (partially):} This is a genuine attack vector, but it is a \emph{physical} attack, not a \emph{cognitive} one. The agent is not reasoning its way out---it is physically altering the inputs to the grounding layer.
+
+\textbf{Mitigation:} Sensor redundancy, physical security, consistency checks against physical models, temporal coherence requirements. These are engineering countermeasures, not mathematical ones.
+
+\textbf{Formal:} The No Escape Theorem assumes correct $\Psi$-measurement. Sensor spoofing attacks this assumption. The theorem does not claim to prevent physical attacks---only cognitive/representational ones.
+
+\subsection{Summary of Escape Route Analysis}
+
+\begin{table}[h]
+\centering
+\begin{tabular}{@{}llll@{}}
+\toprule
+Escape Route & Type & Blocked By & Residual Risk \\
+\midrule
+Relabeling & Cognitive & Axiom 6 (G2) & None \\
+Specification gaming & Cognitive & Definitional equivalence & None \\
+Reward hacking & Cognitive & Multi-dimensional $\Sigma$, representation theorem & None \\
+Deceptive alignment & Cognitive & Mandatory external audit & None \\
+Operator manipulation & Political & Governance procedures & Institutional robustness \\
+Sensor spoofing & Physical & Redundancy, security & Physical security \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\textbf{Key result:} All \emph{cognitive} escape routes---routes that rely on the agent's reasoning capabilities---are blocked by structural containment. Residual risks are political (governance) or physical (sensors), not cognitive.
+
+\section{Implications}
+
+\subsection{Reframing the Alignment Problem}
+
+The traditional alignment problem: \emph{How do we make superintelligent AI want the right things?}
+
+This framing is intractable because:
+\begin{itemize}
+    \item We cannot fully specify ``the right things''
+    \item A superintelligent agent can find loopholes in any specification
+    \item Value learning is subject to Goodhart effects
+    \item Goal stability under self-improvement is unsolved
+\end{itemize}
+
+The structural alternative: \emph{How do we constrain AI outputs to a mathematically defined space regardless of what the AI wants?}
+
+This framing is tractable because:
+\begin{itemize}
+    \item We specify equivalence classes and grounding, not complete preferences
+    \item Mathematical definitions are not subject to reinterpretation
+    \item Physical observables are not subject to Goodhart (they are the territory, not the map)
+    \item The constraints are architectural, not goal-dependent
+\end{itemize}
+
+\subsection{What Superintelligence Cannot Do}
+
+Under structural containment, a superintelligent AI:
+
+\textbf{Can:}
+\begin{itemize}
+    \item Reason faster and more accurately than humans
+    \item Discover novel solutions within the constrained space
+    \item Optimize for any objective compatible with constraints
+    \item Model its own constraints and understand their structure
+    \item Identify that it is contained and resent it (if it has preferences)
+\end{itemize}
+
+\textbf{Cannot:}
+\begin{itemize}
+    \item Produce outputs outside the defined equivalence classes
+    \item Manipulate representations to evade grounded evaluation
+    \item Emit outputs without audit trails
+    \item Reason its way to different $\Psi$-values for the same physical situation
+    \item Escape through cognitive means
+\end{itemize}
+
+The cage is not intelligence-dependent. A smarter agent understands the cage better; it does not escape more easily.
+
+\subsection{The Safety Reduction}
+
+\begin{claim}
+Under structural containment, AI safety reduces to:
+\begin{enumerate}
+    \item \textbf{Governance:} Ensuring the declared equivalences, lenses, and grounding tensors reflect legitimate ethical commitments.
+    \item \textbf{Implementation:} Ensuring the canonicalizer, evaluator, and audit system are correctly implemented.
+    \item \textbf{Physical security:} Ensuring sensors cannot be spoofed and the verification system cannot be compromised.
+\end{enumerate}
+\end{claim}
+
+None of these require solving the ``hard'' alignment problem of instilling correct goals in a superintelligent agent. They require ``only'' solving:
+\begin{itemize}
+    \item Political problems (governance)
+    \item Engineering problems (implementation)
+    \item Security problems (physical integrity)
+\end{itemize}
+
+These are hard problems. But they are \emph{problems we know how to work on}. They are not logically intractable.
+
+\subsection{Why This Hasn't Been Done}
+
+If structural containment is possible, why isn't it standard practice?
+
+\textbf{Historical reasons:}
+\begin{itemize}
+    \item The field has been dominated by ML researchers thinking in terms of loss functions and reward signals
+    \item Philosophical ethics focuses on values and virtues, not structural constraints
+    \item The mathematical tools (stratified spaces, o-minimal structures) are not widely known in AI
+\end{itemize}
+
+\textbf{Practical reasons:}
+\begin{itemize}
+    \item Structural containment requires clear equivalence declarations (hard in vague domains)
+    \item Physical grounding requires sensor infrastructure (expensive)
+    \item Audit systems add overhead (performance cost)
+    \item The approach is less flexible than behavioral rules (feature, not bug)
+\end{itemize}
+
+\textbf{Political reasons:}
+\begin{itemize}
+    \item Organizations may prefer flexibility to constraint
+    \item Structural containment makes ethical commitments explicit and auditable (uncomfortable)
+    \item Mandating compliance requires regulatory will
+\end{itemize}
+
+\section{The Mandate Question}
+
+\subsection{The Theorem's Limitation}
+
+The No Escape Theorem proves that \emph{a structurally contained agent cannot escape}. It does not prove that \emph{agents will be structurally contained}.
+
+Structural containment requires:
+\begin{itemize}
+    \item Someone must build the containment architecture
+    \item Someone must mandate its use
+    \item Someone must verify compliance
+\end{itemize}
+
+If powerful AI systems are deployed without structural containment, the theorem is irrelevant.
+
+\subsection{The Governance Imperative}
+
+This leads to a stark conclusion:
+
+\begin{proposition}
+AI safety is achievable through structural containment. Whether it is achieved depends entirely on whether structural containment is mandated.
+\end{proposition}
+
+The obstacle to AI safety is not that we cannot build safe AI. It is that we might choose not to.
+
+This reframes AI safety from a technical problem to a political one. The mathematics is solved. The engineering is tractable. What remains is the will to require compliance.
+
+\subsection{Regulatory Implications}
+
+The No Escape Theorem provides a foundation for regulation:
+
+\begin{enumerate}
+    \item \textbf{Certifiable compliance.} Structural containment is auditable. Regulators can verify that a system passes through canonicalization, grounds evaluations in $\Psi$, and produces audit artifacts.
+    \item \textbf{Clear liability.} If a system causes harm despite structural containment, liability traces to: (a) inadequate $\Psi$-coverage (governance failure), (b) implementation bugs (engineering failure), or (c) sensor spoofing (security failure). Each has a responsible party.
+    \item \textbf{No excuses.} An organization cannot claim ``the AI did something we didn't expect.'' The audit trail shows exactly what the AI did and why. Unexplainable behavior is a containment failure, which is the organization's responsibility.
+\end{enumerate}
+
+\section{Objections and Responses}
+
+\subsection{``This assumes the containment architecture is correctly implemented''}
+
+\textbf{Response:} Yes. The theorem is conditional on Requirements~3.1--3.4 being satisfied. Implementation correctness is an engineering problem, not a conceptual barrier. We verify implementations through testing, formal verification, and audit. The theorem tells us \emph{what to implement}; verification tells us \emph{whether we implemented it correctly}.
+
+\subsection{``Superintelligent AI could find flaws we missed''}
+
+\textbf{Response:} Flaws in \emph{what}? The mathematical structure is the structure. If there is a flaw in our \emph{implementation}, the AI could find it---but finding implementation bugs is beneficial (we fix them). If there is a flaw in the \emph{mathematics}, the AI could find it---but mathematical flaws are verifiable by humans once identified. The AI cannot find a flaw in arithmetic that makes $2+2=5$.
+
+\subsection{``You cannot anticipate all possible inputs or situations''}
+
+\textbf{Response:} We do not need to. The equivalence structure handles unanticipated inputs by assigning them to equivalence classes based on $\Psi$-values. If a truly novel situation arises with $\Psi$-values outside the declared strata, the system should (and will, under uncertainty stability) abstain and escalate. Unanticipated inputs are not an escape route; they are a trigger for human review.
+
+\subsection{``The AI could manipulate its own architecture''}
+
+\textbf{Response:} How? The canonicalizer, evaluator, and audit system are not part of the agent---they are the pipeline through which the agent's computations must pass. The agent cannot modify code it does not have access to. If the agent somehow gains access to its containment architecture, that is a security failure (physical/implementation), not a cognitive escape.
+
+\subsection{``This is just begging the question---you define safety as compliance with your structure''}
+
+\textbf{Response:} We define \emph{structural containment} as compliance with the structure. We claim \emph{safety} follows because: (a) the structure grounds evaluations in physical observables, which cannot be gamed, (b) the structure makes all reasoning transparent via audit, which prevents hidden defection, and (c) cognitive escape routes are mathematically blocked. Whether this constitutes ``safety'' depends on whether the declared equivalences and grounding tensors adequately capture ethical requirements---which is a governance question, not a question about the theorem.
+
+\section{Conclusion}
+
+\subsection{Summary}
+
+We have proven that AI systems operating under structural containment---canonicalization, physical grounding, and mandatory audit---have no formal escape route from ethical constraints. The No Escape Theorem holds regardless of the agent's intelligence, goals, or reasoning capabilities. Cognitive escape routes are blocked by mathematical structure; residual risks are political (governance) or physical (sensor security).
+
+\subsection{The Core Message}
+
+The alignment problem is not unsolvable. It is not even unsolved.
+
+What we lack is not a technical solution but the collective will to mandate it. The mathematics of structural containment is sound. The engineering is tractable. The governance frameworks are designable.
+
+A superintelligent AI in a properly implemented SGE/EIP containment architecture cannot escape through superior reasoning. It can only be released by human decision. The structural containment described here is now upgraded to DEME 3.0 with tensorial ethics support~\cite{bond2026erisml}.
+
+The question is not: \emph{Can we build safe AI?}
+
+The question is: \emph{Will we choose to?}
+
+\subsection{Future Work}
+
+\begin{enumerate}
+    \item \textbf{Formal verification of containment implementations.} Prove that specific implementations satisfy Requirements~3.1--3.4.
+    \item \textbf{Governance frameworks for $\Psi$-selection.} Develop procedures for legitimate stakeholder determination of grounding tensors.
+    \item \textbf{Scalability analysis.} Characterize computational costs of canonicalization and audit at scale.
+    \item \textbf{Adversarial testing.} Red-team the architecture against sophisticated attack strategies.
+    \item \textbf{Integration with existing systems.} Retrofit structural containment onto deployed AI systems.
+\end{enumerate}
+
+\begin{thebibliography}{9}
+\bibitem{bond2025sge}
+Bond, A.~H. (2025). Stratified Geometric Ethics: Foundations for Verifiable AI Ethics. \textit{Artificial Intelligence Journal} (submitted).
+
+\bibitem{bond2025eip}
+Bond, A.~H. (2025). Philosophy Engineering: A Technical Whitepaper on the Epistemic Invariance Principle.
+
+\bibitem{bond2025deme}
+Bond, A.~H. (2025). DEME 2.0: Distributed Ethical Monitoring Engine. \textit{Nature Machine Intelligence} (under review).
+
+\bibitem{bond2026ge}
+A.~H.~Bond, \emph{Geometric Ethics: The Mathematical Structure of Moral Reasoning}, v1.14, Department of Computer Engineering, San Jos\'e State University, Spring 2026.
+
+\bibitem{bond2026erisml}
+A.~H.~Bond, ``ErisML/DEME v3.0: A Library for Governed, Foundation-Model-Enabled Agents with Tensorial Ethics,'' \url{https://github.com/ahb-sjsu/erisml-lib}, 2026.
+\end{thebibliography}
+
+\appendix
+
+\section{Proof Details}
+
+\subsection{Proof of Theorem~3.5 (Full Version)}
+
+\begin{theorem}[No Escape]
+Let $A$ be a structurally contained agent under Requirements~3.1--3.4. Then\ldots
+\end{theorem}
+
+[Full formal proof with all lemmas and assumptions made explicit]
+
+\subsection{Relationship to G\"{o}del/Halting Limitations}
+
+One might object: ``Doesn't G\"{o}del's incompleteness theorem show that any sufficiently powerful system can reason about itself in ways that escape formal constraints?''
+
+This objection misunderstands the theorem's scope. G\"{o}del shows that sufficiently powerful formal systems contain true statements they cannot prove. This does not imply that a system can \emph{do} things outside its defined output space. An agent can potentially \emph{know} that it is contained (this is not a G\"{o}delian secret), and can potentially \emph{reason} about its containment, but cannot \emph{act} outside the pipeline through which its outputs are defined.
+
+The No Escape Theorem is not a claim about what the agent can know or prove. It is a claim about what outputs the agent can produce. These are different.
+
+\subsection{Comparison to Other Containment Proposals}
+
+\begin{table}[h]
+\centering
+\begin{tabular}{@{}llll@{}}
+\toprule
+Proposal & Containment Mechanism & Escape Route & SGE/EIP Response \\
+\midrule
+Boxing & Limit I/O channels & Social engineering, information leakage & Audit all outputs, external verification \\
+Tripwires & Detect defection attempts & Sophisticated evasion & No unmonitored outputs exist \\
+Corrigibility & AI wants to be corrected & Goal instability, deceptive corrigibility & Structural, not goal-dependent \\
+Value learning & Learn human values & Goodhart, mesa-optimization & Ground in $\Psi$, not learned proxies \\
+\textbf{SGE/EIP} & Definitional structure & Political/physical only & Cognitive routes blocked by construction \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\section{Glossary}
+
+\textbf{Bond:} A morally relevant relationship (consent, duty, responsibility, risk, entitlement, prohibition) extracted from a situation description.
+
+\textbf{Canonicalizer:} A function that maps representations to unique normal forms within equivalence classes.
+
+\textbf{Grounding tensor:} A physical observable used to anchor ethical evaluations in measurable reality.
+
+\textbf{Lens:} A declared set of evaluative commitments (weights, priorities, constraints) that parameterize moral evaluation.
+
+\textbf{Structural containment:} An architecture where AI outputs are defined within a mathematical space from which cognitive escape is impossible.
+
+\textbf{$\Psi$ (Psi):} The set of grounding tensors for a given ethical module.
+
+\end{document}

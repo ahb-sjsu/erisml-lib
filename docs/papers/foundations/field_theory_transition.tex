@@ -1,0 +1,524 @@
+\documentclass[12pt,letterpaper]{article}
+
+% --- Packages ---
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{amsmath,amssymb,amsfonts,amsthm}
+\usepackage{mathtools}
+\usepackage{geometry}
+\usepackage{hyperref}
+\usepackage{cleveref}
+\usepackage{enumitem}
+\usepackage{booktabs}
+\usepackage{microtype}
+\usepackage{natbib}
+\usepackage{graphicx}
+\usepackage{float}
+\usepackage{xcolor}
+\usepackage{fancyhdr}
+\usepackage{longtable}
+\usepackage{array}
+
+\geometry{margin=1in}
+\hypersetup{
+    colorlinks=true,
+    linkcolor=blue!70!black,
+    citecolor=green!50!black,
+    urlcolor=blue!60!black
+}
+
+% --- Header/Footer ---
+\pagestyle{fancy}
+\fancyhf{}
+\fancyhead[L]{\small\textit{From Pathfinding to Field Theory}}
+\fancyhead[R]{\small\textit{March 2026}}
+\fancyfoot[C]{\thepage}
+\renewcommand{\headrulewidth}{0.4pt}
+
+% --- Theorem environments ---
+\newtheorem{theorem}{Theorem}[section]
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{corollary}[theorem]{Corollary}
+\newtheorem{proposition}[theorem]{Proposition}
+\theoremstyle{definition}
+\newtheorem{definition}[theorem]{Definition}
+\newtheorem{example}[theorem]{Example}
+\newtheorem{remark}[theorem]{Remark}
+
+% --- Custom commands ---
+\newcommand{\R}{\mathbb{R}}
+\newcommand{\calM}{\mathcal{M}}
+\newcommand{\calA}{\mathcal{A}}
+\newcommand{\calG}{\mathcal{G}}
+\newcommand{\calL}{\mathcal{L}}
+\newcommand{\calR}{\mathcal{R}}
+\newcommand{\BF}{\mathrm{BF}}
+
+% ============================================================
+\title{%
+\vspace{-1cm}
+{\LARGE\textbf{From Pathfinding to Field Theory}}\\[0.8em]
+{\Large The Transition from $A^*$ on the Moral Manifold\\to the Moral Field Equation}\\[1em]
+{\normalsize March 2026}
+}
+
+\author{Andrew H. Bond\\
+Department of Computer Engineering\\
+San Jos\'{e} State University\\
+\texttt{andrew.bond@sjsu.edu}}
+
+\date{}
+
+\begin{document}
+
+\maketitle
+
+\begin{abstract}
+The Geometric Ethics framework models moral reasoning as $A^*$ pathfinding on a nine-dimensional Riemannian manifold $\calM$, where obligations define heuristics, the metric tensor encodes trade-offs, and behavioral friction provides the cost function. This paper articulates the transition from pathfinding---which is analogous to classical particle mechanics---to a full moral field theory, analogous to the transition from Newtonian mechanics to general relativity. We identify four concrete mathematical upgrades required: (1)~from scalar heuristics to the dynamic moral metric tensor $g_{\mu\nu}$, (2)~from search-cost minimization to the moral Lagrangian and the Hamilton principle for ethics, (3)~from flat-space pathfinding to the Riemann curvature tensor and moral holonomy, and (4)~from local gauge constraints to a candidate moral field equation relating curvature to moral sources. We report that CHSH Bell tests ($N = 600$) have empirically falsified the original $SU(2)_I \times U(1)_H$ gauge group proposal, establishing the classical $D_4 \times U(1)_H$ as the correct symmetry of the moral manifold. The paper locates each upgrade within the existing framework, identifies what is proven, what is empirically confirmed, and what remains open, and argues that the $A^*$ model and the field theory are not competitors but layers of the same architecture: $A^*$ is the computationally tractable approximation; the field equation is the generating theory from which the approximation derives.
+\end{abstract}
+
+\tableofcontents
+
+% ============================================================
+\section{Introduction: The Fog and the Geometry}
+% ============================================================
+
+The central computational claim of Philosophy Engineering is that moral reasoning is equivalent to $A^*$ pathfinding on the moral manifold $\calM$ \cite{bond2026pe}. This claim is precise: optimal moral reasoning---selecting the action that minimizes total behavioral friction while satisfying all hard constraints---is $A^*$ search with the metric tensor providing edge weights and moral obligations serving as pre-compiled heuristic functions.
+
+This model is powerful. It is computationally tractable, algorithmically concrete, and produces verifiable paths through moral space. But it is, in the language of physics, a \emph{particle mechanics}: it finds the best path through a fixed landscape. It does not explain where the landscape comes from.
+
+The transition we articulate in this paper is the moral analogue of the most consequential transition in the history of physics: from Newton's mechanics (``find the path of a particle in a fixed gravitational field'') to Einstein's general relativity (``the distribution of matter determines the curvature, and the curvature determines the paths''). In moral terms:
+
+\begin{quote}
+$A^*$ is how we navigate the fog. The field equation is what the fog actually \emph{is}.
+\end{quote}
+
+The four upgrades required for this transition are not speculative additions to the framework. Three of the four are already developed in the Geometric Ethics monograph \cite{bond2026ge}: the moral metric tensor (Chapters 6, 9), the moral Lagrangian (Chapter 11), and the Riemann curvature tensor with its holonomy interpretation (Chapters 8--10). The fourth---the moral field equation itself---is the principal open problem of the research program (\cite{bond2026ge}, \S19.4).
+
+This paper serves three purposes: (i) to make the transition explicit for researchers approaching the framework from the computational ($A^*$) side, (ii) to provide a self-contained technical summary of each upgrade with references to the full proofs, and (iii) to correct a significant empirical finding---the falsification of the $SU(2)$ gauge group---that reshapes the field-theoretic architecture.
+
+
+% ============================================================
+\section{The $A^*$ Foundation: What We Have}
+\label{sec:astar}
+% ============================================================
+
+We begin by specifying exactly what the $A^*$ model provides, so that the upgrades are defined against a precise baseline.
+
+\subsection{The Moral Manifold}
+
+The moral manifold $\calM$ is a nine-dimensional Whitney-stratified space whose coordinate axes correspond to the fundamental dimensions of moral variation \cite{bond2026ge}:
+
+\begin{enumerate}
+    \item $D_1$: Consequences / Welfare
+    \item $D_2$: Rights / Duties
+    \item $D_3$: Justice / Fairness
+    \item $D_4$: Autonomy / Agency
+    \item $D_5$: Privacy / Data Ethics
+    \item $D_6$: Societal / Environmental Impact
+    \item $D_7$: Virtue / Care
+    \item $D_8$: Procedural Legitimacy
+    \item $D_9$: Epistemic Status
+\end{enumerate}
+
+These nine dimensions are not an \emph{a priori} philosophical imposition. They are derived from a $3 \times 3$ scope/mode grid and have been empirically validated: linear probes trained on LaBSE embeddings decode all nine dimensions with F1 scores of 0.74--0.91 (mean 0.83), and cross-lingual transfer achieves F1 of 0.71--0.82 across six typologically diverse languages \cite{thiele2026}.
+
+\subsection{The $A^*$ Equivalence}
+
+\begin{theorem}[$A^*$ Equivalence, informal {\cite[KA-7]{bond2026pe}}]
+Optimal moral reasoning is equivalent to $A^*$ search on $\calM$ with:
+\begin{itemize}
+    \item \textbf{Cost function} $g(n)$: accumulated behavioral friction from the initial configuration to node $n$.
+    \item \textbf{Heuristic function} $h(n)$: an admissible estimate of remaining friction to the goal configuration. Moral obligations (``do not murder,'' ``keep promises'') serve as pre-compiled heuristics that steer search toward low-cost equilibria.
+\end{itemize}
+\end{theorem}
+
+The behavioral friction along a path $\gamma: [0,1] \to \calM$ is:
+\begin{equation}\label{eq:bf}
+\BF[\gamma] = \int_0^1 \sqrt{g_{\mu\nu}(\gamma(t))\, \dot{\gamma}^\mu(t)\, \dot{\gamma}^\nu(t)}\, dt
+\end{equation}
+
+where $g_{\mu\nu}$ is the moral metric tensor.
+
+\subsection{What $A^*$ Assumes}
+
+The $A^*$ model treats the following as \emph{given}:
+\begin{enumerate}
+    \item The metric $g_{\mu\nu}$ is fixed for a given context.
+    \item The manifold is discretized into a search graph.
+    \item The heuristic $h(n)$ is externally supplied (from obligations).
+    \item The topology is static---strata boundaries do not move during search.
+\end{enumerate}
+
+Each of these assumptions is relaxed in the field-theoretic extension.
+
+
+% ============================================================
+\section{Upgrade 1: From Heuristics to the Dynamic Moral Metric Tensor}
+\label{sec:metric}
+% ============================================================
+
+\subsection{The Static Picture}
+
+In the $A^*$ model, the cost of traversing an edge is a scalar weight derived from the metric tensor evaluated at that point. The metric is a fixed background structure---a map of the terrain that the pathfinder consults but does not modify.
+
+\begin{definition}[Moral Metric Tensor {\cite[Ch.~6]{bond2026ge}}]
+A \emph{moral metric tensor} $g_{\mu\nu}$ on $\calM$ is a symmetric, positive-definite bilinear form assigning to each point $x \in \calM$ an inner product on the tangent space $T_x\calM$:
+\[
+g_{\mu\nu}(x): T_x\calM \times T_x\calM \to \R
+\]
+The metric encodes the \emph{trade-off structure} of ethical reasoning: $g_{13}(x)$, for instance, quantifies how much ``fairness'' costs in units of ``consequences'' at the moral configuration $x$.
+\end{definition}
+
+Empirically, the metric has been calibrated from a corpus of 20,030 Dear Abby letters, yielding dimension-specific weights that range from 0.72 (epistemic status) to 1.00 (physical harm) \cite{bond2026ge}.
+
+\subsection{The Dynamic Upgrade}
+
+In the field-theoretic extension, the metric becomes \emph{dynamic}: it is not a fixed background but is itself determined by the distribution of moral commitments, relationships, and stakes.
+
+This is the precise analogue of the transition from Newtonian gravity (where the gravitational field is a fixed background) to general relativity (where the mass-energy distribution determines the metric, and the metric determines the motion).
+
+\begin{itemize}
+    \item \textbf{Fixed metric (A* model):} The trade-off between fairness and consequences is the same everywhere in moral space. Context-dependence is handled by selecting a governance profile (lens) that fixes the metric for a given evaluation.
+    \item \textbf{Dynamic metric (field theory):} The trade-off between fairness and consequences is itself determined by who is present, what relationships obtain, what commitments have been made, and what is at stake. The metric responds to the moral content of the situation.
+\end{itemize}
+
+The formal structure supporting this upgrade is already in place. The DEME 3.0 governance architecture specifies metric tensors as part of governance profiles \cite[Ch.~18]{bond2026ge}:
+\begin{equation}
+g_{\mu\nu}(x) = w_\mu(x)\, \delta_{\mu\nu} + c_{\mu\nu}(x)
+\end{equation}
+where $w_\mu(x)$ are context-dependent dimension weights and $c_{\mu\nu}(x)$ encodes cross-dimensional coupling. What the field equation would provide is the \emph{differential equation} that determines $g_{\mu\nu}$ from the sources.
+
+\subsection{Degeneracy and Incommensurability}
+
+A feature of the dynamic metric that has no analogue in $A^*$ pathfinding: if the metric is \emph{degenerate} at a point---if $\det(g_{\mu\nu}(x)) = 0$---then some moral dimensions become literally incommensurable at that configuration. No trade-off ratio exists. This is the geometric formalization of value incommensurability, the phenomenon that moral philosophers have long recognized but lacked a mathematical framework to express.
+
+In the $A^*$ model, degeneracy would manifest as infinite or undefined edge weights---a search failure. In the field theory, it is a geometric feature of the manifold: a signature of moral configurations where the ordinary calculus of trade-offs breaks down, and qualitatively different reasoning (stratified evaluation across Whitney strata) is required.
+
+
+% ============================================================
+\section{Upgrade 2: From Search Costs to the Moral Lagrangian}
+\label{sec:lagrangian}
+% ============================================================
+
+\subsection{The $A^*$ Cost Function}
+
+$A^*$ finds the path minimizing $f(n) = g(n) + h(n)$, where $g(n)$ is the accumulated cost and $h(n)$ is the heuristic estimate. This is discrete optimization: the algorithm explores nodes, evaluates edges, and selects the cheapest path.
+
+\subsection{The Lagrangian Upgrade}
+
+The field-theoretic replacement is the \emph{moral Lagrangian} $\calL$ and the associated \emph{action functional} $\calA$.
+
+\begin{definition}[Moral Action {\cite[\S11.4]{bond2026ge}}]
+The moral action along a path $\gamma: [0,T] \to \calM$ is:
+\begin{equation}
+\calA[\gamma] = \int_0^T \calL(\gamma(t), \dot{\gamma}(t))\, dt
+\end{equation}
+where the moral Lagrangian is:
+\begin{equation}\label{eq:lagrangian}
+\calL(\gamma, \dot{\gamma}) = \frac{1}{2} g_{\mu\nu}(\gamma)\, \dot{\gamma}^\mu\, \dot{\gamma}^\nu - V(\gamma)
+\end{equation}
+\end{definition}
+
+The Lagrangian has two terms:
+
+\begin{enumerate}
+    \item \textbf{Kinetic term:} $\frac{1}{2} g_{\mu\nu}\, \dot{\gamma}^\mu\, \dot{\gamma}^\nu$ --- the cost of moral change, measured by the metric. Rapid moral change costs more than gradual change. This generalizes the $A^*$ edge weight from a scalar to a quadratic form.
+
+    \item \textbf{Potential term:} $V(\gamma)$ --- the moral energy landscape.
+    \begin{itemize}
+        \item \textbf{High $V$:} Many obligations are operative and competing. Morally tense configurations: Sophie's Choice, trolley problems, conflicts between filial duty and professional responsibility.
+        \item \textbf{Low $V$:} Obligations satisfied or absent. Morally quiet equilibria: routine interactions, well-functioning relationships.
+        \item $V = -\infty$: Hard prohibitions. The potential wall that enforces absolute constraints---the geometric encoding of deontological side-constraints.
+    \end{itemize}
+\end{enumerate}
+
+\subsection{The Hamilton Principle for Ethics}
+
+The ``best path'' is no longer found by discrete search. It is the path where the action is \emph{stationary}:
+
+\begin{equation}
+\delta \calA[\gamma] = 0
+\end{equation}
+
+This yields the Euler-Lagrange equations:
+\begin{equation}\label{eq:euler-lagrange}
+g_{\mu\nu}\, \ddot{\gamma}^\nu + \Gamma_{\mu\nu\rho}\, \dot{\gamma}^\nu\, \dot{\gamma}^\rho = -\frac{\partial V}{\partial \gamma^\mu}
+\end{equation}
+
+This is the \emph{geodesic equation with a force term}. In the absence of a potential ($V = 0$), the moral trajectory is a geodesic---the path of least moral resistance. In the presence of a potential, moral considerations ``push'' the trajectory away from inertial drift.
+
+\subsection{Why This Matters: Noether's Theorem}
+
+The Lagrangian formulation is not merely an elegant restatement of $A^*$. It enables \emph{Noether's theorem}, which connects symmetries of the Lagrangian to conserved quantities.
+
+\begin{theorem}[Moral Noether's Theorem {\cite[Theorem 11.1]{bond2026ge}}]
+If the moral Lagrangian $\calL$ is invariant under re-description $\gamma^\mu \to \gamma^\mu + \epsilon\, \xi^\mu$ (the Bond Invariance Principle), then the Noether charge
+\begin{equation}
+\mathcal{H} = p_\mu\, \xi^\mu = g_{\mu\nu}\, \dot{\gamma}^\nu\, \xi^\mu
+\end{equation}
+is conserved along any extremal path, where $p_\mu = g_{\mu\nu}\, \dot{\gamma}^\nu$ is the moral momentum.
+\end{theorem}
+
+The conserved charge is \emph{harm}: harm cannot be created or destroyed by redescription. This result is unavailable in the $A^*$ formulation. The pathfinding model can find the cheapest path, but it cannot prove that the cost measure itself is invariant under relabeling. The Lagrangian formulation can.
+
+
+% ============================================================
+\section{Upgrade 3: From Flat-Space Pathfinding to the Riemann Curvature Tensor}
+\label{sec:curvature}
+% ============================================================
+
+\subsection{The Flat-Space Assumption}
+
+$A^*$ pathfinding implicitly assumes that the search graph is an adequate discretization of the underlying space. In a flat space, this assumption is benign: paths compose predictably, and the order of traversal does not affect the result.
+
+Moral space is not flat.
+
+\subsection{The Riemann Curvature Tensor}
+
+The Riemann curvature tensor $R^\mu{}_{\nu\alpha\beta}$ measures how much the moral ``direction'' changes when a vector is parallel-transported around a closed loop. In moral terms: if two agents start at the same moral configuration and reach the same conclusion by different paths, curvature implies they may arrive with different moral \emph{orientations}---different sensitivities, different priorities, different intuitive weightings of the dimensions.
+
+\begin{definition}[Moral Holonomy {\cite[\S8.9]{bond2026ge}}]
+The holonomy group $\mathrm{Hol}(\nabla, p)$ at a point $p \in \calM$ is the group of linear transformations of the tangent space $T_p\calM$ generated by parallel transport around all closed loops based at $p$. If the holonomy is non-trivial, moral reasoning is \emph{path-dependent}: the order in which moral considerations are encountered changes the outcome.
+\end{definition}
+
+\subsection{Consequences for $A^*$}
+
+In curved moral space, $A^*$ pathfinding faces a problem it was not designed to handle: the cost of a path depends not only on the edges traversed but on the \emph{order} of traversal, because the metric itself changes as the agent's moral orientation is parallel-transported along the path.
+
+This is not a deficiency of $A^*$; it is a fundamental feature of curved geometry. The $A^*$ model handles it implicitly (by evaluating the metric at each node), but the curvature tensor makes the path-dependence explicit and \emph{measurable}.
+
+\subsection{Empirical Status}
+
+The curvature of moral space is the next empirical frontier. The monograph states this directly: ``Curvature should produce measurable holonomy (untested: the next empirical frontier)'' \cite[\S22]{bond2026ge}. The non-abelian property of the $D_4$ gauge group ($sr \neq rs$) provides indirect evidence: the order in which Hohfeldian state transitions are applied changes the outcome, which is a discrete analogue of holonomy. But direct measurement of the Riemann tensor components from empirical data remains open.
+
+
+% ============================================================
+\section{Upgrade 4: The Moral Field Equation}
+\label{sec:field-equation}
+% ============================================================
+
+\subsection{The Deepest Open Problem}
+
+The first three upgrades extend the mathematical vocabulary. The fourth is the one that would unify everything: a \emph{moral field equation} relating the curvature of moral space to the distribution of moral sources.
+
+In general relativity, Einstein's field equation accomplishes this:
+\begin{equation}
+R_{\mu\nu} - \frac{1}{2}R\, g_{\mu\nu} = 8\pi G\, T_{\mu\nu}
+\end{equation}
+
+The left side is geometry (curvature). The right side is physics (matter-energy). The equation says: matter tells spacetime how to curve; spacetime tells matter how to move.
+
+The moral analogue would be:
+
+\begin{center}
+\begin{tabular}{ll}
+\toprule
+\textbf{General Relativity} & \textbf{Moral Geometry} \\
+\midrule
+Mass-energy distribution $T_{\mu\nu}$ & Distribution of commitments, relationships, stakes \\
+Spacetime metric $g_{\mu\nu}$ & Moral metric (trade-off structure) \\
+Einstein tensor $G_{\mu\nu}$ & Moral curvature tensor \\
+``Matter tells spacetime how to curve'' & ``Commitments tell moral space how to curve'' \\
+``Spacetime tells matter how to move'' & ``Moral curvature tells obligations how to evolve'' \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\subsection{Current Status: Analogy, Not Equation}
+
+The monograph is explicit about the epistemic status of this analogy:
+
+\begin{quote}
+``But the analogy is currently just an analogy. No moral field equation has been derived or proposed. The problem is to determine whether the analogy can be made precise---whether there exists a tensor equation relating the moral Ricci tensor to a `moral stress-energy tensor' that encodes the distribution of moral sources.'' \cite[\S19.4]{bond2026ge}
+\end{quote}
+
+This honesty is essential. A moral field equation would be ``the deepest result in geometric ethics---the analogue of Einstein's greatest achievement'' \cite[\S19.4]{bond2026ge}. It would:
+
+\begin{enumerate}
+    \item \textbf{Determine curvature from sources:} Given a distribution of moral commitments and relationships, derive the curvature---and thus the path-dependence, geodesics, and holonomy.
+    \item \textbf{Constrain the metric:} Provide differential equations for $g_{\mu\nu}$, constraining its form beyond what governance profiles alone can specify.
+    \item \textbf{Unify dynamics and structure:} Connect the dynamics of moral evolution (Chapter 10) with the statics of moral space (Chapters 5--8).
+\end{enumerate}
+
+\subsection{What Progress Requires}
+
+Three milestones define the research program \cite[\S19.4]{bond2026ge}:
+
+\textbf{Necessary condition:} Identification of the moral stress-energy tensor---the right-hand side of the equation. What are the ``sources'' of moral curvature? Commitments? Relationships? Stakes? Power differentials? The answer determines the form of the equation.
+
+\textbf{Intermediate result:} A proposed equation that is mathematically consistent (satisfies the contracted Bianchi identity, ensuring conservation), dimensionally correct, and qualitatively right (predicting curvature where curvature is expected).
+
+\textbf{Full result:} A field equation making quantitative predictions about curvature at specific points in moral space, testable against empirical data.
+
+
+% ============================================================
+\section{The Gauge Group: An Empirical Correction}
+\label{sec:gauge}
+% ============================================================
+
+The caller's framing references an ``Ethical Yang-Mills'' structure with gauge group $SU(2)_I \times U(1)_H$. This was indeed the original proposal. It has been \textbf{empirically falsified}.
+
+\subsection{The CHSH Tests}
+
+Direct tests of quantum contextuality in moral reasoning ($N = 600$ evaluations across four entangled-agent scenarios) found no violation of the CHSH inequality: all $|S| \leq 2$ \cite[\S12.9]{bond2026ge}. The Hardy non-locality test met 3 of 4 conditions but not the fourth. No-signaling conditions were satisfied in all scenarios ($p > 0.05$).
+
+\subsection{The Revised Gauge Group}
+
+The original $SU(2)_I \times U(1)_H$ predicted quantum contextuality with $|S|$ up to $2\sqrt{2} \approx 2.83$ for appropriate moral states. The data showed classical correlations only. The revised gauge group is:
+
+\begin{equation}
+\boxed{\calG_{\text{ethics}} = D_4 \times U(1)_H}
+\end{equation}
+
+where $D_4 = \langle r, s \mid r^4 = s^2 = e,\; srs = r^{-1} \rangle$ is the dihedral group of order 8 acting on the Hohfeldian square $\{O, C, L, N\}$ (Obligation, Claim, Liberty, No-right), and $U(1)_H$ is the continuous abelian group tracking harm/benefit magnitude.
+
+\subsection{What This Means for the Field Equation}
+
+The gauge group correction has a direct consequence for the field-theoretic architecture. The moral field equation is \emph{not} a non-abelian Yang-Mills equation with $SU(2)$ structure. It is a \emph{classical gauge theory} with:
+
+\begin{itemize}
+    \item A \textbf{discrete} component ($D_4$) governing deontic state transitions---non-abelian but finite, not requiring the machinery of continuous Lie groups.
+    \item A \textbf{continuous} component ($U(1)_H$) governing harm magnitude---abelian, generating the Noether conservation law for harm.
+\end{itemize}
+
+This simplifies the mathematical structure considerably. The field equation, if it exists, is closer in character to an Einstein-type equation (Riemannian geometry with a $U(1)$ gauge field) than to a full Yang-Mills theory. The discrete $D_4$ component enters through the stratification (boundary conditions at strata walls) rather than through the differential equation itself.
+
+This is an example of the framework's empirical discipline: a beautiful theoretical prediction ($SU(2)$ quantum contextuality in ethics) was tested and falsified, and the theory was revised accordingly.
+
+
+% ============================================================
+\section{$A^*$ and Field Theory: Not Competitors, but Layers}
+\label{sec:layers}
+% ============================================================
+
+The transition from $A^*$ to field theory is not a replacement. It is a \emph{layer decomposition} of the same architecture.
+
+\subsection{The Compilation Analogy}
+
+The monograph develops this relationship through the concept of \emph{compilation targets} \cite[\S20]{bond2026ge}:
+
+\begin{quote}
+``Each compilation target represents a different \emph{contraction} of the full ErisML specification---a mapping from the rich normative structure to a computationally tractable approximation. The information lost in compilation is the engineering analogue of the moral residue: normative structure that the computational backend cannot represent.''
+\end{quote}
+
+The layer structure is:
+
+\begin{center}
+\begin{tabular}{lll}
+\toprule
+\textbf{Layer} & \textbf{Physics Analogue} & \textbf{Moral Framework} \\
+\midrule
+Field equation & Einstein's field equations & Moral stress-energy $\to$ curvature \\
+Lagrangian dynamics & Analytical mechanics & Moral action, Noether conservation \\
+Geodesic paths & Particle mechanics & Moral trajectories, least friction \\
+$A^*$ pathfinding & Numerical integration & Discretized search on the manifold \\
+Scalar contraction & Thermodynamics & Bond Index, RLHF reward signal \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+Each layer below is a \emph{contraction} of the layer above. Each contraction loses information---the moral residue $\calR$ of Chapter 14. The $A^*$ model is the computationally tractable layer; the field equation is the generating theory.
+
+\subsection{The Churchill Connection}
+
+The caller's framing invokes Churchill: $A^*$ is the ``best of the worst'' because it is what a human brain or a standard AI can actually compute. A full field theory requires solving 9-dimensional nonlinear partial differential equations in real time.
+
+This is correct, and the framework is explicit about it. Stratified evaluation---the $A^*$ layer---is ``computationally tractable and produces intuitive decisions at boundary crossings'' \cite[\S9]{bond2026ge}. The field equation would be the theory that \emph{explains} why those decisions are intuitive, by deriving the metric from first principles rather than measuring it empirically.
+
+The relationship is analogous to the one between weather prediction (numerical integration of the Navier-Stokes equations on a grid) and atmospheric physics (the full PDE system). You can predict tomorrow's weather without solving the exact equations---but understanding \emph{why} weather works the way it does requires the full theory.
+
+
+% ============================================================
+\section{The Road Ahead}
+\label{sec:roadmap}
+% ============================================================
+
+The four upgrades define a research program. The current status of each:
+
+\begin{center}
+\begin{tabular}{llp{6cm}}
+\toprule
+\textbf{Upgrade} & \textbf{Status} & \textbf{Next Step} \\
+\midrule
+1. Dynamic metric tensor & Formalized, empirically calibrated & Field equation to derive $g_{\mu\nu}$ from sources \\
+2. Moral Lagrangian & Proven (Noether conservation) & Empirical measurement of the potential $V(\gamma)$ \\
+3. Riemann curvature & Formalized, indirectly supported & Direct measurement of holonomy from data \\
+4. Moral field equation & Open problem (analogy only) & Identify the moral stress-energy tensor \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+The critical bottleneck is the identification of the moral stress-energy tensor: the object that encodes the ``sources'' of moral curvature. Candidate sources include:
+
+\begin{itemize}
+    \item \textbf{Commitments:} Promises, contracts, role obligations---these create structure in moral space.
+    \item \textbf{Relationships:} Agent-patient bonds, trust networks, power differentials---these shape the topology.
+    \item \textbf{Stakes:} What is at risk (life, liberty, livelihood)---these determine the magnitude of curvature.
+    \item \textbf{Power asymmetries:} Differences in capacity to affect outcomes---these may generate curvature anisotropy.
+\end{itemize}
+
+The program is empirical: measure the curvature, measure the sources, and determine whether a tensor equation relates them.
+
+
+% ============================================================
+\section{Conclusion}
+\label{sec:conclusion}
+% ============================================================
+
+The $A^*$ model of moral reasoning is not wrong. It is \emph{incomplete} in precisely the way that Newtonian mechanics is incomplete: it works for the cases it was designed to handle, it provides computationally tractable results, and it can be rigorously justified as an approximation of a deeper theory.
+
+The four upgrades described in this paper---dynamic metric, Lagrangian dynamics, Riemann curvature, and the field equation---constitute the transition from moral particle mechanics to moral general relativity. Three of the four are already formalized and partially validated. The fourth is the deepest open problem in geometric ethics.
+
+The empirical falsification of the $SU(2)$ gauge group is, paradoxically, a strength: it demonstrates that the framework is not merely a mathematical exercise but a falsifiable scientific theory that corrects itself when predictions fail.
+
+$A^*$ is how we navigate the moral landscape. The Lagrangian is why the landscape has the shape it does. The field equation, when found, will be what \emph{generates} the landscape from the moral facts of the situation.
+
+Until then, $A^*$ remains the engineering solution---the best we can compute in real time. The field theory is the science: the account of \emph{why} the engineering works.
+
+
+% ============================================================
+% References
+% ============================================================
+\bibliographystyle{plainnat}
+
+\begin{thebibliography}{10}
+
+\bibitem[Bond(2026a)]{bond2026ge}
+Andrew~H. Bond.
+\newblock \emph{Geometric Ethics: The Mathematical Structure of Moral Reasoning}, v1.15.
+\newblock San Jos\'{e} State University, 2026.
+
+\bibitem[Bond(2026b)]{bond2026pe}
+Andrew~H. Bond.
+\newblock Philosophy Engineering: A Foundation Document for the Discipline.
+\newblock v1.0, San Jos\'{e} State University, 2026.
+
+\bibitem[Thiele(2026)]{thiele2026}
+Lucas Thiele.
+\newblock Independent replication of geometric moral structure in multilingual embeddings.
+\newblock UCLA, 2026.
+
+\bibitem[Einstein(1915)]{einstein1915}
+Albert Einstein.
+\newblock Die Feldgleichungen der Gravitation.
+\newblock \emph{Sitzungsberichte der K\"{o}niglich Preu{\ss}ischen Akademie der Wissenschaften}, pages 844--847, 1915.
+
+\bibitem[Yang and Mills(1954)]{yang1954}
+C.~N. Yang and R.~L. Mills.
+\newblock Conservation of isotopic spin and isotopic gauge invariance.
+\newblock \emph{Physical Review}, 96(1):191--195, 1954.
+
+\bibitem[Hohfeld(1913)]{hohfeld1913}
+Wesley~Newcomb Hohfeld.
+\newblock Some fundamental legal conceptions as applied in judicial reasoning.
+\newblock \emph{Yale Law Journal}, 23(1):16--59, 1913.
+
+\bibitem[Noether(1918)]{noether1918}
+Emmy Noether.
+\newblock Invariante Variationsprobleme.
+\newblock \emph{Nachrichten von der Gesellschaft der Wissenschaften zu G\"{o}ttingen}, pages 235--257, 1918.
+
+\end{thebibliography}
+
+\end{document}

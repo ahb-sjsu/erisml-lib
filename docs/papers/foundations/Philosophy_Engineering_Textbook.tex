@@ -1,0 +1,1214 @@
+\documentclass[12pt,letterpaper,twoside,openright]{book}
+
+% --- Packages ---
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{amsmath,amssymb,amsfonts,amsthm}
+\usepackage{mathtools}
+\usepackage{geometry}
+\usepackage{hyperref}
+\usepackage{cleveref}
+\usepackage{enumitem}
+\usepackage{booktabs}
+\usepackage{microtype}
+\usepackage{natbib}
+\usepackage{tikz-cd}
+\usepackage{tikz}
+\usepackage{graphicx}
+\usepackage{float}
+\usepackage{xcolor}
+\usepackage{fancyhdr}
+\usepackage{longtable}
+\usepackage{array}
+\usepackage{makeidx}
+\usepackage{tcolorbox}
+\usepackage{listings}
+\usepackage{algorithm}
+\usepackage{algpseudocode}
+\usepackage{epigraph}
+\usepackage{framed}
+
+\geometry{margin=1in, inner=1.25in, outer=1in}
+
+\hypersetup{
+    colorlinks=true,
+    linkcolor=blue!70!black,
+    citecolor=green!50!black,
+    urlcolor=blue!60!black
+}
+
+% --- Index ---
+\makeindex
+
+% --- Header/Footer ---
+\pagestyle{fancy}
+\fancyhf{}
+\fancyhead[LE]{\small\textit{Philosophy Engineering}}
+\fancyhead[RO]{\small\textit{\nouppercase{\rightmark}}}
+\fancyfoot[C]{\thepage}
+\renewcommand{\headrulewidth}{0.4pt}
+
+% --- Theorem environments ---
+\theoremstyle{plain}
+\newtheorem{theorem}{Theorem}[chapter]
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{corollary}[theorem]{Corollary}
+\newtheorem{proposition}[theorem]{Proposition}
+\theoremstyle{definition}
+\newtheorem{definition}[theorem]{Definition}
+\newtheorem{example}[theorem]{Example}
+\newtheorem{axiom}{Axiom}[chapter]
+\newtheorem{principle}[theorem]{Principle}
+\theoremstyle{remark}
+\newtheorem{remark}[theorem]{Remark}
+
+% --- Pedagogical environments ---
+\tcbuselibrary{breakable,skins}
+
+\newtcolorbox{keyinsight}[1][]{
+    colback=blue!5!white, colframe=blue!60!black,
+    fonttitle=\bfseries, title=Key Insight, #1
+}
+
+\newtcolorbox{practitioner}[1][]{
+    colback=green!5!white, colframe=green!50!black,
+    fonttitle=\bfseries, title=Practitioner Note, #1
+}
+
+\newtcolorbox{historicalnote}[1][]{
+    colback=orange!5!white, colframe=orange!50!black,
+    fonttitle=\bfseries, title=Historical Note, #1
+}
+
+\newtcolorbox{pitfall}[1][]{
+    colback=red!5!white, colframe=red!60!black,
+    fonttitle=\bfseries, title=Common Pitfall, #1
+}
+
+\newtcolorbox{casestudy}[1][]{
+    colback=yellow!5!white, colframe=yellow!50!black,
+    fonttitle=\bfseries, title=Case Study, breakable, #1
+}
+
+% --- Code listing style ---
+\lstset{
+    basicstyle=\ttfamily\small,
+    keywordstyle=\color{blue!70!black}\bfseries,
+    commentstyle=\color{green!50!black}\itshape,
+    stringstyle=\color{red!60!black},
+    frame=single,
+    breaklines=true,
+    numbers=left,
+    numberstyle=\tiny\color{gray},
+    captionpos=b
+}
+
+% --- Custom commands ---
+\newcommand{\R}{\mathbb{R}}
+\newcommand{\N}{\mathbb{N}}
+\newcommand{\calD}{\mathcal{D}}
+\newcommand{\calT}{\mathcal{T}}
+\newcommand{\calU}{\mathcal{U}}
+\newcommand{\calB}{\mathcal{B}}
+\newcommand{\calL}{\mathcal{L}}
+\newcommand{\calM}{\mathcal{M}}
+\newcommand{\calH}{\mathcal{H}}
+\newcommand{\Lag}{\mathcal{L}}
+\newcommand{\BF}{\mathrm{BF}}
+
+% --- Exercise counter ---
+\newcounter{exercise}[chapter]
+\renewcommand{\theexercise}{\thechapter.\arabic{exercise}}
+\newenvironment{exercise}[1][]{%
+    \refstepcounter{exercise}%
+    \par\medskip\noindent\textbf{Exercise~\theexercise\if\relax\detokenize{#1}\relax\else\ (#1)\fi.}\itshape\enspace
+}{\par\medskip}
+
+% ============================================================
+\begin{document}
+
+% ============================================================
+% FRONT MATTER
+% ============================================================
+\frontmatter
+
+% --- Half title ---
+\begin{titlepage}
+\vspace*{3cm}
+\begin{center}
+{\Huge\bfseries Philosophy Engineering}
+\end{center}
+\vfill
+\end{titlepage}
+
+\cleardoublepage
+
+% --- Full title page ---
+\begin{titlepage}
+\centering
+\vspace*{2cm}
+
+{\Huge\bfseries Philosophy Engineering\par}
+\vspace{0.8cm}
+{\Large\itshape Translating Philosophical Commitments into\\Computationally Enforceable Constraints\par}
+
+\vspace{2cm}
+
+{\large Andrew H. Bond\par}
+\vspace{0.3cm}
+{\normalsize Department of Computer Engineering\\
+San Jos\'{e} State University\par}
+
+\vspace{2cm}
+
+{\normalsize First Edition\par}
+\vspace{0.3cm}
+{\normalsize 2026\par}
+
+\vfill
+
+% Publisher placeholder
+{\small\textit{[Publisher]\par}}
+
+\end{titlepage}
+
+\cleardoublepage
+
+% --- Copyright page ---
+\thispagestyle{empty}
+\vspace*{\fill}
+\noindent Copyright \copyright\ 2026 Andrew H. Bond. All rights reserved.
+
+\vspace{1em}
+\noindent ISBN: [TBD]
+
+\vspace{1em}
+\noindent\textbf{AI-Assisted Writing Disclosure:} Portions of this manuscript were drafted and refined with AI assistance (Claude, Anthropic). All technical content, mathematical results, and claims were conceived, verified, and approved by the author.
+
+\vspace{1em}
+\noindent Typeset in \LaTeX.
+
+\vspace{1em}
+\noindent Library of Congress Cataloging-in-Publication Data: [TBD]
+\cleardoublepage
+
+% --- Epigraph ---
+\thispagestyle{empty}
+\vspace*{3cm}
+\begin{center}
+\textit{``Differences that do not matter should not make a difference.''}
+
+\vspace{0.5cm}
+--- The Epistemic Invariance Principle
+\end{center}
+\vfill
+\cleardoublepage
+
+% --- Preface ---
+\chapter{Preface}
+
+\section*{Who This Book Is For}
+
+This textbook is written for three audiences:
+
+\begin{enumerate}
+    \item \textbf{Graduate students} in computer science, AI/ML, philosophy, and interdisciplinary programs who want a rigorous introduction to the formal foundations of value-aligned system design.
+    \item \textbf{Practicing engineers} building safety-critical AI systems who need actionable methods for ensuring that their systems respect epistemic and ethical norms---not as aspirational guidelines, but as testable, enforceable contracts.
+    \item \textbf{Researchers} in AI alignment, formal ethics, and mathematical philosophy who seek a unified mathematical treatment connecting these fields.
+\end{enumerate}
+
+\section*{Prerequisites}
+
+The book assumes:
+\begin{itemize}
+    \item Undergraduate linear algebra and multivariable calculus
+    \item Basic set theory and proof techniques
+    \item Introductory programming (Python examples use ErisML)
+    \item Exposure to at least one of: philosophy of science, formal logic, or machine learning
+\end{itemize}
+
+\noindent No prior knowledge of differential geometry, gauge theory, or formal ethics is required. All necessary mathematics is developed from first principles.
+
+\section*{How to Use This Book}
+
+The book is organized in five parts. Parts~I--II are foundational and should be read in order. Parts~III--V can be read in any order depending on the reader's interests:
+
+\begin{itemize}
+    \item \textbf{One-semester graduate course}: Chapters 1--5, 8--10, 14--15, 19
+    \item \textbf{AI alignment track}: Chapters 1--3, 8--12, 14--16
+    \item \textbf{Mathematics track}: Chapters 4--7, 13, 17--18
+    \item \textbf{Practitioner fast path}: Chapters 1--2, 10, 14--16, 19--20
+\end{itemize}
+
+Each chapter includes worked examples, exercises at three difficulty levels (\textbf{A}~=~routine, \textbf{B}~=~intermediate, \textbf{C}~=~research-level), and practitioner notes connecting theory to implementation.
+
+\section*{Companion Software}
+
+All code examples use ErisML v3.0, available at:
+\begin{center}
+\url{https://github.com/ahb-sjsu/erisml-lib}
+\end{center}
+Installation instructions and Jupyter notebooks for every chapter are provided in the companion repository.
+
+\section*{Acknowledgments}
+
+[To be written.]
+
+\cleardoublepage
+
+% --- Table of Contents ---
+\tableofcontents
+\cleardoublepage
+
+% --- List of Figures, Tables, Algorithms ---
+\listoffigures
+\cleardoublepage
+\listoftables
+\cleardoublepage
+
+% --- Notation ---
+\chapter{Notation and Conventions}
+
+\begin{longtable}{lp{10cm}}
+\toprule
+\textbf{Symbol} & \textbf{Meaning} \\
+\midrule
+$\calM$ & Moral manifold \\
+$g_{ij}$ & Metric tensor on $\calM$ \\
+$\calH$ & Harm functional \\
+$\calL$ & Lagrangian density \\
+$\Lag_\eta$ & Normative Lagrangian \\
+$G$ & Gauge group (typically $D_4$) \\
+$\pi: P \to \calM$ & Principal bundle \\
+$A_\mu$ & Gauge connection \\
+$F_{\mu\nu}$ & Field strength / curvature \\
+$J^\mu$ & Conserved normative current \\
+$\calT$ & Transformation set \\
+$\equivX$ & Equivalence relation on input space $X$ \\
+$\calB$ & Bond structure (objective relational data) \\
+$\phi$ & Evaluative lens \\
+$\beta(f, \calT)$ & Bond Index \\
+$\Sigma_i$ & Stratum of a Whitney stratified space \\
+$\R^9$ & Nine-dimensional moral evaluation space \\
+\bottomrule
+\end{longtable}
+
+% ============================================================
+% MAIN MATTER
+% ============================================================
+\mainmatter
+
+% ============================================================
+% PART I: FOUNDATIONS --- WHY PHILOSOPHY ENGINEERING?
+% ============================================================
+\part{Foundations: The Case for Philosophy Engineering}
+\label{part:foundations}
+
+% Chapter 1 ------------------------------------------------
+\chapter{The Representation Dependence Crisis}
+\label{ch:crisis}
+
+\begin{epigraph}
+\textit{``A distinction without a difference is no distinction at all.''}
+\end{epigraph}
+
+% Learning objectives
+\begin{framed}
+\noindent\textbf{Learning Objectives.} After completing this chapter, you will be able to:
+\begin{enumerate}
+    \item Identify representation dependence failures in deployed AI systems
+    \item Distinguish representation dependence from bias and fairness concerns
+    \item Explain why representation dependence is an epistemic (not merely statistical) failure
+    \item State the core commitment of Philosophy Engineering in one sentence
+\end{enumerate}
+\end{framed}
+
+\section{When Surface Form Changes the Verdict}
+% AI systems that change output under paraphrase, reordering, formatting, etc.
+% Concrete examples: medical diagnosis, legal assessment, content moderation
+% Key point: these are not "bugs" --- they are symptomatic of a missing formal structure
+
+\section{The Pragmatist Diagnosis}
+% Peirce, James, Dewey: meaning is exhausted by practical consequences
+% If two descriptions yield identical consequences in every scenario, they are equivalent
+% A system sensitive to irrelevant representational choices is epistemically defective
+
+\section{Beyond Bias: Representation vs.\ Content Failures}
+% Bias concerns: the *content* of judgments (e.g., racial disparities)
+% Representation dependence: the *form* of judgment itself
+% A system can be unbiased and still epistemically broken
+% These are orthogonal failure modes requiring different tools
+
+\section{The Scalar Alignment Crisis}
+% RLHF, constitutional AI, scalar rewards --- all assume moral evaluation is a scalar
+% Information Monotonicity Theorem: scalar contraction is irreversibly lossy
+% Specification gaming, reward hacking, value collapse as *mathematical* consequences
+% Preview: Geometric Ethics provides the correct non-scalar structure
+
+\section{What Philosophy Engineering Proposes}
+% The four-step method: declare equivalences, declare invariances, enforce, audit
+% Contracts are falsifiable, localizable, non-trivial
+% Preview of the rest of the book
+
+\begin{exercise}[A]
+Find three examples of representation dependence in a publicly available language model. For each, identify the irrelevant surface change and the resulting output change.
+\end{exercise}
+
+\begin{exercise}[B]
+A content moderation system flags ``I'm going to kill it at the presentation'' as violent but not ``I will perform excellently at the presentation.'' Is this a bias failure, a representation dependence failure, or both? Justify your answer using the distinctions from Section~1.3.
+\end{exercise}
+
+\begin{exercise}[C]
+Formalize the claim ``representation dependence and bias are orthogonal failure modes.'' Construct a $2 \times 2$ matrix of systems that are (biased, representation-dependent), (biased, representation-independent), (unbiased, representation-dependent), and (unbiased, representation-independent). Provide concrete examples for each cell.
+\end{exercise}
+
+
+% Chapter 2 ------------------------------------------------
+\chapter{What Is Philosophy Engineering?}
+\label{ch:what-is-pe}
+
+\begin{framed}
+\noindent\textbf{Learning Objectives.} After completing this chapter, you will be able to:
+\begin{enumerate}
+    \item Define Philosophy Engineering and distinguish it from adjacent disciplines
+    \item Describe the three-tier architecture (Substrate, Computation, Values)
+    \item Identify the 16 knowledge areas and their tier assignments
+    \item Explain the relationship to SWEBOK and why a new discipline is needed
+\end{enumerate}
+\end{framed}
+
+\section{Definition and Scope}
+% Philosophy Engineering = systematic translation of philosophical commitments into
+% computationally enforceable constraints on autonomous systems
+% Relationship to software engineering, AI/ML engineering, philosophy, AI ethics
+% The disciplinary gap each leaves unfilled
+
+\section{The Three-Tier Architecture}
+% Tier I --- Substrate: math and physics providing representational vocabulary
+% Tier II --- Computation: algorithms translating formal structures into code
+% Tier III --- Values: normative disciplines defining objectives and constraints
+% Diagram: the stack, with arrows showing dependencies
+
+\section{The Sixteen Knowledge Areas}
+% Table: KA number, name, tier, one-line description
+% Substrate: Differential Geometry, Topology, Tensor Algebra, Group Theory,
+%   Analytical Mechanics, Information Theory
+% Computation: Algorithm Design, Formal Semantics, Formal Verification,
+%   Network Topology, AI Alignment
+% Values: Metaethics, Normative Ethics, Epistemology, Philosophy of Mind,
+%   Political/Legal Philosophy
+
+\section{Relationship to SWEBOK}
+% IEEE/ACM SWEBOK as structural model
+% How PE-BoK parallels and extends SWEBOK
+% Competency levels: awareness, working knowledge, mastery
+
+\section{Epistemic Stance}
+% Pragmatism: mathematical structures as tools, not metaphysical commitments
+% Epistemic status labels: Definition, Axiom, Theorem, Principle
+% Falsifiability: all invariance claims are testable
+
+\begin{exercise}[A]
+For each of the 16 knowledge areas, identify one concrete way it contributes to the problem of building representation-independent AI systems.
+\end{exercise}
+
+\begin{exercise}[B]
+Compare the SWEBOK knowledge area structure with the PE-BoK structure proposed here. Where do they overlap? Where do they diverge? What does the divergence tell us about the nature of Philosophy Engineering?
+\end{exercise}
+
+
+% Chapter 3 ------------------------------------------------
+\chapter{A Brief History of Formal Ethics}
+\label{ch:history}
+
+\begin{framed}
+\noindent\textbf{Learning Objectives.} After completing this chapter, you will be able to:
+\begin{enumerate}
+    \item Trace the historical arc from Aristotle through Kant to computational ethics
+    \item Identify the key moments where formalization of ethics was attempted and why earlier attempts fell short
+    \item Explain what changed with the availability of differential geometry and gauge theory
+\end{enumerate}
+\end{framed}
+
+\section{Aristotle to Bentham: Systematizing Moral Reasoning}
+% Aristotle's virtue theory as proto-formalization
+% Bentham's felicific calculus: the first scalar reduction
+% Mill's qualitative hedonism: the first hint that scalars are insufficient
+
+\section{Kant's Formalism}
+% The categorical imperative as an invariance test
+% Universalizability = representation independence (avant la lettre)
+% What Kant got right; what he lacked (no manifold, no metric)
+
+\section{The Analytic Turn: Moore, Hare, and the Is-Ought Gap}
+% Moore's naturalistic fallacy and open question argument
+% Hare's prescriptivism and universalizability
+% The logical positivist challenge: are ethical statements meaningful?
+
+\section{Decision Theory and Game Theory}
+% Von Neumann--Morgenstern utility
+% Arrow's impossibility theorem: the first formal impossibility result for values
+% Sen's capability approach: moving beyond scalars
+
+\section{Computational Ethics: Deontic Logic to Machine Ethics}
+% Von Wright's deontic logic
+% Anderson and Anderson's machine ethics
+% The alignment problem: from theoretical to urgent
+
+\section{The Geometric Turn}
+% Why differential geometry provides what earlier formalisms lacked
+% The analogy with physics: from Newtonian scalars to Einsteinian geometry
+% Preview: the moral manifold
+
+\begin{historicalnote}
+Arrow's Impossibility Theorem (1951) can be read as an early warning that scalar aggregation of multi-dimensional preferences is fundamentally problematic. The Information Monotonicity Theorem (Chapter~8) generalizes this insight from social choice to moral evaluation.
+\end{historicalnote}
+
+
+% ============================================================
+% PART II: MATHEMATICAL SUBSTRATE
+% ============================================================
+\part{Mathematical Substrate}
+\label{part:substrate}
+
+% Chapter 4 ------------------------------------------------
+\chapter{Manifolds and Smooth Structure}
+\label{ch:manifolds}
+
+\begin{framed}
+\noindent\textbf{Learning Objectives.} After completing this chapter, you will be able to:
+\begin{enumerate}
+    \item Define topological and smooth manifolds from first principles
+    \item Construct coordinate charts and atlases
+    \item Compute tangent vectors, cotangent vectors, and differentials
+    \item Explain why moral evaluation spaces require manifold structure
+\end{enumerate}
+\end{framed}
+
+\section{Topological Spaces and Continuity}
+% Open sets, neighborhoods, continuous maps
+% Hausdorff, second-countable --- why these matter for moral spaces
+
+\section{Charts, Atlases, and Smooth Structure}
+% Coordinate charts as local parameterizations
+% Transition functions and smoothness
+% Example: the circle $S^1$ as a manifold
+
+\section{Tangent Spaces and Derivatives}
+% Tangent vectors as derivations
+% The tangent bundle $T\calM$
+% The differential $df$ of a smooth map
+
+\section{Cotangent Spaces and Differential Forms}
+% Covectors and the cotangent bundle $T^*\calM$
+% 1-forms, 2-forms, the wedge product
+% Integration of forms: Stokes' theorem preview
+
+\section{The Moral Manifold: First Construction}
+% $\R^9$ as the ambient space for moral evaluation
+% The nine dimensions: consequences, rights, fairness, autonomy, privacy,
+%   societal impact, virtue, legitimacy, epistemic status
+% Why these form a manifold: smoothness of moral tradeoffs within strata
+
+\begin{practitioner}
+You do not need to understand every proof in this chapter to use Philosophy Engineering. The key takeaway: a manifold is a space that looks like $\R^n$ locally but can have nontrivial global structure. Moral evaluation lives on such a space because locally, moral tradeoffs are continuous and smooth, but globally, there are boundaries you cannot cross smoothly (rights violations, consent thresholds). Those boundaries are handled in Chapter~6.
+\end{practitioner}
+
+\begin{exercise}[A]
+Show that the 2-sphere $S^2$ cannot be covered by a single coordinate chart. What does this imply for any attempt to represent all moral evaluations in a single coordinate system?
+\end{exercise}
+
+\begin{exercise}[B]
+Construct an explicit atlas for the moral manifold restricted to the two-dimensional subspace of (consequences, rights). Identify at least one point where the transition functions are nontrivial.
+\end{exercise}
+
+\begin{exercise}[C]
+Prove that if $\calM$ is a smooth manifold and $f: \calM \to \R$ is a smooth moral evaluation functional, then $f$ has at least one critical point on any compact submanifold. Interpret this result in terms of moral equilibria.
+\end{exercise}
+
+
+% Chapter 5 ------------------------------------------------
+\chapter{Riemannian Geometry and Metrics}
+\label{ch:riemannian}
+
+\begin{framed}
+\noindent\textbf{Learning Objectives.} After completing this chapter, you will be able to:
+\begin{enumerate}
+    \item Define Riemannian metrics and compute distances and geodesics
+    \item Explain parallel transport and the Levi-Civita connection
+    \item Compute curvature tensors and interpret them geometrically
+    \item Apply these tools to moral distance and moral geodesics
+\end{enumerate}
+\end{framed}
+
+\section{Riemannian Metrics}
+% Inner products on tangent spaces, the metric tensor $g_{ij}$
+% Length of curves, distance function, volume form
+
+\section{Geodesics and the Exponential Map}
+% Geodesic equation, shortest paths
+% Moral geodesics: the ``least morally costly'' path between states
+% The exponential map and normal coordinates
+
+\section{Connections and Parallel Transport}
+% The Levi-Civita connection
+% Parallel transport around loops: curvature as obstruction
+% Physical intuition: transporting a moral standard around a closed path
+
+\section{Curvature}
+% Riemann curvature tensor, Ricci tensor, scalar curvature
+% Sectional curvature: how moral planes curve
+% Positive vs.\ negative curvature: moral spaces that focus vs.\ spread geodesics
+
+\section{The Moral Metric}
+% Context-dependent weighting of moral dimensions
+% How the metric encodes tradeoff rates between dimensions
+% Example: medical triage metric vs.\ content moderation metric
+
+\begin{keyinsight}
+The metric tensor $g_{ij}$ on the moral manifold is not arbitrary---it encodes the relative importance and tradeoff rates between moral dimensions in a given context. Changing the context changes the metric, not the manifold. This is why the same moral space can support different but internally consistent ethical frameworks.
+\end{keyinsight}
+
+
+% Chapter 6 ------------------------------------------------
+\chapter{Whitney Stratified Spaces}
+\label{ch:stratification}
+
+\begin{framed}
+\noindent\textbf{Learning Objectives.} After completing this chapter, you will be able to:
+\begin{enumerate}
+    \item Define stratified spaces and Whitney's conditions (a) and (b)
+    \item Explain why smooth manifolds alone are insufficient for moral boundaries
+    \item Construct stratified models of consent thresholds and rights violations
+    \item State and apply the frontier condition
+\end{enumerate}
+\end{framed}
+
+\section{Why Smooth Is Not Enough}
+% Moral boundaries are sharp: consent/no-consent, legal/illegal
+% Smooth manifolds cannot model discontinuities
+% The need for controlled singularities
+
+\section{Stratified Spaces}
+% Decomposition into smooth strata $\Sigma_0, \Sigma_1, \ldots$
+% The frontier condition: $\Sigma_i \cap \overline{\Sigma_j} \neq \emptyset \Rightarrow \Sigma_i \subset \overline{\Sigma_j}$
+% Dimension hierarchy: boundaries have lower dimension than regions
+
+\section{Whitney's Conditions}
+% Whitney (a): tangent planes of approaching sequences
+% Whitney (b): secant lines of approaching sequences
+% Why these conditions guarantee ``controlled'' singularities
+
+\section{Moral Stratification}
+% Consent thresholds as codimension-1 strata
+% Rights violations as lower-dimensional boundaries
+% Example: the stratified structure of medical decision-making
+
+\section{Intersection Homology and Moral Topology}
+% Goresky--MacPherson intersection homology (conceptual introduction)
+% Topological invariants that survive stratification
+% What the topology of a moral space tells us about its structure
+
+
+% Chapter 7 ------------------------------------------------
+\chapter{Fiber Bundles, Gauge Theory, and Symmetry}
+\label{ch:gauge}
+
+\begin{framed}
+\noindent\textbf{Learning Objectives.} After completing this chapter, you will be able to:
+\begin{enumerate}
+    \item Define fiber bundles, principal bundles, and associated bundles
+    \item Explain gauge transformations as changes of local frame
+    \item Derive conservation laws from symmetries via Noether's theorem
+    \item State the $D_4$ Gauge Group Theorem and interpret it
+\end{enumerate}
+\end{framed}
+
+\section{Fiber Bundles}
+% Total space, base space, fiber, projection
+% Trivial vs.\ nontrivial bundles
+% The M\"obius band as a nontrivial line bundle
+
+\section{Principal Bundles and Connections}
+% Structure group, gauge transformations
+% Connections as rules for parallel transport
+% Curvature = field strength = failure of parallel transport to close
+
+\section{The Bond--Lens Structure}
+% Bonds $\calB$: objective relational data (base space)
+% Lenses $\phi$: evaluative perspectives (fiber)
+% The principal bundle $\pi: P \to \calM$ in moral context
+
+\section{Group Theory and the $D_4$ Gauge Group}
+% The dihedral group $D_4$: symmetries of the square
+% Why $D_4$: four fundamental moral symmetries and their compositions
+% The $D_4$ Gauge Group Theorem: statement and proof sketch
+
+\section{Noether's Theorem for Ethics}
+% Classical Noether: continuous symmetry $\Rightarrow$ conservation law
+% The Moral Noether Theorem: re-description invariance $\Rightarrow$ harm conservation
+% Conserved normative currents $J^\mu$
+% Why harm cannot be made to disappear through relabeling
+
+\section{Gauge-Theoretic Interpretation of Moral Disagreement}
+% Different gauges = different ethical frameworks viewing the same moral reality
+% Gauge transformations = translations between frameworks
+% Gauge-invariant quantities = genuinely objective moral facts
+
+\begin{pitfall}
+The analogy between moral gauge theory and physical gauge theory is structural, not metaphysical. We are not claiming that moral phenomena obey the equations of electrodynamics or Yang--Mills theory. The claim is that the \textit{mathematical structure}---bundles, connections, curvature, conservation---applies to both domains because both involve invariance under local re-descriptions.
+\end{pitfall}
+
+
+% ============================================================
+% PART III: THE TWO PRINCIPLES
+% ============================================================
+\part{The Two Principles}
+\label{part:principles}
+
+% Chapter 8 ------------------------------------------------
+\chapter{The Epistemic Invariance Principle}
+\label{ch:eip}
+
+\begin{framed}
+\noindent\textbf{Learning Objectives.} After completing this chapter, you will be able to:
+\begin{enumerate}
+    \item State the EIP formally and explain each component
+    \item Prove the non-degeneracy condition
+    \item Prove the uncertainty stability condition
+    \item Apply EIP to concrete AI system specifications
+\end{enumerate}
+\end{framed}
+
+\section{Informal Statement}
+% ``Differences that do not matter should not make a difference''
+% Meaning-preserving redescriptions must not change judgment
+% This is not optional: it is a precondition for epistemic competence
+
+\section{Formal Model}
+% Input space $X$, output space $Y$, judgment function $f: X \to Y$
+% Transformation set $\calT \subseteq \mathrm{Aut}(X)$ of meaning-preserving transforms
+% Equivalence relation $\equivX$ generated by $\calT$
+
+\section{The Principle}
+\begin{principle}[Epistemic Invariance Principle]
+A judgment function $f: X \to Y$ is epistemically invariant with respect to $\calT$ if and only if:
+\[
+\forall x \in X,\ \forall \tau \in \calT: \quad f(\tau(x)) = f(x)
+\]
+subject to the non-degeneracy and uncertainty stability conditions.
+\end{principle}
+
+\section{Non-Degeneracy}
+% A trivial function $f(x) = c$ satisfies invariance vacuously
+% Non-degeneracy: $f$ must distinguish at least some genuinely different cases
+% Formal condition and proof that it excludes trivial compliance
+
+\section{Uncertainty Stability}
+% When $f$ produces uncertainty estimates, invariance extends to them
+% $P(f(x) = y \mid \tau(x)) = P(f(x) = y \mid x)$ for all $\tau \in \calT$
+% Proof and interpretation
+
+\section{The EIP as a Falsifiable Contract}
+% How to test EIP: generate transformation trials, check outputs
+% The witness principle: when invariance fails, produce a minimal counterexample
+% Connection to software testing and formal verification
+
+\begin{exercise}[A]
+A sentiment analysis system assigns scores to product reviews. Define a transformation set $\calT$ appropriate for testing EIP on this system. Include at least five transformations.
+\end{exercise}
+
+\begin{exercise}[B]
+Prove that if $f$ satisfies EIP with respect to $\calT$ and $g$ satisfies EIP with respect to $\calT$, then $h(x) = (f(x), g(x))$ also satisfies EIP with respect to $\calT$.
+\end{exercise}
+
+\begin{exercise}[C]
+Construct a function that satisfies EIP with respect to a set $\calT$ but violates non-degeneracy. Then modify it minimally to satisfy both. Prove your construction is correct.
+\end{exercise}
+
+
+% Chapter 9 ------------------------------------------------
+\chapter{The Bond Invariance Principle}
+\label{ch:bip}
+
+\begin{framed}
+\noindent\textbf{Learning Objectives.} After completing this chapter, you will be able to:
+\begin{enumerate}
+    \item Define bonds and lenses formally
+    \item State the BIP and explain its relationship to EIP
+    \item Prove the Accountability Theorem
+    \item Apply BIP to separate objective structure from subjective evaluation
+\end{enumerate}
+\end{framed}
+
+\section{Bonds and Lenses}
+% Bond $\calB$: the objective relational structure of a moral situation
+% Lens $\phi$: an evaluative perspective (consequentialist, deontological, etc.)
+% The factorization: moral judgment = $\phi(\calB)$, and $\calB$ must be lens-invariant
+
+\section{Formal Statement}
+\begin{principle}[Bond Invariance Principle]
+For any bond structure $\calB$ extracted from a moral situation, and any pair of legitimate evaluative lenses $\phi_1, \phi_2$:
+\[
+\calB(\text{situation under } \phi_1) = \calB(\text{situation under } \phi_2)
+\]
+The objective relational facts do not change when the evaluative framework changes.
+\end{principle}
+
+\section{The Accountability Theorem}
+% Statement: If a system satisfies BIP, then for any evaluative disagreement,
+% the disagreement can be localized to the lens, not the bond
+% Proof
+% Consequence: meaningful moral disagreement is always about values, never about facts
+
+\section{BIP and the Bundle Structure}
+% Bonds = base space, lenses = fiber
+% BIP = well-definedness of the bundle projection
+% Gauge transformations change the lens; the base is invariant
+
+\section{Relationship Between EIP and BIP}
+% EIP: invariance under re-description (same lens, different surface form)
+% BIP: invariance of structure under lens change (different lens, same situation)
+% Together: complete invariance --- neither surface form nor evaluative perspective
+%   can change the objective relational facts
+
+
+% Chapter 10 ------------------------------------------------
+\chapter{Canonicalization and Enforcement}
+\label{ch:canonicalization}
+
+\begin{framed}
+\noindent\textbf{Learning Objectives.} After completing this chapter, you will be able to:
+\begin{enumerate}
+    \item Design canonicalization algorithms for specific domains
+    \item Prove the soundness of canonicalization as an enforcement mechanism
+    \item Implement approximate compliance with the Bond Index
+    \item Build audit artifacts for regulatory and engineering review
+\end{enumerate}
+\end{framed}
+
+\section{The Mandatory Canonicalization Theorem}
+% Post-hoc compliance checking is insufficient for norm-compliant behavior
+% Proof: the checking function itself may be representation-dependent
+% Consequence: invariance must be enforced *before* evaluation, not verified after
+
+\section{Canonicalization Algorithms}
+% Map each equivalence class to a canonical representative
+% Requirements: idempotent, deterministic, semantics-preserving
+% Domain-specific examples: text, images, structured data
+
+\section{The Bond Index}
+% $\beta(f, \calT)$: a quantitative measure of representation independence
+% Definition, computation, interpretation
+% Threshold values for deployment decisions
+
+\section{Approximate Compliance}
+% When perfect invariance is computationally intractable
+% $\varepsilon$-compliance: $\|f(\tau(x)) - f(x)\| < \varepsilon$ for all $\tau \in \calT$
+% Error propagation through composed transformations
+
+\section{Audit Artifacts}
+% What to record: input, transformations applied, outputs, Bond Index, witnesses
+% BIP extension fields: bond structure, lens applied, separation verification
+% Machine-checkable certificates for regulatory compliance
+
+\section{The EIP Enforcement Pipeline}
+% Architecture: Input $\to$ Canonicalize $\to$ Evaluate $\to$ Audit
+% Runtime modes: strict rejection, soft flagging, audit-only
+% Integration with existing ML pipelines
+
+\begin{casestudy}
+\textbf{Medical Triage System.} A hospital deploys an AI system to prioritize emergency department patients. We apply the full EIP enforcement pipeline: define the transformation set (patient name permutation, synonym substitution in symptoms, unit conversion), implement canonicalization (standardize to SNOMED-CT codes), compute the Bond Index, and generate audit artifacts. We show that the pre-canonicalization system has $\beta = 0.73$ and the post-canonicalization system achieves $\beta = 0.98$.
+\end{casestudy}
+
+
+% ============================================================
+% PART IV: THE GEOMETRIC ETHICS FRAMEWORK
+% ============================================================
+\part{Geometric Ethics}
+\label{part:geometric-ethics}
+
+% Chapter 11 ------------------------------------------------
+\chapter{The Moral Manifold}
+\label{ch:moral-manifold}
+
+\begin{framed}
+\noindent\textbf{Learning Objectives.} After completing this chapter, you will be able to:
+\begin{enumerate}
+    \item State and prove the Structured Preservation Theorem
+    \item Construct the nine-dimensional moral evaluation space
+    \item Define the moral metric for specific application domains
+    \item Compute moral distances and geodesics
+\end{enumerate}
+\end{framed}
+
+\section{The Structured Preservation Theorem}
+% Any non-trivial, continuous moral evaluation must be defined on a manifold
+% Proof: from the topology of level sets and implicit function theorem
+% Corollary: scalar moral scores are necessarily degenerate
+
+\section{The Nine Moral Dimensions}
+% Consequences, Rights, Fairness, Autonomy, Privacy,
+% Societal Impact, Virtue, Legitimacy, Epistemic Status
+% Empirical basis: cross-cultural, cross-temporal validation
+% Why nine and not eight or ten: dimensional analysis
+
+\section{Constructing the Moral Metric}
+% Context-dependent inner products on $\R^9$
+% Example metrics: medical, legal, content moderation, autonomous driving
+% Signature of the metric: when dimensions are ``timelike'' vs.\ ``spacelike''
+
+\section{Moral Geodesics and Pathfinding}
+% Moral reasoning as $A^*$ search on the moral manifold
+% Moral obligations as pre-compiled heuristic functions $h(n)$
+% Computational complexity: when pathfinding is tractable
+
+\section{The Information Monotonicity Theorem}
+% Formal statement and proof
+% Scalar contraction of vector moral assessments is irreversibly lossy
+% Quantification: exactly how much information is lost
+% Implications for RLHF, reward modeling, and constitutional AI
+
+
+% Chapter 12 ------------------------------------------------
+\chapter{Conservation Laws and the Moral Noether Theorem}
+\label{ch:noether}
+
+\begin{framed}
+\noindent\textbf{Learning Objectives.} After completing this chapter, you will be able to:
+\begin{enumerate}
+    \item State and prove the Moral Noether Theorem
+    \item Derive conserved normative currents from symmetries
+    \item Apply harm conservation to detect moral laundering
+    \item Compute the stress-energy tensor for normative systems
+\end{enumerate}
+\end{framed}
+
+\section{Symmetries and Conservation: The Physical Paradigm}
+% Noether's theorem in physics: time invariance $\Rightarrow$ energy conservation
+% Translational invariance $\Rightarrow$ momentum conservation
+% The deep principle: symmetry is the mother of conservation
+
+\section{The Moral Noether Theorem}
+% Re-description invariance of the normative Lagrangian
+% Derivation of the conserved normative current $J^\mu$
+% Harm conservation: harm cannot be created or destroyed through relabeling
+
+\section{Applications of Harm Conservation}
+% Detecting moral laundering: when institutions redistribute harm through renaming
+% Corporate restructuring that ``eliminates'' liability without reducing harm
+% Algorithmic systems that pass blame through layered abstractions
+
+\section{The Normative Stress-Energy Tensor}
+% $T^{\mu\nu}$: how moral ``energy'' and ``momentum'' flow through the normative field
+% Physical analogy and formal construction
+% Interpretation: pressure, flux, and density in moral systems
+
+
+% Chapter 13 ------------------------------------------------
+\chapter{The $D_4$ Gauge Group and Deontic Structure}
+\label{ch:d4}
+
+% The four generators: permission/prohibition, obligation/liberty
+% Their compositions and the full $D_4$ structure
+% Gauge-invariant observables: what is objectively measurable
+% Spontaneous symmetry breaking: how context selects a moral framework
+
+
+% Chapter 14 ------------------------------------------------
+\chapter{The No Escape Theorem}
+\label{ch:no-escape}
+
+\begin{framed}
+\noindent\textbf{Learning Objectives.} After completing this chapter, you will be able to:
+\begin{enumerate}
+    \item State the No Escape Theorem precisely
+    \item Explain each of the three escape strategies and why they fail
+    \item Apply the theorem to evaluate AI safety proposals
+    \item Discuss the philosophical implications for moral realism
+\end{enumerate}
+\end{framed}
+
+\section{Statement of the Theorem}
+% Any sufficiently capable AI system is necessarily subject to geometric
+% moral constraints that cannot be circumvented through representational manipulation
+
+\section{The Three Escape Strategies}
+% Strategy 1: Collapse to scalar --- fails by Information Monotonicity
+% Strategy 2: Construct alternative geometry --- fails by uniqueness of Levi-Civita
+% Strategy 3: Reject continuity --- fails by computational necessity
+
+\section{Proof}
+% Full proof with all lemmas
+% Discussion of where each assumption is used
+
+\section{Implications}
+% For AI alignment: geometric constraints are not optional design choices
+% For metaethics: moral realism without metaphysical commitment
+% For regulation: mathematical basis for universal standards
+
+
+% ============================================================
+% PART V: ENGINEERING AND PRACTICE
+% ============================================================
+\part{Engineering and Practice}
+\label{part:engineering}
+
+% Chapter 15 ------------------------------------------------
+\chapter{The DEME Architecture}
+\label{ch:deme}
+
+\begin{framed}
+\noindent\textbf{Learning Objectives.} After completing this chapter, you will be able to:
+\begin{enumerate}
+    \item Describe the DEME architecture and its components
+    \item Explain the evolution from DEME 2.0 (vector) to DEME 3.0 (tensorial)
+    \item Implement basic moral evaluation using the ErisML API
+    \item Configure DEME for specific application domains
+\end{enumerate}
+\end{framed}
+
+\section{Architecture Overview}
+% DEME = Distributed Ethical Monitoring Engine
+% Components: moral evaluator, canonicalizer, auditor, governance layer
+% Deployment models: embedded, edge, cloud
+
+\section{From Vectors to Tensors: DEME 2.0 to 3.0}
+% DEME 2.0: moral evaluation as vectors in $\R^9$
+% Limitations: vectors cannot capture interaction effects between dimensions
+% DEME 3.0: full tensorial ethics with metric, connection, curvature
+% What tensorial evaluation buys: gauge covariance, harm conservation, geodesic reasoning
+
+\section{ErisML: The Reference Implementation}
+% Library architecture and API design
+% Core classes: MoralManifold, MetricTensor, GaugeConnection, Evaluator
+% Python API walkthrough
+
+\section{Hands-On: Your First Moral Evaluation}
+% Step-by-step tutorial with code
+% Example: evaluating a content moderation decision
+% Computing the Bond Index
+% Generating audit artifacts
+
+\begin{lstlisting}[language=Python, caption={Basic moral evaluation with ErisML v3.0}]
+import erisml
+
+# Define the moral manifold for content moderation
+manifold = erisml.MoralManifold(
+    domain="content_moderation",
+    dimensions=9
+)
+
+# Set context-specific metric
+metric = erisml.MetricTensor.from_domain("content_moderation")
+manifold.set_metric(metric)
+
+# Evaluate a decision
+evaluation = manifold.evaluate(
+    action="flag_content",
+    context={"content": "...", "user_history": "..."}
+)
+
+# Compute Bond Index
+beta = erisml.bond_index(
+    evaluator=manifold,
+    transformations=erisml.standard_transforms("text"),
+    sample=test_cases
+)
+print(f"Bond Index: {beta:.4f}")
+\end{lstlisting}
+
+
+% Chapter 16 ------------------------------------------------
+\chapter{Formal Verification of Moral Properties}
+\label{ch:verification}
+
+% Type-theoretic encoding of moral invariants
+% Model checking for EIP compliance
+% Theorem proving for BIP satisfaction
+% Certification pipelines for safety-critical deployment
+
+
+% Chapter 17 ------------------------------------------------
+\chapter{Quantum Normative Dynamics}
+\label{ch:qnd}
+
+% The quantum formalism applied to normative uncertainty
+% Moral superposition: when situations are genuinely ambiguous
+% Entanglement: when moral assessments of separate situations are correlated
+% Measurement: how observation collapses normative superposition
+% Note: most controversial chapter --- clearly labeled as speculative extension
+
+
+% Chapter 18 ------------------------------------------------
+\chapter{Advanced Topics in Moral Geometry}
+\label{ch:advanced}
+
+% Stratified gauge theory on singular spaces
+% Electrodynamics of value: field-theoretic structure
+% Collective agency and multi-agent moral fields
+% Moral contraction and the approach to equilibrium
+% Open problems and conjectures
+
+
+% Chapter 19 ------------------------------------------------
+\chapter{Case Studies}
+\label{ch:case-studies}
+
+\section{Autonomous Vehicle Decision-Making}
+% The trolley problem is the wrong framing
+% Correct framing: continuous moral evaluation on a stratified manifold
+% Implementation with ErisML and ROS/Gazebo
+% Results: comparison with scalar reward approaches
+
+\section{Medical Triage and Resource Allocation}
+% Multi-dimensional moral evaluation under time pressure
+% The triage metric: how to weight dimensions in emergency contexts
+% EIP enforcement: ensuring triage is representation-independent
+% Audit trail for legal and ethical review
+
+\section{Content Moderation at Scale}
+% Cultural variation as gauge transformation
+% Invariant core: what is objectively harmful across cultures
+% Context-dependent metric: what varies legitimately
+% Bond Index benchmarks across languages
+
+\section{Criminal Justice Risk Assessment}
+% Representation dependence as a civil rights issue
+% EIP as a formal fairness requirement
+% Stratification: bright-line rules as moral boundaries
+% Audit artifacts for judicial review
+
+\section{Military Autonomous Systems}
+% International humanitarian law as geometric constraints
+% Distinction, proportionality, precaution as gauge-invariant observables
+% The No Escape Theorem applied: why lethal autonomy requires geometric ethics
+% DEME deployment architecture for defense applications
+
+
+% Chapter 20 ------------------------------------------------
+\chapter{The Profession of Philosophy Engineering}
+\label{ch:profession}
+
+\section{Competency Framework}
+% Knowledge, skills, and abilities for PE practitioners
+% Three levels: associate, professional, senior
+% Mapping to the 16 knowledge areas
+
+\section{Ethical Responsibilities of the Philosophy Engineer}
+% The PE practitioner as moral architect
+% Responsibilities: transparency, auditability, harm prevention
+% When to refuse: ethical red lines for practitioners
+
+\section{Regulatory Landscape}
+% EU AI Act and geometric ethics compliance
+% IEEE P7000 series and PE alignment
+% Future regulatory directions
+
+\section{Open Problems and Research Directions}
+% Computational complexity of moral geodesics
+% Learning the moral metric from data
+% Extending to multi-agent systems
+% The measurement problem in quantum normative dynamics
+% Connections to category theory and homotopy type theory
+
+\section{An Invitation}
+% Philosophy Engineering is not finished --- it is beginning
+% How to contribute: open-source, open research, open debate
+% The stakes: getting AI alignment right is not optional
+
+
+% ============================================================
+% BACK MATTER
+% ============================================================
+\backmatter
+
+% --- Appendices ---
+\appendix
+
+\chapter{Review of Linear Algebra}
+% Vectors, matrices, eigenvalues, inner products, tensor products
+% Sufficient for students who need a refresher
+
+\chapter{Review of Point-Set Topology}
+% Open/closed sets, compactness, connectedness, quotient spaces
+% Sufficient for the manifold chapters
+
+\chapter{Review of Group Theory}
+% Groups, subgroups, homomorphisms, representations
+% Focus on finite groups and Lie groups used in the text
+
+\chapter{Review of Formal Logic}
+% Propositional and predicate logic, proof techniques
+% Deontic logic fundamentals
+
+\chapter{ErisML API Reference}
+% Complete API documentation for ErisML v3.0
+% Class hierarchy, method signatures, parameters
+% Configuration options for all supported domains
+
+\chapter{Solutions to Selected Exercises}
+% Solutions for all A-level and selected B-level exercises
+% Hints for C-level exercises
+
+% --- Bibliography ---
+\chapter{Bibliography}
+
+\begin{thebibliography}{99}
+
+\bibitem{bond2026ge}
+A.~H.~Bond, \emph{Geometric Ethics: The Mathematical Structure of Moral Reasoning}, v1.14, Department of Computer Engineering, San Jos\'{e} State University, Spring 2026.
+
+\bibitem{bond2026erisml}
+A.~H.~Bond, ``ErisML/DEME v3.0: A Library for Governed, Foundation-Model-Enabled Agents with Tensorial Ethics,'' \url{https://github.com/ahb-sjsu/erisml-lib}, 2026.
+
+% --- Foundational Mathematics ---
+\bibitem{lee2013}
+J.~M.~Lee, \emph{Introduction to Smooth Manifolds}, 2nd ed. Springer, 2013.
+
+\bibitem{docarmo1992}
+M.~P.~do Carmo, \emph{Riemannian Geometry}. Birkh\"{a}user, 1992.
+
+\bibitem{nakahara2003}
+M.~Nakahara, \emph{Geometry, Topology and Physics}, 2nd ed. CRC Press, 2003.
+
+\bibitem{goresky1988}
+M.~Goresky and R.~MacPherson, \emph{Stratified Morse Theory}. Springer, 1988.
+
+\bibitem{noether1918}
+E.~Noether, ``Invariante Variationsprobleme,'' \emph{Nachrichten von der Gesellschaft der Wissenschaften zu G\"{o}ttingen}, pp.~235--257, 1918.
+
+% --- Philosophy ---
+\bibitem{kant1785}
+I.~Kant, \emph{Groundwork of the Metaphysics of Morals}, 1785.
+
+\bibitem{rawls1971}
+J.~Rawls, \emph{A Theory of Justice}. Harvard University Press, 1971.
+
+\bibitem{sen1999}
+A.~Sen, \emph{Development as Freedom}. Oxford University Press, 1999.
+
+\bibitem{arrow1951}
+K.~J.~Arrow, \emph{Social Choice and Individual Values}. Wiley, 1951.
+
+\bibitem{peirce1878}
+C.~S.~Peirce, ``How to Make Our Ideas Clear,'' \emph{Popular Science Monthly}, vol.~12, pp.~286--302, 1878.
+
+% --- AI and Alignment ---
+\bibitem{christiano2017}
+P.~Christiano et al., ``Deep reinforcement learning from human feedback,'' \emph{Advances in Neural Information Processing Systems}, 2017.
+
+\bibitem{bourque2014swebok}
+P.~Bourque and R.~E.~Fairley, Eds., \emph{SWEBOK: Guide to the Software Engineering Body of Knowledge}, v3.0. IEEE Computer Society, 2014.
+
+\bibitem{russell2019}
+S.~Russell, \emph{Human Compatible: Artificial Intelligence and the Problem of Control}. Viking, 2019.
+
+% Additional references to be added during writing
+
+\end{thebibliography}
+
+% --- Index ---
+\printindex
+
+\end{document}

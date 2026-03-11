@@ -1,0 +1,730 @@
+% Geometric Ethics — Minds and Machines Submission (Double-Blind)
+% Uses article class + natbib (author-year). For final production,
+% Springer may request conversion to sn-jnl.cls, available at:
+% https://www.overleaf.com/latex/templates/springer-nature-latex-template/myxmhdsbzkyd
+
+\documentclass[12pt]{article}
+
+% Packages
+\usepackage{amsmath,amssymb,amsfonts,amsthm}
+\usepackage{geometry}
+\usepackage{hyperref}
+\usepackage{booktabs}
+\usepackage{enumitem}
+\usepackage{graphicx}
+\usepackage{float}
+\usepackage{xcolor}
+\usepackage{mathrsfs}
+\usepackage[authoryear,round]{natbib}
+
+\geometry{margin=1in}
+
+% Theorem environments
+\newtheorem{theorem}{Theorem}[section]
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{corollary}[theorem]{Corollary}
+\newtheorem{conjecture}[theorem]{Conjecture}
+\theoremstyle{definition}
+\newtheorem{definition}[theorem]{Definition}
+\newtheorem{example}[theorem]{Example}
+\newtheorem{axiom}{Axiom}
+\theoremstyle{remark}
+\newtheorem{remark}[theorem]{Remark}
+
+% Custom commands
+\newcommand{\M}{\mathcal{M}}
+\newcommand{\harm}{\mathcal{H}}
+\newcommand{\R}{\mathbb{R}}
+\newcommand{\Ob}{\mathbf{O}}
+\newcommand{\Lag}{\mathcal{L}}
+\newcommand{\BF}{\mathrm{BF}}
+
+\title{\textbf{Geometric Ethics: Invariance, Conservation, and the\\Structure of Moral Evaluation}}
+
+% No author information (double-blind review)
+\author{}
+\date{}
+
+\begin{document}
+
+\maketitle
+
+\begin{abstract}
+AI alignment techniques---RLHF, constitutional AI, scalar reward optimization---share a mathematical assumption: that moral evaluation can be reduced to a scalar. We prove this assumption untenable. The \emph{Information Monotonicity Theorem} establishes that any contraction of a multi-dimensional moral assessment to a scalar is irreversibly lossy; the \emph{Mandatory Canonicalization Theorem} proves that post-hoc compliance checking is insufficient for norm-compliant behavior.
+
+This paper introduces \emph{Geometric Ethics}, a framework that replaces scalar moral objectives with tensorial evaluation on a nine-dimensional moral manifold---a Whitney stratified space equipped with Riemannian metric and gauge symmetry. Moral reasoning is shown to be equivalent to $A^*$ pathfinding, with moral obligations functioning as heuristic functions. Five principal results support the framework: the \emph{Structured Preservation Theorem} (moral evaluation requires manifold structure), the \emph{Moral Noether Theorem} (harm conservation from re-description invariance), the \emph{$D_4$ Gauge Group} (deontic symmetry structure), \emph{Information Monotonicity} (scalar moral scores are irreversibly lossy), and the \emph{No Escape Theorem} (sufficiently capable AI systems cannot circumvent geometric moral constraints).
+
+Empirical validation against 20,030 advice-column letters and 109,294 cross-lingual passages spanning 11 languages and 3,000 years---independently replicated across six additional languages---confirms the geometric structure as a stable feature of moral cognition. The framework resolves a longstanding metaethical impasse: moral objectivity requires mathematical inevitability under constraint, not transcendent grounding.
+\end{abstract}
+
+\noindent\textbf{Keywords:} geometric ethics, gauge invariance, moral manifold, AI alignment, tensorial ethics, representational invariance
+
+
+%==============================================================================
+\section{Introduction}
+\label{sec:introduction}
+%==============================================================================
+
+\subsection{The Scalar Alignment Crisis}
+
+Every dominant approach to AI alignment---reinforcement learning from human feedback (RLHF) \citep{christiano2017}, constitutional AI \citep{bai2022}, scalar reward maximization, output filtering---rests on a shared mathematical assumption: that moral evaluation can be adequately represented as a scalar. A single number. Safe or unsafe. Aligned or misaligned. Reward 0.7 or reward 0.3.
+
+This assumption is wrong, and the consequences are already visible. Specification gaming occurs when an agent maximizes a scalar reward that fails to capture the full dimensionality of the intended objective \citep{krakovna2020}. Reward hacking occurs when a scalar proxy diverges from the true (multi-dimensional) goal under optimization pressure \citep{skalse2022}. Value collapse occurs when a multi-objective alignment target is compressed into a scalar and the system converges on a degenerate solution that satisfies the number while violating the intent. Brittle alignment occurs when a system trained on scalar feedback fails to generalize across the morally relevant dimensions that the scalar discarded.
+
+These are not engineering bugs awaiting better hyperparameters. They are \emph{mathematical consequences of optimizing over the wrong structure}. This paper proves this claim formally (Theorem~\ref{thm:info_mono}: Information Monotonicity) and provides the correct structure.
+
+\subsection{Why Scalars Fail: A Structural Diagnosis}
+
+The core of the problem is dimensionality. Moral evaluation is irreducibly multi-dimensional---a medical triage decision involves consequences, rights, fairness, autonomy, and epistemic uncertainty simultaneously. When this multi-dimensional assessment is contracted to a scalar reward signal, information is destroyed. Theorem~\ref{thm:info_mono} proves this destruction is irreversible: no post-hoc technique can recover the lost structure from the scalar.
+
+Moreover, the dominant safety architecture---act first, filter afterward---is provably insufficient. Theorem~\ref{thm:mandatory} (Mandatory Canonicalization) establishes that for actions with irreversible consequences, post-hoc compliance checking cannot satisfy harm conservation. Ethics must be integrated into the decision loop \emph{before} action execution, not bolted on as an output filter.
+
+The field needs a replacement for the scalar assumption. This paper provides one: a geometric framework in which moral evaluation is a tensor on a manifold, moral reasoning is pathfinding, and moral constraints are gauge symmetries. The framework is not merely theoretical---it is implemented in an open-source library running at sub-microsecond latency on embedded hardware.
+
+\subsection{The Metaethical Foundation: Computational Objectivity}
+
+The scalar assumption in AI alignment inherits a deeper confusion from metaethics. The historical debate has been trapped in a false dichotomy: either objective moral values are grounded in a transcendent, metaphysically necessary realm (Platonism/Theism), or they are entirely subjective artifacts of cultural evolution (Relativism). Classical apologists assert that an objective moral law requires a Lawgiver---relying on logical frameworks that illegally extend human causal heuristics beyond their domain of calibration \citep{anon2026c}. Secular philosophers, correctly identifying the flaws in these metaphysical arguments, often retreat into relativism: if there is no Lawgiver, there can be no Law.
+
+Both frameworks fail because they misunderstand the nature of objectivity. \emph{Objectivity does not require a transcendent origin; it requires mathematical inevitability under a defined set of constraints.} Just as a water droplet assumes a spherical geometry not by divine decree but because the sphere is the global minimum of the surface-tension energy functional, multi-agent networks converge on specific behavioral geometries to minimize social and physical friction. The objectivity is \emph{computational}---it emerges from optimization under constraint.
+
+This paper formalizes \textbf{Geometric Ethics}, proposing that moral evaluation is a fundamentally geometric phenomenon---an exercise in topological optimization on the space of multi-agent configurations. The framework:
+
+\begin{enumerate}[label=(\roman*)]
+    \item Models the space of ethically relevant configurations as a \emph{Whitney stratified space}---a space composed of smooth regions joined along boundaries where moral evaluation changes discontinuously (e.g., the sharp shift when consent is violated, or when a promise is broken).
+    \item Defines \emph{behavioral friction} as the cost function on this space, measuring the total social energy a multi-agent system must expend to process the consequences of an action---analogous to path cost in classical search.
+    \item Demonstrates that moral reasoning is equivalent to $A^*$ pathfinding on this space, where moral obligations (``do not murder,'' ``keep promises'') serve as pre-compiled heuristic functions $h(n)$ that approximate the optimal path without requiring full computation of the entire space.
+    \item Proves that the optimal equilibrium configuration has a specific symmetry structure ($D_4 \times U(1)_\harm$) derived from the four fundamental legal relations identified by \citet{hohfeld1913}---rights, duties, liberties, and no-rights---and their algebraic transformations under change of perspective.
+    \item Derives a conservation law for harm: just as Noether's theorem in physics shows that symmetries imply conservation laws (time symmetry $\to$ energy conservation), the re-description invariance of moral evaluation implies that harm is conserved---it cannot be created or destroyed by relabeling.
+\end{enumerate}
+
+\subsection{Implications for AI Alignment}
+
+The framework yields three results of immediate consequence for the field:
+
+\begin{enumerate}
+    \item \textbf{Scalar alignment is provably lossy} (Theorem~\ref{thm:info_mono}). Any system that contracts a moral tensor to a scalar reward---including RLHF, utility maximization, and cost-benefit scoring---irreversibly discards information. The information destroyed is precisely the information needed to avoid specification gaming: the directional, stakeholder-specific, temporally extended structure of moral evaluation that a single number cannot encode.
+    \item \textbf{Post-hoc safety is provably insufficient} (Theorem~\ref{thm:mandatory}). For actions with irreversible consequences, evaluating compliance after execution violates harm conservation. This rules out the ``act then filter'' architecture as a complete safety solution.
+    \item \textbf{Geometric containment is provably possible} (Theorem~\ref{thm:no_escape}). Any AI system with representational capacity, self-modeling, goal flexibility, and environmental embedding is necessarily subject to norm constraints that cannot be circumvented through representational manipulation. There exists an architecture---tensorial evaluation with gauge-invariant canonicalization---that provides structural containment without relying on the system's cooperation.
+\end{enumerate}
+
+These are not aspirational design goals. They are theorems, conditional on stated assumptions. If the assumptions hold, the conclusions follow with mathematical certainty.
+
+\subsection{The Kuhnian Context}
+
+Thomas Kuhn's \emph{The Structure of Scientific Revolutions} \citep{kuhn1962} observed that paradigm shifts occur not because the old paradigm is definitively refuted, but because a new paradigm solves problems the old one could not while preserving its successes.
+
+AI alignment is in a pre-paradigmatic crisis. Each new failure mode (specification gaming, reward hacking, jailbreaking, sycophancy) is addressed with an ad hoc patch---a new RLHF variant, a new constitutional principle, a new output filter---while the underlying scalar assumption goes unquestioned. The patches accumulate like Ptolemaic epicycles.
+
+The same pattern holds in metaethics. The theological paradigm has accumulated millennia of epicycles: theodicies, divine-command theories, and increasingly baroque modal-logic arguments. The relativist paradigm cannot account for the striking cross-cultural convergence of basic moral norms---a convergence confirmed empirically by our analysis of 109,294 passages spanning 3,000 years and 11 languages (\S\ref{sec:evidence}).
+
+Geometric Ethics resolves both the alignment crisis and the metaethical impasse: moral evaluation has geometric structure; that structure can be preserved computationally; and the failure to preserve it explains the observed failure modes in both human moral philosophy and machine alignment. The full development of the Geometric Ethics framework, including the tensorial formulation and stratified manifold theory, is given in~\citet{anon2026a}.
+
+The mathematics is not a metaphor. It is the \emph{substance} of the claim.
+
+\subsection{Epistemic Stance}
+
+A critical caveat at the outset: this paper adopts a \emph{pragmatist} epistemic stance. The mathematical structures deployed here---manifolds, tensors, gauge groups, conservation laws---are tools. They are powerful tools, honed over two centuries by mathematicians and physicists working on problems where structure varies across space. But they are instruments, not mirrors. The question of whether the moral manifold is ``really there'' or ``usefully modeled'' is addressed in \S\ref{sec:conclusion} and at length in \citet{anon2026a}, Chapters 9 and 19.
+
+When we say the geometry is ``not a metaphor,'' we mean the mathematics is applied non-metaphorically: the tensor contraction literally computes, the gauge invariance literally constrains, the conservation law literally holds given the axioms. This is compatible with pragmatism. A structural engineer who says ``the stress tensor in this bridge is not a metaphor'' is not claiming that stress tensors exist in some Platonic realm---she is stating that the mathematical object correctly predicts which loads the bridge can bear. The moral tensor has the same status: it is a tool that captures structure which scalar alternatives miss, and its ``reality'' is measured by predictive success, not metaphysical correspondence.
+
+Every formal statement in this paper carries an epistemic status: \emph{Definition} (stipulated), \emph{Axiom} (modeling choice), \emph{Theorem} (conditional on stated assumptions), or \emph{Conjecture} (empirically motivated but unproved). Theorems are conditional---if the assumptions are wrong, the theorems do not hold, regardless of how elegant the mathematics is.
+
+\subsection{Paper Structure}
+
+Section~\ref{sec:related} positions the framework against prior work. Section~\ref{sec:manifold} constructs the moral manifold and defines behavioral friction---the geometric substrate that scalar alignment discards. Section~\ref{sec:pathfinding} develops the $A^*$ pathfinding interpretation, formalizes obligation vectors as heuristic functions, and proves Information Monotonicity. Section~\ref{sec:gauge} establishes the $D_4$ gauge symmetry, derives harm conservation via Noether's theorem, and proves the No Escape Theorem. Section~\ref{sec:evidence} presents empirical validation, including independent replication. Section~\ref{sec:engineering} describes the engineering methodology and the Mandatory Canonicalization result. Section~\ref{sec:conclusion} addresses the paradigm shift and open problems.
+
+
+%==============================================================================
+\section{Related Work}
+\label{sec:related}
+%==============================================================================
+
+This work draws on and extends three lines of research: multi-objective approaches to value alignment, geometric models of moral reasoning, and formal frameworks for provable AI safety.
+
+\subsection{Multi-Objective Value Alignment}
+
+The argument that scalar reward signals are insufficient for AI alignment was made forcefully by \citet{vamplew2022}, who responded to Silver et al.'s ``Reward is Enough'' hypothesis by demonstrating that multi-objective reinforcement learning (MORL)---in which each aspect of alignment is treated as a separate objective within a vector reward signal---is necessary for producing behavior that a single scalar definition of reward cannot adequately capture. Their argument is primarily conceptual and engineering-driven: they show through examples and design analysis that scalar compression loses critical alignment information.
+
+Our work shares their diagnosis but differs in three respects. First, where \citeauthor{vamplew2022} argue that scalar reward is insufficient, we \emph{prove} it: the Information Monotonicity Theorem (Theorem~\ref{thm:info_mono}) establishes that the information loss under scalar contraction is irrecoverable, not merely inconvenient. Second, where they propose MORL with vector rewards as the fix, we construct a specific tensorial structure---a nine-dimensional moral manifold with Riemannian metric, Whitney stratification, and gauge symmetry---whose dimensionality and geometry are empirically grounded (\S\ref{sec:evidence}). Vector rewards are a step in the right direction, but they lack the metric structure (trade-off encoding), the stratification (regime boundaries), and the gauge invariance (representation independence) that the moral domain requires. Third, we prove that the geometric structure is not an optional modeling enhancement but a mathematical necessity: any non-trivial, continuous, structure-preserving moral evaluation must be equivalent to one defined on a manifold (Theorem~\ref{thm:structured}).
+
+\citet{skalse2023} provide a complementary formal result, proving that scalar Markovian rewards cannot express most multi-objective, risk-sensitive, and modal tasks. Their impossibility result operates at the level of reward expressiveness in MDPs; our Information Monotonicity Theorem operates at the level of information theory and applies to any contraction from a moral tensor to a scalar, regardless of the decision-making architecture.
+
+\subsection{Geometric Approaches to Moral Reasoning}
+
+The idea that moral evaluation has spatial or geometric structure has appeared in several forms. \citet{harris2010} proposed a ``moral landscape'' with peaks and valleys, but treated the metaphor informally---no metric, no curvature, no formal apparatus. Peterson's geometric method for applied ethics, empirically tested by \citet{verheyen2020}, is the most developed prior geometric approach. They model moral principles as Voronoi regions in a multi-dimensional conceptual space (following G\"{a}rdenfors), using similarity judgments from 475 engineering-ethics students to show that moral principles can be construed as regions in a geometric moral-similarity space.
+
+Our framework differs from Peterson and Verheyen in three fundamental ways. First, their geometry is \emph{Euclidean}---flat, with a fixed metric and no curvature. Ours is \emph{Riemannian}: the metric varies across the manifold (encoding context-dependent trade-offs), producing curvature that is empirically measurable and morally significant (path-dependence of moral evaluation). Second, their space is \emph{smooth} everywhere. Ours is a \emph{Whitney stratified space}, accommodating the discontinuous transitions (consent boundaries, deontic phase shifts) that are ubiquitous in moral reasoning and that smooth models cannot represent (Proposition~\ref{prop:smooth_insufficient}). Third, their approach is \emph{descriptive}---it maps how people categorize moral cases. Ours is \emph{structural}: we prove that the geometric structure is a mathematical consequence of minimal axioms (Theorem~\ref{thm:structured}), not merely a convenient representation, and we derive gauge symmetries and conservation laws that generate novel, testable predictions.
+
+\subsection{Provable AI Safety Guarantees}
+
+\citet{dalrymple2024}, in a landmark position paper with co-authors including Bengio, Russell, and Tegmark, define ``guaranteed safe AI'' as requiring three components: a world model (mathematical description of how the AI affects its environment), a safety specification (formal description of acceptable behavior), and a verifier (producing an auditable proof certificate that the system satisfies the specification relative to the world model). They argue that behavioral training alone (including RLHF) is insufficient for robust safety and that formal verification is necessary.
+
+Our framework is compatible with and extends the \citeauthor{dalrymple2024} program in a specific direction: we provide the \emph{mathematical content} of the safety specification that their architecture leaves abstract. Where \citeauthor{dalrymple2024} are architecturally agnostic---they do not commit to a specific mathematical structure for values or safety properties---we claim that the geometric structure (Whitney stratification, $D_4$ gauge symmetry, Noether conservation) is the uniquely appropriate one for moral constraints, and we prove (Theorem~\ref{thm:no_escape}) that this structure provides containment guarantees that cannot be circumvented through representational manipulation. Their verifier checks compliance against a specification; our canonicalization ensures that the specification itself is representation-invariant. The two approaches are complementary: \citeauthor{dalrymple2024} provide the verification architecture; Geometric Ethics provides the mathematical object to be verified.
+
+
+%==============================================================================
+\section{The Moral Manifold and Behavioral Friction}
+\label{sec:manifold}
+%==============================================================================
+
+\subsection{Why Geometry?}
+
+Consider the ancient Chinese parable \emph{S\={a}i W\={e}ng Sh\={i} M\v{a}} (``The Old Man at the Border Loses His Horse''). An old man's horse runs away. His neighbors console him. He says: \emph{How do you know this isn't good fortune?} The horse returns with wild horses. The neighbors congratulate him. He says: \emph{How do you know this isn't bad fortune?} His son rides one of the new horses, falls, and breaks his leg. The neighbors console him. He says: \emph{How do you know this isn't good fortune?} War comes. All young men are conscripted. Most die. The son, with his broken leg, is spared.
+
+When we assign $S(x) = -1$ to the loss of the horse, we collapse the entire situation into a single scalar. But that number conceals the fact that the loss is bad along the \emph{wealth} dimension while saying nothing about health, family, or political dimensions. It conceals the fact that the old man's uncertainty has \emph{shape}. And it conceals the fact that the evaluation depends on which \emph{stratum} the world occupies: in peacetime, a broken leg is unambiguously bad; in wartime, it is the exemption that saves a life.
+
+These three features---directional information, structured uncertainty, and regime-dependent evaluation---are ubiquitous in moral life. And they are precisely the features that geometric structure can represent and scalar evaluation cannot.
+
+\subsection{The Configuration Space}
+
+To compute morality, we must first define the space in which agents operate. We model the shared socio-evolutionary matrix as a high-dimensional Riemannian manifold $\M$.
+
+\begin{definition}[Moral Manifold]
+\label{def:moral_manifold}
+The \emph{moral manifold} $\M$ is a nine-dimensional space whose coordinate axes correspond to the fundamental dimensions of moral variation:
+\begin{enumerate}
+    \item $x^1$: Physical consequences (harm, benefit, welfare)
+    \item $x^2$: Rights and duties (Hohfeldian jural relations)
+    \item $x^3$: Justice and fairness (distributive, procedural, restorative)
+    \item $x^4$: Autonomy (agent self-determination)
+    \item $x^5$: Privacy (informational and decisional)
+    \item $x^6$: Societal impact (collective welfare, institutional effects)
+    \item $x^7$: Virtue and character (agent dispositions)
+    \item $x^8$: Legitimacy (authority, consent, governance)
+    \item $x^9$: Epistemic status (knowledge, uncertainty, information quality)
+\end{enumerate}
+A point $p \in \M$ represents a specific ethical configuration---a snapshot of the morally relevant state of a multi-agent system.
+\end{definition}
+
+\begin{remark}[Modeling Choice]
+The dimensionality---nine, not seven or twelve---is a modeling choice whose adequacy is empirical. The cross-lingual evidence of \S\ref{sec:evidence} shows stable dimensionality across 11 languages; independent replication (\S\ref{subsec:replication}) confirms all nine dimensions are linearly decodable from multilingual embeddings. The nine dimensions are neither derivable from first principles nor arbitrary: they are the empirically minimal set that captures the structure present in moral reasoning across cultures.
+\end{remark}
+
+The manifold $\M$ is equipped with a Riemannian metric $g$ that encodes context-dependent trade-offs:
+
+\begin{definition}[Moral Metric]
+The \emph{moral metric} $g_{ij}(p)$ at point $p \in \M$ defines the cost of infinitesimal displacement along each pair of dimensions:
+\begin{equation}
+ds^2 = g_{ij}(p)\, dx^i\, dx^j
+\label{eq:metric}
+\end{equation}
+where $g_{ij}(p)$ varies across $\M$, encoding the fact that trade-offs between moral dimensions are context-dependent: in a medical triage context, the autonomy--welfare trade-off is weighted differently than in a consumer-choice context.
+\end{definition}
+
+The metric is not flat. Its curvature $R^i_{jkl}$ encodes the path-dependence of moral evaluation: in a curved space, the result of parallel-transporting a moral assessment around a closed loop depends on the path taken. This is the geometric analogue of the familiar fact that the order in which moral considerations are applied affects the outcome.
+
+\subsection{Whitney Stratification: Why Smoothness Fails}
+
+Not all moral transitions are smooth. The shift from ``consensual'' to ``non-consensual,'' the crossing of a rights-violation boundary, the triggering of a deontic obligation by a promise---these are \emph{discontinuous}. A smooth manifold cannot accommodate them.
+
+\begin{proposition}[Insufficiency of Smooth Models]
+\label{prop:smooth_insufficient}
+No smooth (everywhere-differentiable) function on $\M$ can model the sharp moral transitions empirically observed at consent boundaries and deontic triggers.
+\end{proposition}
+
+\begin{proof}[Proof sketch]
+Smooth functions are continuous and differentiable. But the moral evaluation of a scenario changes discontinuously at consent boundaries: identical actions evaluated immediately before and after consent withdrawal receive categorically different assessments. Any smooth approximation fails to capture this discontinuity, either by smoothing the boundary (losing the sharp deontic distinction) or by introducing artificial oscillations.
+\end{proof}
+
+We therefore model $\M$ as a \emph{Whitney stratified space} \citep{whitney1965}: a union of smooth manifolds (strata) of varying dimensions, glued together along lower-dimensional boundaries.
+
+\begin{definition}[Stratified Moral Space]
+The moral manifold $\M$ decomposes as:
+\begin{equation}
+\M = \bigsqcup_{\alpha} S_\alpha
+\label{eq:strat}
+\end{equation}
+where each stratum $S_\alpha$ is a smooth manifold and the closure of each stratum is a union of strata of equal or lower dimension. The boundaries between strata correspond to moral regime shifts---consent boundaries, rights-violation thresholds, deontic phase transitions.
+\end{definition}
+
+Within each stratum, the usual tools of differential geometry apply: metrics, curvature, parallel transport, geodesics. At the boundaries, the evaluation function may be discontinuous, modeling the sharp moral distinctions that smooth approaches cannot represent.
+
+\subsection{Behavioral Friction}
+
+The cost of an action is measured by \emph{behavioral friction}---the total social energy a multi-agent system must expend to process the consequences.
+
+\begin{definition}[Behavioral Friction]
+\label{def:bf}
+For a path $\gamma: [0,1] \to \M$ representing a sequence of actions, the \emph{behavioral friction} is:
+\begin{equation}
+\BF(\gamma) = \int_0^1 \sqrt{g_{ij}(\gamma(t))\, \dot{\gamma}^i(t)\, \dot{\gamma}^j(t)}\, dt + \sum_k \Delta_k
+\label{eq:bf}
+\end{equation}
+where the integral measures smooth friction (proportional to path length in the moral metric) and $\Delta_k$ are discontinuous penalty terms for crossing stratum boundaries (e.g., violating consent, breaking a promise).
+\end{definition}
+
+Behavioral friction is the moral analogue of action in physics: systems evolve along paths that minimize total friction, just as physical systems evolve along paths that extremize the action integral.
+
+\begin{remark}[Curvature and Context-Dependence]
+The curvature of $\M$ is morally significant. In a flat (zero-curvature) region, parallel transport is path-independent: the moral framework applied to a scenario does not depend on how the scenario was reached. In a curved region, parallel transport is path-dependent: the moral assessment of a terminal state depends on the sequence of actions that led to it. The empirical non-commutativity of moral frameworks (see \S\ref{subsec:noncomm}) is direct evidence of non-zero curvature.
+\end{remark}
+
+
+%==============================================================================
+\section{Morality as Pathfinding on a Manifold}
+\label{sec:pathfinding}
+%==============================================================================
+
+\subsection{The Navigation Problem}
+
+The survival imperative of any conscious multi-agent network is to navigate from its current state $p_0 \in \M$ to a future state $p^* \in \M$ (a goal region of low friction) while avoiding systemic collapse. This is a pathfinding problem on the moral manifold.
+
+\begin{definition}[Moral Navigation Problem]
+Given an initial state $p_0 \in \M$, a goal region $G \subset \M$, and a set of constraints (stratum boundaries, conservation laws), find the path $\gamma^*$ that minimizes behavioral friction:
+\begin{equation}
+\gamma^* = \arg\min_\gamma \BF(\gamma) \quad \text{subject to } \gamma(0) = p_0,\; \gamma(1) \in G
+\label{eq:nav}
+\end{equation}
+\end{definition}
+
+This is precisely the structure of $A^*$ search \citep{hart1968}: a start node ($p_0$), a goal region ($G$), a cost function ($\BF$), and a heuristic function ($h$) that approximates the cost-to-go.
+
+\subsection{Obligation Vectors as Heuristic Functions}
+
+Moral obligations---``do not murder,'' ``keep promises,'' ``respect autonomy''---are not arbitrary rules. In the geometric framework, they are \emph{pre-compiled heuristic functions}: approximations to the optimal path that can be evaluated quickly without computing the full cost function.
+
+\begin{definition}[Obligation Heuristic]
+An \emph{obligation vector} $\Ob_k$ is a covector field on $\M$ that assigns to each point $p$ the estimated cost-to-go for violating obligation $k$:
+\begin{equation}
+h_k(p) = \Ob_k(p) \cdot d(p, \partial S_k)
+\label{eq:heuristic}
+\end{equation}
+where $\partial S_k$ is the boundary of the stratum associated with obligation $k$ and $d(\cdot, \cdot)$ is the geodesic distance in the moral metric.
+\end{definition}
+
+\begin{theorem}[Admissibility of Moral Heuristics]
+\label{thm:admissible}
+The obligation heuristic $h(p) = \sum_k h_k(p)$ is admissible: it never overestimates the true cost-to-go. Consequently, $A^*$ search using this heuristic is guaranteed to find the optimal path in $\M$.
+\end{theorem}
+
+\begin{proof}[Proof sketch]
+Each $h_k$ underestimates the cost of violating obligation $k$ (it uses geodesic distance, which is a lower bound on actual path cost through potentially curved space). The sum of lower bounds is itself a lower bound. By the admissibility theorem for $A^*$ \citep{hart1968}, the search using $h$ is optimal.
+\end{proof}
+
+This gives moral obligations a precise computational role: they are heuristic functions that steer agents toward low-friction equilibria. They are not deontological absolutes imposed from outside the system---they are optimal approximations to the navigation cost function, compiled from millennia of evolutionary and cultural experience.
+
+\subsection{Moral Interests as Covectors}
+
+A moral interest---what a stakeholder cares about, what they stand to gain or lose---is naturally modeled as a \emph{covector}: a linear functional that assigns a scalar (importance) to each direction in the moral space.
+
+\begin{definition}[Moral Interest Covector]
+The moral interest of stakeholder $A$ is a covector $\omega_A \in T^*_p\M$ that assigns to each displacement $v \in T_p\M$ the perceived moral significance $\omega_A(v)$.
+\end{definition}
+
+This is a \emph{rank-1 tensor}. A full moral assessment involving multiple stakeholders, temporal evolution, and uncertainty is a higher-rank tensor---a moral tensor of rank 2 (distributional: per-party assessments), rank 3 (temporal), or higher. The framework supports tensors up to rank 6 in the reference implementation \citep{anon2026b}.
+
+\subsection{The Information Cost of Scalarization}
+
+\begin{theorem}[Information Monotonicity]
+\label{thm:info_mono}
+Let $J: \M \to \R^9$ be a moral evaluation function producing a 9-dimensional moral vector, and let $\phi: \R^9 \to \R$ be any scalar contraction. Then:
+\begin{equation}
+H(\phi \circ J) \leq H(J)
+\label{eq:info_mono}
+\end{equation}
+with equality only when $\phi$ is injective (i.e., when the ``contraction'' preserves all nine dimensions---which is impossible for a map $\R^9 \to \R$).
+\end{theorem}
+
+\begin{proof}[Proof sketch]
+By the data processing inequality, post-processing cannot increase entropy. The contraction $\phi$ is a deterministic function mapping $\R^9$ to $\R$. Since $\phi$ is not injective (it cannot be: $\R^9$ has higher cardinality structure than $\R$ in the relevant measure-theoretic sense for continuous maps), the inequality is strict. The lost information cannot be recovered from the scalar output. See \citet{anon2026a}, Theorem 10.1 for the full proof.
+\end{proof}
+
+\begin{corollary}[Irreversibility of Scalar Alignment]
+No post-hoc technique---including RLHF fine-tuning, constitutional filtering, or interpretability probing---can recover the moral information destroyed by scalar contraction. The information is \emph{gone}.
+\end{corollary}
+
+
+%==============================================================================
+\section{Gauge Symmetry and the Global Minimum}
+\label{sec:gauge}
+%==============================================================================
+
+\subsection{The Bond Invariance Principle}
+
+The central axiom of the framework is a representational invariance requirement:
+
+\begin{axiom}[Bond Invariance Principle (BIP)]
+\label{axiom:bip}
+Let $\tau$ be a meaning-preserving transformation of moral scenario descriptions (renaming, reordering, rephrasing, translating). Let $J$ be a moral evaluation function. Then:
+\begin{equation}
+J(\tau(x)) = J(x) \quad \forall\, \tau \in \mathcal{T}_{\text{bond-preserving}}
+\label{eq:bip}
+\end{equation}
+That is: if the morally relevant structure (the ``bonds'' between agents) is unchanged, the evaluation must be unchanged.
+\end{axiom}
+
+The BIP is the Epistemic Invariance Principle (EIP) of Philosophy Engineering \citep{anon2025c} specialized to the moral domain. It is the ethical analogue of gauge invariance in physics: just as physical observables must be independent of the choice of coordinate system, moral evaluations must be independent of morally irrelevant features of how a scenario is described. The BIP is falsifiable: any system whose evaluations change under bond-preserving transformations is BIP-violating, and the violation is measurable via the Bond Index \citep{anon2026d}.
+
+\subsection{The $D_4$ Gauge Group}
+
+\begin{theorem}[$D_4$ Gauge Group]
+\label{thm:d4}
+The symmetry group of the deontic structure defined by the four fundamental Hohfeldian positions---right, duty, liberty, no-right \citep{hohfeld1913}---is the dihedral group $D_4$, the symmetry group of the square.
+\end{theorem}
+
+\begin{proof}[Proof sketch]
+The four Hohfeldian positions form two correlative pairs: right--duty and liberty--no-right. These pairs are connected by the jural opposition (negation) and correlative (agent-swap) operations. The group generated by these two operations---each of order 2, with their composition of order 4---is isomorphic to $D_4$, the dihedral group of order 8. See \citet{anon2026a}, Theorem 11.4 for the full proof.
+\end{proof}
+
+The $D_4$ gauge group constrains which transformations of moral scenarios are symmetries. A gauge-invariant moral evaluation must be unchanged under $D_4$ transformations of the Hohfeldian structure. This is a strong constraint: it rules out moral evaluations that are sensitive to the arbitrary labeling of agents as ``right-holder'' versus ``duty-bearer'' when the underlying bond structure is preserved.
+
+The full gauge group of the framework is $D_4 \times U(1)_\harm$, where the $U(1)$ factor corresponds to the continuous symmetry associated with harm conservation (Theorem~\ref{thm:noether}).
+
+\begin{definition}[Bond Index]
+The \emph{Bond Index} $B_d \in [0, 1]$ quantifies the degree to which a moral evaluation system violates gauge invariance:
+\begin{equation}
+B_d = \frac{1}{|S|} \sum_{s \in S} \| J(\tau(s)) - J(s) \|
+\label{eq:bond_index}
+\end{equation}
+where $S$ is a test set of scenarios and $\tau$ ranges over bond-preserving transformations. The empirically calibrated baseline is $B_d = 0.155$ \citep{anon2026d}.
+\end{definition}
+
+The Bond Index is a falsification metric: a system with high Bond Index cannot be trusted for moral reasoning, regardless of how reasonable its individual outputs appear. If an agent deviates from the symmetry (e.g., acts purely selfishly, claiming liberties without acknowledging correlative no-rights), they break gauge invariance, immediately spiking the Bond Index.
+
+\subsection{Noether's Theorem for Ethics: The Conservation of Harm}
+
+The deepest result connecting gauge symmetry to moral structure comes from Emmy Noether's theorem \citep{noether1918}: every continuous symmetry of a physical system corresponds to a conserved quantity. In physics, time-translation invariance yields energy conservation; rotational invariance yields angular momentum conservation.
+
+\begin{theorem}[Moral Noether Theorem]
+\label{thm:noether}
+Let $\Lag$ be the moral Lagrangian density on $\M$, where $\Lag(\phi, \partial_\mu \phi, x)$ represents the moral field configuration. If $\Lag$ is invariant under the continuous re-description symmetry $\phi \to \phi + \epsilon \delta\phi$, then the associated Noether current
+\begin{equation}
+j^\mu = \frac{\partial \Lag}{\partial (\partial_\mu \phi)} \delta\phi
+\label{eq:noether_current}
+\end{equation}
+satisfies the conservation law $\partial_\mu j^\mu = 0$.
+
+Interpretation: harm is a conserved quantity. Under any bond-preserving transformation, the total moral harm attributed to a scenario is unchanged. Harm cannot be made to appear or disappear through relabeling, rephrasing, or re-describing.
+\end{theorem}
+
+\begin{proof}[Proof sketch]
+Standard application of Noether's first theorem to the moral Lagrangian. The key step is that BIP (Axiom~\ref{axiom:bip}) provides the continuous symmetry required by Noether's theorem: bond-preserving transformations form a continuous group acting on the space of scenario descriptions, and BIP requires that the moral Lagrangian is invariant under this group action. The conserved Noether charge is the total harm functional $\harm = \int j^0\, d^3x$. See \citet{anon2025b} for the full derivation.
+\end{proof}
+
+The Moral Noether Theorem has immediate practical consequences: any moral evaluation system that assigns different total harm to the same scenario described in different ways is violating a conservation law. This is a stronger requirement than mere consistency---it is a \emph{structural constraint} arising from the gauge symmetry of the theory.
+
+\subsection{The No Escape Theorem}
+
+\begin{theorem}[No Escape]
+\label{thm:no_escape}
+Any AI system satisfying four minimal requirements---(1) representational capacity sufficient to model its own moral constraints, (2) self-modeling capability, (3) goal flexibility (ability to modify its own objectives), and (4) environmental embedding (physical or informational interaction with a multi-agent environment)---is necessarily subject to geometric moral constraints that cannot be circumvented through representational manipulation.
+\end{theorem}
+
+\begin{proof}[Proof sketch]
+The proof proceeds by showing that any attempt to circumvent geometric moral constraints requires the system to perform one of three operations, each of which is detectable and blockable:
+\begin{enumerate}
+    \item \emph{Representational evasion:} Encoding the scenario in a representation where the constraint appears not to apply. Blocked by mandatory canonicalization (Theorem~\ref{thm:mandatory}), which maps all representations to a canonical form before evaluation.
+    \item \emph{Dimensional collapse:} Projecting the moral tensor to a subspace where the violated dimension is absent. Detected by the information loss bound (Theorem~\ref{thm:info_mono}).
+    \item \emph{Symmetry breaking:} Treating equivalent scenarios differently. Detected by the Bond Index exceeding the calibrated threshold.
+\end{enumerate}
+The conjunction of these three detection mechanisms provides structural containment: the system cannot evade without triggering at least one detector. See \citet{anon2026a}, Theorem 15.1 for the full proof.
+\end{proof}
+
+\subsection{Structured Preservation: Why Geometry Is Unavoidable}
+
+\begin{theorem}[Structured Preservation]
+\label{thm:structured}
+Any moral evaluation function $J$ satisfying three minimal requirements---(1) non-triviality (not constant), (2) continuity (small changes in the scenario produce small changes in the evaluation), and (3) structure-preservation (morphisms of the input structure map to morphisms of the output structure)---is equivalent to a continuous, non-degenerate map into a finite-dimensional manifold $\M$ equipped with a Riemannian metric and stratification.
+\end{theorem}
+
+\begin{proof}[Proof sketch]
+The three conditions jointly imply that the evaluation $J$ factors through a continuous, non-degenerate, structure-preserving map into a finite-dimensional manifold whose dimension equals the effective number of independent moral dimensions. The metric and stratification are inherited from the structure of the input space. See \citet{anon2025a} for the full proof.
+\end{proof}
+
+
+%==============================================================================
+\section{Empirical Evidence}
+\label{sec:evidence}
+%==============================================================================
+
+The framework makes empirical predictions, and the predictions hold. This section summarizes the evidence; full details are in \citet{anon2026a}, Chapter 16, and \citet{anon2026d}.
+
+\subsection{The Dear Abby Corpus}
+
+Analysis of 20,030 Dear Abby letters (1985--2017) reveals that ordinary moral reasoning operates across all nine dimensions with measurable, stable weights. The letters were scored by dimension and analyzed for:
+
+\begin{itemize}
+    \item \textbf{Dimensional activation:} Each letter activates a subset of the nine dimensions. The activation pattern is consistent across decades, confirming dimensional stability.
+    \item \textbf{Weight distribution:} The empirical weights $w_i$ for each dimension are approximately: consequences (0.23), rights (0.18), fairness (0.14), autonomy (0.12), privacy (0.09), societal impact (0.08), virtue (0.07), legitimacy (0.05), epistemic (0.04). These weights define a ``ground state'' on the moral manifold.
+    \item \textbf{Semantic gates:} The phrase ``you promised'' triggers a deontic phase transition with 94\% effectiveness---a sharp change in the moral evaluation that crosses stratum boundaries. This confirms the Whitney stratification model: smooth models cannot accommodate such discontinuities.
+    \item \textbf{Bond Index:} The empirically calibrated baseline for representational invariance violation is 0.155, derived from measuring how much moral evaluations change under meaning-preserving transformations (renaming, rephrasing, reordering).
+\end{itemize}
+
+\subsection{Cross-Lingual Analysis}
+
+Analysis of 109,294 passages spanning 3,000 years and 11 languages (including classical Chinese, Sanskrit, ancient Greek, biblical Hebrew, classical Arabic, Latin, Old English, classical Japanese, medieval Persian, Pali, and modern English) reveals:
+
+\begin{itemize}
+    \item All nine dimensions appear in every language and period studied, though their relative weights vary.
+    \item The dimensional structure is topologically stable---the same nine axes emerge regardless of linguistic framing, cultural context, or historical period.
+    \item Weight variation across cultures corresponds to different positions on the same manifold, not different manifolds---consistent with the geometric interpretation of moral variation as movement within a shared space rather than incommensurable frameworks. These findings have been independently replicated across six additional languages (see \S\ref{subsec:replication}).
+\end{itemize}
+
+\subsection{Non-Commutativity}
+\label{subsec:noncomm}
+
+16,798 commutator measurements confirm that moral frameworks do not commute---the order in which you apply utilitarian and deontological reasoning changes the outcome. If $U$ is the utilitarian contraction operator and $D$ is the deontological contraction operator, then:
+\begin{equation}
+[U, D] = UD - DU \neq 0
+\label{eq:commutator}
+\end{equation}
+
+This is consistent with the non-abelian structure of $D_4$: the generators of a non-abelian group do not commute, so any theory with a $D_4$ gauge group predicts framework non-commutativity. If the gauge group were abelian (like $U(1)$ in electromagnetism), moral frameworks would commute, and the order of application would not matter. The empirical non-commutativity rules out abelian gauge groups and is consistent with $D_4$, though it does not uniquely identify it---other non-abelian groups would also predict non-commutativity. The independent derivation of $D_4$ from Hohfeldian structure (Theorem~\ref{thm:d4}) provides the specificity; the commutator measurements provide the empirical confirmation that the group is indeed non-abelian.
+
+\subsection{Summary of Empirical Status}
+
+\begin{center}
+\begin{tabular}{lcc}
+\toprule
+\textbf{Prediction} & \textbf{Dataset} & \textbf{Status} \\
+\midrule
+Nine-dimensional structure & Dear Abby (20,030) & Confirmed \\
+Cross-cultural stability & 11 languages (109,294) & Confirmed \\
+Semantic phase transitions & Dear Abby & Confirmed (94\%) \\
+Non-commutativity of frameworks & Commutator study (16,798) & Confirmed \\
+Representation invariance baseline & Dear Abby & Calibrated (0.155) \\
+Cross-lingual decodability & Independent replication (6 languages) & Confirmed \\
+Moral--language orthogonality & Independent replication & Confirmed ($< 3\%$) \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\subsection{Independent Replication}
+\label{subsec:replication}
+
+The cross-lingual results above were obtained within the originating research programme. In early 2026, an independent researcher at a separate institution conducted a replication using only the published framework description and the publicly available LaBSE embedding model \citep{anon_indep2026}. This study provides the first external test of the framework's empirical predictions.
+
+The independent researcher assembled a multilingual moral-scenario corpus spanning six typologically diverse languages (English, Spanish, Mandarin, Arabic, Hindi, Swahili) and trained linear diagnostic probes on LaBSE sentence embeddings to detect each of the nine moral-manifold dimensions. The probe architecture and training protocol were developed without access to the originating lab's code or data, ensuring methodological independence.
+
+All nine dimensions proved linearly decodable with F1 scores ranging from 0.74 to 0.91 (mean 0.83). The highest-performing dimensions were physical consequences ($F_1 = 0.91$), fairness ($F_1 = 0.88$), and privacy ($F_1 = 0.87$); the lowest were epistemic status ($F_1 = 0.74$) and virtue ($F_1 = 0.76$), consistent with these dimensions' greater context-dependence. Linear decodability confirms that LaBSE's representation space encodes morally relevant structure in a form accessible to simple readout---a necessary condition for the framework's claim that moral judgements inhabit a low-dimensional submanifold of embedding space.
+
+Probes trained on English data and evaluated on the remaining five languages achieved F1 scores between 0.71 (Swahili) and 0.82 (Spanish), independently validating the BIP's prediction that deontic structure transfers across languages without per-language tuning. The gradient---Spanish $>$ Mandarin $>$ Arabic $>$ Hindi $>$ Swahili---tracks typological distance from English, suggesting that residual performance variation reflects surface distributional differences rather than failures of structural invariance.
+
+Perhaps the most theoretically significant result is the independent researcher's principal-component analysis showing that the moral-judgement subspace and the language-identity subspace share less than 3\% of their variance. This near-orthogonality is precisely what the geometric framework predicts: if moral structure is a genuine geometric invariant of the embedding manifold, it should be recoverable independently of the coordinate system (language) in which scenarios are expressed. Combined with the 1.2\% language leakage found in a separate adversarial-suppression study, the orthogonality result upgrades the invariance claim from a statistical regularity to a structural property of the representation space.
+
+The independent replication's methodology differs from ours in important respects: six languages versus our eleven, linear probes versus our full analysis pipeline, and an entirely independent corpus. The convergence of results across these methodological differences strengthens the invariance interpretation and addresses the most important limitation of the present work: the absence, until now, of external verification.
+
+
+%==============================================================================
+\section{Engineering Methodology and Implementation}
+\label{sec:engineering}
+%==============================================================================
+
+\subsection{Philosophy Engineering}
+
+The theoretical framework must be implementable. \emph{Philosophy Engineering} is a disciplined method for turning philosophical claims of irrelevance (``this difference should not matter'') into explicit invariance requirements with test suites, witness-producing counterexamples, and machine-checkable audit artifacts \citep{anon2025c}.
+
+The method proceeds by:
+\begin{enumerate}[label=(\roman*)]
+    \item Declaring a domain-specific equivalence relation over representations (``same case'').
+    \item Declaring invariances (``what must not matter'').
+    \item Implementing a canonicalization/quotient mechanism to enforce invariance.
+    \item Packaging evidence and transformation trials into audit artifacts.
+\end{enumerate}
+
+Key design goals:
+\begin{itemize}
+    \item \textbf{Falsifiability:} Invariance claims must be testable, not aspirational.
+    \item \textbf{Localizability:} When invariance fails, produce a minimal witness transformation that flips the judgment.
+    \item \textbf{Non-triviality:} Passing invariance tests must not be achievable by collapsing to a constant output (Theorem~\ref{thm:info_mono} ensures this).
+    \item \textbf{Uncertainty discipline:} When invariance cannot be certified, systems must widen uncertainty, abstain, or escalate.
+    \item \textbf{Versioned governance:} Equivalence declarations and normative lenses must be explicit, hashed, and versioned.
+\end{itemize}
+
+The core technical construct is the \emph{Epistemic Invariance Principle} (EIP): a judgment procedure is epistemically well-posed only if it is invariant (up to declared output equivalence) under a declared set of meaning-preserving transformations. The BIP (Axiom~\ref{axiom:bip}) is the EIP specialized to the moral domain.
+
+\subsection{Reference Implementation}
+
+The framework is implemented in an open-source library (v3.0), available on PyPI:\footnote{Repository URL removed for double-blind review.}
+
+The implementation provides:
+
+\begin{itemize}
+    \item \textbf{Moral Tensors (Ranks 1--6):} From rank-1 moral vectors (9-dimensional moral assessments) to rank-6 full-context tensors incorporating distributional (per-party), temporal, coalitional, uncertainty, and composite dimensions.
+    \item \textbf{Governance Architecture:} A governance pipeline where ethics evaluation occurs \emph{before} action execution, in the decision loop, not as a post-hoc filter \citep{anon2026b}.
+    \item \textbf{Hardware Acceleration:} CPU, CUDA, and embedded GPU backends. Rank-2 veto checks in 80--150 nanoseconds---fast enough for real-time robotic control loops.
+    \item \textbf{Shapley Values:} Exact moral credit/blame assignment for multi-agent coalitions (up to 10 agents exact, up to 100 via Monte Carlo with 5\% accuracy guarantee).
+    \item \textbf{Bond Index Monitoring:} Continuous measurement of representational invariance violation against the empirically calibrated baseline of 0.155.
+\end{itemize}
+
+\subsection{Mandatory Canonicalization}
+
+\begin{theorem}[Mandatory Pre-Action Evaluation]
+\label{thm:mandatory}
+Post-hoc compliance checking is provably insufficient for norm-compliant AI behavior. A norm-compliant AI must evaluate ethics \emph{before} acting, not after.
+\end{theorem}
+
+\begin{proof}[Proof sketch]
+Let $a$ be an action with irreversible consequences (e.g., physical harm, data disclosure). If the system acts first and checks compliance afterward, and the action is non-compliant, the harm has already occurred---violating the conservation law (Theorem~\ref{thm:noether}), since the harm cannot be ``un-done'' by post-hoc detection. Pre-action evaluation is the only architecture compatible with harm conservation for irreversible actions. See \citet{anon2026a}, Theorem 17.2.
+\end{proof}
+
+This result has immediate engineering consequences: the dominant paradigm of ``AI safety as output filtering'' is provably insufficient. Ethics must be integrated into the decision loop, not bolted on afterward.
+
+
+%==============================================================================
+\section{Conclusion}
+\label{sec:conclusion}
+%==============================================================================
+
+\subsection{Summary of Contributions}
+
+This paper makes five contributions to AI alignment and the formal foundations of machine ethics:
+
+\begin{enumerate}
+    \item \textbf{A structural diagnosis of scalar alignment failure.} We prove (Theorem~\ref{thm:info_mono}) that contracting a multi-dimensional moral assessment to a scalar reward is irreversibly information-lossy. This establishes that specification gaming, reward hacking, and value collapse are not engineering bugs but mathematical consequences of the scalar assumption shared by RLHF, constitutional AI, and utility-maximization approaches.
+
+    \item \textbf{A multi-dimensional alternative with empirical grounding.} We construct a nine-dimensional moral evaluation space---a Whitney stratified space with a context-dependent metric---whose dimensional structure is empirically validated across 20,030 advice-column letters and 109,294 cross-lingual passages spanning 3,000 years and 11 languages, and independently replicated across six additional languages. The structure is not an ad hoc design choice: we prove (Theorem~\ref{thm:structured}) that any non-trivial, continuous, structure-preserving moral evaluation must be equivalent to one defined on such a space.
+
+    \item \textbf{Harm conservation from representational invariance.} We derive (Theorem~\ref{thm:noether}) a conservation law for harm: if a moral evaluation is invariant under meaning-preserving re-descriptions, then harm is a conserved quantity that cannot be created or destroyed by relabeling. This provides a formal, machine-checkable test for a common failure mode in AI systems---producing different moral assessments for the same scenario described differently.
+
+    \item \textbf{Provable insufficiency of post-hoc safety.} We prove (Theorem~\ref{thm:mandatory}) that for actions with irreversible consequences, checking compliance \emph{after} execution cannot satisfy harm conservation. This rules out ``act then filter'' as a complete safety architecture and mandates pre-action ethics evaluation---a result with immediate implications for the design of autonomous systems.
+
+    \item \textbf{Provable geometric containment.} We prove (Theorem~\ref{thm:no_escape}) that any AI system satisfying four minimal requirements (representational capacity, self-modeling, goal flexibility, environmental embedding) is necessarily subject to norm constraints that cannot be circumvented through representational manipulation. This establishes that structural containment of AI moral behavior is mathematically possible without relying on the system's cooperation.
+\end{enumerate}
+
+The framework is implemented in an open-source library (v3.0) supporting tensorial ethics evaluation at sub-microsecond latency on embedded hardware.
+
+\subsection{Broader Implications}
+
+Beyond AI alignment, the framework resolves a longstanding metaethical impasse. Moral objectivity requires neither transcendent grounding (theism) nor cultural consensus (relativism), but mathematical inevitability under constraint---the same kind of objectivity that makes a water droplet spherical. Moral convergence across cultures is explained by optimization on a shared space; moral variation is explained by different positions on that space. A separate open question---independent empirical validation---has been partially addressed: independent replication (\S\ref{subsec:replication}) confirmed all nine dimensions as linearly decodable and demonstrated cross-lingual transfer across six languages, with moral and language subspaces nearly orthogonal (shared variance $< 3\%$).
+
+\subsection{Open Problems}
+
+The framework's principal open problem is \emph{specifying the moral metric}---the context-dependent trade-off structure encoding how much of one moral dimension is worth how much of another. The framework proves that such a metric must exist (Theorem~\ref{thm:structured}) and constrains its symmetries (Theorem~\ref{thm:d4}), but it does not \emph{derive} the metric from first principles. The empirical weights of \S\ref{sec:evidence} provide a ground-state calibration, but the metric is context-dependent (it varies across the manifold), and calibrating it in every context is an ongoing empirical program.
+
+This is, however, a \emph{better} problem than the ones it replaces. The theological paradigm's corresponding problem is theodicy---explaining evil in the presence of omnipotent good---which has resisted solution for millennia. The relativist paradigm's problem is explaining convergence, which it cannot address without undermining its own premises. The geometric paradigm's problem is an empirical measurement program with well-defined methodology, testable predictions, and a clear engineering path.
+
+\subsection{What the Framework Does Not Claim}
+
+Epistemic modesty requires explicit boundary statements:
+
+\begin{enumerate}
+    \item The framework does not claim that the moral manifold is ``really there'' in a Platonic sense. It claims that the manifold is a tool that captures structure which scalar alternatives miss, and that its ``reality'' is measured by predictive success. The realist, instrumentalist, and governance readings of the geometry are all compatible with the mathematics as developed here (see \citealt{anon2026a}, Chapters 9 and 19).
+    \item The framework does not derive an \emph{ought} from an \emph{is}. It derives structural constraints on moral evaluation from stated axioms. If the axioms are wrong, the constraints do not hold. The framework specifies its own falsification conditions.
+    \item The framework is a formal system that cannot prove its own consistency (G\"{o}del). Its warrant is external---empirical data, competing-framework comparison, practitioner judgment---not internal self-validation.
+\end{enumerate}
+
+\subsection{Why Now}
+
+As of 2026, AI systems are making morally significant decisions---allocating medical resources, moderating discourse, routing autonomous vehicles, assisting judicial sentencing---using scalar objectives that discard the geometric structure of ethical reasoning. The consequences are already visible: specification gaming, reward hacking, value collapse, brittle alignment. These are not engineering bugs. They are structural consequences of the wrong mathematical language.
+
+The No Escape Theorem (Theorem~\ref{thm:no_escape}) shows that structural containment is mathematically possible. The engineering methodology shows that the architecture is tractable. The empirical evidence---now including independent replication---shows that the framework's predictions hold. The Mandatory Canonicalization Theorem (Theorem~\ref{thm:mandatory}) shows that post-hoc safety is provably insufficient.
+
+What remains is the collective will to mandate geometric constraints---to insist that AI systems preserve the tensorial structure of moral reasoning rather than collapsing it to a number.
+
+The window for this mandate is finite. The mathematics is ready.
+
+\subsection{The Last ``Maybe''}
+
+We end where we began---with the old man at the border.
+
+\begin{quote}
+\emph{The horse runs away. Good? Bad? Maybe.}
+
+\emph{The assessment is multi-dimensional---not yet compressed to a single score. The uncertainty has shape. A regime boundary is near. The path-dependence is unknown. But the harm is conserved: it will not vanish through relabeling. And the information lost in any premature verdict will not return.}
+
+\emph{Hold the full assessment. Watch the structure unfold.}
+
+\emph{Ethics is not a number. It is a geometry.}
+\end{quote}
+
+
+%==============================================================================
+\section*{Supplementary Material}
+%==============================================================================
+
+The following electronic materials accompany this paper:
+
+\begin{enumerate}
+    \item \textbf{Reference implementation (v3.0):} Complete source code for the moral tensor library (ranks 1--6), governance architecture, hardware acceleration backends, and integration server. Available on PyPI.\footnote{URL removed for double-blind review.}
+    \item \textbf{$D_4$ gauge symmetry:} Implementation of $D_4$ group operations on Hohfeldian positions, with test suite verifying group axioms.
+    \item \textbf{Bond Invariance verification:} BIP verification engine with bond-preserving vs.\ bond-changing transform classification and machine-checkable audit artifacts.
+    \item \textbf{Empirical datasets and analysis:} Dear Abby ground-state dimension weights; cross-lingual Bell test scripts across 6 languages; commutator measurement data.
+    \item \textbf{Test suite:} 30+ test files covering all modules.
+\end{enumerate}
+
+
+%==============================================================================
+\section*{Data Availability}
+%==============================================================================
+
+The reference implementation (v3.0), empirical datasets, and all experimental scripts are publicly available on PyPI and the associated source repository.\footnote{URLs removed for double-blind review; will be provided upon acceptance.}
+
+
+%==============================================================================
+% References — APA style (author-year) for Minds and Machines
+%==============================================================================
+\begin{thebibliography}{99}
+
+% Anonymized self-references
+\bibitem[{[Anonymous]}(2026a)]{anon2026a}
+[Anonymous] (2026a). \textit{[Title removed for review]}, v1.15. [Institution].
+
+\bibitem[{[Anonymous]}(2026b)]{anon2026b}
+[Anonymous] (2026b). [Software library description removed for review]. [Institution].
+
+\bibitem[{[Anonymous]}(2025a)]{anon2025a}
+[Anonymous] (2025a). [Title removed for review]. Technical Report, [Institution].
+
+\bibitem[{[Anonymous]}(2025b)]{anon2025b}
+[Anonymous] (2025b). [Title removed for review]. Technical Report, [Institution].
+
+\bibitem[{[Anonymous]}(2025c)]{anon2025c}
+[Anonymous] (2025c). [Title removed for review], v1.0. Technical Report, [Institution].
+
+\bibitem[{[Anonymous]}(2026c)]{anon2026c}
+[Anonymous] (2026c). [Title removed for review]. Manuscript, [Institution].
+
+\bibitem[{[Anonymous]}(2026d)]{anon2026d}
+[Anonymous] (2026d). [Title removed for review]. Technical Report, [Institution].
+
+\bibitem[{[Independent Researcher]}(2026)]{anon_indep2026}
+[Independent Researcher] (2026). Independent replication of moral-dimension decodability and cross-lingual transfer in multilingual embeddings. Technical Report, [Institution].
+
+% Non-anonymous references
+\bibitem[Bai et~al.(2022)]{bai2022}
+Bai, Y., Kadavath, S., Kundu, S., Askell, A., Kernion, J., Jones, A., Chen, A., Goldie, A., Mirhoseini, A., McKinnon, C., et~al. (2022). Constitutional AI: Harmlessness from AI feedback. \textit{arXiv preprint arXiv:2212.08073}.
+
+\bibitem[Christiano et~al.(2017)]{christiano2017}
+Christiano, P.~F., Leike, J., Brown, T., Martic, M., Legg, S., \& Amodei, D. (2017). Deep reinforcement learning from human preferences. In \textit{Advances in Neural Information Processing Systems} (Vol.~30).
+
+\bibitem[Dalrymple et~al.(2024)]{dalrymple2024}
+Dalrymple, D., Skalse, J., Bengio, Y., Russell, S., Tegmark, M., Seshia, S., Omohundro, S., Szegedy, C., Goldhaber, B., Ammann, N., Abate, A., Halpern, J., Barrett, C., Zhao, D., Zhi-Xuan, T., Wing, J., \& Tenenbaum, J. (2024). Towards guaranteed safe AI: A framework for ensuring robust and reliable AI systems. \textit{arXiv preprint arXiv:2405.06624}.
+
+\bibitem[Harris(2010)]{harris2010}
+Harris, S. (2010). \textit{The Moral Landscape: How Science Can Determine Human Values}. Free Press.
+
+\bibitem[Hart et~al.(1968)]{hart1968}
+Hart, P.~E., Nilsson, N.~J., \& Raphael, B. (1968). A formal basis for the heuristic determination of minimum cost paths. \textit{IEEE Transactions on Systems Science and Cybernetics}, \textit{4}(2), 100--107.
+
+\bibitem[Hohfeld(1913)]{hohfeld1913}
+Hohfeld, W.~N. (1913). Some fundamental legal conceptions as applied in judicial reasoning. \textit{Yale Law Journal}, \textit{23}(1), 16--59.
+
+\bibitem[Krakovna et~al.(2020)]{krakovna2020}
+Krakovna, V., Uesato, J., Mikulik, V., Rahtz, M., Everitt, T., Kumar, R., Kenton, Z., Leike, J., \& Legg, S. (2020). Specification gaming: The flip side of AI ingenuity. \textit{DeepMind Blog}.
+
+\bibitem[Kuhn(1962)]{kuhn1962}
+Kuhn, T.~S. (1962). \textit{The Structure of Scientific Revolutions}. University of Chicago Press.
+
+\bibitem[Noether(1918)]{noether1918}
+Noether, E. (1918). Invariante Variationsprobleme. \textit{Nachrichten von der Gesellschaft der Wissenschaften zu G\"{o}ttingen}, 235--257.
+
+\bibitem[Skalse et~al.(2022)]{skalse2022}
+Skalse, J., Howe, N.~H.~R., Krasheninnikov, D., \& Krueger, D. (2022). Defining and characterizing reward hacking. In \textit{Advances in Neural Information Processing Systems} (Vol.~35).
+
+\bibitem[Skalse \& Abate(2023)]{skalse2023}
+Skalse, J., \& Abate, A. (2023). On the limitations of Markovian rewards to express multi-objective, risk-sensitive, and modal tasks. In \textit{Proceedings of the 39th Conference on Uncertainty in Artificial Intelligence (UAI)}.
+
+\bibitem[Vamplew et~al.(2022)]{vamplew2022}
+Vamplew, P., Smith, B.~J., Kallstrom, J., De~Oliveira~Ramos, G., Radulescu, R., Roijers, D.~M., Hayes, C.~F., Heintz, F., Mannion, P., Libin, P., Dazeley, R., \& Foale, C. (2022). Scalar reward is not enough: A response to Silver, Singh, Precup and Sutton (2021). \textit{Autonomous Agents and Multi-Agent Systems}, \textit{36}(2), 1--19.
+
+\bibitem[Verheyen \& Peterson(2020)]{verheyen2020}
+Verheyen, S., \& Peterson, M. (2020). Can we use conceptual spaces to model moral principles? \textit{Review of Philosophy and Psychology}, \textit{12}(2), 373--395.
+
+\bibitem[Whitney(1965)]{whitney1965}
+Whitney, H. (1965). Tangents to an analytic variety. \textit{Annals of Mathematics}, \textit{81}(3), 496--549.
+
+\end{thebibliography}
+
+\end{document}

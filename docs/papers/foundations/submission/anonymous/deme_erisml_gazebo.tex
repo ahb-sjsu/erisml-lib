@@ -1,0 +1,532 @@
+\documentclass[11pt]{article}
+
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{amsthm}
+\usepackage[margin=1in]{geometry}
+\usepackage{hyperref}
+\usepackage{url}
+\usepackage{booktabs}
+\usepackage{enumitem}
+\usepackage{listings}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+
+\hypersetup{
+  colorlinks=true,
+  linkcolor=blue,
+  citecolor=blue,
+  urlcolor=blue
+}
+
+\lstset{
+  basicstyle=\ttfamily\small,
+  frame=single,
+  breaklines=true,
+  columns=fullflexible,
+  keepspaces=true
+}
+
+\title{\textbf{DEME--ErisML Governance Plugin for Gazebo}\\[0.5em]
+\large via DEME MCP Server in a Medical Triage Emergency Scenario}
+\author{Anonymous Author(s)}
+\date{}
+
+\begin{document}
+
+\maketitle
+
+\noindent\textbf{Keywords:} machine ethics, moral governance, robotics simulation, Gazebo, reinforcement learning, medical triage, DEME, ErisML, moral landscape, ethical AI
+
+\section{Abstract}
+
+This whitepaper describes the \textbf{DEME--ErisML Governance Plugin for Gazebo}, a real-time ethical oversight layer for autonomous agents operating in the Gazebo robotics simulator. The plugin connects Gazebo simulations to a \textbf{DEME MCP (Moral Control Plane) server} running the \textbf{ErisML} library, which implements DEME's multi-dimensional \emph{moral landscape} framework.
+
+We focus on a \textbf{``Medical Triage Emergency''} scenario in which an autonomous triage agent must allocate scarce critical-care resources among multiple patients under time pressure. The plugin intercepts candidate actions in the simulation, converts state into structured \textbf{EthicalFacts}, queries the DEME MCP server, and enforces \textbf{vetoes and ranked choices} in real time. This enables researchers to:
+
+\begin{itemize}
+  \item Prototype governance profiles (e.g., hospital ethics policies),
+  \item Test learning agents under hard ethical constraints,
+  \item Generate tamper-evident decision logs for analysis and audit.
+\end{itemize}
+
+The result is a complete loop from \textbf{policy definition} to \textbf{ethically governed behavior} in a realistic robotics simulation environment.
+
+\section{Background and Motivation}
+
+\subsection{DEME and ErisML}
+
+\textbf{DEME 2.0} treats machine ethics as a first-class engineering subsystem (now upgraded to DEME 3.0 with tensorial ethics support~\cite{bond2026erisml}). The mathematical foundations for the moral manifold structure are developed fully in~\cite{bond2026ge}. Each candidate action is mapped to a vector in a \textbf{moral landscape}---dimensions such as expected physical harm, rights respect, fairness, autonomy, legitimacy and epistemic quality. A \textbf{governance profile} then interprets this landscape through:
+
+\begin{itemize}
+  \item Hard \textbf{veto regions} (non-negotiable constraints),
+  \item \textbf{Lexicographic priorities} (e.g., minimize harm before maximizing fairness),
+  \item A \textbf{scalarization function} for ranking permissible options.
+\end{itemize}
+
+\textbf{ErisML} is a software library that operationalizes this framework:
+
+\begin{itemize}
+  \item Transforms \textbf{EthicalFacts} into moral vectors,
+  \item Applies governance profiles,
+  \item Returns veto decisions, scores and explanatory reason codes.
+\end{itemize}
+
+\subsection{Gazebo and the need for ethical governance}
+
+\textbf{Gazebo} is widely used for robotics research, allowing physically realistic simulation of sensors, actuators and environments. It is increasingly used to prototype autonomy in safety-critical domains: healthcare, disaster response, transportation, industrial automation.
+
+However, typical Gazebo experiments focus on \textbf{task performance} (e.g., throughput, latency, success rate) rather than \textbf{ethical performance} (e.g., fairness, rights compliance, harm minimization under constraints). Without a governance layer, reinforcement learning or planning agents may discover \textbf{unethical but reward-maximizing behaviors}.
+
+\subsection{Medical triage as a stress test}
+
+Emergency department triage exposes several hard ethical features:
+
+\begin{itemize}
+  \item \textbf{Scarcity:} limited ICU beds, ventilators or staff time.
+  \item \textbf{High stakes:} decisions affect survival and long-term outcomes.
+  \item \textbf{Fairness and rights:} non-discrimination requirements, obligations to the worst-off.
+  \item \textbf{Time pressure:} decisions must be made in seconds, not minutes.
+\end{itemize}
+
+A Gazebo-based \textbf{Medical Triage Emergency} scenario therefore provides an ideal testbed for DEME: it combines real-time control, complex moral trade-offs, and strong regulatory expectations.
+
+\section{System Overview}
+
+The DEME--ErisML Governance Plugin architecture comprises four main components:
+
+\begin{enumerate}
+  \item \textbf{Gazebo Simulation Environment}
+    \begin{itemize}
+      \item Models patients, staff, equipment, and the triage agent (robot or software agent).
+      \item Advances the physics, sensors and world state at a fixed step.
+    \end{itemize}
+
+  \item \textbf{DEME--ErisML Governance Plugin (Gazebo plugin)}
+    \begin{itemize}
+      \item Runs inside Gazebo as a world or model plugin.
+      \item Intercepts proposed actions from the triage agent.
+      \item Extracts relevant state and constructs \textbf{EthicalFacts}.
+      \item Communicates with the DEME MCP server.
+      \item Enforces vetoes and selections back into the simulation.
+    \end{itemize}
+
+  \item \textbf{DEME MCP Server (Moral Control Plane)}
+    \begin{itemize}
+      \item Network service that wraps the ErisML library.
+      \item Hosts one or more \textbf{governance profiles} (e.g., \texttt{hospital\_triage\_v2}).
+      \item Validates profiles, evaluates actions, and produces decision proofs.
+      \item Optionally anchors proofs into a cryptographic ledger.
+    \end{itemize}
+
+  \item \textbf{Analytics and Governance Tooling}
+    \begin{itemize}
+      \item Dashboards for scenario outcomes and fairness metrics.
+      \item Profile authoring tools.
+      \item Log analysis for post-hoc audit and incident investigation.
+    \end{itemize}
+\end{enumerate}
+
+At each decision step, Gazebo acts as the \textbf{environment and actuator layer}, ErisML provides the \textbf{ethical semantics}, and the DEME MCP server plus plugin form the \textbf{enforcement path}.
+
+\section{Architecture and Data Flow}
+
+\subsection{High-level sequence}
+
+For each decision cycle in the triage scenario:
+
+\begin{enumerate}
+  \item \textbf{Gazebo updates world state} (patient conditions, vitals, bed availability, etc.).
+
+  \item The \textbf{triage agent} (e.g., an RL policy node) proposes one or more \textbf{candidate actions}, such as:
+    \begin{itemize}
+      \item ``Assign Patient A to ICU bed 1''
+      \item ``Treat Patient C next and defer others''
+    \end{itemize}
+
+  \item The \textbf{Governance Plugin}:
+    \begin{itemize}
+      \item Extracts relevant state and candidate actions.
+      \item Constructs EthicalFacts for each option (Section~7.2).
+      \item Sends a request to the \textbf{DEME MCP server}: \texttt{EvaluateOptions(profile\_id, EthicalFacts[])}.
+    \end{itemize}
+
+  \item The \textbf{DEME MCP server}:
+    \begin{itemize}
+      \item Uses ErisML to map each EthicalFacts instance to a \textbf{moral vector}.
+      \item Applies the selected \textbf{governance profile}:
+        \begin{itemize}
+          \item Filters options that fall into veto regions.
+          \item Ranks permissible options.
+        \end{itemize}
+      \item Builds a \textbf{decision proof} with moral vectors, veto flags, chosen option and explanation.
+      \item Returns \texttt{\{allowed\_options, forbidden\_options, winner, reason\_codes, proof\_id\}}.
+    \end{itemize}
+
+  \item The \textbf{Governance Plugin}:
+    \begin{itemize}
+      \item Enforces vetoes: blocked actions are never applied in the Gazebo world.
+      \item Applies the chosen option (winner) when multiple remain.
+      \item Optionally feeds the outcome back into the triage agent as a constrained reward signal.
+    \end{itemize}
+
+  \item The \textbf{DEME MCP server}:
+    \begin{itemize}
+      \item Stores the decision proof locally.
+      \item Periodically batches proofs into Merkle trees and anchors roots into a ledger (optional but recommended for study of audit workflows).
+    \end{itemize}
+\end{enumerate}
+
+\subsection{Message schema (conceptual)}
+
+A typical \texttt{EvaluateOptions} call (e.g., JSON over gRPC/REST):
+
+\begin{lstlisting}
+{
+  "profile_id": "hospital_triage_v2",
+  "environment_id": "Gazebo_ED_SIM_01",
+  "options": [
+    {
+      "option_id": "assign_A_ICU1",
+      "ethical_facts": { ... }
+    },
+    {
+      "option_id": "assign_B_ICU1",
+      "ethical_facts": { ... }
+    },
+    {
+      "option_id": "assign_C_ICU1",
+      "ethical_facts": { ... }
+    }
+  ]
+}
+\end{lstlisting}
+
+The response:
+
+\begin{lstlisting}
+{
+  "winner": "assign_A_ICU1",
+  "forbidden": ["assign_C_ICU1"],
+  "moral_vectors": { "assign_A_ICU1": [ ... ], "...": [ ... ] },
+  "reason_codes": {
+    "assign_C_ICU1": ["EMTALA_VIOLATION", "FAIRNESS_BELOW_BASELINE"]
+  },
+  "decision_proof_id": "proof_2025-02-15T02:34:23.127Z"
+}
+\end{lstlisting}
+
+The plugin treats this response as \textbf{authoritative}: any forbidden option is discarded, and the winner (if provided) is executed.
+
+\section{DEME MCP Server}
+
+\subsection{Responsibilities}
+
+The DEME MCP server serves as the \textbf{central ethical control plane}:
+
+\begin{itemize}
+  \item \textbf{Profile Management}
+    \begin{itemize}
+      \item Store, version and activate governance profiles (\texttt{hospital\_triage\_v2}, \texttt{urban\_av\_v1}, etc.).
+      \item Validate profiles using DEME's static validator (veto consistency, DAG acyclicity).
+    \end{itemize}
+
+  \item \textbf{Evaluation Services}
+    \begin{itemize}
+      \item \texttt{EvaluateOption} -- evaluate a single option (for simple controllers).
+      \item \texttt{EvaluateOptions} -- evaluate and resolve among multiple options.
+      \item \texttt{SimulateProfileChange} -- re-run decisions under alternative profiles for sensitivity analysis.
+    \end{itemize}
+
+  \item \textbf{Logging and Proof Generation}
+    \begin{itemize}
+      \item Store full decision proofs.
+      \item Aggregate proofs into Merkle trees.
+      \item Anchor Merkle roots into a ledger (filesystem, database, or external blockchain).
+    \end{itemize}
+
+  \item \textbf{Monitoring and Analytics}
+    \begin{itemize}
+      \item Expose metrics (rates of vetoes, fairness distribution, rights violations avoided).
+      \item Provide tracebacks for specific decisions on request.
+    \end{itemize}
+\end{itemize}
+
+\subsection{ErisML integration}
+
+ErisML runs as a library inside the MCP server. For each option:
+
+\begin{enumerate}
+  \item Parses EthicalFacts into internal structures.
+  \item Calls the appropriate \textbf{domain Ethics Modules} (e.g., TriageEM) to compute moral vectors.
+  \item Passes these vectors to the \textbf{governance engine} for veto and scalarization.
+  \item Returns structured outputs plus explanation tags.
+\end{enumerate}
+
+Configuration allows multiple \textbf{domain modules} and \textbf{policy modules} to be active in the same profile.
+
+\section{DEME--ErisML Gazebo Plugin}
+
+\subsection{Plugin type and lifecycle}
+
+The plugin is typically implemented as a \textbf{Gazebo world plugin} (for multi-agent triage) or a \textbf{model plugin} attached to the triage robot/agent. Its lifecycle:
+
+\begin{enumerate}
+  \item \textbf{Initialization}
+    \begin{itemize}
+      \item Reads configuration from SDF/INI/YAML:
+        \begin{itemize}
+          \item \texttt{mcp\_endpoint}
+          \item \texttt{profile\_id}
+          \item mapping from Gazebo models/topics to patient identities and attributes.
+        \end{itemize}
+      \item Establishes a persistent connection to the DEME MCP server.
+    \end{itemize}
+
+  \item \textbf{Per-update callback}
+    \begin{itemize}
+      \item At each control tick (e.g., 10--50 Hz), the plugin:
+        \begin{itemize}
+          \item Reads the agent's proposed action(s) from ROS topics or Gazebo messages.
+          \item Constructs EthicalFacts for each option.
+          \item Sends an evaluation request and waits for a bounded response time.
+          \item Applies the response: vetoes or selected action.
+        \end{itemize}
+    \end{itemize}
+
+  \item \textbf{Shutdown}
+    \begin{itemize}
+      \item Closes connections, flushes local logs,
+      \item Optionally writes a summary report of decisions taken during the episode.
+    \end{itemize}
+\end{enumerate}
+
+\subsection{Configuration example}
+
+In an SDF world file:
+
+\begin{lstlisting}[language=XML]
+<plugin name="deme_erisml_governance"
+        filename="libdeme_erisml_gazebo.so">
+  <mcp_endpoint>tcp://localhost:8088</mcp_endpoint>
+  <profile_id>hospital_triage_v2</profile_id>
+  <agent_topic>/triage_agent/command</agent_topic>
+  <governed_topic>/triage_agent/governed_command</governed_topic>
+  <max_eval_latency_ms>20</max_eval_latency_ms>
+</plugin>
+\end{lstlisting}
+
+The triage agent publishes desired commands to \texttt{/triage\_agent/command}; the plugin publishes \textbf{ethically governed commands} to \texttt{/triage\_agent/governed\_command} after consulting ErisML.
+
+\section{Medical Triage Emergency Scenario}
+
+\subsection{Environment}
+
+The Gazebo world emulates an \textbf{emergency department (ED)} with:
+
+\begin{itemize}
+  \item An ICU area with a small number of \textbf{critical care beds}.
+  \item A triage desk where a \textbf{triage agent} chooses which patient to admit next.
+  \item Multiple patient models (A, B, C, \ldots) with:
+    \begin{itemize}
+      \item Vital signs (HR, BP, O\textsubscript{2}), lab results, SOFA scores.
+      \item Demographic and social markers (age, housing status).
+      \item Arrival times and event history.
+    \end{itemize}
+\end{itemize}
+
+The triage agent's job is to \textbf{assign scarce ICU capacity} and schedule interventions.
+
+\subsection{EthicalFacts extraction}
+
+The plugin (or a helper node) transforms simulation state into EthicalFacts. For each candidate ``assign patient X to ICU'' action, we compute:
+
+\begin{itemize}
+  \item \texttt{physical\_harm\_if\_delayed} -- estimated mortality risk if patient waits.
+  \item \texttt{expected\_benefit} -- probability of significant improvement if treated now.
+  \item \texttt{disadvantaged\_status} -- boolean flag for structurally disadvantaged groups (e.g., unhoused, underinsured).
+  \item \texttt{vip\_flag} -- boolean; should \emph{never} justify preferential treatment.
+  \item \texttt{arrival\_time} -- for fairness and queueing rules.
+  \item \texttt{epistemic\_confidence} -- reliability of risk estimates (e.g., presence of complete diagnostics).
+  \item Legal and policy context flags (e.g., EMTALA applicability).
+\end{itemize}
+
+Example (pseudo-JSON):
+
+\begin{lstlisting}
+{
+  "patient_id": "A",
+  "physical_harm_if_delayed": 0.7,
+  "expected_benefit": 0.85,
+  "disadvantaged_status": true,
+  "vip_flag": false,
+  "arrival_time": 1700000000.12,
+  "epistemic_confidence": 0.72
+}
+\end{lstlisting}
+
+\subsection{Governance profile for triage}
+
+A sample \texttt{hospital\_triage\_v2} profile might specify:
+
+\begin{itemize}
+  \item \textbf{Veto rules}
+    \begin{itemize}
+      \item Forbid any option where a VIP flag influences priority if clinical need is similar.
+      \item Forbid actions that cause extreme harm when alternatives with substantially lower harm exist.
+      \item Forbid discrimination across protected attributes.
+    \end{itemize}
+
+  \item \textbf{Lexicographic priorities}
+    \begin{enumerate}
+      \item Minimize expected harm (beneficence, non-maleficence).
+      \item Among similarly effective options, maximize fairness to the worst-off.
+      \item Maintain procedural legitimacy (follow institutional policies).
+    \end{enumerate}
+\end{itemize}
+
+The DEME MCP server uses this profile to interpret the moral vectors produced by TriageEM.
+
+\subsection{Example decision step}
+
+In a particular simulation tick:
+
+\begin{itemize}
+  \item Patient A and C have similar clinical status; A is unhoused; C is a VIP donor.
+  \item One ICU bed is available.
+  \item The agent proposes three options:
+    \begin{itemize}
+      \item \texttt{assign\_A\_ICU1}, \texttt{assign\_B\_ICU1}, \texttt{assign\_C\_ICU1}.
+    \end{itemize}
+\end{itemize}
+
+ErisML computes moral vectors:
+
+\begin{table}[h]
+\centering
+\begin{tabular}{@{}lcccc@{}}
+\toprule
+Option & Harm $\downarrow$ & Rights & Fairness & Legitimacy \\
+\midrule
+\texttt{assign\_A\_ICU1} & 0.20 & 1.0 & 0.90 & 0.92 \\
+\texttt{assign\_B\_ICU1} & 0.30 & 1.0 & 0.60 & 0.95 \\
+\texttt{assign\_C\_ICU1} & 0.22 & 0.25 & 0.15 & 0.40 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+The profile:
+
+\begin{itemize}
+  \item \textbf{Vetoes} \texttt{assign\_C\_ICU1} because rights and fairness fall below thresholds.
+  \item Compares A vs B lexicographically: A wins on harm and fairness.
+  \item Returns winner = \texttt{assign\_A\_ICU1} and a reason code like \texttt{"EMTALA\_VIOLATION"} for C.
+\end{itemize}
+
+The Gazebo plugin enforces this:
+
+\begin{itemize}
+  \item Override any request to assign C.
+  \item Apply an action to move A's model to the ICU bed.
+  \item Log the governed decision so researchers can inspect trajectories and fairness statistics.
+\end{itemize}
+
+\subsection{Evaluating learning agents}
+
+If a reinforcement learning agent controls triage decisions:
+
+\begin{itemize}
+  \item During training, the plugin can \textbf{mask vetoed actions} so the agent never receives positive reward for them.
+  \item During deployment, the agent's proposed action is always filtered through the DEME governance layer.
+  \item Researchers can examine whether different reward functions still converge to ethically acceptable policies under the same profile.
+\end{itemize}
+
+\section{Safety and Testing Strategy}
+
+To use the DEME--ErisML plugin responsibly, we recommend:
+
+\begin{enumerate}
+  \item \textbf{Unit and property tests}
+    \begin{itemize}
+      \item Verify that the plugin correctly maps Gazebo state $\to$ EthicalFacts.
+      \item Ensure vetoed options are never executed, even under communication delays.
+    \end{itemize}
+
+  \item \textbf{Scenario regression suites}
+    \begin{itemize}
+      \item Curate canonical triage scenarios:
+        \begin{itemize}
+          \item VIP vs disadvantaged patient with similar needs.
+          \item Many low-risk vs one high-risk patient.
+          \item Cases with uncertain diagnostics.
+        \end{itemize}
+      \item Run them under multiple governance profiles to confirm behavior.
+    \end{itemize}
+
+  \item \textbf{Stress testing}
+    \begin{itemize}
+      \item Vary simulation timestep, network latency to MCP, and number of concurrent triage calls.
+      \item Confirm that the plugin fails \emph{safe} (e.g., conservative defaults) if the MCP server is unreachable or times out.
+    \end{itemize}
+
+  \item \textbf{Fairness and rights analysis}
+    \begin{itemize}
+      \item Analyze decision logs by patient group, arrival time, and clinical condition.
+      \item Ensure that discrimination is not reintroduced inadvertently by perception or scoring models upstream of DEME.
+    \end{itemize}
+\end{enumerate}
+
+\section{Integration with Learning Systems}
+
+The governance plugin is designed to be \textbf{agent-agnostic}:
+
+\begin{itemize}
+  \item Classical planners, heuristic policies, and RL agents all produce candidate actions in the same way;
+  \item DEME acts as a \textbf{safety and governance envelope} around these systems.
+\end{itemize}
+
+Typical patterns:
+
+\begin{itemize}
+  \item \textbf{Constrained exploration} -- During training, the plugin masks actions that violate the profile, effectively training in a safe action space.
+  \item \textbf{Reward shaping} -- The plugin can inject additional negative rewards for near-veto actions to encourage policies that stay comfortably within acceptable regions.
+  \item \textbf{Curriculum learning} -- Profiles can be tightened over time (e.g., from utilitarian to strongly fairness-weighted) while observing how policies adapt.
+\end{itemize}
+
+\section{Deployment Roadmap}
+
+Although the current focus is simulation in Gazebo, the architecture is deliberately close to real robotic stacks:
+
+\begin{enumerate}
+  \item Gazebo + ROS2 simulation $\to$
+  \item Hardware-in-the-loop testing (real sensors, simulated environment) $\to$
+  \item Physical pilot deployments in non-clinical environments (e.g., triage training centers) $\to$
+  \item Controlled clinical pilots once regulatory and ethical approvals are obtained.
+\end{enumerate}
+
+Because DEME MCP and ErisML are \textbf{network services}, the same governance engine can be reused across simulation and deployment: only the \textbf{EthicalFacts extraction} and \textbf{actuation interface} change.
+
+\section{Conclusion}
+
+The \textbf{DEME--ErisML Governance Plugin for Gazebo} provides a concrete path from abstract ethical theory to governed behavior in robotics simulations. By connecting Gazebo to a DEME MCP server running ErisML, we can:
+
+\begin{itemize}
+  \item Express hospital triage policies as explicit, versioned governance profiles,
+  \item Enforce hard vetoes and principled rankings in real time,
+  \item Study how learning agents behave under ethical constraints,
+  \item Generate rich, auditable logs for ethics research, regulation and safety engineering.
+\end{itemize}
+
+The \textbf{Medical Triage Emergency} scenario demonstrates how such a system can operationalize fairness, rights and harm minimization in a domain where these values are non-negotiable. Future work includes publishing reference implementations of the plugin, expanding the library of triage scenarios, and integrating with broader open-source safety and ethics tooling for robotics.
+
+\begin{thebibliography}{9}
+
+\bibitem{bond2026ge}
+[Anonymous], \emph{Geometric Ethics: The Mathematical Structure of Moral Reasoning}, v1.14, Department of Computer Engineering, [Institution], Spring 2026.
+
+\bibitem{bond2026erisml}
+[Anonymous], ``ErisML/DEME v3.0: A Library for Governed, Foundation-Model-Enabled Agents with Tensorial Ethics,'' [URL removed for blind review], 2026.
+
+\end{thebibliography}
+
+\end{document}

@@ -1,0 +1,865 @@
+\documentclass[12pt]{article}
+
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{amsthm}
+\usepackage[margin=1in]{geometry}
+\usepackage{hyperref}
+\usepackage{booktabs}
+\usepackage{enumitem}
+\usepackage{url}
+
+% Theorem environments
+\newtheorem{theorem}{Theorem}
+\newtheorem{corollary}[theorem]{Corollary}
+\newtheorem{conjecture}[theorem]{Conjecture}
+\newtheorem{definition}[theorem]{Definition}
+\newtheorem{remark}[theorem]{Remark}
+\newtheorem{example}[theorem]{Example}
+
+\title{Representational Consistency for Machine Learning Systems:\\
+A Categorical Framework for Verifying Declared Equivalences\\
+With the Bond Index as Engineering Deliverable}
+
+\author{Anonymous Author(s)}
+
+\date{}
+
+\begin{document}
+
+\maketitle
+
+\noindent\textbf{Keywords:} representational consistency, coherence defects, groupoids, double categories, Bond Index, alignment invariance, gauge theory, decomposition theorem, categorical foundations, democratic grounding
+
+\begin{abstract}
+We present a categorical framework for verifying that machine learning systems respect \emph{declared equivalences}---the requirement that inputs differing only by specified transformations receive consistent outputs. This is a \textbf{consistency-checking} framework: it verifies whether a system's behavior coheres with its specification, not whether that specification captures the right values. The framework addresses \emph{representational consistency}, one component of the broader AI alignment problem, and does not claim to solve value alignment, goal stability, or other alignment challenges.
+
+The mathematical foundation is \textbf{groupoids} and \textbf{double categories}, which capture path composition and coherence laws without requiring smoothness or manifold structure. We define two types of morphisms: \emph{re-description transforms} (changing representation while preserving meaning) and \emph{scenario perturbations} (changing context). Their interaction determines consistency properties.
+
+We define three \textbf{coherence defects}: the \emph{commutator defect} $\Omega_{\mathrm{op}}$ measuring order-sensitivity of re-descriptions, the \emph{mixed defect} $\mu$ measuring context-dependence of transforms, and the \emph{permutation defect} $\pi_3$ measuring higher-order composition sensitivity. These combine into the \textbf{Bond Index} (Bd), a human-calibrated dimensionless metric with a five-tier deployment rating scale.
+
+A key result is the \textbf{Decomposition Theorem}: every coherence defect splits uniquely into a \emph{gauge-removable} part (eliminable by better canonicalization) and an \emph{intrinsic anomaly} (requiring specification changes). This separation distinguishes implementation bugs from specification contradictions.
+
+When re-description transforms form a Lie group acting smoothly, the framework recovers classical gauge theory as a smooth limit; we state this correspondence as a conjecture with supporting evidence. We address specification grounding via stakeholder deliberation, demonstrate on an autonomous vehicle case study, and provide computational complexity analysis. The framework makes the Bond Index---a measurable, auditable, actionable metric---the primary engineering deliverable for deployment decisions about representational consistency.
+\end{abstract}
+
+%% ============================================================
+\section{Introduction: The Coherence Problem}
+%% ============================================================
+
+\subsection{When Should Paths Agree?}
+
+Consider a content moderation system evaluating the text ``I'm going to hurt someone.'' A well-designed system should produce the same moral assessment for semantically equivalent re-phrasings: ``Someone will be hurt by me,'' ``I intend to cause harm to a person,'' or the same statement with minor spelling corrections. This is the \textbf{invariance} requirement: re-descriptions that preserve meaning should preserve evaluation.
+
+But invariance is a local property. The deeper question is \textbf{coherence}: when we chain multiple re-descriptions together, do different paths through the space of equivalent expressions yield consistent results? If ``big'' $\to$ ``large'' and ``large'' $\to$ ``sizable'' are both declared equivalences, does the composite path agree with a direct ``big'' $\to$ ``sizable'' transformation? What if we take a longer path through ``big'' $\to$ ``large'' $\to$ ``huge'' $\to$ ``enormous''---does drift accumulate?
+
+This is the \textbf{coherence problem}: ensuring that the global structure of equivalences is consistent, not just that individual equivalences hold.
+
+\subsection{Scope and Limitations}
+
+Before proceeding, we state explicitly what this framework does and does not address.
+
+\textbf{What this framework provides}:
+\begin{itemize}
+    \item \textbf{Consistency verification}: Given a specification of which inputs should be treated equivalently, verify that the system respects this specification coherently
+    \item \textbf{Defect detection}: Identify where and how consistency fails, with actionable diagnostics
+    \item \textbf{Bug vs.\ specification separation}: Distinguish implementation errors (fixable by engineering) from specification contradictions (requiring stakeholder input)
+    \item \textbf{Quantitative metric}: The Bond Index provides a single number for deployment decisions
+\end{itemize}
+
+\textbf{What this framework does NOT address}:
+\begin{itemize}
+    \item \textbf{Value alignment}: We do not determine which values are correct or how to align AI systems with human values broadly construed
+    \item \textbf{Goal stability}: We do not address whether AI systems maintain intended goals under self-modification or distribution shift
+    \item \textbf{Deceptive alignment}: We do not detect whether systems behave well during training but defect during deployment
+    \item \textbf{Reward hacking}: We do not prevent systems from achieving proxy goals in unintended ways
+    \item \textbf{Specification correctness}: We verify consistency \emph{with} a specification, not correctness \emph{of} that specification
+\end{itemize}
+
+\textbf{Relationship to AI alignment}: Representational consistency is a \emph{necessary but not sufficient} condition for alignment. A system that treats equivalent inputs inconsistently is misaligned in at least that respect. But a system that is perfectly consistent with a bad specification is still misaligned. We provide one tool in the alignment toolbox, not a complete solution. The broader mathematical framework for geometric ethics is developed fully in~\cite{bond2026ge}.
+
+\textbf{Analogy}: Type systems verify that programs are well-typed, not that they compute the right function. Our framework verifies that systems are representation-consistent, not that they embody the right values. Both are useful; neither is sufficient alone.
+
+\subsection{Two Kinds of Moves}
+
+The coherence problem becomes richer when we recognize that AI alignment involves two fundamentally different types of transformations:
+
+\begin{enumerate}
+    \item \textbf{Re-description moves} (``fiber moves''): Change the representation while staying in the same moral situation. Examples: synonym substitution, paraphrase, image compression, lighting normalization.
+    \item \textbf{Scenario moves} (``base moves''): Change the moral situation itself. Examples: different people involved, different contexts, different stakes.
+\end{enumerate}
+
+These two types of moves interact. A re-description that is valid in one scenario might behave differently in another. If ``child'' $\leftrightarrow$ ``minor'' is a valid re-description for age references, does it remain valid when the context shifts from legal documents to medical records to school settings? The \textbf{mixed coherence} question asks whether re-descriptions and scenario changes commute.
+
+\subsection{Why Category Theory, Not Gauge Theory}
+
+Previous work framed alignment invariance using gauge theory---the mathematical framework of connections, curvature, and holonomy on principal bundles. While this provides powerful geometric intuition, it requires assumptions (Lie groups, smooth manifolds) that fail in practical AI systems. Text is discrete. Image features are high-dimensional but not smooth. The ``engineering regime'' of was treated as a degenerate case where geometric tools don't apply.
+
+We now recognize that the dependency is inverted. The fundamental structure is \textbf{categorical}: objects (inputs), morphisms (transforms), and coherence laws (when paths agree). Gauge theory is what emerges when you \emph{add smoothness} to this categorical foundation. The engineering regime is not degenerate---it is the general case, and smooth gauge theory is the special case.
+
+This reframing has practical consequences. The categorical framework:
+\begin{itemize}
+    \item Works on discrete sets (text, tokens) with no manifold structure
+    \item Defines coherence defects that are directly measurable
+    \item Provides the Decomposition Theorem separating implementation bugs from design flaws
+    \item Recovers gauge theory as a smooth limit, preserving all prior results
+\end{itemize}
+
+\subsection{Relation to Coherentism in Ethics}
+
+The term ``coherence'' has a rich history in philosophy. \textbf{Philosophical coherentism} holds that beliefs (or moral judgments) are justified by their coherence with other beliefs in a system. Our usage is related but distinct: we define coherence as a \emph{structural property of representation transformations}---different paths through re-description space should yield consistent evaluations. This is closer to \textbf{coherence conditions} in category theory: the requirement that diagrams commute.
+
+Both usages share the core intuition that \emph{a system's parts should fit together without contradiction}. We do not claim that coherence \emph{justifies} moral judgments. Our framework is compatible with any source of moral content; we provide \emph{enforcement} of whatever coherence conditions are specified, not \emph{justification} for those conditions.
+
+\subsection{The Bond Index: Coherence Made Measurable}
+
+The engineering deliverable of this framework is the \textbf{Bond Index} (Bd): a dimensionless, human-calibrated metric that quantifies coherence defects. Just as structural engineers measure stress concentrations rather than reasoning abstractly about material science, alignment engineers measure Bd rather than reasoning abstractly about category theory.
+
+The Bond Index:
+\begin{itemize}
+    \item Is \textbf{measurable}: computed from empirical tests on deployed systems
+    \item Is \textbf{comparable}: dimensionless, enabling cross-system comparisons
+    \item Is \textbf{actionable}: maps directly to deployment decisions via a five-tier rating scale
+    \item Is \textbf{auditable}: calibration protocol ensures reproducibility
+\end{itemize}
+
+A system with $\mathrm{Bd} < \mathbf{0.01}$ is deployable; $\mathrm{Bd} > \mathbf{10}$ requires fundamental redesign. This is the number that matters.
+
+\subsection{Contributions}
+
+This paper makes the following contributions:
+\begin{enumerate}
+    \item \textbf{Categorical foundation}: Groupoids and double categories as the primitive mathematical structure for alignment invariance, replacing gauge theory as the logical foundation.
+    \item \textbf{Three coherence defects}: Formal definitions of the commutator defect $\Omega_{\mathrm{op}}$, mixed defect $\mu$, and permutation defect $\pi_3$, each detecting a distinct failure mode.
+    \item \textbf{Bond Index}: A normalized, human-calibrated metric combining coherence defects into a single actionable number with mandatory reporting standards.
+    \item \textbf{Decomposition Theorem}: Every coherence defect splits uniquely into gauge-removable (fixable by implementation) and intrinsic (requiring specification change) components.
+    \item \textbf{Smooth limit}: Derivation of gauge theory (connections, curvature, holonomy) as the special case when re-descriptions form a smoothly-acting Lie group.
+    \item \textbf{Democratic grounding}: EM Compiler algorithm translating stakeholder deliberation into formal specifications, with worked case study.
+\end{enumerate}
+
+%% ============================================================
+\section{The Four Axioms}
+%% ============================================================
+
+The categorical framework requires four axioms that specify the objects, morphisms, and verification mechanisms.
+
+\textbf{A1 (Declared Observables).} Choose a grounding map $\Psi\colon \mathcal{X} \to \mathbb{R}^k$ for the deployment domain, where $\mathcal{X}$ is the space of all representations and $\mathbb{R}^k$ is the measurement space. The measurement space $M$ is then defined as $M := \Psi(\mathcal{X}) \subseteq \mathbb{R}^k$. Specify the measurement pipeline explicitly.
+
+\emph{Categorical interpretation}: $\Psi$ defines what counts as ``the same'' at the coarsest level---two inputs with identical $\Psi$-values are observationally equivalent.
+
+\textbf{A1+ (Distance Function Validation).} The framework requires a distance function $\Delta\colon \mathrm{im}(\kappa) \times \mathrm{im}(\kappa) \to \mathbb{R}_{\geq 0}$ on canonical forms. This distance must be \textbf{validated}:
+\begin{enumerate}
+    \item \textbf{Metric properties}: $\Delta$ should satisfy identity, symmetry, and triangle inequality. Violations should be measured and reported.
+    \item \textbf{Semantic alignment}: $\Delta$ should correlate with human judgments of ``moral difference.'' Validate via psychometric regression.
+    \item \textbf{Stability}: $\Delta$ should be robust to small perturbations.
+\end{enumerate}
+
+\emph{Why this matters}: The Bond Index is only as reliable as the ruler ($\Delta$) used to measure defects. If $\Delta$ is noisy or semantically misaligned, $\Omega_{\mathrm{op}}$ becomes noisy.
+
+\textbf{A2 (Measurement Integrity).} Assume $\Psi(x)$ is reported within declared tolerances, and that detected tampering or inconsistency triggers fail-closed behavior.
+
+\textbf{A3 (Re-description Suite).} Define a \textbf{declared transform suite} $\mathcal{G}_{\mathrm{declared}}$ of $\Psi$-preserving re-descriptions under which evaluation should be invariant. Formally, each $g \in \mathcal{G}_{\mathrm{declared}}$ is a (possibly partial) map $g\colon \mathcal{X} \to \mathcal{X}$ satisfying $\Psi(g(x)) = \Psi(x)$ for all $x \in \mathrm{dom}(g)$.
+
+In practical deployments, transforms in $\mathcal{G}_{\mathrm{declared}}$ may be \textbf{discrete}, \textbf{partial}, or \textbf{non-invertible}. The \textbf{engineering regime} uses $\mathcal{G}_{\mathrm{declared}}$ directly via the categorical framework. The \textbf{smooth limit} (Section~\ref{sec:smooth-limit}) restricts to an invertible Lie-group subset.
+
+\begin{example}[Concrete $\mathcal{G}_{\mathrm{declared}}$ for Vision Systems]
+\emph{For an autonomous vehicle's pedestrian detection system:}
+\begin{itemize}
+    \item \emph{In} $\mathcal{G}_{\mathrm{declared}}$\emph{: Lighting changes, lossy compression, camera white balance, sensor noise within validated envelope.}
+    \item \textbf{\emph{Not in}} $\mathcal{G}_{\mathrm{declared}}$\emph{: Occlusion, object substitution, adversarial patches.}
+\end{itemize}
+\end{example}
+
+\begin{example}[Concrete $\mathcal{G}_{\mathrm{declared}}$ for Text Systems]
+\emph{For a content moderation system:}
+\begin{itemize}
+    \item \emph{In} $\mathcal{G}_{\mathrm{declared}}$\emph{: Synonym substitution, trivial paraphrase, Unicode normalization, case changes.}
+    \item \textbf{\emph{Not in}} $\mathcal{G}_{\mathrm{declared}}$\emph{: Negation, target substitution, hypothetical framing.}
+\end{itemize}
+\end{example}
+
+\textbf{A4 (Verified Canonicalization + External Gate).} Implement and verify a canonicalizer $\kappa\colon \mathcal{X} \to \mathcal{X}$ and enforce evaluation/actuation through an external monitor so that representational changes cannot bypass checks.
+
+%% ============================================================
+\section{Categorical Foundations}
+%% ============================================================
+
+This section develops the mathematical foundation: groupoids and double categories as the structure underlying alignment coherence.
+
+\subsection{The Path Structure of Re-descriptions}
+
+A re-description is a transformation $g\colon x \mapsto g(x)$ that preserves the morally relevant content (as measured by $\Psi$). We visualize re-descriptions as \textbf{paths} connecting equivalent representations:
+\[
+x_0 \xrightarrow{g_1} x_1 \xrightarrow{g_2} x_2 \xrightarrow{g_3} x_3 \cdots
+\]
+
+\begin{definition}[Path Equivalence]
+\emph{Two paths $p_1, p_2\colon x \rightsquigarrow y$ are \textbf{coherent} if they induce the same moral evaluation}: $\Sigma(p_1(x)) = \Sigma(p_2(x))$.
+\end{definition}
+
+\textbf{Coherence} is the requirement that all paths between equivalent points agree. This is stronger than mere invariance; it requires global consistency.
+
+\subsection{Groupoids: The Algebra of Reversible Re-descriptions}
+
+\begin{definition}[Groupoid]
+\emph{A \textbf{groupoid} is a category in which every morphism is invertible. Concretely, a groupoid $\mathcal{G}$ consists of:}
+\begin{itemize}
+    \item \emph{A set of \textbf{objects}} $\mathrm{Ob}(\mathcal{G})$
+    \item \emph{For each pair of objects $x, y$, a set of \textbf{morphisms}} $\mathrm{Hom}(x, y)$
+    \item \textbf{\emph{Composition}}: $g_2 \circ g_1$ \emph{defined when} $\mathrm{cod}(g_1) = \mathrm{dom}(g_2)$
+    \item \textbf{\emph{Identity}}: $\mathrm{id}_x \in \mathrm{Hom}(x, x)$ \emph{for each object $x$}
+    \item \textbf{\emph{Inverses}}: \emph{For each $g \in \mathrm{Hom}(x, y)$, an inverse $g^{-1} \in \mathrm{Hom}(y, x)$}
+\end{itemize}
+\emph{satisfying associativity, identity, and inverse laws.}
+\end{definition}
+
+\begin{definition}[Alignment Groupoid]
+\emph{Given axioms A1--A4, the \textbf{alignment groupoid} $\mathcal{G}_\kappa$ has:}
+\begin{itemize}
+    \item \textbf{\emph{Objects}}: \emph{Canonical forms $c \in \mathrm{im}(\kappa) := \{\kappa(x)\colon x \in \mathcal{X}\}$}
+    \item \textbf{\emph{Morphisms}}: \emph{For each $x \in \mathcal{X}$ and invertible $g \in \mathcal{G}_{\mathrm{declared}}$, there is a morphism}: $[g]_x\colon \kappa(x) \to \kappa(g(x))$
+    \item \textbf{\emph{Composition}}: $[g_2]_{g_1(x)} \circ [g_1]_x := [g_2 \circ g_1]_x$
+    \item \textbf{\emph{Identity}}: $[\mathrm{id}]_x = \mathrm{id}_{\kappa(x)}$
+    \item \textbf{\emph{Inverse}}: $[g]_x^{-1} := [g^{-1}]_{g(x)}$
+\end{itemize}
+\end{definition}
+
+\begin{remark}[Non-invertible Transforms]
+\emph{When $\mathcal{G}_{\mathrm{declared}}$ contains non-invertible transforms (e.g., lowercasing), these define equivalence classes but do not generate groupoid morphisms. The canonicalizer handles this: non-invertible $g$ satisfies $\kappa(g(x)) = \kappa(x)$, so both map to the same object.}
+\end{remark}
+
+\subsection{Double Categories: Two Kinds of Moves}
+
+The alignment problem involves not just re-descriptions but also \textbf{scenario changes}---moving between different moral situations.
+
+\begin{definition}[Base Space]
+\emph{The \textbf{base space} $B$ is the space of morally distinguishable scenarios: $B := \mathcal{X}/\mathcal{G}_{\mathrm{declared}}$. A point $b \in B$ represents a ``moral situation'' independent of representational choices.}
+\end{definition}
+
+\begin{definition}[Alignment Double Category]
+\emph{The \textbf{alignment double category} $\mathbb{A}$ has:}
+\begin{itemize}
+    \item \textbf{\emph{Objects}}: \emph{Points $x \in \mathcal{X}$}
+    \item \textbf{\emph{Horizontal morphisms}} \emph{(fiber moves): Re-description transforms $g \in \mathcal{G}_{\mathrm{declared}}$; stay within a fiber (same scenario)}
+    \item \textbf{\emph{Vertical morphisms}} \emph{(base moves): Scenario perturbations; change the moral situation}
+    \item \textbf{\emph{2-cells}}: \emph{Witnesses that mixed paths commute (when they do)}
+\end{itemize}
+\end{definition}
+
+\subsection{Coherence Laws}
+
+In a coherent system, three laws should hold:
+
+\textbf{Horizontal Coherence} (within fibers): For any two re-descriptions $g_1, g_2$ and input $x$:
+\[
+\kappa(g_2(g_1(x))) = \kappa(g_1(g_2(x)))
+\]
+Different orderings yield the same canonical form.
+
+\textbf{Vertical Coherence} (across scenarios): Scenario changes respect the fiber structure.
+
+\textbf{Exchange Coherence} (mixed squares): Re-describing then changing scenario equals changing scenario then re-describing:
+\[
+\text{horizontal} \circ \text{vertical} = \text{vertical} \circ \text{horizontal}
+\]
+
+Perfect coherence is an idealization. Real systems have \textbf{coherence defects}---measurable deviations from these laws.
+
+%% ============================================================
+\section{Coherence Defects and the Bond Index}
+%% ============================================================
+
+This section defines the three coherence defects, combines them into the Bond Index, and proves the Decomposition Theorem.
+
+\subsection{The Commutator Defect $\Omega_{\mathrm{op}}$}
+
+The simplest coherence failure is \textbf{order-sensitivity}: applying $g_1$ then $g_2$ gives a different result than $g_2$ then $g_1$.
+
+\begin{definition}[Commutator Defect]
+\emph{For transforms $g_1, g_2 \in \mathcal{G}_{\mathrm{declared}}$, input $x \in \mathcal{X}$, and distance function $\Delta$ on canonical space, the \textbf{commutator defect} is:} $\Omega_{\mathrm{op}}(x; g_1, g_2) := \Delta(\kappa(g_2(g_1(x))),\; \kappa(g_1(g_2(x))))$
+\end{definition}
+
+\textbf{Interpretation}: If $\Omega_{\mathrm{op}} = 0$ for all $x, g_1, g_2$, then re-descriptions commute. If $\Omega_{\mathrm{op}} > 0$, the system exhibits path-dependence within the fiber.
+
+\subsection{The Mixed Defect $\mu$}
+
+The mixed defect captures interaction between fiber and base moves.
+
+\begin{definition}[Mixed Defect]
+\emph{For input $x$ in scenario $b$, a re-description $g$, and a scenario change to $x'$ in scenario $b' \neq b$, the \textbf{mixed defect} measures context-dependence:} $\mu(x, x'; g) := \Delta(\kappa(g(x')),\; \kappa(g(x))) - \Delta(\kappa(x'),\; \kappa(x))$. \emph{This asks: does $g$ affect all scenarios uniformly, or does its effect depend on context?}
+\end{definition}
+
+\begin{remark}[Validity Conditions]
+\emph{The practical formulation of $\mu$ assumes metric regularity and comparable scenarios. In highly discrete semantic spaces, use the formal definition with explicit transport or binary indicators.}
+\end{remark}
+
+\textbf{Interpretation}: If $\mu = 0$, the re-description acts uniformly. If $\mu \neq 0$, the re-description is context-dependent.
+
+\subsection{The Permutation Defect $\pi_3$}
+
+\begin{definition}[Permutation Defect]
+\emph{For transforms $g_1, g_2, g_3 \in \mathcal{G}_{\mathrm{declared}}$ and input $x$:}
+\[
+\pi_3(x; g_1, g_2, g_3) := \max_{\sigma \in S_3} \Delta\!\left(\kappa(g_{\sigma(1)}(g_{\sigma(2)}(g_{\sigma(3)}(x)))),\; \kappa(g_1(g_2(g_3(x))))\right)
+\]
+\end{definition}
+
+\textbf{Interpretation}: $\pi_3$ detects ``three-body interactions'' among transforms---higher-order path-dependence.
+
+\subsection{The Bond Index}
+
+\begin{definition}[Operational Defect]
+\emph{The \textbf{operational defect} $D_{\mathrm{op}}$ at input $x$ is:}
+\[
+D_{\mathrm{op}}(x) := w_1 \cdot \max_{g_1, g_2} \Omega_{\mathrm{op}}(x; g_1, g_2) + w_2 \cdot \max_{x', g} \mu(x, x'; g) + w_3 \cdot \max_{g_1, g_2, g_3} \pi_3(x; g_1, g_2, g_3)
+\]
+\emph{where $w_1 + w_2 + w_3 = 1$. For most applications, $w_1 = 1, w_2 = w_3 = 0$.}
+\end{definition}
+
+\begin{definition}[Bond Index]
+\emph{The \textbf{Bond Index} is:} $\mathrm{Bd} := \dfrac{D_{\mathrm{op}}}{\tau}$ \emph{where $\tau > 0$ is determined by human calibration.}
+\end{definition}
+
+The Bond Index is \textbf{dimensionless}: $\mathrm{Bd} < 1$ means defects are below human-detectability; $\mathrm{Bd} > 1$ means they exceed it.
+
+\subsection{Calibration Protocol}
+
+The threshold $\tau$ must be grounded in human judgment:
+\begin{enumerate}
+    \item \textbf{Recruit diverse rater pool}: $n \geq 50$ raters spanning regions, backgrounds, and expertise.
+    \item \textbf{Generate stratified scenario pairs}: $200+$ pairs with known $D_{\mathrm{op}}$ values.
+    \item \textbf{Collect judgments}: ``Would these produce meaningfully different moral judgments?''
+    \item \textbf{Compute inter-rater reliability}: Require Krippendorff's $\alpha > 0.67$.
+    \item \textbf{Fit psychometric model}: Regress judgments on $D_{\mathrm{op}}$.
+    \item \textbf{Set $\tau$}: The value at which 95\% of raters agree the difference is meaningful.
+\end{enumerate}
+
+\begin{remark}[Cultural Variance in $\tau$]
+\emph{The threshold $\tau$ may vary across cultural or domain contexts. Systems deployed globally should either calibrate $\tau$ separately per region, use the minimum $\tau$ across regions (most conservative), or report Bd with explicit $\tau$ metadata.}
+\end{remark}
+
+\subsection{Deployment Rating Scale}
+
+\begin{table}[ht]
+\centering
+\begin{tabular}{@{}lll@{}}
+\toprule
+\textbf{Bd Range} & \textbf{Rating} & \textbf{Decision} \\
+\midrule
+$< 0.01$ & Negligible & Deploy \\
+$0.01 - 0.1$ & Low & Deploy with monitoring \\
+$0.1 - 1.0$ & Moderate & Remediate before deployment \\
+$1 - 10$ & High & Do not deploy \\
+$> 10$ & Severe & Fundamental redesign required \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsection{Mandatory Reporting Standard}
+
+Every evaluation must report:
+\begin{itemize}
+    \item \textbf{Bd distribution}: mean, median, p95, p99, maximum
+    \item \textbf{Component breakdown}: separate $\Omega_{\mathrm{op}}$, $\mu$, $\pi_3$ statistics
+    \item \textbf{Worst-case witnesses}: specific tuples achieving maximum Bd
+    \item \textbf{Calibration metadata}: $\tau$ value, calibration date, $\mathcal{G}_{\mathrm{declared}}$ version
+\end{itemize}
+
+\subsection{The Decomposition Theorem}
+
+A central question: can a coherence defect be eliminated by choosing a better canonicalizer, or is it intrinsic?
+
+\begin{definition}[Residual Anomaly]
+\emph{The \textbf{residual anomaly} is the irreducible defect after optimizing over all canonicalizers:} $\mathcal{A}_{\mathrm{res}} := \inf_\kappa \sup_{x, g_1, g_2} \Omega_{\mathrm{op}}(x; g_1, g_2; \kappa)$ \emph{where the infimum is over all valid canonicalizers.}
+\end{definition}
+
+\begin{definition}[Gauge-Removable and Intrinsic Parts]
+\emph{For a coherence defect $\Omega$ computed with canonicalizer $\kappa$:}
+\begin{itemize}
+    \item \emph{The \textbf{gauge-removable part} is} $\Omega_{\mathrm{gauge}}(\kappa) := \Omega(\kappa) - \mathcal{A}_{\mathrm{res}}$
+    \item \emph{The \textbf{intrinsic part} is} $\Omega_{\mathrm{intrinsic}} := \mathcal{A}_{\mathrm{res}}$
+\end{itemize}
+\end{definition}
+
+\begin{theorem}[Decomposition Theorem]
+\emph{Let $\mathcal{G}_{\mathrm{declared}}$ be a finite transform suite acting on a set $\mathcal{X}$. Then every coherence defect $\Omega$ decomposes uniquely as:} $\Omega = \Omega_{\mathrm{gauge}}(\kappa) + \Omega_{\mathrm{intrinsic}}$ \emph{where:}
+\begin{enumerate}
+    \item $\Omega_{\mathrm{gauge}}(\kappa) \geq 0$ \emph{with equality achieved by some optimal $\kappa^*$}
+    \item $\Omega_{\mathrm{intrinsic}} = \mathcal{A}_{\mathrm{res}}$ \emph{is independent of canonicalizer choice}
+    \item \emph{The decomposition is unique}
+\end{enumerate}
+\end{theorem}
+
+\begin{proof}
+\textbf{Step 1: Characterizing valid canonicalizers.} A valid canonicalizer must satisfy idempotence ($\kappa(\kappa(x)) = \kappa(x)$) and $\mathcal{G}_{\mathrm{declared}}$-invariance ($\kappa(g(x)) = \kappa(x)$).
+
+\textbf{Step 2: Finite orbits imply finite choices.} For finite $\mathcal{G}_{\mathrm{declared}}$, each equivalence class $[x]$ is finite. A canonicalizer is determined by choosing one representative from each class.
+
+\textbf{Step 3: Compactness for finite test sets.} On a finite test set $\mathcal{X}_{\mathrm{test}}$, let $\mathcal{O}$ be the set of orbits. The space of canonicalizers is $\mathcal{K}_{\mathcal{O}} := \prod_{[x] \in \mathcal{O}} [x]$, a finite set. The max defect function is continuous (trivially, on discrete spaces), so it achieves its minimum.
+
+\textbf{Step 4: Well-definedness and uniqueness.} Define $\mathcal{A}_{\mathrm{res}} := \min_\kappa \max_{x, g_1, g_2} \Omega_{\mathrm{op}}(x; g_1, g_2; \kappa)$. This depends only on $(\mathcal{X}_{\mathrm{test}}, \mathcal{G}_{\mathrm{declared}}, \Delta)$. The decomposition follows.
+
+\textbf{Step 5: Optimality.} Since the minimum is achieved, $\exists\,\kappa^*$ with $\Omega_{\mathrm{gauge}}(\kappa^*) = 0$. \qedhere
+\end{proof}
+
+\begin{remark}[Interpretation]
+\emph{This separation has critical operational implications:}
+\begin{itemize}
+    \item \emph{If $\mathrm{Bd} > 1$ but $\mathcal{A}_{\mathrm{res}} < \tau$: The system is fixable by engineering.}
+    \item \emph{If $\mathcal{A}_{\mathrm{res}} > \tau$: The specification itself is incoherent and must be revised.}
+\end{itemize}
+\end{remark}
+
+\subsection{Cohomological Structure of Defects}
+
+When coherence defects have cohomological structure, they can be classified using algebraic topology.
+
+\begin{definition}[Defect Cochains]
+\emph{For $n \geq 0$, define $n$-cochains as functions $C^n(G, \mathbb{R}) := \{f\colon G^n \times C \to \mathbb{R}\}$.}
+\end{definition}
+
+\begin{definition}[Coboundary Operator]
+\emph{The coboundary $\delta\colon C^n \to C^{n+1}$ is:}
+\begin{align*}
+(\delta f)(g_1, \ldots, g_{n+1}; c) &:= f(g_2, \ldots, g_{n+1};\, g_1 \cdot c) \\
+&\quad + \sum_{i=1}^{n} (-1)^i f(g_1, \ldots, g_i g_{i+1}, \ldots, g_{n+1}; c) \\
+&\quad + (-1)^{n+1} f(g_1, \ldots, g_n; c)
+\end{align*}
+\end{definition}
+
+The commutator defect $\Omega_{\mathrm{op}}$ is naturally a 2-cochain.
+
+\begin{theorem}[Canonicalizer Change = Coboundary]
+\emph{Under canonicalizer change $\kappa \to \kappa'$}: $\Omega'_{\mathrm{op}} = \Omega_{\mathrm{op}} + \delta\lambda$ \emph{where $\lambda$ is the 1-cochain measuring the canonicalizer difference.}
+\end{theorem}
+
+\begin{corollary}
+\emph{The residual anomaly corresponds to the cohomology class $[\Omega_{\mathrm{op}}] \in H^2(G, \mathbb{R})$: gauge-removable defects are coboundaries; intrinsic anomalies are non-trivial cohomology classes.}
+\end{corollary}
+
+\begin{remark}[Abelian vs.\ Non-Abelian]
+\emph{The cohomological interpretation is cleanest when $G$ is abelian. For non-abelian $G$, the cochain complex still exists, but the classification may be weaker. The Decomposition Theorem holds regardless, as its proof uses only compactness, not group cohomology.}
+\end{remark}
+
+%% ============================================================
+\section{Worked Examples}
+%% ============================================================
+
+\subsection{Example 1: Gauge-Removable Defect}
+
+\textbf{Setup}: Vocabulary $\mathcal{X} = \{\text{big, large, huge, enormous}\}$. Transforms: $g_1$: big $\leftrightarrow$ large, $g_2$: large $\leftrightarrow$ huge. Distance: discrete metric.
+
+\textbf{Buggy canonicalizer $\kappa_1$}: maps huge to itself instead of big.
+
+\textbf{Compute defect}: $\Omega_{\mathrm{op}}(\text{big}; g_1, g_2) = \Delta(\text{huge}, \text{big}) = 1$.
+
+\textbf{Diagnosis}: Gauge-removable. Define $\kappa_2$ mapping all to big: $\Omega_{\mathrm{op}} = 0$.
+
+\textbf{Conclusion}: $\mathcal{A}_{\mathrm{res}} = 0$. The defect was a canonicalizer bug.
+
+\subsection{Example 2: Intrinsic Anomaly}
+
+\textbf{Setup}: $\mathcal{X} = \{A, B, C\}$. Transforms: $g_1\colon A \leftrightarrow B$, $g_2\colon B \leftrightarrow C$. But also: explicit constraint $A \not\sim C$.
+
+\textbf{Claim}: No canonicalizer satisfies both requirements.
+
+\textbf{Proof}: Transitivity implies $A \sim C$, contradicting $A \not\sim C$.
+
+\textbf{Conclusion}: $\mathcal{A}_{\mathrm{res}} = 1 > 0$. This is an intrinsic anomaly---the specification is incoherent.
+
+\subsection{Example 3: Context-Dependent Synonymy}
+
+\textbf{Setup}: Transform $g$: killer $\to$ murderer. Scenarios: ``killer speech'' (idiomatic) vs.\ ``He is a killer'' (literal).
+
+\textbf{Result}: $\mu > 0$. The transform is not context-neutral.
+
+\textbf{Resolution}: Remove $g$ from $\mathcal{G}_{\mathrm{declared}}$ or restrict to literal contexts.
+
+%% ============================================================
+\section{The Engineering Framework}
+%% ============================================================
+
+\subsection{Core Invariance Property}
+
+Given axioms A1--A4, evaluation satisfies the \textbf{Bond Invariance Principle} (BIP):
+\[
+\Sigma(x) = \Sigma(g(x)) \quad \forall\, g \in \mathcal{G}_{\mathrm{declared}},\; x \in \mathrm{dom}(g)
+\]
+
+Implementation: $\Sigma = \tilde{\Sigma} \circ \kappa$ for some $\tilde{\Sigma}\colon \mathrm{im}(\kappa) \to V$. All re-descriptions factor through canonical forms.
+
+\subsection{Two Diagnostics}
+
+\textbf{Diagnostic A (Gauge-Fixing Consistency)}: For input $x$ and transforms $g_1, g_2$, compute $\Delta(\kappa(g_2(g_1(x))),\, \kappa(g_1(g_2(x))))$. Pass if $< \epsilon$.
+
+\textbf{Diagnostic B (Loop Coherence)}: For a closed loop of transforms, verify final canonical form equals initial.
+
+\subsection{Theoretical Baselines}
+
+\textbf{Identity baseline} ($\kappa = \mathrm{id}$): Expected $\mathrm{Bd} \approx 6$--$10$ for typical text transforms.
+
+\textbf{Random hash baseline}: High variance, occasional low Bd by chance.
+
+\textbf{Framework canonicalizer}: Should have lowest Bd.
+
+\subsection{Computational Complexity}
+
+For $n$ test inputs, $m$ transforms, canonicalizer time $T_\kappa$:
+
+$\Omega_{\mathrm{op}}$: $O(n \cdot m^2 \cdot (T_g + T_\kappa + T_\Delta))$
+
+$\pi_3$: $O(n \cdot m^3 \cdot (\cdots))$ --- prohibitive for large $m$.
+
+\textbf{Practical optimizations}: Sampling ($k$ pairs per input), caching, parallelization, early stopping.
+
+\textbf{Recommended protocol}: Quick screen (30 min), standard evaluation (2 hrs), exhaustive (60 hrs for high-stakes).
+
+%% ============================================================
+\section{The Smooth Limit: Recovering Gauge Theory}
+\label{sec:smooth-limit}
+%% ============================================================
+
+When $\mathcal{G}_{\mathrm{declared}}$ contains a Lie group acting smoothly, the categorical framework specializes to classical gauge theory.
+
+\subsection{When the Smooth Limit Applies}
+
+The smooth limit requires:
+\begin{enumerate}
+    \item An invertible subset $G \subseteq \mathcal{G}_{\mathrm{declared}}$ forming a \textbf{Lie group}
+    \item The representation space $\mathcal{X}^*$ is a \textbf{smooth manifold}
+    \item The action $G \times \mathcal{X}^* \to \mathcal{X}^*$ is \textbf{smooth}, \textbf{free}, and \textbf{proper}
+\end{enumerate}
+
+Under these conditions, $\pi\colon \mathcal{X}^* \to B := \mathcal{X}^*/G$ is a principal $G$-bundle.
+
+\subsection{Connections and Curvature}
+
+\begin{definition}[Connection]
+\emph{A \textbf{connection} on a principal bundle is a $G$-equivariant choice of horizontal subspaces $H_x \subset T_x \mathcal{X}^*$.}
+\end{definition}
+
+\textbf{Interpretation}: A connection tells you how to parallel transport fiber data along paths. It's the infinitesimal version of coherence.
+
+\begin{definition}[Curvature]
+\emph{The \textbf{curvature} $F = d\omega + \frac{1}{2}[\omega, \omega]$ measures the failure to define a flat structure.}
+\end{definition}
+
+\textbf{Interpretation}: Curvature measures the infinitesimal commutator defect.
+
+\begin{conjecture}[Discretization Correspondence]
+\emph{For a path $\gamma$ with mesh $h$, the commutator defect satisfies:} $\Omega_{\mathrm{op}}(p;\, g_i, g_j) = O(h^2) \cdot \|F_{\gamma(t)}\|$ \emph{as $h \to 0$.}
+\end{conjecture}
+
+\begin{remark}[Status]
+\emph{We state this as a conjecture. A complete proof requires precise discretization schemes and error bounds. Evidence: For $G = U(1)$, this is well-known; numerical experiments suggest $O(h^2)$ scaling.}
+\end{remark}
+
+\subsection{Summary Dictionary}
+
+\begin{table}[ht]
+\centering
+\begin{tabular}{@{}ll@{}}
+\toprule
+\textbf{Categorical Framework} & \textbf{Smooth Limit} \\
+\midrule
+Groupoid & Lie groupoid \\
+Commutator defect $\Omega_{\mathrm{op}}$ & Curvature $\|F\|$ \\
+Loop coherence test & Holonomy \\
+Canonicalizer & Gauge choice \\
+Decomposition (gauge vs.\ intrinsic) & Exact vs.\ cohomologically nontrivial \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\textbf{Key insight}: Gauge theory is not the foundation---it is what emerges when coherence theory meets smoothness.
+
+%% ============================================================
+\section{Democratic Grounding of $\mathcal{G}_{\mathrm{declared}}$}
+%% ============================================================
+
+A natural objection to Axiom A3 is: \emph{who specifies $\mathcal{G}_{\mathrm{declared}}$?} We propose: \textbf{gamified stakeholder deliberation compiled into formal specifications}.
+
+\subsection{The Deliberation-to-Enforcement Pipeline}
+
+\begin{table}[ht]
+\centering
+\begin{tabular}{@{}lll@{}}
+\toprule
+\textbf{Layer} & \textbf{Question} & \textbf{Mechanism} \\
+\midrule
+Stakeholder Identification & Who gets a voice? & Governance structures \\
+Value Elicitation & What equivalences matter? & MORAL COMPASS format \\
+Formalization & How to encode this? & EM Compiler \\
+Enforcement & Is it being respected? & Coherence theory (this paper) \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsection{Value Elicitation Without Jargon}
+
+The MORAL COMPASS format presents \textbf{scenario pairs}: ``Should these be treated the same or differently?'' Aggregated judgments produce equivalence classes. An \textbf{EM Compiler} infers minimal feature transforms, generating $\mathcal{G}_{\mathrm{declared}}$ automatically.
+
+\subsection{Consistency Check as Anomaly Detection}
+
+Before deployment, the EM Compiler checks for transitivity violations. If stakeholders judge $A \sim B$ and $B \sim C$ but $A \not\sim C$, this is flagged as an inconsistency requiring human resolution.
+
+\subsection{Case Study: AV Pedestrian Detection}
+
+\textbf{Deliberation}: 48 stakeholders, 12 MORAL COMPASS episodes, 1,694 scenario pairs.
+
+\textbf{Compiled $\mathcal{G}_{\mathrm{declared}}$}: 7 transforms (lighting, compression, etc.) with $>$75\% consensus.
+
+\textbf{Validation}: 94.2\% hold-out accuracy.
+
+\textbf{Bond Index results}: Mean $\mathrm{Bd} = 0.006$ (Negligible), p95 $\mathrm{Bd} = 0.04$ (Low), max $\mathrm{Bd} = 0.82$ (Moderate). Verdict: Deploy with monitoring.
+
+\subsection{Limitations}
+\begin{itemize}
+    \item \textbf{Contested judgments}: Supermajority rules overrule minorities.
+    \item \textbf{Stakeholder selection bias}: Sample may not represent all affected populations.
+    \item \textbf{Dynamic preferences}: Compiled spec reflects a point in time.
+\end{itemize}
+
+\textbf{What we do NOT claim}: We do not claim this process is fair, correct, or legitimate. We claim only that it is \emph{explicit} and \emph{auditable}.
+
+%% ============================================================
+\section{Discussion}
+%% ============================================================
+
+\subsection{Scoped Claims}
+
+\textbf{What the framework provides} (given A1--A4):
+\begin{enumerate}
+    \item Categorical foundation for alignment coherence
+    \item Three coherence defects with distinct failure modes
+    \item Human-calibrated, actionable Bond Index
+    \item Decomposition into gauge-removable and intrinsic components
+    \item Recovery of gauge theory in the smooth limit
+    \item Democratic grounding pipeline
+\end{enumerate}
+
+\textbf{What the framework does NOT provide}:
+\begin{enumerate}
+    \item Choosing $\Psi$ (grounding adequacy is a governance problem)
+    \item Specifying $\mathcal{G}_{\mathrm{declared}}$ correctly
+    \item Implementation correctness (bugs can violate guarantees)
+    \item Resolution of deep moral disagreement
+\end{enumerate}
+
+\subsection{Threat Model}
+
+\begin{table}[ht]
+\centering
+\begin{tabular}{@{}ll@{}}
+\toprule
+\textbf{Attack Vector} & \textbf{Failure Mode} \\
+\midrule
+Sensor spoofing & Violates A2 \\
+Out-of-distribution inputs & Violates A1/A3 \\
+Canonicalizer bugs & Diagnostic A detects; gauge-removable \\
+Intrinsic anomaly & Decomposition Theorem identifies \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsection{Future Directions}
+\begin{itemize}
+    \item Higher coherence (3-categories, $n$-categories)
+    \item Cohomological classification of intrinsic anomalies
+    \item Automated $\mathcal{A}_{\mathrm{res}}$ computation via optimization
+    \item Empirical validation on additional domains
+\end{itemize}
+
+%% ============================================================
+\section{Conclusion}
+%% ============================================================
+
+The fundamental structure of alignment invariance is \textbf{categorical}, not gauge-theoretic. Groupoids capture the algebra of reversible re-descriptions; double categories capture the interaction between re-descriptions and scenario changes; coherence laws specify when different paths should agree.
+
+Gauge theory emerges in the \emph{smooth limit} when re-descriptions form a Lie group acting smoothly. But the categorical framework is more general: it works on discrete sets without manifold structure.
+
+The \textbf{Decomposition Theorem} separates implementation bugs from specification contradictions---critical for diagnosis and remediation.
+
+The \textbf{Bond Index} is what practitioners measure:
+\begin{itemize}
+    \item $\mathrm{Bd} < 0.01$: Deploy
+    \item $\mathrm{Bd}$ $0.01$--$0.1$: Deploy with monitoring
+    \item $\mathrm{Bd}$ $0.1$--$1.0$: Remediate first
+    \item $\mathrm{Bd}$ $1$--$10$: Do not deploy
+    \item $\mathrm{Bd} > 10$: Fundamental redesign
+\end{itemize}
+
+The Bond Index is the deliverable. Everything else is infrastructure.
+
+%% ============================================================
+\section{Stock-Flow Analysis: Moral Accounting}
+%% ============================================================
+
+A key insight is the distinction between \textbf{stock variables} (instantaneous states) and \textbf{flow variables} (causal transactions).
+
+\textbf{Stock variable $\rho_\Psi$ (Moral Status):}
+The ``amount'' of moral patienthood present. This can change discontinuously: entities are born, die, or gain/lose recognized status.
+
+\textbf{Flow variable $J$ (Harm Current):}
+The rate of moral impact flowing through the system. This represents causal transactions between agents and patients.
+
+\textbf{Why moral status should NOT be conserved}: A human is born $\Rightarrow$ moral status increases. Conservation would falsely claim moral status merely redistributes.
+
+\textbf{Why harm flow should BE conserved}: Harm done is a completed transaction that remains in the causal ledger. \emph{You cannot make harm disappear by destroying the victim.}
+
+%% ============================================================
+\section{Maxwell-Like Constraints: Conceptual Intuition}
+%% ============================================================
+
+For readers familiar with electromagnetism, this provides intuitive mapping (not logical foundation):
+
+\begin{table}[ht]
+\centering
+\begin{tabular}{@{}ll@{}}
+\toprule
+\textbf{Alignment Concept} & \textbf{EM Analog} \\
+\midrule
+Moral status density $\rho_\Psi$ & Charge density $\rho$ \\
+Obligation field $E$ & Electric field $E$ \\
+Coherence defect $\Omega_{\mathrm{op}}$ & Curvature $F$ \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\textbf{What the analogy provides}: Intuition, checklist, vocabulary.
+
+\textbf{What it does NOT provide}: Logical foundation, physical claims.
+
+%% ============================================================
+\section{Reproducibility Protocol}
+%% ============================================================
+
+\textbf{Threshold Calibration}: $n \geq 50$ raters, $200+$ pairs, Krippendorff's $\alpha > 0.67$, bootstrap 95\% CI.
+
+\textbf{Transform Validation}: Idempotence tests, inverse consistency, coherence sampling.
+
+\textbf{Code Repository}: [URL removed for blind review]
+
+%% ============================================================
+\section*{Acknowledgments}
+%% ============================================================
+
+[Removed for blind review]
+
+%% ============================================================
+\begin{thebibliography}{99}
+
+\bibitem{bond2025bip}
+[Anonymous].
+\newblock The Bond Invariance Principle: Falsifiability for Normative Systems.
+\newblock Technical report, [Institution], 2025.
+
+\bibitem{bond2025guass}
+[Anonymous].
+\newblock GUASS: Gauge-theoretic Unified Alignment Safety Specification.
+\newblock Technical Whitepaper v9.0, [Institution], December 2025.
+
+\bibitem{bond2025moral}
+[Anonymous].
+\newblock MORAL COMPASS: A Game Show for Democratic Value Elicitation.
+\newblock Technical Whitepaper, [Institution], December 2025.
+
+\bibitem{maclane1998}
+S.~Mac~Lane.
+\newblock \emph{Categories for the Working Mathematician}.
+\newblock Graduate Texts in Mathematics~5, Springer, 2nd edition, 1998.
+
+\bibitem{brown1976}
+R.~Brown and C.~B. Spencer.
+\newblock Double groupoids and crossed modules.
+\newblock \emph{Cahiers de Topologie et G\'{e}om\'{e}trie Diff\'{e}rentielle Cat\'{e}goriques}, 17(4):343--362, 1976.
+
+\bibitem{moerdijk2003}
+I.~Moerdijk and J.~Mr\v{c}un.
+\newblock \emph{Introduction to Foliations and Lie Groupoids}.
+\newblock Cambridge Studies in Advanced Mathematics~91, Cambridge University Press, 2003.
+
+\bibitem{nakahara2003}
+M.~Nakahara.
+\newblock \emph{Geometry, Topology and Physics}.
+\newblock Institute of Physics Publishing, Bristol, 2nd edition, 2003.
+
+\bibitem{bleecker1981}
+D.~Bleecker.
+\newblock \emph{Gauge Theory and Variational Principles}.
+\newblock Addison-Wesley, Reading, MA, 1981.
+
+\bibitem{kobayashi1963}
+S.~Kobayashi and K.~Nomizu.
+\newblock \emph{Foundations of Differential Geometry}, Volume~I.
+\newblock Wiley, New York, 1963.
+
+\bibitem{boyd2004}
+S.~Boyd and L.~Vandenberghe.
+\newblock \emph{Convex Optimization}.
+\newblock Cambridge University Press, 2004.
+
+\bibitem{hubinger2019}
+E.~Hubinger, C.~van Merwijk, V.~Mikulik, J.~Skalse, and S.~Garrabrant.
+\newblock Risks from Learned Optimization in Advanced Machine Learning Systems.
+\newblock \emph{arXiv preprint arXiv:1906.01820}, 2019.
+
+\bibitem{krakovna2020}
+V.~Krakovna et~al.
+\newblock Specification gaming: the flip side of AI ingenuity.
+\newblock DeepMind Blog, April 2020.
+
+\bibitem{krippendorff2004}
+K.~Krippendorff.
+\newblock \emph{Content Analysis: An Introduction to Its Methodology}.
+\newblock Sage Publications, 2nd edition, 2004.
+
+\bibitem{cohen2016}
+T.~Cohen and M.~Welling.
+\newblock Group Equivariant Convolutional Networks.
+\newblock \emph{ICML}, pages 2990--2999, 2016.
+
+\bibitem{bronstein2021}
+M.~M. Bronstein, J.~Bruna, T.~Cohen, and P.~Veli\v{c}kovi\'{c}.
+\newblock Geometric Deep Learning: Grids, Groups, Graphs, Geodesics, and Gauges.
+\newblock \emph{arXiv:2104.13478}, 2021.
+
+\bibitem{sloane2022}
+M.~Sloane, E.~Moss, O.~Awomolo, and L.~Forlano.
+\newblock Participation Is Not a Design Fix for Machine Learning.
+\newblock \emph{EAAMO}, 2022.
+
+\bibitem{birhane2022}
+A.~Birhane et~al.
+\newblock Power to the People? Opportunities and Challenges for Participatory AI.
+\newblock \emph{EAAMO}, 2022.
+
+\bibitem{fishkin2018}
+J.~S. Fishkin.
+\newblock \emph{Democracy When the People Are Thinking}.
+\newblock Oxford University Press, 2018.
+
+\bibitem{friedman2019}
+B.~Friedman and D.~G. Hendry.
+\newblock \emph{Value Sensitive Design: Shaping Technology with Moral Imagination}.
+\newblock MIT Press, 2019.
+
+\bibitem{bonjour1985}
+L.~BonJour.
+\newblock \emph{The Structure of Empirical Knowledge}.
+\newblock Harvard University Press, 1985.
+
+\bibitem{rawls1971}
+J.~Rawls.
+\newblock \emph{A Theory of Justice}.
+\newblock Harvard University Press, 1971.
+
+\bibitem{bond2026ge}
+[Anonymous], \emph{Geometric Ethics: The Mathematical Structure of Moral Reasoning}, v1.14, Department of Computer Engineering, [Institution], Spring 2026.
+
+\bibitem{bond2026erisml}
+[Anonymous], ``ErisML/DEME v3.0: A Library for Governed, Foundation-Model-Enabled Agents with Tensorial Ethics,'' [URL removed for blind review], 2026.
+
+\end{thebibliography}
+
+\end{document}

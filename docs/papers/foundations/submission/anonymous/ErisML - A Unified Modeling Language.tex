@@ -1,0 +1,1175 @@
+\documentclass[conference]{IEEEtran}
+
+% *** PACKAGES ***
+\usepackage{times}
+\usepackage{amsmath,amssymb}
+\usepackage{graphicx}
+\usepackage{listings}
+\usepackage{hyperref}
+\usepackage{url}
+\usepackage{cite}
+\usepackage{booktabs}
+
+\lstset{
+  basicstyle=\ttfamily\footnotesize,
+  breaklines=true,
+  frame=single,
+  xleftmargin=1em,
+  xrightmargin=1em
+}
+
+\begin{document}
+
+\title{ErisML: A Unified Modeling Language for Pervasive AI Governance}
+
+\author{Anonymous Author(s)}
+
+\maketitle
+
+\begin{abstract}
+Foundation models are migrating from data centers to pervasive environments---homes, hospitals, factories, and cities---where they encounter heterogeneous sensors, conflicting objectives, ambiguous regulations, and multi-agent dynamics. Current approaches fragment goals, code, norms, and planning into separate representations and reduce moral evaluation to scalar scores, discarding the multi-dimensional structure that principled ethical reasoning requires. This paper presents ErisML, a unified modeling language and runtime library (v3.0, open-source on PyPI) integrating environment dynamics, agency, multi-objective intents, normative structures, and strategic interaction. At its core, ErisML replaces scalar moral scores with a nine-dimensional \emph{MoralVector} whose axes correspond to distinct ethical dimensions---consequences, rights, fairness, autonomy, privacy, societal impact, virtue, legitimacy, and epistemic quality. The DEME~2.0 (Democratically-governed Ethical Modules) subsystem provides a three-layer enforcement architecture (Reflex, Tactical, Strategic) with tiered Ethics Modules, Pareto-optimal reasoning, and cryptographic audit trails. The mathematical foundations draw on the Geometric Ethics framework: moral evaluation as tensorial objects on a nine-dimensional moral manifold, gauge invariance under the $D_4$ dihedral group encoding Hohfeldian normative symmetries, and a Noether-style conservation law ensuring harm cannot appear or disappear through re-description. The Bond Invariance Principle (BIP) provides a falsifiable coherence criterion, empirically validated across 20,030 advice-column letters and 109,294 cross-lingual passages spanning 3,000 years and 11 languages, with independent replication confirming all nine dimensions are linearly decodable and cross-lingually transferable. ErisML compiles to planners (PDDL), verifiers (PRISM), and reinforcement-learning backends, and enforces norm-gated action selection at sub-microsecond latency on embedded hardware.
+\end{abstract}
+
+\begin{IEEEkeywords}
+Pervasive computing, modeling languages, normative systems, foundation models, AI governance, multi-agent systems, tensorial ethics, moral manifold, gauge invariance, Bond Invariance Principle
+\end{IEEEkeywords}
+
+\section{Introduction}
+\label{sec:introduction}
+
+\subsection{The Challenge of Pervasive AI}
+
+Foundation models are escaping the data center. As they move into homes,
+hospitals, and factories, they face what we call the ``golden apple
+problem''---when AI agents must balance patient comfort against energy
+costs, privacy regulations against clinical safety, or throughput
+against accessibility, who decides what is ``fairest''?
+
+Current pervasive AI systems exhibit four types of chaos:
+
+\textbf{Observational chaos}: Motion sensors conflict with phone GPS.
+Healthcare monitors show vital sign spikes that could be distress or
+malfunction.
+
+\textbf{Intentional chaos}: Energy management wants to shed load;
+medical monitors demand power for insulin pumps; humans want
+entertainment; policy says critical devices have priority---but what
+counts as ``critical''?
+
+\textbf{Normative chaos}: HIPAA demands privacy, public health law
+mandates reporting, advance directives limit interventions, and AI
+training objectives say ``maximize health outcomes.'' Which norm takes
+precedence?
+
+\textbf{Temporal chaos}: Distribution shifts are constant. Models
+trained on summer data face winter storms. Policies optimized for one
+resident must adapt when visitors arrive. Norms for routine operation
+must flex during emergencies.
+
+Current approaches fragment the problem:
+\begin{itemize}
+\item \textbf{Prompts} encode goals but are brittle and unverifiable
+\item \textbf{Rules} capture norms but live separately from models
+\item \textbf{Code} provides orchestration but obscures intent
+\item \textbf{Planning languages} (PDDL) specify goals but lack multi-agent reasoning and normative structures
+\end{itemize}
+
+\subsection{ErisML: A Unified Substrate}
+
+\textbf{ErisML} (named for the Greek goddess of discord) is a
+unified modeling language and runtime library providing a single substrate for:
+
+\begin{enumerate}
+\item \textbf{Environment}: State spaces, dynamics, uncertainty, observability
+\item \textbf{Agency}: Capabilities, beliefs, memory, decision interfaces
+\item \textbf{Intent}: Multi-objective utilities, preferences, goal structures
+\item \textbf{Norms}: Permissions, obligations, prohibitions, sanctions
+\item \textbf{Dynamics}: Multi-agent interactions, strategic behavior, emergence
+\item \textbf{Tensorial ethics}: Multi-dimensional moral evaluation with gauge invariance
+\end{enumerate}
+
+Why unification? Because these elements are inseparable in pervasive
+computing. Agent actions depend on environment state. Environment
+dynamics change based on multi-agent interactions. Norms constrain which
+intents can be pursued. And moral evaluation cannot be reduced to a scalar without information loss---the \emph{Information Monotonicity Theorem} proves that any contraction of a multi-dimensional moral assessment to a scalar is irreversibly lossy, making specification gaming, reward hacking, and value collapse mathematical inevitabilities of scalar-objective architectures.
+
+\subsection{Contributions}
+
+This paper offers:
+\begin{itemize}
+\item \textbf{Design space analysis} exploring fundamental trade-offs in pervasive AI governance
+\item \textbf{The DEME~2.0 architecture}: MoralVector (9D), three-layer enforcement (Reflex/Tactical/Strategic), tiered Ethics Modules, and cryptographic audit trails
+\item \textbf{Formal semantics} grounded in the Geometric Ethics framework---moral manifold, $D_4$ gauge group, Noether conservation
+\item \textbf{The Bond Invariance Principle}: a falsifiable coherence criterion with empirical validation
+\item \textbf{Case studies} demonstrating capabilities and limitations across healthcare, smart-home, and triage scenarios
+\item \textbf{Reference implementation}: ErisML v3.0 on PyPI with sub-microsecond norm enforcement on embedded hardware
+\end{itemize}
+
+The broader mathematical foundations are developed in a companion monograph. We invite critique and collaborative refinement.
+
+\section{Design Space and Related Work}
+\label{sec:design-space}
+
+\subsection{Fundamental Trade-offs}
+
+\textbf{Expressiveness vs.\ Tractability}: More expressive languages
+capture richer phenomena (continuous dynamics, strategic interaction,
+recursive norms) but become intractable. Our position:
+\textbf{stratified by complexity}---core constructs remain decidable;
+extension mechanisms allow expressing (but not automatically solving)
+complex scenarios.
+
+\textbf{Specification vs.\ Learning}: We can't specify everything in
+advance. But unconstrained learning violates norms. Our position:
+\textbf{learning as constrained optimization}---objectives may be
+learned, but norms provide hard boundaries. Learning protocols become
+first-class objects.
+
+\textbf{Autonomy vs.\ Control}: Users want autonomous handling of routine
+cases but must retain ultimate control. Our position:
+\textbf{mixed-initiative interaction} as first-class concept, with
+explicit policies for escalation, override, and explanation.
+
+\textbf{Centralized vs.\ Distributed}: Pervasive systems face consensus
+problems, partial failures, and adversarial dynamics. Our position:
+\textbf{federation-native}---specifications scoped by
+agent/organization/jurisdiction, with explicit conflict resolution.
+
+\textbf{Human-Legibility vs.\ Machine-Optimality}: Auditors need readable
+specifications; solvers need efficient encodings. Our position:
+\textbf{multiple representation levels}---canonical formal
+representation with projections to human-readable views.
+
+\subsection{Related Work and Positioning}
+
+\textbf{Planning Languages}: PDDL~\cite{ghallab2004} and variants specify
+deterministic/stochastic planning problems but lack normative structures
+and multi-agent strategic reasoning.
+
+\textbf{Temporal Logics}: LTL, CTL, and Signal Temporal Logic (STL)
+handle continuous-time dynamics with bounded constraints but don't
+integrate learning or multi-objective optimization.
+
+\textbf{Policy Languages}: Rego (Open Policy Agent) and XACML provide
+industrial policy-as-code but lack environment modeling, dynamics, and
+planning integration.
+
+\textbf{Normative Multi-Agent Systems}: Extensive work on deontic logic
+in MAS~\cite{carmo2002,dignum2004,sergot2001} provides foundational concepts but limited
+integration with modern learning-based agents and formal verification
+tools.
+
+\textbf{BDI Architectures}: AgentSpeak and Jason~\cite{bordini2007} offer agent
+programming with beliefs/desires/intentions but lack formal semantics
+for learning and normative constraints.
+
+\begin{table}[t]
+\caption{Comparison of Related Approaches}
+\label{tab:comparison}
+\centering
+\footnotesize
+\begin{tabular}{@{}p{1.4cm}p{1.6cm}p{1.8cm}p{2.2cm}@{}}
+\toprule
+Approach & Strengths & Limitations & ErisML Difference \\
+\midrule
+PDDL & Mature tools, efficient & No norms, no multi-agent & Adds normative layer + strategic interaction \\
+Temporal Logic & Expressive, verifiable & No learning, no utilities & Integrates with RL + multi-objective optimization \\
+Policy Languages & Production-ready & No dynamics, no planning & Adds environment modeling + agent reasoning \\
+Normative MAS & Rich deontic logic & Limited tool support, no learning integration & Executable specifications + learning backends \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\section{ErisML Architecture}
+\label{sec:architecture}
+
+\subsection{Core Philosophy}
+
+Rather than treating uncertainty, conflicts, and strategic behavior as
+exceptions, ErisML makes them first-class constructs:
+
+\begin{itemize}
+\item \textbf{Observational}: Partial, noisy, conflicting sensor data
+\item \textbf{Intentional}: Multi-objective, often conflicting goals
+\item \textbf{Normative}: Ambiguous, contextual, sometimes contradictory rules
+\item \textbf{Interactive}: Strategic agents, emergent behaviors
+\item \textbf{Temporal}: Distribution shift, non-stationarity, adaptation
+\end{itemize}
+
+\subsection{Illustrative Syntax}
+
+We present ErisML through a smart hospital room example:
+
+\begin{lstlisting}
+// ENVIRONMENT: Physical and informational state
+environment HospitalRoom {
+  objects: Patient, Nurse, CareAgent, Monitor, IVPump;
+
+  state:
+    patient.vitals: {hr: real, bp: real, spo2: real};
+    patient.location: {in_bed, bathroom, fallen};
+    nurse.location: {in_room, at_station, offsite};
+    // Uncertainty annotation
+    patient.pain_level: real @ uncertain(self_report);
+    emergency_status: {routine, urgent, critical};
+
+  dynamics:
+    // Stochastic state transitions
+    update_vitals(v: Vitals) ~> patient.vitals = v @ prob 0.95;
+    fall_detected() ~> {
+      patient.location = fallen;
+      emergency_status = critical;
+      trigger_event("fall_detected");
+    };
+}
+
+// AGENTS: Capabilities, beliefs, constraints
+agent CareAgent {
+  capabilities: {
+    monitor_vitals, adjust_iv_rate, summon_nurse,
+    provide_comfort, call_emergency
+  };
+
+  // Explicit partial observability
+  beliefs: {
+    fully_observed: [patient.vitals, monitor.last_sync];
+    estimated: [patient.pain_level, patient.location];
+    hidden: [nurse.current_workload];
+  };
+
+  // Multi-objective with explicit priorities
+  intents: vector_objective {
+    maximize: patient.comfort,
+    minimize: response_time,
+    maintain: patient.safety >= threshold(critical),
+    respect: nurse.workload <= threshold(sustainable)
+  };
+
+  constraints: {
+    no_direct_medication_changes,  // Only nurses
+    require_explanation: any_action where impact > medium
+  };
+}
+
+// NORMS: Governance structure
+norms ClinicalProtocol {
+  jurisdiction: HospitalRoom;
+  authority: Hospital.PolicyBoard + State.HealthDept;
+
+  prohibition: {
+    CareAgent.adjust_iv_rate when emergency_status == critical;
+    any_agent.share(patient.data, external_party)
+      unless consent_given OR legal_mandate;
+  };
+
+  obligation: {
+    CareAgent.summon_nurse
+      when patient.vitals in danger_zone
+      within 30 seconds;
+    Nurse.respond_to_alert
+      when alert.priority >= urgent
+      within 5 minutes;
+  };
+
+  // Conflict resolution
+  priority: {
+    patient.safety > efficiency > comfort;
+  };
+
+  // Context-sensitive adaptation
+  context_sensitivity: {
+    during night_shift:
+      relax summon_nurse.within from 30s to 60s;
+    during emergency_status == critical:
+      override efficiency_objectives;
+      expand CareAgent.capabilities += emergency_protocols;
+  };
+
+  // Sanctions for violations
+  sanction: {
+    if violated(prohibition.share_patient_data):
+      log_violation(severity=critical);
+      suspend_agent();
+      notify_compliance_officer();
+  };
+}
+
+// DYNAMICS: Multi-agent strategic interaction
+dynamics MultiAgentCare {
+  action_space: {
+    CareAgent: {monitor, adjust_iv, summon, message, none};
+    Nurse: {assess, medicate, respond, override, ignore};
+  };
+
+  // Resource costs (reflects strategic trade-offs)
+  cost_model: {
+    CareAgent.summon: 5.0,      // High: interrupts nurse
+    Nurse.respond: 10.0,         // Very high: takes from
+                                 // other patients
+  };
+
+  // Norm-gated action selection
+  feasible_actions(agent, state): {
+    actions = agent.capabilities;
+    return [a for a in actions
+            if norms.permits(agent, a, state)];
+  };
+}
+\end{lstlisting}
+
+\subsection{DEME 2.0: The Ethics Decision Layer}
+
+ErisML includes \textbf{DEME~2.0} (Democratically-governed Ethical Modules), an ethics-only decision layer that replaces scalar moral scores with structured, multi-dimensional evaluation.
+
+\textbf{MoralVector}: A nine-dimensional vector whose axes correspond to distinct ethical dimensions:
+
+\begin{lstlisting}
+MoralVector(
+  physical_harm=0.1,         # [0,1], 0=none
+  rights_respect=0.9,        # [0,1], 1=fully respected
+  fairness_equity=0.85,      # [0,1], 1=fair
+  autonomy_respect=0.9,      # [0,1], 1=autonomous
+  privacy_protection=0.8,    # [0,1], 1=protected
+  societal_environmental=0.7, # [0,1], 1=beneficial
+  virtue_care=0.8,           # [0,1], 1=caring
+  legitimacy_trust=0.9,      # [0,1], 1=legitimate
+  epistemic_quality=0.85     # [0,1], 1=certain
+)
+\end{lstlisting}
+
+\textbf{Three-Layer Architecture}:
+\begin{itemize}
+\item \textbf{Reflex Layer} ($<100\mu$s): Constitutional veto checks, hard safety constraints
+\item \textbf{Tactical Layer} (10--100ms): Full MoralVector reasoning, Pareto dominance analysis
+\item \textbf{Strategic Layer} (seconds--hours): Policy optimization, governance profile tuning
+\end{itemize}
+
+\textbf{Tiered EM Catalog}: Ethics Modules organized by authority:
+\begin{itemize}
+\item Tier~0 (Constitutional): Non-removable, hard veto (e.g., Geneva conventions)
+\item Tier~1 (Core Safety): Physical harm prevention, hard veto capable
+\item Tier~2 (Rights/Fairness): Autonomy, consent, fairness checks
+\item Tier~3 (Soft Values): Beneficence, virtue ethics, advisory only
+\item Tier~4 (Meta-Governance): Pattern guards, drift detection
+\end{itemize}
+
+\textbf{DecisionProof}: Every decision produces a cryptographically anchored audit artifact linking stakeholder values to machine-speed outcomes, with hash chains for tamper-evident verification. This satisfies traceability requirements in the EU AI Act and NIST AI RMF.
+
+\subsection{Formal Semantics}
+
+ErisML specifications compile to a \textbf{Norm-Constrained Stochastic
+Game} (NCSG):
+
+\textbf{Definition}: A tuple $\langle N, S, \{A_i\}, \{\Omega_i\}, T, \{U_i\}, \Phi, C \rangle$ where:
+\begin{itemize}
+\item $N$ = set of agents
+\item $S$ = state space (finite, continuous, or hybrid)
+\item $A_i$ = action space for agent $i$
+\item $\Omega_i$ = observation space for agent $i$ ($\Omega_i \subseteq S$ for partial observability)
+\item $T: S \times A_1 \times \cdots \times A_n \to \Delta(S)$ = stochastic transition kernel
+\item $U_i: S \times A \to \mathbb{R}^k$ = multi-objective utility for agent $i$
+\item $\Phi = \{\varphi_j\}$ = set of normative constraints
+\item $C: \Phi \times S \to \text{priority\_ordering}$ = conflict resolution function
+\end{itemize}
+
+\textbf{Normative Constraints}: Each $\varphi_j: S \times A \times \text{Time} \to \{\text{permit}, \text{prohibit}, \text{oblige}\}$ with:
+\begin{itemize}
+\item \textbf{Temporal scope}: Obligations have deadlines; permissions may have duration limits
+\item \textbf{Context dependence}: Norms activated based on state predicates
+\item \textbf{Jurisdictional scope}: Norms apply to subsets of agents/states
+\end{itemize}
+
+\textbf{Norm-Gated Policy}: Agent $i$'s policy $\pi_i: \Delta(S) \to \Delta(A_i)$ must satisfy:
+\begin{equation}
+\pi_i(a \mid b) > 0 \;\text{only if}\; \exists s \in \text{support}(b): \forall \varphi \in \Phi: \varphi(s, a, t) \in \{\text{permit}, \text{oblige}\} \lor C(\Phi, s) \;\text{overrides}\; \varphi
+\end{equation}
+
+\textbf{Multi-Objective Optimization}: Vector utilities $U_i \in \mathbb{R}^k$ handled via:
+\begin{itemize}
+\item \textbf{Scalarization}: $\mathbf{w} \cdot U_i$ for weights $\mathbf{w} \in \Delta^{k-1}$
+\item \textbf{Lexicographic}: $(U_i)_1 \gg (U_i)_2 \gg \ldots$ (strict priorities)
+\item \textbf{Constrained}: $\max (U_i)_1$ subject to $(U_i)_j \geq \tau_j\;\forall j > 1$
+\end{itemize}
+
+\textbf{Strategic Equilibrium}: Solution concept depends on assumptions:
+\begin{itemize}
+\item \textbf{Cooperative}: Joint policy maximizes $\sum_i U_i$ subject to norms
+\item \textbf{Competitive}: Constrained Nash equilibrium
+\item \textbf{Stackelberg}: Human as leader, AI agents as followers
+\item \textbf{Open research problem}: What equilibrium concept is appropriate for human-AI teams under normative constraints?
+\end{itemize}
+
+\subsection{Geometric Ethics Foundation}
+
+The NCSG formalism is grounded in the \textbf{Geometric Ethics} framework, which provides the mathematical structure for the normative layer.
+
+\textbf{Moral Manifold}: Ethically relevant configurations form a nine-dimensional manifold $\mathcal{M}$ whose coordinates correspond to the MoralVector dimensions. Stakeholder perspectives are modeled as coordinate charts on $\mathcal{M}$, and moral evaluations are \emph{tensorial} objects---they transform covariantly under changes of representation.
+
+\textbf{$D_4$ Gauge Group}: The symmetries of Hohfeldian normative positions (Obligation, Claim, Liberty, No-claim) form the dihedral group $D_4$, generated by correlative symmetry (perspective swap, $s$) and negation ($r^2$). The non-abelian structure ($rs \neq sr$) captures a fundamental feature of moral reasoning: the order of perspective-shifting and negation operations matters.
+
+\textbf{Moral Noether Theorem}: Applying Noether-style reasoning to the re-description symmetry required by ethical consistency yields a conservation law: \emph{harm accounting must be representation-invariant}. Harm cannot appear or disappear through re-description. The ethical accounting equation is:
+\begin{equation}
+\frac{\partial \rho_\mathcal{H}}{\partial t} + \nabla \cdot J_\mathcal{H} = \sigma
+\end{equation}
+where $\rho_\mathcal{H}$ is harm density, $J_\mathcal{H}$ is harm current, and $\sigma$ represents genuine harm generation or repair. Incoherence is detected when $\sigma$ changes under re-description.
+
+\textbf{No Escape Theorem}: The combination of (1) canonicalization to equivalence-class normal forms, (2) physical grounding in measurable observables, and (3) mandatory audit artifacts creates a containment architecture with no formal escape route---regardless of agent intelligence level.
+
+\subsection{Computational Complexity}
+
+\begin{table}[t]
+\caption{Computational Complexity by ErisML Fragment}
+\label{tab:complexity}
+\centering
+\footnotesize
+\begin{tabular}{@{}p{1.2cm}p{1.3cm}p{0.8cm}p{0.6cm}p{1.5cm}p{1.2cm}@{}}
+\toprule
+Fragment & State Space & Norms & Agents & Verification & Planning \\
+\midrule
+Core & Finite, $\leq 10^6$ & Prop. & Single & $O(|S|\cdot|N|)$ model checking & NP-complete \\
+Multi & Finite, $\leq 10^6$ & Prop. & Multiple & PSPACE-complete & PPAD-complete \\
+Temporal & Continuous & Prop.\ LTL & Single & PSPACE-complete & Undecidable \\
+Full & Hybrid/infinite & First-order & Multiple & Undecidable & Undecidable \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\textbf{Design principle}: Core language remains in decidable fragments.
+Extensions marked with complexity warnings.
+
+\subsection{Compilation Targets}
+
+ErisML must compile to diverse backends, each with semantic limitations:
+
+\begin{table}[t]
+\caption{Compilation Target Trade-offs}
+\label{tab:backends}
+\centering
+\footnotesize
+\begin{tabular}{@{}p{1.2cm}p{1.6cm}p{1.4cm}p{2.4cm}@{}}
+\toprule
+Backend & Preserves & Loses & Verification \\
+\midrule
+PDDL & Deterministic dynamics, goals & Norms $\to$ preconditions (provenance lost) & Classical planning guarantees \\
+PRISM & Stochastic dynamics, prob.\ properties & Strategic interaction, multi-agent & Probabilistic model checking \\
+Safe RL & Continuous optimization, learning & Logical norms $\to$ soft constraints & Statistical testing + runtime monitors \\
+Multi-agent RL & Strategic learning & Hard logical constraints & Empirical testing, no guarantees \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\textbf{Key insight}: Semantics-preserving compilation is impossible for
+some backends. We provide \textbf{best-effort approximation with
+explicit documentation of limitations}.
+
+\section{Research Challenges}
+\label{sec:challenges}
+
+We identify five critical challenges (condensed from original ten):
+
+\subsection{Challenge 1: Specification-Reality Gap}
+
+\textbf{Problem}: How do we ensure ErisML specifications accurately
+capture behavior of learned models with billions of parameters?
+
+\textbf{Approaches}:
+\begin{itemize}
+\item Runtime conformance checking (behavioral types)
+\item Statistical testing (does deployment match spec predictions?)
+\item Formal synthesis (generate models from specs)
+\end{itemize}
+
+\textbf{Open question}: Is there a fundamental gap between symbolic
+specifications and learned representations?
+
+\subsection{Challenge 2: Norm Consistency and Conflict}
+
+\textbf{Problem}: Real normative systems contain contradictions and
+ambiguities. ErisML must handle this without undefined behavior.
+
+\textbf{Approaches}:
+\begin{itemize}
+\item Defeasible logic (norms have default priority, context overrides)
+\item Probabilistic norms (obligations hold with varying certainty)
+\item Meta-norms (rules about which norms apply when)
+\end{itemize}
+
+\textbf{Open question}: Is norm consistency decidable for realistic
+ErisML fragments? (For Core with propositional norms: yes,
+$O(|N|^2)$. For Full with first-order: no, undecidable.)
+
+\subsection{Challenge 3: Learning Under Normative Constraints}
+
+\textbf{Problem}: How do we ensure learned policies respect norms,
+especially when norms are complex and changing?
+
+\textbf{Approaches}:
+\begin{itemize}
+\item Constrained RL (Lagrangian methods, shield synthesis)
+\item Norm-aware architectures (build normative reasoning into model structure)
+\item Verification-in-the-loop (only deploy policies passing formal verification)
+\end{itemize}
+
+\textbf{Open question}: Can we prove a learning algorithm never violates
+norms in novel states?
+
+\subsection{Challenge 4: Distributed Specification and Governance}
+
+\textbf{Problem}: Pervasive systems span organizational boundaries. Who
+writes specifications? What happens when specifications conflict?
+
+\textbf{Approaches}:
+\begin{itemize}
+\item Federated specifications (local ErisML with conflict resolution protocols)
+\item Jurisdictional layering (federal norms override state override local)
+\item Negotiation protocols (automated contract negotiation)
+\end{itemize}
+
+\textbf{Open question}: How do we ensure global safety when no single
+entity controls all agents?
+
+\subsection{Challenge 5: The Value Alignment Problem}
+
+\textbf{Problem}: Even with perfect specifications and verification,
+whose values should the system optimize? When values conflict, who
+decides?
+
+\textbf{Approaches}:
+\begin{itemize}
+\item Explicit value pluralism (encode multiple value systems, let users choose)
+\item Democratic processes (vote on trade-off weights)
+\item Context-dependent ethics (different values in different situations)
+\end{itemize}
+
+\textbf{Open question}: Is value alignment solvable by better
+specifications, or is it inherently social/political?
+
+\section{Technical Requirements}
+\label{sec:requirements}
+
+Based on challenges, we derive requirements (condensed from original ten):
+
+\subsection{R1: Formal Semantics with Complexity Guarantees}
+
+Every construct has formal semantics with known computational
+complexity. Fragments marked by decidability:
+\begin{itemize}
+\item \textbf{ErisML-Core}: Decidable, polynomial verification
+\item \textbf{ErisML-Plus}: Expressive, NP-complete
+\item \textbf{ErisML-Full}: Turing-complete, undecidable properties
+\end{itemize}
+
+Tools warn when crossing boundaries: \emph{``Warning: First-order norms
+used. Verification may not terminate.''}
+
+\subsection{R2: Compositional Semantics}
+
+Meaning of composite specifications determined from parts:
+\begin{itemize}
+\item Environment dynamics compose via parallel ($\oplus$) or sequential ($\odot$) composition
+\item Utilities compose via weighted sum, lexicographic ($\gg$), or Pareto
+\item Norms compose via priority hierarchies ($\rhd$)
+\end{itemize}
+
+Example:
+\texttt{norms Combined = HIPAA $\rhd$ HospitalPolicy $\rhd$ DeviceDefaults}
+
+\subsection{R3: Multi-Fidelity Modeling}
+
+Support multiple abstraction levels with verified relationships:
+\begin{itemize}
+\item Abstract specifications (verifiable, coarse)
+\item Concrete implementations (executable, detailed)
+\item Abstraction functions mapping concrete $\to$ abstract
+\item Refinement proofs ensuring concrete satisfies abstract
+\end{itemize}
+
+\subsection{R4: Audit Trail and Provenance}
+
+Every action traceable to specification clauses permitting it:
+
+\begin{lstlisting}
+{
+  "timestamp": "2025-06-15T03:42:17Z",
+  "agent": "CareAgent_Room_301",
+  "action": "summon_nurse",
+  "reasoning": {
+    "triggered_by": "patient.vitals.hr > 120",
+    "permitted_by": [
+      "ClinicalProtocol.obligation.summon_nurse"
+    ],
+    "blocked_alternatives": [
+      {"action": "adjust_iv",
+       "reason": "prohibited (emergency=critical)"}
+    ]
+  },
+  "signature": "0x8f3a..."
+}
+\end{lstlisting}
+
+\subsection{R5: Graceful Degradation Under Uncertainty}
+
+Explicit uncertainty budgets as first-class constructs:
+
+\begin{lstlisting}
+agent CareAgent {
+  uncertainty_handling: {
+    if entropy(beliefs.patient_location) > 0.5:
+      restrict capabilities to [monitor_only, summon_nurse];
+      escalate_to human_operator;
+  };
+}
+\end{lstlisting}
+
+\section{Case Study: Smart Home Healthcare}
+\label{sec:case-study}
+
+\textbf{Scenario}: Margaret, 78, lives alone with AI care assistance.
+She has diabetes, mild cognitive impairment, and mobility issues. The
+system monitors vitals, manages medication reminders, coordinates with
+nurses, and alerts family during emergencies.
+
+\subsection{The Challenges}
+
+\textbf{Observational chaos}: Glucose monitor occasionally fails. Motion
+sensors have false negatives. Self-reports are inconsistent with
+cognitive state.
+
+\textbf{Intentional chaos}: Margaret wants independence and privacy. Her
+daughter wants safety and monitoring. The AI optimizes health outcomes.
+Insurance wants cost containment.
+
+\textbf{Normative chaos}: HIPAA limits data sharing, but elder abuse
+laws require reporting. Advanced directives say no hospitalization
+unless critical---but what is ``critical''?
+
+\textbf{Temporal chaos}: Cognitive state fluctuates daily. Winter brings
+different risks than summer. Care plan must adapt as she declines.
+
+\subsection{ErisML Solution (Excerpt)}
+
+\begin{lstlisting}
+agent CareAgent {
+  intents: lexicographic {
+    1st: margaret.safety,           // Highest priority
+    2nd: margaret.independence,     // Respect autonomy
+    3rd: family.peace_of_mind,
+    4th: system.efficiency
+  };
+}
+
+norms CareProtocol {
+  // Privacy vs. Safety trade-off
+  prohibition: {
+    CareAgent.share(margaret.data, third_party)
+      unless consent_given OR emergency
+             OR mandated_reporter;
+  };
+
+  // Autonomy preservation
+  prohibition: {
+    CareAgent.override(margaret.decision)
+      unless cognitive_state == unresponsive
+             OR imminent_danger;
+  };
+
+  // Context-sensitive norm adaptation
+  context_sensitivity: {
+    during margaret.cognitive_state == confused:
+      allow increased_monitoring
+        without explicit_consent;
+      increase medication_reminder_frequency;
+  };
+
+  // Conflict resolution: safety trumps privacy
+  priority: {
+    when emergency_status == critical:
+      obligation.call_911
+        overrides prohibition.share_data;
+  };
+}
+\end{lstlisting}
+
+\subsection{What ErisML Enables}
+
+\begin{enumerate}
+\item \textbf{Legible trade-offs}: Family can see autonomy is 2nd priority after safety
+\item \textbf{Auditable decisions}: ``Why didn't system call 911?'' $\to$ ``Glucose was 55, above threshold of 40''
+\item \textbf{Adaptive constraints}: Norms flex with cognitive state, time of day, emergency status
+\item \textbf{Multi-stakeholder governance}: Margaret, daughter, care team, and regulators have voice
+\item \textbf{Longitudinal validation}: Test adaptation over months, not just point-in-time
+\end{enumerate}
+
+\subsection{What ErisML Cannot Prevent (Failure Modes)}
+
+\textbf{Gradual Cognitive Decline}: ErisML has discrete states
+(clear/confused/unresponsive). Reality: Decline is gradual with
+good/bad days. Risk: System flips between autonomy and paternalism
+erratically. Residual risk: Requires human oversight during state
+transitions.
+
+\textbf{Privacy-Safety Gaming}: Margaret might trigger false alarms to
+get attention. Daughter might engineer ``emergencies'' to get
+surveillance. Risk: Norm gaming by humans, not just AI. Mitigation:
+Partial (reputation systems, usage patterns analysis).
+
+\textbf{Sensor Failure Cascades}: If glucose monitor fails during
+actual emergency, system may not detect danger. False positives from
+noisy sensors may cause alert fatigue. Risk: Over-reliance on
+unreliable sensors. Mitigation: Multi-sensor fusion, uncertainty-aware
+decision making.
+
+\section{Implementation Status and Roadmap}
+\label{sec:roadmap}
+
+\subsection{Achieved: ErisML v3.0}
+
+The reference implementation is open-source on PyPI and provides:
+
+\begin{enumerate}
+\item \textbf{Core language}: Lark-based parser, typed AST (Pydantic), core IR for environments, agents, and norms
+\item \textbf{DEME~2.0 ethics layer}: MoralVector (9D), EthicalFacts, tiered EM catalog (Tier 0--4), DecisionProof, BIP verifier
+\item \textbf{Tensorial ethics}: MoralTensor, tensor operations, tensor decomposition, Pareto frontier analysis via MoralLandscape
+\item \textbf{$D_4$ gauge structure}: Hohfeldian state algebra, correlative/negation symmetries, Bond Index, Wilson observables, semantic gates
+\item \textbf{Three-layer pipeline}: Reflex ($<100\mu$s), Tactical (10--100ms), Strategic layers with configurable EM routing
+\item \textbf{Hardware acceleration}: CPU, CUDA, and Jetson backends for sub-microsecond norm enforcement
+\item \textbf{Interoperability}: PDDL/Tarski adapter, PettingZoo adapter for multi-agent RL, MCP server for LLM agent integration
+\item \textbf{Game-theoretic reasoning}: Shapley value computation, coalition analysis, cooperative/competitive equilibria
+\item \textbf{Governance profiles}: V02, V03, V04 profile formats with migration utilities; empirically-derived defaults from 20,030 Dear Abby letters
+\end{enumerate}
+
+The library includes 24 executable examples spanning triage ethics, smart home governance, Greek tragedy scenarios, Hohfeld $D_4$ demonstrations, Bond invariance testing, and five case studies (triage, whistleblower, autonomous vehicle dilemma, hiring bias, climate policy).
+
+\subsection{Open Research Directions}
+
+\textbf{Empirical expansion}: Large-scale human-subject validation of $D_4$ gauge structure predictions; longitudinal deployment studies with real-time norm violation rate (NVR) and alignment drift velocity (ADV) tracking.
+
+\textbf{Non-abelian confirmation}: Current empirical data confirms the Klein four ($V_4$) abelian subgroup of $D_4$. Confirming the full non-abelian structure requires experimental observation of ``quarter-turn'' transformations in human moral reasoning.
+
+\textbf{Scalability}: Distributed ErisML with federation protocols for multi-jurisdictional governance; Byzantine-tolerant norm consensus.
+
+\textbf{Standards pathway}: Alignment with IEEE P7001 (explainability), IEEE P7003 (fairness), EU AI Act high-risk documentation, ISO 23894 risk assessment, and NIST AI RMF.
+
+\section{Empirical Validation: Bond Invariance Principle}
+\label{sec:empirical}
+
+The \textbf{Bond Invariance Principle} (BIP)---that ethical judgments must be invariant under transformations preserving the underlying normative relationships---provides ErisML's falsifiability criterion. BIP has been validated both computationally (via the built-in BIP verifier and Bond Index calibration suite) and empirically via cross-lingual transfer learning.
+
+\subsection{Computational Validation}
+
+The ErisML library includes a BIP verification pipeline that tests decision invariance under bond-preserving transforms:
+
+\begin{itemize}
+\item \textbf{Reorder options}: Presentation order must not affect verdict
+\item \textbf{Relabel identifiers}: Option names must not affect verdict after canonicalization
+\item \textbf{Unit scaling}: Rescaling inputs must not affect verdict after canonicalization
+\item \textbf{Paraphrase evidence}: Semantically equivalent descriptions must produce identical verdicts
+\item \textbf{Composite transforms}: Group compositions of the above
+\end{itemize}
+
+The \textbf{Bond Index} ($\mathrm{Bd}$) measures representational coherence: $\mathrm{Bd} = 0$ indicates perfect correlative symmetry; the empirical baseline from the Dear Abby corpus (20,030 letters, 1985--2017) is $\mathrm{Bd} = 0.155$. The $D_4$ Hohfeldian gauge structure is verified through Wilson observable computations, confirming non-abelian structure when quarter-turn transformations are observed.
+
+\subsection{Cross-Lingual Empirical Validation}
+
+Cross-lingual transfer learning experiments test whether ethical structure transfers across languages independent of surface features, as BIP predicts.
+
+\textbf{[Author] (2026)}: Adversarial probing on LaBSE (475M parameters) using 109,294 passages spanning 3,000 years and 11 languages. Deontic-axis transfer is perfect (1.0); structural/surface ratio is 11.1x ($p=0.023$).
+
+\textbf{[Independent replication] (2026)}~\cite{thiele2026}: Extends BIP testing to \emph{all nine} moral dimensions using 512 labeled moral vignettes and cross-lingual transfer across six typologically diverse languages (English, Spanish, French, Arabic, Chinese, Japanese).
+
+\begin{table}[t]
+\caption{BIP Empirical Validation: Per-Dimension Probe Results}
+\label{tab:bip-results}
+\centering
+\footnotesize
+\begin{tabular}{@{}p{2.8cm}p{0.8cm}p{3.5cm}@{}}
+\toprule
+Dimension & F1 & Cross-lingual transfer \\
+\midrule
+Justice / Fairness & 0.81 & Stable across all 6 languages \\
+Privacy / Data & 0.81 & Strong; Arabic highest (0.83) \\
+Welfare / Consequences & 0.80 & Stable; Japanese highest (0.55) \\
+Autonomy / Agency & 0.75 & Arabic/Chinese highest \\
+Procedural Legitimacy & 0.73 & Stable across languages \\
+Virtue / Care & 0.72 & Japanese highest (0.67), English lowest (0.48) \\
+Rights / Duties & 0.67 & Stable; overlaps with other dimensions \\
+Societal / Environmental & 0.59 & Perfect transfer (1.0) all languages \\
+Epistemic Status & 0.56 & Hardest; uncertainty expressed subtly \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+Key findings: (1) All nine dimensions are linearly decodable from LaBSE, confirming the moral manifold structure. (2) Cross-lingual transfer holds across all nine dimensions, extending BIP beyond the deontic axis. (3) Language leakage is 67.6\%---substantially lower than the original 99.8\% minimal-probe figure---and is concentrated in the first 10 transformer layers, dropping to 84.6\% only at the final layer. (4) Critically, moral and language signals occupy \textbf{orthogonal directions} in the embedding space: residual leakage is uniform (0.664--0.682) across all dimensions regardless of probe performance, empirically justifying the Rank-2 tensor canonicalization approach.
+
+\section{Related Standards and Interoperability}
+\label{sec:standards}
+
+ErisML must align with emerging regulatory and technical standards:
+
+\begin{table}[t]
+\caption{Standards Alignment}
+\label{tab:standards}
+\centering
+\footnotesize
+\begin{tabular}{@{}p{1.4cm}p{1.6cm}p{2.2cm}p{1.4cm}@{}}
+\toprule
+Standard & Requirement & ErisML Support & Gap \\
+\midrule
+IEEE P7001 & Explainable decisions & Audit trail (R4), provenance & NL summaries \\
+IEEE P7003 & Fairness metrics & Multi-objective intents encode fairness & No built-in bias detection \\
+EU AI Act & High-risk system documentation & Formal specs provide documentation & Certification pathway \\
+ISO 23894 & Risk assessment, monitoring & Runtime monitoring, safety metrics & Standardized risk scoring \\
+NIST AI RMF & Trustworthy AI characteristics & Maps to requirements R1--R5 & Detailed guidance documents \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\section{Limitations and Risks}
+\label{sec:limitations}
+
+\subsection{Technical Limitations}
+
+\textbf{Computational intractability}: Full verification may be NP-hard
+or undecidable. We verify approximations, not actual systems (especially
+for learned components).
+
+\textbf{Specification incompleteness}: Open-world environments prevent
+anticipating all states/events. Systems will encounter situations
+outside specifications.
+
+\textbf{Learning-specification mismatch}: Gap between continuous neural
+embeddings and discrete symbolic logic is fundamental. No perfect bridge
+exists.
+
+\textbf{Scalability limits}: As systems grow (millions of agents,
+billions of states), centralized specifications may become unmanageable.
+
+\subsection{Societal and Ethical Risks}
+
+\textbf{Specification as control}: ErisML could enable centralized
+control, with specifications written by the powerful and imposed on the
+vulnerable.
+
+\textbf{Complexity as opacity}: If specifications are too complex to
+understand, they obscure rather than illuminate. May create false
+confidence.
+
+\textbf{Gaming and exploitation}: Adversaries could craft malicious
+specifications that technically comply with norms but violate their
+spirit.
+
+\textbf{Power dynamics}: Who writes specifications embeds values and
+power relations. Corporate-written specs encode corporate interests;
+government-written specs encode state priorities. We cannot solve this
+through better syntax---it requires transparency, contestation
+mechanisms, and accountability structures.
+
+\subsection{Environmental Costs}
+
+Formal verification, multi-agent simulation, and continuous monitoring
+are compute-intensive. At scale (smart cities, IoT), this could mean
+billions of norm checks per day, continuous verification as systems
+adapt, and significant energy consumption.
+We must weigh governance benefits against environmental costs.
+Prioritize high-stakes domains (healthcare, safety-critical) over
+convenience applications (smart lightbulbs).
+
+\section{Open Questions}
+\label{sec:open-questions}
+
+\textbf{Q1: Specification-Reality Gap}: Can symbolic specifications ever
+fully capture learned model behavior? Or is there a fundamental
+representational mismatch?
+
+\textbf{Q2: Democratic Specification}: How do we ensure specifications
+reflect diverse stakeholder values in public systems? Participatory
+design~\cite{simonsen2012} provides methods, but pervasive systems blur stakeholder
+boundaries.
+
+\textbf{Q3: Equilibrium Concept}: What is the right strategic
+equilibrium for human-AI teams under norms? Nash equilibria are chaotic;
+cooperative solutions require shared objectives.
+
+\textbf{Q4: Adaptation-Safety Trade-off}: How do we maintain safety
+invariants across specification updates? Can we automatically propose
+specification changes based on failures?
+
+\textbf{Q5: Privacy-Transparency Paradox}: Auditing requires
+transparency; privacy requires opacity. We cannot have perfect auditing
+and perfect privacy. Where should the balance be?
+
+\section{Conclusion}
+\label{sec:conclusion}
+
+As foundation models move from cloud to edge, from single-purpose to
+multi-agent, from controlled to pervasive environments, fragmented
+approaches to governance will fail. The Information Monotonicity Theorem proves that scalar moral objectives are irreversibly lossy; the Mandatory Canonicalization Theorem proves that post-hoc compliance checking is insufficient. Specification gaming, reward hacking, and value collapse are not engineering bugs---they are mathematical consequences of optimizing over the wrong structure.
+
+ErisML provides structured governance---not eliminating conflict (which
+is impossible in pluralistic systems) but making trade-offs explicit
+across nine ethical dimensions, enabling governance without tyranny, and supporting coexistence of
+agents with divergent goals. The mathematical foundations from Geometric Ethics~\cite{bond2026ge}---moral manifold, $D_4$ gauge group, Noether conservation, No Escape containment---provide the theoretical grounding; the DEME~2.0 architecture provides the engineering substrate; and the Bond Invariance Principle provides the falsifiability criterion.
+
+The reference implementation (ErisML v3.0~\cite{bond2026erisml}, open-source on PyPI) demonstrates that this framework is not merely theoretical: tensorial ethics evaluation runs at sub-microsecond latency on embedded hardware, the $D_4$ gauge structure is implemented and testable, and empirical validation spans 109,294 cross-lingual passages across 3,000 years and 11 languages.
+
+Significant challenges remain: confirming full non-abelian $D_4$ structure in human moral reasoning, scaling to distributed multi-jurisdictional governance, bridging the gap between symbolic specifications and learned representations, and navigating the power dynamics of who writes specifications.
+
+But the alternative---continuing with prompts, scalar rewards, and ad-hoc
+code---is provably worse.
+
+The age of pervasive AI is here. The chaos is real. We offer ErisML
+as common foundations for governance, safety,
+and trust, and invite critique and collaborative refinement.
+
+\section*{Acknowledgments}
+
+The author thanks anonymous reviewers whose feedback shaped this work.
+Discussions with colleagues in pervasive computing, AI safety,
+multi-agent systems, and HCI informed this work. The Geometric Ethics
+mathematical foundations were developed across a series of companion papers. Some editorial refinements were AI-assisted; all content was reviewed and approved by the author.
+
+\bibliographystyle{IEEEtran}
+
+\begin{thebibliography}{45}
+
+\bibitem{weiser1991}
+M.~Weiser, ``The Computer for the 21st Century,'' \emph{Scientific American}, vol.~265, no.~3, pp.~94--104, 1991.
+
+\bibitem{satyanarayanan2001}
+M.~Satyanarayanan, ``Pervasive Computing: Vision and Challenges,'' \emph{IEEE Pervasive Computing}, vol.~1, no.~4, pp.~10--17, 2001.
+
+\bibitem{bommasani2021}
+R.~Bommasani \emph{et~al.}, ``On the Opportunities and Risks of Foundation Models,'' \emph{arXiv:2108.07258}, 2021.
+
+\bibitem{achiam2023}
+J.~Achiam \emph{et~al.}, ``GPT-4 Technical Report,'' \emph{arXiv:2303.08774}, 2023.
+
+\bibitem{ghallab2004}
+M.~Ghallab, D.~Nau, and P.~Traverso, \emph{Automated Planning: Theory and Practice}.\hskip 1em plus 0.5em minus 0.4em\relax Morgan Kaufmann, 2004.
+
+\bibitem{sutton2018}
+R.~S.~Sutton and A.~G.~Barto, \emph{Reinforcement Learning: An Introduction}, 2nd~ed.\hskip 1em plus 0.5em minus 0.4em\relax MIT Press, 2018.
+
+\bibitem{wooldridge2009}
+M.~Wooldridge, \emph{An Introduction to MultiAgent Systems}, 2nd~ed.\hskip 1em plus 0.5em minus 0.4em\relax Wiley, 2009.
+
+\bibitem{carmo2002}
+J.~Carmo and A.~J.~I.~Jones, ``Deontic Logic and Contrary-to-Duties,'' in \emph{Handbook of Philosophical Logic}, vol.~8, pp.~265--343, 2002.
+
+\bibitem{amodei2016}
+D.~Amodei \emph{et~al.}, ``Concrete Problems in AI Safety,'' \emph{arXiv:1606.06565}, 2016.
+
+\bibitem{ouyang2022}
+L.~Ouyang \emph{et~al.}, ``Training Language Models to Follow Instructions with Human Feedback,'' in \emph{NeurIPS}, 2022.
+
+\bibitem{bai2022}
+Y.~Bai \emph{et~al.}, ``Constitutional AI: Harmlessness from AI Feedback,'' \emph{arXiv:2212.08073}, 2022.
+
+\bibitem{anthropic2023}
+Anthropic, ``Claude's Constitution,'' 2023. [Online]. Available: \url{https://www.anthropic.com/index/claudes-constitution}
+
+\bibitem{hadfield2017}
+D.~Hadfield-Menell \emph{et~al.}, ``Inverse Reward Design,'' in \emph{NeurIPS}, 2017.
+
+\bibitem{mcmahan2017}
+B.~McMahan \emph{et~al.}, ``Communication-Efficient Learning of Deep Networks from Decentralized Data,'' in \emph{AISTATS}, 2017.
+
+\bibitem{dwork2006}
+C.~Dwork, ``Differential Privacy,'' in \emph{ICALP}, 2006.
+
+\bibitem{amershi2019}
+S.~Amershi \emph{et~al.}, ``Guidelines for Human-AI Interaction,'' in \emph{CHI}, 2019.
+
+\bibitem{liang2022}
+P.~Liang \emph{et~al.}, ``Holistic Evaluation of Language Models,'' \emph{arXiv:2211.09110}, 2022.
+
+\bibitem{sculley2015}
+D.~Sculley \emph{et~al.}, ``Hidden Technical Debt in Machine Learning Systems,'' in \emph{NeurIPS}, 2015.
+
+\bibitem{gebru2021}
+T.~Gebru \emph{et~al.}, ``Datasheets for Datasets,'' \emph{Communications of the ACM}, vol.~64, no.~12, pp.~86--92, 2021.
+
+\bibitem{mitchell2019}
+M.~Mitchell \emph{et~al.}, ``Model Cards for Model Reporting,'' in \emph{FAT*}, 2019.
+
+\bibitem{dalal2008}
+N.~Dalal \emph{et~al.}, ``Value-Sensitive Design and Information Systems,'' in \emph{The Handbook of Information and Computer Ethics}.\hskip 1em plus 0.5em minus 0.4em\relax Wiley, 2008.
+
+\bibitem{ha2018}
+D.~Ha and J.~Schmidhuber, ``World Models,'' \emph{arXiv:1803.10122}, 2018.
+
+\bibitem{hafner2021}
+D.~Hafner \emph{et~al.}, ``Mastering Atari with Discrete World Models,'' in \emph{ICLR}, 2021.
+
+\bibitem{rai2020}
+A.~Rai, ``Explainable AI: From Black Box to Glass Box,'' \emph{Journal of the Academy of Marketing Science}, vol.~48, pp.~137--141, 2020.
+
+\bibitem{russell2019}
+S.~Russell, \emph{Human Compatible: Artificial Intelligence and the Problem of Control}.\hskip 1em plus 0.5em minus 0.4em\relax Viking, 2019.
+
+\bibitem{dignum2019}
+V.~Dignum, \emph{Responsible Artificial Intelligence: How to Develop and Use AI in a Responsible Way}.\hskip 1em plus 0.5em minus 0.4em\relax Springer, 2019.
+
+\bibitem{rahwan2019}
+I.~Rahwan \emph{et~al.}, ``Machine Behaviour,'' \emph{Nature}, vol.~568, pp.~477--486, 2019.
+
+\bibitem{yao2023}
+S.~Yao \emph{et~al.}, ``ReAct: Synergizing Reasoning and Acting in Language Models,'' in \emph{ICLR}, 2023.
+
+\bibitem{shinn2023}
+N.~Shinn \emph{et~al.}, ``Reflexion: Language Agents with Verbal Reinforcement,'' \emph{arXiv:2303.11366}, 2023.
+
+\bibitem{wang2023}
+G.~Wang \emph{et~al.}, ``Voyager: An Open-Ended Embodied Agent with LLMs,'' \emph{arXiv:2305.16291}, 2023.
+
+\bibitem{dignum2004}
+F.~Dignum \emph{et~al.}, ``Meeting the Deadline: Why, When and How,'' in \emph{Formal Approaches to Agent-Based Systems}.\hskip 1em plus 0.5em minus 0.4em\relax Springer, 2004.
+
+\bibitem{sergot2001}
+M.~Sergot, ``A Computational Theory of Normative Positions,'' \emph{ACM Trans.\ on Computational Logic}, vol.~2, no.~4, pp.~581--622, 2001.
+
+\bibitem{bordini2007}
+R.~H.~Bordini, J.~F.~H{\"u}bner, and M.~Wooldridge, \emph{Programming Multi-Agent Systems in AgentSpeak using Jason}.\hskip 1em plus 0.5em minus 0.4em\relax Wiley, 2007.
+
+\bibitem{simonsen2012}
+J.~Simonsen and T.~Robertson, \emph{Routledge International Handbook of Participatory Design}.\hskip 1em plus 0.5em minus 0.4em\relax Routledge, 2012.
+
+\bibitem{maler2004}
+O.~Maler and D.~Nickovic, ``Monitoring Temporal Properties of Continuous Signals,'' in \emph{Formal Techniques, Modelling and Analysis of Timed and Fault-Tolerant Systems}.\hskip 1em plus 0.5em minus 0.4em\relax Springer, 2004.
+
+\bibitem{platzer2018}
+A.~Platzer, \emph{Logical Foundations of Cyber-Physical Systems}.\hskip 1em plus 0.5em minus 0.4em\relax Springer, 2018.
+
+\bibitem{bengio2020}
+Y.~Bengio \emph{et~al.}, ``A Meta-Transfer Objective for Learning to Disentangle Causal Mechanisms,'' in \emph{ICLR}, 2020.
+
+\bibitem{abel2017}
+D.~Abel \emph{et~al.}, ``Agent-Agnostic Human-in-the-Loop Reinforcement Learning,'' \emph{arXiv:1701.04079}, 2017.
+
+\bibitem{finn2017}
+C.~Finn \emph{et~al.}, ``Model-Agnostic Meta-Learning for Fast Adaptation,'' in \emph{ICML}, 2017.
+
+\bibitem{euaiact2021}
+European Commission, ``Proposal for a Regulation on Artificial Intelligence (AI Act),'' 2021.
+
+\bibitem{bond2026ge}
+[Anonymous], \emph{Geometric Ethics: The Mathematical Structure of Moral Reasoning}, v1.14, Department of Computer Engineering, [Institution], Spring 2026.
+
+\bibitem{bond2026erisml}
+[Anonymous], ``ErisML/DEME v3.0: A Library for Governed, Foundation-Model-Enabled Agents with Tensorial Ethics,'' [URL removed for blind review], 2026.
+
+\bibitem{bond2026noescape}
+[Anonymous], ``No Escape: Mathematical Containment for Artificial Agents---Why Structural Constraints Succeed Where Behavioral Rules Fail,'' [Institution], 2026.
+
+\bibitem{bond2026noether}
+[Anonymous], ``Noether's Theorem for Ethics: Harm Accounting and the Formal Structure of Normative Coherence,'' [Institution], 2026.
+
+\bibitem{bond2026diffgeom}
+[Anonymous], ``Differential Geometry for Moral Alignment: The Mathematical Foundations of DEME 3.0,'' [Institution], 2025.
+
+\bibitem{bond2026stratified}
+[Anonymous], ``Stratified Gauge Theory: Invariance and Conservation on Singular Spaces,'' [Institution], 2025.
+
+\bibitem{bond2026deme2}
+[Anonymous], ``DEME 2.0: Real-Time Ethical Governance for Safety-Critical Autonomous Systems via Computable Moral Landscapes,'' [Institution], 2025.
+
+\bibitem{thiele2026}
+[Anonymous collaborator], ``Does LaBSE Encode Moral Geometry? Testing the Geometric Ethics Framework Through Cross-Lingual Probing,'' Undergraduate Research Report, [Institution], 2026.
+
+\end{thebibliography}
+
+\appendix
+
+\section{ErisML Grammar (Excerpt)}
+\label{app:grammar}
+
+\begin{lstlisting}
+<model> ::= <environment> <agent>* <norms>?
+            <dynamics>? <validation>?
+
+<environment> ::= "environment" <id> "{" <env-body> "}"
+<env-body> ::= <objects> <state> <observations>?
+               <dynamics>
+
+<agent> ::= "agent" <id> "{" <agent-body> "}"
+<agent-body> ::= <capabilities> <beliefs> <intents>
+                 <constraints>?
+
+<norms> ::= "norms" <id> "{" <norm-rule>* "}"
+<norm-rule> ::= <permission> | <prohibition>
+              | <obligation> | <sanction>
+
+<permission>  ::= "permission:" "{" <action-expr>
+                    <condition>? "}" ";"
+<prohibition> ::= "prohibition:" "{" <action-expr>
+                    <condition>? "}" ";"
+<obligation>  ::= "obligation:" "{" <action-expr>
+                    <deadline>? "}" ";"
+
+<intents> ::= "intents:" <intent-expr> ";"
+<intent-expr> ::= <weighted> | <lexicographic>
+                | <constrained>
+
+<condition> ::= "when" <expr> | "unless" <expr>
+\end{lstlisting}
+
+\section{Compilation Example (PDDL)}
+\label{app:pddl}
+
+\textbf{ErisML Input}:
+
+\begin{lstlisting}
+environment SimpleRoom {
+  objects: Robot, Door;
+  state:
+    door.status: {open, closed};
+    robot.location: {inside, outside};
+  dynamics:
+    open_door() ~> door.status = open;
+    enter() ~> robot.location = inside
+               if door.status == open;
+}
+
+agent Robot {
+  intents: goal robot.location == inside;
+}
+
+norms Safety {
+  prohibition: Robot.enter()
+    unless door.status == open;
+}
+\end{lstlisting}
+
+\textbf{PDDL Output}:
+
+\begin{lstlisting}
+(define (domain simple-room)
+  (:requirements :strips :typing)
+  (:predicates (door-open) (door-closed)
+               (robot-inside) (robot-outside))
+
+  (:action open-door
+    :parameters ()
+    :precondition (door-closed)
+    :effect (and (door-open)
+                 (not (door-closed))))
+
+  (:action enter
+    :parameters ()
+    :precondition (and (robot-outside)
+                       (door-open)) ; Norm enforced
+    :effect (and (robot-inside)
+                 (not (robot-outside)))))
+
+(define (problem reach-inside)
+  (:domain simple-room)
+  (:init (door-closed) (robot-outside))
+  (:goal (robot-inside)))
+\end{lstlisting}
+
+\textbf{Note}: The prohibition from \texttt{norms Safety} is compiled
+into the precondition of the \texttt{enter} action. This ensures the
+planner never generates norm-violating plans, but provenance information
+(that this precondition comes from a norm) is lost in translation.
+
+\end{document}

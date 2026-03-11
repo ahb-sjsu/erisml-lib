@@ -1,0 +1,1124 @@
+\documentclass[12pt]{article}
+
+% Packages
+\usepackage{amsmath,amssymb,amsfonts,amsthm}
+\usepackage{geometry}
+\usepackage{hyperref}
+\usepackage{booktabs}
+\usepackage{enumitem}
+\usepackage{graphicx}
+\usepackage{float}
+\usepackage{xcolor}
+\usepackage{mathrsfs}
+
+\geometry{margin=1in}
+
+% Theorem environments
+\newtheorem{theorem}{Theorem}[section]
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{corollary}[theorem]{Corollary}
+\newtheorem{conjecture}[theorem]{Conjecture}
+\theoremstyle{definition}
+\newtheorem{definition}[theorem]{Definition}
+\newtheorem{example}[theorem]{Example}
+\newtheorem{axiom}{Axiom}
+\theoremstyle{remark}
+\newtheorem{remark}[theorem]{Remark}
+
+% Custom commands
+\newcommand{\E}{\mathcal{E}}               % Economic decision complex
+\newcommand{\M}{\mathcal{M}}               % General manifold
+\newcommand{\R}{\mathbb{R}}
+\newcommand{\Z}{\mathbb{Z}}
+\newcommand{\BF}{\mathrm{BF}}              % Behavioral friction
+\newcommand{\BI}{\mathrm{BI}}              % Bond Index
+\newcommand{\Ho}{\mathfrak{H}}             % Hohfeldian structure
+\newcommand{\Nash}{\mathrm{NE}}            % Nash equilibrium
+
+\title{\textbf{Geometric Economics:\\Heuristic Bounded Rationality, the Bond Geodesic,\\and the Death of Homo Economicus}}
+
+\author{Andrew H. Bond\\
+Department of Computer Engineering\\
+San Jos\'{e} State University\\
+\texttt{andrew.bond@sjsu.edu}\\
+ORCID: 0009-0003-2599-6158}
+
+\date{March 2026}
+
+\begin{document}
+
+\maketitle
+
+\noindent\textbf{Keywords:} geometric economics, bounded rationality, Bond geodesic, behavioral economics, moral heuristics, A* pathfinding, Nash equilibrium, Kahneman, game theory, economic manifold
+
+\begin{abstract}
+Classical economics rests on Homo economicus---the perfectly rational agent who maximizes a scalar utility function over all possible actions.  This model is mathematically elegant and empirically false.  Behavioral economics, following Kahneman and Tversky, has documented systematic deviations from rational choice but lacks a unified mathematical framework that explains \emph{why} these deviations occur and \emph{what structure} they share.
+
+We provide that framework.  We show that economic decision-making is not scalar optimization but \emph{pathfinding on a multi-dimensional decision manifold}---a weighted simplicial complex $\E$ whose dimensions include not only monetary cost but moral constraint, social norm, cultural taboo, reputational risk, and temporal discounting.  The agent's decision is modeled as $A^*$ search with evaluation function $f(n) = g(n) + h(n)$, where $g(n)$ is the accumulated economic cost (System 2: slow, deliberate calculation) and $h(n)$ is the \emph{moral-heuristic cost} (System 1: fast, automatic boundary enforcement).  We call the resulting optimal path the \emph{Bond geodesic}.
+
+The framework yields five principal results:  (1) The \emph{Heuristic Truncation Theorem}: moral and cultural heuristics are not ``biases'' but admissible search heuristics that reduce an intractable optimization to a tractable one, at the cost of provably bounded suboptimality.  (2) The \emph{Scalar Irrecoverability Theorem}: projecting the multi-dimensional decision manifold to scalar utility destroys information that is mathematically irrecoverable---``irrational'' behavior is rational on the full manifold, irrational only on the projection.  (3) The \emph{Bond Geodesic Equilibrium}: the replacement for Nash equilibrium when agents optimize on the full manifold rather than on the scalar projection.  (4) \emph{Prospect theory as asymmetric edge weights}: Kahneman and Tversky's loss aversion, reference dependence, and probability weighting emerge as geometric properties of the decision manifold's metric.  (5) The \emph{Fairness Conservation Law}: in closed economic exchanges, the total moral friction is conserved---unfairness in one dimension must be compensated in another.
+
+The framework unifies classical economics, behavioral economics, and moral psychology into a single geometric structure.  Homo economicus is not wrong because humans are irrational; it is wrong because it computes on the wrong manifold.
+\end{abstract}
+
+\newpage
+\tableofcontents
+\newpage
+
+
+%==============================================================================
+\section{Introduction}
+\label{sec:intro}
+%==============================================================================
+
+\subsection{The Crisis in Economic Theory}
+
+Economics has a theory problem.
+
+Classical economics---from Adam Smith through Arrow-Debreu---is built on the axiom of rational choice: agents have complete, transitive preferences; they maximize expected utility; they process all available information; they respond to incentives.  This axiom produces beautiful mathematics: general equilibrium theory, the welfare theorems, mechanism design.  It also produces predictions that are systematically wrong.
+
+Humans do not maximize expected utility.  They violate transitivity.  They discount hyperbolically rather than exponentially.  They are loss-averse.  They reject unfair offers in the ultimatum game even when rejection leaves them with nothing.  They tip in restaurants they will never visit again.  They donate to charity.  They do not steal their groceries, even when the expected utility of free food minus the probability-weighted cost of detection is positive.
+
+These are not edge cases.  They are the \emph{central phenomena} of economic life.  An economic theory that cannot explain why people do not steal is not a theory of human economic behavior---it is a theory of something else.
+
+\subsection{The Behavioral Economics Response}
+
+Kahneman and Tversky's prospect theory \cite{kahneman1979} and the subsequent behavioral economics programme \cite{kahneman2011,thaler2008} documented these deviations rigorously.  The findings are now textbook:
+
+\begin{itemize}
+    \item \textbf{Loss aversion:} Losses loom larger than equivalent gains ($\lambda \approx 2.25$).
+    \item \textbf{Reference dependence:} Utility is evaluated relative to a reference point, not in absolute terms.
+    \item \textbf{Framing effects:} Logically equivalent descriptions produce different choices.
+    \item \textbf{Probability weighting:} Small probabilities are overweighted; large probabilities are underweighted.
+    \item \textbf{Present bias:} Immediate rewards are overvalued relative to future rewards (hyperbolic discounting).
+    \item \textbf{Fairness constraints:} Agents sacrifice material payoff to punish unfairness (ultimatum game, dictator game, public goods games).
+\end{itemize}
+
+Behavioral economics knows \emph{that} humans deviate from rational choice.  It has documented \emph{how} they deviate---with precision, replicability, and Nobel Prizes.  But it has not answered \emph{why}, in the sense of providing a unified mathematical framework from which these deviations follow as theorems rather than as a list of documented biases.
+
+Kahneman's own dual-process theory \cite{kahneman2011}---System 1 (fast, automatic, heuristic) and System 2 (slow, deliberate, calculating)---provides the psychological architecture.  What it lacks is the \emph{mathematical content}: What is the space on which System 1 and System 2 operate?  What is the formal relationship between them?  Why does their interaction produce the specific pattern of ``biases'' that behavioral economics has catalogued?
+
+\subsection{The Proposal: Economics on the Right Manifold}
+
+We answer these questions by porting the Geometric Ethics framework \cite{bond2026geometric}---originally developed for AI alignment---into economic decision theory.  The core insight is:
+
+\begin{quote}
+\emph{Homo economicus is not wrong because humans are irrational.  It is wrong because it computes on the wrong manifold.}
+\end{quote}
+
+Classical economics models decisions on a one-dimensional manifold: scalar utility $u \in \R$.  The agent picks the action that maximizes $u$.  But human decisions are not made on a one-dimensional space.  They are made on a \emph{multi-dimensional decision manifold} $\E$ that includes:
+
+\begin{enumerate}
+    \item Monetary cost/benefit (the only dimension Homo economicus sees)
+    \item Moral constraint (deontological rules: ``do not steal,'' ``keep promises'')
+    \item Social norm (reputational cost, reciprocity expectations, group identity)
+    \item Cultural taboo (sacred values, incommensurable goods, protected categories)
+    \item Temporal horizon (present self vs.\ future self, intergenerational obligation)
+    \item Fairness (distributional justice, procedural justice, proportionality)
+    \item Autonomy (freedom of choice, coercion aversion, reactance)
+    \item Epistemic status (information quality, trust, uncertainty aversion)
+    \item Institutional legitimacy (rule of law, procedural regularity, consent)
+\end{enumerate}
+
+These are the nine dimensions of the moral manifold identified in Geometric Ethics \cite{bond2026geometric}, empirically validated across 20,030 texts and 11 languages, and independently replicated across 6 additional languages \cite{thiele2026}.  The claim is not that these dimensions are unique to ethics.  The claim is that they are the \emph{same dimensions on which economic decisions are made}---because economic decisions are a subset of moral decisions.
+
+Every economic transaction is also a moral event.  Buying groceries rather than stealing them is an economic decision \emph{and} a moral decision.  Accepting a job offer involves monetary calculation \emph{and} fairness assessment.  Setting a price involves cost accounting \emph{and} social-norm compliance.  The classical economist's move of stripping away all dimensions except monetary cost is not a simplification---it is a \emph{dimensional collapse} that destroys the information needed to predict actual behavior.
+
+\subsection{What This Paper Contributes}
+
+\begin{enumerate}
+    \item \textbf{The Economic Decision Complex} $\E$: a formal construction of the space on which economic decisions are actually made---a weighted simplicial complex with nine dimensions, Mahalanobis edge weights, and regime boundaries encoding moral-economic phase transitions.
+
+    \item \textbf{Heuristic Bounded Rationality:} a mathematical theory in which moral and cultural heuristics are not ``cognitive biases'' but \emph{admissible $A^*$ heuristics} that reduce an intractable optimization problem (find the optimal action on a 9-dimensional manifold with incomplete information) to a tractable one (follow the moral-heuristic pruned search), with provably bounded suboptimality.
+
+    \item \textbf{The Bond Geodesic:} the replacement for Nash equilibrium when agents are modeled as pathfinding on the full manifold rather than maximizing on the scalar projection.
+
+    \item \textbf{Geometric Behavioral Economics:} a systematic derivation of Kahneman--Tversky phenomena (loss aversion, framing effects, probability weighting, fairness constraints) as geometric properties of the decision manifold, rather than as a catalogue of biases.
+
+    \item \textbf{The Fairness Conservation Law:} a discrete balance principle showing that moral friction is conserved in closed economic exchanges---agents cannot extract unfair surplus without creating a compensating moral deficit detectable by the Bond Index.
+\end{enumerate}
+
+
+%==============================================================================
+\section{Related Work}
+\label{sec:related}
+%==============================================================================
+
+\subsection{Classical Rational Choice}
+
+The expected utility framework, axiomatized by von Neumann and Morgenstern \cite{vonneumann1944} and extended by Savage \cite{savage1954}, provides the mathematical foundation of classical economics.  An agent has preferences over lotteries (probability distributions over outcomes), and if those preferences satisfy four axioms (completeness, transitivity, independence, continuity), there exists a utility function $u$ such that the agent's behavior is equivalent to maximizing $\mathbb{E}[u]$.
+
+This is a powerful result---but it is a \emph{representation theorem}, not a behavioral theory.  It says that \emph{if} preferences satisfy the axioms, \emph{then} they can be represented as utility maximization.  The behavioral economics programme has shown that human preferences systematically violate the axioms---particularly independence (the Allais paradox) and transitivity (context-dependent choice).  The classical response---that humans are ``approximately'' rational, or rational ``in the limit''---has been empirically falsified: deviations are systematic, predictable, and stable across populations and cultures.
+
+Our framework provides a different diagnosis: the axioms are satisfied on the \emph{full manifold} but violated on the \emph{scalar projection}.  A preference relation that is transitive in nine dimensions can appear intransitive when projected to one dimension, just as a helix---a curve that is monotonically ascending in 3D---appears to reverse direction when projected onto a plane.
+
+\subsection{Behavioral Economics and Prospect Theory}
+
+Kahneman and Tversky's prospect theory \cite{kahneman1979} replaced expected utility with a descriptive model in which:
+\begin{enumerate}
+    \item Utility is evaluated as gains and losses relative to a reference point (not absolute wealth).
+    \item The value function is concave for gains and convex for losses (diminishing sensitivity).
+    \item Losses are weighted more heavily than gains (loss aversion: $v(-x) > v(x)$ for $x > 0$).
+    \item Probabilities are transformed by a weighting function $w(p)$ that overweights small $p$ and underweights large $p$.
+\end{enumerate}
+
+Prospect theory is descriptively accurate.  But it is a \emph{parameterization}, not an \emph{explanation}.  It tells you the shape of the value function ($S$-curved, steeper for losses) but not \emph{why} evolution or culture produced that shape.  Our framework derives the prospect-theoretic value function as a consequence of the manifold's metric structure: the asymmetry between gains and losses is a geometric property of the decision manifold (losses traverse moral dimensions that gains do not), not an arbitrary feature of the value function.
+
+\subsection{Bounded Rationality}
+
+Herbert Simon's bounded rationality \cite{simon1955} recognized that agents have finite computational resources and cannot optimize over all alternatives.  Simon proposed ``satisficing''---choosing the first alternative that exceeds an aspiration level---as a more realistic model.  Gigerenzer and colleagues \cite{gigerenzer1999} extended this into the ``fast and frugal heuristics'' programme, showing that simple heuristics can outperform optimal procedures in uncertain environments (the ``less is more'' effect).
+
+Our framework formalizes what Simon intuited and Gigerenzer demonstrated: heuristics are not approximations to an ideal optimizer but \emph{components of a different optimization architecture}.  Specifically, moral and cultural heuristics serve as the $h(n)$ function in $A^*$ search---they estimate the cost-to-go, prune the search space, and guarantee that the resulting path is optimal \emph{given the heuristic}.  This is not satisficing; it is \emph{heuristic-guided optimal search} on the full manifold.
+
+\subsection{Game Theory and Nash Equilibrium}
+
+Nash equilibrium \cite{nash1950} is the dominant solution concept in non-cooperative game theory: a strategy profile where no player can unilaterally improve their payoff.  The Nash framework assumes common knowledge of rationality, where ``rationality'' means scalar utility maximization.
+
+The well-known failures of Nash equilibrium in behavioral games---cooperation in the prisoner's dilemma, rejection in the ultimatum game, contribution in public goods games---are typically attributed to ``social preferences'' or ``other-regarding utility.''  The standard move is to modify the utility function to include fairness, reciprocity, or inequality aversion \cite{fehr1999,bolton2000}, producing models like Fehr--Schmidt inequality aversion or Bolton--Ockenfels ERC.
+
+These models are correct in spirit but \emph{ad hoc} in execution.  Each behavioral anomaly gets its own utility-function modification.  There is no unified principle that generates all the modifications.  Our framework provides that principle: agents do not maximize a scalar utility function (with or without social-preference modifications).  They minimize path cost on the full decision manifold.  The ``social preferences'' are not modifications to the utility function---they are \emph{dimensions of the manifold} that the utility function was projecting away.
+
+\subsection{Arrow's Impossibility and Sen's Capabilities}
+
+Arrow's impossibility theorem \cite{arrow1951} proves that no social welfare function can simultaneously satisfy unrestricted domain, Pareto efficiency, independence of irrelevant alternatives, and non-dictatorship when aggregating ordinal preferences over three or more alternatives.  This result has shaped welfare economics for seven decades.
+
+Our framework suggests a geometric resolution.  Arrow's theorem operates on \emph{ordinal rankings}---one-dimensional orderings of alternatives.  On a multi-dimensional manifold, the ``impossibility'' dissolves: agents do not rank alternatives on a line; they evaluate them as attribute vectors in $\R^9$.  The impossibility arises from projecting multi-dimensional evaluations onto one-dimensional orderings.  Specifically:
+
+\begin{proposition}[Arrow Dissolution]
+\label{prop:arrow}
+Let agents evaluate alternatives as attribute vectors $\mathbf{a} \in \R^9$ rather than as ordinal rankings.  Then a social welfare \emph{mapping} $W: (\R^9)^n \to \R^9$ that averages attribute vectors (component-wise mean, or Mahalanobis-weighted mean) satisfies analogues of all four Arrow conditions simultaneously:
+\begin{enumerate}
+    \item \emph{Unrestricted domain:} Any profile of attribute-vector evaluations is admissible.
+    \item \emph{Pareto:} If all agents' vectors agree that $\mathbf{a}(x) >_k \mathbf{a}(y)$ on every dimension $k$, the social vector preserves this.
+    \item \emph{Independence:} The social ranking of $x$ vs.\ $y$ depends only on agents' attribute vectors for $x$ and $y$.
+    \item \emph{Non-dictatorship:} No single agent determines the social vector.
+\end{enumerate}
+The impossibility reappears only when $W$ is composed with a projection $\phi: \R^9 \to \R$---i.e., when the multi-dimensional social evaluation is collapsed to a scalar ranking.
+\end{proposition}
+
+This connects to Sen's capability approach \cite{sen1999}, which argues that welfare should be evaluated not as scalar utility but as a vector of \emph{capabilities}---substantive freedoms to achieve various ``functionings.''  Sen's capabilities are, in our framework, the dimensions of the decision manifold: $d_4$ (autonomy/freedom), $d_1$ (material capability), $d_9$ (epistemic capability), etc.  The capability approach has been criticized for lacking a formal aggregation procedure; the Mahalanobis-weighted structure of the economic decision complex provides one.
+
+\subsection{Information Economics and Market Failure}
+
+Akerlof's market for lemons \cite{akerlof1970} demonstrated that information asymmetry can cause market collapse: when sellers know product quality but buyers do not, adverse selection drives good products out.  Stiglitz and colleagues \cite{stiglitz1981} generalized this to insurance, credit, and labor markets.
+
+In our framework, information asymmetry is a specific distortion of dimension $d_9$ (epistemic status) and $d_5$ (trust).  A ``lemon'' market is one where the edge weights perceived by buyers differ from the true edge weights because $d_9$ is miscalibrated:
+\begin{equation}
+w_{\text{perceived}}(v_i, v_j) \neq w_{\text{true}}(v_i, v_j) \quad \text{when } d_9(v_j) \text{ is unobservable}
+\end{equation}
+Market institutions---warranties, reputation systems, regulation---function as \emph{manifold calibration mechanisms}: they align $w_{\text{perceived}}$ with $w_{\text{true}}$ by providing information that corrects the $d_9$ component.  Market failure is manifold miscalibration.
+
+\subsection{Commons Governance and Collective Action}
+
+Ostrom's \cite{ostrom1990} Nobel-winning work on governing the commons showed that communities can solve collective-action problems without either privatization or centralized regulation, through institutions that create \emph{conditional cooperation norms}.  In our framework, Ostrom's design principles are boundary-penalty calibration rules:
+
+\begin{itemize}
+    \item \emph{Clearly defined boundaries} establish which agents are on the decision complex and which edges exist.
+    \item \emph{Graduated sanctions} calibrate $\beta_k$ values: small violations incur small boundary penalties, escalating with severity.
+    \item \emph{Collective-choice arrangements} ensure $d_4$ (autonomy) is preserved---agents participate in setting the rules, so the legitimacy dimension $d_8$ supports compliance.
+    \item \emph{Monitoring} maintains $d_9$ (epistemic status)---agents can observe whether others comply, keeping the manifold calibrated.
+\end{itemize}
+
+Ostrom showed empirically that these institutions work.  We show \emph{why}: they maintain the calibration of the decision manifold so that the Bond geodesic for each agent includes cooperation.
+
+\subsection{Moral Foundations Theory}
+
+Haidt's Moral Foundations Theory \cite{haidt2012} identifies five (later six) moral ``taste receptors'': care/harm, fairness/cheating, loyalty/betrayal, authority/subversion, sanctity/degradation, and liberty/oppression.  These overlap substantially with the nine dimensions of the moral manifold \cite{bond2026geometric}, and Haidt's insight that moral judgments are primarily \emph{intuitive} (not reasoned) maps directly onto the System~1 / $h(n)$ interpretation.
+
+Our contribution relative to Haidt is mathematical formalization: the moral foundations become dimensions of a metric space with measurable distances, gauge symmetry, and conservation laws.  Haidt shows that humans \emph{have} moral intuitions that constrain economic behavior; we show that these intuitions have \emph{geometric structure} that can be computed.
+
+\subsection{Experimental Economics}
+
+The experimental economics tradition---from Smith's \cite{smith1962} pioneering market experiments through Camerer's \cite{camerer2003} comprehensive synthesis---has produced the empirical base that any new theory must explain.  Key findings include: (a) double-auction markets converge to competitive equilibrium even with few traders (consistent with our framework when moral dimensions are inactive); (b) bargaining games show systematic fairness-driven deviations from Nash prediction (consistent with active $d_3$); (c) trust games show substantial trust and reciprocity even in one-shot anonymous settings (consistent with active $d_7$, identity/virtue); (d) punishment of norm violators persists even when costly to the punisher (consistent with $\beta_{\text{fairness}}$ exceeding monetary cost).
+
+The geometric framework explains why \emph{some} markets behave classically and others do not: classical behavior emerges when the active dimensions collapse to $d_1$ (e.g., anonymous commodity markets with enforceable contracts), while behavioral anomalies emerge when additional dimensions are activated (e.g., face-to-face bargaining, trust-dependent exchange, morally loaded goods).
+
+
+%==============================================================================
+\section{The Economic Decision Complex}
+\label{sec:manifold}
+%==============================================================================
+
+\subsection{Dimensions of Economic Decision-Making}
+
+We identify nine dimensions on which economic decisions are evaluated.  These are the same nine dimensions of the moral manifold \cite{bond2026geometric}, re-interpreted for economic contexts:
+
+\begin{enumerate}
+    \item $d_1$: \textbf{Consequences} --- monetary cost, material outcome, risk-adjusted expected value.  This is the \emph{only} dimension visible to Homo economicus.
+    \item $d_2$: \textbf{Rights/Entitlements} --- property rights, contractual obligations, Hohfeldian positions.  ``This is mine'' vs.\ ``this is available.''
+    \item $d_3$: \textbf{Fairness} --- distributional justice, procedural justice, proportionality, reciprocity.  ``Is this a fair deal?''
+    \item $d_4$: \textbf{Autonomy} --- freedom of choice, coercion aversion, voluntariness.  ``Am I choosing freely or being forced?''
+    \item $d_5$: \textbf{Privacy/Trust} --- information asymmetry, disclosure norms, fiduciary duty.  ``Can I trust this counterparty?''
+    \item $d_6$: \textbf{Social impact} --- externalities, community effects, reputational consequence.  ``What will people think?''
+    \item $d_7$: \textbf{Virtue/Identity} --- self-image, moral identity, character consistency.  ``Is this the kind of person I am?''
+    \item $d_8$: \textbf{Legitimacy} --- institutional trust, rule compliance, procedural regularity.  ``Are the rules being followed?''
+    \item $d_9$: \textbf{Epistemic status} --- information quality, confidence, ambiguity.  ``Do I understand what I'm getting?''
+\end{enumerate}
+
+\begin{remark}[Why Nine Dimensions, Not One]
+The claim is not that these dimensions are \emph{optional} extras that ``nice'' people care about.  The claim is that these dimensions are \emph{computationally active in every economic decision}, including the decisions of self-interested agents.  A purely selfish agent still cares about rights ($d_2$: ``can I be punished for this?''), social impact ($d_6$: ``will this damage my reputation?''), and legitimacy ($d_8$: ``will the contract be enforced?'').  The nine dimensions are not moral preferences layered on top of economic calculation---they are the \emph{constraint structure} of the decision space itself.
+\end{remark}
+
+\subsection{The Decision Complex: Primary Construction}
+
+\begin{definition}[Economic Decision Complex]
+\label{def:econ_complex}
+The \emph{economic decision complex} $\E$ is a weighted simplicial complex constructed as follows:
+\begin{itemize}
+    \item \textbf{Vertices (0-simplices):} Each vertex $v_i$ represents an \emph{economic state}---a configuration of goods, services, obligations, and relationships available to the agent.  The vertex carries an \emph{attribute vector} $\mathbf{a}(v_i) \in \R^9$, whose components are scores along the nine dimensions.
+    \item \textbf{Edges (1-simplices):} An edge $(v_i, v_j)$ represents an available \emph{action}---a transaction, decision, or behavioral choice that moves the agent from state $v_i$ to state $v_j$.  The edge carries a weight $w(v_i, v_j) \geq 0$ representing the \emph{total cost} of the action on the full manifold.
+    \item \textbf{Higher simplices:} A $k$-simplex $[v_0, \ldots, v_k]$ represents a \emph{bundle}---a set of mutually available actions that can be taken jointly (e.g., a package deal, a multi-attribute trade).
+\end{itemize}
+\end{definition}
+
+\begin{definition}[Multi-Dimensional Edge Weights]
+\label{def:edge_weights}
+The weight of an edge $(v_i, v_j)$ in $\E$ is:
+\begin{equation}
+w(v_i, v_j) = \underbrace{\Delta \mathbf{a}^T\, \Sigma^{-1}\, \Delta \mathbf{a}}_{\text{Mahalanobis distance}} + \underbrace{\sum_k \beta_k \cdot \mathbf{1}[\text{moral boundary } k \text{ crossed}]}_{\text{heuristic boundary penalties}}
+\label{eq:edge_weight}
+\end{equation}
+where $\Delta \mathbf{a} = \mathbf{a}(v_j) - \mathbf{a}(v_i)$ is the attribute-vector difference, $\Sigma$ is the $9 \times 9$ \emph{dimensional covariance matrix} estimated from observed economic behavior, and $\beta_k$ is the penalty for crossing the $k$-th moral-economic boundary.
+\end{definition}
+
+The Mahalanobis distance is critical.  Economic dimensions are \emph{not independent}: fairness ($d_3$) interacts with consequences ($d_1$); autonomy ($d_4$) modulates the weight of social impact ($d_6$); trust ($d_5$) gates access to higher-consequence transactions ($d_1$).  An $L_1$ norm (which treats dimensions as orthogonal) would systematically mispredict behavior.
+
+\subsection{Moral-Economic Phase Transitions}
+
+Not all economic transitions are smooth.  Some are discontinuous:
+
+\begin{definition}[Moral-Economic Boundary]
+\label{def:boundary}
+A \emph{moral-economic boundary} is a threshold in the decision complex $\E$ where the local decision regime changes discontinuously:
+\begin{itemize}
+    \item \textbf{The theft boundary:} The transition from ``buy'' to ``steal'' crosses a deontological boundary ($d_2$: rights violation) with $\beta_{\text{theft}} = \infty$ for most agents.  This is why Homo economicus cannot explain why people do not steal: on the scalar projection, theft has positive expected utility (free goods minus detection cost); on the full manifold, the edge weight is infinite.
+    \item \textbf{The promise boundary:} The transition from ``keep promise'' to ``break promise'' crosses a social-norm boundary ($d_6$, $d_7$) with high but finite $\beta$.
+    \item \textbf{The sacred-value boundary:} Certain goods are \emph{incommensurable}---no monetary offer can compensate for their loss.  ``How much to sell your child?'' has $\beta = \infty$ along the cultural-taboo dimension.  Tetlock's ``forbidden tradeoffs'' \cite{tetlock2000} are precisely the infinite-weight boundaries on the decision manifold.
+    \item \textbf{The market-norm / social-norm boundary:} Introducing monetary payment into a social relationship (``paying a friend for dinner'') crosses a regime boundary that changes the entire metric structure---the Mahalanobis weights shift because the covariance matrix $\Sigma$ is different in market-norm space vs.\ social-norm space.  This is Ariely's \cite{ariely2008} finding that market norms and social norms are ``two different worlds.''
+\end{itemize}
+\end{definition}
+
+\begin{proposition}[Infinite-Weight Boundaries Explain ``Irrational'' Refusal]
+\label{prop:infinite_weight}
+An agent who refuses a transaction with positive expected monetary value ($\Delta d_1 > 0$) is acting rationally on the full manifold $\E$ whenever the transaction crosses a boundary with $\beta_k > \Delta d_1 / \sigma_1^2$.  The refusal appears ``irrational'' only when the decision is projected onto the $d_1$ axis alone.
+\end{proposition}
+
+\begin{proof}
+The total edge weight is $w = \Delta \mathbf{a}^T \Sigma^{-1} \Delta \mathbf{a} + \beta_k$.  Even if the Mahalanobis component contributes a net decrease in distance along $d_1$ (the action improves monetary position), the boundary penalty $\beta_k$ makes the total weight positive.  The action is therefore not on the minimum-cost path---the agent rationally avoids it.  Projection onto $d_1$ discards $\beta_k$, making the refusal appear unmotivated.
+\end{proof}
+
+
+%==============================================================================
+\section{Heuristic Bounded Rationality}
+\label{sec:heuristic}
+%==============================================================================
+
+\subsection{Economic Decision as $A^*$ Search}
+
+The central computational claim: economic decision-making is an instance of $A^*$ search on the economic decision complex $\E$.
+
+\begin{definition}[Economic Decision as Pathfinding]
+An economic decision is a pathfinding problem on $\E$:
+\begin{itemize}
+    \item \textbf{Start node $v_0$:} The agent's current economic state (endowment, obligations, relationships).
+    \item \textbf{Goal region $G$:} The set of states the agent prefers (higher wealth, fulfilled obligations, maintained relationships---\emph{on all nine dimensions}).
+    \item \textbf{Path $\gamma$:} A sequence of actions (transactions, decisions) taking the agent from $v_0$ to a state in $G$.
+    \item \textbf{Cost function:} $f(n) = g(n) + h(n)$, where:
+    \begin{itemize}
+        \item $g(n)$ is the \emph{accumulated cost} from $v_0$ to the current state $n$---the sum of edge weights along the path so far.  This is the \textbf{System 2} component: explicit, deliberate cost-benefit calculation.
+        \item $h(n)$ is the \emph{heuristic estimate} of the remaining cost from $n$ to the nearest goal state in $G$---the agent's \emph{intuitive assessment} of ``how far I still need to go.''  This is the \textbf{System 1} component: fast, automatic, based on moral rules, cultural norms, and past experience.
+    \end{itemize}
+\end{itemize}
+\end{definition}
+
+This mapping is not metaphorical.  It is exact:
+
+\begin{center}
+\begin{tabular}{ll}
+\toprule
+\textbf{$A^*$ Component} & \textbf{Economic Decision Counterpart} \\
+\midrule
+Start node $v_0$ & Current endowment/situation \\
+Goal region $G$ & Desired economic outcome \\
+Edge cost $w(v_i, v_j)$ & Full cost of action (all 9 dimensions) \\
+$g(n)$: accumulated cost & System 2: deliberate cost-benefit analysis \\
+$h(n)$: heuristic estimate & System 1: moral/cultural/intuitive assessment \\
+Boundary penalty $\beta_k$ & Moral rule (``do not steal'', ``keep promises'') \\
+Open list & Options under consideration \\
+Closed list & Options already evaluated and dismissed \\
+Optimal path $\gamma^*$ & Chosen course of action \\
+Path not found & Decision paralysis / no acceptable option \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\subsection{Moral Heuristics as Admissible Search Heuristics}
+
+In $A^*$ search, a heuristic $h(n)$ is \emph{admissible} if it never overestimates the true cost-to-go: $h(n) \leq h^*(n)$ for all $n$, where $h^*(n)$ is the true minimum remaining cost.  An admissible heuristic guarantees that $A^*$ finds the optimal path.
+
+\begin{theorem}[Heuristic Truncation Theorem]
+\label{thm:heuristic_truncation}
+Let $h_M(n)$ be a \emph{moral heuristic}---a function that assigns high cost to actions violating moral rules and zero cost to actions consistent with them:
+\begin{equation}
+h_M(n) = \sum_{k} \beta_k \cdot P(\text{action from } n \text{ crosses boundary } k)
+\label{eq:moral_heuristic}
+\end{equation}
+If the boundary penalties $\beta_k$ are lower bounds on the true moral cost of crossing boundary $k$ (i.e., $\beta_k \leq \beta_k^*$ where $\beta_k^*$ is the actual cost including legal penalty, social sanction, and psychological distress), then $h_M$ is \emph{admissible}, and $A^*$ search with $h_M$ is guaranteed to find the optimal path on $\E$.
+\end{theorem}
+
+\begin{proof}
+By construction, $h_M(n) \leq h^*(n)$: the true remaining cost includes the actual boundary penalties $\beta_k^*$ plus the Mahalanobis distance to the goal, both of which are non-negative.  Since $\beta_k \leq \beta_k^*$ and the Mahalanobis component is non-negative, $h_M$ underestimates the true cost-to-go.  By the admissibility theorem for $A^*$ \cite{hart1968}, the search finds the optimal path.
+\end{proof}
+
+\begin{corollary}[Moral Rules Are Not Biases]
+\label{cor:not_biases}
+If moral heuristics are admissible search heuristics, then following them does not produce suboptimal behavior \emph{on the full manifold}.  It produces behavior that appears suboptimal only when projected onto a lower-dimensional subspace (e.g., scalar utility).  Calling moral heuristics ``biases'' is a dimensional-projection error.
+\end{corollary}
+
+\begin{remark}[When Heuristics Are Inadmissible]
+Not all moral heuristics are admissible.  A heuristic that \emph{overestimates} moral cost---e.g., excessive guilt, irrational fear of social disapproval, pathological risk aversion---is inadmissible and may cause the search to miss the optimal path.  This corresponds to \emph{genuine} bias: the agent avoids options that are actually available.  The framework distinguishes between rational heuristic use (admissible: the ``bias'' is in the projection, not the behavior) and genuine cognitive distortion (inadmissible: the heuristic itself is miscalibrated).
+\end{remark}
+
+\subsection{The Admissibility Spectrum and Infinite Boundaries}
+\label{sec:admissibility_spectrum}
+
+A natural objection arises: if ``never steal'' assigns $\beta_{\text{theft}} = \infty$ but the true cost of stealing a loaf of bread to survive is finite (a small fine, a brief social sanction), then $h(n)$ has \emph{overestimated} the true cost-to-go.  The heuristic is inadmissible, and $A^*$ loses its optimality guarantee.  Does this not invalidate the entire mapping?
+
+No.  The objection conflates two different cost functions, and the resolution illuminates the deepest feature of the framework.
+
+\begin{theorem}[Admissibility Depends on the Manifold]
+\label{thm:admissibility_manifold}
+Let $h^*_\E(n)$ denote the true minimum remaining cost on the full manifold $\E$, and let $h^*_1(n)$ denote the true minimum remaining cost on the scalar projection $d_1$ alone.  A moral heuristic $h_M(n)$ with $\beta_k = \infty$ for some boundary $k$ satisfies:
+\begin{enumerate}
+    \item $h_M(n) \leq h^*_\E(n)$ (admissible on the full manifold) whenever the true cost of crossing boundary $k$ on $\E$---including legal penalty, social sanction, psychological distress, identity damage, and downstream path costs on all nine dimensions---is indeed infinite or exceeds $h_M(n)$.
+    \item $h_M(n) > h^*_1(n)$ (inadmissible on the scalar projection) whenever the monetary cost alone of crossing boundary $k$ is finite.
+\end{enumerate}
+The heuristic is admissible or inadmissible \emph{relative to the manifold on which optimality is defined}.
+\end{theorem}
+
+\begin{proof}
+The true cost $h^*_\E(n)$ includes all nine dimensions.  For the theft boundary, the true manifold cost includes: legal penalty ($d_1$, $d_4$: loss of liberty), social sanction ($d_6$: reputation destruction), identity cost ($d_7$: ``I am a thief''), rights violation ($d_2$: criminal record creates lasting Hohfeldian disability), and epistemic cost ($d_9$: future uncertainty about consequences).  For most agents, the sum of these costs across all dimensions is effectively unbounded---a felony conviction forecloses entire regions of the decision manifold permanently.  Thus $\beta_{\text{theft}} = \infty$ is not an overestimate on $\E$; it is a reasonable lower bound.  On the scalar projection, only the monetary component ($d_1$) of this cost survives, and $h_M(n) > h^*_1(n)$.
+\end{proof}
+
+The critic who objects that ``never steal'' overestimates the cost of theft is implicitly computing $h^*$ on the scalar projection $d_1$.  On that manifold, the objection is correct---and the conclusion is that Homo economicus should steal, which is empirically false.  On the full manifold $\E$, $\beta_{\text{theft}} = \infty$ is admissible because the true cost of theft on $\E$ is effectively infinite for most agents in most contexts.
+
+\begin{definition}[$\varepsilon$-Admissibility and Bounded Suboptimality]
+\label{def:epsilon_admissible}
+A heuristic $h(n)$ is \emph{$\varepsilon$-admissible} if $h(n) \leq (1 + \varepsilon)\, h^*(n)$ for all $n$.  When $A^*$ uses an $\varepsilon$-admissible heuristic, the returned path has cost at most $(1 + \varepsilon)$ times the optimal path cost \cite{hart1968}.
+\end{definition}
+
+\begin{theorem}[The Bounded Suboptimality Theorem]
+\label{thm:bounded_suboptimality}
+Evolution and culture did not design System~1 for strict admissibility (globally optimal decisions).  They designed it for \emph{$\varepsilon$-admissibility with small $\varepsilon$}: decisions that are provably close to optimal, computed in $O(1)$ time rather than the exponential time required for exact optimization.  Specifically:
+\begin{enumerate}
+    \item \textbf{Infinite boundaries are strictly admissible on $\E$ in the common case.}  For boundaries whose true manifold cost is effectively infinite (theft, murder, incest), $\beta_k = \infty$ is a lower bound, hence admissible.  The search is optimal.
+    \item \textbf{Finite moral boundaries are $\varepsilon$-admissible.}  For boundaries whose true cost is large but finite (promise-breaking, queue-jumping, stinginess), the heuristic $\beta_k$ may slightly overestimate or underestimate $\beta_k^*$.  Evolution calibrates $\beta_k$ via emotional feedback (guilt, shame, pride) to be close to $\beta_k^*$, yielding $\varepsilon$-admissibility with small $\varepsilon$.
+    \item \textbf{Genuine biases are large-$\varepsilon$ errors.}  Phobias, framing effects, and probability-weighting errors correspond to heuristics where $\varepsilon$ is large---the heuristic substantially over- or underestimates $h^*$.  These are the \emph{only} phenomena that deserve the label ``bias.''
+\end{enumerate}
+\end{theorem}
+
+\begin{proof}[Argument]
+The computer science result is precise: standard $A^*$ guarantees a perfectly optimal path \emph{if and only if} $h(n)$ never overestimates the true remaining cost ($h(n) \leq h^*(n)$ for all $n$).  When this condition is relaxed, the algorithm \emph{Weighted $A^*$}---which uses $f(n) = g(n) + w \cdot h(n)$ with inflation weight $w > 1$---sacrifices perfect optimality in exchange for dramatically faster search: it finds a path guaranteed to cost at most $w$ times the optimum, while exploring exponentially fewer nodes \cite{hart1968}.  This is the exact trade-off that evolutionary biology faces.  A brain that computed the globally optimal action on a 9-dimensional manifold with $\varepsilon = 0$ would require exhaustive search---computationally intractable in the milliseconds available for predator avoidance, mate selection, or social negotiation.  A brain that inflates moral boundary costs by a factor $w = 1 + \varepsilon$ (overestimating sacred-value penalties) prunes the search space catastrophically, finds a near-optimal path in $O(1)$ time, and survives.  Human System~1 is weighted $A^*$, not standard $A^*$: it trades optimality for tractability.
+
+The evolutionary fitness cost of crossing a sacred-value boundary (theft, betrayal, incest) is catastrophic: expulsion from the group, loss of cooperative partners, death.  An organism that \emph{underestimates} these costs (inadmissible in the other direction---$\beta_k < \beta_k^*$) takes the ``optimal'' path through theft, is detected, and is eliminated from the gene pool.  An organism that \emph{overestimates} ($\beta_k > \beta_k^*$) pays a small opportunity cost but survives.  Natural selection therefore produces heuristics that are biased toward overestimation of sacred-boundary costs---i.e., toward \emph{conservatively admissible} heuristics that may sacrifice global optimality but never cross a catastrophic boundary.  This is precisely $\varepsilon$-admissible $A^*$ with $\varepsilon > 0$: the agent finds a near-optimal path that avoids catastrophic edges, at the cost of occasionally missing the true optimum.  The suboptimality is bounded, and the bound is set by evolutionary calibration of $\beta_k$.
+
+For extreme cases (Jean Valjean stealing bread to survive), the framework predicts \emph{exactly what we observe}: the agent experiences intense moral conflict ($h(n)$ and $g(n)$ disagree), the decision is agonizing rather than automatic, and society treats the transgression with nuance rather than absolute condemnation---because the community recognizes that the agent's manifold was distorted by starvation ($\Delta d_1 \to -\infty$ on the non-theft path), making the theft boundary the \emph{lower-cost} path on the true manifold even though $\beta_{\text{theft}}$ is very large.  The heuristic's overestimate is detected precisely because System~2 ($g(n)$) can compute that the alternative path cost exceeds $\beta_{\text{theft}}$ in this extreme case.
+\end{proof}
+
+\begin{remark}[The Hierarchy of Heuristic Quality]
+The framework thus classifies System~1 heuristics into a precise hierarchy:
+\begin{enumerate}
+    \item \textbf{Strictly admissible} ($\beta_k \leq \beta_k^*$): the heuristic underestimates or exactly estimates the true boundary cost.  The search is optimal.  Examples: the taboo on murder, where the true cost (execution, life imprisonment, complete social exclusion) genuinely exceeds any finite heuristic estimate.
+    \item \textbf{$\varepsilon$-admissible} ($\beta_k \leq (1+\varepsilon)\beta_k^*$): the heuristic slightly overestimates.  The search finds a near-optimal path.  Examples: most social-norm heuristics (tipping, queue etiquette, gift reciprocity).
+    \item \textbf{Inadmissible} ($\beta_k \gg \beta_k^*$): the heuristic substantially overestimates.  The search may miss genuinely good paths.  Examples: phobias (irrationally high $\beta$ for harmless stimuli), excessive guilt, pathological risk aversion.
+    \item \textbf{Gauge-variant} ($\beta_k$ depends on framing, not on the state): the heuristic is not even a consistent function of the manifold position.  Examples: framing effects, anchoring, availability bias.
+\end{enumerate}
+Categories 1--2 are features of the architecture.  Categories 3--4 are genuine cognitive errors.  Behavioral economics has conflated all four categories under the single label ``bias.''
+\end{remark}
+
+\subsection{Why Homo Economicus Fails: The Scalar Irrecoverability Theorem}
+
+\begin{theorem}[Scalar Irrecoverability]
+\label{thm:irrecoverability}
+Let $\phi: \R^9 \to \R$ be any function that maps a 9-dimensional attribute vector to a scalar utility value.  Then:
+\begin{enumerate}
+    \item $\phi$ is not injective (multiple distinct attribute vectors map to the same scalar).
+    \item The information lost under $\phi$ is \emph{irrecoverable}: there exists no function $\psi: \R \to \R^9$ such that $\psi \circ \phi = \text{id}$.
+    \item The optimal path on $\E$ (the Bond geodesic) is in general \emph{different} from the path that maximizes $\phi$-utility, and the difference is not bounded by any function of $\phi$ alone.
+\end{enumerate}
+\end{theorem}
+
+\begin{proof}
+(1) follows from dimensionality: $\phi$ maps $\R^9$ to $\R$, and by the rank-nullity theorem, the kernel of $d\phi$ has dimension at least 8 at every regular point.  (2) follows from (1) by the data processing inequality.  (3) follows because the minimum-cost path on $\E$ depends on the full 9-dimensional edge weights, but the $\phi$-optimal path depends only on $\phi$-values at the vertices; two edges with identical $\phi$-differences but different attribute-vector differences will have different weights on $\E$ but identical weights under $\phi$.
+\end{proof}
+
+This theorem is the mathematical death certificate of Homo economicus.  It does not say that scalar utility is a bad \emph{approximation}---it says that the information destroyed by the scalar projection is \emph{mathematically irrecoverable}.  No amount of sophistication in the utility function can compensate for the dimensional collapse.
+
+\begin{corollary}[The Allais and Ellsberg Paradoxes Are Not Paradoxes]
+\label{cor:allais}
+The Allais paradox \cite{allais1953} (violation of the independence axiom) and the Ellsberg paradox \cite{ellsberg1961} (violation of subjective expected utility under ambiguity) are both consequences of Scalar Irrecoverability.
+\begin{enumerate}
+    \item \emph{Allais:} The agent's preference reversal between ``certain \$1M'' and ``89\% chance of \$1M, 10\% chance of \$5M, 1\% chance of \$0'' reflects the activation of $d_9$ (epistemic certainty has value beyond expected monetary value) and $d_7$ (identity: ``I am prudent'').  On the scalar projection, independence is violated.  On the full manifold, preferences are consistent: the attribute-vector difference between certainty and risk includes non-zero components on $d_7$ and $d_9$ that the expected-value calculation discards.
+    \item \emph{Ellsberg:} Ambiguity aversion (preferring known to unknown probabilities) reflects $d_9$ directly: known probabilities have higher epistemic-status scores than ambiguous ones.  The Mahalanobis distance from the ambiguous gamble to the goal is larger than from the known-probability gamble, even when expected values are equal, because $\Delta d_9 \neq 0$ for the ambiguous case.
+\end{enumerate}
+\end{corollary}
+
+\begin{theorem}[Projected Intransitivity]
+\label{thm:intransitivity}
+Let $\succ_{\E}$ denote the preference relation on the full manifold (``$x \succ_{\E} y$ iff $w(v_0, x) < w(v_0, y)$'') and let $\succ_\phi$ denote the projected preference (``$x \succ_\phi y$ iff $\phi(x) > \phi(y)$'').  Then:
+\begin{enumerate}
+    \item $\succ_{\E}$ is transitive (it is a total order induced by path cost from $v_0$).
+    \item $\succ_\phi$ may be intransitive: there exist alternatives $x, y, z$ such that $\phi(x) > \phi(y) > \phi(z) > \phi(x)$ is possible when the projection $\phi$ discards different dimensions for different pairwise comparisons.
+\end{enumerate}
+\end{theorem}
+
+\begin{proof}
+(1) Path cost $w(v_0, \cdot)$ is a real-valued function on vertices of $\E$; the induced ordering is a total preorder, hence transitive.  (2) Consider three alternatives with attribute vectors $\mathbf{a}(x) = (3, 1, 5)$, $\mathbf{a}(y) = (5, 3, 1)$, $\mathbf{a}(z) = (1, 5, 3)$ in a 3-dimensional example.  If $\phi$ is context-dependent---comparing $x$ vs.\ $y$ on dimensions $\{1,2\}$ (where $y$ wins), $y$ vs.\ $z$ on dimensions $\{2,3\}$ (where $z$ wins), and $z$ vs.\ $x$ on dimensions $\{1,3\}$ (where $x$ wins)---then $\succ_\phi$ is cyclic.  This context-dependence is precisely what Tversky's \cite{tversky1969} experiments on intransitive preferences demonstrate: the ``relevant'' dimension shifts with the comparison pair.  On $\E$ with fixed metric, preferences are transitive; the intransitivity is an artifact of context-dependent projection.
+\end{proof}
+
+\begin{example}[The Grocery Store]
+\label{ex:grocery}
+An agent stands in a grocery store.  Two paths are available:
+\begin{itemize}
+    \item \textbf{Path A (buy):} Pay \$50.  Attribute-vector change: $\Delta d_1 = -50$, all other dimensions $\approx 0$.  Edge weight: $w_A = 50^2 / \sigma_1^2$.
+    \item \textbf{Path B (steal):} Pay \$0.  Attribute-vector change: $\Delta d_1 = 0$, but $\Delta d_2 = -\infty$ (rights violation), $\Delta d_6 = -\text{large}$ (social sanction risk), $\Delta d_7 = -\text{large}$ (identity violation).  Edge weight: $w_B = \infty$.
+\end{itemize}
+Under scalar utility ($\phi = d_1$): $\phi(B) > \phi(A)$, so Homo economicus steals.\\
+On the full manifold: $w_B = \infty > w_A$, so the rational agent buys.
+
+The agent is not ``irrational'' for buying.  The economist is computing on the wrong manifold.
+\end{example}
+
+
+%==============================================================================
+\section{The Bond Geodesic}
+\label{sec:geodesic}
+%==============================================================================
+
+\subsection{Definition}
+
+\begin{definition}[Bond Geodesic]
+\label{def:geodesic}
+The \emph{Bond geodesic} $\gamma^*$ from an initial state $v_0$ to a goal region $G$ on the economic decision complex $\E$ is the minimum-cost path:
+\begin{equation}
+\gamma^* = \arg\min_\gamma \sum_{i=0}^{m-1} w(v_i, v_{i+1}) \quad \text{subject to } \gamma(0) = v_0,\; \gamma(\text{end}) \in G
+\label{eq:geodesic}
+\end{equation}
+where $w$ is the full multi-dimensional edge weight (Equation~\ref{eq:edge_weight}).  The Bond geodesic is the path that a rational agent takes when \emph{all nine dimensions of the decision manifold are active}.
+\end{definition}
+
+The name ``geodesic'' is precise: on a Riemannian manifold, a geodesic is the locally distance-minimizing path.  The Bond geodesic is the discrete analogue---the minimum-cost path on the weighted simplicial complex $\E$.  It is named to distinguish it from the classical ``utility-maximizing path,'' which is a geodesic only on the scalar projection.
+
+\subsection{Bond Geodesic Equilibrium}
+
+In a multi-agent setting (game theory), we replace Nash equilibrium with the Bond geodesic equilibrium:
+
+\begin{definition}[Bond Geodesic Equilibrium (BGE)]
+\label{def:bge}
+A strategy profile $(\gamma_1^*, \ldots, \gamma_n^*)$ is a \emph{Bond geodesic equilibrium} if each $\gamma_i^*$ is a Bond geodesic on agent $i$'s decision complex $\E_i$, given the strategies of the other agents:
+\begin{equation}
+\gamma_i^* = \arg\min_{\gamma_i} \BF_i(\gamma_i \mid \gamma_{-i}^*) \quad \forall\, i = 1, \ldots, n
+\label{eq:bge}
+\end{equation}
+where $\BF_i$ is the total path cost (behavioral friction) on agent $i$'s manifold, and $\gamma_{-i}^*$ denotes the other agents' strategies.
+\end{definition}
+
+\begin{theorem}[Relationship to Nash Equilibrium]
+\label{thm:nash_relationship}
+Every Bond geodesic equilibrium projects to a Nash equilibrium on the scalar submanifold.  The converse is false: not every Nash equilibrium lifts to a Bond geodesic equilibrium.  Specifically:
+\begin{enumerate}
+    \item If all boundary penalties are zero ($\beta_k = 0$ for all $k$) and the covariance matrix is diagonal with $\Sigma = \sigma_1^2 \mathbf{e}_1 \mathbf{e}_1^T$ (only the monetary dimension has variance), the BGE reduces to the Nash equilibrium.
+    \item If boundary penalties are non-zero, the BGE excludes Nash equilibria that require crossing moral boundaries---even if those equilibria are Pareto-optimal on the scalar projection.
+    \item The set of BGE strategies is a subset of the Nash equilibrium set of the ``augmented game'' where payoffs include all nine dimensions.
+\end{enumerate}
+\end{theorem}
+
+\begin{proof}[Proof sketch]
+(1) When $\beta_k = 0$ and $\Sigma$ is concentrated on $d_1$, the Mahalanobis distance reduces to $(\Delta d_1)^2 / \sigma_1^2$, and path minimization is equivalent to $d_1$-maximization.  The BGE reduces to each agent minimizing monetary cost, which is the standard Nash condition.  (2) A Nash equilibrium that requires one agent to cross a boundary with $\beta_k > 0$ has higher path cost than an alternative path that avoids the boundary---even if the alternative has lower monetary payoff.  The BGE selects the boundary-avoiding path.  (3) The augmented game includes all nine dimensions as payoff components; the BGE is a Nash equilibrium of this augmented game by definition.
+\end{proof}
+
+\begin{theorem}[Existence of Bond Geodesic Equilibrium]
+\label{thm:bge_existence}
+Let $\Gamma = (N, \{\E_i\}_{i \in N}, \{G_i\}_{i \in N})$ be a finite game where $N$ is a finite set of agents, each $\E_i$ is a finite economic decision complex with positive edge weights, and each $G_i$ is a non-empty goal region.  If for each agent $i$ and each strategy profile $\gamma_{-i}$ of the other agents, there exists at least one path from $v_0^{(i)}$ to $G_i$ with finite total cost, then a Bond geodesic equilibrium exists.
+\end{theorem}
+
+\begin{proof}
+Each agent's best-response correspondence $\mathrm{BR}_i(\gamma_{-i}) = \arg\min_{\gamma_i} \BF_i(\gamma_i \mid \gamma_{-i})$ is well-defined: the edge weights are positive and the complex is finite, so the set of paths from $v_0^{(i)}$ to $G_i$ is finite and non-empty (by assumption), and the minimum over a finite non-empty set of real numbers exists.  The strategy space for each agent is the finite set of simple paths from $v_0^{(i)}$ to $G_i$, which is a finite set.  Each agent's cost function $\BF_i$ is continuous in the strategies of the other agents (since $\gamma_{-i}$ affects $\BF_i$ only through the edge weights, which are fixed, and the goal-region availability, which is constant).  Therefore, the best-response correspondence is non-empty-valued and closed-valued on a finite strategy space.  A fixed point exists by the finite analog of Kakutani's theorem (equivalently, by Nash's existence theorem applied to the augmented finite game).
+\end{proof}
+
+\begin{theorem}[Uniqueness and Multiplicity of the BGE]
+\label{thm:bge_uniqueness}
+\hfill
+\begin{enumerate}
+    \item \textbf{Generically unique in strict games:} If for each agent $i$ and each $\gamma_{-i}$, the best-response path is unique (no two paths from $v_0^{(i)}$ to $G_i$ have identical total cost), then the BGE is unique.
+    \item \textbf{Multiple BGE possible:} When ties exist---multiple paths with identical manifold cost---the game may admit multiple BGE, just as finite games may admit multiple Nash equilibria.
+    \item \textbf{Refinement by $\varepsilon$-perturbation:} If the edge weights are perturbed by independent draws from a continuous distribution with support $[0, \varepsilon]$, all ties are broken with probability 1, and the BGE is unique almost surely for sufficiently small $\varepsilon$.  This is the analog of Harsanyi's (1973) purification theorem for Nash equilibria.
+\end{enumerate}
+\end{theorem}
+
+\begin{proof}
+(1)~If each best-response is a singleton, the best-response correspondence is a function $\mathrm{BR}: \prod_i S_i \to \prod_i S_i$ on the finite strategy space.  A function on a finite set has at least one fixed point; if $\mathrm{BR}$ is a contraction (which follows from the uniqueness of each component), the fixed point is unique.  (2)~When ties exist, $\mathrm{BR}_i$ is set-valued, and multiple fixed points may arise; standard examples (e.g., the coordination game on the manifold) produce two symmetric BGE.  (3)~A continuous perturbation of edge weights produces a strict game with probability~1 (no two path costs are equal), reducing to case~(1).
+\end{proof}
+
+\begin{remark}[Computing the BGE]
+The BGE is computable.  For each agent $i$ with decision complex $\E_i$ of $|V_i|$ vertices and $|E_i|$ edges, the optimal path (Bond geodesic) is computed by $A^*$ search in time $O(|E_i| + |V_i| \log |V_i|)$ with an admissible heuristic, or by Dijkstra's algorithm in the same time bound.  The BGE is then found by iterated best response: each agent computes their Bond geodesic given the others' current strategies, and the process is repeated until convergence.  On a finite game with $n$ agents and finite strategy spaces, iterated best response converges in finitely many steps (since the strategy profile space is finite and the cost function is bounded below, the sequence of profiles must eventually cycle or stabilize; uniqueness from Theorem~\ref{thm:bge_uniqueness}(1) guarantees stabilization in the generic case).  This gives the BGE a computational advantage over Nash equilibrium, whose computation is PPAD-complete in general \cite{nash1950}: the graph structure of $\E$ enables polynomial-time pathfinding, whereas general-form Nash computation does not.
+\end{remark}
+
+\begin{theorem}[Welfare Properties of the BGE]
+\label{thm:welfare}
+Let $(\gamma_1^*, \ldots, \gamma_n^*)$ be a Bond geodesic equilibrium.
+\begin{enumerate}
+    \item \textbf{Manifold Pareto optimality:} The BGE is Pareto-optimal on the full manifold $\E$ among all strategy profiles that respect every agent's boundary constraints.  That is: no alternative profile makes some agent better off on all nine dimensions without making another agent worse off on at least one dimension, subject to the constraint that no agent is required to cross an infinite-weight boundary.
+    \item \textbf{Scalar Pareto suboptimality:} The BGE may be Pareto-suboptimal on the scalar projection $d_1$.  Specifically, there may exist a strategy profile that gives every agent higher monetary payoff, but that profile requires at least one agent to cross a moral boundary.
+\end{enumerate}
+\end{theorem}
+
+\begin{proof}
+(1) Suppose for contradiction that a profile $(\gamma_1', \ldots, \gamma_n')$ Pareto-dominates the BGE on $\E$ while respecting all boundary constraints.  Then for some agent $i$, $\BF_i(\gamma_i' \mid \gamma_{-i}') < \BF_i(\gamma_i^* \mid \gamma_{-i}^*)$, and for no agent $j$, $\BF_j(\gamma_j' \mid \gamma_{-j}') > \BF_j(\gamma_j^* \mid \gamma_{-j}^*)$.  But then agent $i$ could unilaterally deviate to $\gamma_i'$, contradicting the BGE condition.  (2) Follows directly from Theorem~\ref{thm:irrecoverability}: scalar projection discards the boundary constraints, so scalar-optimal profiles may violate them.
+\end{proof}
+
+\begin{remark}[The First and Second Welfare Theorems on the Manifold]
+The First Welfare Theorem---every competitive equilibrium is Pareto efficient---holds on the full manifold when ``competitive equilibrium'' is reinterpreted as ``Bond geodesic equilibrium in a complete-market setting'' and ``Pareto efficiency'' is evaluated on all nine dimensions.  The Second Welfare Theorem---every Pareto-efficient allocation can be achieved as a competitive equilibrium with appropriate transfers---requires that transfers be possible on all nine dimensions, not just on $d_1$.  Monetary redistribution alone is insufficient if the Pareto-efficient allocation requires changes in rights ($d_2$), autonomy ($d_4$), or legitimacy ($d_8$).  This explains why purely monetary redistribution fails to achieve social-welfare objectives that have multi-dimensional structure---a point Sen \cite{sen1999} has long emphasized.
+\end{remark}
+
+\subsection{The Bond Geodesic Explains Behavioral Game Theory}
+
+\begin{example}[The Ultimatum Game]
+\label{ex:ultimatum}
+In the ultimatum game, Player 1 proposes a split of \$10; Player 2 accepts or rejects.  Under Nash equilibrium (scalar utility), Player 1 offers \$0.01 and Player 2 accepts (because \$0.01 $>$ \$0).
+
+Observed behavior: Player 1 typically offers \$4--\$5; Player 2 rejects offers below $\sim$\$2--\$3.
+
+\textbf{Bond geodesic analysis:}
+\begin{itemize}
+    \item Player 2's decision is pathfinding on $\E_2$ with dimensions including $d_3$ (fairness).
+    \item Accepting an unfair offer ($\leq \$2$) yields $\Delta d_1 = +2$ (monetary gain) but $\Delta d_3 = -\text{large}$ (fairness violation) and $\Delta d_7 = -\text{large}$ (identity: ``I am a pushover'').
+    \item The total edge weight for accepting an unfair offer exceeds the weight for rejecting: $w_{\text{accept}} = 4/\sigma_1^2 + \beta_{\text{fairness}} + \beta_{\text{identity}} > w_{\text{reject}} = 0$.
+    \item Player 2 rationally rejects.  Player 1, anticipating this, offers $\sim$\$5.
+\end{itemize}
+The BGE prediction---equal or near-equal splits---matches observed behavior.  The Nash prediction does not.
+\end{example}
+
+\begin{example}[The Prisoner's Dilemma]
+\label{ex:prisoners}
+In the one-shot prisoner's dilemma, the Nash equilibrium is mutual defection.  But in experiments (and life), substantial cooperation is observed, especially when players can see each other or share group identity.
+
+\textbf{Bond geodesic analysis:}
+\begin{itemize}
+    \item Defection yields higher $d_1$ (monetary payoff) but incurs costs on $d_3$ (fairness: betrayal of implicit reciprocity), $d_6$ (social impact: ``I am a defector''), and $d_7$ (virtue: ``I broke trust'').
+    \item If $\beta_{\text{fairness}} + \beta_{\text{social}} + \beta_{\text{virtue}} > \Delta d_1 / \sigma_1^2$ (the moral cost exceeds the monetary gain), the Bond geodesic is cooperation.
+    \item Factors that increase moral boundary salience---face-to-face interaction, group identity, repeated play---increase $\beta_k$ and shift the BGE toward cooperation.  Factors that decrease salience---anonymity, large groups, one-shot play---decrease $\beta_k$ and shift the BGE toward defection.
+\end{itemize}
+This explains \emph{why} cooperation varies with context: the manifold's boundary penalties are context-dependent.
+\end{example}
+
+\begin{example}[Public Goods and Free-Riding]
+\label{ex:public_goods}
+In public goods games, Nash equilibrium predicts zero contribution.  Observed behavior: $\sim$40--60\% of endowment is contributed initially, declining toward (but rarely reaching) zero over rounds.
+
+\textbf{Bond geodesic analysis:}
+\begin{itemize}
+    \item Contributing activates $d_3$ (fairness: doing one's part), $d_6$ (social approval), and $d_7$ (virtuous self-image) at low cost to $d_1$ (monetary).
+    \item Free-riding activates monetary gain ($\Delta d_1 > 0$) but incurs social cost ($\Delta d_6 < 0$) and identity cost ($\Delta d_7 < 0$).
+    \item Initial contributions reflect high $\beta_{\text{social}}$ (unfamiliarity; agents don't want to be ``first defector'').
+    \item Decline over rounds reflects \emph{learning about others' boundary penalties}: when agents observe free-riding, $\beta_{\text{social}}$ decreases (``others aren't contributing, so social sanction is low''), shifting the BGE toward lower contributions.
+    \item The fact that contributions stabilize above zero (not at zero) reflects the non-vanishing identity cost $\beta_{\text{virtue}}$, which does not depend on others' behavior.
+\end{itemize}
+\end{example}
+
+
+%==============================================================================
+\section{Geometric Behavioral Economics}
+\label{sec:behavioral}
+%==============================================================================
+
+The behavioral economics anomalies documented by Kahneman, Tversky, Thaler, and others are not a catalogue of unrelated ``biases.''  They are geometric properties of the economic decision manifold.
+
+\subsection{Loss Aversion as Asymmetric Metric}
+
+\begin{theorem}[Loss Aversion as Metric Asymmetry]
+\label{thm:loss_aversion}
+Kahneman--Tversky loss aversion ($\lambda \approx 2.25$) arises from an asymmetry in the decision manifold's metric: losses traverse \emph{more dimensions} than equivalent gains.
+\end{theorem}
+
+\begin{proof}[Argument]
+Consider an agent at state $v_0$ evaluating a gain of $+x$ or a loss of $-x$ on the monetary dimension ($d_1$).
+
+\textbf{Gain path ($v_0 \to v_+$):} The attribute-vector change is concentrated on $d_1$: $\Delta \mathbf{a}_+ \approx (x, 0, 0, 0, 0, 0, 0, 0, 0)$.  The edge weight is approximately $w_+ \approx x^2 / \sigma_1^2$.
+
+\textbf{Loss path ($v_0 \to v_-$):} The attribute-vector change affects multiple dimensions: $\Delta \mathbf{a}_- \approx (-x, -\delta_2, -\delta_3, 0, 0, -\delta_6, -\delta_7, 0, -\delta_9)$, where $\delta_2$ reflects the perceived rights violation (``I had this; now it's taken''), $\delta_3$ reflects fairness (``this is unfair''), $\delta_6$ reflects social status (``I've lost standing''), $\delta_7$ reflects identity (``I am a loser''), and $\delta_9$ reflects epistemic anxiety (``what else might I lose?'').  The edge weight is $w_- \approx x^2/\sigma_1^2 + \delta_2^2/\sigma_2^2 + \delta_3^2/\sigma_3^2 + \cdots > w_+$.
+
+The ratio $w_- / w_+ > 1$ is the \emph{geometric loss-aversion coefficient}.  Its value depends on the magnitudes of the cross-dimensional activations $\delta_k$, which are empirically measurable.  The classical loss-aversion parameter $\lambda = w_- / w_+$ is not a free parameter of the model---it is a \emph{derived quantity} determined by the manifold's metric structure.
+\end{proof}
+
+\begin{remark}[Why $\lambda \approx 2.25$]
+The specific value $\lambda \approx 2.25$ should be derivable from the dimensional covariance matrix $\Sigma$ estimated from behavioral data.  If losses activate approximately 4--5 dimensions beyond $d_1$ with average activation $\delta_k \approx 0.5\sigma_k$, then $w_- / w_+ \approx 1 + 4 \times 0.25 = 2.0$, close to the observed value.  Precise calibration requires fitting $\Sigma$ to experimental data from prospect-theory studies---a concrete empirical programme.
+\end{remark}
+
+\subsection{Reference Dependence as Coordinate Choice}
+
+\begin{proposition}[Reference Points as Local Coordinates]
+\label{prop:reference}
+Kahneman--Tversky reference dependence is a coordinate effect: the agent evaluates outcomes in \emph{local coordinates centered at the current state} rather than in global coordinates.  This is not a bias---it is the natural coordinate system for pathfinding.  $A^*$ search computes edge costs $w(v_i, v_{i+1})$ from the \emph{current} node, not from the origin; the cost of moving from ``here'' to ``there'' depends on where ``here'' is.
+\end{proposition}
+
+In physics, the analogous phenomenon is well understood: the metric of a curved manifold is position-dependent.  A path that costs little from one starting point may cost a great deal from another, not because the agent is ``biased'' but because the manifold's curvature varies.  Reference dependence is economic curvature.
+
+\subsection{Framing Effects as Gauge Variance}
+
+\begin{theorem}[Framing as Gauge Symmetry Violation]
+\label{thm:framing}
+A framing effect---where logically equivalent descriptions of the same decision produce different choices---is a \emph{gauge symmetry violation} on the decision manifold.  The Bond Invariance Principle (BIP) \cite{bond2026geometric} requires that evaluations be invariant under meaning-preserving transformations.  Framing effects occur when the agent's heuristic function $h(n)$ is not gauge-invariant---when the System 1 assessment depends on the description rather than the described state.
+\end{theorem}
+
+\begin{proof}[Argument]
+Let $x$ and $\tau(x)$ be two descriptions of the same economic state, related by a meaning-preserving transformation $\tau$ (e.g., ``90\% survival rate'' vs.\ ``10\% mortality rate'').  The BIP requires $J(\tau(x)) = J(x)$.  If the agent's choice differs between $x$ and $\tau(x)$, then $h(\cdot)$ is gauge-variant: the heuristic assigns different costs to the same economic state under different descriptions.
+
+This is a \emph{miscalibration of the heuristic}, not a fundamental feature of the manifold.  The manifold structure (the edge weights $w$) is gauge-invariant; the heuristic approximation $h$ may not be.  The Bond Index \cite{bond2026geometric} quantifies the magnitude of this miscalibration.
+\end{proof}
+
+This distinction is important: loss aversion is a \emph{structural feature of the manifold} (Section~\ref{thm:loss_aversion}---losses genuinely traverse more dimensions), while framing effects are \emph{heuristic miscalibrations} (the heuristic treats different descriptions differently when it should not).  The framework distinguishes between rational responses to manifold structure and genuine cognitive errors.
+
+\subsection{Hyperbolic Discounting as Path Curvature}
+
+Classical economics assumes exponential discounting: a reward $R$ at time $t$ has present value $R \cdot e^{-\delta t}$.  Observed behavior is \emph{hyperbolic}: $R / (1 + kt)$, which produces present bias and preference reversals.
+
+\begin{proposition}[Hyperbolic Discounting as Temporal Curvature]
+\label{prop:hyperbolic}
+Hyperbolic discounting arises because the decision manifold's curvature is non-constant along the temporal dimension ($d_5$: temporal horizon).  Near the present ($t \to 0$), the manifold is sharply curved (short-term consequences loom large in all dimensions), producing steep discounting.  At distant horizons ($t \to \infty$), the manifold flattens (distant consequences affect fewer dimensions), producing shallow discounting.  The overall discount function is the integral of curvature along the temporal axis, which yields a hyperbolic rather than exponential form.
+\end{proposition}
+
+This also explains why present bias is stronger for visceral goods (food, sex, drugs) than for abstract goods (money, career advancement): visceral goods activate more dimensions of the manifold at short time horizons (social impact, identity, autonomy are all engaged by immediate visceral choice), while abstract goods primarily affect $d_1$ (consequences) at all horizons.
+
+\subsection{The Endowment Effect as Hohfeldian Asymmetry}
+
+\begin{proposition}[Endowment Effect as Rights Creation]
+\label{prop:endowment}
+The endowment effect---valuing a good more highly when you own it than when you don't---arises because ownership creates a Hohfeldian right ($d_2$) that must be \emph{surrendered} upon sale.  The attribute-vector change for selling includes $\Delta d_2 < 0$ (loss of right), while the attribute-vector change for buying includes $\Delta d_2 > 0$ (acquisition of right).  Since loss of rights activates more dimensions than acquisition (by the same mechanism as loss aversion), selling has higher total edge weight than buying.
+\end{proposition}
+
+The willingness-to-accept / willingness-to-pay gap ($\text{WTA} / \text{WTP} \approx 2$--$3$) is thus not a separate phenomenon from loss aversion---it is the \emph{same metric asymmetry}, expressed in the specific domain of property rights.
+
+
+%==============================================================================
+\section{Conservation Laws in Economic Systems}
+\label{sec:conservation}
+%==============================================================================
+
+\subsection{The Fairness Conservation Law}
+
+\begin{theorem}[Fairness Conservation in Closed Exchange]
+\label{thm:fairness_conservation}
+In a closed bilateral economic exchange between agents $A$ and $B$---where no third party enters, no external rules change, and the exchange is voluntary---the total \emph{moral friction} is conserved:
+\begin{equation}
+\BF(A) + \BF(B) = 0
+\label{eq:fairness_conservation}
+\end{equation}
+where $\BF(X)$ is the net behavioral friction experienced by agent $X$, summed over all nine dimensions.  Equivalently: in a closed voluntary exchange, every gain to one party on any dimension is matched by a corresponding cost to the other party.
+\end{theorem}
+
+\begin{proof}
+In a bilateral exchange, the goods and obligations transferred from $A$ to $B$ are exactly the goods and obligations received by $B$ from $A$.  On the monetary dimension, this is trivial: $\Delta d_1(A) = -\Delta d_1(B)$.  On the rights dimension, it follows from Hohfeldian correlative structure: every right $A$ transfers is a right $B$ acquires; every obligation $A$ is relieved of is an obligation $B$ assumes.  On the fairness dimension, if both parties perceive the exchange as fair, $\Delta d_3(A) = \Delta d_3(B) = 0$; if one party perceives unfairness ($\Delta d_3(A) < 0$), the other party either perceives corresponding advantage ($\Delta d_3(B) > 0$) or the exchange does not occur (the unfairness makes the total edge weight too high for the disadvantaged party).
+
+The conservation law holds because $\E$ is symmetric under party-swap for voluntary bilateral exchange: the same edge connects $A$'s state to $B$'s state, and the Mahalanobis distance is symmetric.
+\end{proof}
+
+\begin{corollary}[Exploitation Is Detectable]
+If one party consistently extracts surplus on $d_1$ (monetary gain) while the counterparty consistently bears costs on $d_3$ (fairness), $d_4$ (autonomy), or $d_6$ (social impact), the Bond Index will be non-zero.  Exploitation is not a moral judgment---it is a \emph{measurable asymmetry} in the dimensional distribution of behavioral friction.
+\end{corollary}
+
+\subsection{The No-Free-Lunch Theorem for Unfairness}
+
+\begin{theorem}[No Free Lunch]
+\label{thm:no_free_lunch}
+An agent cannot extract positive surplus on all nine dimensions simultaneously from a voluntary bilateral exchange.  If $\Delta d_k(A) > 0$ for some $k$, then $\Delta d_j(A) < 0$ for some $j \neq k$, or $\Delta d_k(B) < 0$.
+\end{theorem}
+
+\begin{proof}
+Follows from Fairness Conservation (Theorem~\ref{thm:fairness_conservation}): if the total friction sums to zero, a gain on one dimension must be offset by a loss on another dimension or a corresponding loss to the counterparty.  If both agents had positive $\Delta d_k$ on all dimensions, the total friction would be negative---a creation of value from nothing---which violates the conservation law for closed systems.
+\end{proof}
+
+This is the geometric analogue of ``there is no such thing as a free lunch''---but it applies to \emph{all nine dimensions}, not just money.  You cannot get something for nothing on any combination of monetary value, rights, fairness, autonomy, trust, social standing, moral identity, institutional legitimacy, or epistemic quality.
+
+
+%==============================================================================
+\section{Kahneman's Systems as Geometric Structure}
+\label{sec:kahneman}
+%==============================================================================
+
+\subsection{System 1 as Heuristic Function}
+
+Kahneman's System 1 \cite{kahneman2011} is fast, automatic, associative, and operates with little conscious effort.  In our framework, System 1 \emph{is} the heuristic function $h(n)$:
+
+\begin{center}
+\begin{tabular}{ll}
+\toprule
+\textbf{System 1 Property} & \textbf{$h(n)$ Property} \\
+\midrule
+Fast, automatic & Computed without search (lookup, not calculation) \\
+Based on associations & Based on learned boundary penalties $\beta_k$ \\
+Context-sensitive & $h(n)$ depends on current state $n$ \\
+Emotionally valenced & Boundary penalties are affectively tagged \\
+Hard to override & $h(n)$ contributes to $f(n)$ whether or not System 2 agrees \\
+Culturally variable & Boundary penalties $\beta_k$ are culturally calibrated \\
+Occasionally wrong & $h(n)$ may be inadmissible (gauge-variant) \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\subsection{System 2 as Explicit Path Computation}
+
+Kahneman's System 2 is slow, deliberate, effortful, and sequential.  In our framework, System 2 \emph{is} the explicit computation of $g(n)$---the accumulated cost along the path so far:
+
+\begin{center}
+\begin{tabular}{ll}
+\toprule
+\textbf{System 2 Property} & \textbf{$g(n)$ Property} \\
+\midrule
+Slow, effortful & Requires summing edge weights along path \\
+Sequential & Path cost is accumulated step by step \\
+Capacity-limited & Working memory limits the path length being evaluated \\
+Can override System 1 & Can select path with low $g$ even if $h$ is high \\
+Depleted by effort & Cognitive resources needed for $g$-computation are finite \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\subsection{The Interaction: $f = g + h$}
+
+The crucial insight is that $f(n) = g(n) + h(n)$ is not a weighted average---it is a \emph{sum}.  Both systems contribute to every decision.  System 1 cannot be ``turned off''; the heuristic $h(n)$ always contributes to the evaluation, even when System 2 is fully engaged.  This explains:
+
+\begin{enumerate}
+    \item \textbf{Ego depletion:} When System 2 resources are depleted (fatigue, cognitive load), $g(n)$ computation becomes less accurate.  The agent relies more on $h(n)$---more on heuristics, less on deliberate calculation.  This is not irrationality; it is $A^*$ search with a degraded $g$-function, which shifts the optimal path toward heuristic-guided rather than cost-calculated routes.
+
+    \item \textbf{Emotional override:} Strong emotions amplify $h(n)$---fear increases $\beta_{\text{risk}}$, anger decreases $\beta_{\text{fairness}}$ (making retaliation seem less costly), guilt increases $\beta_{\text{virtue}}$.  The optimal path on the modified manifold may differ from the ``rational'' path computed with default $\beta_k$ values.
+
+    \item \textbf{Dual-process conflicts:} The phenomenology of ``knowing the right thing but doing the wrong thing'' is the experience of $g(n)$ and $h(n)$ pointing to different paths.  When $h(n)$ assigns high cost to the $g$-optimal path (e.g., the economically rational action feels morally wrong), the agent experiences \emph{decision conflict}.  Resolution depends on the relative magnitudes of $g$ and $h$.
+
+    \item \textbf{Moral intuitions in economic decisions:} The ``gut feeling'' that a deal is unfair, that a price is too high, that a counterparty cannot be trusted---these are $h(n)$ evaluations computed by System 1 on the moral dimensions of the manifold.  They are not noise; they are \emph{boundary-penalty estimates} based on pattern-matching to previously encountered manifold regions.
+\end{enumerate}
+
+
+%==============================================================================
+\section{Applications and Predictions}
+\label{sec:applications}
+%==============================================================================
+
+\subsection{Pricing and Willingness to Pay}
+
+The framework predicts that willingness to pay (WTP) is not a scalar but a \emph{function of the manifold position}:
+
+\begin{equation}
+\text{WTP}(v_0, G) = \min_\gamma \sum_{i} w(v_i, v_{i+1}) \Big|_{d_1\text{-component}}
+\label{eq:wtp}
+\end{equation}
+
+That is, WTP is the monetary component of the Bond geodesic cost.  This predicts:
+\begin{enumerate}
+    \item WTP for ``fair trade'' coffee exceeds WTP for identical coffee without the label, because the moral-boundary penalty for buying exploitatively sourced goods ($\beta_{\text{fairness}}$) raises the total cost of the non-fair-trade path.
+    \item WTP decreases when the purchase context activates market norms rather than social norms (Ariely's finding), because the boundary penalties $\beta_k$ for social-norm violations drop to zero in market-norm space, reducing the manifold to a lower-dimensional subspace.
+    \item WTP for goods whose acquisition involves moral compromise (e.g., products of child labor) is \emph{negative} for some agents---they would need to be \emph{paid} to accept the good, because the moral edge weight exceeds the monetary value.
+\end{enumerate}
+
+\subsection{Labor Markets and Wage Rigidity}
+
+Bewley's \cite{bewley1999} field study found that firms resist cutting nominal wages even in recessions, citing ``morale'' as the primary reason.  The framework explains this:
+
+\begin{itemize}
+    \item A wage cut traverses the fairness dimension ($\Delta d_3 < 0$) and the legitimacy dimension ($\Delta d_8 < 0$) for the employee.
+    \item By the loss-aversion theorem (Theorem~\ref{thm:loss_aversion}), the \emph{perceived} cost of a wage cut ($w_-$) exceeds the cost of never having received the higher wage ($w_+$), because the loss activates more dimensions.
+    \item The employer anticipates that the total behavioral friction $\BF_{\text{employee}}$ will include reduced effort, increased turnover, and social sanction ($d_6$)---all of which cost more than the savings from the wage cut.
+    \item The Bond geodesic for the employer avoids the wage-cut edge and instead traverses a different path (layoffs, reduced hiring, unpaid overtime) that has lower total manifold cost---even though its monetary cost ($d_1$) may be higher.
+\end{itemize}
+
+\subsection{Market Design and Mechanism Design}
+
+The framework has direct implications for mechanism design:
+
+\begin{proposition}[Repugnance as Manifold Constraint]
+\label{prop:repugnance}
+Roth's \cite{roth2007} concept of ``repugnant markets''---transactions that are economically efficient but socially prohibited (organ sales, mercenary contracts, child adoption markets)---corresponds to transactions whose Bond geodesic cost is infinite:
+\begin{equation}
+w_{\text{repugnant}} = \infty \quad \text{(sacred-value boundary, } \beta_{\text{sacred}} = \infty\text{)}
+\end{equation}
+No monetary compensation can offset an infinite boundary penalty.  This is not a preference that market design can ``fix''---it is a topological feature of the decision manifold.  The boundary exists because certain goods are \emph{not on the same connected component} as monetary goods in the agent's decision complex.
+\end{proposition}
+
+This explains why some markets fail to clear despite large gains from trade: the participants' decision manifolds do not contain any edge connecting the ``trade'' state to the ``moral-acceptability'' region.  The market does not exist because the path does not exist.
+
+\subsection{Falsifiability, Predictive Constraints, and the Epicycle Objection}
+\label{sec:falsifiability}
+
+A natural and serious objection must be addressed directly.
+
+\begin{quote}
+\emph{``A nine-dimensional manifold with a customizable covariance matrix $\Sigma$ and adjustable boundary penalties $\beta_k$ can explain anything post hoc.  If an agent behaves bizarrely, you just adjust $d_7$ or $d_4$ to fit.  The framework is an unfalsifiable epicycle model.''}
+\end{quote}
+
+This objection is wrong, but it is wrong for a specific and instructive reason.  The framework is \emph{parametrically flexible} (it has many parameters) but \emph{structurally rigid} (the parameters are constrained by measurable quantities and the structure generates qualitative predictions that no parameter adjustment can reverse).  We address both aspects.
+
+\subsubsection{Structural Constraints on $\Sigma$ and $\beta_k$}
+
+The covariance matrix $\Sigma$ and boundary penalties $\beta_k$ are \emph{not free parameters} to be adjusted post hoc.  They are empirically constrained:
+
+\begin{enumerate}
+    \item \textbf{$\Sigma$ is estimated \emph{before} prediction, not after.}  The $9 \times 9$ covariance matrix is estimated from behavioral data (reaction times, choice frequencies, physiological correlates) in a \emph{calibration phase} that is independent of the prediction task.  The estimation procedure parallels standard psychometric practice: administer a battery of moral-economic scenarios, measure attribute-vector activations via validated instruments (the MoralVector probes of \cite{bond2026geometric}), and compute $\Sigma$ from the calibration sample.  Once $\Sigma$ is fixed, the framework generates \emph{a priori} predictions for novel scenarios, with no parameter adjustment.
+
+    \item \textbf{$\beta_k$ values are measurable, not assumed.}  Sacred-value boundaries ($\beta_k = \infty$) are empirically identifiable via the ``taboo trade-off'' paradigm of Tetlock et al.\ \cite{tetlock2000}: offer increasing monetary compensation for crossing the boundary and observe whether any finite offer is accepted.  If no finite offer suffices, $\beta_k = \infty$ is confirmed.  For finite boundaries, $\beta_k$ is estimated from the compensation amount at which agents become willing to cross the boundary---the \emph{reservation price for norm violation}.
+
+    \item \textbf{$\Sigma$ is symmetric and positive semi-definite.}  The $9 \times 9$ matrix has at most $9(9+1)/2 = 45$ free parameters, not 81.  Empirical regularities further constrain it: cross-lingual validation in Geometric Ethics \cite{bond2026geometric} shows that the rank of $\Sigma$ (the number of active dimensions) is stable across cultures at $\approx 9$, even though individual entries vary.  This is a structural prediction: any culture that reduces $\operatorname{rank}(\Sigma) < 9$ would falsify the framework.
+
+    \item \textbf{The dimensions are fixed, not chosen to fit.}  The nine dimensions are derived from the convergent moral-foundations literature (Haidt \cite{haidt2012}, Graham, Shweder) and validated empirically via factor analysis in \cite{bond2026geometric}.  The framework does \emph{not} permit adding a tenth dimension to explain an anomaly; the dimensionality is a structural commitment, falsifiable by discovering a replicable economic behavior that cannot be decomposed into the nine-dimensional attribute space.
+\end{enumerate}
+
+\subsubsection{A Priori Predictions That Distinguish the Framework}
+
+The framework generates predictions that are (a) specific, (b) testable with existing experimental methods, (c) different from the predictions of classical economics and standard behavioral economics, and (d) not achievable by post-hoc parameter adjustment:
+
+\begin{enumerate}
+    \item \textbf{Prediction 1 (Dimensional Loss Aversion):}  Loss aversion should vary with the number of activated moral dimensions, not just with monetary magnitude.  \emph{Specific test:} Hold monetary loss constant at \$100.  Vary the moral-dimensional content: (a) losing \$100 cash (activates $d_1$ only, predicted $\lambda \approx 1.2$), (b) losing a \$100 gift from a friend ($d_1 + d_5 + d_7$, predicted $\lambda \approx 2.0$), (c) losing a \$100 family heirloom ($d_1 + d_2 + d_6 + d_7$, predicted $\lambda \approx 3.0$).  \emph{What would falsify:} If $\lambda$ is constant across conditions (as standard prospect theory predicts), the framework is wrong.  If $\lambda$ varies but not monotonically with dimension count, the dimensional model is wrong.
+
+    \item \textbf{Prediction 2 (Bond Index Correlates):}  Agents with higher Bond Index scores (measured independently via the validated instrument in \cite{bond2026geometric}) should: (a) reject more unfair ultimatum offers, (b) contribute more in public goods games, (c) show higher WTP for fair-trade goods, and (d) exhibit smaller framing effects.  \emph{What would falsify:} If Bond Index is uncorrelated with these behavioral measures, or if the correlations have the wrong sign.
+
+    \item \textbf{Prediction 3 (Framing Reduction via Gauge Training):}  Training agents to evaluate economic options in terms of explicit attribute vectors (making the manifold structure salient) should reduce framing effects by a measurable amount.  \emph{Specific test:} Pre-test framing susceptibility using Tversky-Kahneman Asian Disease Problem.  Train treatment group to decompose decisions into 9-dimensional attribute vectors.  Post-test framing susceptibility.  Predicted: $\geq 30\%$ reduction in framing effect magnitude.  \emph{What would falsify:} No reduction, or increased framing effects after training.
+
+    \item \textbf{Prediction 4 (Cross-Cultural Rank Stability):}  The rank of $\Sigma$ (number of active dimensions) should be invariant ($\operatorname{rank}(\Sigma) = 9$) across all cultures, even as the entries of $\Sigma$ vary substantially.  \emph{Specific test:} Estimate $\Sigma$ from moral-economic batteries administered in $\geq 10$ countries spanning Henrich's \cite{henrich2010} WEIRD/non-WEIRD divide.  Compute rank via eigenvalue analysis.  \emph{What would falsify:} Any culture where $\operatorname{rank}(\Sigma) < 8$ (allowing for measurement noise).
+
+    \item \textbf{Prediction 5 (Hysteresis in Norm Transitions):}  Introducing monetary incentives into a social-norm domain produces an irreversible phase transition on the manifold: removing the incentive does not restore the original $\beta_k$ values.  \emph{Already confirmed:} Gneezy and Rustichini \cite{gneezy2000} found that introducing fines for late daycare pickup increased lateness, and removing fines did not restore the original rate.  \emph{Novel extension:} The framework predicts that the hysteresis magnitude should be proportional to the number of dimensions on which the original norm operated---a social norm anchored in $d_3 + d_6 + d_7$ should show larger hysteresis than one anchored in $d_6$ alone.
+
+    \item \textbf{Prediction 6 (Intransitivity Conditions):}  Preference intransitivity (Tversky \cite{tversky1969}) should occur \emph{only} when the comparison context shifts the salient dimensions.  \emph{Specific test:} Present three alternatives with attribute vectors designed so that each pair highlights different dimensions (per Theorem~\ref{thm:intransitivity}).  Predicted: intransitivity appears.  Now repeat with explicit attribute-vector display (all dimensions visible simultaneously).  Predicted: intransitivity vanishes.  \emph{What would falsify:} Intransitivity persisting even when all dimensions are simultaneously visible.
+\end{enumerate}
+
+\subsubsection{What Would Kill the Framework}
+
+For completeness, the following findings would falsify the framework outright, not merely require parameter recalibration:
+
+\begin{enumerate}
+    \item Discovery of a replicable economic behavior that cannot be decomposed into any subset of the nine dimensions.
+    \item Evidence that $\Sigma$ has rank $< 5$ in any large population (the manifold is not genuinely high-dimensional).
+    \item Evidence that loss aversion is completely independent of the moral-dimensional content of the loss (the metric asymmetry is not geometric).
+    \item Evidence that Bond Index has zero predictive power for any behavioral-economic measure (the manifold has no connection to observed behavior).
+    \item Evidence that heuristic training \emph{increases} rather than decreases framing effects (gauge invariance is not the mechanism).
+\end{enumerate}
+
+\begin{remark}[Comparison with Scalar Utility]
+Scalar utility maximization ($U: X \to \R$) has one free function.  The geometric framework has a $9 \times 9$ matrix $\Sigma$ and up to 9 boundary parameters $\beta_k$---at most 54 free parameters.  But scalar utility, despite having fewer parameters, is \emph{already falsified} by the existing behavioral economics literature: it cannot explain loss aversion, framing effects, intransitivity, ultimatum game rejections, or the endowment effect without introducing ad hoc modifications (prospect theory's value function, fairness utility, warm-glow utility) that themselves add free parameters.  The relevant comparison is not ``how many parameters does each model have?'' but ``how many parameters does each model need to explain the known phenomena?''  Scalar utility plus prospect theory plus fairness utility plus warm-glow giving plus hyperbolic discounting has more free parameters than the geometric framework---and still lacks a unified mathematical structure.  The geometric framework achieves greater explanatory scope with fewer total degrees of freedom and a single mathematical architecture.
+\end{remark}
+
+
+%==============================================================================
+\section{Worked Examples}
+\label{sec:examples}
+%==============================================================================
+
+\subsection{Example 1: Why People Tip}
+
+\textbf{Problem:} Homo economicus does not tip in restaurants he will never revisit.  Humans do.
+
+\textbf{Bond geodesic analysis:}
+\begin{enumerate}
+    \item The agent is at vertex $v_0$ (meal complete, bill received) and must reach goal region $G$ (leave restaurant).
+    \item \textbf{Path A (no tip):} $\Delta d_1 = 0$ (save money), $\Delta d_3 = -\text{moderate}$ (fairness violation: server provided service), $\Delta d_6 = -\text{moderate}$ (social norm violation: tipping is expected), $\Delta d_7 = -\text{moderate}$ (identity: ``I am not a cheapskate'').  Edge weight: $w_A = \beta_{\text{fairness}} + \beta_{\text{social}} + \beta_{\text{identity}}$.
+    \item \textbf{Path B (tip 18\%):} $\Delta d_1 = -\$5$ (monetary cost), $\Delta d_3 = 0$ (fair exchange), $\Delta d_6 = 0$ (norm satisfied), $\Delta d_7 = 0$ (identity intact).  Edge weight: $w_B = 25/\sigma_1^2$.
+    \item For most agents, $w_A > w_B$: the moral boundary penalties exceed the monetary cost.  The Bond geodesic includes tipping.
+    \item The framework also predicts: (a) tipping decreases when social norms weaken (anonymous settings), (b) tipping varies cross-culturally (different $\beta_k$ values), (c) tipping is higher when the server is visible (social dimension $d_6$ more salient).  All confirmed empirically.
+\end{enumerate}
+
+\subsection{Example 2: The Housing Bubble}
+
+\textbf{Problem:} In 2005--2007, millions of Americans took out mortgages they could not afford.  Were they irrational?
+
+\textbf{Bond geodesic analysis:}
+\begin{enumerate}
+    \item The decision manifold was \emph{distorted} by institutional manipulation:
+    \begin{itemize}
+        \item Legitimacy ($d_8$) was artificially inflated: ``The bank approved you, so you can afford it.''  $\beta_{\text{legitimacy}} \to 0$ for the risky mortgage, because the institution itself endorsed it.
+        \item Epistemic status ($d_9$) was degraded: complex mortgage instruments obscured the true cost, reducing the accuracy of $g(n)$.
+        \item Social norms ($d_6$) pointed toward buying: ``Everyone is buying; don't miss out.''  $\beta_{\text{social}}$ for \emph{not buying} was high.
+    \end{itemize}
+    \item The Bond geodesic on the \emph{distorted} manifold correctly led to purchase.  The buyers were rational \emph{on the manifold they could perceive}.
+    \item The error was not in the agents' search algorithm---it was in the \emph{manifold calibration}.  The boundary penalties and edge weights were wrong because the institutions providing calibration data (banks, rating agencies) were themselves miscalibrated.
+    \item The framework predicts: financial crises occur when institutional manipulation distorts $\beta_k$ values (boundary penalties) and $\Sigma$ (covariance structure) to the point where the Bond geodesic on the perceived manifold diverges catastrophically from the geodesic on the true manifold.
+\end{enumerate}
+
+\subsection{Example 3: Carbon Pricing}
+
+\textbf{Problem:} Economists advocate carbon taxes to internalize externalities.  But carbon taxes face fierce political resistance even when revenue-neutral.  Why?
+
+\textbf{Bond geodesic analysis:}
+\begin{enumerate}
+    \item A carbon tax modifies the edge weights on $d_1$ (monetary cost of carbon-intensive goods increases) but also activates:
+    \begin{itemize}
+        \item $d_4$ (autonomy): ``The government is telling me how to live.''
+        \item $d_3$ (fairness): ``Rural communities bear disproportionate costs.''
+        \item $d_8$ (legitimacy): ``Who gave the government authority to price the air?''
+        \item $d_7$ (identity): ``I am not the kind of person who accepts carbon taxes'' (for agents whose political identity opposes them).
+    \end{itemize}
+    \item The total edge weight for accepting the carbon tax includes boundary penalties on dimensions $d_3$, $d_4$, $d_7$, and $d_8$---none of which appear in the economist's scalar cost-benefit analysis.
+    \item The Bond geodesic for many agents avoids the carbon-tax edge entirely, even though the $d_1$ cost-benefit is favorable.
+    \item \textbf{Policy implication:} Effective carbon pricing must reduce the boundary penalties on the non-monetary dimensions---address fairness concerns (revenue redistribution), autonomy concerns (frame as choice expansion, not restriction), and legitimacy concerns (democratic mandate).  An economist who designs carbon policy only on $d_1$ will be surprised by political failure; a geometric economist who designs on all nine dimensions will not.
+\end{enumerate}
+
+
+%==============================================================================
+\section{Conclusion}
+\label{sec:conclusion}
+%==============================================================================
+
+\subsection{Summary}
+
+This paper has made five contributions:
+
+\begin{enumerate}
+    \item \textbf{The Economic Decision Complex:} A formal construction of the space on which human economic decisions are actually made---a nine-dimensional weighted simplicial complex, not a one-dimensional utility axis.
+
+    \item \textbf{Heuristic Bounded Rationality:} Moral and cultural heuristics are admissible $A^*$ search heuristics that reduce intractable optimization to tractable pathfinding.  They are not ``biases''---they are components of the search architecture.
+
+    \item \textbf{The Bond Geodesic:} The replacement for Nash equilibrium when agents pathfind on the full manifold.  The BGE subsumes Nash equilibrium as a special case (when all non-monetary dimensions are zeroed out) and explains behavioral game-theory anomalies as features, not bugs.
+
+    \item \textbf{Geometric Behavioral Economics:} Loss aversion, reference dependence, framing effects, hyperbolic discounting, the endowment effect, and fairness constraints are derived as geometric properties of the decision manifold, not catalogued as a list of biases.
+
+    \item \textbf{Fairness Conservation:} In closed economic exchanges, total moral friction is conserved.  Exploitation is a measurable manifold asymmetry, not a subjective judgment.
+\end{enumerate}
+
+\subsection{What Changes}
+
+If this framework is correct:
+
+\begin{enumerate}
+    \item \textbf{``Irrationality'' is reclassified.}  Most behavioral economics ``biases'' are not cognitive errors but rational responses to manifold dimensions that classical economics ignores.  The few genuine biases (framing effects, some probability-weighting errors) are identifiable as gauge-invariance violations---they have a specific mathematical signature.
+
+    \item \textbf{Welfare economics is revised.}  If utility is multi-dimensional, Pareto optimality must be evaluated on the full manifold.  A policy that is Pareto-improving on $d_1$ (everyone gets more money) but Pareto-worsening on $d_4$ (everyone loses autonomy) is \emph{not} unambiguously welfare-improving.  Cost-benefit analysis must include all nine dimensions.
+
+    \item \textbf{Mechanism design acquires moral constraints.}  The Revelation Principle assumes agents can be incentivized to truthfully report preferences.  On the full manifold, some truthful reports cross sacred-value boundaries ($\beta = \infty$) and cannot be elicited at any price.  Mechanism design must respect manifold topology.
+
+    \item \textbf{Financial regulation has a formal foundation.}  Financial crises are manifold-distortion events.  Regulation that maintains the calibration of boundary penalties (transparency requirements maintain $d_9$; fiduciary duties maintain $d_5$; fairness rules maintain $d_3$) is structural stability, not market interference.
+
+    \item \textbf{The gap between economics and psychology closes.}  Kahneman's System 1 and System 2, Haidt's moral foundations, Gigerenzer's fast-and-frugal heuristics, and classical utility theory are unified into a single geometric framework: $f(n) = g(n) + h(n)$ on the economic decision complex $\E$.
+\end{enumerate}
+
+\subsection{Open Problems}
+
+\begin{enumerate}
+    \item \textbf{Calibration of $\Sigma$.}  The $9 \times 9$ covariance matrix must be estimated from economic behavioral data (experimental games, field studies, market data).  This is a large empirical programme.
+
+    \item \textbf{Cultural variation in $\beta_k$.}  The boundary penalties are culturally calibrated.  Mapping the cross-cultural variation in $\beta_k$ values---which moral boundaries are strong in which cultures---would connect this framework to Henrich's \cite{henrich2010} work on cross-cultural economic behavior.
+
+    \item \textbf{Dynamic manifolds.}  The decision manifold evolves: norms change, boundaries shift, new dimensions emerge.  A theory of manifold dynamics would connect to institutional economics and cultural evolution.
+
+    \item \textbf{Computational complexity.}  $A^*$ on the full 9-dimensional complex may be computationally intractable for the brain.  What approximation algorithms do humans actually use?  This connects to the ``resource rationality'' programme \cite{lieder2020}.
+
+    \item \textbf{The moral metric.}  The Mahalanobis distance requires a metric (the covariance matrix $\Sigma$).  Calibrating this metric from behavioral data---determining the precise trade-off structure between dimensions---is the central open empirical problem.
+\end{enumerate}
+
+\subsection{The Stakes}
+
+For two centuries, economics has described human behavior as utility maximization on a line.  The mathematics was beautiful.  The predictions were wrong.  Behavioral economics showed they were wrong, documented how they were wrong, and won Nobel Prizes for being right about the wrongness.  But it did not provide the replacement mathematics.
+
+This paper provides it.  Human economic behavior is not maximization on a line.  It is pathfinding on a manifold.  The line is a projection.  The manifold is real.
+
+Homo economicus is not wrong because humans are irrational.  Homo economicus is wrong because it lives on the wrong manifold.
+
+
+%==============================================================================
+% References
+%==============================================================================
+\begin{thebibliography}{99}
+
+\bibitem{bond2026geometric}
+A.~H. Bond, \emph{Geometric Ethics: The Mathematical Structure of Moral Reasoning}, v1.15, Department of Computer Engineering, San Jos\'{e} State University, Spring 2026.
+
+\bibitem{thiele2026}
+L.~Thiele, ``Independent Replication of MoralVector Decodability and Cross-Lingual Transfer in LaBSE Embeddings,'' Dept.\ Computer Science, UCLA, Tech.\ Rep., 2026.
+
+\bibitem{kahneman1979}
+D.~Kahneman and A.~Tversky, ``Prospect Theory: An Analysis of Decision Under Risk,'' \emph{Econometrica}, vol.~47, no.~2, pp.~263--292, 1979.
+
+\bibitem{kahneman2011}
+D.~Kahneman, \emph{Thinking, Fast and Slow}. Farrar, Straus and Giroux, 2011.
+
+\bibitem{thaler2008}
+R.~H. Thaler and C.~R. Sunstein, \emph{Nudge: Improving Decisions About Health, Wealth, and Happiness}. Yale University Press, 2008.
+
+\bibitem{vonneumann1944}
+J.~von Neumann and O.~Morgenstern, \emph{Theory of Games and Economic Behavior}. Princeton University Press, 1944.
+
+\bibitem{savage1954}
+L.~J. Savage, \emph{The Foundations of Statistics}. Wiley, 1954.
+
+\bibitem{simon1955}
+H.~A. Simon, ``A Behavioral Model of Rational Choice,'' \emph{The Quarterly Journal of Economics}, vol.~69, no.~1, pp.~99--118, 1955.
+
+\bibitem{gigerenzer1999}
+G.~Gigerenzer, P.~M. Todd, and the ABC Research Group, \emph{Simple Heuristics That Make Us Smart}. Oxford University Press, 1999.
+
+\bibitem{nash1950}
+J.~Nash, ``Equilibrium Points in $n$-Person Games,'' \emph{Proceedings of the National Academy of Sciences}, vol.~36, no.~1, pp.~48--49, 1950.
+
+\bibitem{fehr1999}
+E.~Fehr and K.~M. Schmidt, ``A Theory of Fairness, Competition, and Cooperation,'' \emph{The Quarterly Journal of Economics}, vol.~114, no.~3, pp.~817--868, 1999.
+
+\bibitem{bolton2000}
+G.~E. Bolton and A.~Ockenfels, ``ERC: A Theory of Equity, Reciprocity, and Competition,'' \emph{American Economic Review}, vol.~90, no.~1, pp.~166--193, 2000.
+
+\bibitem{haidt2012}
+J.~Haidt, \emph{The Righteous Mind: Why Good People Are Divided by Politics and Religion}. Vintage, 2012.
+
+\bibitem{tetlock2000}
+P.~E. Tetlock, O.~V. Kristel, S.~B. Elson, M.~C. Green, and J.~S. Lerner, ``The Psychology of the Unthinkable: Taboo Trade-Offs, Forbidden Base Rates, and Heretical Counterfactuals,'' \emph{Journal of Personality and Social Psychology}, vol.~78, no.~5, pp.~853--870, 2000.
+
+\bibitem{hart1968}
+P.~E. Hart, N.~J. Nilsson, and B.~Raphael, ``A Formal Basis for the Heuristic Determination of Minimum Cost Paths,'' \emph{IEEE Transactions on Systems Science and Cybernetics}, vol.~4, no.~2, pp.~100--107, 1968.
+
+\bibitem{ariely2008}
+D.~Ariely, \emph{Predictably Irrational: The Hidden Forces That Shape Our Decisions}. HarperCollins, 2008.
+
+\bibitem{bewley1999}
+T.~F. Bewley, \emph{Why Wages Don't Fall During a Recession}. Harvard University Press, 1999.
+
+\bibitem{roth2007}
+A.~E. Roth, ``Repugnance as a Constraint on Markets,'' \emph{Journal of Economic Perspectives}, vol.~21, no.~3, pp.~37--58, 2007.
+
+\bibitem{gneezy2000}
+U.~Gneezy and A.~Rustichini, ``A Fine is a Price,'' \emph{The Journal of Legal Studies}, vol.~29, no.~1, pp.~1--17, 2000.
+
+\bibitem{henrich2010}
+J.~Henrich, S.~J. Heine, and A.~Norenzayan, ``The Weirdest People in the World?'' \emph{Behavioral and Brain Sciences}, vol.~33, no.~2--3, pp.~61--83, 2010.
+
+\bibitem{lieder2020}
+F.~Lieder and T.~L. Griffiths, ``Resource-Rational Analysis: Understanding Human Cognition as the Optimal Use of Limited Computational Resources,'' \emph{Behavioral and Brain Sciences}, vol.~43, e1, 2020.
+
+\bibitem{arrow1951}
+K.~J. Arrow, \emph{Social Choice and Individual Values}. Wiley, 1951.
+
+\bibitem{sen1999}
+A.~Sen, \emph{Development as Freedom}. Knopf, 1999.
+
+\bibitem{akerlof1970}
+G.~A. Akerlof, ``The Market for `Lemons': Quality Uncertainty and the Market Mechanism,'' \emph{The Quarterly Journal of Economics}, vol.~84, no.~3, pp.~488--500, 1970.
+
+\bibitem{stiglitz1981}
+J.~E. Stiglitz and A.~Weiss, ``Credit Rationing in Markets with Imperfect Information,'' \emph{American Economic Review}, vol.~71, no.~3, pp.~393--410, 1981.
+
+\bibitem{ostrom1990}
+E.~Ostrom, \emph{Governing the Commons: The Evolution of Institutions for Collective Action}. Cambridge University Press, 1990.
+
+\bibitem{allais1953}
+M.~Allais, ``Le Comportement de l'Homme Rationnel devant le Risque: Critique des Postulats et Axiomes de l'\'{E}cole Am\'{e}ricaine,'' \emph{Econometrica}, vol.~21, no.~4, pp.~503--546, 1953.
+
+\bibitem{ellsberg1961}
+D.~Ellsberg, ``Risk, Ambiguity, and the Savage Axioms,'' \emph{The Quarterly Journal of Economics}, vol.~75, no.~4, pp.~643--669, 1961.
+
+\bibitem{tversky1969}
+A.~Tversky, ``Intransitivity of Preferences,'' \emph{Psychological Review}, vol.~76, no.~1, pp.~31--48, 1969.
+
+\bibitem{smith1962}
+V.~L. Smith, ``An Experimental Study of Competitive Market Behavior,'' \emph{Journal of Political Economy}, vol.~70, no.~2, pp.~111--137, 1962.
+
+\bibitem{camerer2003}
+C.~F. Camerer, \emph{Behavioral Game Theory: Experiments in Strategic Interaction}. Princeton University Press, 2003.
+
+\end{thebibliography}
+
+\end{document}

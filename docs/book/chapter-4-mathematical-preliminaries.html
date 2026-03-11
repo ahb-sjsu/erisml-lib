@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Chapter 4: Mathematical Preliminaries &mdash; Geometric Ethics</title>
+  <meta name="description" content="Chapter 4: Mathematical Preliminaries from Geometric Ethics: The Mathematical Structure of Moral Reasoning by Andrew H. Bond.">
+  <link rel="stylesheet" href="../assets/css/style.css">
+  <link rel="stylesheet" href="book.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Crimson+Pro:ital,wght@0,300;0,400;0,600;0,700;1,400&family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+</head>
+
+<body>
+  <nav id="main-nav">
+    <div class="nav-inner">
+      <a href="../index.html" class="nav-brand">
+        <span class="brand-symbol">M</span>
+        <span class="brand-text">Geometric Ethics</span>
+      </a>
+      <button class="nav-toggle" aria-label="Toggle menu">
+        <span></span><span></span><span></span>
+      </button>
+      <ul class="nav-links">
+        <li><a href="index.html">Book</a></li>
+        <li><a href="../index.html#core-argument">Core Argument</a></li>
+        <li><a href="../index.html#objects">Framework</a></li>
+        <li><a href="../index.html#tutorials">Tutorials</a></li>
+        <li><a href="../index.html#dear-ethicist">Play</a></li>
+        <li><a href="../index.html#community" class="nav-discord">Discord</a></li>
+      </ul>
+    </div>
+  </nav>
+
+  <article class="book-chapter">
+    <div class="chapter-container">
+      <div class="chapter-nav-top">
+        <a href="part-ii-the-framework.html" class="nav-prev">&larr; Part II: The Framework</a>
+        <a href="index.html" class="nav-toc">Contents</a>
+        <a href="chapter-5-the-moral-manifold.html" class="nav-next">Chapter 5: The Moral Manifold &rarr;</a>
+      </div>
+
+      <nav class="chapter-toc">
+        <h4>In this chapter</h4>
+        <ol><li><a href="#a-note-on-epistemic-status">A Note on Epistemic Status</a></li><li><a href="#4-1-manifolds">4.1 Manifolds</a></li><li><a href="#4-2-tangent-spaces-and-tangent-bundles">4.2 Tangent Spaces and Tangent Bundles</a></li><li><a href="#4-3-covectors-dual-spaces-and-the-cotangent-bundle">4.3 Covectors, Dual Spaces, and the Cotangent Bundle</a></li><li><a href="#4-4-tensors">4.4 Tensors</a></li><li><a href="#4-5-the-metric-tensor">4.5 The Metric Tensor</a></li><li><a href="#4-6-connections-parallel-transport-and-curvature">4.6 Connections, Parallel Transport, and Curvature</a></li><li><a href="#4-7-fiber-bundles">4.7 Fiber Bundles</a></li><li><a href="#4-8-stratified-spaces">4.8 Stratified Spaces</a></li><li><a href="#4-9-gauge-theory-a-brief-introduction">4.9 Gauge Theory: A Brief Introduction</a></li><li><a href="#4-10-summary-the-geometric-toolkit">4.10 Summary: The Geometric Toolkit</a></li><li><a href="#4-11-bibliographic-notes">4.11 Bibliographic Notes</a></li></ol>
+      </nav>
+      <div class="chapter-content">
+<h1 id="chapter-4-mathematical-preliminaries" class="chapter-title">Chapter 4: Mathematical Preliminaries</h1>
+<p class="body-text"><strong>RUNNING EXAMPLE — Priya’s Model</strong></p>
+<p class="body-text"><em>Priya sketches on a whiteboard. A patient’s situation is a point in some space. What space? She lists relevant dimensions: medical severity, trial compatibility, travel burden, insurance status, support-network strength, informed-consent capacity. Six dimensions, at minimum. She draws arrows representing different fairness adjustments—tangent vectors. She notices that adjusting ‘travel burden’ in one direction helps rural patients but hurts patients with mobility disabilities, because these dimensions are coupled. She needs a metric that tells her how the dimensions relate. She does not have the vocabulary yet, but she is discovering that her patient space is a manifold, and her fairness interventions are vectors in its tangent space.</em></p>
+<p class="first-paragraph"><em>This chapter develops the geometric vocabulary used throughout the book. No prior knowledge of differential geometry is assumed; we require only multivariate calculus and linear algebra. Readers with background in differential geometry may skim Sections 4.1–4.5 and focus on Section 4.6 (stratified spaces) and Section 4.7 (gauge theory), which introduce structures less commonly encountered.</em></p>
+<h2 id="a-note-on-epistemic-status" class="section-heading">A Note on Epistemic Status</h2>
+<p class="first-paragraph">The mathematical structures introduced in this chapter — manifolds, tensors, metrics, connections, fiber bundles, stratified spaces, gauge transformations — are tools. They are powerful tools, honed over two centuries by mathematicians and physicists working on problems where structure varies across space. Their power lies in their domain-adaptedness: they were built to describe exactly the kind of phenomena (curvature, path-dependence, boundary discontinuity, gauge invariance) that the moral domain exhibits. But they are instruments, not mirrors. The question of whether the moral manifold is “really there” or “usefully modeled” is addressed in Chapter 9 (which argues for a governance account) and Chapter 29 (which surveys the realist, instrumentalist, and governance positions). This chapter teaches how to use the toolkit. The reader should carry through the formalism the understanding that every definition and theorem that follows is conditional on modeling choices made explicit in Chapter 5.</p>
+<p class="body-text">One limitation deserves mention at the outset. Gödel’s incompleteness theorems establish that no formal system of sufficient expressive power can prove its own consistency. The framework developed in this book is such a system. It cannot, therefore, self-validate — it cannot prove from within that its axioms are the right axioms or that its theorems capture what they claim to capture. This is not a defect peculiar to geometric ethics; it is a structural feature of all formal systems, from Peano arithmetic to the Standard Model. The appropriate response is not to abandon formalism but to test it externally — against empirical data (Chapter 17), against competing frameworks (Appendix E), and against the collective judgment of practitioners who use the tools and evaluate their fit. The framework’s authority is pragmatic, not self-grounding.</p>
+<h2 id="4-1-manifolds" class="section-heading">4.1 Manifolds</h2>
+<h3 id="the-idea" class="subsection-heading">The Idea</h3>
+<p class="first-paragraph">A manifold is a space that <em>locally</em> looks like ordinary Euclidean space ℝⁿ but may have nontrivial <em>global</em> structure. The surface of the Earth is the standard example: any small region looks flat (a neighborhood of a point can be mapped onto a patch of ℝ²), but the whole surface is curved, closed, and cannot be covered by a single flat map without distortion.</p>
+<p class="body-text">This is precisely the concept we need for moral space. Locally — in the neighborhood of a single moral situation — moral trade-offs may look like ordinary multi-dimensional optimization: move a little in one direction to improve fairness, a little in another to improve efficiency. The space of nearby variations is flat. But globally, moral space may be curved (obligations change as you traverse it), closed in certain directions (you cannot go past certain constraints), or have nontrivial topology (circling back to the “same” situation may yield a different moral assessment).</p>
+<h3 id="formal-definition" class="subsection-heading">Formal Definition</h3>
+<p class="first-paragraph"><strong>Definition 4.1 (Topological Manifold).</strong> An <em>n-dimensional topological manifold</em> is a topological space M that is: 1. <strong>Hausdorff:</strong> Distinct points can be separated by disjoint open sets. 2. <strong>Second-countable:</strong> The topology has a countable basis. 3. <strong>Locally Euclidean:</strong> Every point p ∈ M has a neighborhood homeomorphic to an open subset of ℝⁿ.</p>
+<p class="body-text">Condition (3) is the essential one: around every point, there is a <em>coordinate chart</em> — a continuous bijection φ: U → V, where U ⊂ M is open and V ⊂ ℝⁿ is open. The chart assigns n real numbers (coordinates) to each point in U. Conditions (1) and (2) are topological regularity conditions that exclude pathological spaces.</p>
+<p class="body-text">A collection of charts {(U_α, φ_α)} that covers all of M is called an <em>atlas</em>. When two charts overlap — when U_α ∩ U_β ≠ ∅ — we get a <em>transition function</em></p>
+<p class="first-paragraph">which tells us how to translate between the two coordinate systems on their overlap.</p>
+<p class="body-text"><strong>Definition 4.2 (Smooth Manifold).</strong> A topological manifold is <em>smooth</em> if it admits an atlas whose transition functions are all smooth (infinitely differentiable, i.e., C^∞).</p>
+<p class="body-text">Smoothness is what allows us to do calculus on M: to take derivatives, define gradients, and study how quantities change from point to point.</p>
+<h3 id="example-the-circle" class="subsection-heading">Example: The Circle</h3>
+<p class="first-paragraph">The circle S¹ is a 1-dimensional manifold. No single coordinate chart covers S¹ (a single chart would have to be homeomorphic to an interval in ℝ, and circles are not homeomorphic to intervals). But two charts suffice: one covering all but the “north pole” and one covering all but the “south pole.” The transition function on their overlap is smooth. Hence S¹ is a smooth 1-manifold.</p>
+<h3 id="example-the-2-simplex" class="subsection-heading">Example: The 2-Simplex</h3>
+<p class="first-paragraph">The space of probability distributions over three outcomes is the 2-simplex:</p>
+<p class="first-paragraph">The <em>interior</em> of Δ² (where all p_i &gt; 0) is a 2-dimensional smooth manifold. The <em>boundary</em> — where one or more p_i = 0 — is not itself a manifold of the same dimension, but the whole simplex has the structure of a <em>manifold with boundary</em> (or, as we shall see, a stratified space).</p>
+<p class="body-text">This example is directly relevant: the simplex of probability distributions over actions is a natural candidate for part of moral space.</p>
+<h2 id="4-2-tangent-spaces-and-tangent-bundles" class="section-heading">4.2 Tangent Spaces and Tangent Bundles</h2>
+<h3 id="tangent-vectors" class="subsection-heading">Tangent Vectors</h3>
+<p class="first-paragraph">At each point p of a smooth manifold M, there is a <em>tangent space</em> T_pM — a vector space of the same dimension as M that represents the “infinitesimal directions” one can move from p.</p>
+<p class="body-text">In coordinates (x¹, …, xⁿ), the tangent space at p is spanned by the partial derivative operators {∂/∂x¹_p, …, ∂/∂xⁿ_p}. A tangent vector v ∈ T_pM can be written</p>
+<p class="first-paragraph">where v^i are the components of v in this coordinate basis. (We use the Einstein summation convention: repeated upper and lower indices are summed over.)</p>
+<p class="body-text"><strong>Intuition:</strong> A tangent vector at p is a “velocity” — a direction and rate of change. If γ(t) is a curve on M with γ(0) = p, then its velocity γ’(0) is a tangent vector at p. The tangent space T_pM is the collection of all such velocities.</p>
+<p class="body-text"><strong>Moral interpretation:</strong> At a point p in moral space (a particular moral situation), the tangent space T_pM represents the possible <em>variations</em> of the situation: small changes in resource allocation, slight modifications of commitments, marginal shifts in context. An obligation vector O(p) ∈ T_pM points in the direction one <em>ought</em> to move.</p>
+<h3 id="the-tangent-bundle" class="subsection-heading">The Tangent Bundle</h3>
+<p class="first-paragraph"><strong>Definition 4.3 (Tangent Bundle).</strong> The <em>tangent bundle</em> TM is the disjoint union of all tangent spaces:</p>
+<p class="first-paragraph">TM is itself a smooth manifold of dimension 2n (n coordinates for the base point, n for the tangent vector). A <em>vector field</em> on M is a smooth assignment of a tangent vector to each point — a smooth section X: M → TM satisfying X(p) ∈ T_pM for all p.</p>
+<h3 id="transformation-of-tangent-vectors" class="subsection-heading">Transformation of Tangent Vectors</h3>
+<p class="first-paragraph">Under a change of coordinates x → x̃, tangent vector components transform by the <em>Jacobian</em>:</p>
+<p class="first-paragraph">This is the prototype of all tensor transformation laws. Objects that transform by one copy of the Jacobian are called <em>contravariant vectors</em> (or simply vectors). The transformation law ensures that the geometric object v is independent of the coordinate choice — only its <em>components</em> change.</p>
+<h2 id="4-3-covectors-dual-spaces-and-the-cotangent-bundle" class="section-heading">4.3 Covectors, Dual Spaces, and the Cotangent Bundle</h2>
+<h3 id="covectors" class="subsection-heading">Covectors</h3>
+<p class="first-paragraph">A <em>covector</em> (or <em>1-form</em>) at p is a linear map ω: T_pM → ℝ. The space of all covectors at p is the <em>dual space</em> T_p<em>M, also called the</em> cotangent space*.</p>
+<p class="body-text">In coordinates, covectors have components ω_i (lower index) and transform by the <em>inverse</em> Jacobian:</p>
+<p class="first-paragraph">The fundamental operation between a vector and a covector is <em>contraction</em>:</p>
+<p class="first-paragraph">This produces a scalar — a number independent of coordinates. The contraction is the geometric content of “evaluating”: applying a covector to a vector yields an invariant quantity.</p>
+<p class="body-text"><strong>Moral interpretation:</strong> If obligations are vectors (upper index, pointing in the direction one should move), then <em>interests</em> are naturally covectors (lower index, assigning a real-valued weight to each direction). The contraction S = I_μ O^μ — interest applied to obligation — yields <em>satisfaction</em>, a scalar. This fundamental formula, developed in Chapter 6, is the geometric expression of “how well obligations align with interests.”</p>
+<h3 id="the-gradient" class="subsection-heading">The Gradient</h3>
+<p class="first-paragraph">The most natural covector is the <em>gradient</em> of a function. If f: M → ℝ is a smooth function, its gradient df is a covector field:</p>
+<p class="first-paragraph">The gradient df at p is the covector that, applied to any tangent vector v, gives the rate of change of f in the direction v:</p>
+<p class="first-paragraph"><strong>Note:</strong> The gradient is a covector, not a vector. In ℝⁿ with the standard Euclidean metric, the distinction is invisible (the metric provides a canonical identification between vectors and covectors). On a general manifold, the distinction matters — and it matters for ethics. Converting a gradient (covector) into a “direction of steepest ascent” (vector) requires the metric. Different metrics yield different “steepest” directions from the same gradient. This is the geometric content of the observation that different ethical theories, given the same moral landscape, may prescribe different actions.</p>
+<h2 id="4-4-tensors" class="section-heading">4.4 Tensors</h2>
+<h3 id="definition" class="subsection-heading">Definition</h3>
+<p class="first-paragraph">A <em>tensor of type (r, s)</em> at p ∈ M is a multilinear map</p>
+<p class="first-paragraph">In coordinates, T has components  with r upper indices and s lower indices. The <em>rank</em> of the tensor is (r, s), and the total number of indices is r + s.</p>
+<p class="body-text"><strong>Examples:</strong> - A scalar is a (0, 0)-tensor: a number, invariant under coordinate changes. - A vector is a (1, 0)-tensor: one upper index, transforms by the Jacobian. - A covector is a (0, 1)-tensor: one lower index, transforms by the inverse Jacobian. - The metric (Section 4.5) is a (0, 2)-tensor: two lower indices.</p>
+<h3 id="transformation-law" class="subsection-heading">Transformation Law</h3>
+<p class="first-paragraph">Under a coordinate change x → x̃, the components of a (r, s)-tensor transform as:</p>
+<p class="first-paragraph">Each upper index contributes one Jacobian factor; each lower index contributes one inverse Jacobian factor. The key property: <em>the tensor itself is a geometric object independent of coordinates; only its components change.</em></p>
+<p class="body-text">This is why tensors are central to the framework. The requirement that moral evaluation be independent of description — the Bond Invariance Principle — is precisely the requirement that moral quantities be <em>tensorial</em>: their values, after proper transformation, are the same in every coordinate system.</p>
+<h3 id="contraction" class="subsection-heading">Contraction</h3>
+<p class="first-paragraph"><em>Contraction</em> is the operation of summing over a paired upper and lower index:</p>
+<p class="first-paragraph">Contraction reduces the rank by (1, 1). It produces a new tensor whose value is independent of coordinates (the sum over the shared index is invariant).</p>
+<p class="body-text"><strong>Moral significance:</strong> The contraction from a high-rank moral tensor to a scalar decision is the geometric version of what happens when we <em>decide</em>. Information is lost (rank decreases), but the result is invariant. Chapter 15 develops the concept of <em>moral contraction</em> in detail: the process by which the rich tensorial structure of a moral situation is reduced to an action, and the <em>moral residue</em> — the normative information discarded by contraction.</p>
+<h3 id="tensor-fields" class="subsection-heading">Tensor Fields</h3>
+<p class="first-paragraph">A <em>tensor field</em> of type (r, s) on M is a smooth assignment of a (r, s)-tensor to each point p ∈ M. The metric tensor, curvature tensor, and moral evaluation tensors are all tensor fields.</p>
+<h2 id="4-5-the-metric-tensor" class="section-heading">4.5 The Metric Tensor</h2>
+<h3 id="definition" class="subsection-heading">Definition</h3>
+<p class="first-paragraph">A <em>metric tensor</em> (or simply <em>metric</em>) on M is a smooth (0, 2)-tensor field g that is: 1. <strong>Symmetric:</strong> g(v, w) = g(w, v) for all tangent vectors v, w. 2. <strong>Non-degenerate:</strong> If g(v, w) = 0 for all w, then v = 0.</p>
+<p class="body-text">In coordinates:</p>
+<p class="first-paragraph">The metric defines an <em>inner product</em> on each tangent space: g(v, w) = g_{ij} v^i w^j. This allows us to measure:</p>
+<p class="body-text"><strong>Lengths:</strong> v = √(g(v, v)) (when the inner product is positive).</p>
+<p class="body-text"><strong>Angles:</strong> The angle between v and w is determined by g(v, w) / (v w).</p>
+<p class="body-text"><strong>Distances:</strong> The length of a curve γ from a to b is ∫_a^b √(g(γ’, γ’)) dt.</p>
+<h3 id="riemannian-vs-semi-riemannian-vs-degenerate" class="subsection-heading">Riemannian vs. Semi-Riemannian vs. Degenerate</h3>
+<p class="first-paragraph">If g is positive-definite (g(v, v) &gt; 0 for all nonzero v), we have a <em>Riemannian metric</em>, and M is a Riemannian manifold. Distances are always positive, and the geometry behaves like a generalization of Euclidean space.</p>
+<p class="body-text">If g has indefinite signature (some directions give g(v, v) &gt; 0, others g(v, v) &lt; 0), we have a <em>semi-Riemannian</em> (or pseudo-Riemannian) metric. Spacetime in general relativity has signature (-,+,+,+).</p>
+<p class="body-text">For moral space, we must also consider <em>degenerate</em> metrics: metrics where condition (2) fails, so that g(v, w) = 0 for all w does not imply v = 0. A degenerate metric means certain directions are “invisible” to the inner product — they have zero length and zero angle with everything.</p>
+<p class="body-text"><strong>Moral interpretation:</strong> A degenerate metric represents <em>incommensurability</em>. If the metric is degenerate along the subspace spanned by “ecological value” and “economic value,” it means there is no well-defined trade-off ratio between them. They cannot be compared by the metric — not because we lack information, but because the geometric structure of moral space does not support the comparison. This is a precise formalization of a claim that moral philosophers have made informally for decades.</p>
+<h3 id="the-metric-as-musical-isomorphism" class="subsection-heading">The Metric as Musical Isomorphism</h3>
+<p class="first-paragraph">A non-degenerate metric provides a canonical map between vectors and covectors:</p>
+<p class="first-paragraph">where g^{ij} is the inverse of g_{ij}. This is called the <em>musical isomorphism</em> (the notation ♭ for lowering and ♯ for raising). It identifies vectors with covectors — but the identification depends on the choice of metric. Different metrics yield different identifications.</p>
+<p class="body-text">This is why the metric matters: it determines how we convert between obligations (vectors) and interests (covectors), and how we compute the satisfaction scalar S = Iμ Oμ. When the interest is naturally a vector rather than a covector, the metric mediates: S = gμν Oμ Iν. Different metrics — different ethical theories — assign different satisfactions to the same obligation-interest pair.</p>
+<h2 id="4-6-connections-parallel-transport-and-curvature" class="section-heading">4.6 Connections, Parallel Transport, and Curvature</h2>
+<h3 id="the-problem-of-comparison" class="subsection-heading">The Problem of Comparison</h3>
+<p class="first-paragraph">On a flat space, comparing vectors at different points is straightforward: translate one to the location of the other and compare. On a curved manifold, this does not work. There is no canonical way to identify the tangent space at p with the tangent space at q. To compare vectors at different points, we need additional structure: a <em>connection</em>.</p>
+<p class="body-text"><strong>Moral interpretation:</strong> Can we compare obligations across contexts? The obligation to keep a promise in one situation and the obligation to help a stranger in another — are they “the same” obligation, differently instantiated? On a flat moral manifold, the answer would be straightforward. On a curved one, it depends on <em>how we transport the obligation from one context to the other</em> — and the answer may depend on the path.</p>
+<h3 id="the-connection" class="subsection-heading">The Connection</h3>
+<p class="first-paragraph"><strong>Definition 4.4 (Affine Connection).</strong> An <em>affine connection</em> (or <em>covariant derivative</em>) on M is a map ∇ that takes a vector field X and a vector field Y and produces a new vector field ∇_X Y, satisfying:</p>
+<p class="body-text">∇_{fX+gY} Z = f∇_X Z + g∇_Y Z (linearity in the first argument)</p>
+<p class="body-text">∇_X(Y + Z) = ∇_X Y + ∇_X Z (additivity in the second argument)</p>
+<p class="body-text">∇_X(fY) = (Xf)Y + f∇_X Y (Leibniz rule)</p>
+<p class="first-paragraph">The connection is specified in coordinates by the <em>Christoffel symbols</em> Γ^k_{ij}:</p>
+<p class="first-paragraph">The covariant derivative of a vector field V along a direction ∂_i is:</p>
+<p class="first-paragraph">The Christoffel symbols encode how the coordinate basis vectors change from point to point — the “correction” needed to account for the curvature of the manifold.</p>
+<p class="body-text"><strong>Levi-Civita connection.</strong> On a Riemannian manifold, there is a unique connection that is: - <em>Metric-compatible</em>: ∇g = 0 (parallel transport preserves inner products) - <em>Torsion-free</em>: ∇_X Y - ∇_Y X = [X, Y]</p>
+<p class="body-text">This is the Levi-Civita connection, and its Christoffel symbols are determined by the metric:</p>
+<h3 id="parallel-transport" class="subsection-heading">Parallel Transport</h3>
+<p class="first-paragraph">A vector field V along a curve γ(t) is <em>parallel-transported</em> if ∇_{’} V = 0 — the covariant derivative of V along the curve vanishes. Parallel transport moves a vector along a path while keeping it “as constant as possible,” given the curvature of the space.</p>
+<p class="body-text">On a flat manifold, parallel transport is path-independent: moving a vector from p to q gives the same result regardless of the route. On a curved manifold, the result depends on the path.</p>
+<p class="body-text"><strong>Example:</strong> On the sphere S², start at the equator with a vector pointing east. Parallel-transport it north to the pole, then south along a different meridian to the equator. The vector no longer points east — it has been rotated by an angle equal to the solid angle enclosed by the path. This rotation is called <em>holonomy</em>.</p>
+<p class="body-text"><strong>Moral example:</strong> Transport the obligation “keep your promise” from a context of personal friendship to a context of professional duty by two different routes — one passing through the context of family obligation, the other through the context of institutional requirement. If the resulting obligation differs, moral space has curvature. The difference is the <em>moral holonomy</em>, and it measures how much the moral landscape twists between these contexts.</p>
+<h3 id="the-riemann-curvature-tensor" class="subsection-heading">The Riemann Curvature Tensor</h3>
+<p class="first-paragraph"><strong>Definition 4.5 (Riemann Curvature Tensor).</strong> The curvature of a connection ∇ is measured by the (1, 3)-tensor:</p>
+<p class="first-paragraph">In components:</p>
+<p class="first-paragraph">The Riemann tensor vanishes if and only if the manifold is flat (locally isometric to Euclidean space). When it is nonzero, it encodes the path-dependence of parallel transport: transporting a vector V around an infinitesimal parallelogram spanned by X and Y yields a change proportional to R(X, Y)V.</p>
+<p class="body-text"><strong>Contractions of the Riemann tensor</strong> yield lower-rank curvature tensors: - The <em>Ricci tensor</em>: R_{ij} = R^k{}<em>{ikj} (a symmetric (0, 2)-tensor) - The scalar curvature: R = g^{ij} R</em>{ij} (a single number summarizing overall curvature at each point)</p>
+<p class="body-text">Whether moral space has nonzero curvature is an empirical question — one of the open problems in Chapter 29. But the framework is equipped to handle it if it does.</p>
+<h2 id="4-7-fiber-bundles" class="section-heading">4.7 Fiber Bundles</h2>
+<h3 id="motivation" class="subsection-heading">Motivation</h3>
+<p class="first-paragraph">So far, we have attached vector spaces (tangent spaces) to each point of M. But many quantities in geometry — and in ethics — require richer structures. A person at point p may carry not just a tangent vector but an entire <em>space of possible values</em>, <em>a set of agent perspectives</em>, or <em>a group of symmetry transformations</em>. Fiber bundles generalize the tangent bundle to accommodate these richer structures.</p>
+<figure class="book-figure"><img src="images/image_rId10.png" alt="Figure" loading="lazy"></figure>
+<p class="body-text"></p>
+<h3 id="definition" class="subsection-heading">Definition</h3>
+<p class="first-paragraph"><strong>Definition 4.6 (Fiber Bundle).</strong> A <em>fiber bundle</em> is a triple (E, π, M) where: - E is a topological space called the <em>total space</em> - M is a topological space called the <em>base space</em> - π: E → M is a continuous surjection called the <em>projection</em> - For each p ∈ M, the <em>fiber</em> F_p = π⁻¹(p) is homeomorphic to a fixed space F (the <em>typical fiber</em>) - <em>Local triviality</em>: Each point p has a neighborhood U such that π⁻¹(U) ≅ U × F</p>
+<p class="body-text">The total space E looks locally like a product M × F, but may be “twisted” globally — like a Möbius strip, which locally looks like a strip of paper but has a global twist.</p>
+<p class="body-text"><strong>Example (Tangent Bundle).</strong> The tangent bundle TM is a fiber bundle with base space M, total space TM, and fiber ℝⁿ (the tangent space at each point).</p>
+<p class="body-text"><strong>Example (Frame Bundle).</strong> At each point p, the <em>frame bundle</em> consists of all ordered bases for T_pM. The fiber is GL(n, ℝ) — the group of invertible n × n matrices.</p>
+<h3 id="sections" class="subsection-heading">Sections</h3>
+<p class="first-paragraph">A <em>section</em> of a fiber bundle is a smooth map σ: M → E such that π(σ(p)) = p for all p — it selects one element from each fiber. A vector field is a section of the tangent bundle. A metric tensor is a section of the bundle of symmetric (0, 2)-tensors.</p>
+<p class="body-text"><strong>Moral interpretation:</strong> Consider a bundle over moral space M whose fiber at each point p is the space of <em>possible moral character traits</em> available to an agent in situation p. A <em>virtue</em> is then a section of this bundle: a consistent assignment of character to each situation. The requirement that virtue be <em>consistent</em> — that it not jump discontinuously — is the requirement that the section be smooth. Virtue ethics, in this language, is the study of sections of the character fiber bundle.</p>
+<h2 id="4-8-stratified-spaces" class="section-heading">4.8 Stratified Spaces</h2>
+<h3 id="beyond-smooth-manifolds" class="subsection-heading">Beyond Smooth Manifolds</h3>
+<p class="first-paragraph">Smooth manifolds are fundamental, but they are not sufficient for moral space. Manifolds are, by definition, uniform in dimension: every point has a neighborhood homeomorphic to ℝⁿ for the <em>same</em> n. But moral space has regions of different effective dimensions (the interior of the simplex has dimension 2; its edges have dimension 1; its vertices have dimension 0), separated by boundaries where the smooth structure changes.</p>
+<p class="body-text">For this, we need <em>stratified spaces</em>.</p>
+<h3 id="definition" class="subsection-heading">Definition</h3>
+<p class="first-paragraph"><strong>Definition 4.7 (Whitney Stratification).</strong> A <em>Whitney stratified space</em> is a topological space X together with a locally finite partition into smooth manifolds {S_α}_{α ∈ A} (called <em>strata</em>) such that:</p>
+<p class="body-text"><strong>Frontier condition:</strong> If S_α ∩ cl(S_β) ≠ ∅ and S_α ≠ S_β, then S_α ⊂ cl(S_β) and dim(S_α) &lt; dim(S_β).</p>
+<p class="body-text"><strong>Whitney’s condition (B):</strong> For strata S_α ⊂ cl(S_β), consider sequences {x_n} ⊂ S_β and {y_n} ⊂ S_α both converging to y ∈ S_α. If the secant lines ℓ_n = x_n y_n converge to a line ℓ, and the tangent planes T_{x_n} S_β converge to a plane τ, then ℓ ⊂ τ.</p>
+<p class="first-paragraph">Condition (1) says that lower-dimensional strata lie on the boundaries of higher-dimensional strata — they are genuinely “boundary” structures, not isolated points floating in space. Condition (2) is a regularity condition ensuring that higher-dimensional strata approach lower-dimensional strata in a controlled way — no “pinching” or pathological tangencies.</p>
+<h3 id="example-the-simplex" class="subsection-heading">Example: The Simplex</h3>
+<p class="first-paragraph">The 2-simplex Δ² has a natural Whitney stratification: - <strong>2-stratum</strong> (interior): {(p₁, p₂, p₃) : all pᵢ &gt; 0}, a 2-dimensional manifold. - <strong>1-strata</strong> (edges): Three edges, each a 1-dimensional manifold. - <strong>0-strata</strong> (vertices): Three vertices, each a 0-dimensional manifold (a point).</p>
+<p class="body-text">The frontier condition holds: each vertex is in the closure of each adjacent edge, and each edge is in the closure of the interior. Whitney’s condition (B) holds because the simplex is a convex polytope.</p>
+<h3 id="moral-significance" class="subsection-heading">Moral Significance</h3>
+<p class="first-paragraph">Stratification is the geometric structure that represents moral <em>thresholds</em>, <em>phase transitions</em>, and <em>categorical boundaries</em>:</p>
+<p class="body-text">The transition from “permissible” to “forbidden” is a stratum boundary.</p>
+<p class="body-text">The transition from “one duty applies” to “a different duty applies” is a stratum boundary.</p>
+<p class="body-text">The point where “consent” shifts from insufficient to sufficient is a stratum boundary.</p>
+<p class="body-text">A genuine dilemma — where two strata of different moral regimes meet at a singularity — is a 0-stratum at the intersection of higher-dimensional boundaries.</p>
+<p class="first-paragraph">Within each stratum, smooth calculus applies: we can take derivatives, define gradients, and optimize. <em>Across</em> stratum boundaries, we need the machinery of stratified spaces to track how the structure changes. The transition functions between strata encode the “rules of passage” from one moral regime to another — and these transitions may be discontinuous.</p>
+<h2 id="4-9-gauge-theory-a-brief-introduction" class="section-heading">4.9 Gauge Theory: A Brief Introduction</h2>
+<h3 id="motivation" class="subsection-heading">Motivation</h3>
+<p class="first-paragraph">Gauge theory is the mathematical framework that describes how local symmetries constrain global structure. In physics, it governs all four fundamental forces. In this book, it provides the mathematical content of the Bond Invariance Principle: the requirement that moral evaluations be invariant under admissible re-descriptions.</p>
+<h3 id="gauge-transformations" class="subsection-heading">Gauge Transformations</h3>
+<p class="first-paragraph">Consider a fiber bundle (E, π, M) with structure group G — a Lie group that acts on each fiber. A <em>gauge transformation</em> is a smooth map g: M → G that acts on sections by:</p>
+<p class="first-paragraph">In physics, gauge transformations change the “internal” description at each point (e.g., the phase of a quantum field) without changing the physics. In ethics, gauge transformations change the <em>representation</em> of a moral situation (the framing, the language, the cultural context) without changing the moral content.</p>
+<p class="body-text"><strong>Definition 4.8 (Gauge Invariance).</strong> A quantity Q defined on sections of a fiber bundle is <em>gauge-invariant</em> if Q(g · σ) = Q(σ) for all gauge transformations g.</p>
+<p class="body-text">The Bond Invariance Principle states that legitimate moral evaluations must be gauge-invariant: if two descriptions are related by an admissible re-description (a gauge transformation), they must receive the same moral assessment.</p>
+<h3 id="connections-on-fiber-bundles" class="subsection-heading">Connections on Fiber Bundles</h3>
+<p class="first-paragraph">A <em>connection</em> on a fiber bundle generalizes the affine connection of Section 4.6 to arbitrary fibers. It specifies how to parallel-transport elements of the fiber along paths in the base space.</p>
+<p class="body-text">In coordinates, a connection is given by a <em>gauge field</em> A — a 1-form on M valued in the Lie algebra 𝔤 of the structure group G:</p>
+<p class="first-paragraph">where T_a are generators of 𝔤. The gauge field tells us how the “internal” structure (the fiber) changes as we move through the base space.</p>
+<h3 id="curvature-of-a-connection" class="subsection-heading">Curvature of a Connection</h3>
+<p class="first-paragraph">The <em>curvature</em> of a gauge connection is the 2-form:</p>
+<p class="first-paragraph">In components:</p>
+<p class="first-paragraph">where f^a{}_{bc} are the structure constants of the Lie algebra. The curvature measures the failure of parallel transport to be path-independent — the holonomy of the connection.</p>
+<p class="body-text">If F = 0, the connection is <em>flat</em> and parallel transport is path-independent. If F ≠ 0, different paths between the same endpoints yield different results.</p>
+<p class="body-text"><strong>Moral interpretation:</strong> Moral curvature F ≠ 0 means that transporting a moral assessment along different paths through moral space yields different results. The obligation you arrive at depends on the route you took — which intermediate contexts you passed through. This is the geometric content of moral path-dependence, and it is distinct from mere disagreement: it is a structural feature of the moral landscape itself.</p>
+<h3 id="noether-s-theorem-preview" class="subsection-heading">Noether’s Theorem (Preview)</h3>
+<p class="first-paragraph">A central result of gauge theory is <em>Noether’s theorem</em>: every continuous symmetry of a system corresponds to a conserved quantity. The connection to ethics is developed in Chapter 12, but the basic structure is:</p>
+<p class="body-text"><strong>Symmetry:</strong> Moral evaluation is invariant under re-description (gauge invariance).</p>
+<p class="body-text"><strong>Conservation law:</strong> Harm is conserved — it cannot be created or destroyed by re-description, only generated by wrongdoing or repaired by restorative action.</p>
+<p class="first-paragraph">The mathematical proof follows the same pattern as in physics: the invariance of the action functional under infinitesimal gauge transformations implies, via the Euler-Lagrange equations, the existence of a conserved current.</p>
+<h2 id="4-10-summary-the-geometric-toolkit" class="section-heading">4.10 Summary: The Geometric Toolkit</h2>
+<p class="first-paragraph">The table below summarizes the mathematical structures introduced in this chapter and previews their moral applications (developed in subsequent chapters).</p>
+<div class="table-wrapper"><table class="book-table"><tr><th>Structure</th><th>Definition</th><th>Moral Application</th></tr><tr><td>Manifold M</td><td>Space locally homeomorphic to ℝⁿ</td><td>The moral manifold: space of structured situations</td></tr><tr><td>Tangent vector v ∈ T_pM</td><td>Infinitesimal direction at a point</td><td>Possible variations; obligations as directions</td></tr><tr><td>Covector ω ∈ T_p*M</td><td>Linear functional on tangent vectors</td><td>Interests; weights on moral dimensions</td></tr><tr><td>Tensor T of type (r, s)</td><td>Multilinear map; transforms by Jacobians</td><td>Moral evaluations; invariant under re-description</td></tr><tr><td>Contraction</td><td>Summing paired indices; reduces rank</td><td>From tensorial evaluation to scalar decision</td></tr><tr><td>Metric g</td><td>Inner product on tangent spaces</td><td>Trade-off structure between values</td></tr><tr><td>Degenerate metric</td><td>Metric with zero eigenvalues</td><td>Incommensurability of values</td></tr><tr><td>Connection ∇</td><td>Rule for parallel transport</td><td>How obligations change across contexts</td></tr><tr><td>Curvature R</td><td>Path-dependence of parallel transport</td><td>Whether moral assessment is path-dependent</td></tr><tr><td>Fiber bundle (E, π, M)</td><td>Space of “internal” structures over M</td><td>Agent perspectives; character traits; jural states</td></tr><tr><td>Gauge transformation</td><td>Change of internal representation</td><td>Re-description; change of framing</td></tr><tr><td>Gauge invariance</td><td>Invariance under gauge transformations</td><td>Bond Invariance Principle</td></tr><tr><td>Stratified space</td><td>Manifold with boundary strata</td><td>Moral thresholds; phase transitions; categorical boundaries</td></tr></table></div>
+<h2 id="4-11-bibliographic-notes" class="section-heading">4.11 Bibliographic Notes</h2>
+<p class="first-paragraph">The differential geometry in Sections 4.1–4.6 is standard and can be found in Lee (2012), <em>Introduction to Smooth Manifolds</em>, which is the gentlest rigorous introduction, or do Carmo (1992), <em>Riemannian Geometry</em>, for the metric and curvature theory. Readers seeking physical intuition may prefer Frankel (2011), <em>The Geometry of Physics</em>.</p>
+<p class="body-text">For fiber bundles and gauge theory (Section 4.9), Nakahara (2003), <em>Geometry, Topology, and Physics</em>, provides an accessible treatment aimed at physicists. The mathematical foundations are in Kobayashi and Nomizu (1963), <em>Foundations of Differential Geometry</em>, though this is aimed at specialists.</p>
+<p class="body-text">For stratified spaces (Section 4.8), the original source is Whitney (1965). An accessible modern treatment is Pflaum (2001), <em>Analytic and Geometric Study of Stratified Spaces</em>. The application to moral space is, to our knowledge, original to this work and to the companion paper on Stratified Geometric Ethics (Bond 2025).</p>
+<p class="body-text">Readers who wish to go deeper before proceeding should read Lee (2012), Chapters 1–6, which covers manifolds, tangent spaces, and vector bundles at the level assumed in subsequent chapters.</p>
+<p class="body-text">❖</p>
+<p class="body-text"><em>The mathematics in this chapter is not new.</em></p>
+<p class="body-text"><em>It is the standard toolkit of modern geometry, developed over two centuries by mathematicians working on problems in physics, topology, and analysis.</em></p>
+<p class="body-text"><em>What is new is the application.</em></p>
+<p class="body-text"><em>In the next chapter, we build the moral manifold — the specific space on which geometric ethics takes shape.</em></p>
+      </div>
+
+      <div class="chapter-nav-bottom">
+        <a href="part-ii-the-framework.html" class="nav-prev">&larr; Part II: The Framework</a>
+        <a href="index.html" class="nav-toc">Contents</a>
+        <a href="chapter-5-the-moral-manifold.html" class="nav-next">Chapter 5: The Moral Manifold &rarr;</a>
+      </div>
+    </div>
+  </article>
+
+  <footer class="book-footer">
+    <p>&copy; 2026 Andrew H. Bond. <em>Geometric Ethics: The Mathematical Structure of Moral Reasoning.</em></p>
+    <p class="footer-note">Ethics is not a number.</p>
+  </footer>
+
+  <script>
+    window.addEventListener('scroll', () => {
+      document.getElementById('main-nav').classList.toggle('scrolled', window.scrollY > 20);
+    });
+    document.querySelector('.nav-toggle')?.addEventListener('click', function() {
+      document.querySelector('.nav-links').classList.toggle('open');
+    });
+  </script>
+</body>
+</html>

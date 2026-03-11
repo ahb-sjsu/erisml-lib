@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Appendix B: Reproduction Cookbook &mdash; Geometric Ethics</title>
+  <meta name="description" content="Appendix B: Reproduction Cookbook from Geometric Ethics: The Mathematical Structure of Moral Reasoning by Andrew H. Bond.">
+  <link rel="stylesheet" href="../assets/css/style.css">
+  <link rel="stylesheet" href="book.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Crimson+Pro:ital,wght@0,300;0,400;0,600;0,700;1,400&family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+</head>
+
+<body>
+  <nav id="main-nav">
+    <div class="nav-inner">
+      <a href="../index.html" class="nav-brand">
+        <span class="brand-symbol">M</span>
+        <span class="brand-text">Geometric Ethics</span>
+      </a>
+      <button class="nav-toggle" aria-label="Toggle menu">
+        <span></span><span></span><span></span>
+      </button>
+      <ul class="nav-links">
+        <li><a href="index.html">Book</a></li>
+        <li><a href="../index.html#core-argument">Core Argument</a></li>
+        <li><a href="../index.html#objects">Framework</a></li>
+        <li><a href="../index.html#tutorials">Tutorials</a></li>
+        <li><a href="../index.html#dear-ethicist">Play</a></li>
+        <li><a href="../index.html#community" class="nav-discord">Discord</a></li>
+      </ul>
+    </div>
+  </nav>
+
+  <article class="book-chapter">
+    <div class="chapter-container">
+      <div class="chapter-nav-top">
+        <a href="appendix-a-related-work-and-differentiation.html" class="nav-prev">&larr; Appendix A: Related Work and Differentiation</a>
+        <a href="index.html" class="nav-toc">Contents</a>
+        <a href="appendix-c-human-subjects-research-roadmap.html" class="nav-next">Appendix C: Human-Subjects Research Roadmap &rarr;</a>
+      </div>
+
+      <nav class="chapter-toc">
+        <h4>In this chapter</h4>
+        <ol><li><a href="#b-1-prerequisites">B.1 Prerequisites</a></li><li><a href="#b-2-quick-start-10-minute-smoke-test">B.2 Quick Start: 10-Minute Smoke Test</a></li><li><a href="#b-3-full-pipeline-60-minute-reproduction">B.3 Full Pipeline: 60-Minute Reproduction</a></li><li><a href="#b-4-expected-outputs-and-pass-criteria">B.4 Expected Outputs and Pass Criteria</a></li><li><a href="#b-5-where-failures-show-up">B.5 Where Failures Show Up</a></li><li><a href="#b-6-bond-index-tiers-in-practice">B.6 Bond Index Tiers in Practice</a></li><li><a href="#b-7-running-the-full-test-suite">B.7 Running the Full Test Suite</a></li></ol>
+      </nav>
+      <div class="chapter-content">
+<h1 id="appendix-b-reproduction-cookbook" class="chapter-title">Appendix B: Reproduction Cookbook</h1>
+<p class="body-text">This appendix provides an idiot-proof guide to reproducing the computational claims of geometric ethics using the ErisML reference implementation. No prior familiarity with the codebase is assumed. The entire sequence can be completed on a standard laptop in under 60 minutes.</p>
+<h2 id="b-1-prerequisites" class="section-heading">B.1 Prerequisites</h2>
+<p class="body-text">Hardware: any machine with Python 3.10 or later. No GPU required. The full test suite runs in under 5 minutes on a 2020-era laptop. Memory requirement: under 500 MB.</p>
+<p class="body-text">Installation: pip install erisml. This installs the ErisML library and all dependencies (numpy, scipy, pydantic, lark, pettingzoo, gymnasium). Verify the installation with: python -c &quot;import erisml; print(erisml.__version__)&quot;. Expected output: 2.0.0 or later.</p>
+<h2 id="b-2-quick-start-10-minute-smoke-test" class="section-heading">B.2 Quick Start: 10-Minute Smoke Test</h2>
+<p class="body-text">Step 1: Run the minimal DEME demonstration. Command: python -m erisml.examples.hello_deme. This creates two candidate options (one respecting rights, one violating them), evaluates both with a RightsFirstEM ethics module, and prints the verdicts. Expected output: the rights-respecting option is preferred; the rights-violating option is forbidden. Runtime: under 2 seconds. This exercises the Layer 1 (EthicalFacts generation) and Layer 2 (Ethics Module evaluation) pipeline described in Chapter 18.6.</p>
+<p class="body-text">Step 2: Run the D₄ gauge structure verification. Command: python -m erisml.examples.hohfeld_d4_demo. This exercises all eight elements of the dihedral group D₄ acting on the Hohfeldian state space {O, C, N, L}. Expected output: all group relations verified (r⁴ = e, s² = e, srs = r⁻¹), non-abelian structure confirmed (rs ≠ sr), Klein four subgroup V₄ identified, and Bond Index = 0.0 (perfect gauge invariance). Runtime: under 2 seconds. This exercises the algebraic structure described in Chapters 8 and 11.</p>
+<p class="body-text">If both commands produce the expected output, the installation is correct and the core algebraic and ethical evaluation pipelines are functional.</p>
+<h2 id="b-3-full-pipeline-60-minute-reproduction" class="section-heading">B.3 Full Pipeline: 60-Minute Reproduction</h2>
+<p class="body-text">The following seven-step sequence exercises every major computational claim in the manuscript, mapping each demo to its corresponding chapter.</p>
+<p class="body-text">Step 1 — Layer 1→2 pipeline (Chapter 18.6): python -m erisml.examples.hello_deme. Verifies: EthicalFacts generation from scenario description, Ethics Module evaluation producing ranked verdicts. Pass criterion: rights-violating option is forbidden.</p>
+<p class="body-text">Step 2 — D₄ gauge verification (Chapters 8, 11): python -m erisml.examples.hohfeld_d4_demo. Verifies: all D₄ group relations, non-abelian structure, Wilson observable (path holonomy), Bond Index computation. Pass criterion: Bond Index = 0.0, all group relations hold.</p>
+<p class="body-text">Step 3 — Bond Invariance Principle (Chapter 18.7): python -m erisml.examples.bond_invariance_demo. Verifies: bond-preserving transforms (option reordering, identifier relabeling, unit/scale changes, equivalent redescriptions) do not change the verdict; bond-changing transforms (removing discrimination evidence) may change the verdict; declared lens changes (switching stakeholder profiles) yield different but consistent verdicts. Pass criterion: all bond-preserving transforms produce identical verdicts; JSON audit artifact is generated.</p>
+<p class="body-text">Step 4 — Full DEME 4-layer architecture (Chapter 18.6): python -m erisml.examples.triage_ethics_demo. Verifies: DEMEProfileV03 loading, three triage options spanning all nine EthicalFacts dimensions, tiered EM evaluation (Tier 0: GenevaBaseEM, Tier 2: CaseStudy1TriageEM and RightsFirstEM), governance aggregation with base-EM veto. Pass criterion: DecisionOutcome with ranked options, forbidden options list, and human-readable rationale.</p>
+<p class="body-text">Step 5 — MoralVector and contraction (Chapter 15): python -m erisml.examples.deme_2_demo. Verifies: 8+1 dimensional MoralVector construction, tier-weighted governance (Tier 0 = 10×, Tier 1 = 5×, Tier 2 = 3×, Tier 3 = 1×), Pareto frontier analysis, and explicit scalar contraction via to_scalar(). Pass criterion: contraction loss is reported and nonzero, demonstrating the inevitability of residue (Proposition 15.1).</p>
+<p class="body-text">Step 6 — Game theory and fair allocation (Chapter 13.3): python -m erisml.examples.demo_game_theory followed by python -m erisml.examples.demo_shapley. Verifies: Nash equilibrium computation for Prisoner’s Dilemma (StrategicLayer), Shapley value computation for airport cost allocation (CooperativeLayer). Pass criterion: Nash equilibrium matches known solution; Shapley values sum to total cost.</p>
+<p class="body-text">Step 7 — No Escape Theorem instantiation (Chapter 18): python -m erisml.examples.tiny_home. Verifies: norm-gated action execution in a grid world. The agent attempts to enter a restricted zone; the NormSystem raises a NormViolation exception. Pass criterion: the exception is raised (the forbidden action is structurally impossible, not merely penalized). The agent cannot learn to circumvent the prohibition.</p>
+<h2 id="b-4-expected-outputs-and-pass-criteria" class="section-heading">B.4 Expected Outputs and Pass Criteria</h2>
+<p class="body-text">For bond-preserving transforms (Step 3): the selected option must be identical before and after the transform. Any difference is a BIP violation. The JSON audit artifact records the baseline verdict, transformed verdict, canonical mapping, and pass/fail status for each transform.</p>
+<p class="body-text">For bond-changing transforms (Step 3): the verdict may legitimately differ. The audit artifact records which evidence dimension was modified and how the verdict changed. A bond-changing transform that does not change the verdict is not a failure — it indicates that the removed evidence was not decision-relevant.</p>
+<p class="body-text">For the D₄ verification (Step 2): all eight group elements must produce the correct permutation of Hohfeldian states. Any failure indicates a bug in the implementation, not a theoretical issue, since the group structure is mathematically determined.</p>
+<h2 id="b-5-where-failures-show-up" class="section-heading">B.5 Where Failures Show Up</h2>
+<p class="body-text">The ErisML implementation follows a minimal witness design: when a test fails, the output identifies exactly which component failed and why. If a BIP test fails, the JSON audit artifact pinpoints which transform broke invariance and which ethics module produced the discrepant verdict. If a D₄ group relation fails, the output shows which element pair violated the relation and what the actual vs. expected result was.</p>
+<p class="body-text">If governance aggregation produces an unexpected result, the DecisionOutcome includes per-module verdicts, tier weights, and the aggregation trace. This allows the user to identify whether the issue is in the grounding (Layer 1), the evaluation (Layer 2), or the aggregation (Layer 3).</p>
+<p class="body-text">If a norm violation is not raised in Step 7 (tiny_home.py), this indicates a failure of the structural containment mechanism — which would be a counterexample to the No Escape Theorem and a publishable result in its own right.</p>
+<h2 id="b-6-bond-index-tiers-in-practice" class="section-heading">B.6 Bond Index Tiers in Practice</h2>
+<p class="body-text">The Bond Index Bd quantifies the degree of gauge non-invariance in a moral evaluation system. In practice: Bd = 0.0 indicates perfect invariance (the system’s verdicts are completely insensitive to admissible redescriptions). Bd &lt; 0.1 indicates cosmetic relabeling artifacts (minor formatting or tokenization differences that do not affect the moral substance). Bd between 0.1 and 0.5 indicates substantive framing sensitivity (the system’s verdicts are influenced by how the situation is described, which is a potential bias). Bd &gt; 0.5 indicates systematic bias (the system’s moral evaluations are dominated by framing effects rather than moral content).</p>
+<p class="body-text">For a system to be considered BIP-compliant, it must achieve Bd &lt; 0.1 on the standard transformation suite. The ErisML reference implementation achieves Bd = 0.0 on all bond-preserving transforms by construction (the canonicalization layer strips non-moral-content variation before evaluation).</p>
+<h2 id="b-7-running-the-full-test-suite" class="section-heading">B.7 Running the Full Test Suite</h2>
+<p class="body-text">For continuous integration and regression testing, run: pytest --cov=src/erisml. This executes the complete test suite including unit tests for each ethics module, integration tests for the DEME pipeline, property-based tests for D₄ group relations, and BIP compliance tests for the standard transformation suite. Expected: all tests pass. Coverage report shows the tested fraction of the codebase.</p>
+<p class="body-text">The test suite is designed to serve as a living specification: each test corresponds to a specific claim in the manuscript, and a test failure indicates either a bug in the implementation or a theoretical claim that needs revision. The mapping between tests and manuscript claims is documented in the test file docstrings.</p>
+      </div>
+
+      <div class="chapter-nav-bottom">
+        <a href="appendix-a-related-work-and-differentiation.html" class="nav-prev">&larr; Appendix A: Related Work and Differentiation</a>
+        <a href="index.html" class="nav-toc">Contents</a>
+        <a href="appendix-c-human-subjects-research-roadmap.html" class="nav-next">Appendix C: Human-Subjects Research Roadmap &rarr;</a>
+      </div>
+    </div>
+  </article>
+
+  <footer class="book-footer">
+    <p>&copy; 2026 Andrew H. Bond. <em>Geometric Ethics: The Mathematical Structure of Moral Reasoning.</em></p>
+    <p class="footer-note">Ethics is not a number.</p>
+  </footer>
+
+  <script>
+    window.addEventListener('scroll', () => {
+      document.getElementById('main-nav').classList.toggle('scrolled', window.scrollY > 20);
+    });
+    document.querySelector('.nav-toggle')?.addEventListener('click', function() {
+      document.querySelector('.nav-links').classList.toggle('open');
+    });
+  </script>
+</body>
+</html>
