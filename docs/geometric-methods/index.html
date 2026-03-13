@@ -14,6 +14,9 @@
   <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"></script>
   <!-- Marked for markdown parsing -->
   <script src="https://cdn.jsdelivr.net/npm/marked@12.0.0/marked.min.js"></script>
+  <!-- Interactive demos -->
+  <link rel="stylesheet" href="assets/demos.css">
+  <script defer src="assets/demos.js"></script>
   <style>
     :root {
       --cb-teal:     #1b9e77;
@@ -584,6 +587,11 @@ async function loadChapter(chapterId) {
         throwOnError: false,
         trust: true
       });
+    }
+
+    // Inject interactive demos
+    if (typeof injectDemos === 'function') {
+      injectDemos(chapterId, content);
     }
 
     // Update URL hash
