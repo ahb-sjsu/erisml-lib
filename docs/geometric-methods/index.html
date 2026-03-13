@@ -1,0 +1,648 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Geometric Methods in Computational Modeling &mdash; Andrew H. Bond</title>
+  <meta name="description" content="A comprehensive textbook on geometric methods for computational modeling: Mahalanobis distance, hyperbolic geometry, SPD manifolds, topological data analysis, and structural fuzzing.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Crimson+Pro:ital,wght@0,300;0,400;0,600;0,700;1,300;1,400&family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <!-- KaTeX for math rendering -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"></script>
+  <!-- Marked for markdown parsing -->
+  <script src="https://cdn.jsdelivr.net/npm/marked@12.0.0/marked.min.js"></script>
+  <style>
+    :root {
+      --cb-teal:     #1b9e77;
+      --cb-orange:   #d95f02;
+      --cb-purple:   #7570b3;
+      --cb-pink:     #e7298a;
+      --cb-green:    #66a61e;
+      --cb-gold:     #e6ab02;
+      --accent:      #1b9e77;
+      --accent-light:#66c2a5;
+      --accent-glow: rgba(27,158,119,0.3);
+      --bg-deep:     #0b1622;
+      --bg-dark:     #0f1f2e;
+      --bg-card:     #142536;
+      --bg-hover:    #1a3248;
+      --bg-section:  #0d1a28;
+      --text-primary:   #e8ecf0;
+      --text-secondary: #8fa4b8;
+      --text-muted:     #5c7a94;
+      --text-accent:    #66c2a5;
+      --border-subtle:  rgba(102,194,165,0.15);
+      --border-medium:  rgba(102,194,165,0.3);
+      --sidebar-width: 320px;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; font-size: 16px; }
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      background: var(--bg-deep);
+      color: var(--text-primary);
+      line-height: 1.7;
+      overflow-x: hidden;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* --- Top Navigation --- */
+    .top-nav {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+      background: rgba(11,22,34,0.92);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--border-subtle);
+      height: 56px;
+      display: flex; align-items: center; padding: 0 24px;
+    }
+    .top-nav .brand {
+      display: flex; align-items: center; gap: 12px;
+      text-decoration: none; color: var(--text-primary);
+    }
+    .top-nav .brand-symbol {
+      width: 32px; height: 32px; border-radius: 8px;
+      background: linear-gradient(135deg, var(--accent), var(--accent-light));
+      display: flex; align-items: center; justify-content: center;
+      font-family: 'Crimson Pro', serif; font-weight: 700; font-size: 18px;
+      color: var(--bg-deep);
+    }
+    .top-nav .brand-text {
+      font-family: 'Crimson Pro', serif; font-weight: 600; font-size: 1.1rem;
+    }
+    .top-nav .nav-links {
+      margin-left: auto; display: flex; gap: 20px; list-style: none;
+    }
+    .top-nav .nav-links a {
+      color: var(--text-secondary); text-decoration: none; font-size: 0.85rem;
+      font-weight: 500; transition: color 0.2s;
+    }
+    .top-nav .nav-links a:hover { color: var(--accent-light); }
+    .sidebar-toggle {
+      display: none; background: none; border: none; color: var(--text-primary);
+      font-size: 1.5rem; cursor: pointer; margin-right: 12px;
+    }
+
+    /* --- Layout --- */
+    .layout {
+      display: flex; margin-top: 56px; min-height: calc(100vh - 56px);
+    }
+
+    /* --- Sidebar --- */
+    .sidebar {
+      width: var(--sidebar-width); min-width: var(--sidebar-width);
+      background: var(--bg-dark);
+      border-right: 1px solid var(--border-subtle);
+      overflow-y: auto; padding: 24px 0;
+      position: sticky; top: 56px; height: calc(100vh - 56px);
+    }
+    .sidebar h3 {
+      font-family: 'Crimson Pro', serif; font-size: 0.75rem;
+      text-transform: uppercase; letter-spacing: 0.12em;
+      color: var(--text-muted); padding: 16px 20px 8px; margin-top: 8px;
+    }
+    .sidebar h3:first-child { margin-top: 0; }
+    .sidebar a {
+      display: block; padding: 8px 20px; color: var(--text-secondary);
+      text-decoration: none; font-size: 0.88rem; line-height: 1.4;
+      border-left: 3px solid transparent; transition: all 0.15s;
+    }
+    .sidebar a:hover {
+      background: var(--bg-hover); color: var(--text-primary);
+      border-left-color: var(--accent-light);
+    }
+    .sidebar a.active {
+      background: rgba(27,158,119,0.1); color: var(--accent-light);
+      border-left-color: var(--accent); font-weight: 500;
+    }
+    .sidebar .ch-num {
+      display: inline-block; width: 28px; color: var(--text-muted);
+      font-family: 'JetBrains Mono', monospace; font-size: 0.78rem;
+    }
+
+    /* --- Main Content --- */
+    .main-content {
+      flex: 1; max-width: 860px; padding: 48px clamp(24px, 4vw, 64px);
+      margin: 0 auto;
+    }
+
+    /* --- Landing Page --- */
+    .landing { text-align: center; padding: 80px 20px; }
+    .landing h1 {
+      font-family: 'Crimson Pro', serif; font-size: clamp(2rem, 5vw, 3.2rem);
+      font-weight: 700; margin-bottom: 12px;
+      background: linear-gradient(135deg, var(--text-primary), var(--accent-light));
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    .landing .subtitle {
+      font-family: 'Crimson Pro', serif; font-size: 1.3rem;
+      color: var(--text-secondary); font-style: italic; margin-bottom: 48px;
+    }
+    .landing .part-grid {
+      display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 20px; text-align: left; max-width: 900px; margin: 0 auto;
+    }
+    .part-card {
+      background: var(--bg-card); border: 1px solid var(--border-subtle);
+      border-radius: 12px; padding: 24px; transition: all 0.2s;
+      cursor: pointer;
+    }
+    .part-card:hover {
+      border-color: var(--accent); transform: translateY(-2px);
+      box-shadow: 0 8px 32px rgba(27,158,119,0.15);
+    }
+    .part-card h3 {
+      font-family: 'Crimson Pro', serif; font-size: 1.1rem;
+      color: var(--accent-light); margin-bottom: 8px;
+      text-transform: none; letter-spacing: 0; padding: 0;
+    }
+    .part-card .ch-list {
+      list-style: none; font-size: 0.88rem; color: var(--text-secondary);
+    }
+    .part-card .ch-list li { padding: 3px 0; }
+    .part-card .ch-list .ch-n {
+      color: var(--text-muted); font-family: 'JetBrains Mono', monospace;
+      font-size: 0.78rem; margin-right: 6px;
+    }
+    .stats-bar {
+      display: flex; justify-content: center; gap: 48px;
+      margin: 40px 0 60px; flex-wrap: wrap;
+    }
+    .stat { text-align: center; }
+    .stat .num {
+      font-family: 'JetBrains Mono', monospace; font-size: 2rem;
+      color: var(--accent-light); font-weight: 500;
+    }
+    .stat .label {
+      font-size: 0.8rem; color: var(--text-muted); text-transform: uppercase;
+      letter-spacing: 0.1em; margin-top: 4px;
+    }
+
+    /* --- Chapter Content Styling --- */
+    .chapter-content h1 {
+      font-family: 'Crimson Pro', serif; font-size: 2.2rem; font-weight: 700;
+      margin-bottom: 8px; color: var(--text-primary);
+      border-bottom: 2px solid var(--accent); padding-bottom: 12px;
+    }
+    .chapter-content h2 {
+      font-family: 'Crimson Pro', serif; font-size: 1.55rem; font-weight: 600;
+      color: var(--accent-light); margin: 48px 0 16px;
+      padding-bottom: 8px; border-bottom: 1px solid var(--border-subtle);
+    }
+    .chapter-content h3 {
+      font-family: 'Crimson Pro', serif; font-size: 1.2rem; font-weight: 600;
+      color: var(--text-primary); margin: 32px 0 12px;
+      text-transform: none; letter-spacing: 0; padding: 0;
+    }
+    .chapter-content h4 {
+      font-family: 'Crimson Pro', serif; font-size: 1.05rem; font-weight: 600;
+      color: var(--text-secondary); margin: 24px 0 8px;
+    }
+    .chapter-content p {
+      margin: 12px 0; font-size: 1rem; line-height: 1.8;
+    }
+    .chapter-content blockquote {
+      border-left: 3px solid var(--accent);
+      padding: 12px 20px; margin: 20px 0;
+      background: rgba(27,158,119,0.05);
+      border-radius: 0 8px 8px 0;
+      font-family: 'Crimson Pro', serif;
+      font-style: italic; color: var(--text-secondary);
+      font-size: 1.05rem;
+    }
+    .chapter-content pre {
+      background: #0a1929; border: 1px solid var(--border-subtle);
+      border-radius: 8px; padding: 20px; margin: 20px 0;
+      overflow-x: auto; font-size: 0.85rem; line-height: 1.5;
+    }
+    .chapter-content code {
+      font-family: 'JetBrains Mono', monospace; font-size: 0.88em;
+    }
+    .chapter-content pre code {
+      color: var(--text-primary); font-size: 0.85rem;
+    }
+    .chapter-content :not(pre) > code {
+      background: rgba(27,158,119,0.12); padding: 2px 6px;
+      border-radius: 4px; color: var(--accent-light);
+    }
+    .chapter-content table {
+      width: 100%; border-collapse: collapse; margin: 20px 0;
+      font-size: 0.92rem;
+    }
+    .chapter-content th {
+      background: var(--bg-card); color: var(--accent-light);
+      font-weight: 600; text-align: left; padding: 10px 14px;
+      border-bottom: 2px solid var(--accent);
+    }
+    .chapter-content td {
+      padding: 10px 14px; border-bottom: 1px solid var(--border-subtle);
+      color: var(--text-secondary);
+    }
+    .chapter-content tr:hover td { background: rgba(27,158,119,0.04); }
+    .chapter-content ul, .chapter-content ol {
+      padding-left: 24px; margin: 12px 0;
+    }
+    .chapter-content li { margin: 6px 0; line-height: 1.7; }
+    .chapter-content hr {
+      border: none; height: 1px;
+      background: var(--border-subtle); margin: 40px 0;
+    }
+    .chapter-content strong { color: var(--text-primary); }
+    .chapter-content em { color: var(--text-secondary); }
+
+    /* Math display blocks */
+    .chapter-content .katex-display {
+      margin: 20px 0; overflow-x: auto; padding: 8px 0;
+    }
+
+    /* Chapter navigation */
+    .chapter-nav {
+      display: flex; justify-content: space-between; align-items: center;
+      margin-top: 64px; padding-top: 24px;
+      border-top: 1px solid var(--border-subtle);
+    }
+    .chapter-nav a {
+      display: flex; align-items: center; gap: 8px;
+      color: var(--accent-light); text-decoration: none;
+      font-size: 0.92rem; padding: 10px 16px;
+      border: 1px solid var(--border-subtle); border-radius: 8px;
+      transition: all 0.2s;
+    }
+    .chapter-nav a:hover {
+      border-color: var(--accent); background: rgba(27,158,119,0.08);
+    }
+    .chapter-nav .placeholder { visibility: hidden; }
+
+    /* Loading */
+    .loading {
+      text-align: center; padding: 80px 20px; color: var(--text-muted);
+    }
+    .loading .spinner {
+      width: 40px; height: 40px; border: 3px solid var(--border-subtle);
+      border-top-color: var(--accent); border-radius: 50%;
+      animation: spin 0.8s linear infinite; margin: 0 auto 16px;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* Back to top */
+    .back-to-top {
+      position: fixed; bottom: 24px; right: 24px;
+      width: 40px; height: 40px; border-radius: 50%;
+      background: var(--accent); color: var(--bg-deep);
+      border: none; cursor: pointer; font-size: 1.2rem;
+      display: none; align-items: center; justify-content: center;
+      box-shadow: 0 4px 16px rgba(27,158,119,0.4);
+      transition: opacity 0.2s;
+      z-index: 50;
+    }
+    .back-to-top.visible { display: flex; }
+
+    /* --- Responsive --- */
+    @media (max-width: 900px) {
+      .sidebar {
+        position: fixed; left: -320px; z-index: 90;
+        transition: left 0.3s ease; top: 56px; height: calc(100vh - 56px);
+        box-shadow: 4px 0 24px rgba(0,0,0,0.5);
+      }
+      .sidebar.open { left: 0; }
+      .sidebar-toggle { display: block; }
+      .top-nav .nav-links { display: none; }
+      .main-content { padding: 32px 16px; }
+    }
+    @media (max-width: 600px) {
+      .landing h1 { font-size: 1.8rem; }
+      .stats-bar { gap: 24px; }
+      .chapter-content h1 { font-size: 1.6rem; }
+      .chapter-content h2 { font-size: 1.3rem; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Top Navigation -->
+  <nav class="top-nav">
+    <button class="sidebar-toggle" onclick="toggleSidebar()" aria-label="Toggle sidebar">&#9776;</button>
+    <a href="index.html" class="brand">
+      <span class="brand-symbol">G</span>
+      <span class="brand-text">Geometric Methods in Computational Modeling</span>
+    </a>
+    <ul class="nav-links">
+      <li><a href="../index.html">Geometric Ethics</a></li>
+      <li><a href="https://pypi.org/project/structural-fuzzing/">PyPI</a></li>
+      <li><a href="https://github.com/ahb-sjsu/structural-fuzzing">GitHub</a></li>
+    </ul>
+  </nav>
+
+  <div class="layout">
+    <!-- Sidebar -->
+    <aside class="sidebar" id="sidebar">
+      <h3>Part I: Foundations</h3>
+      <a href="#chapter-01" data-chapter="chapter-01-why-geometry"><span class="ch-num">1</span> Why Geometry?</a>
+      <a href="#chapter-02" data-chapter="chapter-02-mahalanobis-distance"><span class="ch-num">2</span> Mahalanobis Distance</a>
+      <a href="#chapter-03" data-chapter="chapter-03-hyperbolic-geometry"><span class="ch-num">3</span> Hyperbolic Geometry</a>
+      <a href="#chapter-04" data-chapter="chapter-04-spd-manifolds"><span class="ch-num">4</span> SPD Manifolds</a>
+      <a href="#chapter-05" data-chapter="chapter-05-topological-data-analysis"><span class="ch-num">5</span> Topological Data Analysis</a>
+
+      <h3>Part II: Algorithms</h3>
+      <a href="#chapter-06" data-chapter="chapter-06-pathfinding-on-manifolds"><span class="ch-num">6</span> Pathfinding on Manifolds</a>
+      <a href="#chapter-07" data-chapter="chapter-07-equilibrium-on-manifolds"><span class="ch-num">7</span> Equilibrium on Manifolds</a>
+      <a href="#chapter-08" data-chapter="chapter-08-pareto-optimization"><span class="ch-num">8</span> Pareto Optimization</a>
+      <a href="#chapter-09" data-chapter="chapter-09-adversarial-robustness"><span class="ch-num">9</span> Adversarial Robustness</a>
+      <a href="#chapter-10" data-chapter="chapter-10-adversarial-probing"><span class="ch-num">10</span> Adversarial Probing</a>
+
+      <h3>Part III: Patterns</h3>
+      <a href="#chapter-11" data-chapter="chapter-11-subset-enumeration"><span class="ch-num">11</span> Subset Enumeration</a>
+      <a href="#chapter-12" data-chapter="chapter-12-compositional-testing"><span class="ch-num">12</span> Compositional Testing</a>
+      <a href="#chapter-13" data-chapter="chapter-13-group-theoretic-augmentation"><span class="ch-num">13</span> Group-Theoretic Augmentation</a>
+      <a href="#chapter-14" data-chapter="chapter-14-gradient-reversal"><span class="ch-num">14</span> Gradient Reversal</a>
+      <a href="#chapter-15" data-chapter="chapter-15-cholesky-parameterization"><span class="ch-num">15</span> Cholesky Parameterization</a>
+
+      <h3>Part IV: Systems</h3>
+      <a href="#chapter-16" data-chapter="chapter-16-geometric-pipelines"><span class="ch-num">16</span> Geometric Pipelines</a>
+      <a href="#chapter-17" data-chapter="chapter-17-scaling"><span class="ch-num">17</span> Scaling</a>
+      <a href="#chapter-18" data-chapter="chapter-18-production-deployment"><span class="ch-num">18</span> Production Deployment</a>
+      <a href="#chapter-19" data-chapter="chapter-19-case-study-defect-prediction"><span class="ch-num">19</span> Case Study: Defect Prediction</a>
+      <a href="#chapter-20" data-chapter="chapter-20-case-study-bioacoustics"><span class="ch-num">20</span> Case Study: Bioacoustics</a>
+
+      <h3>Appendices</h3>
+      <a href="#appendix-a" data-chapter="appendix-a-notation"><span class="ch-num">A</span> Mathematical Notation</a>
+      <a href="#appendix-b" data-chapter="appendix-b-software"><span class="ch-num">B</span> Software &amp; Installation</a>
+      <a href="#appendix-c" data-chapter="appendix-c-proofs"><span class="ch-num">C</span> Selected Proofs</a>
+    </aside>
+
+    <!-- Main Content Area -->
+    <main class="main-content" id="content">
+      <!-- Landing page shown by default -->
+      <div class="landing" id="landing">
+        <h1>Geometric Methods in Computational Modeling</h1>
+        <p class="subtitle">Andrew H. Bond &mdash; San Jos&eacute; State University</p>
+
+        <div class="stats-bar">
+          <div class="stat"><div class="num">20</div><div class="label">Chapters</div></div>
+          <div class="stat"><div class="num">4</div><div class="label">Parts</div></div>
+          <div class="stat"><div class="num">3</div><div class="label">Appendices</div></div>
+          <div class="stat"><div class="num">10k+</div><div class="label">Lines</div></div>
+        </div>
+
+        <div class="part-grid">
+          <div class="part-card" onclick="loadChapter('chapter-01-why-geometry')">
+            <h3>Part I: Foundations</h3>
+            <ul class="ch-list">
+              <li><span class="ch-n">1.</span> Why Geometry?</li>
+              <li><span class="ch-n">2.</span> Mahalanobis Distance &amp; Weighted Metrics</li>
+              <li><span class="ch-n">3.</span> Hyperbolic Geometry for Hierarchical Data</li>
+              <li><span class="ch-n">4.</span> SPD Manifolds &amp; Spectral Geometry</li>
+              <li><span class="ch-n">5.</span> Topological Data Analysis</li>
+            </ul>
+          </div>
+          <div class="part-card" onclick="loadChapter('chapter-06-pathfinding-on-manifolds')">
+            <h3>Part II: Algorithms on Manifolds</h3>
+            <ul class="ch-list">
+              <li><span class="ch-n">6.</span> Pathfinding on Manifolds</li>
+              <li><span class="ch-n">7.</span> Equilibrium on Manifolds</li>
+              <li><span class="ch-n">8.</span> Pareto Optimization</li>
+              <li><span class="ch-n">9.</span> Adversarial Robustness &amp; MRI</li>
+              <li><span class="ch-n">10.</span> Adversarial Probing</li>
+            </ul>
+          </div>
+          <div class="part-card" onclick="loadChapter('chapter-11-subset-enumeration')">
+            <h3>Part III: Design Patterns</h3>
+            <ul class="ch-list">
+              <li><span class="ch-n">11.</span> Subset Enumeration</li>
+              <li><span class="ch-n">12.</span> Compositional Testing</li>
+              <li><span class="ch-n">13.</span> Group-Theoretic Augmentation</li>
+              <li><span class="ch-n">14.</span> Gradient Reversal &amp; Invariance</li>
+              <li><span class="ch-n">15.</span> Cholesky Parameterization</li>
+            </ul>
+          </div>
+          <div class="part-card" onclick="loadChapter('chapter-16-geometric-pipelines')">
+            <h3>Part IV: Systems &amp; Integration</h3>
+            <ul class="ch-list">
+              <li><span class="ch-n">16.</span> Building Geometric Pipelines</li>
+              <li><span class="ch-n">17.</span> Scaling to High Dimensions</li>
+              <li><span class="ch-n">18.</span> Production Deployment</li>
+              <li><span class="ch-n">19.</span> Case Study: Defect Prediction</li>
+              <li><span class="ch-n">20.</span> Case Study: Bioacoustics</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <!-- Chapter content injected here -->
+      <div class="chapter-content" id="chapter-content" style="display:none;"></div>
+    </main>
+  </div>
+
+  <button class="back-to-top" id="backToTop" onclick="scrollToTop()" aria-label="Back to top">&uarr;</button>
+
+<script>
+// Chapter ordering for prev/next navigation
+const CHAPTERS = [
+  'chapter-01-why-geometry',
+  'chapter-02-mahalanobis-distance',
+  'chapter-03-hyperbolic-geometry',
+  'chapter-04-spd-manifolds',
+  'chapter-05-topological-data-analysis',
+  'chapter-06-pathfinding-on-manifolds',
+  'chapter-07-equilibrium-on-manifolds',
+  'chapter-08-pareto-optimization',
+  'chapter-09-adversarial-robustness',
+  'chapter-10-adversarial-probing',
+  'chapter-11-subset-enumeration',
+  'chapter-12-compositional-testing',
+  'chapter-13-group-theoretic-augmentation',
+  'chapter-14-gradient-reversal',
+  'chapter-15-cholesky-parameterization',
+  'chapter-16-geometric-pipelines',
+  'chapter-17-scaling',
+  'chapter-18-production-deployment',
+  'chapter-19-case-study-defect-prediction',
+  'chapter-20-case-study-bioacoustics',
+  'appendix-a-notation',
+  'appendix-b-software',
+  'appendix-c-proofs'
+];
+
+const CHAPTER_TITLES = {
+  'chapter-01-why-geometry': 'Ch 1: Why Geometry?',
+  'chapter-02-mahalanobis-distance': 'Ch 2: Mahalanobis Distance',
+  'chapter-03-hyperbolic-geometry': 'Ch 3: Hyperbolic Geometry',
+  'chapter-04-spd-manifolds': 'Ch 4: SPD Manifolds',
+  'chapter-05-topological-data-analysis': 'Ch 5: Topological Data Analysis',
+  'chapter-06-pathfinding-on-manifolds': 'Ch 6: Pathfinding on Manifolds',
+  'chapter-07-equilibrium-on-manifolds': 'Ch 7: Equilibrium on Manifolds',
+  'chapter-08-pareto-optimization': 'Ch 8: Pareto Optimization',
+  'chapter-09-adversarial-robustness': 'Ch 9: Adversarial Robustness',
+  'chapter-10-adversarial-probing': 'Ch 10: Adversarial Probing',
+  'chapter-11-subset-enumeration': 'Ch 11: Subset Enumeration',
+  'chapter-12-compositional-testing': 'Ch 12: Compositional Testing',
+  'chapter-13-group-theoretic-augmentation': 'Ch 13: Group-Theoretic Augmentation',
+  'chapter-14-gradient-reversal': 'Ch 14: Gradient Reversal',
+  'chapter-15-cholesky-parameterization': 'Ch 15: Cholesky Parameterization',
+  'chapter-16-geometric-pipelines': 'Ch 16: Geometric Pipelines',
+  'chapter-17-scaling': 'Ch 17: Scaling',
+  'chapter-18-production-deployment': 'Ch 18: Production Deployment',
+  'chapter-19-case-study-defect-prediction': 'Ch 19: Case Study: Defect Prediction',
+  'chapter-20-case-study-bioacoustics': 'Ch 20: Case Study: Bioacoustics',
+  'appendix-a-notation': 'Appendix A: Notation',
+  'appendix-b-software': 'Appendix B: Software',
+  'appendix-c-proofs': 'Appendix C: Proofs'
+};
+
+let chapterCache = {};
+let currentChapter = null;
+
+// Configure marked
+marked.setOptions({
+  breaks: false,
+  gfm: true,
+  headerIds: true
+});
+
+function toggleSidebar() {
+  document.getElementById('sidebar').classList.toggle('open');
+}
+
+function scrollToTop() {
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+// Back-to-top visibility
+window.addEventListener('scroll', () => {
+  const btn = document.getElementById('backToTop');
+  btn.classList.toggle('visible', window.scrollY > 400);
+});
+
+async function loadChapter(chapterId) {
+  currentChapter = chapterId;
+  const landing = document.getElementById('landing');
+  const content = document.getElementById('chapter-content');
+
+  // Show loading
+  landing.style.display = 'none';
+  content.style.display = 'block';
+  content.innerHTML = '<div class="loading"><div class="spinner"></div><p>Loading chapter...</p></div>';
+
+  // Update sidebar active state
+  document.querySelectorAll('.sidebar a').forEach(a => a.classList.remove('active'));
+  const activeLink = document.querySelector(`.sidebar a[data-chapter="${chapterId}"]`);
+  if (activeLink) {
+    activeLink.classList.add('active');
+    activeLink.scrollIntoView({ block: 'nearest' });
+  }
+
+  // Close mobile sidebar
+  document.getElementById('sidebar').classList.remove('open');
+
+  // Scroll to top
+  window.scrollTo({ top: 0, behavior: 'instant' });
+
+  try {
+    let md;
+    if (chapterCache[chapterId]) {
+      md = chapterCache[chapterId];
+    } else {
+      const resp = await fetch(`chapters/${chapterId}.md`);
+      if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
+      md = await resp.text();
+      chapterCache[chapterId] = md;
+    }
+
+    // Render markdown
+    let html = marked.parse(md);
+
+    // Add prev/next navigation
+    const idx = CHAPTERS.indexOf(chapterId);
+    let navHtml = '<div class="chapter-nav">';
+    if (idx > 0) {
+      navHtml += `<a href="#" onclick="loadChapter('${CHAPTERS[idx-1]}'); return false;">&larr; ${CHAPTER_TITLES[CHAPTERS[idx-1]]}</a>`;
+    } else {
+      navHtml += '<span class="placeholder">&larr;</span>';
+    }
+    if (idx < CHAPTERS.length - 1) {
+      navHtml += `<a href="#" onclick="loadChapter('${CHAPTERS[idx+1]}'); return false;">${CHAPTER_TITLES[CHAPTERS[idx+1]]} &rarr;</a>`;
+    } else {
+      navHtml += '<span class="placeholder">&rarr;</span>';
+    }
+    navHtml += '</div>';
+
+    content.innerHTML = html + navHtml;
+
+    // Render math with KaTeX
+    if (typeof renderMathInElement === 'function') {
+      renderMathInElement(content, {
+        delimiters: [
+          { left: '$$', right: '$$', display: true },
+          { left: '$', right: '$', display: false },
+          { left: '\\[', right: '\\]', display: true },
+          { left: '\\(', right: '\\)', display: false }
+        ],
+        throwOnError: false,
+        trust: true
+      });
+    }
+
+    // Update URL hash
+    history.replaceState(null, '', `#${chapterId}`);
+    document.title = `${CHAPTER_TITLES[chapterId]} — Geometric Methods`;
+
+  } catch (err) {
+    content.innerHTML = `<div class="loading"><p>Error loading chapter: ${err.message}</p><p><a href="#" onclick="showLanding(); return false;">Return to table of contents</a></p></div>`;
+  }
+}
+
+function showLanding() {
+  document.getElementById('landing').style.display = 'block';
+  document.getElementById('chapter-content').style.display = 'none';
+  document.querySelectorAll('.sidebar a').forEach(a => a.classList.remove('active'));
+  history.replaceState(null, '', 'index.html');
+  document.title = 'Geometric Methods in Computational Modeling — Andrew H. Bond';
+  currentChapter = null;
+}
+
+// Sidebar click handler
+document.querySelectorAll('.sidebar a[data-chapter]').forEach(a => {
+  a.addEventListener('click', (e) => {
+    e.preventDefault();
+    loadChapter(a.dataset.chapter);
+  });
+});
+
+// Handle initial hash
+window.addEventListener('DOMContentLoaded', () => {
+  const hash = location.hash.replace('#', '');
+  if (hash && CHAPTERS.includes(hash)) {
+    loadChapter(hash);
+  }
+  // Wait for KaTeX auto-render to be ready
+  document.addEventListener('DOMContentLoaded', () => {});
+});
+
+// Handle back/forward
+window.addEventListener('hashchange', () => {
+  const hash = location.hash.replace('#', '');
+  if (hash && CHAPTERS.includes(hash) && hash !== currentChapter) {
+    loadChapter(hash);
+  } else if (!hash) {
+    showLanding();
+  }
+});
+
+// Keyboard navigation
+document.addEventListener('keydown', (e) => {
+  if (!currentChapter) return;
+  const idx = CHAPTERS.indexOf(currentChapter);
+  if (e.key === 'ArrowLeft' && idx > 0) {
+    loadChapter(CHAPTERS[idx - 1]);
+  } else if (e.key === 'ArrowRight' && idx < CHAPTERS.length - 1) {
+    loadChapter(CHAPTERS[idx + 1]);
+  }
+});
+</script>
+
+</body>
+</html>
