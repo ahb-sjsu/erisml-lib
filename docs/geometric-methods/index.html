@@ -499,11 +499,72 @@ const CHAPTER_TITLES = {
 let chapterCache = {};
 let currentChapter = null;
 
-// Configure marked
-marked.setOptions({
+// Configure marked with KaTeX math extensions.
+// Extensions capture $...$ and $$...$$ at the tokenizer level, BEFORE
+// Marked processes backslash escapes (which would strip \; \{ \| etc.).
+// Renderers call katex.renderToString directly — KaTeX is loaded via
+// defer scripts and is available by the time marked.parse() runs.
+marked.use({
   breaks: false,
   gfm: true,
-  headerIds: true
+  headerIds: true,
+  extensions: [
+    // Block-level display math: $$...$$
+    {
+      name: 'blockMath',
+      level: 'block',
+      start(src) { return src.indexOf('$$'); },
+      tokenizer(src) {
+        const match = src.match(/^\$\$([\s\S]+?)\$\$/);
+        if (match) {
+          return { type: 'blockMath', raw: match[0], text: match[1].trim() };
+        }
+      },
+      renderer(token) {
+        if (typeof katex === 'undefined') return '<div>$$' + token.text + '$$</div>';
+        try {
+          return '<div>' + katex.renderToString(token.text, {
+            displayMode: true, throwOnError: false, trust: true
+          }) + '</div>';
+        } catch(e) {
+          return '<div class="math-error">$$' + token.text + '$$</div>';
+        }
+      }
+    },
+    // Inline math: $...$
+    {
+      name: 'inlineMath',
+      level: 'inline',
+      start(src) {
+        let idx = src.indexOf('$');
+        while (idx !== -1) {
+          // Skip escaped \$ and display-math $$
+          if (idx > 0 && src[idx - 1] === '\\') { idx = src.indexOf('$', idx + 1); continue; }
+          if (src[idx + 1] === '$') { idx = src.indexOf('$', idx + 2); continue; }
+          const rest = src.substring(idx);
+          if (rest.match(/^\$[^\$\n]+?\$/)) return idx;
+          idx = src.indexOf('$', idx + 1);
+        }
+        return -1;
+      },
+      tokenizer(src) {
+        const match = src.match(/^\$([^\$\n]+?)\$/);
+        if (match) {
+          return { type: 'inlineMath', raw: match[0], text: match[1] };
+        }
+      },
+      renderer(token) {
+        if (typeof katex === 'undefined') return '$' + token.text + '$';
+        try {
+          return katex.renderToString(token.text, {
+            displayMode: false, throwOnError: false, trust: true
+          });
+        } catch(e) {
+          return '<span class="math-error">$' + token.text + '$</span>';
+        }
+      }
+    }
+  ]
 });
 
 function toggleSidebar() {
@@ -575,19 +636,7 @@ async function loadChapter(chapterId) {
 
     content.innerHTML = html + navHtml;
 
-    // Render math with KaTeX
-    if (typeof renderMathInElement === 'function') {
-      renderMathInElement(content, {
-        delimiters: [
-          { left: '$$', right: '$$', display: true },
-          { left: '$', right: '$', display: false },
-          { left: '\\[', right: '\\]', display: true },
-          { left: '\\(', right: '\\)', display: false }
-        ],
-        throwOnError: false,
-        trust: true
-      });
-    }
+    // Math is pre-rendered by Marked extensions — no post-processing needed.
 
     // Inject interactive demos
     if (typeof injectDemos === 'function') {

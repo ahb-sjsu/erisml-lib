@@ -608,7 +608,7 @@ Each analysis stage in the campaign builds on the others. Subset enumeration ide
 
 ### 19.11.5 The Framework Scales
 
-The five-dimensional case study in this chapter is deliberately small, chosen for pedagogical clarity. The framework's architecture scales to higher-dimensional spaces. For $n$ dimensions with `max_subset_dims = k$, the enumeration cost is $\sum_{j=1}^{k} \binom{n}{j}$, which grows polynomially for fixed $k$. With $k = 3$ and $n = 10$, this is $10 + 45 + 120 = 175$ subsets---still feasible. For $n = 20$ or beyond, the enumeration becomes expensive and the greedy approaches (forward selection, backward elimination, compositional testing) serve as practical approximations. Chapter 17 discusses scaling strategies for high-dimensional analysis spaces in detail.
+The five-dimensional case study in this chapter is deliberately small, chosen for pedagogical clarity. The framework's architecture scales to higher-dimensional spaces. For $n$ dimensions with `max_subset_dims = k`, the enumeration cost is $\sum_{j=1}^{k} \binom{n}{j}$, which grows polynomially for fixed $k$. With $k = 3$ and $n = 10$, this is $10 + 45 + 120 = 175$ subsets---still feasible. For $n = 20$ or beyond, the enumeration becomes expensive and the greedy approaches (forward selection, backward elimination, compositional testing) serve as practical approximations. Chapter 17 discusses scaling strategies for high-dimensional analysis spaces in detail.
 
 ---
 
