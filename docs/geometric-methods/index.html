@@ -553,29 +553,52 @@ async function loadChapter(chapterId) {
     }
 
     // Protect math expressions from Marked's markdown parser.
-    // Marked treats $...$ content as regular text and mangles it
-    // (removes spaces, interprets underscores as <em>, etc.).
-    // We replace math blocks with placeholders, parse markdown,
-    // then restore the original math for KaTeX to render.
+    // Marked treats $...$ content as regular text — interpreting
+    // underscores as <em>, stripping spaces, mangling LaTeX.
+    // We scan character-by-character to correctly extract all math
+    // blocks, replace with placeholders, let Marked parse the rest,
+    // then restore the math for KaTeX.
     const mathPlaceholders = [];
-    let protected = md;
 
-    // Protect display math ($$...$$) first — greedy across newlines
-    protected = protected.replace(/\$\$([\s\S]+?)\$\$/g, (match) => {
-      const id = mathPlaceholders.length;
-      mathPlaceholders.push(match);
-      return `\x00MATH${id}\x00`;
-    });
+    function protectMath(src) {
+      let result = '';
+      let i = 0;
+      while (i < src.length) {
+        // Display math: $$...$$
+        if (src[i] === '$' && src[i+1] === '$') {
+          const start = i;
+          i += 2;
+          while (i < src.length - 1 && !(src[i] === '$' && src[i+1] === '$')) i++;
+          if (i < src.length - 1) i += 2; // skip closing $$
+          const id = mathPlaceholders.length;
+          mathPlaceholders.push(src.slice(start, i));
+          result += `\x00MATH${id}\x00`;
+          continue;
+        }
+        // Inline math: $...$  (not preceded by \, not $$)
+        if (src[i] === '$' && (i === 0 || src[i-1] !== '\\')) {
+          const start = i;
+          i += 1;
+          // Scan for closing $ (same line, allow any content including \| and _)
+          while (i < src.length && src[i] !== '$' && src[i] !== '\n') i++;
+          if (i < src.length && src[i] === '$') {
+            i += 1; // skip closing $
+            const id = mathPlaceholders.length;
+            mathPlaceholders.push(src.slice(start, i));
+            result += `\x00MATH${id}\x00`;
+            continue;
+          }
+          // No closing $ found on same line — not math, emit the original $
+          result += src.slice(start, i);
+          continue;
+        }
+        result += src[i];
+        i++;
+      }
+      return result;
+    }
 
-    // Protect inline math ($...$) — non-greedy, single line
-    protected = protected.replace(/\$([^\$\n]+?)\$/g, (match) => {
-      const id = mathPlaceholders.length;
-      mathPlaceholders.push(match);
-      return `\x00MATH${id}\x00`;
-    });
-
-    // Now Marked can safely parse without touching math
-    let html = marked.parse(protected);
+    let html = marked.parse(protectMath(md));
 
     // Restore math expressions
     html = html.replace(/\x00MATH(\d+)\x00/g, (_, id) => mathPlaceholders[parseInt(id)]);
