@@ -552,8 +552,33 @@ async function loadChapter(chapterId) {
       chapterCache[chapterId] = md;
     }
 
-    // Render markdown
-    let html = marked.parse(md);
+    // Protect math expressions from Marked's markdown parser.
+    // Marked treats $...$ content as regular text and mangles it
+    // (removes spaces, interprets underscores as <em>, etc.).
+    // We replace math blocks with placeholders, parse markdown,
+    // then restore the original math for KaTeX to render.
+    const mathPlaceholders = [];
+    let protected = md;
+
+    // Protect display math ($$...$$) first — greedy across newlines
+    protected = protected.replace(/\$\$([\s\S]+?)\$\$/g, (match) => {
+      const id = mathPlaceholders.length;
+      mathPlaceholders.push(match);
+      return `\x00MATH${id}\x00`;
+    });
+
+    // Protect inline math ($...$) — non-greedy, single line
+    protected = protected.replace(/\$([^\$\n]+?)\$/g, (match) => {
+      const id = mathPlaceholders.length;
+      mathPlaceholders.push(match);
+      return `\x00MATH${id}\x00`;
+    });
+
+    // Now Marked can safely parse without touching math
+    let html = marked.parse(protected);
+
+    // Restore math expressions
+    html = html.replace(/\x00MATH(\d+)\x00/g, (_, id) => mathPlaceholders[parseInt(id)]);
 
     // Add prev/next navigation
     const idx = CHAPTERS.indexOf(chapterId);
