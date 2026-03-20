@@ -1,6 +1,6 @@
 # Chapter 5: Topological Data Analysis
 
-*Geometric Methods in Computational Modeling* — Andrew H. Bond
+*Structural Fuzzing: Geometric Methods for Adversarial Model Validation* — Andrew H. Bond
 
 ---
 
@@ -472,7 +472,7 @@ Topological data analysis provides a principled framework for extracting shape-b
 
 6. **Application to cetacean bioacoustics** demonstrates that topological features capture the dynamical shape of vocal patterns — cyclic structure, interval clustering, rhythmic regularity — in ways that are invariant to tempo and complementary to spectral analysis.
 
-The topological perspective will recur in later chapters. In Part II, we will see how persistent homology can detect phase transitions in adversarial parameter spaces (Chapter 9) and how topological features serve as robust invariants for structural fuzzing campaigns (Chapter 12). The key takeaway is that topology captures qualitative structure — the presence or absence of holes, loops, and clusters — that persists under the continuous deformations induced by noise, measurement error, and parameter perturbation, making it a natural complement to the metric and manifold methods developed in Chapters 2 through 4.
+The topological perspective will recur in later chapters. In Part II, we will see how persistent homology can detect phase transitions in adversarial parameter spaces (Chapter 9) and how topological features serve as robust invariants for structural fuzzing campaigns (Chapter 20). The key takeaway is that topology captures qualitative structure — the presence or absence of holes, loops, and clusters — that persists under the continuous deformations induced by noise, measurement error, and parameter perturbation, making it a natural complement to the metric and manifold methods developed in Chapters 2 through 4.
 
 ---
 

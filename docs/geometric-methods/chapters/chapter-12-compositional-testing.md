@@ -3,7 +3,7 @@
 > *"The whole is other than the sum of its parts."*
 > --- Kurt Koffka, *Principles of Gestalt Psychology* (1935)
 
-Chapters 4 and 9 developed two complementary views of multi-dimensional model behavior. Subset enumeration (Chapter 4) asks: which combinations of dimensions produce the best fit? Sensitivity profiling (Chapter 9) asks: how much does each dimension contribute to the baseline? Both are indispensable. Both are incomplete.
+Chapters 11 and 9 developed two complementary views of multi-dimensional model behavior. Subset enumeration (Chapter 11) asks: which combinations of dimensions produce the best fit? Sensitivity profiling (Chapter 9) asks: how much does each dimension contribute to the baseline? Both are indispensable. Both are incomplete.
 
 Subset enumeration tests every combination independently, but it does not reveal *how* dimensions interact---whether the combination of Complexity and Process is better than expected from their individual contributions, or merely the sum of two independent effects. Sensitivity profiling measures the marginal contribution of each dimension by ablation, but it holds all other dimensions fixed, missing the cases where removing two dimensions simultaneously is far worse (or far better) than removing each alone.
 
@@ -353,7 +353,7 @@ This sequence encodes several types of information.
 
 The gains exhibit strong diminishing returns: the first dimension added (Process) produces a gain of 1.72, while the last (Halstead) produces only 0.07. This is a common pattern. It arises because each successive dimension can only capture the variance unexplained by the already-active dimensions, and that unexplained variance shrinks with each addition.
 
-**Diminishing-returns elbow.** The point where marginal gains transition from substantial to negligible---the "elbow" of the MAE curve---is a natural place to draw a complexity boundary. In the example above, the elbow occurs at step 2 (adding Size), after which further dimensions contribute less than 0.15 MAE each. A practitioner might reasonably conclude that three dimensions (Complexity, Process, Size) capture the essential behavior and the remaining two add complexity without proportionate benefit. This connects directly to the Pareto analysis of Chapter 5: the elbow in the compositional sequence often corresponds to a Pareto-optimal point on the (dimensionality, MAE) frontier.
+**Diminishing-returns elbow.** The point where marginal gains transition from substantial to negligible---the "elbow" of the MAE curve---is a natural place to draw a complexity boundary. In the example above, the elbow occurs at step 2 (adding Size), after which further dimensions contribute less than 0.15 MAE each. A practitioner might reasonably conclude that three dimensions (Complexity, Process, Size) capture the essential behavior and the remaining two add complexity without proportionate benefit. This connects directly to the Pareto analysis of Chapter 8: the elbow in the compositional sequence often corresponds to a Pareto-optimal point on the (dimensionality, MAE) frontier.
 
 **Interaction signatures.** The marginal gains also encode interaction information, though less directly than the interaction matrix. If the gain from adding dimension $j$ to the set $\{d_1, \ldots, d_k\}$ is much larger than $j$'s individual ablation delta from the sensitivity profile, then $j$ is synergistic with the current active set: it contributes more in combination than it does alone. Conversely, if the gain is much smaller than the ablation delta, the current set already captures most of $j$'s information---a signature of redundancy.
 
@@ -491,7 +491,7 @@ To identify redundancy clusters from the compositional result:
 2. Compute the ratio $R_j = G_j / \Delta_j$ (gain relative to individual importance).
 3. Group consecutive dimensions with $R_j < 0.3$ (or another threshold) into clusters.
 
-Each cluster represents a set of dimensions that are largely interchangeable. The model could use any one of them as a representative, reducing dimensionality without significant loss of information. This directly connects to the dimensionality reduction motivation of Chapter 5's Pareto analysis: redundancy clusters are the mechanism by which models achieve good performance with fewer dimensions.
+Each cluster represents a set of dimensions that are largely interchangeable. The model could use any one of them as a representative, reducing dimensionality without significant loss of information. This directly connects to the dimensionality reduction motivation of Chapter 8's Pareto analysis: redundancy clusters are the mechanism by which models achieve good performance with fewer dimensions.
 
 ---
 
@@ -510,7 +510,7 @@ The geometry of this path encodes interaction information:
 
 ### 12.7.2 Composition Paths and the Pareto Frontier
 
-The composition path can be overlaid on the Pareto frontier from Chapter 5. Pareto-optimal points represent the best possible MAE for each dimensionality, while the composition path represents the MAE achieved by a particular greedy construction. The gap between the composition path and the Pareto frontier measures the cost of the greedy approximation: how much worse the greedy ordering is compared to the optimal subset at each dimensionality.
+The composition path can be overlaid on the Pareto frontier from Chapter 8. Pareto-optimal points represent the best possible MAE for each dimensionality, while the composition path represents the MAE achieved by a particular greedy construction. The gap between the composition path and the Pareto frontier measures the cost of the greedy approximation: how much worse the greedy ordering is compared to the optimal subset at each dimensionality.
 
 If the composition path lies close to the Pareto frontier at every step, the greedy algorithm is performing well---the interaction structure is sufficiently captured by the greedy choices. If the composition path deviates significantly from the Pareto frontier at some step, the greedy algorithm has made a suboptimal choice at that point, and the interaction structure contains non-greedy features (e.g., a triple of dimensions that is strong as a unit but whose pairwise components are weak).
 
@@ -570,7 +570,7 @@ Compositional testing addresses a fundamental gap in single-dimension analysis: 
 
 5. **The geometric interpretation.** The interaction matrix functions as a metric tensor on the dimension activation space, encoding how curvature in the activation space maps to curvature in the evaluation space. Compositional testing traces an approximately geodesic path through this space.
 
-The analysis developed in this chapter is *local*: it characterizes interactions around a specific baseline configuration (for ablation) or along a specific greedy path (for composition). It does not guarantee that the interaction structure is the same in other regions of the parameter space. For models with strongly nonlinear evaluation functions, interactions can appear and disappear as the baseline moves. Chapter 13 extends the analysis by examining how compositional structures change under perturbation, connecting the local interaction picture to the global robustness framework developed in Chapter 7.
+The analysis developed in this chapter is *local*: it characterizes interactions around a specific baseline configuration (for ablation) or along a specific greedy path (for composition). It does not guarantee that the interaction structure is the same in other regions of the parameter space. For models with strongly nonlinear evaluation functions, interactions can appear and disappear as the baseline moves. Chapter 13 extends the analysis by examining how compositional structures change under perturbation, connecting the local interaction picture to the global robustness framework developed in Chapter 9.
 
 ---
 

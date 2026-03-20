@@ -345,12 +345,12 @@ report = run_campaign(
 
 | Stage | Tool | Chapter | Question |
 |-------|------|---------|----------|
-| 1 | Subset enumeration | 4 | Which dimension combinations matter? |
-| 2 | Pareto frontier | 5 | Which configurations are non-dominated? |
-| 3 | Sensitivity profiling | 10 | Which dimensions drive predictions? |
+| 1 | Subset enumeration | 11 | Which dimension combinations matter? |
+| 2 | Pareto frontier | 8 | Which configurations are non-dominated? |
+| 3 | Sensitivity profiling | 9 | Which dimensions drive predictions? |
 | 4 | Model Robustness Index | 9 | How stable is the best configuration? |
-| 5 | Adversarial thresholds | 10 | Where does each dimension break? |
-| 6 | Compositional testing | 10 | How do dimensions interact? |
+| 5 | Adversarial thresholds | 9--10 | Where does each dimension break? |
+| 6 | Compositional testing | 12 | How do dimensions interact? |
 
 ### 10.6.2 The Report as a Geometric Object
 
@@ -409,10 +409,10 @@ The unifying theme is the radar analogy: *the difference between "sent" and "rec
 
 ### 10.8.2 Connection to Part III
 
-Part III shifts from developing tools in isolation to deploying them in integrated systems. The probing framework is central:
+Part III shifts from developing tools in isolation to identifying reusable design patterns. The probing framework is central:
 
-- **Chapter 11** applies probing to continuous monitoring, tracking how sensitivity fingerprints evolve and triggering alerts when adversarial thresholds drop.
-- **Chapter 12** integrates probing with pathfinding (Chapter 6), navigating from fragile to robust configurations along geodesics using the probe response surface as the cost function.
-- **Chapter 13** combines probing with multi-objective optimization, computing Pareto frontiers in the (MAE, DRI) plane to select configurations that are simultaneously accurate and robust.
+- **Chapter 11** applies the subset enumeration pattern to systematically explore which dimension combinations matter, using the probing tools from this chapter to validate each configuration.
+- **Chapter 12** develops compositional testing, integrating probing with incremental dimension-building to reveal interaction effects invisible to single-dimension analysis.
+- **Chapter 13** combines probing with group-theoretic data augmentation, exploiting symmetries to multiply probing coverage without proportional computational cost.
 
-The transition from Part II to Part III mirrors the transition from constructing individual instruments to building an orchestra. Each instrument---subset enumeration, Pareto analysis, sensitivity profiling, MRI, adversarial probing, TDA---has been developed and tested in isolation. Part III teaches them to play together.
+The transition from Part II to Part III mirrors the transition from constructing individual instruments to building an orchestra. Each instrument---Pareto analysis, sensitivity profiling, MRI, adversarial probing, TDA---has been developed and tested in isolation. Part III teaches them to play together.

@@ -29,7 +29,7 @@ FEATURE_GROUPS = {
 
 Five groups, sixteen features, one dimension per group. The analysis space is $\mathbb{R}^5$, small enough for exhaustive subset enumeration yet rich enough to capture the structural questions that matter: which combinations of metric families predict defects? Which are redundant? Where are the fragility boundaries?
 
-The grouping itself is a modeling decision. One could split Halstead into "volume" and "effort" sub-groups, or merge Size and Halstead into a single "scale" dimension. Chapter 3 discusses the principles for constructing dimension groupings. Here, we follow the standard five-group decomposition because it aligns with the domain taxonomy and produces a space small enough for exhaustive analysis.
+The grouping itself is a modeling decision. One could split Halstead into "volume" and "effort" sub-groups, or merge Size and Halstead into a single "scale" dimension. Chapter 1 discusses the principles for constructing dimension groupings. Here, we follow the standard five-group decomposition because it aligns with the domain taxonomy and produces a space small enough for exhaustive analysis.
 
 ### 19.1.2 Ground Truth Structure
 
@@ -64,7 +64,7 @@ The generator produces 1,000 modules with 16 features each and a binary defect l
 
 ## 19.2 Building the Evaluation Function
 
-The structural fuzzing framework communicates with models through a single interface: the *evaluation function*. This function takes a parameter vector $\mathbf{p} \in \mathbb{R}^n$ (one entry per dimension) and returns a scalar MAE along with a dictionary of per-target errors. The design of this interface is discussed in Chapter 3; here we implement it for defect prediction.
+The structural fuzzing framework communicates with models through a single interface: the *evaluation function*. This function takes a parameter vector $\mathbf{p} \in \mathbb{R}^n$ (one entry per dimension) and returns a scalar MAE along with a dictionary of per-target errors. The design of this interface is discussed in Chapter 1; here we implement it for defect prediction.
 
 ### 19.2.1 The evaluate_fn Contract
 
@@ -300,7 +300,7 @@ The elbow at $k = 2$ is the key finding. A team with limited feature engineering
 
 ### 19.6.1 Ablation Rankings
 
-Sensitivity profiling (Chapter 7) ablates each dimension from the best baseline configuration and measures the resulting increase in MAE. The ranking reveals which dimensions the model depends on most:
+Sensitivity profiling (Chapter 9) ablates each dimension from the best baseline configuration and measures the resulting increase in MAE. The ranking reveals which dimensions the model depends on most:
 
 ```python
 print("Sensitivity ranking (ablation from best configuration):")
@@ -347,7 +347,7 @@ Sensitivity profiling and subset enumeration provide complementary information. 
 
 ### 19.7.1 MRI Computation
 
-The Model Robustness Index (Chapter 7) quantifies how sensitive the best configuration is to parameter perturbations. The framework perturbs the baseline parameters 300 times in log-space and measures the distribution of MAE deviations:
+The Model Robustness Index (Chapter 9) quantifies how sensitive the best configuration is to parameter perturbations. The framework perturbs the baseline parameters 300 times in log-space and measures the distribution of MAE deviations:
 
 ```python
 mri = report.mri_result
@@ -457,7 +457,7 @@ This kind of *conditional deployment guidance* is impossible to derive from a sc
 
 ### 19.9.1 The Build Sequence
 
-The compositional test (Chapter 4) constructs a greedy dimension-addition sequence, starting from a single dimension and iteratively adding the candidate that produces the largest MAE reduction:
+The compositional test (Chapter 12) constructs a greedy dimension-addition sequence, starting from a single dimension and iteratively adding the candidate that produces the largest MAE reduction:
 
 ```python
 comp = report.composition_result

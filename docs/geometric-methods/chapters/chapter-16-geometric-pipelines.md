@@ -17,12 +17,12 @@ Each geometric tool from Parts II and III answers one question:
 
 | Tool | Chapter | Question |
 |------|---------|----------|
-| Subset enumeration | 4 | Which dimension combinations matter? |
-| Pareto frontier | 5 | Which configurations are non-dominated tradeoffs? |
-| Sensitivity profiling | 7 | How much does each dimension contribute? |
-| Model Robustness Index | 7 | How stable is the best configuration under perturbation? |
-| Adversarial threshold search | 14 | Where are the exact tipping points? |
-| Compositional testing | 15 | In what order should dimensions be added? |
+| Subset enumeration | 11 | Which dimension combinations matter? |
+| Pareto frontier | 8 | Which configurations are non-dominated tradeoffs? |
+| Sensitivity profiling | 9 | How much does each dimension contribute? |
+| Model Robustness Index | 9 | How stable is the best configuration under perturbation? |
+| Adversarial threshold search | 9 | Where are the exact tipping points? |
+| Compositional testing | 12 | In what order should dimensions be added? |
 
 The answers to these questions are not independent. The Pareto frontier depends on the subset enumeration results. Sensitivity profiling uses the best configuration found by enumeration as its baseline. The MRI perturbs that same baseline. Adversarial search probes the dimensions that sensitivity profiling identified as critical. Each stage consumes the output of its predecessors and enriches the overall picture.
 
@@ -614,7 +614,7 @@ This keeps the pipeline running but may produce misleading results if exceptions
 
 ### 16.7.3 Interpreting the MRI Under Partial Information
 
-The MRI is sensitive to the perturbation distribution. If the evaluation function returns unreliable values for certain parameter regions (e.g., near the inactive threshold), the MRI may over-estimate or under-estimate tail risk. Chapter 7 discusses this issue in detail; here the practical advice is: examine the MRI's `worst_case_mae` field. If it is unreasonably large (orders of magnitude above the baseline MAE), one or more perturbation samples likely hit a degenerate configuration, and the MRI should be recomputed with a smaller `mri_scale`.
+The MRI is sensitive to the perturbation distribution. If the evaluation function returns unreliable values for certain parameter regions (e.g., near the inactive threshold), the MRI may over-estimate or under-estimate tail risk. Chapter 9 discusses this issue in detail; here the practical advice is: examine the MRI's `worst_case_mae` field. If it is unreasonably large (orders of magnitude above the baseline MAE), one or more perturbation samples likely hit a degenerate configuration, and the MRI should be recomputed with a smaller `mri_scale`.
 
 ---
 

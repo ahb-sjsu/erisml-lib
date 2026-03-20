@@ -1,8 +1,8 @@
 # Appendix B: Software Dependencies and Installation
 
 This appendix provides a guide to setting up the software environment
-required to reproduce the examples in *Geometric Methods in Computational
-Modeling*. The primary framework, `structural-fuzzing`, is available on
+required to reproduce the examples in *Structural Fuzzing: Geometric Methods
+for Adversarial Model Validation*. The primary framework, `structural-fuzzing`, is available on
 PyPI and serves as the backbone for the structural validation techniques
 developed throughout the text.
 
@@ -47,8 +47,8 @@ source .venv/bin/activate
 Alternatively, with conda:
 
 ```bash
-conda create -n geometric-modeling python=3.12
-conda activate geometric-modeling
+conda create -n structural-fuzzing python=3.12
+conda activate structural-fuzzing
 ```
 
 **Best practices:**
@@ -207,22 +207,29 @@ chapter. "Core" means only `structural-fuzzing` and NumPy are needed.
 | Chapter / Part | Core | scikit-learn | pandas | scipy | gudhi/ripser | geoopt |
 |----------------|------|-------------|--------|-------|-------------|--------|
 | **Part I: Foundations** | | | | | | |
-| Ch 1. Introduction to Geometric Modeling | Required | -- | -- | -- | -- | -- |
-| Ch 2. Parameter Spaces and Manifolds | Required | -- | -- | Recommended | -- | -- |
-| Ch 3. Structural Validation Framework | Required | -- | -- | -- | -- | -- |
+| Ch 1. Why Geometry? | Required | -- | -- | -- | -- | -- |
+| Ch 2. Mahalanobis Distance | Required | -- | -- | Recommended | -- | -- |
+| Ch 3. Hyperbolic Geometry | Required | -- | -- | Recommended | -- | Required |
+| Ch 4. SPD Manifolds | Required | -- | -- | Required | -- | -- |
+| Ch 5. Topological Data Analysis | Required | -- | -- | Required | Required | -- |
 | **Part II: Algorithms** | | | | | | |
-| Ch 4. Subset Enumeration and Pareto Analysis | Required | Recommended | -- | -- | -- | -- |
-| Ch 5. Sensitivity and Ablation Methods | Required | Recommended | Recommended | -- | -- | -- |
-| Ch 6. Robustness Quantification (MRI) | Required | -- | -- | Recommended | -- | -- |
-| Ch 7. Adversarial Threshold Detection | Required | -- | -- | -- | -- | -- |
-| **Part III: Patterns** | | | | | | |
-| Ch 8. Compositional Model Building | Required | Recommended | Recommended | -- | -- | -- |
-| Ch 9. Topological Feature Analysis | Required | -- | -- | Required | Required | -- |
-| Ch 10. Hyperbolic Embeddings | Required | -- | -- | Recommended | -- | Required |
+| Ch 6. Pathfinding on Manifolds | Required | -- | -- | Recommended | -- | -- |
+| Ch 7. Equilibrium on Manifolds | Required | -- | -- | -- | -- | -- |
+| Ch 8. Pareto Optimization | Required | Recommended | -- | -- | -- | -- |
+| Ch 9. Adversarial Robustness (MRI) | Required | Recommended | Recommended | -- | -- | -- |
+| Ch 10. Adversarial Probing | Required | -- | -- | -- | -- | -- |
+| **Part III: Design Patterns** | | | | | | |
+| Ch 11. Subset Enumeration | Required | Recommended | -- | -- | -- | -- |
+| Ch 12. Compositional Testing | Required | Recommended | Recommended | -- | -- | -- |
+| Ch 13. Group-Theoretic Augmentation | Required | -- | -- | -- | -- | -- |
+| Ch 14. Gradient Reversal | Required | -- | -- | -- | -- | -- |
+| Ch 15. Cholesky Parameterization | Required | -- | -- | Recommended | -- | -- |
 | **Part IV: Systems** | | | | | | |
-| Ch 11. Geometric Economics (eris-econ) | Required | -- | Recommended | Recommended | -- | -- |
-| Ch 12. Ecological Modeling (eris-ketos) | Required | -- | Recommended | Recommended | -- | -- |
-| Ch 13. Abstract Reasoning (arc-agi) | Required | -- | -- | -- | -- | Required |
+| Ch 16. Building Geometric Pipelines | Required | Recommended | Recommended | -- | -- | -- |
+| Ch 17. Scaling to High Dimensions | Required | -- | -- | Recommended | -- | -- |
+| Ch 18. Production Deployment | Required | -- | -- | -- | -- | -- |
+| Ch 19. Case Study: Defect Prediction | Required | Required | Recommended | -- | -- | -- |
+| Ch 20. Case Study: Bioacoustics | Required | -- | Recommended | Recommended | Required | Required |
 
 ## B.9 Complete Installation for All Chapters
 
@@ -248,7 +255,7 @@ pip install structural-fuzzing
 ```
 
 This installs only `structural-fuzzing` and NumPy, sufficient for
-Chapters 1 through 7.
+Chapters 1 through 2 and Chapters 6 through 11.
 
 ## B.10 Verifying the Full Installation
 

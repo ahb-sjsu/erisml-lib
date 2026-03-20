@@ -1,6 +1,6 @@
 # Chapter 20: Case Study --- Cetacean Bioacoustics
 
-*Geometric Methods in Computational Modeling* --- Andrew H. Bond
+*Structural Fuzzing: Geometric Methods for Adversarial Model Validation* --- Andrew H. Bond
 
 > *"There is no other species on earth whose social organization and communication system so closely parallels our own as the sperm whale."*
 > --- Hal Whitehead, *Sperm Whales: Social Evolution in the Ocean* (2003)
@@ -429,7 +429,7 @@ This mirrors the `make_evaluate_fn` pattern from the geometric economics model, 
 
 ### 20.7.2 Subset Enumeration
 
-Following the methodology of Chapter 7, we enumerate subsets of feature dimensions to determine which geometric methods are essential and which are redundant. Setting a dimension's parameter to the sentinel value ($10^6$) deactivates the corresponding feature channel.
+Following the methodology of Chapter 11, we enumerate subsets of feature dimensions to determine which geometric methods are essential and which are redundant. Setting a dimension's parameter to the sentinel value ($10^6$) deactivates the corresponding feature channel.
 
 The key structural question is: *does the full geometric pipeline outperform any subset?* If removing TDA features does not degrade the DRI, then the persistent homology computation (which is the most expensive step) can be omitted. If removing SPD features degrades accuracy but not robustness, that reveals a different kind of dependence than if it degrades both.
 
@@ -445,7 +445,7 @@ The expected findings, based on the domain knowledge developed in Sections 20.2-
 
 ### 20.7.3 Sensitivity Profiling and the MRI
 
-The Model Robustness Index (Chapter 7) perturbs the decoder's feature weights and measures the distribution of DRI deviations:
+The Model Robustness Index (Chapter 9) perturbs the decoder's feature weights and measures the distribution of DRI deviations:
 
 $$\text{MRI} = 0.5 \cdot \bar{d} + 0.3 \cdot d_{75} + 0.2 \cdot d_{95}$$
 
@@ -568,7 +568,7 @@ This chapter has demonstrated, in a single end-to-end example, the central theme
 
 **Adversarial testing finds what validation misses.** A decoder with 86% accuracy might seem adequate. The DRI reveals that it fails catastrophically under 1.2% click dropout. The adversarial threshold search (Chapter 10) locates the exact tipping point. The sensitivity profile identifies which transforms are dangerous. None of this information is available from the accuracy number.
 
-**Structural fuzzing composes with domain methods.** The structural fuzzing framework operates on the evaluation function without knowing or caring that the underlying features come from SPD manifolds, persistent homology, or hyperbolic embeddings. It tests which feature channels matter (subset enumeration, Chapter 7), how stable the configuration is (MRI, Chapter 7), and where the pipeline breaks (adversarial threshold, Chapter 10). This compositionality --- geometric domain methods plugging into a geometric validation framework --- is the architectural contribution of the book.
+**Structural fuzzing composes with domain methods.** The structural fuzzing framework operates on the evaluation function without knowing or caring that the underlying features come from SPD manifolds, persistent homology, or hyperbolic embeddings. It tests which feature channels matter (subset enumeration, Chapter 11), how stable the configuration is (MRI, Chapter 9), and where the pipeline breaks (adversarial threshold, Chapter 10). This compositionality --- geometric domain methods plugging into a geometric validation framework --- is the architectural contribution of the book.
 
 **Invariance and sensitivity are two sides of the same coin.** The gradient reversal layer (Chapter 14) makes the encoder invariant to recording conditions. The DRI measures whether that invariance actually holds. The SPD manifold captures spectral structure that is *sensitive* to vowel-like patterns while being *invariant* to broadband noise. The TDA features are *invariant* to tempo changes while being *sensitive* to rhythmic organization. Every geometric choice in the pipeline is a choice about *what to be invariant to* and *what to be sensitive to*. Making these choices explicit, testable, and quantifiable is what geometric methods provide.
 
