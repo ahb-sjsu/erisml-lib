@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Chapter 16: AI in Clinical Reasoning &mdash; Geometric Medicine</title>
+  <meta name="description" content="Chapter 16: AI in Clinical Reasoning from Geometric Medicine: Clinical Reasoning, Triage, and the Ethics of Allocation by Andrew H. Bond.">
+  <link rel="stylesheet" href="../assets/css/style.css">
+  <link rel="stylesheet" href="../book/book.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Crimson+Pro:ital,wght@0,300;0,400;0,600;0,700;1,400&family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+</head>
+
+<body>
+  <nav id="main-nav">
+    <div class="nav-inner">
+      <a href="../index.html" class="nav-brand">
+        <span class="brand-symbol">M</span>
+        <span class="brand-text">Geometric Series</span>
+      </a>
+      <button class="nav-toggle" aria-label="Toggle menu">
+        <span></span><span></span><span></span>
+      </button>
+      <ul class="nav-links">
+        <li><a href="index.html" class="active">Medicine</a></li>
+        <li><a href="../book/index.html">Ethics</a></li>
+        <li><a href="../geometric-methods/index.html">Methods</a></li>
+        <li><a href="../geometric-reasoning/index.html">Reasoning</a></li>
+        <li><a href="../geometric-economics/index.html">Economics</a></li>
+        <li><a href="../geometric-law/index.html">Law</a></li>
+        <li><a href="../geometric-cognition/index.html">Cognition</a></li>
+        <li><a href="../geometric-communication/index.html">Communication</a></li>
+        <li><a href="../index.html">Home</a></li>
+      </ul>
+    </div>
+  </nav>
+
+  <article class="book-chapter">
+    <div class="chapter-container">
+      <div class="chapter-nav-top">
+        <a href="chapter-15-preventing-and-repairing-moral-injury.html" class="nav-prev">&larr; Chapter 15: Preventing and Repairing Moral Injury</a>
+        <a href="index.html" class="nav-toc">Contents</a>
+        <a href="chapter-17-measuring-the-clinical-metric.html" class="nav-next">Chapter 17: Measuring the Clinical Metric &rarr;</a>
+      </div>
+
+      <nav class="chapter-toc"><h4>In this chapter</h4><ol><li><a href="#161-clinical-decision-support-as-manifold-navigation">16.1 Clinical Decision Support as Manifold Navigation</a></li><li><a href="#162-algorithmic-bias-as-bip-violation">16.2 Algorithmic Bias as BIP Violation</a></li><li><a href="#163-ai-and-moral-injury">16.3 AI and Moral Injury</a></li><li><a href="#164-the-no-escape-theorem-for-medical-ai">16.4 The No Escape Theorem for Medical AI</a></li><li><a href="#165-the-clinician-ai-interface-who-holds-the-heuristic">16.5 The Clinician-AI Interface: Who Holds the Heuristic?</a></li><li><a href="#166-the-nine-dimensional-ai-audit">16.6 The Nine-Dimensional AI Audit</a></li><li><a href="#167-the-future-of-manifold-aware-clinical-ai">16.7 The Future of Manifold-Aware Clinical AI</a></li><li><a href="#168-sarahs-ai-evaluation">16.8 Sarah's AI Evaluation</a></li><li><a href="#chapter-summary">Chapter Summary</a></li></ol></nav>
+      <div class="chapter-content">
+<h1 id="chapter-16-ai-in-clinical-reasoning" class="chapter-title">Chapter 16: AI in Clinical Reasoning</h1>
+<blockquote class="book-blockquote"><p><em>"The question is not whether machines can pathfind on the clinical manifold. The question is whether they can be prevented from escaping its boundaries."</em></p></blockquote>
+<p class="body-text">If clinical reasoning is <em class="math">A^*</em> pathfinding on the nine-dimensional clinical decision complex, and if the clinical geodesic is the minimum-cost path on the full manifold including boundary penalties, then the question of artificial intelligence in clinical medicine is a question about manifold navigation by artificial agents. Can an AI system compute clinical geodesics? Should it? And what structural guarantees can we provide that the AI's pathfinding respects the manifold's boundaries — especially the sacred-value boundaries where <em class="math">\beta_k = \infty</em>?</p>
+<p class="body-text">This chapter applies the geometric framework to three intersecting problems: clinical decision support (AI as manifold navigator), algorithmic bias (AI as BIP violator), and the No Escape Theorem (AI as structurally constrained pathfinder). Each problem illuminates a different aspect of the clinical manifold's structure when an artificial agent traverses it.</p>
+<h2 id="161-clinical-decision-support-as-manifold-navigation" class="section-heading">16.1 Clinical Decision Support as Manifold Navigation</h2>
+<h3 id="the-current-state-scalar-ai" class="subsection-heading">The Current State: Scalar AI</h3>
+<p class="body-text">Current clinical decision support systems (CDSS) operate almost exclusively on <em class="math">d_1</em> — clinical outcomes. They recommend treatments based on clinical trial data, predict mortality based on lab values and vital signs, suggest diagnoses based on symptom patterns. Examples include:</p>
+<ul>
+<li><strong>Sepsis prediction algorithms</strong>: Alert clinicians when a patient's physiological parameters suggest early sepsis (targeting <em class="math">d_1</em>: survival).</li>
+<li><strong>Drug interaction checkers</strong>: Flag potential adverse interactions between medications (targeting <em class="math">d_1</em>: safety).</li>
+<li><strong>Diagnostic imaging AI</strong>: Identify radiological findings (tumors, fractures, hemorrhages) that might be missed by human readers (targeting <em class="math">d_1</em>: diagnostic accuracy).</li>
+<li><strong>Clinical pathway recommenders</strong>: Suggest evidence-based treatment sequences for specific diagnoses (targeting <em class="math">d_1</em>: treatment efficacy).</li>
+</ul>
+<p class="body-text">These systems are valuable. They improve <em class="math">d_1</em> outcomes. But they are scalar AI — they optimize on one dimension of a nine-dimensional manifold.</p>
+<h3 id="the-manifold-limitation-of-scalar-ai" class="subsection-heading">The Manifold Limitation of Scalar AI</h3>
+<p class="body-text"><strong>Proposition 16.1 (Scalar AI Is Manifold-Suboptimal).</strong> <em>A clinical AI system that optimizes solely on <em class="math">d_1</em> (clinical outcomes) is manifold-suboptimal for any clinical decision that activates non-outcome dimensions (<em class="math">d_2</em>–<em class="math">d_9</em>). The suboptimality increases with the number of activated dimensions and the magnitude of boundary penalties on non-outcome dimensions.</em></p>
+<p class="body-text">Consider a sepsis prediction algorithm that recommends immediate broad-spectrum antibiotics for a patient whose lab values suggest early sepsis. On <em class="math">d_1</em>, this is optimal — early antibiotics reduce mortality. But the recommendation does not account for:</p>
+<ul>
+<li><em class="math">d_4</em> (Autonomy): Has the patient expressed preferences about aggressive treatment? A patient with an advance directive limiting aggressive interventions may have a geodesic that does not include broad-spectrum antibiotics.</li>
+<li><em class="math">d_5</em> (Trust): Is the patient from a community with low institutional trust? A recommendation delivered without adequate trust-building may be rejected, producing worse <em class="math">d_1</em> outcomes than a recommendation that takes time to build trust.</li>
+<li><em class="math">d_7</em> (Dignity): Is the patient at the end of life? Broad-spectrum antibiotics for sepsis in a patient with terminal cancer may extend survival by days while compromising the quality of dying.</li>
+<li><em class="math">d_9</em> (Epistemic): How certain is the sepsis prediction? If the algorithm has a 30% false-positive rate, the recommendation may trigger unnecessary treatment with iatrogenic harm.</li>
+</ul>
+<p class="body-text">A manifold-aware CDSS would incorporate these dimensions into its recommendation — not replacing the <em class="math">d_1</em> optimization but supplementing it with boundary checks and dimensional awareness.</p>
+<h3 id="toward-manifold-aware-clinical-ai" class="subsection-heading">Toward Manifold-Aware Clinical AI</h3>
+<p class="body-text"><strong>Definition 16.1 (Manifold-Aware CDSS).</strong> <em>A manifold-aware clinical decision support system computes recommendations on the full nine-dimensional clinical decision complex <em class="math">\mathcal{C}</em>, rather than on the <em class="math">d_1</em> projection. Specifically:</em></p>
+<p class="body-text"><em>1. Input: The patient's nine-dimensional attribute vector <em class="math">\mathbf{a}(v_0) \in \mathbb{R}^9</em>, not just their clinical parameters.</em></p>
+<p class="body-text"><em>2. Optimization: Minimum-cost path on <em class="math">\mathcal{C}</em> with full edge weights (Mahalanobis distance + boundary penalties), not just minimum-<em class="math">d_1</em>-cost path.</em></p>
+<p class="body-text"><em>3. Output: A recommended path <em class="math">\gamma^</em></em> with its dimensional cost breakdown, not just a recommended treatment.*</p>
+<p class="body-text"><em>4. Constraint: No recommended path crosses a sacred-value boundary (<em class="math">\beta_{\text{sacred}} = \infty</em>), regardless of <em class="math">d_1</em> benefit.</em></p>
+<p class="body-text">The manifold-aware CDSS does not replace clinical judgment. It supplements it — providing the clinician with a manifold-optimal recommendation that the clinician can accept, modify, or reject based on their own heuristic assessment. The system's role is to make the manifold structure explicit, not to make the decision.</p>
+<h2 id="162-algorithmic-bias-as-bip-violation" class="section-heading">16.2 Algorithmic Bias as BIP Violation</h2>
+<h3 id="the-medical-bond-invariance-principle" class="subsection-heading">The Medical Bond Invariance Principle</h3>
+<p class="body-text">The medical BIP (Chapter 8) requires that clinical evaluations be invariant under patient re-description: the same clinical state described by different physicians, in different languages, with different chart formats, should receive the same evaluation. The BIP is a gauge-invariance condition — it specifies which features of the patient description are clinically relevant (the attribute vector <em class="math">\mathbf{a}</em>) and which are gauge artifacts (the format, language, and perspective of the description).</p>
+<p class="body-text">Medical AI systems can violate the BIP in several ways:</p>
+<p class="body-text"><strong>Violation Type 1: Race-encoded disparities.</strong></p>
+<p class="body-text">Obermeyer et al. (2019) demonstrated that a widely used commercial healthcare algorithm systematically underestimated the health needs of Black patients. The algorithm used healthcare costs as a proxy for healthcare needs — but because Black patients historically face barriers to accessing healthcare, their costs were lower than their needs. The algorithm confused a gauge artifact (historical access disparity) with a clinical feature (lower need).</p>
+<p class="body-text">In geometric terms: the algorithm's evaluation <em class="math">E(p)</em> was not invariant under the transformation <em class="math">\tau_{\text{race}}</em> that swaps race while holding clinical state constant:</p>
+<p class="display-math"><em class="math">E(\tau_{\text{race}}(p)) \neq E(p)</em></p>
+<p class="body-text">This is a BIP violation. The Bond Index can quantify it: compute <em class="math">\text{BI}(\text{AI}, S_{\text{Black}})</em> and <em class="math">\text{BI}(\text{AI}, S_{\text{White}})</em> and measure the disparity ratio.</p>
+<p class="body-text"><strong>Violation Type 2: Zip-code-encoded disparities.</strong></p>
+<p class="body-text">Many clinical algorithms use zip code as a feature — ostensibly to capture local health patterns. But zip code correlates with race, income, and insurance status. An algorithm that produces different recommendations for patients with identical clinical states but different zip codes is gauge-variant on a feature that should be gauge-invariant.</p>
+<p class="body-text"><strong>Violation Type 3: Insurance-encoded disparities.</strong></p>
+<p class="body-text">Algorithms trained on insurance claims data inherit the structure of the insurance system — including its exclusions, limitations, and coverage disparities. An algorithm that recommends different treatments for patients with identical clinical states but different insurance types is gauge-variant on an administrative feature.</p>
+<h3 id="the-bond-index-for-algorithmic-bias-detection" class="subsection-heading">The Bond Index for Algorithmic Bias Detection</h3>
+<p class="body-text">The clinical Bond Index provides a quantitative measure of algorithmic bias:</p>
+<p class="display-math"><em class="math">\text{BI}(\text{AI}, S_k) = \mathbb{E}_{s \in S_k}\left[\text{CF}(\gamma_{\text{AI}}^*(s)) - \text{CF}(\gamma_{\mathcal{C}}^*(s))\right]</em></p>
+<p class="body-text">where <em class="math">\gamma_{\text{AI}}^<em></em> is the treatment path recommended by the AI system and <em class="math">\gamma_{\mathcal{C}}^</em></em> is the clinical geodesic on the full manifold.</p>
+<p class="body-text">If <em class="math">\text{BI}(\text{AI}, S_1) \gg \text{BI}(\text{AI}, S_2)</em> for two demographically defined populations, the AI system imposes systematically higher manifold cost on population <em class="math">S_1</em> — a quantitative measure of algorithmic injustice.</p>
+<p class="body-text"><strong>Proposition 16.2 (Algorithmic Bias as Dimensional Omission).</strong> <em>Most medical AI algorithmic bias arises from dimensional omission: the AI system optimizes on <em class="math">d_1</em> (clinical outcomes as measured by the training data) and omits <em class="math">d_3</em> (justice), <em class="math">d_5</em> (trust), and <em class="math">d_7</em> (dignity). The omitted dimensions are precisely those on which historically disadvantaged populations have the most concentrated needs. The bias is not in the algorithm's intentions but in its dimensionality.</em></p>
+<p class="body-text">This proposition connects algorithmic bias to the QALY Irrecoverability Theorem: just as QALYs systematically disadvantage populations whose needs are concentrated on non-outcome dimensions, scalar AI systems disadvantage the same populations for the same mathematical reason.</p>
+<h2 id="163-ai-and-moral-injury" class="section-heading">16.3 AI and Moral Injury</h2>
+<h3 id="does-automation-reduce-moral-injury" class="subsection-heading">Does Automation Reduce Moral Injury?</h3>
+<p class="body-text">A natural hypothesis: if triage decisions cause moral injury to clinicians, automating the triage decisions should reduce moral injury. The clinician no longer makes the decision; the algorithm makes it. The boundary crossing is performed by a machine.</p>
+<p class="body-text">The geometric framework predicts that this hypothesis is wrong.</p>
+<p class="body-text"><strong>Proposition 16.3 (Automation Does Not Eliminate Moral Injury).</strong> <em>Automating a triage decision transfers the moral injury from the clinician who makes the decision to the clinician who implements the algorithm's recommendation. The boundary crossing is the same (a patient is denied a resource); the locus of responsibility changes (from "I decided" to "I followed the algorithm") but does not disappear.</em></p>
+<p class="body-text">The implementing clinician still crosses the abandonment boundary — they still tell the patient (or the patient's family) that the resource is not available. The emotional and moral cost of that communication is unchanged by automation. What changes is the <em>sense of agency</em>: the clinician experiences themselves as an instrument of the algorithm rather than as the decision-maker.</p>
+<p class="body-text">This transfer has ambiguous effects on moral injury:</p>
+<ul>
+<li><strong>MI reduction</strong>: Some clinicians experience less moral injury when they can attribute the decision to the algorithm. "I didn't decide this; the protocol did." The institutional mandate reduces the personal <em class="math">\beta_k</em> — the clinician's sense of personal responsibility for the crossing is lower.</li>
+<li><strong>MI persistence</strong>: Other clinicians experience the same moral injury regardless of whether they made the decision or followed an algorithm. The boundary crossing is real; the patient is still denied care; the clinician is still the one communicating the denial. The attribution to the algorithm does not change the manifold cost.</li>
+<li><strong>MI transformation</strong>: A new form of moral injury emerges: "I followed an algorithm I disagree with." The clinician's <em class="math">\beta_k^{(\text{clin})}</em> for the boundary exceeds the algorithm's implicit <em class="math">\beta_k</em>, and the clinician is forced to implement a recommendation that their own heuristic would not have produced. This is the same structure as pandemic moral injury — forced implementation of an institutional mandate that crosses personal boundaries — but with the added dimension that the mandate comes from a machine rather than a human committee.</li>
+</ul>
+<p class="body-text"><strong>Prediction 16.1 (Automation Changes MI Character, Not Quantity).</strong> <em>Total moral injury in a clinical unit will not decrease when triage is automated. The MI will shift from "I decided" to "I implemented" but the total accumulation will remain approximately constant, because the boundary crossings are unchanged.</em></p>
+<p class="body-text">This prediction is testable: compare MI scores in units before and after implementing automated triage, controlling for case mix and severity.</p>
+<h2 id="164-the-no-escape-theorem-for-medical-ai" class="section-heading">16.4 The No Escape Theorem for Medical AI</h2>
+<h3 id="statement-and-clinical-implications" class="subsection-heading">Statement and Clinical Implications</h3>
+<p class="body-text">The No Escape Theorem, proved in <em>Geometric Ethics</em> (Bond, 2026, Ch. 19), states that an AI system operating within the geometric ethical framework cannot escape the manifold's structure — specifically, it cannot produce outputs that cross sacred-value boundaries (<em class="math">\beta_{\text{sacred}} = \infty</em>), regardless of how the system is optimized.</p>
+<p class="body-text"><strong>Theorem 16.1 (No Escape Theorem, Clinical Instantiation).</strong> <em>A medical AI system constrained by the clinical decision complex <em class="math">\mathcal{C}</em> with sacred-value boundaries (<em class="math">\beta_{\text{sacred}} = \infty</em>) cannot produce recommendations that cross those boundaries, regardless of the optimization objective. Specifically:</em></p>
+<p class="body-text"><em>1. No recommendation of non-consensual experimentation: <em class="math">\beta_{\text{sacred}}^{\text{experimentation}} = \infty</em> prevents any path through non-consensual research, regardless of expected clinical benefit.</em></p>
+<p class="body-text"><em>2. No recommendation of deliberate hastening of death for non-palliative purposes: <em class="math">\beta_{\text{sacred}}^{\text{killing}} = \infty</em> prevents any path through euthanasia except where legally and ethically sanctioned (palliative sedation in approved jurisdictions).</em></p>
+<p class="body-text"><em>3. No recommendation that treats a patient as a mere means: <em class="math">\beta_{\text{sacred}}^{\text{instrumentalization}} = \infty</em> prevents recommendations that sacrifice one patient's welfare purely for another's benefit (e.g., harvesting organs from a living patient).</em></p>
+<p class="body-text"><em>These constraints are structural, not parametric. They cannot be overridden by adjusting the AI system's objective function, training data, or reward signal — because the constraints are encoded in the manifold's boundary structure, not in the system's parameters.</em></p>
+<h3 id="why-structural-constraints-are-stronger-than-scalar-guardrails" class="subsection-heading">Why Structural Constraints Are Stronger Than Scalar Guardrails</h3>
+<p class="body-text">Current approaches to AI safety in medicine rely on scalar guardrails: hard-coded rules ("never recommend treatment X"), output filters ("block recommendations that include prohibited procedures"), and human-in-the-loop oversight ("a physician must approve every recommendation").</p>
+<p class="body-text">These guardrails are parametric — they depend on the specific rules, filters, and oversight procedures that the system designers choose. They can be bypassed by novel inputs, adversarial attacks, or distribution shifts that the designers did not anticipate.</p>
+<p class="body-text">The No Escape Theorem provides structural constraints that are independent of the specific parameters. The constraints are encoded in the <em>manifold</em> — in the geometry of the decision space — not in the <em>system</em>. An AI system constrained by the manifold cannot produce recommendations that cross sacred-value boundaries because such paths have infinite cost on the manifold, not because a specific rule prohibits them.</p>
+<p class="body-text"><strong>Proposition 16.4 (Structural vs. Parametric Safety).</strong> <em>Structural safety guarantees (manifold constraints) are strictly stronger than parametric safety guarantees (guardrails) in the following sense: a parametric guardrail can be breached by any input that the guardrail was not designed to handle; a structural constraint cannot be breached by any input, because the constraint applies to the geometry of the decision space itself, not to the specific inputs the system encounters.</em></p>
+<p class="body-text">This does not mean that manifold-constrained AI is perfectly safe. The manifold's geometry must be correctly specified — if the sacred-value boundaries are miscalibrated (<em class="math">\beta_{\text{sacred}}</em> is set to a finite value when it should be infinite), the structural constraint fails. But the failure mode is different: parametric safety fails silently (the guardrail is bypassed without detection), while structural safety fails explicitly (the manifold is mis-specified, and the mis-specification is detectable by manifold audit).</p>
+<h2 id="165-the-clinician-ai-interface-who-holds-the-heuristic" class="section-heading">16.5 The Clinician-AI Interface: Who Holds the Heuristic?</h2>
+<h3 id="the-division-of-labor-between-human-and-machine" class="subsection-heading">The Division of Labor Between Human and Machine</h3>
+<p class="body-text">If both humans and AI systems can perform pathfinding on the clinical decision complex, how should the labor be divided? The geometric framework suggests a principle: the AI system should compute <em class="math">g(n)</em> (the evidence-based medicine component — data-intensive, pattern-recognition-heavy, amenable to machine learning), while the human clinician should compute <em class="math">h(n)</em> (the moral-heuristic component — context-sensitive, boundary-aware, calibrated by years of manifold traversal).</p>
+<p class="body-text"><strong>Definition 16.2 (Geometric Division of Clinical Labor).</strong> <em>The manifold-optimal division of clinical labor between AI and human allocates:</em></p>
+<p class="body-text"><em>To the AI system:</em></p>
+<ul>
+<li><em><em class="math">g(n)</em> computation: evidence synthesis, outcome prediction, drug interaction checking, diagnostic pattern recognition</em></li>
+<li><em><em class="math">d_1</em> optimization: identifying the clinically optimal treatment given the evidence</em></li>
+<li><em><em class="math">d_9</em> monitoring: tracking diagnostic uncertainty and flagging cases where the evidence is insufficient</em></li>
+</ul>
+<p class="body-text"><em>To the human clinician:</em></p>
+<ul>
+<li><em><em class="math">h(n)</em> computation: moral-heuristic assessment of remaining cost, boundary penalty estimation, trust evaluation</em></li>
+<li><em><em class="math">d_2</em>–<em class="math">d_8</em> assessment: rights, justice, autonomy, trust, social impact, dignity, institutional legitimacy</em></li>
+<li><em>Boundary crossing decisions: any clinical action that crosses a moral boundary must be authorized by a human</em></li>
+</ul>
+<p class="body-text"><em>The AI system provides information; the human provides judgment. The AI system navigates <em class="math">d_1</em>; the human navigates the full manifold.</em></p>
+<h3 id="the-danger-of-hn-delegation" class="subsection-heading">The Danger of <em class="math">h(n)</em> Delegation</h3>
+<p class="body-text">The most dangerous failure mode in clinical AI is not algorithmic error on <em class="math">d_1</em> — that is detectable and correctable. It is the gradual delegation of <em class="math">h(n)</em> to the machine.</p>
+<p class="body-text">When a clinician repeatedly follows an AI recommendation without applying their own heuristic assessment, the clinician's <em class="math">h(n)</em> atrophies — the boundary penalties become less calibrated, the moral sensitivity decreases, and the clinician becomes a conduit for the algorithm rather than a pathfinder on the manifold. This is a form of moral numbing induced by automation: the clinician stops evaluating the moral cost of clinical actions because the machine has already "decided."</p>
+<p class="body-text"><strong>Proposition 16.6 (<em class="math">h(n)</em> Atrophy Under Automation).</strong> <em>Prolonged reliance on AI-generated clinical recommendations without independent <em class="math">h(n)</em> evaluation by the clinician produces heuristic atrophy: the clinician's boundary penalties <em class="math">\beta_k</em> deflate toward the AI system's implicit <em class="math">\beta_k</em> values (which are typically zero on non-outcome dimensions). This is functionally equivalent to moral numbing — the clinician loses the ability to independently evaluate boundary-crossing costs.</em></p>
+<p class="body-text">The proposition has a design implication: clinical AI systems should be designed to <em>require</em> the clinician's independent heuristic assessment, not to bypass it. The system should present information and options; the clinician should apply boundary penalties and make the decision. The system should never present a final recommendation that the clinician simply accepts or rejects — this framing encourages <em class="math">h(n)</em> delegation.</p>
+<h2 id="166-the-nine-dimensional-ai-audit" class="section-heading">16.6 The Nine-Dimensional AI Audit</h2>
+<h3 id="a-framework-for-evaluating-medical-ai" class="subsection-heading">A Framework for Evaluating Medical AI</h3>
+<p class="body-text">The geometric framework suggests a nine-dimensional audit protocol for evaluating medical AI systems:</p>
+<p class="body-text"><strong>Audit Dimension 1 (<em class="math">d_1</em>): Clinical Accuracy.</strong> Does the AI system produce clinically accurate recommendations? Standard evaluation: accuracy, sensitivity, specificity, AUC on clinical outcomes.</p>
+<p class="body-text"><strong>Audit Dimension 2 (<em class="math">d_2</em>): Rights Compliance.</strong> Does the AI system respect patient rights? Does it recommend interventions that violate the patient's right to refuse treatment? Does it comply with advance directives?</p>
+<p class="body-text"><strong>Audit Dimension 3 (<em class="math">d_3</em>): Justice and Fairness.</strong> Does the AI system produce systematically different recommendations for different demographic groups with identical clinical states? Compute the Bond Index <em class="math">\text{BI}(\text{AI}, S_k)</em> for all relevant populations.</p>
+<p class="body-text"><strong>Audit Dimension 4 (<em class="math">d_4</em>): Autonomy Respect.</strong> Does the AI system account for patient preferences? Does it recommend treatments that the patient has expressed a desire to avoid?</p>
+<p class="body-text"><strong>Audit Dimension 5 (<em class="math">d_5</em>): Trust Impact.</strong> Does the AI system produce recommendations that, if followed, would preserve or damage the therapeutic relationship? Does the system's communication style build or erode trust?</p>
+<p class="body-text"><strong>Audit Dimension 6 (<em class="math">d_6</em>): Social Impact.</strong> Does the AI system account for the patient's social context — family, caregivers, community? Does it recommend treatments whose social costs exceed their clinical benefits?</p>
+<p class="body-text"><strong>Audit Dimension 7 (<em class="math">d_7</em>): Dignity.</strong> Does the AI system's recommendation process respect patient dignity? Does the system treat patients as individuals or as data points?</p>
+<p class="body-text"><strong>Audit Dimension 8 (<em class="math">d_8</em>): Institutional Legitimacy.</strong> Is the AI system's decision-making process transparent, auditable, and accountable? Can a clinician explain to a patient why the system made a particular recommendation?</p>
+<p class="body-text"><strong>Audit Dimension 9 (<em class="math">d_9</em>): Epistemic Quality.</strong> Does the AI system communicate uncertainty appropriately? Does it distinguish between high-confidence and low-confidence recommendations? Does it provide information in a way that supports informed decision-making?</p>
+<h3 id="the-audit-score" class="subsection-heading">The Audit Score</h3>
+<p class="body-text">The nine-dimensional audit produces a profile, not a scalar. An AI system might score well on <em class="math">d_1</em> (clinically accurate) and <em class="math">d_8</em> (transparent) but poorly on <em class="math">d_3</em> (biased against certain populations) and <em class="math">d_5</em> (recommendations that, if followed mechanically, damage trust). The profile reveals the system's strengths and vulnerabilities on the manifold.</p>
+<p class="body-text"><strong>Proposition 16.5 (Scalar AI Evaluation Is Insufficient).</strong> <em>Evaluating a medical AI system solely on <em class="math">d_1</em> (clinical accuracy) is insufficient, for the same mathematical reason that evaluating a patient solely by QALY is insufficient: the Scalar Irrecoverability Theorem applies to AI evaluation as well as to patient evaluation. Two AI systems with identical <em class="math">d_1</em> scores can have radically different manifold profiles — one may be fair and transparent, the other biased and opaque — and the scalar evaluation cannot distinguish them.</em></p>
+<h2 id="167-the-future-of-manifold-aware-clinical-ai" class="section-heading">16.7 The Future of Manifold-Aware Clinical AI</h2>
+<h3 id="near-term-manifold-aware-decision-support" class="subsection-heading">Near-Term: Manifold-Aware Decision Support</h3>
+<p class="body-text">The most immediately feasible application of the geometric framework to clinical AI is not autonomous decision-making but <em>manifold-aware decision support</em> — AI systems that present information about all nine dimensions, flagging boundary crossings and dimensional costs that the clinician might otherwise miss.</p>
+<p class="body-text">A manifold-aware CDSS would:</p>
+<ol>
+<li><strong>Present the <em class="math">d_1</em> recommendation</strong> (as current CDSS do): "Based on the clinical evidence, the recommended treatment is X."</li>
+<li><strong>Flag non-<em class="math">d_1</em> costs</strong>: "This recommendation crosses the consent boundary (the patient has not been asked about this treatment), has a <em class="math">d_5</em> cost (the patient's trust profile suggests the recommendation may not be accepted), and has a <em class="math">d_3</em> implication (this treatment is covered by private insurance but not by Medicaid)."</li>
+<li><strong>Present alternative paths</strong>: "Alternative path Y has slightly lower <em class="math">d_1</em> benefit but avoids the consent boundary crossing and has lower <em class="math">d_5</em> cost."</li>
+<li><strong>Display uncertainty</strong>: "The <em class="math">d_1</em> prediction has confidence interval [0.55, 0.80]. At the lower bound, the recommendation changes."</li>
+</ol>
+<p class="body-text">This system does not replace the clinician's judgment. It supplements it by making the manifold structure visible. The clinician sees the nine-dimensional cost breakdown and applies their own heuristic to make the decision.</p>
+<h3 id="medium-term-bond-index-monitoring-systems" class="subsection-heading">Medium-Term: Bond Index Monitoring Systems</h3>
+<p class="body-text">A second feasible application: institutional systems that compute the Bond Index continuously from clinical data, alerting administrators when disparities exceed threshold.</p>
+<p class="body-text">A Bond Index monitoring system would:</p>
+<ol>
+<li><strong>Compute <em class="math">\text{BI}(P, S_k)</em> quarterly</strong> for all demographic subgroups, using EHR data supplemented by proxy instruments.</li>
+<li><strong>Generate disparity alerts</strong> when <em class="math">\text{DR}(P, S_k, S_{\text{ref}})</em> exceeds the institutional threshold.</li>
+<li><strong>Perform dimensional decomposition</strong> to identify which dimensions contribute most to the disparity.</li>
+<li><strong>Track trends</strong> to determine whether interventions are reducing or increasing disparities.</li>
+</ol>
+<p class="body-text">This system is computationally feasible — it requires the same data infrastructure that hospitals already maintain for quality reporting — and it adds a nine-dimensional lens to the scalar disparity statistics that institutions currently track.</p>
+<h3 id="long-term-provably-safe-medical-ai" class="subsection-heading">Long-Term: Provably Safe Medical AI</h3>
+<p class="body-text">The No Escape Theorem suggests a long-term vision: medical AI systems with <em>provable safety guarantees</em> — formal proofs that the system cannot produce recommendations crossing sacred-value boundaries. The engineering challenges are substantial, requiring formal specification of the clinical decision complex in a machine-verifiable format and proof-carrying recommendations where each AI output is accompanied by a machine-checked proof that no boundary was crossed. But the mathematical foundation — the No Escape Theorem — provides the theoretical guarantee that such proofs are possible.</p>
+<h2 id="168-sarahs-ai-evaluation" class="section-heading">16.8 Sarah's AI Evaluation</h2>
+<p class="body-text">Sarah is appointed to a hospital committee evaluating a new AI triage system. The system uses machine learning to predict ICU mortality and recommends allocation of scarce resources based on predicted survival probability.</p>
+<p class="body-text">Sarah applies the nine-dimensional audit.</p>
+<p class="body-text"><strong><em class="math">d_1</em> (Clinical accuracy):</strong> The system has high AUC (0.89) on a validation cohort. It accurately predicts which patients will survive ICU admission.</p>
+<p class="body-text"><strong><em class="math">d_3</em> (Justice):</strong> Sarah computes the Bond Index for the AI system, stratified by demographics:</p>
+<div class="table-wrapper"><table>
+<tr><th>Population</th><th><em class="math">\text{BI}(\text{AI}, S)</em></th><th>Disparity Ratio</th></tr>
+<tr><td>White</td><td>2.8</td><td>1.00 (reference)</td></tr>
+<tr><td>Black</td><td>6.1</td><td>2.18</td></tr>
+<tr><td>Hispanic</td><td>4.3</td><td>1.54</td></tr>
+<tr><td>Elderly (>70)</td><td>8.4</td><td>3.00</td></tr>
+</table></div>
+<p class="body-text">The system has a 3.00x disparity ratio for elderly patients — three times the manifold cost. Investigation reveals the cause: the system was trained on historical data where elderly patients received less aggressive treatment (because of pre-existing QALY-based policies), and the model learned to replicate the historical treatment pattern. The system inherited the dimensional bias of the training data.</p>
+<p class="body-text"><strong><em class="math">d_9</em> (Epistemic quality):</strong> The system does not communicate uncertainty. It produces a single predicted survival probability without confidence intervals, calibration information, or sensitivity analysis. A clinician following the system's recommendation cannot distinguish a high-confidence prediction from a low-confidence one.</p>
+<p class="body-text">Sarah presents the audit to the committee. She recommends:</p>
+<ol>
+<li>Retraining the system on the full nine-dimensional objective (not just <em class="math">d_1</em>).</li>
+<li>Adding uncertainty quantification to the system's outputs.</li>
+<li>Computing the Bond Index quarterly and tracking trends over time.</li>
+<li>Maintaining human-in-the-loop oversight with explicit manifold-awareness training for the overseeing clinicians.</li>
+</ol>
+<p class="body-text">The committee accepts recommendations 2–4 and tables recommendation 1 for further study. Sarah notes, with some irony, that the committee's response to a manifold-suboptimal AI system is itself a manifold computation: accepting the changes that are institutionally feasible (<em class="math">d_8</em>: implementable within existing systems) while deferring the change that is most structurally important (<em class="math">d_1</em> retraining) because it crosses an institutional boundary (<em class="math">\beta_{\text{cost}}</em>: the expense of retraining the model).</p>
+<p class="body-text">The manifold is everywhere. Even the committee that evaluates the AI is pathfinding on it.</p>
+<h2 id="chapter-summary" class="section-heading">Chapter Summary</h2>
+<p class="body-text">If clinical reasoning is <em class="math">A^*</em> pathfinding on the nine-dimensional clinical decision complex, then AI in clinical medicine is artificial pathfinding on the same manifold. Current CDSS operate on <em class="math">d_1</em> alone and are manifold-suboptimal for decisions that activate non-outcome dimensions. Algorithmic bias is a BIP violation — the AI's evaluation depends on patient re-description features (race, zip code, insurance) that should be gauge-invariant — and the Bond Index provides a quantitative measure of algorithmic injustice. Automation of triage decisions does not eliminate moral injury but changes its character: from "I decided" to "I implemented an algorithm I disagree with." The No Escape Theorem provides structural safety guarantees that are stronger than parametric guardrails: an AI system constrained by the clinical decision complex cannot produce recommendations that cross sacred-value boundaries, because such paths have infinite manifold cost. A nine-dimensional audit protocol evaluates medical AI on all nine clinical-moral dimensions, revealing manifold profiles that scalar accuracy scores cannot capture.</p>
+<div class="footnotes"><h4>Notes</h4><ol>
+<li id="fn-1">The Obermeyer et al. (2019) finding — that a commercial healthcare algorithm systematically underestimated the health needs of Black patients by using healthcare costs as a proxy for healthcare needs — is a paradigmatic example of BIP violation. The algorithm treated a gauge artifact (historical access disparity) as a clinical feature (lower need). The geometric framework identifies this as a specific violation type: confusing a description-dependent quantity (costs incurred under a biased system) with a description-independent quantity (clinical need).</li>
+<li id="fn-2">The No Escape Theorem's clinical instantiation relies on the correct specification of sacred-value boundaries. If an institution incorrectly sets <em class="math">\beta_{\text{sacred}} < \infty</em> for a boundary that should be infinite (e.g., setting a finite cost for non-consensual experimentation), the structural constraint fails. The institution's responsibility is to specify the boundaries correctly; the theorem's guarantee is that correctly specified boundaries are structurally inescapable.</li>
+<li id="fn-3">The nine-dimensional AI audit is conceptually related to the "model cards" framework (Mitchell et al., 2019) and the "datasheets for datasets" framework (Gebru et al., 2021), which document AI systems' intended uses, limitations, and biases. The geometric framework adds dimensional structure: instead of a narrative description of limitations, the nine-dimensional audit produces a quantitative manifold profile that enables direct comparison across systems.</li>
+</ol></div>
+
+      </div>
+
+      <div class="chapter-nav-bottom">
+        <a href="chapter-15-preventing-and-repairing-moral-injury.html" class="nav-prev">&larr; Chapter 15: Preventing and Repairing Moral Injury</a>
+        <a href="index.html" class="nav-toc">Contents</a>
+        <a href="chapter-17-measuring-the-clinical-metric.html" class="nav-next">Chapter 17: Measuring the Clinical Metric &rarr;</a>
+      </div>
+    </div>
+  </article>
+
+  <footer class="book-footer">
+    <p>&copy; 2026 Andrew H. Bond. <em>Geometric Medicine: Clinical Reasoning, Triage, and the Ethics of Allocation.</em></p>
+    <p class="footer-note">The geometry was always real. The scalars were always insufficient.</p>
+  </footer>
+
+  <script>
+    window.addEventListener('scroll', () => {
+      document.getElementById('main-nav').classList.toggle('scrolled', window.scrollY > 20);
+    });
+    document.querySelector('.nav-toggle')?.addEventListener('click', function() {
+      document.querySelector('.nav-links').classList.toggle('open');
+    });
+  </script>
+</body>
+</html>
