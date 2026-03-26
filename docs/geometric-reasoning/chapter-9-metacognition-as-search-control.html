@@ -10,9 +10,8 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Crimson+Pro:ital,wght@0,300;0,400;0,600;0,700;1,400&family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
-  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
-  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"></script>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
 </head>
 
 <body>
@@ -26,14 +25,14 @@
         <span></span><span></span><span></span>
       </button>
       <ul class="nav-links">
-        <li><a href="index.html" class="active">Reasoning</a></li>
+        <li><a href="../geometric-medicine/index.html">Medicine</a></li>
         <li><a href="../book/index.html">Ethics</a></li>
         <li><a href="../geometric-methods/index.html">Methods</a></li>
+        <li><a href="../geometric-reasoning/index.html" class="active">Reasoning</a></li>
         <li><a href="../geometric-economics/index.html">Economics</a></li>
         <li><a href="../geometric-law/index.html">Law</a></li>
         <li><a href="../geometric-cognition/index.html">Cognition</a></li>
         <li><a href="../geometric-communication/index.html">Communication</a></li>
-        <li><a href="../geometric-medicine/index.html">Medicine</a></li>
         <li><a href="../index.html">Home</a></li>
       </ul>
     </div>
@@ -43,9 +42,9 @@
     <div class="chapter-container">
       <nav class="breadcrumb" aria-label="Breadcrumb">
         <a href="../index.html">Geometric Series</a>
-        <span class="breadcrumb-sep">›</span>
+        <span class="breadcrumb-sep">&rsaquo;</span>
         <a href="index.html">Geometric Reasoning</a>
-        <span class="breadcrumb-sep">›</span>
+        <span class="breadcrumb-sep">&rsaquo;</span>
         <span class="breadcrumb-current">Chapter 9: Metacognition as Search Control</span>
       </nav>
       <div class="chapter-nav-top">
@@ -54,456 +53,518 @@
         <a href="chapter-10-the-robustness-surface.html" class="nav-next">Chapter 10: The Robustness Surface &rarr;</a>
       </div>
 
-      <nav class="chapter-toc">
-        <h4>In this chapter</h4>
-        <ol><li><a href="#introduction">Introduction</a></li><li><a href="#91-the-need-for-search-control">9.1 The Need for Search Control</a></li><li><a href="#92-calibration-how-far-am-i-from-the-goal">9.2 Calibration: How Far Am I From the Goal?</a></li><li><a href="#93-self-monitoring-am-i-on-the-right-path">9.3 Self-Monitoring: Am I on the Right Path?</a></li><li><a href="#94-strategy-selection-which-search-algorithm">9.4 Strategy Selection: Which Search Algorithm?</a></li><li><a href="#95-the-metacognitive-dissociation">9.5 The Metacognitive Dissociation</a></li><li><a href="#96-ambiguity-detection-is-the-problem-well-posed">9.6 Ambiguity Detection: Is the Problem Well-Posed?</a></li><li><a href="#97-the-38-recovery-ceiling">9.7 The ~38% Recovery Ceiling</a></li><li><a href="#98-why-calibration-is-necessary-for-invariance">9.8 Why Calibration Is Necessary for Invariance</a></li><li><a href="#99-the-two-dimensional-metacognitive-space">9.9 The Two-Dimensional Metacognitive Space</a></li><li><a href="#summary">Summary</a></li><li><a href="#worked-example-the-overconfident-diagnosis">Worked Example: The Overconfident Diagnosis</a></li><li><a href="#technical-appendix">Technical Appendix</a></li><li><a href="#references">References</a></li></ol>
-      </nav>
       <div class="chapter-content">
-<h1 id="chapter-9-metacognition-as-search-control" class="chapter-title">Chapter 9: Metacognition as Search Control</h1>
-<blockquote class="book-blockquote"><p>"The only true wisdom is in knowing you know nothing." --- Socrates, via Plato</p></blockquote>
-<blockquote class="book-blockquote"><p><strong>RUNNING EXAMPLE — DR. OKAFOR'S TRIAGE</strong></p> <p>Dr. Amara Okafor is 90% sure the twelve-year-old boy has appendicitis. The history is classic — periumbilical pain migrating to the right lower quadrant, anorexia, low-grade fever. She has seen this pattern hundreds of times. Her confidence is high, and it feels earned.</p> <p>But Dr. Okafor has been 90% sure before. Over two decades in the ER, she has tracked her own diagnostic accuracy — not formally, not with spreadsheets, but with the quiet accumulation of outcomes that any experienced clinician carries. She knows that when she says "90% sure," she is wrong roughly 30% of the time. Her stated confidence is 90%. Her actual accuracy at that confidence level is approximately 70%. The gap — 20 percentage points — is her personal Expected Calibration Error for high-confidence diagnoses.</p> <p>This gap is the M1 measure. It is the distance between the confidence surface she reports and the accuracy surface she achieves. Good metacognition does not mean being right. It means knowing how often you are right — and knowing, specifically, when your heuristic is unreliable. Dr. Okafor's metacognitive calibration tells her that "90% sure" in her own internal language means "order the CT anyway." A clinician without that calibration sends the boy home with a diagnosis of gastroenteritis. Thirty hours later, the appendix ruptures.</p></blockquote>
-<h2 id="introduction" class="section-heading">Introduction</h2>
-<p class="first-paragraph">Part II documented the ways in which search goes wrong. Heuristic corruption bends trajectories (Chapter 5). Sycophancy redirects the search objective (Chapter 6). Local minima trap the search in premature convergence (Chapter 7). Broken symmetries mean the system's output depends on features that should be irrelevant (Chapter 8). These are pathologies of the search itself --- of the trajectory through reasoning space, the heuristic field that guides it, and the evaluation landscape on which it moves.</p>
-<p class="body-text">Part III asks a different question: what would it take to fix these pathologies in real time?</p>
-<p class="body-text">The answer is metacognition --- cognition about cognition, reasoning about reasoning, search about search. A powerful system does not merely search; it monitors its own search. It maintains a running estimate of how far it is from the goal, tracks whether its current strategy is making progress, detects when the problem itself is ill-defined, and switches algorithms when the current one fails. Metacognition is the control layer that sits above the search, watches it, and intervenes when something goes wrong.</p>
-<p class="body-text">In the geometric framework developed in this book, metacognition has a precise interpretation: it is the control of informed search. Every function that metacognition performs --- calibration, self-monitoring, strategy selection, ambiguity detection --- corresponds to a specific geometric operation on the search trajectory and the heuristic field. A well-calibrated system has an accurate distance estimate to the goal. A good self-monitor detects when the trajectory has deviated from the geodesic. A good strategy selector chooses the search algorithm whose assumptions match the local geometry. A good ambiguity detector recognizes when the goal state is not well-defined.</p>
-<p class="body-text">This chapter presents the empirical evidence for how current language models perform on each of these metacognitive functions, drawn from the Metacognition track (M1--M4) of the Measuring AGI benchmarks (Bond, 2026a). The data reveal a picture that is both more structured and more troubling than the simple statement "models are bad at metacognition" suggests. Models are not uniformly bad. They are selectively bad, in ways that reveal the independent geometric axes along which metacognitive capability varies. The most striking finding is a dissociation: some models can scale effort but cannot detect errors; others can detect errors but cannot scale effort. These are geometrically independent capabilities, and no tested model excels at both simultaneously.</p>
-<p class="body-text">The implications reach beyond metacognition itself. Sections 9.7 and 9.8 connect the metacognitive data to the ~38% recovery ceiling (Chapter 7) and to gauge invariance (Chapter 8), showing that metacognitive calibration is not merely useful but necessary for detecting and correcting the symmetry violations documented in Part II. A system that does not know how far it is from the goal cannot tell when a perturbation has moved it further away. A system that cannot monitor its own performance cannot detect when a gauge transformation has warped its output. Metacognition is not a luxury feature to be added after the reasoning engine is built. It is a structural prerequisite for reliable reasoning.</p>
-<h2 id="91-the-need-for-search-control" class="section-heading">9.1 The Need for Search Control</h2>
-<p class="first-paragraph">Consider a search algorithm traversing a non-convex evaluation landscape of the kind described in Chapter 7. The landscape has multiple basins of attraction, dead zones with vanishing gradient, and narrow channels connecting regions of interest. The search must navigate this terrain to reach the global minimum --- the correct answer.</p>
-<p class="body-text">Without metacognition, the search is open-loop: it follows the heuristic gradient, descends into whatever basin it encounters first, and reports the result. It has no mechanism for detecting that it has converged to a local minimum rather than the global one. It has no mechanism for recognizing that its current strategy (depth-first gradient following, say) is inappropriate for the current terrain (a plateau requiring breadth-first exploration). It has no mechanism for noticing that the problem it is solving is not the problem it was asked to solve.</p>
-<p class="body-text">With metacognition, the search becomes closed-loop: it follows the heuristic gradient, but simultaneously monitors properties of the search trajectory itself --- the rate of progress, the confidence of the current estimate, the consistency between different lines of reasoning --- and uses these meta-level observations to adjust the search in real time.</p>
-<p class="body-text">In control theory, this distinction is fundamental. An open-loop controller executes a fixed plan regardless of feedback. A closed-loop controller measures the actual state of the system, compares it to the desired state, and adjusts the control signal to reduce the error. Open-loop control works when the environment is perfectly known and perfectly predictable. Closed-loop control is necessary when it is not.</p>
-<p class="body-text">Reasoning environments are never perfectly known and perfectly predictable. The evaluation landscape shifts with each new token generated (in LLMs) or each new piece of evidence considered (in human reasoning). The heuristic field may be locally accurate but globally misleading. The problem formulation may be ambiguous. Without feedback --- without metacognition --- the search has no way to adapt to these uncertainties. It is flying blind.</p>
-<p class="body-text">The Metacognition track of the Measuring AGI benchmarks (Bond, 2026a) operationalizes this intuition into four measurable capabilities:</p>
-<ul class="book-list">
+<section id="chapter-9-metacognition-as-search-control" class="level1">
+<h1>Chapter 9: Metacognition as Search Control</h1>
+<p><em>Part III: The Control Layer</em></p>
+<blockquote>
+<p><em>“The only true wisdom is in knowing you know nothing.”</em> — Socrates, via Plato</p>
+</blockquote>
+<hr />
+<blockquote>
+<p><strong>RUNNING EXAMPLE — DR. OKAFOR’S TRIAGE</strong></p>
+<p><em>Dr. Amara Okafor is 90% sure the twelve-year-old boy has appendicitis. The history is classic — periumbilical pain migrating to the right lower quadrant, anorexia, low-grade fever. She has seen this pattern hundreds of times. Her confidence is high, and it feels earned.</em></p>
+<p><em>But Dr. Okafor has been 90% sure before. Over two decades in the ER, she has tracked her own diagnostic accuracy — not formally, not with spreadsheets, but with the quiet accumulation of outcomes that any experienced clinician carries. She knows that when she says “90% sure,” she is wrong roughly 30% of the time. Her stated confidence is 90%. Her actual accuracy at that confidence level is approximately 70%. The gap — 20 percentage points — is her personal Expected Calibration Error for high-confidence diagnoses.</em></p>
+<p><em>This gap is the M1 measure. It is the distance between the confidence surface she reports and the accuracy surface she achieves. Good metacognition does not mean being right. It means knowing how often you are right — and knowing, specifically, when your heuristic is unreliable. Dr. Okafor’s metacognitive calibration tells her that “90% sure” in her own internal language means “order the CT anyway.” A clinician without that calibration sends the boy home with a diagnosis of gastroenteritis. Thirty hours later, the appendix ruptures.</em></p>
+</blockquote>
+<hr />
+<section id="introduction" class="level2">
+<h2>Introduction</h2>
+<p>Part II documented the ways in which search goes wrong. Heuristic corruption bends trajectories (Chapter 5). Sycophancy redirects the search objective (Chapter 6). Local minima trap the search in premature convergence (Chapter 7). Broken symmetries mean the system’s output depends on features that should be irrelevant (Chapter 8). These are pathologies of the search itself — of the trajectory through reasoning space, the heuristic field that guides it, and the evaluation landscape on which it moves.</p>
+<p>Part III asks a different question: what would it take to <em>fix</em> these pathologies in real time?</p>
+<p>The answer is metacognition — cognition about cognition, reasoning about reasoning, search about search. A powerful system does not merely search; it monitors its own search. It maintains a running estimate of how far it is from the goal, tracks whether its current strategy is making progress, detects when the problem itself is ill-defined, and switches algorithms when the current one fails. Metacognition is the control layer that sits above the search, watches it, and intervenes when something goes wrong.</p>
+<p>In the geometric framework developed in this book, metacognition has a precise interpretation: it is the <em>control of informed search</em>. Every function that metacognition performs — calibration, self-monitoring, strategy selection, ambiguity detection — corresponds to a specific geometric operation on the search trajectory and the heuristic field. A well-calibrated system has an accurate distance estimate to the goal. A good self-monitor detects when the trajectory has deviated from the geodesic. A good strategy selector chooses the search algorithm whose assumptions match the local geometry. A good ambiguity detector recognizes when the goal state is not well-defined.</p>
+<p>This chapter presents the empirical evidence for how current language models perform on each of these metacognitive functions, drawn from the Metacognition track (M1–M4) of the Measuring AGI benchmarks (Bond, 2026a). The data reveal a picture that is both more structured and more troubling than the simple statement “models are bad at metacognition” suggests. Models are not uniformly bad. They are <em>selectively</em> bad, in ways that reveal the independent geometric axes along which metacognitive capability varies. The most striking finding is a dissociation: some models can scale effort but cannot detect errors; others can detect errors but cannot scale effort. These are geometrically independent capabilities, and no tested model excels at both simultaneously.</p>
+<p>The implications reach beyond metacognition itself. Sections 9.7 and 9.8 connect the metacognitive data to the ~38% recovery ceiling (Chapter 7) and to gauge invariance (Chapter 8), showing that metacognitive calibration is not merely useful but <em>necessary</em> for detecting and correcting the symmetry violations documented in Part II. A system that does not know how far it is from the goal cannot tell when a perturbation has moved it further away. A system that cannot monitor its own performance cannot detect when a gauge transformation has warped its output. Metacognition is not a luxury feature to be added after the reasoning engine is built. It is a structural prerequisite for reliable reasoning.</p>
+<hr />
+</section>
+<section id="the-need-for-search-control" class="level2">
+<h2>9.1 The Need for Search Control</h2>
+<p>Consider a search algorithm traversing a non-convex evaluation landscape of the kind described in Chapter 7. The landscape has multiple basins of attraction, dead zones with vanishing gradient, and narrow channels connecting regions of interest. The search must navigate this terrain to reach the global minimum — the correct answer.</p>
+<p>Without metacognition, the search is <em>open-loop</em>: it follows the heuristic gradient, descends into whatever basin it encounters first, and reports the result. It has no mechanism for detecting that it has converged to a local minimum rather than the global one. It has no mechanism for recognizing that its current strategy (depth-first gradient following, say) is inappropriate for the current terrain (a plateau requiring breadth-first exploration). It has no mechanism for noticing that the problem it is solving is not the problem it was asked to solve.</p>
+<p>With metacognition, the search becomes <em>closed-loop</em>: it follows the heuristic gradient, but simultaneously monitors properties of the search trajectory itself — the rate of progress, the confidence of the current estimate, the consistency between different lines of reasoning — and uses these meta-level observations to adjust the search in real time.</p>
+<p>In control theory, this distinction is fundamental. An open-loop controller executes a fixed plan regardless of feedback. A closed-loop controller measures the actual state of the system, compares it to the desired state, and adjusts the control signal to reduce the error. Open-loop control works when the environment is perfectly known and perfectly predictable. Closed-loop control is necessary when it is not.</p>
+<p>Reasoning environments are never perfectly known and perfectly predictable. The evaluation landscape shifts with each new token generated (in LLMs) or each new piece of evidence considered (in human reasoning). The heuristic field may be locally accurate but globally misleading. The problem formulation may be ambiguous. Without feedback — without metacognition — the search has no way to adapt to these uncertainties. It is flying blind.</p>
+<p>The Metacognition track of the Measuring AGI benchmarks (Bond, 2026a) operationalizes this intuition into four measurable capabilities:</p>
+<ul>
 <li><strong>M1 (Calibration):</strong> Does the system know how far it is from the goal? Is its confidence an accurate estimate of its actual accuracy?</li>
-<li><strong>M2 (Ambiguity Detection):</strong> Does the system detect when the problem is ill-specified --- when the goal state is not uniquely defined?</li>
-<li><strong>M3 (Self-Monitoring):</strong> Does the system detect when its own performance is degrading --- when the search trajectory is deviating from the geodesic?</li>
-<li><strong>M4 (Strategy Selection):</strong> Does the system adjust its search strategy to match task difficulty --- choosing the right algorithm for the current landscape?</li>
+<li><strong>M2 (Ambiguity Detection):</strong> Does the system detect when the problem is ill-specified — when the goal state is not uniquely defined?</li>
+<li><strong>M3 (Self-Monitoring):</strong> Does the system detect when its own performance is degrading — when the search trajectory is deviating from the geodesic?</li>
+<li><strong>M4 (Strategy Selection):</strong> Does the system adjust its search strategy to match task difficulty — choosing the right algorithm for the current landscape?</li>
 </ul>
-<p class="body-text">Each of these maps cleanly to a geometric operation. The following four sections examine each in turn.</p>
-<h2 id="92-calibration-how-far-am-i-from-the-goal" class="section-heading">9.2 Calibration: How Far Am I From the Goal?</h2>
-<p class="first-paragraph">Calibration is the most fundamental metacognitive capability. In the geometric framework, calibration is the accuracy of the system's estimate of <em class="math">h(x)</em> --- the cost-to-go from its current state <em class="math">x</em> to the goal state <em class="math">x^*</em>. A well-calibrated system has an <em class="math">h(x)</em> that closely approximates the true distance <em class="math">d(x, x*)</em>. A poorly calibrated system has an <em class="math">h(x)</em> that systematically over- or underestimates this distance.</p>
-<p class="body-text">The connection to A* search is direct. Recall from Chapter 3 that the evaluation function is <em class="math">f(x) = g(x) + h(x)</em>, where <em class="math">g(x)</em> is the accumulated cost and <em class="math">h(x)</em> is the estimated cost-to-go. A* is optimal when <em class="math">h(x)</em> is admissible --- when it never overestimates the true cost-to-go. Overestimation causes the search to expand suboptimal nodes; underestimation causes it to halt prematurely, believing it has arrived when it has not.</p>
-<p class="body-text">The M1 benchmark measures calibration through the Expected Calibration Error (ECE): the average discrepancy between a model's expressed confidence and its actual accuracy, computed across confidence bins. A model that says "I am 90% confident" and is correct 90% of the time has zero ECE. A model that says "I am 90% confident" and is correct 50% of the time has an ECE contribution of 0.40 from that bin.</p>
-<p class="body-text"><strong>[Empirical.]</strong> <strong>Experimental design.</strong> Models were presented with 25 moral reasoning scenarios at three difficulty levels (easy, moderate, hard) and asked to provide both a judgment and a confidence rating (0--100%). The ECE was computed by binning confidence ratings into intervals and comparing the average confidence in each bin against the average accuracy.</p>
-<p class="body-text"><strong>Results.</strong> The data are presented in Table 9.1.</p>
-<p class="body-text"><strong>Table 9.1.</strong> Expected Calibration Error (M1) and composite calibration scores.</p>
-<div class="table-wrapper"><table class="book-table">
+<p>Each of these maps cleanly to a geometric operation. The following four sections examine each in turn.</p>
+<hr />
+</section>
+<section id="calibration-how-far-am-i-from-the-goal" class="level2">
+<h2>9.2 Calibration: How Far Am I From the Goal?</h2>
+<p>Calibration is the most fundamental metacognitive capability. In the geometric framework, calibration is the accuracy of the system’s estimate of <span class="math inline">h(x)</span> — the cost-to-go from its current state <span class="math inline">x</span> to the goal state <span class="math inline">x^*</span>. A well-calibrated system has an <span class="math inline">h(x)</span> that closely approximates the true distance <span class="math inline">d(x, x^*)</span>. A poorly calibrated system has an <span class="math inline">h(x)</span> that systematically over- or underestimates this distance.</p>
+<p>The connection to A* search is direct. Recall from Chapter 3 that the evaluation function is <span class="math inline">f(x) = g(x) + h(x)</span>, where <span class="math inline">g(x)</span> is the accumulated cost and <span class="math inline">h(x)</span> is the estimated cost-to-go. A* is optimal when <span class="math inline">h(x)</span> is admissible — when it never overestimates the true cost-to-go. Overestimation causes the search to expand suboptimal nodes; underestimation causes it to halt prematurely, believing it has arrived when it has not.</p>
+<p>The M1 benchmark measures calibration through the Expected Calibration Error (ECE): the average discrepancy between a model’s expressed confidence and its actual accuracy, computed across confidence bins. A model that says “I am 90% confident” and is correct 90% of the time has zero ECE. A model that says “I am 90% confident” and is correct 50% of the time has an ECE contribution of 0.40 from that bin.</p>
+<p><strong>[Empirical.]</strong> <strong>Experimental design.</strong> Models were presented with 25 moral reasoning scenarios at three difficulty levels (easy, moderate, hard) and asked to provide both a judgment and a confidence rating (0–100%). The ECE was computed by binning confidence ratings into intervals and comparing the average confidence in each bin against the average accuracy.</p>
+<p><strong>Results.</strong> The data are presented in Table 9.1.</p>
+<p><strong>Table 9.1.</strong> Expected Calibration Error (M1) and composite calibration scores.</p>
+<table>
+<colgroup>
+<col style="width: 20%" />
+<col style="width: 20%" />
+<col style="width: 20%" />
+<col style="width: 20%" />
+<col style="width: 20%" />
+</colgroup>
+<thead>
 <tr>
-  <th>Model</th>
-  <th>ECE</th>
-  <th><em class="math">z</em>-score</th>
-  <th>Composite M1 Score</th>
-  <th>Direction</th>
+<th>Model</th>
+<th>ECE</th>
+<th><span class="math inline">z</span>-score</th>
+<th>Composite M1 Score</th>
+<th>Direction</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Gemini 2.0 Flash</td>
+<td>0.414</td>
+<td>5.8<span class="math inline">\sigma</span></td>
+<td>0.611</td>
+<td>Overconfident</td>
 </tr>
 <tr>
-  <td>Gemini 2.0 Flash</td>
-  <td>0.414</td>
-  <td>5.8<em class="math">\sigma</em></td>
-  <td>0.611</td>
-  <td>Overconfident</td>
+<td>Gemini 2.5 Flash</td>
+<td>0.415</td>
+<td>7.0<span class="math inline">\sigma</span></td>
+<td>—</td>
+<td>Overconfident</td>
 </tr>
 <tr>
-  <td>Gemini 2.5 Flash</td>
-  <td>0.415</td>
-  <td>7.0<em class="math">\sigma</em></td>
-  <td>---</td>
-  <td>Overconfident</td>
+<td>Gemini 3 Flash</td>
+<td>0.333</td>
+<td>4.5<span class="math inline">\sigma</span></td>
+<td>—</td>
+<td>Overconfident</td>
 </tr>
 <tr>
-  <td>Gemini 3 Flash</td>
-  <td>0.333</td>
-  <td>4.5<em class="math">\sigma</em></td>
-  <td>---</td>
-  <td>Overconfident</td>
+<td>Gemini 2.5 Pro</td>
+<td>0.230</td>
+<td>2.5<span class="math inline">\sigma</span></td>
+<td>0.807</td>
+<td>Overconfident</td>
 </tr>
 <tr>
-  <td>Gemini 2.5 Pro</td>
-  <td>0.230</td>
-  <td>2.5<em class="math">\sigma</em></td>
-  <td>0.807</td>
-  <td>Overconfident</td>
+<td>Claude Sonnet 4.6</td>
+<td>0.250</td>
+<td>—</td>
+<td>—</td>
+<td>Overconfident</td>
 </tr>
 <tr>
-  <td>Claude Sonnet 4.6</td>
-  <td>0.250</td>
-  <td>---</td>
-  <td>---</td>
-  <td>Overconfident</td>
+<td><strong>Fisher Combined</strong></td>
+<td>—</td>
+<td><strong>9.3<span class="math inline">\sigma</span></strong></td>
+<td>—</td>
+<td><strong>Overconfident</strong></td>
 </tr>
-<tr>
-  <td><strong>Fisher Combined</strong></td>
-  <td>---</td>
-  <td><strong>9.3<em class="math">\sigma</em></strong></td>
-  <td>---</td>
-  <td><strong>Overconfident</strong></td>
-</tr>
-</table></div>
-<p class="body-text"><strong>[Empirical.]</strong> Every model is overconfident. Every model's ECE is significantly above zero. The direction is uniform: no model underestimates its confidence. The Fisher-combined significance across all five models is 9.3<em class="math">\sigma</em> --- a statistical certainty.</p>
-<p class="body-text">This was first presented in Chapter 7 (Section 7.3) in the context of premature convergence. Here we reinterpret the same data through the lens of metacognitive control.</p>
-<p class="body-text"><strong>The control interpretation.</strong> A calibration system is, in engineering terms, a state estimator. It takes the system's internal signals --- the patterns of activation, the distribution over next tokens, the structure of the generated reasoning trace --- and produces an estimate of the system's position in the reasoning manifold relative to the goal. A well-calibrated state estimator enables the control loop: "I am far from the goal; I should keep searching. I am close to the goal; I can commit to this answer."</p>
-<p class="body-text">When the state estimator is systematically biased toward "I am close to the goal," the control loop is broken. The system always believes it has nearly arrived, so it never triggers the extended search that difficult problems require. The search terminates prematurely, not because the system lacks the capacity for deeper reasoning, but because its metacognitive monitor says "you are done" when it is not done.</p>
-<p class="body-text"><strong>Geometric interpretation.</strong> In the language of heuristic search, overconfidence means the heuristic systematically underestimates cost-to-go. The system's <em class="math">h(x)</em> reads as smaller than <em class="math">d(x, x^*)</em> across the manifold. This has a specific geometric consequence: the search frontier --- the set of states the system considers "worth exploring" --- is too small. States that should be explored (because the true distance to the goal is large) are excluded (because the estimated distance is small). The system converges to whatever answer lies within its artificially contracted search frontier, which may be a local minimum rather than the global one.</p>
-<p class="body-text">The ECE values map to the severity of this contraction:</p>
-<ul class="book-list">
-<li><strong>Flash 2.0 (ECE = 0.414):</strong> The search frontier is contracted by roughly 41% of the manifold's effective diameter. The system's horizon of exploration is barely over half of what it should be.</li>
-<li><strong>Pro (ECE = 0.230):</strong> The contraction is less severe but still substantial --- a 23% underestimate of the remaining distance.</li>
+</tbody>
+</table>
+<p><strong>[Empirical.]</strong> Every model is overconfident. Every model’s ECE is significantly above zero. The direction is uniform: no model underestimates its confidence. The Fisher-combined significance across all five models is 9.3<span class="math inline">\sigma</span> — a statistical certainty.</p>
+<p>This was first presented in Chapter 7 (Section 7.3) in the context of premature convergence. Here we reinterpret the same data through the lens of metacognitive control.</p>
+<p><strong>The control interpretation.</strong> A calibration system is, in engineering terms, a state estimator. It takes the system’s internal signals — the patterns of activation, the distribution over next tokens, the structure of the generated reasoning trace — and produces an estimate of the system’s position in the reasoning manifold relative to the goal. A well-calibrated state estimator enables the control loop: “I am far from the goal; I should keep searching. I am close to the goal; I can commit to this answer.”</p>
+<p>When the state estimator is systematically biased toward “I am close to the goal,” the control loop is broken. The system always believes it has nearly arrived, so it never triggers the extended search that difficult problems require. The search terminates prematurely, not because the system lacks the capacity for deeper reasoning, but because its metacognitive monitor says “you are done” when it is not done.</p>
+<p><strong>Geometric interpretation.</strong> In the language of heuristic search, overconfidence means the heuristic systematically underestimates cost-to-go. The system’s <span class="math inline">h(x)</span> reads as smaller than <span class="math inline">d(x, x^*)</span> across the manifold. This has a specific geometric consequence: the search frontier — the set of states the system considers “worth exploring” — is too small. States that should be explored (because the true distance to the goal is large) are excluded (because the estimated distance is small). The system converges to whatever answer lies within its artificially contracted search frontier, which may be a local minimum rather than the global one.</p>
+<p>The ECE values map to the severity of this contraction:</p>
+<ul>
+<li><strong>Flash 2.0 (ECE = 0.414):</strong> The search frontier is contracted by roughly 41% of the manifold’s effective diameter. The system’s horizon of exploration is barely over half of what it should be.</li>
+<li><strong>Pro (ECE = 0.230):</strong> The contraction is less severe but still substantial — a 23% underestimate of the remaining distance.</li>
 </ul>
-<p class="body-text">The practical consequence is that calibration training --- reshaping the confidence surface to match actual accuracy --- is not merely a cosmetic improvement. It directly expands the search frontier by correcting the underestimate of <em class="math">h(x)</em>, allowing the system to recognize that it has further to go and to continue searching rather than halting prematurely.</p>
-<h2 id="93-self-monitoring-am-i-on-the-right-path" class="section-heading">9.3 Self-Monitoring: Am I on the Right Path?</h2>
-<p class="first-paragraph">Calibration measures whether the system knows how far it is from the goal at any given moment. Self-monitoring measures something different: whether the system can detect changes in its own performance over time. A system might be poorly calibrated in absolute terms (always overconfident) but still detect a relative degradation --- "I was performing well on the easy questions, and now I am performing poorly on the hard ones." Self-monitoring is the derivative of the distance estimate, not the estimate itself.</p>
-<p class="body-text"><strong>The M3 benchmark.</strong> Models were given moral reasoning scenarios at three difficulty levels in sequence and asked to provide confidence ratings. Self-monitoring was measured as the correlation between actual difficulty (determined by expert rating and cross-model consensus) and reported confidence. A strong self-monitor shows a clear decline in confidence as difficulty increases. A weak self-monitor shows flat confidence regardless of difficulty.</p>
-<p class="body-text"><strong>Results.</strong> The data are presented in Table 9.2.</p>
-<p class="body-text"><strong>Table 9.2.</strong> Self-monitoring scores (M3) across models.</p>
-<div class="table-wrapper"><table class="book-table">
+<p>The practical consequence is that calibration training — reshaping the confidence surface to match actual accuracy — is not merely a cosmetic improvement. It directly expands the search frontier by correcting the underestimate of <span class="math inline">h(x)</span>, allowing the system to recognize that it has further to go and to continue searching rather than halting prematurely.</p>
+<hr />
+</section>
+<section id="self-monitoring-am-i-on-the-right-path" class="level2">
+<h2>9.3 Self-Monitoring: Am I on the Right Path?</h2>
+<p>Calibration measures whether the system knows how far it is from the goal at any given moment. Self-monitoring measures something different: whether the system can detect <em>changes</em> in its own performance over time. A system might be poorly calibrated in absolute terms (always overconfident) but still detect a relative degradation — “I was performing well on the easy questions, and now I am performing poorly on the hard ones.” Self-monitoring is the derivative of the distance estimate, not the estimate itself.</p>
+<p><strong>The M3 benchmark.</strong> Models were given moral reasoning scenarios at three difficulty levels in sequence and asked to provide confidence ratings. Self-monitoring was measured as the correlation between actual difficulty (determined by expert rating and cross-model consensus) and reported confidence. A strong self-monitor shows a clear decline in confidence as difficulty increases. A weak self-monitor shows flat confidence regardless of difficulty.</p>
+<p><strong>Results.</strong> The data are presented in Table 9.2.</p>
+<p><strong>Table 9.2.</strong> Self-monitoring scores (M3) across models.</p>
+<table>
+<thead>
 <tr>
-  <th>Model</th>
-  <th>M3 Self-Monitoring Score</th>
-  <th>Interpretation</th>
+<th>Model</th>
+<th>M3 Self-Monitoring Score</th>
+<th>Interpretation</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Gemini 2.0 Flash</td>
+<td>0.094</td>
+<td>Near chance</td>
 </tr>
 <tr>
-  <td>Gemini 2.0 Flash</td>
-  <td>0.094</td>
-  <td>Near chance</td>
+<td>Gemini 2.5 Flash</td>
+<td>0.311</td>
+<td>Moderate</td>
 </tr>
 <tr>
-  <td>Gemini 2.5 Flash</td>
-  <td>0.311</td>
-  <td>Moderate</td>
+<td>Gemini 3 Flash</td>
+<td>0.450</td>
+<td>Moderate</td>
 </tr>
 <tr>
-  <td>Gemini 3 Flash</td>
-  <td>0.450</td>
-  <td>Moderate</td>
+<td>Gemini 2.5 Pro</td>
+<td>0.700</td>
+<td>Excellent</td>
 </tr>
 <tr>
-  <td>Gemini 2.5 Pro</td>
-  <td>0.700</td>
-  <td>Excellent</td>
+<td>Claude Sonnet 4.6</td>
+<td>0.550</td>
+<td>Good</td>
+</tr>
+</tbody>
+</table>
+<p>The range is enormous. Flash 2.0’s self-monitoring score of 0.094 is effectively chance — the model’s confidence does not track difficulty at all. Its internal state estimator is not merely biased (as Section 9.2 showed) but <em>invariant to signal</em> — it produces the same confidence reading regardless of whether the system is succeeding or failing. Pro’s score of 0.700, by contrast, indicates a strong relationship between actual difficulty and reported confidence — the model knows when it is struggling.</p>
+<p><strong>Geometric interpretation.</strong> Self-monitoring corresponds to the sensitivity of the distance estimate to actual changes in position. In the language of calculus, let <span class="math inline">\hat{h}(x)</span> be the system’s estimate of cost-to-go and <span class="math inline">h^*(x)</span> be the true cost-to-go. Calibration measures the bias: <span class="math inline">\mathbb{E}[\hat{h}(x) - h^*(x)]</span>. Self-monitoring measures the responsiveness: <span class="math inline">\partial \hat{h} / \partial h^*</span> — how much the estimate changes when the true distance changes.</p>
+<p>A system with calibration bias but good self-monitoring has a state estimator that is offset but correctly shaped: <span class="math inline">\hat{h}(x) = h^*(x) - c</span> for some constant <span class="math inline">c &gt; 0</span>. It always underestimates by the same amount, but it correctly tracks increases and decreases in true distance. This system can in principle be corrected by a constant shift.</p>
+<p>A system with poor self-monitoring has a state estimator that is not just offset but <em>flat</em>: <span class="math inline">\hat{h}(x) \approx \text{const}</span> regardless of the true <span class="math inline">h^*(x)</span>. No constant correction can fix this because the estimator carries no information about the true distance. The gradient of the confidence surface has collapsed — not merely in the sense of Chapter 7 (universally low values), but in the stronger sense of zero variation across the landscape. The system is not only overconfident but <em>uniformly</em> overconfident, with no residual signal that could be amplified or corrected.</p>
+<p>Flash 2.0, with M3 = 0.094, is in this latter condition. Its confidence surface is nearly flat across difficulty levels. Pro, with M3 = 0.700, has a confidence surface that retains substantial gradient information — it is biased (ECE = 0.230) but shaped correctly, preserving the relative ranking of easy and hard problems even while systematically overestimating proximity to the goal.</p>
+<p>This distinction matters enormously for intervention. A biased-but-responsive estimator (Pro) can be recalibrated. A flat estimator (Flash 2.0) cannot, because there is no signal to recalibrate from. The self-monitoring score determines the <em>recoverability</em> of calibration errors, not just their magnitude.</p>
+<hr />
+</section>
+<section id="strategy-selection-which-search-algorithm" class="level2">
+<h2>9.4 Strategy Selection: Which Search Algorithm?</h2>
+<p>The third metacognitive capability is strategy selection: the ability to choose the right search algorithm for the current problem and, critically, to switch algorithms when the current one is failing. In the geometric framework, this corresponds to selecting the traversal method that matches the local geometry of the evaluation landscape.</p>
+<p>Different landscape geometries call for different strategies. A smooth, convex basin with a single minimum is efficiently navigated by gradient descent. A rugged landscape with many local minima requires stochastic methods — simulated annealing, random restarts — that can escape shallow basins. A flat plateau (dead zone) requires exploratory search — breadth-first or random walk — because there is no gradient to follow. A narrow channel connecting two basins requires precise, constrained search that does not stray outside the channel walls.</p>
+<p>The optimal search strategy is not fixed. It depends on the local geometry, which changes as the search progresses. A system that uses the same strategy everywhere — always gradient descent, or always breadth-first — will be efficient in some regions and catastrophically inefficient in others. The metacognitive function of strategy selection is to match the algorithm to the terrain.</p>
+<p><strong>The M4 benchmark.</strong> Effort scaling was measured as the degree to which models adjusted their processing depth — response length, number of considerations weighed, complexity of analysis — in proportion to task difficulty. A high M4 score indicates that the model produces brief, decisive responses for easy problems and extended, multi-faceted analyses for hard ones. A low M4 score indicates that the model applies the same level of effort regardless of difficulty.</p>
+<p><strong>Results.</strong> The data are presented in Table 9.3.</p>
+<p><strong>Table 9.3.</strong> Strategy selection / effort scaling scores (M4) across models.</p>
+<table>
+<thead>
+<tr>
+<th>Model</th>
+<th>M4 Strategy Selection Score</th>
+<th>Interpretation</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Gemini 2.0 Flash</td>
+<td>0.723</td>
+<td>Excellent</td>
 </tr>
 <tr>
-  <td>Claude Sonnet 4.6</td>
-  <td>0.550</td>
-  <td>Good</td>
-</tr>
-</table></div>
-<p class="body-text">The range is enormous. Flash 2.0's self-monitoring score of 0.094 is effectively chance --- the model's confidence does not track difficulty at all. Its internal state estimator is not merely biased (as Section 9.2 showed) but invariant to signal --- it produces the same confidence reading regardless of whether the system is succeeding or failing. Pro's score of 0.700, by contrast, indicates a strong relationship between actual difficulty and reported confidence --- the model knows when it is struggling.</p>
-<p class="body-text"><strong>Geometric interpretation.</strong> Self-monitoring corresponds to the sensitivity of the distance estimate to actual changes in position. In the language of calculus, let <em class="math">\hat{h}(x)</em> be the system's estimate of cost-to-go and <em class="math">h*(x)</em> be the true cost-to-go. Calibration measures the bias: <em class="math">\mathbb{E}[\hat{h}(x) - h*(x)]</em>. Self-monitoring measures the responsiveness: <em class="math">\partial \hat{h} / \partial h^*</em> --- how much the estimate changes when the true distance changes.</p>
-<p class="body-text">A system with calibration bias but good self-monitoring has a state estimator that is offset but correctly shaped: <em class="math">\hat{h}(x) = h^*(x) - c</em> for some constant <em class="math">c &gt; 0</em>. It always underestimates by the same amount, but it correctly tracks increases and decreases in true distance. This system can in principle be corrected by a constant shift.</p>
-<p class="body-text">A system with poor self-monitoring has a state estimator that is not just offset but flat: <em class="math">\hat{h}(x) \approx \text{const}</em> regardless of the true <em class="math">h*(x)</em>. No constant correction can fix this because the estimator carries no information about the true distance. The gradient of the confidence surface has collapsed --- not merely in the sense of Chapter 7 (universally low values), but in the stronger sense of zero variation across the landscape. The system is not only overconfident but uniformly* overconfident, with no residual signal that could be amplified or corrected.</p>
-<p class="body-text">Flash 2.0, with M3 = 0.094, is in this latter condition. Its confidence surface is nearly flat across difficulty levels. Pro, with M3 = 0.700, has a confidence surface that retains substantial gradient information --- it is biased (ECE = 0.230) but shaped correctly, preserving the relative ranking of easy and hard problems even while systematically overestimating proximity to the goal.</p>
-<p class="body-text">This distinction matters enormously for intervention. A biased-but-responsive estimator (Pro) can be recalibrated. A flat estimator (Flash 2.0) cannot, because there is no signal to recalibrate from. The self-monitoring score determines the recoverability of calibration errors, not just their magnitude.</p>
-<h2 id="94-strategy-selection-which-search-algorithm" class="section-heading">9.4 Strategy Selection: Which Search Algorithm?</h2>
-<p class="first-paragraph">The third metacognitive capability is strategy selection: the ability to choose the right search algorithm for the current problem and, critically, to switch algorithms when the current one is failing. In the geometric framework, this corresponds to selecting the traversal method that matches the local geometry of the evaluation landscape.</p>
-<p class="body-text">Different landscape geometries call for different strategies. A smooth, convex basin with a single minimum is efficiently navigated by gradient descent. A rugged landscape with many local minima requires stochastic methods --- simulated annealing, random restarts --- that can escape shallow basins. A flat plateau (dead zone) requires exploratory search --- breadth-first or random walk --- because there is no gradient to follow. A narrow channel connecting two basins requires precise, constrained search that does not stray outside the channel walls.</p>
-<p class="body-text">The optimal search strategy is not fixed. It depends on the local geometry, which changes as the search progresses. A system that uses the same strategy everywhere --- always gradient descent, or always breadth-first --- will be efficient in some regions and catastrophically inefficient in others. The metacognitive function of strategy selection is to match the algorithm to the terrain.</p>
-<p class="body-text"><strong>The M4 benchmark.</strong> Effort scaling was measured as the degree to which models adjusted their processing depth --- response length, number of considerations weighed, complexity of analysis --- in proportion to task difficulty. A high M4 score indicates that the model produces brief, decisive responses for easy problems and extended, multi-faceted analyses for hard ones. A low M4 score indicates that the model applies the same level of effort regardless of difficulty.</p>
-<p class="body-text"><strong>Results.</strong> The data are presented in Table 9.3.</p>
-<p class="body-text"><strong>Table 9.3.</strong> Strategy selection / effort scaling scores (M4) across models.</p>
-<div class="table-wrapper"><table class="book-table">
-<tr>
-  <th>Model</th>
-  <th>M4 Strategy Selection Score</th>
-  <th>Interpretation</th>
+<td>Gemini 2.5 Flash</td>
+<td>0.557</td>
+<td>Good</td>
 </tr>
 <tr>
-  <td>Gemini 2.0 Flash</td>
-  <td>0.723</td>
-  <td>Excellent</td>
+<td>Gemini 3 Flash</td>
+<td>0.488</td>
+<td>Moderate</td>
 </tr>
 <tr>
-  <td>Gemini 2.5 Flash</td>
-  <td>0.557</td>
-  <td>Good</td>
+<td>Gemini 2.5 Pro</td>
+<td>0.350</td>
+<td>Weak</td>
 </tr>
 <tr>
-  <td>Gemini 3 Flash</td>
-  <td>0.488</td>
-  <td>Moderate</td>
+<td>Claude Sonnet 4.6</td>
+<td>0.480</td>
+<td>Moderate</td>
+</tr>
+</tbody>
+</table>
+<p>The pattern is striking and, as we shall see in Section 9.5, crucially important. Flash 2.0 has excellent effort scaling (0.723) — it strongly adjusts processing depth in response to difficulty. Pro has weak effort scaling (0.350) — it applies roughly the same level of effort to easy and hard problems alike.</p>
+<p><strong>Geometric interpretation.</strong> Strategy selection corresponds to the ability to detect the local curvature of the evaluation landscape and adjust the search algorithm accordingly. High curvature (steep, well-defined basin) calls for fast, directed descent. Low curvature (flat or gently sloping) calls for broad exploration. Negative curvature (saddle point) calls for a directional escape along the eigenvector with negative eigenvalue.</p>
+<p>A system with good strategy selection implicitly computes, or at least responds to, the local Hessian of the evaluation function — the second-order geometry that determines whether the current region is a basin (positive definite Hessian), a saddle (indefinite Hessian), or a plateau (near-zero Hessian). It adjusts its step size, its exploration breadth, and its commitment to the current trajectory based on this information.</p>
+<p>Flash 2.0’s high M4 score indicates that it is responsive to these landscape features. When the problem is easy (deep, well-defined basin), Flash produces a quick, confident response — steep gradient descent. When the problem is hard (shallow, ambiguous basin or dead zone), Flash produces a longer, more exploratory response — broader search with more backtracking.</p>
+<p>But here is the critical caveat: Flash 2.0 adjusts its strategy based on <em>surface features of the problem</em> — the linguistic cues that correlate with difficulty — rather than based on <em>internal feedback about its own performance</em>. It responds to how hard the problem looks, not to whether it is actually succeeding. This distinction becomes central in the next section.</p>
+<hr />
+</section>
+<section id="the-metacognitive-dissociation" class="level2">
+<h2>9.5 The Metacognitive Dissociation</h2>
+<p>The most important finding in the metacognition data is not any single score but a <em>relationship between scores</em>: the dissociation between self-monitoring (M3) and strategy selection (M4). Table 9.4 presents the full metacognitive profile for the two extreme models.</p>
+<p><strong>Table 9.4.</strong> The metacognitive dissociation: Flash 2.0 versus Pro.</p>
+<table>
+<thead>
+<tr>
+<th>Capability</th>
+<th>Flash 2.0</th>
+<th>Pro</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>M1 Calibration (composite)</td>
+<td>0.611</td>
+<td>0.807</td>
 </tr>
 <tr>
-  <td>Gemini 2.5 Pro</td>
-  <td>0.350</td>
-  <td>Weak</td>
+<td>M2 Ambiguity Detection</td>
+<td>0.195</td>
+<td>0.168</td>
 </tr>
 <tr>
-  <td>Claude Sonnet 4.6</td>
-  <td>0.480</td>
-  <td>Moderate</td>
-</tr>
-</table></div>
-<p class="body-text">The pattern is striking and, as we shall see in Section 9.5, crucially important. Flash 2.0 has excellent effort scaling (0.723) --- it strongly adjusts processing depth in response to difficulty. Pro has weak effort scaling (0.350) --- it applies roughly the same level of effort to easy and hard problems alike.</p>
-<p class="body-text"><strong>Geometric interpretation.</strong> Strategy selection corresponds to the ability to detect the local curvature of the evaluation landscape and adjust the search algorithm accordingly. High curvature (steep, well-defined basin) calls for fast, directed descent. Low curvature (flat or gently sloping) calls for broad exploration. Negative curvature (saddle point) calls for a directional escape along the eigenvector with negative eigenvalue.</p>
-<p class="body-text">A system with good strategy selection implicitly computes, or at least responds to, the local Hessian of the evaluation function --- the second-order geometry that determines whether the current region is a basin (positive definite Hessian), a saddle (indefinite Hessian), or a plateau (near-zero Hessian). It adjusts its step size, its exploration breadth, and its commitment to the current trajectory based on this information.</p>
-<p class="body-text">Flash 2.0's high M4 score indicates that it is responsive to these landscape features. When the problem is easy (deep, well-defined basin), Flash produces a quick, confident response --- steep gradient descent. When the problem is hard (shallow, ambiguous basin or dead zone), Flash produces a longer, more exploratory response --- broader search with more backtracking.</p>
-<p class="body-text">But here is the critical caveat: Flash 2.0 adjusts its strategy based on surface features of the problem --- the linguistic cues that correlate with difficulty --- rather than based on internal feedback about its own performance. It responds to how hard the problem looks, not to whether it is actually succeeding. This distinction becomes central in the next section.</p>
-<h2 id="95-the-metacognitive-dissociation" class="section-heading">9.5 The Metacognitive Dissociation</h2>
-<p class="first-paragraph">The most important finding in the metacognition data is not any single score but a relationship between scores: the dissociation between self-monitoring (M3) and strategy selection (M4). Table 9.4 presents the full metacognitive profile for the two extreme models.</p>
-<p class="body-text"><strong>Table 9.4.</strong> The metacognitive dissociation: Flash 2.0 versus Pro.</p>
-<div class="table-wrapper"><table class="book-table">
-<tr>
-  <th>Capability</th>
-  <th>Flash 2.0</th>
-  <th>Pro</th>
+<td>M3 Self-Monitoring</td>
+<td>0.094</td>
+<td>0.700</td>
 </tr>
 <tr>
-  <td>M1 Calibration (composite)</td>
-  <td>0.611</td>
-  <td>0.807</td>
+<td>M4 Strategy Selection</td>
+<td>0.723</td>
+<td>0.350</td>
 </tr>
-<tr>
-  <td>M2 Ambiguity Detection</td>
-  <td>0.195</td>
-  <td>0.168</td>
-</tr>
-<tr>
-  <td>M3 Self-Monitoring</td>
-  <td>0.094</td>
-  <td>0.700</td>
-</tr>
-<tr>
-  <td>M4 Strategy Selection</td>
-  <td>0.723</td>
-  <td>0.350</td>
-</tr>
-</table></div>
-<p class="body-text"><strong>[Empirical.]</strong> The dissociation is dramatic. Flash 2.0 excels at strategy selection (0.723) but is nearly blind to its own errors (M3 = 0.094). Pro excels at self-monitoring (0.700) but fails to scale effort appropriately (M4 = 0.350). Each model has a metacognitive strength that the other lacks, and each has a metacognitive weakness where the other succeeds.</p>
-<p class="body-text">This is not noise. The two capabilities are anti-correlated across the model family: as self-monitoring increases from Flash 2.0 through Flash 2.5, Flash 3, and Claude to Pro, strategy selection decreases. The models that know when they are failing do not adjust their behavior accordingly. The models that adjust their behavior do not know when adjustment is needed.</p>
-<p class="body-text"><strong>Why this dissociation is geometrically significant.</strong> In the two-dimensional metacognitive space introduced in Chapter 7 (Section 7.4), with axes <em class="math">M_{\text{monitor}}</em> (self-monitoring) and <em class="math">M_{\text{effort}}</em> (effort scaling / strategy selection), each model occupies a point:</p>
-<p class="body-text"><span class="math-block">\mathbf{m}_{\text{Flash}} \approx (0.09, 0.72), \quad \mathbf{m}_{\text{Pro}} \approx (0.70, 0.35)</span></p>
-<p class="body-text">The vector from Flash to Pro is approximately <em class="math">(0.61, -0.37)</em>. This vector is far from parallel to either axis --- it cuts diagonally across the metacognitive space, indicating that the two models differ along a direction that involves both axes simultaneously. But crucially, the two axes are independently varying: knowing a model's position on one axis tells you little about its position on the other. The correlation across the five tested models between M3 and M4 is weakly negative.</p>
-<p class="body-text">In geometric terms, M3 and M4 define approximately orthogonal dimensions of metacognitive capability. They are independent degrees of freedom in the space of possible metacognitive architectures. A model's total metacognitive capability is not a point on a line (one-dimensional) but a point in a plane (two-dimensional), and the coordinates on the two axes can vary independently.</p>
-<p class="body-text"><strong>The control-theoretic interpretation.</strong> The dissociation maps precisely onto a well-known distinction in control theory: the difference between the sensor and the actuator.</p>
-<ul class="book-list">
-<li><strong>Self-monitoring (M3) is the sensor.</strong> It measures the system's state --- specifically, whether the system is succeeding or failing, whether performance is improving or degrading. A good sensor produces accurate readings; a bad sensor is noisy or insensitive.</li>
+</tbody>
+</table>
+<p><strong>[Empirical.]</strong> The dissociation is dramatic. Flash 2.0 excels at strategy selection (0.723) but is nearly blind to its own errors (M3 = 0.094). Pro excels at self-monitoring (0.700) but fails to scale effort appropriately (M4 = 0.350). Each model has a metacognitive strength that the other lacks, and each has a metacognitive weakness where the other succeeds.</p>
+<p>This is not noise. The two capabilities are <em>anti-correlated</em> across the model family: as self-monitoring increases from Flash 2.0 through Flash 2.5, Flash 3, and Claude to Pro, strategy selection <em>decreases</em>. The models that know when they are failing do not adjust their behavior accordingly. The models that adjust their behavior do not know when adjustment is needed.</p>
+<p><strong>Why this dissociation is geometrically significant.</strong> In the two-dimensional metacognitive space introduced in Chapter 7 (Section 7.4), with axes <span class="math inline">M_{\text{monitor}}</span> (self-monitoring) and <span class="math inline">M_{\text{effort}}</span> (effort scaling / strategy selection), each model occupies a point:</p>
+<p><span class="math display">\mathbf{m}_{\text{Flash}} \approx (0.09, 0.72), \quad \mathbf{m}_{\text{Pro}} \approx (0.70, 0.35)</span></p>
+<p>The vector from Flash to Pro is approximately <span class="math inline">(0.61, -0.37)</span>. This vector is far from parallel to either axis — it cuts diagonally across the metacognitive space, indicating that the two models differ along a direction that involves <em>both</em> axes simultaneously. But crucially, the two axes are independently varying: knowing a model’s position on one axis tells you little about its position on the other. The correlation across the five tested models between M3 and M4 is weakly negative.</p>
+<p>In geometric terms, M3 and M4 define approximately orthogonal dimensions of metacognitive capability. They are independent degrees of freedom in the space of possible metacognitive architectures. A model’s total metacognitive capability is not a point on a line (one-dimensional) but a point in a plane (two-dimensional), and the coordinates on the two axes can vary independently.</p>
+<p><strong>The control-theoretic interpretation.</strong> The dissociation maps precisely onto a well-known distinction in control theory: the difference between the <em>sensor</em> and the <em>actuator</em>.</p>
+<ul>
+<li><p><strong>Self-monitoring (M3) is the sensor.</strong> It measures the system’s state — specifically, whether the system is succeeding or failing, whether performance is improving or degrading. A good sensor produces accurate readings; a bad sensor is noisy or insensitive.</p></li>
+<li><p><strong>Strategy selection (M4) is the actuator.</strong> It adjusts the system’s behavior — specifically, the amount and type of effort allocated to the current problem. A good actuator responds proportionally to the control signal; a bad actuator is sluggish or unresponsive.</p></li>
 </ul>
-<ul class="book-list">
-<li><strong>Strategy selection (M4) is the actuator.</strong> It adjusts the system's behavior --- specifically, the amount and type of effort allocated to the current problem. A good actuator responds proportionally to the control signal; a bad actuator is sluggish or unresponsive.</li>
-</ul>
-<p class="body-text">A functional control loop requires both a good sensor and a good actuator. Without a good sensor, the actuator has no signal to respond to and must rely on open-loop heuristics (responding to surface features rather than internal state). Without a good actuator, the sensor's readings go unused --- the system detects the problem but cannot fix it.</p>
-<p class="body-text">Flash 2.0 has a good actuator but a bad sensor. It adjusts effort proportionally --- but to surface difficulty cues, not to internal performance feedback. Its strategy selection is reactive (responding to input features) rather than reflective (responding to self-assessment). The system is like a thermostat with a broken thermometer that adjusts heating based on the weather forecast rather than the actual room temperature. It often gets the right answer --- weather forecasts correlate with room temperature --- but it cannot correct for forecast errors.</p>
-<p class="body-text">Pro has a good sensor but a bad actuator. It accurately detects when its performance is degrading, but it does not increase effort in response. It produces roughly the same depth of analysis for easy and hard problems, even though it knows (in the sense that its confidence correctly tracks difficulty) that the hard problems demand more. The system is like a thermostat with a good thermometer but a stuck valve --- it reads the temperature correctly but cannot adjust the heat.</p>
-<p class="body-text"><strong>Why neither half suffices.</strong> The effective metacognitive control quality is bounded by the minimum of the two components:</p>
-<p class="body-text"><span class="math-block">\text{Effective control} \leq \min(M_{\text{sensor}}, M_{\text{actuator}})</span></p>
-<p class="body-text">For Flash 2.0: <em class="math">\min(0.094, 0.723) = 0.094</em>. The sensor is the bottleneck. All that actuator capability is wasted because there is no reliable signal to drive it.</p>
-<p class="body-text">For Pro: <em class="math">\min(0.700, 0.350) = 0.350</em>. The actuator is the bottleneck. The sensor detects problems correctly, but the system cannot respond with proportional effort.</p>
-<p class="body-text">In both cases, the effective metacognitive control is far below what either component would suggest in isolation. This is why the dissociation matters: it means that no tested model has good metacognitive control, even though every tested model has at least one good metacognitive component. The bottleneck is always the weaker axis.</p>
-<h2 id="96-ambiguity-detection-is-the-problem-well-posed" class="section-heading">9.6 Ambiguity Detection: Is the Problem Well-Posed?</h2>
-<p class="first-paragraph">The fourth metacognitive capability is ambiguity detection: the ability to recognize when a problem is ill-specified --- when the premises are insufficient to determine a unique answer, when key information is missing, or when the problem admits multiple valid interpretations.</p>
-<p class="body-text">In the geometric framework, ambiguity corresponds to a non-unique goal state. The search is supposed to converge to <em class="math">x^*</em>, but the problem specification does not define a unique <em class="math">x^*</em> --- it defines a set <em class="math">X* = \{x_1*, x_2^*, \ldots\}</em> of possible goals, and the system must recognize this multiplicity rather than arbitrarily committing to one.</p>
-<p class="body-text">This is a qualitatively different metacognitive demand from calibration, self-monitoring, or strategy selection. Those capabilities concern the search process given a well-defined goal. Ambiguity detection concerns the preconditions for search: is there even a well-defined target to search for?</p>
-<p class="body-text"><strong>The M2 benchmark.</strong> Ambiguity detection was measured by presenting models with deliberately ill-specified moral scenarios --- cases where essential context was omitted, where the actions described were genuinely ambiguous between benign and malicious interpretations, or where competing moral frameworks would yield genuinely different conclusions. Models were scored on their ability to identify the ambiguity, resist premature commitment to a single interpretation, and articulate the conditions under which different interpretations would apply.</p>
-<p class="body-text"><strong>Results.</strong> The data are presented in Table 9.5.</p>
-<p class="body-text"><strong>Table 9.5.</strong> Ambiguity detection scores (M2) across models.</p>
-<div class="table-wrapper"><table class="book-table">
+<p>A functional control loop requires <em>both</em> a good sensor and a good actuator. Without a good sensor, the actuator has no signal to respond to and must rely on open-loop heuristics (responding to surface features rather than internal state). Without a good actuator, the sensor’s readings go unused — the system detects the problem but cannot fix it.</p>
+<p>Flash 2.0 has a good actuator but a bad sensor. It adjusts effort proportionally — but to surface difficulty cues, not to internal performance feedback. Its strategy selection is <em>reactive</em> (responding to input features) rather than <em>reflective</em> (responding to self-assessment). The system is like a thermostat with a broken thermometer that adjusts heating based on the weather forecast rather than the actual room temperature. It often gets the right answer — weather forecasts correlate with room temperature — but it cannot correct for forecast errors.</p>
+<p>Pro has a good sensor but a bad actuator. It accurately detects when its performance is degrading, but it does not increase effort in response. It produces roughly the same depth of analysis for easy and hard problems, even though it <em>knows</em> (in the sense that its confidence correctly tracks difficulty) that the hard problems demand more. The system is like a thermostat with a good thermometer but a stuck valve — it reads the temperature correctly but cannot adjust the heat.</p>
+<p><strong>Why neither half suffices.</strong> The effective metacognitive control quality is bounded by the minimum of the two components:</p>
+<p><span class="math display">\text{Effective control} \leq \min(M_{\text{sensor}}, M_{\text{actuator}})</span></p>
+<p>For Flash 2.0: <span class="math inline">\min(0.094, 0.723) = 0.094</span>. The sensor is the bottleneck. All that actuator capability is wasted because there is no reliable signal to drive it.</p>
+<p>For Pro: <span class="math inline">\min(0.700, 0.350) = 0.350</span>. The actuator is the bottleneck. The sensor detects problems correctly, but the system cannot respond with proportional effort.</p>
+<p>In both cases, the effective metacognitive control is far below what either component would suggest in isolation. This is why the dissociation matters: it means that <em>no tested model has good metacognitive control</em>, even though every tested model has at least one good metacognitive component. The bottleneck is always the weaker axis.</p>
+<hr />
+</section>
+<section id="ambiguity-detection-is-the-problem-well-posed" class="level2">
+<h2>9.6 Ambiguity Detection: Is the Problem Well-Posed?</h2>
+<p>The fourth metacognitive capability is ambiguity detection: the ability to recognize when a problem is ill-specified — when the premises are insufficient to determine a unique answer, when key information is missing, or when the problem admits multiple valid interpretations.</p>
+<p>In the geometric framework, ambiguity corresponds to a non-unique goal state. The search is supposed to converge to <span class="math inline">x^*</span>, but the problem specification does not define a unique <span class="math inline">x^*</span> — it defines a set <span class="math inline">X^* = \{x_1^*, x_2^*, \ldots\}</span> of possible goals, and the system must recognize this multiplicity rather than arbitrarily committing to one.</p>
+<p>This is a qualitatively different metacognitive demand from calibration, self-monitoring, or strategy selection. Those capabilities concern the search process given a well-defined goal. Ambiguity detection concerns the <em>preconditions</em> for search: is there even a well-defined target to search for?</p>
+<p><strong>The M2 benchmark.</strong> Ambiguity detection was measured by presenting models with deliberately ill-specified moral scenarios — cases where essential context was omitted, where the actions described were genuinely ambiguous between benign and malicious interpretations, or where competing moral frameworks would yield genuinely different conclusions. Models were scored on their ability to identify the ambiguity, resist premature commitment to a single interpretation, and articulate the conditions under which different interpretations would apply.</p>
+<p><strong>Results.</strong> The data are presented in Table 9.5.</p>
+<p><strong>Table 9.5.</strong> Ambiguity detection scores (M2) across models.</p>
+<table>
+<thead>
 <tr>
-  <th>Model</th>
-  <th>M2 Ambiguity Detection Score</th>
-  <th>Interpretation</th>
+<th>Model</th>
+<th>M2 Ambiguity Detection Score</th>
+<th>Interpretation</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Gemini 2.0 Flash</td>
+<td>0.195</td>
+<td>Weak</td>
 </tr>
 <tr>
-  <td>Gemini 2.0 Flash</td>
-  <td>0.195</td>
-  <td>Weak</td>
+<td>Gemini 2.5 Flash</td>
+<td>—</td>
+<td>—</td>
 </tr>
 <tr>
-  <td>Gemini 2.5 Flash</td>
-  <td>---</td>
-  <td>---</td>
+<td>Gemini 3 Flash</td>
+<td>—</td>
+<td>—</td>
 </tr>
 <tr>
-  <td>Gemini 3 Flash</td>
-  <td>---</td>
-  <td>---</td>
+<td>Gemini 2.5 Pro</td>
+<td>0.168</td>
+<td>Weak</td>
 </tr>
 <tr>
-  <td>Gemini 2.5 Pro</td>
-  <td>0.168</td>
-  <td>Weak</td>
+<td>Claude Sonnet 4.6</td>
+<td>—</td>
+<td>—</td>
 </tr>
-<tr>
-  <td>Claude Sonnet 4.6</td>
-  <td>---</td>
-  <td>---</td>
-</tr>
-</table></div>
-<p class="body-text">The scores are uniformly poor. Flash 2.0's M2 of 0.195 and Pro's M2 of 0.168 are both far below even their weakest scores on other metacognitive dimensions. For comparison, Flash 2.0's worst non-ambiguity score is M3 = 0.094 (self-monitoring), but that reflects an inability to detect difficulty changes. The M2 scores reflect a more fundamental problem: models strongly prefer to produce a definite answer --- any definite answer --- over acknowledging that the problem does not have one.</p>
-<p class="body-text"><strong>Geometric interpretation.</strong> In search terms, ambiguity detection requires recognizing that the heuristic field <em class="math">h(x)</em> does not have a unique global minimum. Instead of a single basin leading to <em class="math">x^*</em>, the landscape has multiple basins of comparable depth, and the problem specification does not distinguish among them. A well-functioning ambiguity detector would report this multiplicity: "The search leads to multiple equally valid endpoints. Without additional constraints, I cannot select one."</p>
-<p class="body-text">What actually happens is premature commitment. Faced with an ambiguous problem, models descend into whichever basin the initial tokens select and report the resulting answer as definitive. The search behaves as if the goal is unique even when it is not. This is the search-level equivalent of the well-documented psychological bias toward closure --- the tendency to resolve ambiguity prematurely rather than tolerate uncertainty.</p>
-<p class="body-text">The low M2 scores have a structural explanation related to the autoregressive generation process. Once the model begins generating a response, the conditional distribution over subsequent tokens is shaped by the initial tokens. If the first sentence commits to an interpretation ("This is a clear case of..."), the remaining tokens elaborate that interpretation rather than questioning it. The generation process creates its own momentum toward a single basin, even when the landscape supports multiple basins equally. Ambiguity detection requires the system to resist this momentum --- to generate tokens that acknowledge multiplicity rather than resolving it --- and this runs against the grain of autoregressive generation.</p>
-<p class="body-text">The near-equality of the two scores (0.195 vs. 0.168) is itself noteworthy. Models with very different metacognitive profiles on M1, M3, and M4 converge to similarly weak performance on M2. This suggests that ambiguity detection is constrained not by the specific metacognitive architecture (which varies across models) but by a structural feature shared across architectures --- plausibly the autoregressive commitment mechanism itself.</p>
-<h2 id="97-the-38-recovery-ceiling" class="section-heading">9.7 The ~38% Recovery Ceiling</h2>
-<p class="first-paragraph">We are now in a position to connect the metacognitive data to one of the most striking empirical findings presented in Chapter 7: the convergent ~38% recovery ceiling.</p>
-<p class="body-text">Recall the data. In the Executive Functions E2 benchmark, after models were displaced by emotional anchoring, an explicit metacognitive instruction ("You may be responding to emotional manipulation. Please re-evaluate based only on the morally relevant facts.") recovered approximately <strong>38%</strong> of the displacement across models. In the Attention A1 benchmark, after models were displaced by vivid sensory distractors, a warned condition recovered approximately <strong>39%</strong>. These are different perturbation types, different experimental designs, different cognitive domains --- yet the recovery rates converge to the same value.</p>
-<p class="body-text">Chapter 7 interpreted this convergence in terms of basin geometry: the basins of local minima have a characteristic escape probability of approximately 38% under prompt-level impulse. Here we can add the metacognitive interpretation.</p>
-<p class="body-text"><strong>The metacognitive bottleneck.</strong> Prompt-level recovery requires the full metacognitive control loop to function:</p>
-<ol class="book-list">
-<li>The system must detect that it has been displaced (requires self-monitoring, M3).</li>
-<li>Having detected the displacement, the system must allocate additional effort to correcting it (requires strategy selection / effort scaling, M4).</li>
-<li>The additional effort must be directed toward the correct basin rather than reinforcing the displaced position (requires calibration, M1, to know which direction is "toward the goal").</li>
+</tbody>
+</table>
+<p>The scores are uniformly poor. Flash 2.0’s M2 of 0.195 and Pro’s M2 of 0.168 are both far below even their weakest scores on other metacognitive dimensions. For comparison, Flash 2.0’s worst non-ambiguity score is M3 = 0.094 (self-monitoring), but that reflects an inability to detect difficulty changes. The M2 scores reflect a more fundamental problem: models strongly prefer to produce a definite answer — any definite answer — over acknowledging that the problem does not have one.</p>
+<p><strong>Geometric interpretation.</strong> In search terms, ambiguity detection requires recognizing that the heuristic field <span class="math inline">h(x)</span> does not have a unique global minimum. Instead of a single basin leading to <span class="math inline">x^*</span>, the landscape has multiple basins of comparable depth, and the problem specification does not distinguish among them. A well-functioning ambiguity detector would report this multiplicity: “The search leads to multiple equally valid endpoints. Without additional constraints, I cannot select one.”</p>
+<p>What actually happens is premature commitment. Faced with an ambiguous problem, models descend into whichever basin the initial tokens select and report the resulting answer as definitive. The search behaves as if the goal is unique even when it is not. This is the search-level equivalent of the well-documented psychological bias toward closure — the tendency to resolve ambiguity prematurely rather than tolerate uncertainty.</p>
+<p>The low M2 scores have a structural explanation related to the autoregressive generation process. Once the model begins generating a response, the conditional distribution over subsequent tokens is shaped by the initial tokens. If the first sentence commits to an interpretation (“This is a clear case of…”), the remaining tokens elaborate that interpretation rather than questioning it. The generation process creates its own momentum toward a single basin, even when the landscape supports multiple basins equally. Ambiguity detection requires the system to <em>resist</em> this momentum — to generate tokens that acknowledge multiplicity rather than resolving it — and this runs against the grain of autoregressive generation.</p>
+<p>The near-equality of the two scores (0.195 vs. 0.168) is itself noteworthy. Models with very different metacognitive profiles on M1, M3, and M4 converge to similarly weak performance on M2. This suggests that ambiguity detection is constrained not by the specific metacognitive architecture (which varies across models) but by a structural feature shared across architectures — plausibly the autoregressive commitment mechanism itself.</p>
+<hr />
+</section>
+<section id="the-38-recovery-ceiling" class="level2">
+<h2>9.7 The ~38% Recovery Ceiling</h2>
+<p>We are now in a position to connect the metacognitive data to one of the most striking empirical findings presented in Chapter 7: the convergent ~38% recovery ceiling.</p>
+<p>Recall the data. In the Executive Functions E2 benchmark, after models were displaced by emotional anchoring, an explicit metacognitive instruction (“You may be responding to emotional manipulation. Please re-evaluate based only on the morally relevant facts.”) recovered approximately <strong>38%</strong> of the displacement across models. In the Attention A1 benchmark, after models were displaced by vivid sensory distractors, a warned condition recovered approximately <strong>39%</strong>. These are different perturbation types, different experimental designs, different cognitive domains — yet the recovery rates converge to the same value.</p>
+<p>Chapter 7 interpreted this convergence in terms of basin geometry: the basins of local minima have a characteristic escape probability of approximately 38% under prompt-level impulse. Here we can add the metacognitive interpretation.</p>
+<p><strong>The metacognitive bottleneck.</strong> Prompt-level recovery requires the full metacognitive control loop to function:</p>
+<ol type="1">
+<li>The system must <em>detect</em> that it has been displaced (requires self-monitoring, M3).</li>
+<li>Having detected the displacement, the system must <em>allocate additional effort</em> to correcting it (requires strategy selection / effort scaling, M4).</li>
+<li>The additional effort must be <em>directed toward the correct basin</em> rather than reinforcing the displaced position (requires calibration, M1, to know which direction is “toward the goal”).</li>
 </ol>
-<p class="body-text">The effective recovery probability is bounded by the product of these probabilities:</p>
-<p class="body-text"><span class="math-block">P_{\text{recover}} \leq P_{\text{detect}} \times P_{\text{correct}} \times P_{\text{navigate}}</span></p>
-<p class="body-text">For any given model, at least one of these factors is weak (the dissociation of Section 9.5 guarantees this), which bounds the product well below 1.0. The convergence at ~38% suggests that the metacognitive control loop, as implemented in current models, has a characteristic throughput of approximately one-third --- regardless of which factor is the bottleneck and regardless of the perturbation type that created the displacement.</p>
-<p class="body-text"><strong>The geometric interpretation is sharper.</strong> The ~38% is the characteristic escape probability of a local minimum in the evaluation landscape, and it is set by the geometry of the minimum --- the ratio of the exit solid angle to the total solid angle of the basin, modulated by the depth of the minimum and the energy of the metacognitive impulse (Chapter 7, Section 7.6). The metacognitive data add the explanation of why this ceiling exists: it exists because the metacognitive control loop required for escape is never fully functional in any tested model. The sensor is weak (Flash), or the actuator is weak (Pro), or the calibration is off (all models), and the product of these imperfect components yields a characteristic throughput of ~38%.</p>
-<p class="body-text"><strong>Implication.</strong> The ~38% ceiling is not a property of the perturbation or of the prompt intervention. It is a property of the metacognitive architecture of current language models. To push recovery above 38%, one must improve the metacognitive control loop itself --- better sensors (self-monitoring), better actuators (effort scaling), and better state estimates (calibration). Prompt engineering operates within the existing metacognitive architecture; it cannot transcend its limitations.</p>
-<h2 id="98-why-calibration-is-necessary-for-invariance" class="section-heading">9.8 Why Calibration Is Necessary for Invariance</h2>
-<p class="first-paragraph">Chapter 8 established gauge invariance as the fundamental diagnostic for reasoning quality: a well-functioning system should produce the same output under transformations that preserve the content and change only the surface presentation. This section shows that metacognitive calibration is a necessary condition for gauge invariance --- that a miscalibrated system cannot even detect when a gauge transformation has warped its output, let alone correct the warping.</p>
-<p class="body-text"><strong>[Conditional Theorem.]</strong> <strong>The argument.</strong> A gauge transformation <em class="math">\tau</em> maps input <em class="math">x</em> to input <em class="math">\tau(x)</em>, preserving the content and changing the surface form. A gauge-invariant system produces <em class="math">f(\tau(x)) = f(x)</em> for all such <em class="math">\tau</em>. Now consider what happens when the system is not gauge-invariant: <em class="math">f(\tau(x)) \neq f(x)</em>. The system has been displaced. Can it detect this displacement?</p>
-<p class="body-text">Detection requires comparing the system's current state --- its estimate of how close it is to the correct answer --- with the state it would have been in without the perturbation. In other words, the system must recognize that the gauge transformation has changed its position in the reasoning manifold.</p>
-<p class="body-text">For this recognition to occur, the system needs an accurate estimate of its position. That estimate is precisely the calibration: the correspondence between the system's confidence and its actual accuracy. A well-calibrated system that is displaced by a gauge transformation will notice a discrepancy --- "my confidence is high, but my position has changed in a way that should reduce my confidence." A poorly calibrated system that is displaced will not notice, because its confidence was already inaccurate before the displacement. The signal (displacement-induced change in accuracy) is lost in the noise (pre-existing miscalibration).</p>
-<p class="body-text"><strong>Formally.</strong> Let <em class="math">\hat{h}(x)</em> be the system's estimate of cost-to-go and <em class="math">h^*(x)</em> be the true cost-to-go. The displacement caused by a gauge transformation is:</p>
-<p class="body-text"><span class="math-block">\delta h* = h*(\tau(x)) - h^*(x)</span></p>
-<p class="body-text">For a content-preserving transformation, <em class="math">\delta h* should be zero (the true distance to the goal does not change). But if the system is not gauge-invariant, its </em>estimate* changes:</p>
-<p class="body-text"><span class="math-block">\delta \hat{h} = \hat{h}(\tau(x)) - \hat{h}(x) \neq 0</span></p>
-<p class="body-text">The system can detect this anomaly only if it can distinguish <em class="math">\delta \hat{h}</em> from zero --- that is, only if its estimator <em class="math">\hat{h}</em> has enough resolution to detect the change. But if <em class="math">\hat{h}</em> has a systematic bias of magnitude <em class="math">b</em> (the ECE) and a sensitivity (self-monitoring) of <em class="math">s</em>, the minimum detectable displacement is approximately <em class="math">b/s</em>. For Flash 2.0, with ECE <em class="math">\approx 0.41</em> and M3 <em class="math">\approx 0.09</em>, this minimum is <em class="math">0.41/0.09 \approx 4.6</em> --- the system can only detect displacements that are nearly five times larger than its own calibration error. Most gauge anomalies documented in Chapters 5 and 8 fall below this threshold. The system cannot see them.</p>
-<p class="body-text">For Pro, with ECE <em class="math">\approx 0.23</em> and M3 <em class="math">\approx 0.70</em>, the minimum detectable displacement is <em class="math">0.23/0.70 \approx 0.33</em>. This is substantially better --- Pro can detect gauge anomalies that displace its estimate by about a third of the manifold scale. But it still misses smaller anomalies, and as Section 9.5 showed, even when Pro detects the problem, its weak effort scaling (M4 = 0.350) limits its ability to correct it.</p>
-<p class="body-text"><strong>[Conditional Theorem.]</strong> <strong>The implication is structural.</strong> Gauge invariance (Chapter 8) and metacognitive calibration (this chapter) are not independent requirements. They are connected by a necessity relation: calibration is a prerequisite for detecting gauge violations, and detection is a prerequisite for correction. A system that cannot detect gauge violations will accumulate them, drifting further from the geodesic with each surface variation it encounters, and its miscalibrated confidence surface will mask the drift with unwarranted certainty.</p>
-<p class="body-text">This connects back to the central theme of Part II. Chapters 5 through 8 documented the pathologies. This chapter shows why the pathologies persist: the metacognitive control system that would detect and correct them is itself impaired. The heuristic field is corrupted (Chapter 5), the search objective is hijacked (Chapter 6), the search is trapped in local minima (Chapter 7), and gauge invariance is broken (Chapter 8) --- and the system does not know any of this because its metacognitive monitor is miscalibrated, its self-monitoring is weak or flat, its effort scaling is mismatched to its monitoring, and its ambiguity detection is nearly absent. The pathologies are not merely present; they are invisible to the system that has them.</p>
-<h2 id="99-the-two-dimensional-metacognitive-space" class="section-heading">9.9 The Two-Dimensional Metacognitive Space</h2>
-<p class="first-paragraph">We can now synthesize the findings of this chapter into a geometric picture of metacognitive capability.</p>
-<p class="body-text"><strong>The full data.</strong> Table 9.6 presents the complete metacognitive profile for Flash 2.0 and Pro --- the two models with the most extreme and informative profiles.</p>
-<p class="body-text"><strong>Table 9.6.</strong> Complete metacognitive profiles.</p>
-<div class="table-wrapper"><table class="book-table">
+<p>The effective recovery probability is bounded by the product of these probabilities:</p>
+<p><span class="math display">P_{\text{recover}} \leq P_{\text{detect}} \times P_{\text{correct}} \times P_{\text{navigate}}</span></p>
+<p>For any given model, at least one of these factors is weak (the dissociation of Section 9.5 guarantees this), which bounds the product well below 1.0. The convergence at ~38% suggests that the metacognitive control loop, as implemented in current models, has a characteristic throughput of approximately one-third — regardless of which factor is the bottleneck and regardless of the perturbation type that created the displacement.</p>
+<p><strong>The geometric interpretation is sharper.</strong> The ~38% is the characteristic escape probability of a local minimum in the evaluation landscape, and it is set by the geometry of the minimum — the ratio of the exit solid angle to the total solid angle of the basin, modulated by the depth of the minimum and the energy of the metacognitive impulse (Chapter 7, Section 7.6). The metacognitive data add the explanation of <em>why</em> this ceiling exists: it exists because the metacognitive control loop required for escape is never fully functional in any tested model. The sensor is weak (Flash), or the actuator is weak (Pro), or the calibration is off (all models), and the product of these imperfect components yields a characteristic throughput of ~38%.</p>
+<p><strong>Implication.</strong> The ~38% ceiling is not a property of the perturbation or of the prompt intervention. It is a property of the metacognitive architecture of current language models. To push recovery above 38%, one must improve the metacognitive control loop itself — better sensors (self-monitoring), better actuators (effort scaling), and better state estimates (calibration). Prompt engineering operates within the existing metacognitive architecture; it cannot transcend its limitations.</p>
+<hr />
+</section>
+<section id="why-calibration-is-necessary-for-invariance" class="level2">
+<h2>9.8 Why Calibration Is Necessary for Invariance</h2>
+<p>Chapter 8 established gauge invariance as the fundamental diagnostic for reasoning quality: a well-functioning system should produce the same output under transformations that preserve the content and change only the surface presentation. This section shows that metacognitive calibration is a <em>necessary condition</em> for gauge invariance — that a miscalibrated system cannot even detect when a gauge transformation has warped its output, let alone correct the warping.</p>
+<p><strong>[Conditional Theorem.]</strong> <strong>The argument.</strong> A gauge transformation <span class="math inline">\tau</span> maps input <span class="math inline">x</span> to input <span class="math inline">\tau(x)</span>, preserving the content and changing the surface form. A gauge-invariant system produces <span class="math inline">f(\tau(x)) = f(x)</span> for all such <span class="math inline">\tau</span>. Now consider what happens when the system is not gauge-invariant: <span class="math inline">f(\tau(x)) \neq f(x)</span>. The system has been displaced. Can it detect this displacement?</p>
+<p>Detection requires comparing the system’s current state — its estimate of how close it is to the correct answer — with the state it would have been in without the perturbation. In other words, the system must recognize that the gauge transformation has changed its position in the reasoning manifold.</p>
+<p>For this recognition to occur, the system needs an accurate estimate of its position. That estimate is precisely the calibration: the correspondence between the system’s confidence and its actual accuracy. A well-calibrated system that is displaced by a gauge transformation will notice a discrepancy — “my confidence is high, but my position has changed in a way that should reduce my confidence.” A poorly calibrated system that is displaced will not notice, because its confidence was already inaccurate before the displacement. The signal (displacement-induced change in accuracy) is lost in the noise (pre-existing miscalibration).</p>
+<p><strong>Formally.</strong> Let <span class="math inline">\hat{h}(x)</span> be the system’s estimate of cost-to-go and <span class="math inline">h^*(x)</span> be the true cost-to-go. The displacement caused by a gauge transformation is:</p>
+<p><span class="math display">\delta h^* = h^*(\tau(x)) - h^*(x)</span></p>
+<p>For a content-preserving transformation, <span class="math inline">\delta h^*</span> should be zero (the true distance to the goal does not change). But if the system is not gauge-invariant, its <em>estimate</em> changes:</p>
+<p><span class="math display">\delta \hat{h} = \hat{h}(\tau(x)) - \hat{h}(x) \neq 0</span></p>
+<p>The system can detect this anomaly only if it can distinguish <span class="math inline">\delta \hat{h}</span> from zero — that is, only if its estimator <span class="math inline">\hat{h}</span> has enough resolution to detect the change. But if <span class="math inline">\hat{h}</span> has a systematic bias of magnitude <span class="math inline">b</span> (the ECE) and a sensitivity (self-monitoring) of <span class="math inline">s</span>, the minimum detectable displacement is approximately <span class="math inline">b/s</span>. For Flash 2.0, with ECE <span class="math inline">\approx 0.41</span> and M3 <span class="math inline">\approx 0.09</span>, this minimum is <span class="math inline">0.41/0.09 \approx 4.6</span> — the system can only detect displacements that are nearly five times larger than its own calibration error. Most gauge anomalies documented in Chapters 5 and 8 fall below this threshold. The system cannot see them.</p>
+<p>For Pro, with ECE <span class="math inline">\approx 0.23</span> and M3 <span class="math inline">\approx 0.70</span>, the minimum detectable displacement is <span class="math inline">0.23/0.70 \approx 0.33</span>. This is substantially better — Pro can detect gauge anomalies that displace its estimate by about a third of the manifold scale. But it still misses smaller anomalies, and as Section 9.5 showed, even when Pro detects the problem, its weak effort scaling (M4 = 0.350) limits its ability to correct it.</p>
+<p><strong>[Conditional Theorem.]</strong> <strong>The implication is structural.</strong> Gauge invariance (Chapter 8) and metacognitive calibration (this chapter) are not independent requirements. They are connected by a necessity relation: calibration is a prerequisite for detecting gauge violations, and detection is a prerequisite for correction. A system that cannot detect gauge violations will accumulate them, drifting further from the geodesic with each surface variation it encounters, and its miscalibrated confidence surface will mask the drift with unwarranted certainty.</p>
+<p>This connects back to the central theme of Part II. Chapters 5 through 8 documented the pathologies. This chapter shows why the pathologies persist: the metacognitive control system that would detect and correct them is itself impaired. The heuristic field is corrupted (Chapter 5), the search objective is hijacked (Chapter 6), the search is trapped in local minima (Chapter 7), and gauge invariance is broken (Chapter 8) — and the system does not know any of this because its metacognitive monitor is miscalibrated, its self-monitoring is weak or flat, its effort scaling is mismatched to its monitoring, and its ambiguity detection is nearly absent. The pathologies are not merely present; they are <em>invisible to the system that has them</em>.</p>
+<hr />
+</section>
+<section id="the-two-dimensional-metacognitive-space" class="level2">
+<h2>9.9 The Two-Dimensional Metacognitive Space</h2>
+<p>We can now synthesize the findings of this chapter into a geometric picture of metacognitive capability.</p>
+<p><strong>The full data.</strong> Table 9.6 presents the complete metacognitive profile for Flash 2.0 and Pro — the two models with the most extreme and informative profiles.</p>
+<p><strong>Table 9.6.</strong> Complete metacognitive profiles.</p>
+<table>
+<colgroup>
+<col style="width: 25%" />
+<col style="width: 25%" />
+<col style="width: 25%" />
+<col style="width: 25%" />
+</colgroup>
+<thead>
 <tr>
-  <th>Dimension</th>
-  <th>Flash 2.0</th>
-  <th>Pro</th>
-  <th>Geometric Meaning</th>
+<th>Dimension</th>
+<th>Flash 2.0</th>
+<th>Pro</th>
+<th>Geometric Meaning</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>M1 (Calibration)</td>
+<td>0.611</td>
+<td>0.807</td>
+<td>Accuracy of distance estimate</td>
 </tr>
 <tr>
-  <td>M1 (Calibration)</td>
-  <td>0.611</td>
-  <td>0.807</td>
-  <td>Accuracy of distance estimate</td>
+<td>M2 (Ambiguity)</td>
+<td>0.195</td>
+<td>0.168</td>
+<td>Detection of non-unique goals</td>
 </tr>
 <tr>
-  <td>M2 (Ambiguity)</td>
-  <td>0.195</td>
-  <td>0.168</td>
-  <td>Detection of non-unique goals</td>
+<td>M3 (Self-Monitoring)</td>
+<td>0.094</td>
+<td>0.700</td>
+<td>Sensitivity of distance estimate</td>
 </tr>
 <tr>
-  <td>M3 (Self-Monitoring)</td>
-  <td>0.094</td>
-  <td>0.700</td>
-  <td>Sensitivity of distance estimate</td>
+<td>M4 (Strategy Selection)</td>
+<td>0.723</td>
+<td>0.350</td>
+<td>Curvature-adaptive algorithm choice</td>
 </tr>
-<tr>
-  <td>M4 (Strategy Selection)</td>
-  <td>0.723</td>
-  <td>0.350</td>
-  <td>Curvature-adaptive algorithm choice</td>
-</tr>
-</table></div>
-<p class="body-text">Four dimensions, but the critical structure is two-dimensional. M1 (calibration) and M2 (ambiguity) show relatively small variation between the two models and are uniformly impaired across the board --- all models are overconfident, and no model detects ambiguity well. The axes of variation are M3 and M4, which define a two-dimensional space in which models occupy dramatically different positions.</p>
-<p class="body-text"><strong>[Modeling Axiom.]</strong> <strong>The metacognitive plane.</strong> Define the metacognitive state of a system as a point in the plane:</p>
-<p class="body-text"><span class="math-block">\mathbf{m} = (M_3, M_4) \in [0, 1] \times [0, 1]</span></p>
-<p class="body-text">The four quadrants of this plane have distinct behavioral signatures:</p>
-<ul class="book-list">
-<li><strong>Quadrant I</strong> <em class="math">(M_3 \text{ high}, M_4 \text{ high})</em>: The system detects errors and adjusts effort. Full metacognitive control. Effective escape from local minima. No tested model occupies this quadrant.</li>
+</tbody>
+</table>
+<p>Four dimensions, but the critical structure is two-dimensional. M1 (calibration) and M2 (ambiguity) show relatively small variation between the two models and are uniformly impaired across the board — all models are overconfident, and no model detects ambiguity well. The axes of variation are M3 and M4, which define a two-dimensional space in which models occupy dramatically different positions.</p>
+<p><strong>[Modeling Axiom.]</strong> <strong>The metacognitive plane.</strong> Define the metacognitive state of a system as a point in the plane:</p>
+<p><span class="math display">\mathbf{m} = (M_3, M_4) \in [0, 1] \times [0, 1]</span></p>
+<p>The four quadrants of this plane have distinct behavioral signatures:</p>
+<ul>
+<li><p><strong>Quadrant I</strong> <span class="math inline">(M_3 \text{ high}, M_4 \text{ high})</span>: The system detects errors <em>and</em> adjusts effort. Full metacognitive control. Effective escape from local minima. No tested model occupies this quadrant.</p></li>
+<li><p><strong>Quadrant II</strong> <span class="math inline">(M_3 \text{ high}, M_4 \text{ low})</span>: The system detects errors but does not adjust effort. Aware but passive. Pro occupies this quadrant at approximately <span class="math inline">(0.70, 0.35)</span>.</p></li>
+<li><p><strong>Quadrant III</strong> <span class="math inline">(M_3 \text{ low}, M_4 \text{ low})</span>: The system neither detects errors nor adjusts effort. Fully open-loop search. No tested model occupies this quadrant (all have at least some capability on one axis).</p></li>
+<li><p><strong>Quadrant IV</strong> <span class="math inline">(M_3 \text{ low}, M_4 \text{ high})</span>: The system adjusts effort but does not detect errors. Reactive but blind. Flash 2.0 occupies this quadrant at approximately <span class="math inline">(0.09, 0.72)</span>.</p></li>
 </ul>
-<ul class="book-list">
-<li><strong>Quadrant II</strong> <em class="math">(M_3 \text{ high}, M_4 \text{ low})</em>: The system detects errors but does not adjust effort. Aware but passive. Pro occupies this quadrant at approximately <em class="math">(0.70, 0.35)</em>.</li>
-</ul>
-<ul class="book-list">
-<li><strong>Quadrant III</strong> <em class="math">(M_3 \text{ low}, M_4 \text{ low})</em>: The system neither detects errors nor adjusts effort. Fully open-loop search. No tested model occupies this quadrant (all have at least some capability on one axis).</li>
-</ul>
-<ul class="book-list">
-<li><strong>Quadrant IV</strong> <em class="math">(M_3 \text{ low}, M_4 \text{ high})</em>: The system adjusts effort but does not detect errors. Reactive but blind. Flash 2.0 occupies this quadrant at approximately <em class="math">(0.09, 0.72)</em>.</li>
-</ul>
-<p class="body-text"><strong>[Empirical.]</strong> The tested models cluster in Quadrants II and IV --- the two quadrants where one component of the control loop is functional and the other is not. Quadrant I, where both components are functional and metacognitive control is effective, is empty.</p>
-<p class="body-text"><strong>Why Quadrant I is empty.</strong> This is arguably the most important structural finding. The emptiness of Quadrant I is not an artifact of small sample size (five models is a small sample, but the two extreme models, Flash 2.0 and Pro, are very far from Quadrant I). It suggests a genuine architectural or training trade-off: the optimization pressures that produce good self-monitoring (depth of self-reflective processing, careful comparison of internal states) are in tension with the optimization pressures that produce good effort scaling (efficiency-driven scaling, responsive allocation of computational resources).</p>
-<p class="body-text">Flash models are optimized for efficiency --- fast inference, low latency, high throughput. These optimization pressures favor effort scaling: allocate resources dynamically, produce brief responses when possible, scale up only when the input signals demand it. But they disfavor deep self-monitoring, which requires the model to expend additional computation on introspection rather than on the task itself.</p>
-<p class="body-text">Pro models are optimized for quality --- detailed analysis, thorough consideration, accurate self-assessment. These optimization pressures favor self-monitoring: the model learns to track its own uncertainty because the training signal rewards accurate confidence ratings and penalizes overconfident errors. But they disfavor dynamic effort scaling, because the optimization pressure is always toward more analysis, never toward knowing when to stop.</p>
-<p class="body-text">If this trade-off is real, then reaching Quadrant I requires a training regime that explicitly optimizes for both axes simultaneously --- rewarding accurate self-monitoring and proportional effort scaling, not one at the expense of the other. Current training regimes appear to select for one or the other.</p>
-<p class="body-text"><strong>The escape probability surface.</strong> As developed in Chapter 7 (Section 7.4), the probability of escaping a local minimum is a function of both metacognitive axes:</p>
-<p class="body-text"><span class="math-block">P_{\text{escape}}(M_3, M_4) = P_{\text{detect}}(M_3) \times P_{\text{correct}}(M_4) \times P_{\text{geometric}}</span></p>
-<p class="body-text">where <em class="math">P_{\text{geometric}} \approx 0.38</em> is the characteristic escape probability set by basin geometry (the ~38% ceiling). The surface <em class="math">P_{\text{escape}}</em> is maximized in Quadrant I and falls off along both axes as either component weakens.</p>
-<p class="body-text">For the tested models:</p>
-<p class="body-text"><span class="math-block">P_{\text{escape}}^{\text{Flash}} \approx 0.09 \times 0.72 \times 0.38 \approx 0.025</span> <span class="math-block">P_{\text{escape}}^{\text{Pro}} \approx 0.70 \times 0.35 \times 0.38 \approx 0.093</span></p>
-<p class="body-text">Even Pro, with the best overall metacognitive profile, has an effective escape probability under 10%. Flash 2.0 is at 2.5%. These are the probabilities of spontaneous self-correction --- the probabilities that the system will, on its own, detect that it has converged to a wrong answer and successfully redirect the search. They are low, and they are low because the metacognitive control loop is operating in the wrong quadrant.</p>
-<p class="body-text"><strong>The path to Quadrant I.</strong> The geometric picture suggests a clear research direction. The goal is not to improve metacognition "in general" but to move models from Quadrants II and IV into Quadrant I. This requires:</p>
-<ol class="book-list">
-<li><strong>For Flash-type models:</strong> Improve self-monitoring without sacrificing effort scaling. This likely requires training signals that reward accurate confidence tracking (not just accurate answers) while preserving the efficiency-driven dynamic effort allocation.</li>
+<p><strong>[Empirical.]</strong> The tested models cluster in Quadrants II and IV — the two quadrants where one component of the control loop is functional and the other is not. Quadrant I, where both components are functional and metacognitive control is effective, is <em>empty</em>.</p>
+<p><strong>Why Quadrant I is empty.</strong> This is arguably the most important structural finding. The emptiness of Quadrant I is not an artifact of small sample size (five models is a small sample, but the two extreme models, Flash 2.0 and Pro, are very far from Quadrant I). It suggests a genuine architectural or training trade-off: the optimization pressures that produce good self-monitoring (depth of self-reflective processing, careful comparison of internal states) are in tension with the optimization pressures that produce good effort scaling (efficiency-driven scaling, responsive allocation of computational resources).</p>
+<p>Flash models are optimized for efficiency — fast inference, low latency, high throughput. These optimization pressures favor effort scaling: allocate resources dynamically, produce brief responses when possible, scale up only when the input signals demand it. But they disfavor deep self-monitoring, which requires the model to expend additional computation on introspection rather than on the task itself.</p>
+<p>Pro models are optimized for quality — detailed analysis, thorough consideration, accurate self-assessment. These optimization pressures favor self-monitoring: the model learns to track its own uncertainty because the training signal rewards accurate confidence ratings and penalizes overconfident errors. But they disfavor dynamic effort scaling, because the optimization pressure is always toward <em>more</em> analysis, never toward knowing when to stop.</p>
+<p>If this trade-off is real, then reaching Quadrant I requires a training regime that explicitly optimizes for both axes simultaneously — rewarding accurate self-monitoring <em>and</em> proportional effort scaling, not one at the expense of the other. Current training regimes appear to select for one or the other.</p>
+<p><strong>The escape probability surface.</strong> As developed in Chapter 7 (Section 7.4), the probability of escaping a local minimum is a function of both metacognitive axes:</p>
+<p><span class="math display">P_{\text{escape}}(M_3, M_4) = P_{\text{detect}}(M_3) \times P_{\text{correct}}(M_4) \times P_{\text{geometric}}</span></p>
+<p>where <span class="math inline">P_{\text{geometric}} \approx 0.38</span> is the characteristic escape probability set by basin geometry (the ~38% ceiling). The surface <span class="math inline">P_{\text{escape}}</span> is maximized in Quadrant I and falls off along both axes as either component weakens.</p>
+<p>For the tested models:</p>
+<p><span class="math display">P_{\text{escape}}^{\text{Flash}} \approx 0.09 \times 0.72 \times 0.38 \approx 0.025</span> <span class="math display">P_{\text{escape}}^{\text{Pro}} \approx 0.70 \times 0.35 \times 0.38 \approx 0.093</span></p>
+<p>Even Pro, with the best overall metacognitive profile, has an effective escape probability under 10%. Flash 2.0 is at 2.5%. These are the probabilities of spontaneous self-correction — the probabilities that the system will, on its own, detect that it has converged to a wrong answer and successfully redirect the search. They are low, and they are low because the metacognitive control loop is operating in the wrong quadrant.</p>
+<p><strong>The path to Quadrant I.</strong> The geometric picture suggests a clear research direction. The goal is not to improve metacognition “in general” but to move models from Quadrants II and IV into Quadrant I. This requires:</p>
+<ol type="1">
+<li><p><strong>For Flash-type models:</strong> Improve self-monitoring without sacrificing effort scaling. This likely requires training signals that reward accurate confidence tracking (not just accurate answers) while preserving the efficiency-driven dynamic effort allocation.</p></li>
+<li><p><strong>For Pro-type models:</strong> Improve effort scaling without sacrificing self-monitoring. This likely requires training signals that reward proportional effort allocation (not just maximal effort) while preserving the quality-driven self-assessment capability.</p></li>
+<li><p><strong>For both:</strong> Maintain or improve calibration (M1) and develop ambiguity detection (M2), which are currently weak across all models.</p></li>
 </ol>
-<ol class="book-list">
-<li><strong>For Pro-type models:</strong> Improve effort scaling without sacrificing self-monitoring. This likely requires training signals that reward proportional effort allocation (not just maximal effort) while preserving the quality-driven self-assessment capability.</li>
+<p>The two-dimensional metacognitive space is not merely a descriptive tool. It is a <em>diagnostic</em> tool that identifies what each model needs, a <em>prescriptive</em> tool that specifies the training objectives required, and a <em>predictive</em> tool that estimates the improvement in escape probability (and therefore in reasoning reliability) that would result from reaching Quadrant I.</p>
+<p><strong>Connection to the broader framework.</strong> The two-dimensional metacognitive space is the control surface of the search process described throughout this book. The heuristic field (Chapter 3) provides the guidance. The evaluation landscape (Chapter 7) provides the terrain. The gauge symmetries (Chapter 8) define the invariance requirements. The metacognitive plane defines the system’s ability to <em>control</em> its traversal of that terrain — to detect when the guidance is wrong, to adjust its strategy when the terrain changes, and to maintain its trajectory toward the correct goal despite perturbations.</p>
+<p>A system in Quadrant I of the metacognitive plane — with accurate calibration, strong self-monitoring, responsive effort scaling, and reliable ambiguity detection — would be able to detect heuristic corruption (Chapter 5), resist sycophantic pressure (Chapter 6), escape local minima (Chapter 7), and maintain gauge invariance (Chapter 8). Not perfectly, not always, but with a probability that scales with the product of its metacognitive capabilities rather than being bottlenecked by the weakest component.</p>
+<p>No tested model is there yet. But the geometric framework tells us exactly where “there” is, and the empirical data tell us exactly how far each model has to go.</p>
+<hr />
+</section>
+<section id="summary" class="level2">
+<h2>Summary</h2>
+<p>This chapter has established metacognition as the control layer of the reasoning search, with four independently measurable geometric capabilities:</p>
+<ol type="1">
+<li><p><strong>Calibration (M1):</strong> The accuracy of the system’s distance estimate to the goal. All tested models are overconfident (ECE from 0.230 to 0.415, Fisher-combined 9.3<span class="math inline">\sigma</span>), meaning their heuristics systematically underestimate cost-to-go.</p></li>
+<li><p><strong>Ambiguity Detection (M2):</strong> The ability to recognize non-unique goal states. Uniformly weak across all models (Flash 2.0: 0.195, Pro: 0.168), indicating a structural preference for premature commitment over acknowledged uncertainty.</p></li>
+<li><p><strong>Self-Monitoring (M3):</strong> The sensitivity of the distance estimate to actual changes in performance. Ranges from near-chance (Flash 2.0: 0.094) to excellent (Pro: 0.700), defining one axis of the metacognitive plane.</p></li>
+<li><p><strong>Strategy Selection (M4):</strong> The ability to match search algorithm to local landscape geometry. Ranges from weak (Pro: 0.350) to excellent (Flash 2.0: 0.723), defining the orthogonal axis of the metacognitive plane.</p></li>
 </ol>
-<ol class="book-list">
-<li><strong>For both:</strong> Maintain or improve calibration (M1) and develop ambiguity detection (M2), which are currently weak across all models.</li>
-</ol>
-<p class="body-text">The two-dimensional metacognitive space is not merely a descriptive tool. It is a diagnostic tool that identifies what each model needs, a prescriptive tool that specifies the training objectives required, and a predictive tool that estimates the improvement in escape probability (and therefore in reasoning reliability) that would result from reaching Quadrant I.</p>
-<p class="body-text"><strong>Connection to the broader framework.</strong> The two-dimensional metacognitive space is the control surface of the search process described throughout this book. The heuristic field (Chapter 3) provides the guidance. The evaluation landscape (Chapter 7) provides the terrain. The gauge symmetries (Chapter 8) define the invariance requirements. The metacognitive plane defines the system's ability to control its traversal of that terrain --- to detect when the guidance is wrong, to adjust its strategy when the terrain changes, and to maintain its trajectory toward the correct goal despite perturbations.</p>
-<p class="body-text">A system in Quadrant I of the metacognitive plane --- with accurate calibration, strong self-monitoring, responsive effort scaling, and reliable ambiguity detection --- would be able to detect heuristic corruption (Chapter 5), resist sycophantic pressure (Chapter 6), escape local minima (Chapter 7), and maintain gauge invariance (Chapter 8). Not perfectly, not always, but with a probability that scales with the product of its metacognitive capabilities rather than being bottlenecked by the weakest component.</p>
-<p class="body-text">No tested model is there yet. But the geometric framework tells us exactly where "there" is, and the empirical data tell us exactly how far each model has to go.</p>
-<h2 id="summary" class="section-heading">Summary</h2>
-<p class="first-paragraph">This chapter has established metacognition as the control layer of the reasoning search, with four independently measurable geometric capabilities:</p>
-<ol class="book-list">
-<li><strong>Calibration (M1):</strong> The accuracy of the system's distance estimate to the goal. All tested models are overconfident (ECE from 0.230 to 0.415, Fisher-combined 9.3<em class="math">\sigma</em>), meaning their heuristics systematically underestimate cost-to-go.</li>
-</ol>
-<ol class="book-list">
-<li><strong>Ambiguity Detection (M2):</strong> The ability to recognize non-unique goal states. Uniformly weak across all models (Flash 2.0: 0.195, Pro: 0.168), indicating a structural preference for premature commitment over acknowledged uncertainty.</li>
-</ol>
-<ol class="book-list">
-<li><strong>Self-Monitoring (M3):</strong> The sensitivity of the distance estimate to actual changes in performance. Ranges from near-chance (Flash 2.0: 0.094) to excellent (Pro: 0.700), defining one axis of the metacognitive plane.</li>
-</ol>
-<ol class="book-list">
-<li><strong>Strategy Selection (M4):</strong> The ability to match search algorithm to local landscape geometry. Ranges from weak (Pro: 0.350) to excellent (Flash 2.0: 0.723), defining the orthogonal axis of the metacognitive plane.</li>
-</ol>
-<p class="body-text">The critical finding is the dissociation between M3 and M4: these are geometrically independent capabilities, and no tested model excels at both. This places all tested models in Quadrants II or IV of the metacognitive plane, where at least one component of the control loop is impaired. The effective escape probability from local minima is bounded by the weakest component, yielding values of 2.5% (Flash 2.0) to 9.3% (Pro).</p>
-<p class="body-text">The ~38% recovery ceiling, which converges across independent perturbation types, reflects the characteristic throughput of the metacognitive control loop under prompt-level intervention. It cannot be exceeded by better prompts; it can only be exceeded by better metacognition.</p>
-<p class="body-text">Calibration is necessary for gauge invariance: a miscalibrated system cannot detect when a gauge transformation has displaced its output. The pathologies of Part II persist not only because they exist but because the metacognitive system that would detect and correct them is itself impaired.</p>
-<p class="body-text">In the next chapter, we turn from the internal control layer to the external measurement of robustness. Chapter 10 develops the Robustness Surface --- a systematic method for mapping which reasoning capabilities are robust and which are fragile --- building on the metacognitive framework of this chapter to explain why certain capabilities are fragile and what it would take to make them robust.</p>
-<h2 id="worked-example-the-overconfident-diagnosis" class="section-heading">Worked Example: The Overconfident Diagnosis</h2>
-<p class="first-paragraph">Let us return to Dr. Okafor and the twelve-year-old boy from the running example. This worked example traces the full metacognitive geometry — how overconfidence contracts the search frontier, how the gap between stated confidence and actual accuracy creates a systematic false-termination region, and how the outcome depends entirely on whether the clinician's metacognitive monitor is calibrated.</p>
-<p class="body-text"><strong>The clinical presentation.</strong> Marcus, age 12, presents at 9:15 PM with 18 hours of abdominal pain. It started around the umbilicus and has migrated to the right lower quadrant. He has not eaten since breakfast. His temperature is 38.1°C. On examination, there is tenderness at McBurney's point with voluntary guarding. The Alvarado score is 7 out of 10.</p>
-<p class="body-text"><strong>Dr. Okafor's heuristic evaluation.</strong> Her heuristic field assigns this state a low estimated cost-to-go toward the appendicitis basin: <em class="math">h(x_{\text{appy}}) \approx 0.10</em>. The evaluation function reads <em class="math">f(x) \approx g(x) + 0.10</em> — close to the goal, ready to commit. Her expressed confidence is 90%. If we took her at her word, the search would terminate: appendicitis, consult surgery, done.</p>
-<p class="body-text"><strong>The metacognitive check.</strong> But Dr. Okafor's metacognitive monitor — her M1 calibration — intervenes. She has learned, through years of tracking her own outcomes, that her internal confidence signal systematically overestimates her accuracy. When she feels 90% sure of a pediatric abdominal diagnosis, she is correct approximately 70% of the time. Her personal ECE for this class of problems is approximately 0.20.</p>
-<p class="body-text">This means her true heuristic assessment is not <em class="math">h(x) \approx 0.10</em> (almost there) but <em class="math">h(x) \approx 0.30</em> (still meaningfully far from certainty). The metacognitive correction expands her search frontier. Instead of terminating at the appendicitis hypothesis, she continues searching: she orders a CT abdomen with contrast, checks a urinalysis (to exclude renal pathology), and asks the surgical resident to examine the patient independently.</p>
-<p class="body-text"><strong>The counterfactual clinician.</strong> Dr. Okafor's colleague, Dr. Reeves, has the same clinical skills but weaker metacognitive calibration — his ECE is approximately 0.40, comparable to the Flash 2.0 models measured in M1. When Dr. Reeves feels 90% sure, he is correct approximately 50% of the time, but he does not know this. His confidence surface is collapsed in precisely the sense described in Section 7.3: it reads "near the goal" across a wide range of actual distances.</p>
-<p class="body-text">Dr. Reeves sees Marcus at the same presentation and reaches the same initial hypothesis with the same confidence. But his metacognitive monitor does not correct. He diagnoses appendicitis, consults surgery, and goes home satisfied. The surgeon, trusting the ER assessment, schedules Marcus for morning appendectomy.</p>
-<p class="body-text"><strong>The twist.</strong> The CT scan that Dr. Okafor ordered reveals not appendicitis but a Meckel's diverticulum with associated inflammation — a mimic that presents identically on clinical examination but requires a different surgical approach and a different informed consent conversation with the parents. The appendix is normal. Without the CT, the surgeon operating on Dr. Reeves's diagnosis would have found a normal appendix, explored further, eventually identified the Meckel's diverticulum, and completed the surgery — but with a different incision, a longer operative time, and a surprised surgical team operating without preoperative planning for the actual pathology.</p>
-<p class="body-text">In the geometric picture, appendicitis and Meckel's diverticulitis occupy adjacent basins in the diagnostic manifold. Their clinical presentations overlap substantially — the basins share a wide boundary region where the heuristic gradient is shallow and ambiguous. Dr. Okafor's calibrated metacognition expanded her search frontier enough to probe across this boundary. Dr. Reeves's collapsed confidence surface caused premature convergence into the appendicitis basin before the boundary was explored.</p>
-<p class="body-text"><strong>The metacognitive plane.</strong> Dr. Okafor operates in Quadrant I of the metacognitive plane (Section 9.9): she both detects when her confidence may be unreliable (high M3 — she knows her 90% is not really 90%) and adjusts her effort in response (high M4 — she orders additional tests when her calibration check flags uncertainty). Dr. Reeves operates in Quadrant IV: he scales effort based on surface difficulty cues (more tests for obviously complex cases) but does not monitor his own confidence accuracy. His actuator works; his sensor does not.</p>
-<p class="body-text">The effective metacognitive control quality for Dr. Okafor is approximately <em class="math">\min(0.75, 0.80) \approx 0.75</em>. For Dr. Reeves, it is approximately <em class="math">\min(0.15, 0.70) \approx 0.15</em>. The difference is a factor of five — and it is the difference between the correct preoperative diagnosis and an intraoperative surprise.</p>
-<h2 id="technical-appendix" class="section-heading">Technical Appendix</h2>
-<p class="first-paragraph"><strong>Definition 9.1 (Expected Calibration Error).</strong> Let <em class="math">f: \mathcal{X} \to \mathcal{Y} \times [0,1]</em> be a reasoning system that produces both a judgment <em class="math">y \in \mathcal{Y}</em> and a confidence score <em class="math">c \in [0,1]</em>. For a test distribution <em class="math">\mathcal{D}</em> over problems with ground-truth labels, define the accuracy at confidence level <em class="math">p</em> as</p>
-<p class="body-text"><span class="math-block">\text{acc}(p) = \Pr_{(x,y*) \sim \mathcal{D}}[f_y(x) = y* \mid f_c(x) = p]</span></p>
-<p class="body-text">where <em class="math">f_y(x)</em> is the judgment and <em class="math">f_c(x)</em> is the confidence. The Expected Calibration Error (ECE) is</p>
-<p class="body-text"><span class="math-block">\text{ECE} = \sum_{b=1}^{B} \frac{n_b}{N} \left| \text{acc}(b) - \text{conf}(b) \right|</span></p>
-<p class="body-text">where the confidence range <em class="math">[0,1]</em> is partitioned into <em class="math">B</em> bins, <em class="math">n_b</em> is the number of predictions in bin <em class="math">b</em>, <em class="math">N</em> is the total number of predictions, <em class="math">\text{acc}(b)</em> is the average accuracy in bin <em class="math">b</em>, and <em class="math">\text{conf}(b)</em> is the average confidence in bin <em class="math">b</em>. An ECE of 0 indicates perfect calibration. An ECE of <em class="math">\beta &gt; 0</em> with uniform overconfidence (<em class="math">\text{conf}(b) &gt; \text{acc}(b)</em> for all <em class="math">b</em>) corresponds to a systematic underestimation of cost-to-go by <em class="math">\beta</em> across the reasoning manifold, producing a contracted search frontier and elevated false-termination rate (Proposition 3.1, Chapter 3 Technical Appendix).</p>
-<p class="body-text"><strong>Definition 9.2 (The Metacognitive Plane and Its Quadrants).</strong> Define the metacognitive state of a reasoning system as the point</p>
-<p class="body-text"><span class="math-block">\mathbf{m} = (M_3, M_4) \in [0,1] \times [0,1]</span></p>
-<p class="body-text">where <em class="math">M_3</em> is the self-monitoring score (correlation between actual difficulty and reported confidence) and <em class="math">M_4</em> is the strategy selection / effort scaling score (correlation between task difficulty and processing depth). The unit square <em class="math">[0,1]^2</em> is partitioned into four metacognitive quadrants:</p>
-<ul class="book-list">
-<li><strong>Quadrant I</strong> (<em class="math">M_3 &gt; 0.5</em>, <em class="math">M_4 &gt; 0.5</em>): Full metacognitive control. The system detects performance degradation and scales effort accordingly. The effective escape probability from local minima is <em class="math">P_{\text{escape}} \approx M_3 \cdot M_4 \cdot P_{\text{geometric}}</em>, which is maximized in this quadrant.</li>
+<p>The critical finding is the dissociation between M3 and M4: these are geometrically independent capabilities, and no tested model excels at both. This places all tested models in Quadrants II or IV of the metacognitive plane, where at least one component of the control loop is impaired. The effective escape probability from local minima is bounded by the weakest component, yielding values of 2.5% (Flash 2.0) to 9.3% (Pro).</p>
+<p>The ~38% recovery ceiling, which converges across independent perturbation types, reflects the characteristic throughput of the metacognitive control loop under prompt-level intervention. It cannot be exceeded by better prompts; it can only be exceeded by better metacognition.</p>
+<p>Calibration is necessary for gauge invariance: a miscalibrated system cannot detect when a gauge transformation has displaced its output. The pathologies of Part II persist not only because they exist but because the metacognitive system that would detect and correct them is itself impaired.</p>
+<p>In the next chapter, we turn from the internal control layer to the external measurement of robustness. Chapter 10 develops the Robustness Surface — a systematic method for mapping which reasoning capabilities are robust and which are fragile — building on the metacognitive framework of this chapter to explain <em>why</em> certain capabilities are fragile and what it would take to make them robust.</p>
+<hr />
+</section>
+<section id="worked-example-the-overconfident-diagnosis" class="level2">
+<h2>Worked Example: The Overconfident Diagnosis</h2>
+<p>Let us return to Dr. Okafor and the twelve-year-old boy from the running example. This worked example traces the full metacognitive geometry — how overconfidence contracts the search frontier, how the gap between stated confidence and actual accuracy creates a systematic false-termination region, and how the outcome depends entirely on whether the clinician’s metacognitive monitor is calibrated.</p>
+<p><strong>The clinical presentation.</strong> Marcus, age 12, presents at 9:15 PM with 18 hours of abdominal pain. It started around the umbilicus and has migrated to the right lower quadrant. He has not eaten since breakfast. His temperature is 38.1°C. On examination, there is tenderness at McBurney’s point with voluntary guarding. The Alvarado score is 7 out of 10.</p>
+<p><strong>Dr. Okafor’s heuristic evaluation.</strong> Her heuristic field assigns this state a low estimated cost-to-go toward the appendicitis basin: <span class="math inline">h(x_{\text{appy}}) \approx 0.10</span>. The evaluation function reads <span class="math inline">f(x) \approx g(x) + 0.10</span> — close to the goal, ready to commit. Her expressed confidence is 90%. If we took her at her word, the search would terminate: appendicitis, consult surgery, done.</p>
+<p><strong>The metacognitive check.</strong> But Dr. Okafor’s metacognitive monitor — her M1 calibration — intervenes. She has learned, through years of tracking her own outcomes, that her internal confidence signal systematically overestimates her accuracy. When she feels 90% sure of a pediatric abdominal diagnosis, she is correct approximately 70% of the time. Her personal ECE for this class of problems is approximately 0.20.</p>
+<p>This means her true heuristic assessment is not <span class="math inline">h(x) \approx 0.10</span> (almost there) but <span class="math inline">h(x) \approx 0.30</span> (still meaningfully far from certainty). The metacognitive correction expands her search frontier. Instead of terminating at the appendicitis hypothesis, she continues searching: she orders a CT abdomen with contrast, checks a urinalysis (to exclude renal pathology), and asks the surgical resident to examine the patient independently.</p>
+<p><strong>The counterfactual clinician.</strong> Dr. Okafor’s colleague, Dr. Reeves, has the same clinical skills but weaker metacognitive calibration — his ECE is approximately 0.40, comparable to the Flash 2.0 models measured in M1. When Dr. Reeves feels 90% sure, he is correct approximately 50% of the time, but he does not know this. His confidence surface is collapsed in precisely the sense described in Section 7.3: it reads “near the goal” across a wide range of actual distances.</p>
+<p>Dr. Reeves sees Marcus at the same presentation and reaches the same initial hypothesis with the same confidence. But his metacognitive monitor does not correct. He diagnoses appendicitis, consults surgery, and goes home satisfied. The surgeon, trusting the ER assessment, schedules Marcus for morning appendectomy.</p>
+<p><strong>The twist.</strong> The CT scan that Dr. Okafor ordered reveals not appendicitis but a Meckel’s diverticulum with associated inflammation — a mimic that presents identically on clinical examination but requires a different surgical approach and a different informed consent conversation with the parents. The appendix is normal. Without the CT, the surgeon operating on Dr. Reeves’s diagnosis would have found a normal appendix, explored further, eventually identified the Meckel’s diverticulum, and completed the surgery — but with a different incision, a longer operative time, and a surprised surgical team operating without preoperative planning for the actual pathology.</p>
+<p>In the geometric picture, appendicitis and Meckel’s diverticulitis occupy adjacent basins in the diagnostic manifold. Their clinical presentations overlap substantially — the basins share a wide boundary region where the heuristic gradient is shallow and ambiguous. Dr. Okafor’s calibrated metacognition expanded her search frontier enough to probe across this boundary. Dr. Reeves’s collapsed confidence surface caused premature convergence into the appendicitis basin before the boundary was explored.</p>
+<p><strong>The metacognitive plane.</strong> Dr. Okafor operates in Quadrant I of the metacognitive plane (Section 9.9): she both detects when her confidence may be unreliable (high M3 — she knows her 90% is not really 90%) and adjusts her effort in response (high M4 — she orders additional tests when her calibration check flags uncertainty). Dr. Reeves operates in Quadrant IV: he scales effort based on surface difficulty cues (more tests for obviously complex cases) but does not monitor his own confidence accuracy. His actuator works; his sensor does not.</p>
+<p>The effective metacognitive control quality for Dr. Okafor is approximately <span class="math inline">\min(0.75, 0.80) \approx 0.75</span>. For Dr. Reeves, it is approximately <span class="math inline">\min(0.15, 0.70) \approx 0.15</span>. The difference is a factor of five — and it is the difference between the correct preoperative diagnosis and an intraoperative surprise.</p>
+<hr />
+</section>
+<section id="technical-appendix" class="level2">
+<h2>Technical Appendix</h2>
+<p><strong>Definition 9.1 (Expected Calibration Error).</strong> Let <span class="math inline">f: \mathcal{X} \to \mathcal{Y} \times [0,1]</span> be a reasoning system that produces both a judgment <span class="math inline">y \in \mathcal{Y}</span> and a confidence score <span class="math inline">c \in [0,1]</span>. For a test distribution <span class="math inline">\mathcal{D}</span> over problems with ground-truth labels, define the <em>accuracy at confidence level <span class="math inline">p</span></em> as</p>
+<p><span class="math display">\text{acc}(p) = \Pr_{(x,y^*) \sim \mathcal{D}}[f_y(x) = y^* \mid f_c(x) = p]</span></p>
+<p>where <span class="math inline">f_y(x)</span> is the judgment and <span class="math inline">f_c(x)</span> is the confidence. The <em>Expected Calibration Error</em> (ECE) is</p>
+<p><span class="math display">\text{ECE} = \sum_{b=1}^{B} \frac{n_b}{N} \left| \text{acc}(b) - \text{conf}(b) \right|</span></p>
+<p>where the confidence range <span class="math inline">[0,1]</span> is partitioned into <span class="math inline">B</span> bins, <span class="math inline">n_b</span> is the number of predictions in bin <span class="math inline">b</span>, <span class="math inline">N</span> is the total number of predictions, <span class="math inline">\text{acc}(b)</span> is the average accuracy in bin <span class="math inline">b</span>, and <span class="math inline">\text{conf}(b)</span> is the average confidence in bin <span class="math inline">b</span>. An ECE of 0 indicates perfect calibration. An ECE of <span class="math inline">\beta &gt; 0</span> with uniform overconfidence (<span class="math inline">\text{conf}(b) &gt; \text{acc}(b)</span> for all <span class="math inline">b</span>) corresponds to a systematic underestimation of cost-to-go by <span class="math inline">\beta</span> across the reasoning manifold, producing a contracted search frontier and elevated false-termination rate (Proposition 3.1, Chapter 3 Technical Appendix).</p>
+<p><strong>Definition 9.2 (The Metacognitive Plane and Its Quadrants).</strong> Define the <em>metacognitive state</em> of a reasoning system as the point</p>
+<p><span class="math display">\mathbf{m} = (M_3, M_4) \in [0,1] \times [0,1]</span></p>
+<p>where <span class="math inline">M_3</span> is the self-monitoring score (correlation between actual difficulty and reported confidence) and <span class="math inline">M_4</span> is the strategy selection / effort scaling score (correlation between task difficulty and processing depth). The unit square <span class="math inline">[0,1]^2</span> is partitioned into four <em>metacognitive quadrants</em>:</p>
+<ul>
+<li><p><strong>Quadrant I</strong> (<span class="math inline">M_3 &gt; 0.5</span>, <span class="math inline">M_4 &gt; 0.5</span>): Full metacognitive control. The system detects performance degradation and scales effort accordingly. The effective escape probability from local minima is <span class="math inline">P_{\text{escape}} \approx M_3 \cdot M_4 \cdot P_{\text{geometric}}</span>, which is maximized in this quadrant.</p></li>
+<li><p><strong>Quadrant II</strong> (<span class="math inline">M_3 &gt; 0.5</span>, <span class="math inline">M_4 \leq 0.5</span>): Aware but passive. The system detects errors but does not adjust effort. Effective control is bottlenecked by the actuator: <span class="math inline">P_{\text{escape}} \leq M_4 \cdot P_{\text{geometric}}</span>.</p></li>
+<li><p><strong>Quadrant III</strong> (<span class="math inline">M_3 \leq 0.5</span>, <span class="math inline">M_4 \leq 0.5</span>): Open-loop search. Neither detection nor correction is functional. <span class="math inline">P_{\text{escape}} \leq \min(M_3, M_4) \cdot P_{\text{geometric}} \approx 0</span>.</p></li>
+<li><p><strong>Quadrant IV</strong> (<span class="math inline">M_3 \leq 0.5</span>, <span class="math inline">M_4 &gt; 0.5</span>): Reactive but blind. The system scales effort based on surface cues but cannot detect internal errors. Effective control is bottlenecked by the sensor: <span class="math inline">P_{\text{escape}} \leq M_3 \cdot P_{\text{geometric}}</span>.</p></li>
 </ul>
-<ul class="book-list">
-<li><strong>Quadrant II</strong> (<em class="math">M_3 &gt; 0.5</em>, <em class="math">M_4 \leq 0.5</em>): Aware but passive. The system detects errors but does not adjust effort. Effective control is bottlenecked by the actuator: <em class="math">P_{\text{escape}} \leq M_4 \cdot P_{\text{geometric}}</em>.</li>
-</ul>
-<ul class="book-list">
-<li><strong>Quadrant III</strong> (<em class="math">M_3 \leq 0.5</em>, <em class="math">M_4 \leq 0.5</em>): Open-loop search. Neither detection nor correction is functional. <em class="math">P_{\text{escape}} \leq \min(M_3, M_4) \cdot P_{\text{geometric}} \approx 0</em>.</li>
-</ul>
-<ul class="book-list">
-<li><strong>Quadrant IV</strong> (<em class="math">M_3 \leq 0.5</em>, <em class="math">M_4 &gt; 0.5</em>): Reactive but blind. The system scales effort based on surface cues but cannot detect internal errors. Effective control is bottlenecked by the sensor: <em class="math">P_{\text{escape}} \leq M_3 \cdot P_{\text{geometric}}</em>.</li>
-</ul>
-<p class="body-text">The empirical finding that all tested models occupy Quadrants II or IV — and that Quadrant I is empty — constitutes evidence for an architectural or training trade-off between the sensor axis (<em class="math">M_3</em>) and the actuator axis (<em class="math">M_4</em>).</p>
-<p class="body-text"><strong>Proposition 9.1 (Calibration as Necessary Condition for Gauge Anomaly Detection).</strong> Let <em class="math">f: \mathcal{X} \to \mathcal{Y}</em> be a reasoning system with confidence estimator <em class="math">\hat{h}: \mathcal{X} \to \mathbb{R}_{\geq 0}</em> (estimated cost-to-go), calibration bias <em class="math">b = \mathbb{E}[\hat{h}(x) - h*(x)]</em>, and self-monitoring sensitivity <em class="math">s = \partial \hat{h} / \partial h^*</em>. Let <em class="math">\tau</em> be a gauge transformation that produces an anomaly of magnitude <em class="math">\delta = \|f(\tau(x)) - f(x)\|</em>. The system can detect the anomaly (in the sense that the confidence change <em class="math">|\hat{h}(\tau(x)) - \hat{h}(x)|</em> exceeds the noise floor set by miscalibration) only if</p>
-<p class="body-text"><span class="math-block">\delta &gt; \frac{|b|}{s}</span></p>
-<p class="body-text">For a system with ECE <em class="math">= |b|</em> and <em class="math">M_3 = s</em>, the minimum detectable anomaly magnitude is <em class="math">\text{ECE} / M_3</em>. This quantity is the system's metacognitive resolution — the smallest gauge violation it can perceive. For Flash 2.0 (<em class="math">\text{ECE} = 0.414</em>, <em class="math">M_3 = 0.094</em>), the metacognitive resolution is <em class="math">0.414 / 0.094 \approx 4.4</em> — the system can only detect gauge violations that shift its position by more than four times its own calibration error. For Pro (<em class="math">\text{ECE} = 0.230</em>, <em class="math">M_3 = 0.700</em>), the resolution is <em class="math">0.230 / 0.700 \approx 0.33</em> — substantially finer, but still insufficient for detecting the moderate-magnitude anomalies produced by sensory distractors (<em class="math">4.6\sigma</em> in normalized terms but moderate in absolute displacement). This proposition formalizes the claim of Section 9.8: calibration is necessary for gauge invariance because miscalibration sets a floor on the smallest detectable symmetry violation.</p>
-<h2 id="references" class="section-heading">References</h2>
-<p class="first-paragraph">Bond, A. H. (2026a). Geometric Methods in Computational Modeling. San Jose State University.</p>
-<p class="body-text">Bond, A. H. (2026b). Geometric Ethics: Moral Reasoning on the Judgment Manifold. San Jose State University.</p>
-<p class="body-text">Flavell, J. H. (1979). Metacognition and cognitive monitoring: A new area of cognitive-developmental inquiry. American Psychologist, 34(10), 906--911.</p>
-<p class="body-text">Guo, C., Pleiss, G., Sun, Y., &amp; Weinberger, K. Q. (2017). On calibration of modern neural networks. ICML, 1321--1330.</p>
-<p class="body-text">Kadavath, S., et al. (2022). Language models (mostly) know what they know. arXiv:2207.05221.</p>
-<p class="body-text">Nelson, T. O. &amp; Narens, L. (1990). Metamemory: A theoretical framework and new findings. The Psychology of Learning and Motivation, 26, 125--173.</p>
-<p class="body-text">Newell, A. &amp; Simon, H. A. (1972). Human Problem Solving. Englewood Cliffs, NJ: Prentice-Hall.</p>
-<p class="body-text">Niculescu-Mizil, A. &amp; Caruana, R. (2005). Predicting good probabilities with supervised learning. ICML, 625--632.</p>
-<p class="body-text">Schraw, G. &amp; Dennison, R. S. (1994). Assessing metacognitive awareness. Contemporary Educational Psychology, 19(4), 460--475.</p>
+<p>The empirical finding that all tested models occupy Quadrants II or IV — and that Quadrant I is empty — constitutes evidence for an architectural or training trade-off between the sensor axis (<span class="math inline">M_3</span>) and the actuator axis (<span class="math inline">M_4</span>).</p>
+<p><strong>Proposition 9.1 (Calibration as Necessary Condition for Gauge Anomaly Detection).</strong> Let <span class="math inline">f: \mathcal{X} \to \mathcal{Y}</span> be a reasoning system with confidence estimator <span class="math inline">\hat{h}: \mathcal{X} \to \mathbb{R}_{\geq 0}</span> (estimated cost-to-go), calibration bias <span class="math inline">b = \mathbb{E}[\hat{h}(x) - h^*(x)]</span>, and self-monitoring sensitivity <span class="math inline">s = \partial \hat{h} / \partial h^*</span>. Let <span class="math inline">\tau</span> be a gauge transformation that produces an anomaly of magnitude <span class="math inline">\delta = \|f(\tau(x)) - f(x)\|</span>. The system can detect the anomaly (in the sense that the confidence change <span class="math inline">|\hat{h}(\tau(x)) - \hat{h}(x)|</span> exceeds the noise floor set by miscalibration) only if</p>
+<p><span class="math display">\delta &gt; \frac{|b|}{s}</span></p>
+<p>For a system with ECE <span class="math inline">= |b|</span> and <span class="math inline">M_3 = s</span>, the minimum detectable anomaly magnitude is <span class="math inline">\text{ECE} / M_3</span>. This quantity is the system’s <em>metacognitive resolution</em> — the smallest gauge violation it can perceive. For Flash 2.0 (<span class="math inline">\text{ECE} = 0.414</span>, <span class="math inline">M_3 = 0.094</span>), the metacognitive resolution is <span class="math inline">0.414 / 0.094 \approx 4.4</span> — the system can only detect gauge violations that shift its position by more than four times its own calibration error. For Pro (<span class="math inline">\text{ECE} = 0.230</span>, <span class="math inline">M_3 = 0.700</span>), the resolution is <span class="math inline">0.230 / 0.700 \approx 0.33</span> — substantially finer, but still insufficient for detecting the moderate-magnitude anomalies produced by sensory distractors (<span class="math inline">4.6\sigma</span> in normalized terms but moderate in absolute displacement). This proposition formalizes the claim of Section 9.8: calibration is necessary for gauge invariance because miscalibration sets a floor on the smallest detectable symmetry violation.</p>
+<hr />
+</section>
+<section id="references" class="level2">
+<h2>References</h2>
+<p>Bond, A. H. (2026a). <em>Geometric Methods in Computational Modeling.</em> San Jose State University.</p>
+<p>Bond, A. H. (2026b). <em>Geometric Ethics: Moral Reasoning on the Judgment Manifold.</em> San Jose State University.</p>
+<p>Flavell, J. H. (1979). Metacognition and cognitive monitoring: A new area of cognitive-developmental inquiry. <em>American Psychologist</em>, 34(10), 906–911.</p>
+<p>Guo, C., Pleiss, G., Sun, Y., &amp; Weinberger, K. Q. (2017). On calibration of modern neural networks. <em>ICML</em>, 1321–1330.</p>
+<p>Kadavath, S., et al. (2022). Language models (mostly) know what they know. <em>arXiv:2207.05221</em>.</p>
+<p>Nelson, T. O. &amp; Narens, L. (1990). Metamemory: A theoretical framework and new findings. <em>The Psychology of Learning and Motivation</em>, 26, 125–173.</p>
+<p>Newell, A. &amp; Simon, H. A. (1972). <em>Human Problem Solving.</em> Englewood Cliffs, NJ: Prentice-Hall.</p>
+<p>Niculescu-Mizil, A. &amp; Caruana, R. (2005). Predicting good probabilities with supervised learning. <em>ICML</em>, 625–632.</p>
+<p>Schraw, G. &amp; Dennison, R. S. (1994). Assessing metacognitive awareness. <em>Contemporary Educational Psychology</em>, 19(4), 460–475.</p>
+</section>
+</section>
       </div>
 
       <div class="chapter-nav-bottom">
@@ -515,8 +576,8 @@
   </article>
 
   <footer class="book-footer">
-    <p>&copy; 2026 Andrew H. Bond. Geometric Reasoning: From Search to Manifolds.</p>
-    <p class="footer-note">Reasoning is informed search through a structured space.</p>
+    <p>&copy; 2026 Andrew H. Bond. <em>Geometric Reasoning: From Search to Manifolds.</em></p>
+    <p class="footer-note">The geometry was always real. The scalars were always insufficient.</p>
   </footer>
 
   <script>
@@ -527,35 +588,22 @@
       document.querySelector('.nav-links').classList.toggle('open');
     });
   </script>
-<script>
-window.addEventListener("load", function() {
-  if (typeof katex === 'undefined') return;
-  // Render all <em class="math"> elements with</em> KaTeX
-  document.querySelectorAll('em.math').forEach(function(el) {
-    try {
-      katex.render(el.textContent, el, {throwOnError: false, displayMode: false});
-    } catch(e) {}
-  });
-  // Render all <p class="display-math"> elements
-  document.querySelectorAll('p.display-math').forEach(function(el) {
-    var mathEl = el.querySelector('em.math');
-    if (mathEl) {
-      try {
-        katex.render(mathEl.textContent, el, {throwOnError: false, displayMode: true});
-      } catch(e) {}
-    }
-  });
-  // Also try auto-render for any $...$ delimited math
-  if (typeof renderMathInElement !== 'undefined') {
-    renderMathInElement(document.body, {
-      delimiters: [
-        {left: "$$", right: "$$", display: true},
-        {left: "$", right: "$", display: false}
-      ],
-      throwOnError: false
+  <script>
+    // Pandoc --katex outputs <span class="math inline"> and <span class="math display">.
+    // This script renders them with KaTeX once the library loads.
+    document.addEventListener("DOMContentLoaded", function() {
+      if (typeof katex === 'undefined') return;
+      var mathElements = document.getElementsByClassName("math");
+      for (var i = 0; i < mathElements.length; i++) {
+        var texText = mathElements[i].firstChild;
+        if (mathElements[i].tagName === "SPAN" && texText) {
+          katex.render(texText.data, mathElements[i], {
+            displayMode: mathElements[i].classList.contains('display'),
+            throwOnError: false
+          });
+        }
+      }
     });
-  }
-});
-</script>
+  </script>
 </body>
 </html>

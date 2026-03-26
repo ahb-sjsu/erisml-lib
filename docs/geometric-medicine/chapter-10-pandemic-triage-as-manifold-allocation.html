@@ -10,9 +10,8 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Crimson+Pro:ital,wght@0,300;0,400;0,600;0,700;1,400&family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
-  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
-  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"></script>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
 </head>
 
 <body>
@@ -26,7 +25,7 @@
         <span></span><span></span><span></span>
       </button>
       <ul class="nav-links">
-        <li><a href="index.html" class="active">Medicine</a></li>
+        <li><a href="../geometric-medicine/index.html" class="active">Medicine</a></li>
         <li><a href="../book/index.html">Ethics</a></li>
         <li><a href="../geometric-methods/index.html">Methods</a></li>
         <li><a href="../geometric-reasoning/index.html">Reasoning</a></li>
@@ -43,9 +42,9 @@
     <div class="chapter-container">
       <nav class="breadcrumb" aria-label="Breadcrumb">
         <a href="../index.html">Geometric Series</a>
-        <span class="breadcrumb-sep">›</span>
+        <span class="breadcrumb-sep">&rsaquo;</span>
         <a href="index.html">Geometric Medicine</a>
-        <span class="breadcrumb-sep">›</span>
+        <span class="breadcrumb-sep">&rsaquo;</span>
         <span class="breadcrumb-current">Chapter 10: Pandemic Triage as Manifold Allocation</span>
       </nav>
       <div class="chapter-nav-top">
@@ -54,264 +53,323 @@
         <a href="chapter-11-vaccine-allocation-organ-transplant-and-the-geometry-of-scarcity.html" class="nav-next">Chapter 11: Vaccine Allocation, Organ Transplant, and the Geometry of Scarcity &rarr;</a>
       </div>
 
-      <nav class="chapter-toc"><h4>In this chapter</h4><ol><li><a href="#101-the-formal-structure-of-triage">10.1 The Formal Structure of Triage</a></li><li><a href="#102-utilitarian-triage-vs-manifold-optimal-triage">10.2 Utilitarian Triage vs. Manifold-Optimal Triage</a></li><li><a href="#103-three-cases-of-divergence">10.3 Three Cases of Divergence</a></li><li><a href="#104-why-clinicians-resist-utilitarian-triage">10.4 Why Clinicians Resist Utilitarian Triage</a></li><li><a href="#105-the-pandemic-as-natural-experiment">10.5 The Pandemic as Natural Experiment</a></li><li><a href="#106-the-moral-geometry-of-specific-triage-scenarios">10.6 The Moral Geometry of Specific Triage Scenarios</a></li><li><a href="#107-triage-protocol-design-from-scalar-to-manifold">10.7 Triage Protocol Design: From Scalar to Manifold</a></li><li><a href="#108-historical-triage-systems-through-the-geometric-lens">10.8 Historical Triage Systems Through the Geometric Lens</a></li><li><a href="#109-the-ethics-of-triage-communication">10.9 The Ethics of Triage Communication</a></li><li><a href="#1010-sarahs-pandemic">10.10 Sarah's Pandemic</a></li><li><a href="#chapter-summary">Chapter Summary</a></li></ol></nav>
       <div class="chapter-content">
-<h1 id="chapter-10-pandemic-triage-as-manifold-allocation" class="chapter-title">Chapter 10: Pandemic Triage as Manifold Allocation</h1>
-<blockquote class="book-blockquote"><p>"The utilitarian calculus is not wrong. It is incomplete. It answers the right question on one dimension and the wrong question on eight."</p></blockquote>
-<p class="body-text">Triage is the moment where the geometric framework faces its hardest test. In the preceding chapters, we analyzed individual clinical decisions — one patient, one clinician, one geodesic. Triage is different. Triage is the simultaneous computation of geodesics for multiple patients under resource constraints that make it impossible for all patients to follow their individually optimal paths. It is the clinical analogue of the multi-agent pathfinding problem from computer science — and like multi-agent pathfinding, it is computationally hard, morally fraught, and practically unavoidable.</p>
-<p class="body-text">This chapter develops triage as constrained multi-agent pathfinding on the clinical decision complex. We prove the Divergence Theorem: utilitarian triage (maximize clinical outcomes on <em class="math">d_1</em>) and manifold-optimal triage (minimize total clinical friction on all nine dimensions) produce different allocations in precisely the cases that cause the most moral distress — ventilator withdrawal, age-based deprioritization, and choices among patients with similar prognoses. We examine the COVID-19 pandemic as a natural experiment that tested the framework's predictions. And we follow Sarah Chen into the pandemic ICU, where the distance between scalar triage and manifold-optimal triage is measured in human lives and moral injuries.</p>
-<h2 id="101-the-formal-structure-of-triage" class="section-heading">10.1 The Formal Structure of Triage</h2>
-<h3 id="triage-as-multi-agent-pathfinding" class="subsection-heading">Triage as Multi-Agent Pathfinding</h3>
-<p class="body-text">A single clinical decision is pathfinding on the clinical decision complex <em class="math">\mathcal{C}</em>: from a patient's current state <em class="math">v_0</em> to a goal region <em class="math">G</em>, minimizing total clinical friction <em class="math">\text{CF}(\gamma)</em> along the path. The clinician computes <em class="math">f(n) = g(n) + h(n)</em>, and the minimum-cost path <em class="math">\gamma^*</em> is the clinical geodesic.</p>
-<p class="body-text">Triage introduces two complications that transform the problem:</p>
-<ol>
-<li><strong>Multiple simultaneous patients</strong>: The clinician must compute geodesics for <em class="math">n</em> patients at once, not one at a time.</li>
+<section id="chapter-10-pandemic-triage-as-manifold-allocation" class="level1">
+<h1>Chapter 10: Pandemic Triage as Manifold Allocation</h1>
+<blockquote>
+<p><em>“The utilitarian calculus is not wrong. It is incomplete. It answers the right question on one dimension and the wrong question on eight.”</em></p>
+</blockquote>
+<hr />
+<p>Triage is the moment where the geometric framework faces its hardest test. In the preceding chapters, we analyzed individual clinical decisions — one patient, one clinician, one geodesic. Triage is different. Triage is the simultaneous computation of geodesics for multiple patients under resource constraints that make it impossible for all patients to follow their individually optimal paths. It is the clinical analogue of the multi-agent pathfinding problem from computer science — and like multi-agent pathfinding, it is computationally hard, morally fraught, and practically unavoidable.</p>
+<p>This chapter develops triage as constrained multi-agent pathfinding on the clinical decision complex. We prove the Divergence Theorem: utilitarian triage (maximize clinical outcomes on <span class="math inline">d_1</span>) and manifold-optimal triage (minimize total clinical friction on all nine dimensions) produce different allocations in precisely the cases that cause the most moral distress — ventilator withdrawal, age-based deprioritization, and choices among patients with similar prognoses. We examine the COVID-19 pandemic as a natural experiment that tested the framework’s predictions. And we follow Sarah Chen into the pandemic ICU, where the distance between scalar triage and manifold-optimal triage is measured in human lives and moral injuries.</p>
+<hr />
+<section id="the-formal-structure-of-triage" class="level2">
+<h2>10.1 The Formal Structure of Triage</h2>
+<section id="triage-as-multi-agent-pathfinding" class="level3">
+<h3>Triage as Multi-Agent Pathfinding</h3>
+<p>A single clinical decision is pathfinding on the clinical decision complex <span class="math inline">\mathcal{C}</span>: from a patient’s current state <span class="math inline">v_0</span> to a goal region <span class="math inline">G</span>, minimizing total clinical friction <span class="math inline">\text{CF}(\gamma)</span> along the path. The clinician computes <span class="math inline">f(n) = g(n) + h(n)</span>, and the minimum-cost path <span class="math inline">\gamma^*</span> is the clinical geodesic.</p>
+<p>Triage introduces two complications that transform the problem:</p>
+<ol type="1">
+<li><strong>Multiple simultaneous patients</strong>: The clinician must compute geodesics for <span class="math inline">n</span> patients at once, not one at a time.</li>
 <li><strong>Resource constraints</strong>: The total resources available (ventilators, ICU beds, surgical hours, medications) are insufficient for all patients to follow their individually optimal paths.</li>
 </ol>
-<p class="body-text"><strong>Definition 10.1 (Triage Problem).</strong> A triage problem is a tuple <em class="math">(N, \mathcal{C}, R, G)</em> where:</p>
+<p><strong>Definition 10.1 (Triage Problem).</strong> <em>A triage problem is a tuple <span class="math inline">(N, \mathcal{C}, R, G)</span> where:</em></p>
 <ul>
-<li><em class="math">N = \{p_1, \ldots, p_n\}</em> is a set of patients.</li>
-<li><em class="math">\mathcal{C} = \{\mathcal{C}_1, \ldots, \mathcal{C}_n\}</em> is the set of clinical decision complexes (one per patient, each carrying a nine-dimensional attribute vector).</li>
-<li><em class="math">R</em> is a resource constraint: a bound on the total resources available across all patients.</li>
-<li><em class="math">G = \{G_1, \ldots, G_n\}</em> is the set of goal regions (acceptable outcomes for each patient).</li>
+<li><em><span class="math inline">N = \{p_1, \ldots, p_n\}</span> is a set of patients.</em></li>
+<li><em><span class="math inline">\mathcal{C} = \{\mathcal{C}_1, \ldots, \mathcal{C}_n\}</span> is the set of clinical decision complexes (one per patient, each carrying a nine-dimensional attribute vector).</em></li>
+<li><em><span class="math inline">R</span> is a resource constraint: a bound on the total resources available across all patients.</em></li>
+<li><em><span class="math inline">G = \{G_1, \ldots, G_n\}</span> is the set of goal regions (acceptable outcomes for each patient).</em></li>
 </ul>
-<p class="body-text">The triage decision is a feasible allocation that minimizes total clinical-moral friction:</p>
-<p class="display-math"><em class="math">(\gamma_1^*, \ldots, \gamma_n^*) = \arg\min_{\gamma_1, \ldots, \gamma_n} \sum_{i=1}^n \text{CF}(\gamma_i) \quad \text{subject to } \sum_{i=1}^n r(\gamma_i) \leq R</em></p>
-<p class="body-text">where <em class="math">\text{CF}(\gamma_i)</em> is the total clinical friction for patient <em class="math">i's path and</em> <em class="math">r(\gamma_i)</em> is the resource cost of that path.</p>
-<h3 id="what-changes-under-resource-constraints" class="subsection-heading">What Changes Under Resource Constraints</h3>
-<p class="body-text">Without resource constraints, each patient follows their individual geodesic <em class="math">\gamma_i^*</em>. The total cost is <em class="math">\sum_i \text{CF}(\gamma_i*)</em> — the sum of individually optimal paths. Resource constraints force deviations from individual geodesics. Some patients receive suboptimal paths (delayed treatment, no ventilator, comfort care instead of ICU admission). The triage question is: which patients deviate, and how far?</p>
-<div class="figure-placeholder"><p class="figure-caption"><strong>Figure:</strong> Schematic showing <em class="math">n = 30</em> patients on the clinical manifold, with individually optimal geodesics (dashed) and resource-constrained feasible paths (solid), highlighting the deviation between individual geodesics and constrained allocations</p></div>
-<h3 id="tractability" class="subsection-heading">Tractability</h3>
-<p class="body-text">General multi-agent pathfinding is NP-hard. But clinical triage operates under constraints that make the problem tractable in practice:</p>
+<p><em>The triage decision is a feasible allocation that minimizes total clinical-moral friction:</em></p>
+<p><span class="math display">(\gamma_1^*, \ldots, \gamma_n^*) = \arg\min_{\gamma_1, \ldots, \gamma_n} \sum_{i=1}^n \text{CF}(\gamma_i) \quad \text{subject to } \sum_{i=1}^n r(\gamma_i) \leq R</span></p>
+<p><em>where <span class="math inline">\text{CF}(\gamma_i)</span> is the total clinical friction for patient <span class="math inline">i</span>’s path and <span class="math inline">r(\gamma_i)</span> is the resource cost of that path.</em></p>
+</section>
+<section id="what-changes-under-resource-constraints" class="level3">
+<h3>What Changes Under Resource Constraints</h3>
+<p>Without resource constraints, each patient follows their individual geodesic <span class="math inline">\gamma_i^*</span>. The total cost is <span class="math inline">\sum_i \text{CF}(\gamma_i^*)</span> — the sum of individually optimal paths. Resource constraints force deviations from individual geodesics. Some patients receive suboptimal paths (delayed treatment, no ventilator, comfort care instead of ICU admission). The triage question is: <em>which patients deviate, and how far?</em></p>
+<p>[Figure 10.1: Schematic showing <span class="math inline">n = 30</span> patients on the clinical manifold, with individually optimal geodesics (dashed) and resource-constrained feasible paths (solid), highlighting the deviation between individual geodesics and constrained allocations]</p>
+</section>
+<section id="tractability" class="level3">
+<h3>Tractability</h3>
+<p>General multi-agent pathfinding is NP-hard. But clinical triage operates under constraints that make the problem tractable in practice:</p>
 <ul>
 <li><strong>Bounded problem size</strong>: An ICU has 10–50 beds, not thousands. A pandemic surge involves hundreds to thousands of patients per hospital, but triage decisions are made locally within units.</li>
 <li><strong>Few resource types</strong>: Ventilators, ICU beds, nursing hours, specific medications. Not a continuous resource space.</li>
 <li><strong>Small per-patient action spaces</strong>: For each patient, the triage decision typically has a small number of options (admit to ICU / admit to floor / discharge / comfort care), not a combinatorial explosion.</li>
 </ul>
-<p class="body-text">The framework does not propose replacing existing triage heuristics (ESI, START, JumpSTART) with exact solvers. It proposes that the objective function should be total manifold cost <em class="math">\sum_i \text{CF}(\gamma_i)</em>, not total scalar outcome <em class="math">\sum_i d_1(\gamma_i)</em>. The existing algorithms work with the manifold objective — the change is in what is being optimized, not how the optimization is performed. The primary value is offline policy design: evaluating crisis standards of care against the manifold objective before the crisis arrives.</p>
-<h2 id="102-utilitarian-triage-vs-manifold-optimal-triage" class="section-heading">10.2 Utilitarian Triage vs. Manifold-Optimal Triage</h2>
-<h3 id="the-utilitarian-objective" class="subsection-heading">The Utilitarian Objective</h3>
-<p class="body-text">The dominant approach to crisis standards of care is utilitarian: maximize the number of lives saved, or maximize total life-years saved. Emanuel et al. (2020), in their influential New England Journal of Medicine framework for COVID-19 resource allocation, proposed four values (maximizing benefits, treating people equally, promoting instrumental value, giving priority to the worst off) but operationalized the framework primarily through <em class="math">d_1</em> — clinical prognosis, expected survival, life-years gained.</p>
-<p class="body-text">The utilitarian triage objective is:</p>
-<p class="display-math"><em class="math">(\gamma_1^U, \ldots, \gamma_n^U) = \arg\max_{\gamma_1, \ldots, \gamma_n} \sum_{i=1}^n d_1(\gamma_i) \quad \text{subject to } \sum_{i=1}^n r(\gamma_i) \leq R</em></p>
-<p class="body-text">This is a well-defined optimization problem with a scalar objective. It is computationally tractable. It produces clear, defensible, protocol-driven decisions. And it is, in precisely the cases that matter most, manifold-suboptimal.</p>
-<h3 id="the-manifold-objective" class="subsection-heading">The Manifold Objective</h3>
-<p class="body-text">The manifold-optimal triage objective minimizes total clinical friction on all nine dimensions:</p>
-<p class="display-math"><em class="math">(\gamma_1^*, \ldots, \gamma_n^*) = \arg\min_{\gamma_1, \ldots, \gamma_n} \sum_{i=1}^n \text{CF}(\gamma_i) \quad \text{subject to } \sum_{i=1}^n r(\gamma_i) \leq R</em></p>
-<p class="body-text">where:</p>
-<p class="display-math"><em class="math">\text{CF}(\gamma_i) = \sum_{(v_j, v_{j+1}) \in \gamma_i} \left[ \Delta \mathbf{a}^T \Sigma^{-1} \Delta \mathbf{a} + \sum_k \beta_k \cdot \mathbf{1}[\text{boundary } k \text{ crossed}] \right]</em></p>
-<p class="body-text">The manifold objective includes the utilitarian objective as a special case — when only <em class="math">d_1</em> is activated and no boundaries are crossed, the two objectives coincide. But the manifold objective also accounts for boundary-crossing costs, cross-dimensional interactions, and the moral costs imposed on both patients and clinicians by the triage process itself.</p>
-<h3 id="the-divergence-theorem" class="subsection-heading">The Divergence Theorem</h3>
-<p class="body-text"><strong>Theorem 10.1 (Divergence of Utilitarian and Manifold-Optimal Triage).</strong> Let <em class="math">\gamma_U^*</em> be the utilitarian triage allocation (maximize total <em class="math">d_1) and let</em> <em class="math">\gamma_{\mathcal{C}}^</em> be the manifold-optimal allocation (minimize total <em class="math">\text{CF}</em>). Then:</p>
-<p class="body-text">1. <em class="math">\gamma_U* = \gamma_{\mathcal{C}}^</em> when the triage decisions activate only <em class="math">d_1 and no moral boundaries are crossed.</em></p>
-<p class="body-text">2. <em class="math">\gamma_U* \neq \gamma_{\mathcal{C}}^</em> when triage decisions cross moral boundaries or activate non-outcome dimensions. Specifically:</p>
-<p class="body-text">(a) Ventilator withdrawal from a current patient to reallocate to a new patient with better prognosis is utilitarian-optimal but manifold-suboptimal, because withdrawal crosses the abandonment boundary (<em class="math">\beta_{\text{abandon}}</em>) and trust boundary (<em class="math">\beta_{\text{trust}}).</em></p>
-<p class="body-text">(b) Age-based deprioritization (younger patients first) is utilitarian-optimal (maximizes life-years) but manifold-suboptimal when it violates <em class="math">d_3</em> (justice: equal moral worth regardless of age).</p>
-<p class="body-text">(c) Lottery allocation (random assignment when prognoses are similar) is utilitarian-equivalent (no outcome difference) but manifold-superior: it preserves <em class="math">d_3</em> (fairness), <em class="math">d_7 (dignity), and</em> <em class="math">d_8</em> (legitimacy) while avoiding boundary crossings.</p>
-<p class="body-text">Proof. (1) follows from the Mahalanobis distance reducing to the <em class="math">d_1</em> component when all other dimensions have zero activation and no boundary terms contribute. Under these conditions, minimizing total <em class="math">\text{CF}</em> is identical to maximizing total <em class="math">d_1</em> (since <em class="math">\text{CF}</em> is a monotonic function of deviation from optimal <em class="math">d_1</em>).</p>
-<p class="body-text">(2a) Withdrawing a ventilator from a current patient crosses the abandonment boundary (<em class="math">\beta_{\text{abandon}}</em>) and the trust boundary (<em class="math">\beta_{\text{trust}}</em>). The utilitarian calculation considers only the <em class="math">d_1</em> gain of reallocation (the new patient has better prognosis). The manifold calculation adds <em class="math">\beta_{\text{abandon}} + \beta_{\text{trust}}</em> to the cost of withdrawal. When these boundary penalties exceed the <em class="math">d_1</em> differential between the two patients, the manifold-optimal allocation keeps the ventilator with the current patient — even though the utilitarian allocation reassigns it.</p>
-<p class="body-text">(2b) Age-based deprioritization weights younger patients' expected life-years more heavily. This is equivalent to applying a discount factor to <em class="math">d_1</em> based on age, which violates <em class="math">d_3</em> (equal moral worth). The manifold cost of the <em class="math">d_3</em> violation is:</p>
-<p class="display-math"><em class="math">\beta_{\text{justice}} \cdot \mathbf{1}[\text{age-based deprioritization}]</em></p>
-<p class="body-text">When <em class="math">\beta_{\text{justice}}</em> exceeds the <em class="math">d_1</em> differential between the age groups, the manifold-optimal allocation is age-neutral.</p>
-<p class="body-text">(2c) When two patients have similar prognoses (<em class="math">|d_1(p_i) - d_1(p_j)|</em> < \epsilon</em>), the utilitarian objective is indifferent between them — any allocation is equally good on <em class="math">d_1</em>. The manifold objective is not indifferent: a lottery allocation preserves <em class="math">d_3</em> (procedural fairness), <em class="math">d_7</em> (neither patient is devalued by the criterion), and <em class="math">d_8</em> (transparent, rule-based process), while a criterion-based allocation (by age, social value, or other discriminator) imposes costs on these dimensions. <em class="math">\square</em></p>
-<h2 id="103-three-cases-of-divergence" class="section-heading">10.3 Three Cases of Divergence</h2>
-<h3 id="case-a-ventilator-withdrawal-and-reallocation" class="subsection-heading">Case A: Ventilator Withdrawal and Reallocation</h3>
-<p class="body-text">The scenario that defined the moral crisis of the COVID-19 pandemic. A patient has been on a ventilator for seven days. Prognosis is poor but not hopeless — estimated 20% chance of survival. A new patient arrives in the emergency department with severe respiratory failure and an estimated 70% chance of survival if ventilated. There is one ventilator. The utilitarian calculation is clear: reallocate.</p>
-<p class="body-text"><strong>Utilitarian analysis:</strong></p>
-<p class="display-math"><em class="math">d_1(\text{new patient, ventilated}) - d_1(\text{current patient, continued}) = 0.70 - 0.20 = +0.50</em></p>
-<p class="body-text">The utilitarian gain is 0.50 expected life-years per life-year at stake. Reallocate.</p>
-<p class="body-text"><strong>Manifold analysis:</strong></p>
-<p class="body-text">The ventilator withdrawal crosses two boundaries:</p>
+<p>The framework does not propose replacing existing triage heuristics (ESI, START, JumpSTART) with exact solvers. It proposes that the <em>objective function</em> should be total manifold cost <span class="math inline">\sum_i \text{CF}(\gamma_i)</span>, not total scalar outcome <span class="math inline">\sum_i d_1(\gamma_i)</span>. The existing algorithms work with the manifold objective — the change is in what is being optimized, not how the optimization is performed. The primary value is <em>offline policy design</em>: evaluating crisis standards of care against the manifold objective before the crisis arrives.</p>
+<hr />
+</section>
+</section>
+<section id="utilitarian-triage-vs.-manifold-optimal-triage" class="level2">
+<h2>10.2 Utilitarian Triage vs. Manifold-Optimal Triage</h2>
+<section id="the-utilitarian-objective" class="level3">
+<h3>The Utilitarian Objective</h3>
+<p>The dominant approach to crisis standards of care is utilitarian: maximize the number of lives saved, or maximize total life-years saved. Emanuel et al. (2020), in their influential <em>New England Journal of Medicine</em> framework for COVID-19 resource allocation, proposed four values (maximizing benefits, treating people equally, promoting instrumental value, giving priority to the worst off) but operationalized the framework primarily through <span class="math inline">d_1</span> — clinical prognosis, expected survival, life-years gained.</p>
+<p>The utilitarian triage objective is:</p>
+<p><span class="math display">(\gamma_1^U, \ldots, \gamma_n^U) = \arg\max_{\gamma_1, \ldots, \gamma_n} \sum_{i=1}^n d_1(\gamma_i) \quad \text{subject to } \sum_{i=1}^n r(\gamma_i) \leq R</span></p>
+<p>This is a well-defined optimization problem with a scalar objective. It is computationally tractable. It produces clear, defensible, protocol-driven decisions. And it is, in precisely the cases that matter most, manifold-suboptimal.</p>
+</section>
+<section id="the-manifold-objective" class="level3">
+<h3>The Manifold Objective</h3>
+<p>The manifold-optimal triage objective minimizes total clinical friction on all nine dimensions:</p>
+<p><span class="math display">(\gamma_1^*, \ldots, \gamma_n^*) = \arg\min_{\gamma_1, \ldots, \gamma_n} \sum_{i=1}^n \text{CF}(\gamma_i) \quad \text{subject to } \sum_{i=1}^n r(\gamma_i) \leq R</span></p>
+<p>where:</p>
+<p><span class="math display">\text{CF}(\gamma_i) = \sum_{(v_j, v_{j+1}) \in \gamma_i} \left[ \Delta \mathbf{a}^T \Sigma^{-1} \Delta \mathbf{a} + \sum_k \beta_k \cdot \mathbf{1}[\text{boundary } k \text{ crossed}] \right]</span></p>
+<p>The manifold objective includes the utilitarian objective as a special case — when only <span class="math inline">d_1</span> is activated and no boundaries are crossed, the two objectives coincide. But the manifold objective also accounts for boundary-crossing costs, cross-dimensional interactions, and the moral costs imposed on both patients and clinicians by the triage process itself.</p>
+</section>
+<section id="the-divergence-theorem" class="level3">
+<h3>The Divergence Theorem</h3>
+<p><strong>Theorem 10.1 (Divergence of Utilitarian and Manifold-Optimal Triage).</strong> <em>Let <span class="math inline">\gamma_U^*</span> be the utilitarian triage allocation (maximize total <span class="math inline">d_1</span>) and let <span class="math inline">\gamma_{\mathcal{C}}^*</span> be the manifold-optimal allocation (minimize total <span class="math inline">\text{CF}</span>). Then:</em></p>
+<p><em>1. <span class="math inline">\gamma_U^* = \gamma_{\mathcal{C}}^*</span> when the triage decisions activate only <span class="math inline">d_1</span> and no moral boundaries are crossed.</em></p>
+<p><em>2. <span class="math inline">\gamma_U^* \neq \gamma_{\mathcal{C}}^*</span> when triage decisions cross moral boundaries or activate non-outcome dimensions. Specifically:</em></p>
+<p><em>(a) Ventilator withdrawal from a current patient to reallocate to a new patient with better prognosis is utilitarian-optimal but manifold-suboptimal, because withdrawal crosses the abandonment boundary (<span class="math inline">\beta_{\text{abandon}}</span>) and trust boundary (<span class="math inline">\beta_{\text{trust}}</span>).</em></p>
+<p><em>(b) Age-based deprioritization (younger patients first) is utilitarian-optimal (maximizes life-years) but manifold-suboptimal when it violates <span class="math inline">d_3</span> (justice: equal moral worth regardless of age).</em></p>
+<p><em>(c) Lottery allocation (random assignment when prognoses are similar) is utilitarian-equivalent (no outcome difference) but manifold-superior: it preserves <span class="math inline">d_3</span> (fairness), <span class="math inline">d_7</span> (dignity), and <span class="math inline">d_8</span> (legitimacy) while avoiding boundary crossings.</em></p>
+<p><em>Proof.</em> (1) follows from the Mahalanobis distance reducing to the <span class="math inline">d_1</span> component when all other dimensions have zero activation and no boundary terms contribute. Under these conditions, minimizing total <span class="math inline">\text{CF}</span> is identical to maximizing total <span class="math inline">d_1</span> (since <span class="math inline">\text{CF}</span> is a monotonic function of deviation from optimal <span class="math inline">d_1</span>).</p>
+<p>(2a) Withdrawing a ventilator from a current patient crosses the abandonment boundary (<span class="math inline">\beta_{\text{abandon}}</span>) and the trust boundary (<span class="math inline">\beta_{\text{trust}}</span>). The utilitarian calculation considers only the <span class="math inline">d_1</span> gain of reallocation (the new patient has better prognosis). The manifold calculation adds <span class="math inline">\beta_{\text{abandon}} + \beta_{\text{trust}}</span> to the cost of withdrawal. When these boundary penalties exceed the <span class="math inline">d_1</span> differential between the two patients, the manifold-optimal allocation keeps the ventilator with the current patient — even though the utilitarian allocation reassigns it.</p>
+<p>(2b) Age-based deprioritization weights younger patients’ expected life-years more heavily. This is equivalent to applying a discount factor to <span class="math inline">d_1</span> based on age, which violates <span class="math inline">d_3</span> (equal moral worth). The manifold cost of the <span class="math inline">d_3</span> violation is:</p>
+<p><span class="math display">\beta_{\text{justice}} \cdot \mathbf{1}[\text{age-based deprioritization}]</span></p>
+<p>When <span class="math inline">\beta_{\text{justice}}</span> exceeds the <span class="math inline">d_1</span> differential between the age groups, the manifold-optimal allocation is age-neutral.</p>
+<p>(2c) When two patients have similar prognoses (<span class="math inline">|d_1(p_i) - d_1(p_j)| &lt; \epsilon</span>), the utilitarian objective is indifferent between them — any allocation is equally good on <span class="math inline">d_1</span>. The manifold objective is not indifferent: a lottery allocation preserves <span class="math inline">d_3</span> (procedural fairness), <span class="math inline">d_7</span> (neither patient is devalued by the criterion), and <span class="math inline">d_8</span> (transparent, rule-based process), while a criterion-based allocation (by age, social value, or other discriminator) imposes costs on these dimensions. <span class="math inline">\square</span></p>
+<hr />
+</section>
+</section>
+<section id="three-cases-of-divergence" class="level2">
+<h2>10.3 Three Cases of Divergence</h2>
+<section id="case-a-ventilator-withdrawal-and-reallocation" class="level3">
+<h3>Case A: Ventilator Withdrawal and Reallocation</h3>
+<p>The scenario that defined the moral crisis of the COVID-19 pandemic. A patient has been on a ventilator for seven days. Prognosis is poor but not hopeless — estimated 20% chance of survival. A new patient arrives in the emergency department with severe respiratory failure and an estimated 70% chance of survival if ventilated. There is one ventilator. The utilitarian calculation is clear: reallocate.</p>
+<p><strong>Utilitarian analysis:</strong></p>
+<p><span class="math display">d_1(\text{new patient, ventilated}) - d_1(\text{current patient, continued}) = 0.70 - 0.20 = +0.50</span></p>
+<p>The utilitarian gain is 0.50 expected life-years per life-year at stake. Reallocate.</p>
+<p><strong>Manifold analysis:</strong></p>
+<p>The ventilator withdrawal crosses two boundaries:</p>
 <ul>
-<li><em class="math">\beta_{\text{abandon}}</em>: The clinician-patient relationship is a fiduciary bond. Withdrawing treatment from a current patient to benefit a stranger violates <em class="math">d_5</em> (trust) not just for this patient but for all patients who learn that ventilators can be reassigned. The boundary penalty reflects the systemic trust damage.</li>
-<li><em class="math">\beta_{\text{rights}}</em>: The current patient has a de facto claim on the ventilator (having already received it). Withdrawal may violate <em class="math">d_2</em> (rights and obligations) depending on the legal and ethical framework.</li>
+<li><p><span class="math inline">\beta_{\text{abandon}}</span>: The clinician-patient relationship is a fiduciary bond. Withdrawing treatment from a current patient to benefit a stranger violates <span class="math inline">d_5</span> (trust) not just for this patient but for all patients who learn that ventilators can be reassigned. The boundary penalty reflects the systemic trust damage.</p></li>
+<li><p><span class="math inline">\beta_{\text{rights}}</span>: The current patient has a de facto claim on the ventilator (having already received it). Withdrawal may violate <span class="math inline">d_2</span> (rights and obligations) depending on the legal and ethical framework.</p></li>
 </ul>
-<p class="body-text">Additionally, the withdrawal imposes a cost on <em class="math">d_7</em> (dignity) — the current patient is effectively told that their life is worth less than the new arrival's — and on <em class="math">d_8</em> (institutional legitimacy) — the hospital's protocols did not warn the patient that ventilator support could be withdrawn.</p>
-<p class="display-math"><em class="math">\text{CF}(\text{reallocate}) = \Delta d_1 \text{ gain} + \beta_{\text{abandon}} + \beta_{\text{trust}} + \Delta d_7 + \Delta d_8</em></p>
-<p class="body-text">For <em class="math">\beta_{\text{abandon}} + \beta_{\text{trust}} > \Delta d_1</em>, the manifold-optimal decision is to not reallocate — to continue ventilation for the current patient and find an alternative for the new arrival (transfer, improvised ventilation, prone positioning without intubation).</p>
-<p class="body-text"><strong>The key insight</strong>: The utilitarian analysis counts only the <em class="math">d_1</em> differential. The manifold analysis counts the full cost of the allocation process, including the boundaries crossed and the trust destroyed. The two analyses disagree precisely when the boundary costs are large — which is exactly the scenario that causes moral injury to clinicians.</p>
-<h3 id="case-b-age-based-deprioritization" class="subsection-heading">Case B: Age-Based Deprioritization</h3>
-<p class="body-text">A 32-year-old teacher and a 74-year-old retired engineer arrive simultaneously with comparable severity of illness. Both need ICU admission. One bed is available. The utilitarian protocol prioritizes the 32-year-old: more expected life-years saved.</p>
-<p class="body-text"><strong>Utilitarian analysis:</strong></p>
-<p class="display-math"><em class="math">d_1(\text{teacher}) = 0.65 \times 45 \text{ life-years} = 29.25 \text{ QALYs}</em></p>
-<p class="display-math"><em class="math">d_1(\text{engineer}) = 0.60 \times 12 \text{ life-years} = 7.20 \text{ QALYs}</em></p>
-<p class="body-text">The utilitarian gain of prioritizing the teacher is <em class="math">29.25 - 7.20 = 22.05</em> QALYs. Prioritize the teacher.</p>
-<p class="body-text"><strong>Manifold analysis:</strong></p>
-<p class="body-text">The age-based deprioritization activates <em class="math">d_3</em> (justice). The retired engineer has equal moral worth — his life is not less valuable because it is shorter. The <em class="math">d_3</em> cost depends on the community's boundary penalty for age discrimination:</p>
-<p class="display-math"><em class="math">\beta_{\text{justice}} \cdot \mathbf{1}[\text{age used as triage criterion}]</em></p>
-<p class="body-text">The QALY Irrecoverability Theorem (Theorem 2) predicts exactly this failure: the QALY calculation discards the <em class="math">d_3</em> information. A QALY of 7.20 and a QALY of 29.25 differ only on <em class="math">d_1</em> — the eight dimensions discarded by the scalar include the justice dimension that makes the comparison problematic.</p>
-<p class="body-text">When prognoses are comparable (the survival probabilities differ by only 5 percentage points — 65% vs. 60%), the <em class="math">d_1</em> differential is small and the <em class="math">d_3</em> cost of age-based discrimination may exceed it:</p>
-<p class="display-math"><em class="math">\beta_{\text{justice}} > \frac{(0.65 - 0.60)^2}{\sigma_1^2}</em></p>
-<p class="body-text">In this case, the manifold-optimal allocation uses a lottery rather than an age-based criterion — preserving <em class="math">d_3</em> at negligible <em class="math">d_1</em> cost.</p>
-<h3 id="case-c-lottery-allocation-among-similar-prognoses" class="subsection-heading">Case C: Lottery Allocation Among Similar Prognoses</h3>
-<p class="body-text">Six patients with comparable severity and comparable prognoses need ICU admission. Three beds are available. The utilitarian algorithm can rank them by expected life-years, but the differences are within the uncertainty range — the ranking is dominated by measurement noise, not by genuine prognostic differences.</p>
-<p class="body-text"><strong>The manifold-superior allocation is a lottery.</strong></p>
-<p class="body-text">A lottery preserves:</p>
-<ul>
-<li><em class="math">d_3</em> (fairness): every patient has an equal chance, regardless of age, race, social status, or insurance</li>
-<li><em class="math">d_7</em> (dignity): no patient is devalued by the allocation criterion ("you are less worth saving because...")</li>
-<li><em class="math">d_8</em> (institutional legitimacy): the allocation process is transparent, defensible, and free from bias</li>
-<li><em class="math">d_5</em> (trust): the system treats everyone equally, reinforcing public trust in medical institutions</li>
-</ul>
-<p class="body-text">The <em class="math">d_1</em> cost of a lottery relative to the utilitarian optimum is, by hypothesis, negligible — the patients have comparable prognoses. The manifold benefit is substantial.</p>
-<p class="body-text"><strong>Proposition 10.1 (Manifold Superiority of Lottery Allocation).</strong> When the <em class="math">d_1</em> differential among patients is below threshold <em class="math">\epsilon (comparable prognoses), lottery allocation is manifold-superior to criterion-based allocation for any criterion that activates</em> <em class="math">d_3</em>, <em class="math">d_7</em>, or <em class="math">d_8</em>.</p>
-<p class="body-text">This result formalizes the intuition behind the widespread endorsement of lottery allocation in pandemic ethics guidelines (White et al., 2009; Emanuel et al., 2020). The utilitarian framework cannot justify lotteries — they are <em class="math">d_1</em>-equivalent at best. The manifold framework can: lotteries are manifold-superior because they avoid boundary crossings on non-outcome dimensions.</p>
-<h2 id="104-why-clinicians-resist-utilitarian-triage" class="section-heading">10.4 Why Clinicians Resist Utilitarian Triage</h2>
-<p class="body-text">The widespread clinician resistance to utilitarian crisis standards of care during COVID-19 — documented by Greenberg et al. (2020), Rushton (2018), and many others — has been characterized as emotional, irrational, or a failure of moral courage. The geometric framework offers a different interpretation.</p>
-<p class="body-text"><strong>Proposition 10.2 (Clinician Resistance as Correct Manifold Computation).</strong> Clinician resistance to utilitarian triage is not irrationality. It is the clinician's well-calibrated heuristic <em class="math">h(n)</em> correctly identifying that the utilitarian triage path crosses moral boundaries whose total manifold cost exceeds the utilitarian benefit. The clinicians are right on the full manifold. The utilitarian algorithms are right on the scalar projection. The conflict is dimensional mismatch, not ethical disagreement.</p>
-<p class="body-text">Consider the ventilator withdrawal scenario. A clinician who has spent a career calibrating <em class="math">h(n)</em> — developing the boundary penalties for abandonment, trust violation, and dignity compromise through years of supervised pathfinding — is asked to implement a protocol that crosses three of those boundaries simultaneously. The clinician's heuristic correctly reports a high cost. The protocol, operating on <em class="math">d_1</em> alone, reports a benefit.</p>
-<p class="body-text">The clinician is not being irrational. The clinician is computing on a higher-dimensional space than the protocol. The resistance is not a failure of moral reasoning — it is the correct output of a well-calibrated heuristic function operating on a richer manifold than the utilitarian objective acknowledges.</p>
-<p class="body-text">This interpretation has practical consequences. If clinician resistance is irrationality, the solution is education: teach clinicians to accept utilitarian triage. If clinician resistance is correct manifold computation, the solution is protocol redesign: develop triage protocols that minimize total manifold cost, not just total <em class="math">d_1</em> outcome.</p>
-<h2 id="105-the-pandemic-as-natural-experiment" class="section-heading">10.5 The Pandemic as Natural Experiment</h2>
-<h3 id="covid-19-and-the-forced-contraction" class="subsection-heading">COVID-19 and the Forced Contraction</h3>
-<p class="body-text">The COVID-19 pandemic was the largest forced contraction in the history of clinical ethics. Across the world, clinicians were required to contract nine-dimensional clinical-moral tensors to binary decisions (ventilate / do not ventilate) under time pressure, resource scarcity, and extreme uncertainty.</p>
-<p class="body-text">The pandemic tested the framework's predictions in real time:</p>
-<p class="body-text"><strong>Prediction 10.1</strong>: Clinician moral distress should be highest when triage decisions activate multiple manifold dimensions simultaneously.</p>
-<p class="body-text">The empirical evidence is consistent. The most morally distressing triage decisions were not those with clear <em class="math">d_1</em> differentials (patient A will clearly survive, patient B will clearly not) but those involving multiple dimensions: withdrawing ventilators from current patients (<em class="math">d_1 + d_5 + d_7</em>), denying treatment to elderly patients (<em class="math">d_1 + d_3 + d_7</em>), and making decisions under extreme prognostic uncertainty (<em class="math">d_1 + d_9</em>). Single-dimension triage (patient A is more likely to survive than patient B, all else equal) caused less distress — exactly as the framework predicts.</p>
-<p class="body-text"><strong>Prediction 10.2</strong>: Moral injury should correlate with the number of boundary crossings, not just the severity of outcomes.</p>
-<p class="body-text">Greenberg et al. (2020) documented that moral injury in COVID-19 healthcare workers was not simply a function of patient mortality (a <em class="math">d_1</em> measure). Clinicians in high-mortality units with clear triage protocols reported less moral distress than clinicians in moderate-mortality units with ambiguous protocols that required repeated boundary crossings. The quantity of morally costly decisions — each one a boundary crossing on the manifold — mattered more than the clinical severity of any individual decision.</p>
-<p class="body-text"><strong>Prediction 10.3</strong>: Clinicians who disagreed with the triage protocol should show higher moral injury than clinicians who agreed with it, independent of clinical outcomes.</p>
-<p class="body-text">This prediction follows directly from the moral injury definition (Definition 5 in the GCE paper): moral injury occurs when the institutionally mandated geodesic requires crossing boundaries that the clinician's personal manifold assigns high penalties. If the clinician's <em class="math">\beta_k</em> values are aligned with the protocol's, no boundary is crossed. If they diverge, every triage decision is a forced boundary crossing.</p>
-<p class="body-text">The pandemic literature is consistent with this prediction. Rushton (2018) documented that moral distress was highest among clinicians whose personal ethical commitments conflicted with institutional protocols — not among clinicians who were simply exhausted.</p>
-<h3 id="what-the-pandemic-revealed-about-triage-design" class="subsection-heading">What the Pandemic Revealed About Triage Design</h3>
-<p class="body-text">The pandemic exposed a fundamental asymmetry in existing triage protocols: they were designed to optimize <em class="math">d_1</em> (clinical outcomes) under resource constraints, but the moral costs of implementation fell on dimensions (<em class="math">d_5</em>: trust, <em class="math">d_7</em>: dignity, <em class="math">d_3</em>: justice) that the protocols did not model.</p>
-<div class="figure-placeholder"><p class="figure-caption"><strong>Figure:</strong> Dimensional activation map of COVID-19 triage decisions, showing which of the nine clinical-moral dimensions were activated by different triage scenarios, with predicted and observed moral injury correlation</p></div>
-<p class="body-text">The framework suggests three design principles for manifold-aware triage protocols:</p>
-<ol>
-<li><strong>Minimize unnecessary boundary crossings.</strong> Many pandemic triage protocols crossed boundaries that could have been avoided. For example, some protocols required explicit age-based deprioritization when a lottery among similar-prognosis patients would have achieved comparable <em class="math">d_1</em> outcomes without the <em class="math">d_3</em> violation.</li>
-<li><strong>Make boundary crossings explicit and anticipated.</strong> Clinicians reported less moral distress when boundary crossings were anticipated (part of a pre-established protocol) than when they were ad hoc (made up on the spot). Pre-established protocols reduce the clinician's sense of personal responsibility for the boundary crossing — the institution crossed the boundary, not the individual.</li>
-<li><strong>Separate the decision from the implementation.</strong> Several institutions found that moral injury was reduced when triage decisions were made by a triage officer or committee who did not have a prior relationship with the patient, and the implementation was communicated by the treating clinician with appropriate emotional support. This separates the <em class="math">d_5</em> cost (trust damage from the triage decision) from the <em class="math">d_5</em> preservation (the treating clinician remains the patient's advocate).</li>
+<p>Additionally, the withdrawal imposes a cost on <span class="math inline">d_7</span> (dignity) — the current patient is effectively told that their life is worth less than the new arrival’s — and on <span class="math inline">d_8</span> (institutional legitimacy) — the hospital’s protocols did not warn the patient that ventilator support could be withdrawn.</p>
+<p><span class="math display">\text{CF}(\text{reallocate}) = \Delta d_1 \text{ gain} + \beta_{\text{abandon}} + \beta_{\text{trust}} + \Delta d_7 + \Delta d_8</span></p>
+<p>For <span class="math inline">\beta_{\text{abandon}} + \beta_{\text{trust}} &gt; \Delta d_1</span>, the manifold-optimal decision is to <em>not</em> reallocate — to continue ventilation for the current patient and find an alternative for the new arrival (transfer, improvised ventilation, prone positioning without intubation).</p>
+<p><strong>The key insight</strong>: The utilitarian analysis counts only the <span class="math inline">d_1</span> differential. The manifold analysis counts the full cost of the allocation process, including the boundaries crossed and the trust destroyed. The two analyses disagree precisely when the boundary costs are large — which is exactly the scenario that causes moral injury to clinicians.</p>
+</section>
+<section id="case-b-age-based-deprioritization" class="level3">
+<h3>Case B: Age-Based Deprioritization</h3>
+<p>A 32-year-old teacher and a 74-year-old retired engineer arrive simultaneously with comparable severity of illness. Both need ICU admission. One bed is available. The utilitarian protocol prioritizes the 32-year-old: more expected life-years saved.</p>
+<p><strong>Utilitarian analysis:</strong></p>
+<p><span class="math display">d_1(\text{teacher}) = 0.65 \times 45 \text{ life-years} = 29.25 \text{ QALYs}</span> <span class="math display">d_1(\text{engineer}) = 0.60 \times 12 \text{ life-years} = 7.20 \text{ QALYs}</span></p>
+<p>The utilitarian gain of prioritizing the teacher is <span class="math inline">29.25 - 7.20 = 22.05</span> QALYs. Prioritize the teacher.</p>
+<p><strong>Manifold analysis:</strong></p>
+<p>The age-based deprioritization activates <span class="math inline">d_3</span> (justice). The retired engineer has equal moral worth — his life is not less valuable because it is shorter. The <span class="math inline">d_3</span> cost depends on the community’s boundary penalty for age discrimination:</p>
+<p><span class="math display">\beta_{\text{justice}} \cdot \mathbf{1}[\text{age used as triage criterion}]</span></p>
+<p>The QALY Irrecoverability Theorem (Theorem 2) predicts exactly this failure: the QALY calculation discards the <span class="math inline">d_3</span> information. A QALY of 7.20 and a QALY of 29.25 differ only on <span class="math inline">d_1</span> — the eight dimensions discarded by the scalar include the justice dimension that makes the comparison problematic.</p>
+<p>When prognoses are comparable (the survival probabilities differ by only 5 percentage points — 65% vs. 60%), the <span class="math inline">d_1</span> differential is small and the <span class="math inline">d_3</span> cost of age-based discrimination may exceed it:</p>
+<p><span class="math display">\beta_{\text{justice}} &gt; \frac{(0.65 - 0.60)^2}{\sigma_1^2}</span></p>
+<p>In this case, the manifold-optimal allocation uses a lottery rather than an age-based criterion — preserving <span class="math inline">d_3</span> at negligible <span class="math inline">d_1</span> cost.</p>
+</section>
+<section id="case-c-lottery-allocation-among-similar-prognoses" class="level3">
+<h3>Case C: Lottery Allocation Among Similar Prognoses</h3>
+<p>Six patients with comparable severity and comparable prognoses need ICU admission. Three beds are available. The utilitarian algorithm can rank them by expected life-years, but the differences are within the uncertainty range — the ranking is dominated by measurement noise, not by genuine prognostic differences.</p>
+<p><strong>The manifold-superior allocation is a lottery.</strong></p>
+<p>A lottery preserves: - <span class="math inline">d_3</span> (fairness): every patient has an equal chance, regardless of age, race, social status, or insurance - <span class="math inline">d_7</span> (dignity): no patient is devalued by the allocation criterion (“you are less worth saving because…”) - <span class="math inline">d_8</span> (institutional legitimacy): the allocation process is transparent, defensible, and free from bias - <span class="math inline">d_5</span> (trust): the system treats everyone equally, reinforcing public trust in medical institutions</p>
+<p>The <span class="math inline">d_1</span> cost of a lottery relative to the utilitarian optimum is, by hypothesis, negligible — the patients have comparable prognoses. The manifold benefit is substantial.</p>
+<p><strong>Proposition 10.1 (Manifold Superiority of Lottery Allocation).</strong> <em>When the <span class="math inline">d_1</span> differential among patients is below threshold <span class="math inline">\epsilon</span> (comparable prognoses), lottery allocation is manifold-superior to criterion-based allocation for any criterion that activates <span class="math inline">d_3</span>, <span class="math inline">d_7</span>, or <span class="math inline">d_8</span>.</em></p>
+<p>This result formalizes the intuition behind the widespread endorsement of lottery allocation in pandemic ethics guidelines (White et al., 2009; Emanuel et al., 2020). The utilitarian framework cannot justify lotteries — they are <span class="math inline">d_1</span>-equivalent at best. The manifold framework can: lotteries are manifold-superior because they avoid boundary crossings on non-outcome dimensions.</p>
+<hr />
+</section>
+</section>
+<section id="why-clinicians-resist-utilitarian-triage" class="level2">
+<h2>10.4 Why Clinicians Resist Utilitarian Triage</h2>
+<p>The widespread clinician resistance to utilitarian crisis standards of care during COVID-19 — documented by Greenberg et al. (2020), Rushton (2018), and many others — has been characterized as emotional, irrational, or a failure of moral courage. The geometric framework offers a different interpretation.</p>
+<p><strong>Proposition 10.2 (Clinician Resistance as Correct Manifold Computation).</strong> <em>Clinician resistance to utilitarian triage is not irrationality. It is the clinician’s well-calibrated heuristic <span class="math inline">h(n)</span> correctly identifying that the utilitarian triage path crosses moral boundaries whose total manifold cost exceeds the utilitarian benefit. The clinicians are right on the full manifold. The utilitarian algorithms are right on the scalar projection. The conflict is dimensional mismatch, not ethical disagreement.</em></p>
+<p>Consider the ventilator withdrawal scenario. A clinician who has spent a career calibrating <span class="math inline">h(n)</span> — developing the boundary penalties for abandonment, trust violation, and dignity compromise through years of supervised pathfinding — is asked to implement a protocol that crosses three of those boundaries simultaneously. The clinician’s heuristic correctly reports a high cost. The protocol, operating on <span class="math inline">d_1</span> alone, reports a benefit.</p>
+<p>The clinician is not being irrational. The clinician is computing on a higher-dimensional space than the protocol. The resistance is not a failure of moral reasoning — it is the correct output of a well-calibrated heuristic function operating on a richer manifold than the utilitarian objective acknowledges.</p>
+<p>This interpretation has practical consequences. If clinician resistance is irrationality, the solution is education: teach clinicians to accept utilitarian triage. If clinician resistance is correct manifold computation, the solution is protocol redesign: develop triage protocols that minimize total manifold cost, not just total <span class="math inline">d_1</span> outcome.</p>
+<hr />
+</section>
+<section id="the-pandemic-as-natural-experiment" class="level2">
+<h2>10.5 The Pandemic as Natural Experiment</h2>
+<section id="covid-19-and-the-forced-contraction" class="level3">
+<h3>COVID-19 and the Forced Contraction</h3>
+<p>The COVID-19 pandemic was the largest forced contraction in the history of clinical ethics. Across the world, clinicians were required to contract nine-dimensional clinical-moral tensors to binary decisions (ventilate / do not ventilate) under time pressure, resource scarcity, and extreme uncertainty.</p>
+<p>The pandemic tested the framework’s predictions in real time:</p>
+<p><strong>Prediction 10.1</strong>: Clinician moral distress should be highest when triage decisions activate multiple manifold dimensions simultaneously.</p>
+<p>The empirical evidence is consistent. The most morally distressing triage decisions were not those with clear <span class="math inline">d_1</span> differentials (patient A will clearly survive, patient B will clearly not) but those involving multiple dimensions: withdrawing ventilators from current patients (<span class="math inline">d_1 + d_5 + d_7</span>), denying treatment to elderly patients (<span class="math inline">d_1 + d_3 + d_7</span>), and making decisions under extreme prognostic uncertainty (<span class="math inline">d_1 + d_9</span>). Single-dimension triage (patient A is more likely to survive than patient B, all else equal) caused less distress — exactly as the framework predicts.</p>
+<p><strong>Prediction 10.2</strong>: Moral injury should correlate with the number of boundary crossings, not just the severity of outcomes.</p>
+<p>Greenberg et al. (2020) documented that moral injury in COVID-19 healthcare workers was not simply a function of patient mortality (a <span class="math inline">d_1</span> measure). Clinicians in high-mortality units with clear triage protocols reported less moral distress than clinicians in moderate-mortality units with ambiguous protocols that required repeated boundary crossings. The quantity of morally costly decisions — each one a boundary crossing on the manifold — mattered more than the clinical severity of any individual decision.</p>
+<p><strong>Prediction 10.3</strong>: Clinicians who disagreed with the triage protocol should show higher moral injury than clinicians who agreed with it, independent of clinical outcomes.</p>
+<p>This prediction follows directly from the moral injury definition (Definition 5 in the GCE paper): moral injury occurs when the institutionally mandated geodesic requires crossing boundaries that the clinician’s personal manifold assigns high penalties. If the clinician’s <span class="math inline">\beta_k</span> values are aligned with the protocol’s, no boundary is crossed. If they diverge, every triage decision is a forced boundary crossing.</p>
+<p>The pandemic literature is consistent with this prediction. Rushton (2018) documented that moral distress was highest among clinicians whose personal ethical commitments conflicted with institutional protocols — not among clinicians who were simply exhausted.</p>
+</section>
+<section id="what-the-pandemic-revealed-about-triage-design" class="level3">
+<h3>What the Pandemic Revealed About Triage Design</h3>
+<p>The pandemic exposed a fundamental asymmetry in existing triage protocols: they were designed to optimize <span class="math inline">d_1</span> (clinical outcomes) under resource constraints, but the moral costs of implementation fell on dimensions (<span class="math inline">d_5</span>: trust, <span class="math inline">d_7</span>: dignity, <span class="math inline">d_3</span>: justice) that the protocols did not model.</p>
+<p>[Figure 10.2: Dimensional activation map of COVID-19 triage decisions, showing which of the nine clinical-moral dimensions were activated by different triage scenarios, with predicted and observed moral injury correlation]</p>
+<p>The framework suggests three design principles for manifold-aware triage protocols:</p>
+<ol type="1">
+<li><p><strong>Minimize unnecessary boundary crossings.</strong> Many pandemic triage protocols crossed boundaries that could have been avoided. For example, some protocols required explicit age-based deprioritization when a lottery among similar-prognosis patients would have achieved comparable <span class="math inline">d_1</span> outcomes without the <span class="math inline">d_3</span> violation.</p></li>
+<li><p><strong>Make boundary crossings explicit and anticipated.</strong> Clinicians reported less moral distress when boundary crossings were anticipated (part of a pre-established protocol) than when they were ad hoc (made up on the spot). Pre-established protocols reduce the clinician’s sense of personal responsibility for the boundary crossing — the institution crossed the boundary, not the individual.</p></li>
+<li><p><strong>Separate the decision from the implementation.</strong> Several institutions found that moral injury was reduced when triage decisions were made by a triage officer or committee who did not have a prior relationship with the patient, and the implementation was communicated by the treating clinician with appropriate emotional support. This separates the <span class="math inline">d_5</span> cost (trust damage from the triage decision) from the <span class="math inline">d_5</span> preservation (the treating clinician remains the patient’s advocate).</p></li>
 </ol>
-<h2 id="106-the-moral-geometry-of-specific-triage-scenarios" class="section-heading">10.6 The Moral Geometry of Specific Triage Scenarios</h2>
-<h3 id="scenario-1-the-surge-thirty-patients-twelve-ventilators" class="subsection-heading">Scenario 1: The Surge — Thirty Patients, Twelve Ventilators</h3>
-<p class="body-text">Sarah's ICU has twelve ventilators and thirty patients who need them. The hospital has activated crisis standards of care. The triage protocol is utilitarian: maximize expected life-years saved.</p>
-<p class="body-text"><strong>The scalar computation</strong>: Rank all thirty patients by expected life-years gained from ventilation. Assign ventilators to the top twelve. Deny ventilators to the bottom eighteen.</p>
-<p class="body-text"><strong>The manifold computation</strong>: The scalar ranking is a starting point, not a final answer. The manifold computation additionally considers:</p>
-<p class="body-text">For each patient denied a ventilator:</p>
+<hr />
+</section>
+</section>
+<section id="the-moral-geometry-of-specific-triage-scenarios" class="level2">
+<h2>10.6 The Moral Geometry of Specific Triage Scenarios</h2>
+<section id="scenario-1-the-surge-thirty-patients-twelve-ventilators" class="level3">
+<h3>Scenario 1: The Surge — Thirty Patients, Twelve Ventilators</h3>
+<p>Sarah’s ICU has twelve ventilators and thirty patients who need them. The hospital has activated crisis standards of care. The triage protocol is utilitarian: maximize expected life-years saved.</p>
+<p><strong>The scalar computation</strong>: Rank all thirty patients by expected life-years gained from ventilation. Assign ventilators to the top twelve. Deny ventilators to the bottom eighteen.</p>
+<p><strong>The manifold computation</strong>: The scalar ranking is a starting point, not a final answer. The manifold computation additionally considers:</p>
+<p>For each patient denied a ventilator: - <span class="math inline">\beta_{\text{abandon}}</span>: Is the clinician-patient relationship severed by denial? - <span class="math inline">d_7</span> cost: Is the patient told their life is worth less than others’? - <span class="math inline">d_6</span> cost: What is the impact on the patient’s family? - <span class="math inline">d_9</span> cost: Was the prognostic estimate reliable enough to justify the ranking?</p>
+<p>For the system as a whole: - <span class="math inline">d_3</span> cost: Does the ranking systematically disadvantage any demographic group? - <span class="math inline">d_8</span> cost: Was the protocol established through a legitimate process? - <span class="math inline">d_5</span> cost: Will public trust in the healthcare system survive this allocation?</p>
+<p><strong>The manifold-optimal triage</strong> may differ from the scalar ranking in several respects:</p>
 <ul>
-<li><em class="math">\beta_{\text{abandon}}</em>: Is the clinician-patient relationship severed by denial?</li>
-<li><em class="math">d_7</em> cost: Is the patient told their life is worth less than others'?</li>
-<li><em class="math">d_6</em> cost: What is the impact on the patient's family?</li>
-<li><em class="math">d_9</em> cost: Was the prognostic estimate reliable enough to justify the ranking?</li>
+<li>Patients with very similar prognoses (rank 11, 12, 13, 14) should be allocated by lottery rather than by marginal <span class="math inline">d_1</span> differences that are within measurement error.</li>
+<li>Patients who have been receiving ventilation for several days should not be withdrawn unless the <span class="math inline">d_1</span> differential exceeds the withdrawal boundary costs.</li>
+<li>Patients from communities with historically low healthcare trust (<span class="math inline">d_5</span>) should not be disproportionately denied — the bond index (Chapter 12) should be monitored.</li>
 </ul>
-<p class="body-text">For the system as a whole:</p>
-<ul>
-<li><em class="math">d_3</em> cost: Does the ranking systematically disadvantage any demographic group?</li>
-<li><em class="math">d_8</em> cost: Was the protocol established through a legitimate process?</li>
-<li><em class="math">d_5</em> cost: Will public trust in the healthcare system survive this allocation?</li>
-</ul>
-<p class="body-text"><strong>The manifold-optimal triage</strong> may differ from the scalar ranking in several respects:</p>
-<ul>
-<li>Patients with very similar prognoses (rank 11, 12, 13, 14) should be allocated by lottery rather than by marginal <em class="math">d_1</em> differences that are within measurement error.</li>
-<li>Patients who have been receiving ventilation for several days should not be withdrawn unless the <em class="math">d_1</em> differential exceeds the withdrawal boundary costs.</li>
-<li>Patients from communities with historically low healthcare trust (<em class="math">d_5</em>) should not be disproportionately denied — the bond index (Chapter 12) should be monitored.</li>
-</ul>
-<h3 id="scenario-2-the-slow-surge-accumulated-decisions-over-weeks" class="subsection-heading">Scenario 2: The Slow Surge — Accumulated Decisions Over Weeks</h3>
-<p class="body-text">The acute surge is dramatic but conceptually simple — thirty patients, twelve ventilators, one decision. The slow surge is harder. Over three weeks, a steady stream of patients arrives, each requiring an allocation decision. The cumulative effect is more damaging than any single decision because:</p>
-<ol>
-<li><strong>Each decision is individually small but cumulatively large.</strong> Denying one patient a ventilator is a single boundary crossing. Denying thirty patients over three weeks is thirty boundary crossings — and the Moral Injury Accumulation Theorem (Chapter 13) says these accumulate monotonically.</li>
-<li><strong>The resource constraint shifts over time.</strong> As current patients recover or die, ventilators become available. A patient denied a ventilator on Day 3 might have received one on Day 5. The clinician who denied the ventilator on Day 3 carries the moral cost of a decision that subsequent events rendered unnecessary.</li>
-<li><strong>The heuristic degrades under sustained stress.</strong> After weeks of triage decisions, the clinician's <em class="math">h(n)</em> begins to change — either hypervigilance (holding ventilators in reserve "just in case," which is manifold-suboptimal) or moral numbing (boundary penalties decrease, making future boundary crossings easier but degrading the quality of future decisions).</li>
+</section>
+<section id="scenario-2-the-slow-surge-accumulated-decisions-over-weeks" class="level3">
+<h3>Scenario 2: The Slow Surge — Accumulated Decisions Over Weeks</h3>
+<p>The acute surge is dramatic but conceptually simple — thirty patients, twelve ventilators, one decision. The slow surge is harder. Over three weeks, a steady stream of patients arrives, each requiring an allocation decision. The cumulative effect is more damaging than any single decision because:</p>
+<ol type="1">
+<li><p><strong>Each decision is individually small but cumulatively large.</strong> Denying one patient a ventilator is a single boundary crossing. Denying thirty patients over three weeks is thirty boundary crossings — and the Moral Injury Accumulation Theorem (Chapter 13) says these accumulate monotonically.</p></li>
+<li><p><strong>The resource constraint shifts over time.</strong> As current patients recover or die, ventilators become available. A patient denied a ventilator on Day 3 might have received one on Day 5. The clinician who denied the ventilator on Day 3 carries the moral cost of a decision that subsequent events rendered unnecessary.</p></li>
+<li><p><strong>The heuristic degrades under sustained stress.</strong> After weeks of triage decisions, the clinician’s <span class="math inline">h(n)</span> begins to change — either hypervigilance (holding ventilators in reserve “just in case,” which is manifold-suboptimal) or moral numbing (boundary penalties decrease, making future boundary crossings easier but degrading the quality of future decisions).</p></li>
 </ol>
-<p class="body-text"><strong>The manifold framework predicts</strong>: Slow-surge triage is more morally injurious than acute-surge triage, even if the total number of deaths is the same, because the slow surge produces more cumulative boundary crossings and more heuristic degradation.</p>
-<h3 id="scenario-3-pediatric-triage" class="subsection-heading">Scenario 3: Pediatric Triage</h3>
-<p class="body-text">The hardest triage scenario involves children. The <em class="math">d_1</em> calculation is different (children have more expected life-years), but the manifold cost of denying treatment to a child activates every non-outcome dimension:</p>
+<p><strong>The manifold framework predicts</strong>: Slow-surge triage is more morally injurious than acute-surge triage, even if the total number of deaths is the same, because the slow surge produces more cumulative boundary crossings and more heuristic degradation.</p>
+</section>
+<section id="scenario-3-pediatric-triage" class="level3">
+<h3>Scenario 3: Pediatric Triage</h3>
+<p>The hardest triage scenario involves children. The <span class="math inline">d_1</span> calculation is different (children have more expected life-years), but the manifold cost of denying treatment to a child activates every non-outcome dimension:</p>
 <ul>
-<li><em class="math">d_3</em> (justice): children cannot be responsible for their illness</li>
-<li><em class="math">d_5</em> (trust): denying treatment to a child destroys parental trust in institutions</li>
-<li><em class="math">d_6</em> (social impact): the death of a child devastates families and communities</li>
-<li><em class="math">d_7</em> (dignity): children cannot understand or consent to the allocation</li>
-<li><em class="math">\beta_{\text{sacred}}</em>: many clinicians and many societies treat the death of a child as a near-sacred boundary</li>
+<li><span class="math inline">d_3</span> (justice): children cannot be responsible for their illness</li>
+<li><span class="math inline">d_5</span> (trust): denying treatment to a child destroys parental trust in institutions</li>
+<li><span class="math inline">d_6</span> (social impact): the death of a child devastates families and communities</li>
+<li><span class="math inline">d_7</span> (dignity): children cannot understand or consent to the allocation</li>
+<li><span class="math inline">\beta_{\text{sacred}}</span>: many clinicians and many societies treat the death of a child as a near-sacred boundary</li>
 </ul>
-<p class="body-text"><strong>Proposition 10.3 (Pediatric Triage Asymmetry).</strong> The manifold cost of denying treatment to a child exceeds the manifold cost of denying treatment to an adult with identical <em class="math">d_1</em> prognosis, because the non-outcome dimensions (<em class="math">d_3</em>, <em class="math">d_5</em>, <em class="math">d_6</em>, <em class="math">d_7</em>) assign higher costs to pediatric cases. This is not age-based discrimination — it is the correct computation on a manifold that includes relational, justice, and dignity dimensions.</p>
-<p class="body-text">The asymmetry is precisely the opposite of the QALY-based asymmetry: QALYs favor children because they have more life-years to gain (<em class="math">d_1</em>); the manifold favors children because non-outcome dimensions are more heavily activated. The two asymmetries point in the same direction, but for different reasons — and the distinction matters when the populations are adults of different ages (where the QALY asymmetry favors younger adults but the manifold calculation depends on the specific boundary costs, not on a generic age discount).</p>
-<h2 id="107-triage-protocol-design-from-scalar-to-manifold" class="section-heading">10.7 Triage Protocol Design: From Scalar to Manifold</h2>
-<h3 id="the-current-standard-utilitarian-protocols" class="subsection-heading">The Current Standard: Utilitarian Protocols</h3>
-<p class="body-text">Most existing crisis standards of care follow the utilitarian framework:</p>
-<ol>
-<li>Assess clinical prognosis (<em class="math">d_1</em>) using validated scoring systems (SOFA, APACHE)</li>
+<p><strong>Proposition 10.3 (Pediatric Triage Asymmetry).</strong> <em>The manifold cost of denying treatment to a child exceeds the manifold cost of denying treatment to an adult with identical <span class="math inline">d_1</span> prognosis, because the non-outcome dimensions (<span class="math inline">d_3</span>, <span class="math inline">d_5</span>, <span class="math inline">d_6</span>, <span class="math inline">d_7</span>) assign higher costs to pediatric cases. This is not age-based discrimination — it is the correct computation on a manifold that includes relational, justice, and dignity dimensions.</em></p>
+<p>The asymmetry is precisely the opposite of the QALY-based asymmetry: QALYs favor children because they have more life-years to gain (<span class="math inline">d_1</span>); the manifold favors children because non-outcome dimensions are more heavily activated. The two asymmetries point in the same direction, but for different reasons — and the distinction matters when the populations are adults of different ages (where the QALY asymmetry favors younger adults but the manifold calculation depends on the specific boundary costs, not on a generic age discount).</p>
+<hr />
+</section>
+</section>
+<section id="triage-protocol-design-from-scalar-to-manifold" class="level2">
+<h2>10.7 Triage Protocol Design: From Scalar to Manifold</h2>
+<section id="the-current-standard-utilitarian-protocols" class="level3">
+<h3>The Current Standard: Utilitarian Protocols</h3>
+<p>Most existing crisis standards of care follow the utilitarian framework:</p>
+<ol type="1">
+<li>Assess clinical prognosis (<span class="math inline">d_1</span>) using validated scoring systems (SOFA, APACHE)</li>
 <li>Rank patients by expected benefit from the scarce resource</li>
 <li>Allocate to the highest-ranked patients</li>
 <li>Re-evaluate periodically</li>
 </ol>
-<p class="body-text">These protocols are clear, defensible, and computationally simple. They are also systematically suboptimal on the manifold, because they ignore eight of nine dimensions.</p>
-<h3 id="a-manifold-aware-protocol" class="subsection-heading">A Manifold-Aware Protocol</h3>
-<p class="body-text">The geometric framework suggests the following modifications to utilitarian triage protocols:</p>
-<p class="body-text"><strong>Step 1: Compute <em class="math">d_1</em> rankings as before.</strong> The utilitarian component of triage — clinical prognosis assessment — is valid and necessary. The manifold framework does not replace it; it supplements it.</p>
-<p class="body-text"><strong>Step 2: Identify boundary crossings.</strong> For each allocation in the utilitarian ranking, determine which clinical-moral boundaries are crossed:</p>
-<ul>
-<li>Does the allocation require withdrawing treatment from a current patient? (<em class="math">\beta_{\text{abandon}}</em>)</li>
-<li>Does the allocation systematically disadvantage a demographic group? (<em class="math">\beta_{\text{justice}}</em>)</li>
-<li>Does the allocation violate specific patients' advance directives or expressed preferences? (<em class="math">\beta_{\text{consent}}</em>)</li>
-</ul>
-<p class="body-text"><strong>Step 3: Compute manifold cost.</strong> For allocations that cross boundaries, add the boundary penalty to the <em class="math">d_1</em> cost. If the total manifold cost of the utilitarian allocation exceeds the total manifold cost of an alternative allocation, use the alternative.</p>
-<p class="body-text"><strong>Step 4: Apply lottery tiebreaking.</strong> When patients have comparable <em class="math">d_1</em> prognoses (within measurement uncertainty), use lottery allocation rather than marginal <em class="math">d_1</em> differences.</p>
-<p class="body-text"><strong>Step 5: Monitor the Bond Index.</strong> Compute the clinical Bond Index (Chapter 12) for the triage protocol stratified by demographics. If the Bond Index reveals systematic disparities, modify the protocol.</p>
-<p class="body-text"><strong>Step 6: Compute the Moral Injury Index.</strong> Before implementation, estimate the moral injury that the protocol will impose on clinicians (Chapter 13). If the Moral Injury Index exceeds a threshold, redesign the protocol to reduce unnecessary boundary crossings.</p>
-<h3 id="the-cost-of-manifold-aware-triage" class="subsection-heading">The Cost of Manifold-Aware Triage</h3>
-<p class="body-text">The manifold-aware protocol is more complex than the utilitarian protocol. It requires more information (boundary penalties, demographic data, clinician surveys), more computation (manifold cost estimation, Bond Index monitoring), and more institutional infrastructure (ethics committees, triage oversight, lottery mechanisms).</p>
-<p class="body-text">Is the added complexity worth it?</p>
-<p class="body-text">The framework's answer: the manifold cost is paid whether you compute it or not. A utilitarian protocol that ignores <em class="math">d_3</em>, <em class="math">d_5</em>, <em class="math">d_7</em>, and <em class="math">d_8</em> does not eliminate the costs on those dimensions — it merely fails to account for them. The costs manifest as moral injury to clinicians, loss of public trust, demographic disparities in outcomes, and institutional legitimacy crises. These costs are real, even if the protocol does not measure them.</p>
-<p class="body-text">The manifold-aware protocol does not eliminate these costs. It makes them visible, computable, and — to the extent possible — minimizable.</p>
-<h2 id="108-historical-triage-systems-through-the-geometric-lens" class="section-heading">10.8 Historical Triage Systems Through the Geometric Lens</h2>
-<h3 id="from-larrey-to-the-present-a-dimensional-history" class="subsection-heading">From Larrey to the Present: A Dimensional History</h3>
-<p class="body-text">Every triage system in the history of medicine is a specific contraction of the clinical tensor. Tracing the history of triage through the geometric lens reveals a gradual expansion of the dimensions that triage systems acknowledge — and a persistent failure to acknowledge all nine.</p>
-<p class="body-text"><strong>Baron Dominique Jean Larrey (1792): Contraction to <em class="math">d_1</em>.</strong></p>
-<p class="body-text">Napoleon's chief surgeon introduced the first systematic battlefield triage: sort casualties by survivability, treat the most salvageable first, regardless of rank. Larrey's system contracted the clinical tensor to a single dimension — clinical outcomes (<em class="math">d_1</em>). It was revolutionary because it ignored social status (<em class="math">d_6</em>), military rank (<em class="math">d_8</em>), and political importance — dimensions that had previously dominated allocation. Larrey's innovation was not just medical but geometric: he identified <em class="math">d_1</em> as the relevant dimension and discarded the rest.</p>
-<p class="body-text"><strong>Emergency Severity Index, ESI (2011): Contraction to <em class="math">d_1 + d_8</em>.</strong></p>
-<p class="body-text">The modern ESI system, used in most US emergency departments, assigns patients to five triage levels based on clinical acuity and anticipated resource needs. The system contracts the clinical tensor to two dimensions: <em class="math">d_1</em> (how sick is the patient?) and <em class="math">d_8</em> (how many resources will treatment require?). The system does not account for <em class="math">d_3</em> (justice: is the allocation equitable across demographics?), <em class="math">d_5</em> (trust: does the patient trust the emergency department?), or <em class="math">d_7</em> (dignity: is the triage process experienced as dehumanizing?).</p>
-<p class="body-text"><strong>START/JumpSTART (1983/2002): Mass Casualty Contraction.</strong></p>
-<p class="body-text">The Simple Triage and Rapid Treatment (START) system, used for mass casualty events, contracts the clinical tensor to a binary — dead/alive — modified by respiratory rate, pulse, and mental status. JumpSTART adapts the system for pediatric patients. Both systems operate on <em class="math">d_1</em> alone, with no consideration of non-outcome dimensions. The systems are appropriate for their context (rapid field triage under extreme time pressure) but produce significant moral injury when applied to sustained allocation decisions where non-outcome dimensions are activated.</p>
-<p class="body-text"><strong>Pandemic Crisis Standards of Care (2020): Attempted expansion to <em class="math">d_1 + d_3</em>.</strong></p>
-<p class="body-text">COVID-19 triage guidelines (Emanuel et al., 2020; White et al., 2020) attempted to incorporate justice (<em class="math">d_3</em>) alongside clinical outcomes (<em class="math">d_1</em>): lotteries as tiebreakers, life-cycle considerations, essential worker prioritization. This represented an expansion from one-dimensional to two-dimensional triage. The geometric framework predicts that the expansion was insufficient — seven dimensions remained unaccounted for — and the pandemic moral injury literature confirms the prediction.</p>
-<h3 id="the-geometric-trend" class="subsection-heading">The Geometric Trend</h3>
-<p class="body-text">The history of triage shows a slow expansion of the acknowledged dimensional space: from <em class="math">d_1</em> alone (Larrey) to <em class="math">d_1 + d_8</em> (ESI) to <em class="math">d_1 + d_3</em> (pandemic ethics). The geometric framework proposes the final step: triage on the full nine-dimensional manifold. This does not mean that every triage decision must explicitly compute nine-dimensional costs — in acute settings, rapid heuristic triage remains necessary. It means that the objective function against which triage systems are designed and evaluated should be the full manifold cost, not a scalar projection.</p>
-<div class="figure-placeholder"><p class="figure-caption"><strong>Figure:</strong> Historical evolution of triage dimensionality, from Larrey (1D) through ESI (2D) and pandemic ethics (2D) to the manifold-optimal framework (9D)</p></div>
-<h2 id="109-the-ethics-of-triage-communication" class="section-heading">10.9 The Ethics of Triage Communication</h2>
-<h3 id="how-the-decision-is-communicated-matters-on-the-manifold" class="subsection-heading">How the Decision Is Communicated Matters on the Manifold</h3>
-<p class="body-text">Triage is not only a decision but a communication. The way a triage decision is communicated to the patient and family affects multiple dimensions of the clinical decision complex — and the manifold cost of communication is often larger than the manifold cost of the decision itself.</p>
-<p class="body-text">Consider two ways of communicating the same triage decision (denial of a ventilator):</p>
-<p class="body-text"><strong>Communication A (scalar):</strong> "Based on the protocol, your mother does not qualify for a ventilator. We will provide comfort care."</p>
-<p class="body-text"><strong>Communication B (manifold-aware):</strong> "Your mother is very sick, and we have been working hard to help her. We have more patients who need ventilators than we have ventilators available. A triage team — not your mother's doctors — has reviewed all the patients and made the allocation. Your mother will receive comfort care, which means we will focus on keeping her comfortable, managing her pain, and allowing you to be with her. We will not stop caring for her."</p>
-<p class="body-text">Communication A is efficient but activates <em class="math">d_5</em> (trust damage: "the protocol doesn't care about my mother"), <em class="math">d_7</em> (dignity damage: "my mother doesn't qualify"), and <em class="math">d_8</em> (legitimacy damage: "what protocol? who decided?"). Communication B addresses each of these dimensions: it emphasizes the ongoing relationship (<em class="math">d_5</em>), respects the patient's worth (<em class="math">d_7</em>), explains the process (<em class="math">d_8</em>), and separates the triage decision from the treating team (<em class="math">\beta_{\text{abandon}}</em> reduction).</p>
-<p class="body-text"><strong>Proposition 10.4 (Communication as Manifold Cost Modifier).</strong> The manifold cost of a triage decision is modulated by the quality of communication. A triage decision communicated with transparency (<em class="math">d_8</em>), empathy (<em class="math">d_5), and dignity-preservation (</em><em class="math">d_7</em>) has lower total manifold cost than the same decision communicated as a protocol output — even though the allocation is identical.</p>
-<p class="body-text">This proposition has immediate practical implications for triage protocol design: protocols should specify not only the allocation algorithm but the communication script. The communication is not a courtesy — it is a manifold cost intervention that reduces the total cost of the triage system.</p>
-<h3 id="communication-and-moral-injury" class="subsection-heading">Communication and Moral Injury</h3>
-<p class="body-text">The communication burden falls on the clinician who delivers the message. A clinician who tells a patient "you don't qualify for a ventilator" crosses the abandonment boundary in their own experience. A clinician who tells a patient "we will not stop caring for you — the form of care is changing, not the commitment" crosses the same boundary with lower subjective penalty.</p>
-<p class="body-text">Training clinicians in manifold-aware triage communication reduces both the patient's manifold cost (better trust, dignity, and legitimacy preservation) and the clinician's moral injury (lower subjective boundary-crossing penalty). The training is a dual intervention — benefiting both parties on the manifold.</p>
-<h2 id="1010-sarahs-pandemic" class="section-heading">10.10 Sarah's Pandemic</h2>
-<p class="body-text">The pandemic arrives in March. Sarah's ICU is converted to a COVID-19 ward in forty-eight hours. Elective surgeries are canceled. The hospital activates crisis standards of care.</p>
-<h3 id="day-1-the-first-triage" class="subsection-heading">Day 1: The First Triage</h3>
-<p class="body-text">Twelve ventilators. Fourteen patients needing ventilation. The triage committee — two attendings and an ethicist — evaluates prognoses. The top twelve are ventilated. Two are assigned to comfort care.</p>
-<p class="body-text">The two patients assigned to comfort care: a 78-year-old retired teacher with diabetes and chronic kidney disease (estimated 15% survival with ventilation), and an 81-year-old retired postal worker with COPD (estimated 12% survival).</p>
-<p class="body-text">Sarah knows the 78-year-old. Mrs. Washington — she was Sarah's patient on the general medicine ward two months ago. Sarah diagnosed her pneumonia, adjusted her diabetes medications, called her daughter every evening. Mrs. Washington trusts Sarah.</p>
-<p class="body-text">The triage committee assigns Mrs. Washington to comfort care. The protocol is utilitarian-optimal. On the scalar, the decision is correct.</p>
-<p class="body-text">Sarah walks to Mrs. Washington's room. She sits beside her and takes her hand. "We don't have enough ventilators," she says. "I'm so sorry."</p>
-<p class="body-text">Mrs. Washington looks at her. "Is there nothing you can do?"</p>
-<p class="body-text">On the manifold, this moment activates every dimension simultaneously. <em class="math">d_1</em> (clinical outcome: Mrs. Washington will likely die), <em class="math">d_2</em> (rights: she has a right to treatment that cannot be provided), <em class="math">d_3</em> (justice: she was deprioritized because of her age and comorbidities), <em class="math">d_4</em> (autonomy: she was not consulted in the allocation), <em class="math">d_5</em> (trust: Sarah promised to take care of her), <em class="math">d_6</em> (social impact: her daughter will grieve), <em class="math">d_7</em> (dignity: she is dying because a committee decided her life was worth less than others'), <em class="math">d_8</em> (institutional legitimacy: the hospital promised care it cannot deliver), <em class="math">d_9</em> (epistemic: the 15% estimate is uncertain — she might have survived).</p>
-<p class="body-text">Sarah crosses the abandonment boundary. She does not choose to cross it — the institution mandates it. The boundary penalty is added to her cumulative moral injury.</p>
-<h3 id="week-2-the-withdrawal-decision" class="subsection-heading">Week 2: The Withdrawal Decision</h3>
-<p class="body-text">A patient has been on a ventilator for ten days. No improvement. The committee recommends withdrawal and reallocation to a newly admitted patient with better prognosis.</p>
-<p class="body-text">The utilitarian calculation is clear. The manifold calculation is not.</p>
-<p class="body-text">Sarah's attending refuses to implement the withdrawal. "I started this patient on the ventilator," he says. "I can't be the one to take it away." The triage committee assigns a different physician to implement the decision. The boundary crossing is the same; the assignment of responsibility changes.</p>
-<p class="body-text">Sarah notices that the attending is not being irrational. His <em class="math">h(n)</em> correctly identifies that withdrawal crosses the abandonment boundary at high cost. The committee, operating on <em class="math">d_1</em> alone, does not see the cost. The attending, operating on the full manifold, does.</p>
-<h3 id="week-4-the-heuristic-shifts" class="subsection-heading">Week 4: The Heuristic Shifts</h3>
-<p class="body-text">After four weeks of daily triage decisions, Sarah notices changes in herself. She no longer flinches when the triage pager sounds. She processes the numbers — SOFA score, prognosis estimate, ventilator availability — and makes the recommendation. The process has become routine.</p>
-<p class="body-text">She worries about this. Is she becoming more efficient or more numb?</p>
-<p class="body-text">The framework predicts two possible responses to sustained boundary crossing: hypervigilance (inflated <em class="math">\beta_k</em> — the clinician becomes risk-averse) or moral numbing (deflated <em class="math">\beta_k</em> — the boundary penalty decreases through repeated violation). Sarah is experiencing moral numbing. Her <em class="math">\beta_{\text{abandon}}</em> has decreased. The boundary that once felt impassable now feels routine.</p>
-<p class="body-text">This is <em class="math">h(n)</em> damage. It is not burnout — Sarah sleeps adequately, eats regularly, and has supportive colleagues. It is moral injury: the permanent alteration of her heuristic function by forced boundary crossings she did not choose.</p>
-<h3 id="the-toll" class="subsection-heading">The Toll</h3>
-<p class="body-text">By the time the surge subsides, Sarah has participated in forty-seven triage decisions. She has denied ventilators to nineteen patients, twelve of whom died. She has recommended withdrawal of ventilation from three patients, all of whom died within hours. She has watched two colleagues leave medicine permanently.</p>
-<p class="body-text">She is not the clinician she was before the pandemic. Her <em class="math">h(n)</em> has been altered on multiple dimensions. She is faster at triage — and she knows that the speed comes at a cost she cannot yet fully measure.</p>
-<p class="body-text">The manifold exists. Sarah has traversed its most costly regions. The mathematics of that traversal — the accumulation theorem, the heuristic damage modes, the moral injury index — is the subject of Part V.</p>
-<h2 id="chapter-summary" class="section-heading">Chapter Summary</h2>
-<p class="body-text">Triage is constrained multi-agent pathfinding on the clinical decision complex. The utilitarian objective — maximize clinical outcomes — coincides with the manifold objective only when triage decisions activate only <em class="math">d_1</em> and no moral boundaries are crossed. In the cases that matter most — ventilator withdrawal, age-based deprioritization, and allocation among comparable-prognosis patients — the utilitarian and manifold objectives diverge. Clinician resistance to utilitarian triage is not irrationality but correct computation on a higher-dimensional space. The COVID-19 pandemic served as a natural experiment that tested and confirmed the framework's predictions about moral distress, boundary-crossing costs, and the dimensional structure of triage decisions. Manifold-aware triage protocol design — which supplements the utilitarian objective with boundary penalties, lottery tiebreaking, Bond Index monitoring, and Moral Injury Index estimation — offers a path toward triage systems that are both clinically effective and morally sustainable.</p>
-<div class="footnotes"><h4>Notes</h4><ol>
-<li id="fn-1">Emanuel et al. (2020) proposed a multi-value framework for COVID-19 allocation, but the operationalization reduced to maximizing clinical benefit (<em class="math">d_1</em>) with equity considerations as secondary tiebreakers. The geometric framework makes the equity dimensions primary components of the objective function, not secondary adjustments.</li>
-<li id="fn-2">The manifold superiority of lottery allocation has a long history in the ethics of scarcity. Broome (1984) argued for fairness-based lottery allocation on philosophical grounds; the geometric framework provides the mathematical basis by demonstrating that lotteries avoid boundary crossings on <em class="math">d_3</em>, <em class="math">d_7</em>, and <em class="math">d_8</em> that criterion-based allocations incur.</li>
-<li id="fn-3">The distinction between acute-surge and slow-surge moral injury has not, to my knowledge, been characterized in the existing moral injury literature. The geometric framework predicts the distinction from the Moral Injury Accumulation Theorem: cumulative boundary crossings over time produce more total moral injury than a single concentrated allocation event with the same total boundary-crossing count, because sustained crossing also degrades the heuristic (making each subsequent crossing easier to perform but more damaging to the clinician's long-term moral architecture).</li>
-</ol></div>
-
+<p>These protocols are clear, defensible, and computationally simple. They are also systematically suboptimal on the manifold, because they ignore eight of nine dimensions.</p>
+</section>
+<section id="a-manifold-aware-protocol" class="level3">
+<h3>A Manifold-Aware Protocol</h3>
+<p>The geometric framework suggests the following modifications to utilitarian triage protocols:</p>
+<p><strong>Step 1: Compute <span class="math inline">d_1</span> rankings as before.</strong> The utilitarian component of triage — clinical prognosis assessment — is valid and necessary. The manifold framework does not replace it; it supplements it.</p>
+<p><strong>Step 2: Identify boundary crossings.</strong> For each allocation in the utilitarian ranking, determine which clinical-moral boundaries are crossed: - Does the allocation require withdrawing treatment from a current patient? (<span class="math inline">\beta_{\text{abandon}}</span>) - Does the allocation systematically disadvantage a demographic group? (<span class="math inline">\beta_{\text{justice}}</span>) - Does the allocation violate specific patients’ advance directives or expressed preferences? (<span class="math inline">\beta_{\text{consent}}</span>)</p>
+<p><strong>Step 3: Compute manifold cost.</strong> For allocations that cross boundaries, add the boundary penalty to the <span class="math inline">d_1</span> cost. If the total manifold cost of the utilitarian allocation exceeds the total manifold cost of an alternative allocation, use the alternative.</p>
+<p><strong>Step 4: Apply lottery tiebreaking.</strong> When patients have comparable <span class="math inline">d_1</span> prognoses (within measurement uncertainty), use lottery allocation rather than marginal <span class="math inline">d_1</span> differences.</p>
+<p><strong>Step 5: Monitor the Bond Index.</strong> Compute the clinical Bond Index (Chapter 12) for the triage protocol stratified by demographics. If the Bond Index reveals systematic disparities, modify the protocol.</p>
+<p><strong>Step 6: Compute the Moral Injury Index.</strong> Before implementation, estimate the moral injury that the protocol will impose on clinicians (Chapter 13). If the Moral Injury Index exceeds a threshold, redesign the protocol to reduce unnecessary boundary crossings.</p>
+</section>
+<section id="the-cost-of-manifold-aware-triage" class="level3">
+<h3>The Cost of Manifold-Aware Triage</h3>
+<p>The manifold-aware protocol is more complex than the utilitarian protocol. It requires more information (boundary penalties, demographic data, clinician surveys), more computation (manifold cost estimation, Bond Index monitoring), and more institutional infrastructure (ethics committees, triage oversight, lottery mechanisms).</p>
+<p>Is the added complexity worth it?</p>
+<p>The framework’s answer: the manifold cost is paid whether you compute it or not. A utilitarian protocol that ignores <span class="math inline">d_3</span>, <span class="math inline">d_5</span>, <span class="math inline">d_7</span>, and <span class="math inline">d_8</span> does not eliminate the costs on those dimensions — it merely fails to account for them. The costs manifest as moral injury to clinicians, loss of public trust, demographic disparities in outcomes, and institutional legitimacy crises. These costs are real, even if the protocol does not measure them.</p>
+<p>The manifold-aware protocol does not eliminate these costs. It makes them visible, computable, and — to the extent possible — minimizable.</p>
+<hr />
+</section>
+</section>
+<section id="historical-triage-systems-through-the-geometric-lens" class="level2">
+<h2>10.8 Historical Triage Systems Through the Geometric Lens</h2>
+<section id="from-larrey-to-the-present-a-dimensional-history" class="level3">
+<h3>From Larrey to the Present: A Dimensional History</h3>
+<p>Every triage system in the history of medicine is a specific contraction of the clinical tensor. Tracing the history of triage through the geometric lens reveals a gradual expansion of the dimensions that triage systems acknowledge — and a persistent failure to acknowledge all nine.</p>
+<p><strong>Baron Dominique Jean Larrey (1792): Contraction to <span class="math inline">d_1</span>.</strong></p>
+<p>Napoleon’s chief surgeon introduced the first systematic battlefield triage: sort casualties by survivability, treat the most salvageable first, regardless of rank. Larrey’s system contracted the clinical tensor to a single dimension — clinical outcomes (<span class="math inline">d_1</span>). It was revolutionary because it ignored social status (<span class="math inline">d_6</span>), military rank (<span class="math inline">d_8</span>), and political importance — dimensions that had previously dominated allocation. Larrey’s innovation was not just medical but geometric: he identified <span class="math inline">d_1</span> as the relevant dimension and discarded the rest.</p>
+<p><strong>Emergency Severity Index, ESI (2011): Contraction to <span class="math inline">d_1 + d_8</span>.</strong></p>
+<p>The modern ESI system, used in most US emergency departments, assigns patients to five triage levels based on clinical acuity and anticipated resource needs. The system contracts the clinical tensor to two dimensions: <span class="math inline">d_1</span> (how sick is the patient?) and <span class="math inline">d_8</span> (how many resources will treatment require?). The system does not account for <span class="math inline">d_3</span> (justice: is the allocation equitable across demographics?), <span class="math inline">d_5</span> (trust: does the patient trust the emergency department?), or <span class="math inline">d_7</span> (dignity: is the triage process experienced as dehumanizing?).</p>
+<p><strong>START/JumpSTART (1983/2002): Mass Casualty Contraction.</strong></p>
+<p>The Simple Triage and Rapid Treatment (START) system, used for mass casualty events, contracts the clinical tensor to a binary — dead/alive — modified by respiratory rate, pulse, and mental status. JumpSTART adapts the system for pediatric patients. Both systems operate on <span class="math inline">d_1</span> alone, with no consideration of non-outcome dimensions. The systems are appropriate for their context (rapid field triage under extreme time pressure) but produce significant moral injury when applied to sustained allocation decisions where non-outcome dimensions are activated.</p>
+<p><strong>Pandemic Crisis Standards of Care (2020): Attempted expansion to <span class="math inline">d_1 + d_3</span>.</strong></p>
+<p>COVID-19 triage guidelines (Emanuel et al., 2020; White et al., 2020) attempted to incorporate justice (<span class="math inline">d_3</span>) alongside clinical outcomes (<span class="math inline">d_1</span>): lotteries as tiebreakers, life-cycle considerations, essential worker prioritization. This represented an expansion from one-dimensional to two-dimensional triage. The geometric framework predicts that the expansion was insufficient — seven dimensions remained unaccounted for — and the pandemic moral injury literature confirms the prediction.</p>
+</section>
+<section id="the-geometric-trend" class="level3">
+<h3>The Geometric Trend</h3>
+<p>The history of triage shows a slow expansion of the acknowledged dimensional space: from <span class="math inline">d_1</span> alone (Larrey) to <span class="math inline">d_1 + d_8</span> (ESI) to <span class="math inline">d_1 + d_3</span> (pandemic ethics). The geometric framework proposes the final step: triage on the full nine-dimensional manifold. This does not mean that every triage decision must explicitly compute nine-dimensional costs — in acute settings, rapid heuristic triage remains necessary. It means that <em>the objective function</em> against which triage systems are designed and evaluated should be the full manifold cost, not a scalar projection.</p>
+<p>[Figure 10.3: Historical evolution of triage dimensionality, from Larrey (1D) through ESI (2D) and pandemic ethics (2D) to the manifold-optimal framework (9D)]</p>
+<hr />
+</section>
+</section>
+<section id="the-ethics-of-triage-communication" class="level2">
+<h2>10.9 The Ethics of Triage Communication</h2>
+<section id="how-the-decision-is-communicated-matters-on-the-manifold" class="level3">
+<h3>How the Decision Is Communicated Matters on the Manifold</h3>
+<p>Triage is not only a decision but a communication. The way a triage decision is communicated to the patient and family affects multiple dimensions of the clinical decision complex — and the manifold cost of communication is often larger than the manifold cost of the decision itself.</p>
+<p>Consider two ways of communicating the same triage decision (denial of a ventilator):</p>
+<p><strong>Communication A (scalar):</strong> “Based on the protocol, your mother does not qualify for a ventilator. We will provide comfort care.”</p>
+<p><strong>Communication B (manifold-aware):</strong> “Your mother is very sick, and we have been working hard to help her. We have more patients who need ventilators than we have ventilators available. A triage team — not your mother’s doctors — has reviewed all the patients and made the allocation. Your mother will receive comfort care, which means we will focus on keeping her comfortable, managing her pain, and allowing you to be with her. We will not stop caring for her.”</p>
+<p>Communication A is efficient but activates <span class="math inline">d_5</span> (trust damage: “the protocol doesn’t care about my mother”), <span class="math inline">d_7</span> (dignity damage: “my mother doesn’t qualify”), and <span class="math inline">d_8</span> (legitimacy damage: “what protocol? who decided?”). Communication B addresses each of these dimensions: it emphasizes the ongoing relationship (<span class="math inline">d_5</span>), respects the patient’s worth (<span class="math inline">d_7</span>), explains the process (<span class="math inline">d_8</span>), and separates the triage decision from the treating team (<span class="math inline">\beta_{\text{abandon}}</span> reduction).</p>
+<p><strong>Proposition 10.4 (Communication as Manifold Cost Modifier).</strong> <em>The manifold cost of a triage decision is modulated by the quality of communication. A triage decision communicated with transparency (<span class="math inline">d_8</span>), empathy (<span class="math inline">d_5</span>), and dignity-preservation (<span class="math inline">d_7</span>) has lower total manifold cost than the same decision communicated as a protocol output — even though the allocation is identical.</em></p>
+<p>This proposition has immediate practical implications for triage protocol design: protocols should specify not only the allocation algorithm but the communication script. The communication is not a courtesy — it is a manifold cost intervention that reduces the total cost of the triage system.</p>
+</section>
+<section id="communication-and-moral-injury" class="level3">
+<h3>Communication and Moral Injury</h3>
+<p>The communication burden falls on the clinician who delivers the message. A clinician who tells a patient “you don’t qualify for a ventilator” crosses the abandonment boundary in their own experience. A clinician who tells a patient “we will not stop caring for you — the form of care is changing, not the commitment” crosses the same boundary with lower subjective penalty.</p>
+<p>Training clinicians in manifold-aware triage communication reduces both the patient’s manifold cost (better trust, dignity, and legitimacy preservation) and the clinician’s moral injury (lower subjective boundary-crossing penalty). The training is a dual intervention — benefiting both parties on the manifold.</p>
+<hr />
+</section>
+</section>
+<section id="sarahs-pandemic" class="level2">
+<h2>10.10 Sarah’s Pandemic</h2>
+<p>The pandemic arrives in March. Sarah’s ICU is converted to a COVID-19 ward in forty-eight hours. Elective surgeries are canceled. The hospital activates crisis standards of care.</p>
+<section id="day-1-the-first-triage" class="level3">
+<h3>Day 1: The First Triage</h3>
+<p>Twelve ventilators. Fourteen patients needing ventilation. The triage committee — two attendings and an ethicist — evaluates prognoses. The top twelve are ventilated. Two are assigned to comfort care.</p>
+<p>The two patients assigned to comfort care: a 78-year-old retired teacher with diabetes and chronic kidney disease (estimated 15% survival with ventilation), and an 81-year-old retired postal worker with COPD (estimated 12% survival).</p>
+<p>Sarah knows the 78-year-old. Mrs. Washington — she was Sarah’s patient on the general medicine ward two months ago. Sarah diagnosed her pneumonia, adjusted her diabetes medications, called her daughter every evening. Mrs. Washington trusts Sarah.</p>
+<p>The triage committee assigns Mrs. Washington to comfort care. The protocol is utilitarian-optimal. On the scalar, the decision is correct.</p>
+<p>Sarah walks to Mrs. Washington’s room. She sits beside her and takes her hand. “We don’t have enough ventilators,” she says. “I’m so sorry.”</p>
+<p>Mrs. Washington looks at her. “Is there nothing you can do?”</p>
+<p>On the manifold, this moment activates every dimension simultaneously. <span class="math inline">d_1</span> (clinical outcome: Mrs. Washington will likely die), <span class="math inline">d_2</span> (rights: she has a right to treatment that cannot be provided), <span class="math inline">d_3</span> (justice: she was deprioritized because of her age and comorbidities), <span class="math inline">d_4</span> (autonomy: she was not consulted in the allocation), <span class="math inline">d_5</span> (trust: Sarah promised to take care of her), <span class="math inline">d_6</span> (social impact: her daughter will grieve), <span class="math inline">d_7</span> (dignity: she is dying because a committee decided her life was worth less than others’), <span class="math inline">d_8</span> (institutional legitimacy: the hospital promised care it cannot deliver), <span class="math inline">d_9</span> (epistemic: the 15% estimate is uncertain — she might have survived).</p>
+<p>Sarah crosses the abandonment boundary. She does not choose to cross it — the institution mandates it. The boundary penalty is added to her cumulative moral injury.</p>
+</section>
+<section id="week-2-the-withdrawal-decision" class="level3">
+<h3>Week 2: The Withdrawal Decision</h3>
+<p>A patient has been on a ventilator for ten days. No improvement. The committee recommends withdrawal and reallocation to a newly admitted patient with better prognosis.</p>
+<p>The utilitarian calculation is clear. The manifold calculation is not.</p>
+<p>Sarah’s attending refuses to implement the withdrawal. “I started this patient on the ventilator,” he says. “I can’t be the one to take it away.” The triage committee assigns a different physician to implement the decision. The boundary crossing is the same; the assignment of responsibility changes.</p>
+<p>Sarah notices that the attending is not being irrational. His <span class="math inline">h(n)</span> correctly identifies that withdrawal crosses the abandonment boundary at high cost. The committee, operating on <span class="math inline">d_1</span> alone, does not see the cost. The attending, operating on the full manifold, does.</p>
+</section>
+<section id="week-4-the-heuristic-shifts" class="level3">
+<h3>Week 4: The Heuristic Shifts</h3>
+<p>After four weeks of daily triage decisions, Sarah notices changes in herself. She no longer flinches when the triage pager sounds. She processes the numbers — SOFA score, prognosis estimate, ventilator availability — and makes the recommendation. The process has become routine.</p>
+<p>She worries about this. Is she becoming more efficient or more numb?</p>
+<p>The framework predicts two possible responses to sustained boundary crossing: hypervigilance (inflated <span class="math inline">\beta_k</span> — the clinician becomes risk-averse) or moral numbing (deflated <span class="math inline">\beta_k</span> — the boundary penalty decreases through repeated violation). Sarah is experiencing moral numbing. Her <span class="math inline">\beta_{\text{abandon}}</span> has decreased. The boundary that once felt impassable now feels routine.</p>
+<p>This is <span class="math inline">h(n)</span> damage. It is not burnout — Sarah sleeps adequately, eats regularly, and has supportive colleagues. It is moral injury: the permanent alteration of her heuristic function by forced boundary crossings she did not choose.</p>
+</section>
+<section id="the-toll" class="level3">
+<h3>The Toll</h3>
+<p>By the time the surge subsides, Sarah has participated in forty-seven triage decisions. She has denied ventilators to nineteen patients, twelve of whom died. She has recommended withdrawal of ventilation from three patients, all of whom died within hours. She has watched two colleagues leave medicine permanently.</p>
+<p>She is not the clinician she was before the pandemic. Her <span class="math inline">h(n)</span> has been altered on multiple dimensions. She is faster at triage — and she knows that the speed comes at a cost she cannot yet fully measure.</p>
+<p>The manifold exists. Sarah has traversed its most costly regions. The mathematics of that traversal — the accumulation theorem, the heuristic damage modes, the moral injury index — is the subject of Part V.</p>
+<hr />
+</section>
+</section>
+<section id="chapter-summary" class="level2">
+<h2>Chapter Summary</h2>
+<p>Triage is constrained multi-agent pathfinding on the clinical decision complex. The utilitarian objective — maximize clinical outcomes — coincides with the manifold objective only when triage decisions activate only <span class="math inline">d_1</span> and no moral boundaries are crossed. In the cases that matter most — ventilator withdrawal, age-based deprioritization, and allocation among comparable-prognosis patients — the utilitarian and manifold objectives diverge. Clinician resistance to utilitarian triage is not irrationality but correct computation on a higher-dimensional space. The COVID-19 pandemic served as a natural experiment that tested and confirmed the framework’s predictions about moral distress, boundary-crossing costs, and the dimensional structure of triage decisions. Manifold-aware triage protocol design — which supplements the utilitarian objective with boundary penalties, lottery tiebreaking, Bond Index monitoring, and Moral Injury Index estimation — offers a path toward triage systems that are both clinically effective and morally sustainable.</p>
+<hr />
+</section>
+</section>
       </div>
 
       <div class="chapter-nav-bottom">
@@ -335,35 +393,22 @@
       document.querySelector('.nav-links').classList.toggle('open');
     });
   </script>
-<script>
-window.addEventListener("load", function() {
-  if (typeof katex === 'undefined') return;
-  // Render all <em class="math"> elements with</em> KaTeX
-  document.querySelectorAll('em.math').forEach(function(el) {
-    try {
-      katex.render(el.textContent, el, {throwOnError: false, displayMode: false});
-    } catch(e) {}
-  });
-  // Render all <p class="display-math"> elements
-  document.querySelectorAll('p.display-math').forEach(function(el) {
-    var mathEl = el.querySelector('em.math');
-    if (mathEl) {
-      try {
-        katex.render(mathEl.textContent, el, {throwOnError: false, displayMode: true});
-      } catch(e) {}
-    }
-  });
-  // Also try auto-render for any $...$ delimited math
-  if (typeof renderMathInElement !== 'undefined') {
-    renderMathInElement(document.body, {
-      delimiters: [
-        {left: "$$", right: "$$", display: true},
-        {left: "$", right: "$", display: false}
-      ],
-      throwOnError: false
+  <script>
+    // Pandoc --katex outputs <span class="math inline"> and <span class="math display">.
+    // This script renders them with KaTeX once the library loads.
+    document.addEventListener("DOMContentLoaded", function() {
+      if (typeof katex === 'undefined') return;
+      var mathElements = document.getElementsByClassName("math");
+      for (var i = 0; i < mathElements.length; i++) {
+        var texText = mathElements[i].firstChild;
+        if (mathElements[i].tagName === "SPAN" && texText) {
+          katex.render(texText.data, mathElements[i], {
+            displayMode: mathElements[i].classList.contains('display'),
+            throwOnError: false
+          });
+        }
+      }
     });
-  }
-});
-</script>
+  </script>
 </body>
 </html>

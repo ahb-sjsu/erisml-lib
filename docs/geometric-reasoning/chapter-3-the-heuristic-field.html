@@ -10,9 +10,8 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Crimson+Pro:ital,wght@0,300;0,400;0,600;0,700;1,400&family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
-  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
-  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"></script>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
 </head>
 
 <body>
@@ -26,14 +25,14 @@
         <span></span><span></span><span></span>
       </button>
       <ul class="nav-links">
-        <li><a href="index.html" class="active">Reasoning</a></li>
+        <li><a href="../geometric-medicine/index.html">Medicine</a></li>
         <li><a href="../book/index.html">Ethics</a></li>
         <li><a href="../geometric-methods/index.html">Methods</a></li>
+        <li><a href="../geometric-reasoning/index.html" class="active">Reasoning</a></li>
         <li><a href="../geometric-economics/index.html">Economics</a></li>
         <li><a href="../geometric-law/index.html">Law</a></li>
         <li><a href="../geometric-cognition/index.html">Cognition</a></li>
         <li><a href="../geometric-communication/index.html">Communication</a></li>
-        <li><a href="../geometric-medicine/index.html">Medicine</a></li>
         <li><a href="../index.html">Home</a></li>
       </ul>
     </div>
@@ -43,9 +42,9 @@
     <div class="chapter-container">
       <nav class="breadcrumb" aria-label="Breadcrumb">
         <a href="../index.html">Geometric Series</a>
-        <span class="breadcrumb-sep">›</span>
+        <span class="breadcrumb-sep">&rsaquo;</span>
         <a href="index.html">Geometric Reasoning</a>
-        <span class="breadcrumb-sep">›</span>
+        <span class="breadcrumb-sep">&rsaquo;</span>
         <span class="breadcrumb-current">Chapter 3: The Heuristic Field</span>
       </nav>
       <div class="chapter-nav-top">
@@ -54,288 +53,368 @@
         <a href="chapter-4-geodesics-and-optimal-reasoning.html" class="nav-next">Chapter 4: Geodesics and Optimal Reasoning &rarr;</a>
       </div>
 
-      <nav class="chapter-toc">
-        <h4>In this chapter</h4>
-        <ol><li><a href="#31-the-heuristic-as-scalar-field">3.1 The Heuristic as Scalar Field</a></li><li><a href="#32-a-as-gradient-descent-on-the-evaluation-landscape">3.2 A* as Gradient Descent on the Evaluation Landscape</a></li><li><a href="#33-properties-of-good-heuristics-admissibility-and-consistency">3.3 Properties of Good Heuristics: Admissibility and Consistency</a></li><li><a href="#34-the-heuristic-in-neural-networks">3.4 The Heuristic in Neural Networks</a></li><li><a href="#35-attention-as-heuristic-guidance">3.5 Attention as Heuristic Guidance</a></li><li><a href="#36-when-the-heuristic-lies-overconfidence-as-inadmissibility">3.6 When the Heuristic Lies: Overconfidence as Inadmissibility</a></li><li><a href="#37-implications-for-reasoning-quality">3.7 Implications for Reasoning Quality</a></li><li><a href="#notes-on-chapter-3">Notes on Chapter 3</a></li><li><a href="#worked-example-when-the-heuristic-hesitates">Worked Example: When the Heuristic Hesitates</a></li><li><a href="#technical-appendix">Technical Appendix</a></li><li><a href="#references-for-chapter-3">References for Chapter 3</a></li></ol>
-      </nav>
       <div class="chapter-content">
-<h1 id="chapter-3-the-heuristic-field" class="chapter-title">Chapter 3: The Heuristic Field</h1>
-<blockquote class="book-blockquote"><p>"Every act of reasoning is a bet about where the answer lives."</p></blockquote>
-<blockquote class="book-blockquote"><p><strong>RUNNING EXAMPLE — DR. OKAFOR'S TRIAGE</strong></p> <p>Dr. Amara Okafor does not consult a decision tree when she walks into the ER. She walks in, and the room organizes itself. Chest pain radiating to the left arm — high urgency, steep gradient pulling her attention. Skateboard abrasion, bleeding but superficial — low urgency, the field nearly flat. Sudden thunderclap headache — an intermediate ridge, ambiguous, the gradient pointing two ways at once.</p> <p>What she carries, after twenty years of emergency medicine, is not a checklist but a field: a scalar function defined over the space of clinical presentations, assigning to each configuration an estimated distance from disaster. That function is her heuristic field, and its gradient is the force that organizes her attention before she has consciously registered why. The field has topology. There are saddle points — presentations where two diagnoses are equally likely and the gradient offers no clear direction. There are basins — clusters of symptoms that reliably funnel toward a single diagnosis. There are ridges — clinical boundaries where a small change in presentation (sharp versus dull chest pain, unilateral versus bilateral headache) flips the gradient entirely, sending the search into a different diagnostic valley.</p> <p>This chapter gives Dr. Okafor's intuition a mathematical name. The heuristic field is not a metaphor for clinical experience — it is a precise description of what clinical experience computes.</p></blockquote>
-<p class="first-paragraph">In Chapter 1, we established that reasoning is search over a structured possibility space. In Chapter 2, we gave that space geometric structure — a manifold equipped with a metric, curvature, and boundaries. But a manifold alone does not explain how a reasoner navigates it. A chess player does not enumerate all possible games; a mathematician does not traverse every chain of logical implications; a language model does not assign equal probability to every token. Something guides the search. Something tells the reasoner where to look next.</p>
-<p class="body-text">That something is the <strong>heuristic field</strong>.</p>
-<p class="body-text">This chapter makes a simple but far-reaching claim: the quality of reasoning is determined by the quality of the heuristic field that guides it. A perfect heuristic yields perfect reasoning. A corrupted heuristic yields corrupted reasoning. And the specific ways in which the heuristic can fail — overestimation, underestimation, discontinuity, flat regions — produce specific, diagnosable pathologies in the reasoning trajectory.</p>
-<p class="body-text">We begin with the formal definition of what a heuristic actually is, mathematically. We then reinterpret the classical A* algorithm as gradient descent on an evaluation landscape, revealing how the geometry of the heuristic field shapes search behavior. We extend this framework to neural networks, showing how attention mechanisms implement heuristic guidance. And we close with the central empirical finding: current language models have systematically corrupted heuristic fields, and this corruption has measurable, predictable consequences.</p>
-<h2 id="31-the-heuristic-as-scalar-field" class="section-heading">3.1 The Heuristic as Scalar Field</h2>
-<h3 id="311-the-standard-definition" class="subsection-heading">3.1.1 The Standard Definition</h3>
-<p class="first-paragraph">In the classical AI literature, a heuristic function <em class="math">h(x)</em> is defined as an estimate of the cost to reach a goal state from state <em class="math">x</em>. If <em class="math">h*(x)</em> denotes the true optimal cost-to-go, then <em class="math">h(x) \approx h*(x)</em> is the aspiration — a function that tells us, at every point in the search space, how far we are from where we want to be.</p>
-<p class="body-text">This definition is typically presented in the context of discrete graph search. State <em class="math">x</em> is a node. The goal is another node, or a set of nodes. The cost is measured along edges. The heuristic assigns a number to each node.</p>
-<p class="body-text">But this framing obscures what is really going on. Let us restate it precisely.</p>
-<h3 id="312-the-geometric-restatement" class="subsection-heading">3.1.2 The Geometric Restatement</h3>
-<p class="first-paragraph">Let <em class="math">M</em> be the state manifold — the space of all possible states of the reasoning system, equipped with the geometric structure developed in Chapter 2. Let <em class="math">\mathcal{G} \subset M</em> be the goal set — the region of states that constitute acceptable answers, solutions, or conclusions.</p>
-<p class="body-text">A <strong>heuristic</strong> is a smooth function</p>
-<p class="body-text"><span class="math-block">h: M \to \mathbb{R}</span></p>
-<p class="body-text">that assigns to every state <em class="math">x \in M</em> a real number <em class="math">h(x)</em> representing the estimated cost of reaching <em class="math">\mathcal{G}</em> from <em class="math">x</em>.</p>
-<p class="body-text"><strong>[Modeling Axiom.]</strong> This is, formally, a <strong>scalar field</strong> on <em class="math">M</em>. It is the same mathematical object as a temperature field in thermodynamics, a potential energy surface in physics, or a loss landscape in machine learning. It assigns a single real number to every point in the space.</p>
-<p class="body-text">More precisely, <em class="math">h</em> is a section of the trivial real line bundle <em class="math">M \times \mathbb{R} \to M</em>. This seemingly pedantic observation matters because it tells us how <em class="math">h</em> transforms under changes of coordinates. When we change our representation of the state space — say, by moving from one parameterization of a neural network's internal state to another — the heuristic values must transform accordingly. The heuristic is not a property of any particular coordinate system; it is a geometric invariant of the state manifold.</p>
-<h3 id="313-what-the-heuristic-looks-like" class="subsection-heading">3.1.3 What the Heuristic "Looks Like"</h3>
-<p class="first-paragraph">Imagine the state manifold as a landscape, with the heuristic value at each point determining the elevation. The goal states sit in the lowest valleys — regions where <em class="math">h(x) \approx 0</em>. States far from the goal sit on high plateaus or mountain peaks. The contour lines of <em class="math">h</em> — the level sets <em class="math">\{x : h(x) = c\}</em> — are "isoheuristic surfaces," sets of states that the heuristic judges to be equidistant from the goal.</p>
-<p class="body-text">A perfect heuristic <em class="math">h = h^*</em> produces a landscape whose level sets are exactly the true equicost surfaces. The valleys are precisely where the solutions are, the ridges separate distinct solution basins, and the elevation at every point accurately reflects the true remaining effort.</p>
-<p class="body-text">An imperfect heuristic produces a warped landscape. Some valleys are illusory — the reasoner descends into them expecting to find a solution, but none exists. Some true solutions are hidden behind ridges that the heuristic places too high. The topology of the landscape may differ from reality: the heuristic might merge distinct solution basins into one, or fracture a single basin into several disconnected pieces.</p>
-<h3 id="314-the-gradient-of-the-heuristic" class="subsection-heading">3.1.4 The Gradient of the Heuristic</h3>
-<p class="first-paragraph">Because <em class="math">h</em> is a scalar field on a manifold, it has a gradient: <em class="math">\nabla h</em>, a vector field that points in the direction of steepest increase in <em class="math">h</em>. The negative gradient <em class="math">-\nabla h</em> points toward steepest decrease — toward lower heuristic values, toward the goal.</p>
-<p class="body-text">This gradient field is the core navigational signal. A reasoner following <em class="math">-\nabla h</em> is moving in the direction that the heuristic judges to be most promising. The integral curves of <em class="math">-\nabla h</em> — the paths that always follow the direction of steepest descent — are the "heuristic streamlines," the trajectories that the heuristic itself recommends.</p>
-<p class="body-text">When the heuristic is perfect, the streamlines approximate geodesics on <em class="math">M</em> — the optimal reasoning paths discussed in Chapter 4. When the heuristic is imperfect, the streamlines deviate from geodesics, and the nature of the deviation diagnoses the nature of the heuristic's imperfection.</p>
-<h2 id="32-a-as-gradient-descent-on-the-evaluation-landscape" class="section-heading">3.2 A* as Gradient Descent on the Evaluation Landscape</h2>
-<h3 id="321-the-evaluation-function" class="subsection-heading">3.2.1 The Evaluation Function</h3>
-<p class="first-paragraph">The A* search algorithm, introduced by Hart, Nilsson, and Raphael (1968), uses an evaluation function</p>
-<p class="body-text"><span class="math-block">f(x) = g(x) + h(x)</span></p>
-<p class="body-text">where <em class="math">g(x)</em> is the cost already incurred to reach state <em class="math">x</em> from the start state, and <em class="math">h(x)</em> is the heuristic estimate of the remaining cost. The algorithm always expands the state with the lowest <em class="math">f</em>-value — the state that appears to lie on the cheapest total path from start to goal.</p>
-<p class="body-text">The standard presentation describes this as "selecting the node with the lowest estimated total cost." This is correct but does not capture the geometric content of the operation.</p>
-<h3 id="322-the-f-landscape" class="subsection-heading">3.2.2 The f-Landscape</h3>
-<p class="first-paragraph">Consider the function <em class="math">f: M \to \mathbb{R}</em> as a scalar field in its own right. It defines a landscape — the <strong>evaluation landscape</strong> or <strong>f-landscape</strong> — that combines two sources of information: what the search has already paid (<em class="math">g</em>) and what it expects to pay (<em class="math">h</em>).</p>
-<p class="body-text">As the search progresses, <em class="math">g(x)</em> changes — the known costs get updated as new paths are discovered. But <em class="math">h(x)</em> is fixed by the heuristic. So the f-landscape is a dynamic surface: the <em class="math">g</em>-component evolves while the <em class="math">h</em>-component is static. The search proceeds by descending this evolving landscape.</p>
-<p class="body-text">At each step, A* selects the state with minimal <em class="math">f</em>-value. This is precisely the operation of finding the lowest point on the current f-landscape's frontier — the boundary between explored and unexplored territory. A* is performing <strong>discrete gradient descent</strong> on the f-landscape, stepping to the lowest neighboring point at each iteration.</p>
-<h3 id="323-the-continuous-limit" class="subsection-heading">3.2.3 The Continuous Limit</h3>
-<p class="first-paragraph">In the continuous limit — when the state space becomes a manifold and the discrete steps become infinitesimal — A* becomes gradient flow on the f-landscape. The search trajectory satisfies</p>
-<p class="body-text"><span class="math-block">\frac{dx}{dt} = -\nabla f(x) = -\nabla g(x) - \nabla h(x)</span></p>
-<p class="body-text">This is a dynamical system. The search trajectory is a solution curve of this ODE. The behavior of the search is determined by the geometry of the f-landscape: its critical points, its basins of attraction, its saddle structures, its ridgelines.</p>
-<ul class="book-list">
-<li><strong>Minima of <em class="math">f</em></strong> are attractors of the search — states toward which the search converges. True solutions correspond to global minima. Local minima of <em class="math">f</em> that are not true solutions are traps — the search converges to them but finds no solution.</li>
+<section id="chapter-3-the-heuristic-field" class="level1">
+<h1>Chapter 3: The Heuristic Field</h1>
+<blockquote>
+<p><em>“Every act of reasoning is a bet about where the answer lives.”</em></p>
+</blockquote>
+<blockquote>
+<p><strong>RUNNING EXAMPLE — DR. OKAFOR’S TRIAGE</strong></p>
+<p><em>Dr. Amara Okafor does not consult a decision tree when she walks into the ER. She walks in, and the room organizes itself. Chest pain radiating to the left arm — high urgency, steep gradient pulling her attention. Skateboard abrasion, bleeding but superficial — low urgency, the field nearly flat. Sudden thunderclap headache — an intermediate ridge, ambiguous, the gradient pointing two ways at once.</em></p>
+<p><em>What she carries, after twenty years of emergency medicine, is not a checklist but a field: a scalar function defined over the space of clinical presentations, assigning to each configuration an estimated distance from disaster. That function is her heuristic field, and its gradient is the force that organizes her attention before she has consciously registered why. The field has topology. There are saddle points — presentations where two diagnoses are equally likely and the gradient offers no clear direction. There are basins — clusters of symptoms that reliably funnel toward a single diagnosis. There are ridges — clinical boundaries where a small change in presentation (sharp versus dull chest pain, unilateral versus bilateral headache) flips the gradient entirely, sending the search into a different diagnostic valley.</em></p>
+<p><em>This chapter gives Dr. Okafor’s intuition a mathematical name. The heuristic field is not a metaphor for clinical experience — it is a precise description of what clinical experience computes.</em></p>
+</blockquote>
+<p>In Chapter 1, we established that reasoning is search over a structured possibility space. In Chapter 2, we gave that space geometric structure — a manifold equipped with a metric, curvature, and boundaries. But a manifold alone does not explain how a reasoner navigates it. A chess player does not enumerate all possible games; a mathematician does not traverse every chain of logical implications; a language model does not assign equal probability to every token. Something guides the search. Something tells the reasoner where to look next.</p>
+<p>That something is the <strong>heuristic field</strong>.</p>
+<p>This chapter makes a simple but far-reaching claim: the quality of reasoning is determined by the quality of the heuristic field that guides it. A perfect heuristic yields perfect reasoning. A corrupted heuristic yields corrupted reasoning. And the specific ways in which the heuristic can fail — overestimation, underestimation, discontinuity, flat regions — produce specific, diagnosable pathologies in the reasoning trajectory.</p>
+<p>We begin with the formal definition of what a heuristic actually is, mathematically. We then reinterpret the classical A* algorithm as gradient descent on an evaluation landscape, revealing how the geometry of the heuristic field shapes search behavior. We extend this framework to neural networks, showing how attention mechanisms implement heuristic guidance. And we close with the central empirical finding: current language models have systematically corrupted heuristic fields, and this corruption has measurable, predictable consequences.</p>
+<hr />
+<section id="the-heuristic-as-scalar-field" class="level2">
+<h2>3.1 The Heuristic as Scalar Field</h2>
+<section id="the-standard-definition" class="level3">
+<h3>3.1.1 The Standard Definition</h3>
+<p>In the classical AI literature, a heuristic function <span class="math inline">h(x)</span> is defined as an estimate of the cost to reach a goal state from state <span class="math inline">x</span>. If <span class="math inline">h^*(x)</span> denotes the true optimal cost-to-go, then <span class="math inline">h(x) \approx h^*(x)</span> is the aspiration — a function that tells us, at every point in the search space, how far we are from where we want to be.</p>
+<p>This definition is typically presented in the context of discrete graph search. State <span class="math inline">x</span> is a node. The goal is another node, or a set of nodes. The cost is measured along edges. The heuristic assigns a number to each node.</p>
+<p>But this framing obscures what is really going on. Let us restate it precisely.</p>
+</section>
+<section id="the-geometric-restatement" class="level3">
+<h3>3.1.2 The Geometric Restatement</h3>
+<p>Let <span class="math inline">M</span> be the state manifold — the space of all possible states of the reasoning system, equipped with the geometric structure developed in Chapter 2. Let <span class="math inline">\mathcal{G} \subset M</span> be the goal set — the region of states that constitute acceptable answers, solutions, or conclusions.</p>
+<p>A <strong>heuristic</strong> is a smooth function</p>
+<p><span class="math display">h: M \to \mathbb{R}</span></p>
+<p>that assigns to every state <span class="math inline">x \in M</span> a real number <span class="math inline">h(x)</span> representing the estimated cost of reaching <span class="math inline">\mathcal{G}</span> from <span class="math inline">x</span>.</p>
+<p><strong>[Modeling Axiom.]</strong> This is, formally, a <strong>scalar field</strong> on <span class="math inline">M</span>. It is the same mathematical object as a temperature field in thermodynamics, a potential energy surface in physics, or a loss landscape in machine learning. It assigns a single real number to every point in the space.</p>
+<p>More precisely, <span class="math inline">h</span> is a section of the trivial real line bundle <span class="math inline">M \times \mathbb{R} \to M</span>. This seemingly pedantic observation matters because it tells us how <span class="math inline">h</span> transforms under changes of coordinates. When we change our representation of the state space — say, by moving from one parameterization of a neural network’s internal state to another — the heuristic values must transform accordingly. The heuristic is not a property of any particular coordinate system; it is a geometric invariant of the state manifold.</p>
+</section>
+<section id="what-the-heuristic-looks-like" class="level3">
+<h3>3.1.3 What the Heuristic “Looks Like”</h3>
+<p>Imagine the state manifold as a landscape, with the heuristic value at each point determining the elevation. The goal states sit in the lowest valleys — regions where <span class="math inline">h(x) \approx 0</span>. States far from the goal sit on high plateaus or mountain peaks. The contour lines of <span class="math inline">h</span> — the level sets <span class="math inline">\{x : h(x) = c\}</span> — are “isoheuristic surfaces,” sets of states that the heuristic judges to be equidistant from the goal.</p>
+<p>A perfect heuristic <span class="math inline">h = h^*</span> produces a landscape whose level sets are exactly the true equicost surfaces. The valleys are precisely where the solutions are, the ridges separate distinct solution basins, and the elevation at every point accurately reflects the true remaining effort.</p>
+<p>An imperfect heuristic produces a warped landscape. Some valleys are illusory — the reasoner descends into them expecting to find a solution, but none exists. Some true solutions are hidden behind ridges that the heuristic places too high. The topology of the landscape may differ from reality: the heuristic might merge distinct solution basins into one, or fracture a single basin into several disconnected pieces.</p>
+</section>
+<section id="the-gradient-of-the-heuristic" class="level3">
+<h3>3.1.4 The Gradient of the Heuristic</h3>
+<p>Because <span class="math inline">h</span> is a scalar field on a manifold, it has a gradient: <span class="math inline">\nabla h</span>, a vector field that points in the direction of steepest increase in <span class="math inline">h</span>. The negative gradient <span class="math inline">-\nabla h</span> points toward steepest decrease — toward lower heuristic values, toward the goal.</p>
+<p>This gradient field is the core navigational signal. A reasoner following <span class="math inline">-\nabla h</span> is moving in the direction that the heuristic judges to be most promising. The integral curves of <span class="math inline">-\nabla h</span> — the paths that always follow the direction of steepest descent — are the “heuristic streamlines,” the trajectories that the heuristic itself recommends.</p>
+<p>When the heuristic is perfect, the streamlines approximate geodesics on <span class="math inline">M</span> — the optimal reasoning paths discussed in Chapter 4. When the heuristic is imperfect, the streamlines deviate from geodesics, and the nature of the deviation diagnoses the nature of the heuristic’s imperfection.</p>
+<hr />
+</section>
+</section>
+<section id="a-as-gradient-descent-on-the-evaluation-landscape" class="level2">
+<h2>3.2 A* as Gradient Descent on the Evaluation Landscape</h2>
+<section id="the-evaluation-function" class="level3">
+<h3>3.2.1 The Evaluation Function</h3>
+<p>The A* search algorithm, introduced by Hart, Nilsson, and Raphael (1968), uses an evaluation function</p>
+<p><span class="math display">f(x) = g(x) + h(x)</span></p>
+<p>where <span class="math inline">g(x)</span> is the cost already incurred to reach state <span class="math inline">x</span> from the start state, and <span class="math inline">h(x)</span> is the heuristic estimate of the remaining cost. The algorithm always expands the state with the lowest <span class="math inline">f</span>-value — the state that appears to lie on the cheapest total path from start to goal.</p>
+<p>The standard presentation describes this as “selecting the node with the lowest estimated total cost.” This is correct but does not capture the geometric content of the operation.</p>
+</section>
+<section id="the-f-landscape" class="level3">
+<h3>3.2.2 The f-Landscape</h3>
+<p>Consider the function <span class="math inline">f: M \to \mathbb{R}</span> as a scalar field in its own right. It defines a landscape — the <strong>evaluation landscape</strong> or <strong>f-landscape</strong> — that combines two sources of information: what the search has already paid (<span class="math inline">g</span>) and what it expects to pay (<span class="math inline">h</span>).</p>
+<p>As the search progresses, <span class="math inline">g(x)</span> changes — the known costs get updated as new paths are discovered. But <span class="math inline">h(x)</span> is fixed by the heuristic. So the f-landscape is a dynamic surface: the <span class="math inline">g</span>-component evolves while the <span class="math inline">h</span>-component is static. The search proceeds by descending this evolving landscape.</p>
+<p>At each step, A* selects the state with minimal <span class="math inline">f</span>-value. This is precisely the operation of finding the lowest point on the current f-landscape’s frontier — the boundary between explored and unexplored territory. A* is performing <strong>discrete gradient descent</strong> on the f-landscape, stepping to the lowest neighboring point at each iteration.</p>
+</section>
+<section id="the-continuous-limit" class="level3">
+<h3>3.2.3 The Continuous Limit</h3>
+<p>In the continuous limit — when the state space becomes a manifold and the discrete steps become infinitesimal — A* becomes gradient flow on the f-landscape. The search trajectory satisfies</p>
+<p><span class="math display">\frac{dx}{dt} = -\nabla f(x) = -\nabla g(x) - \nabla h(x)</span></p>
+<p>This is a dynamical system. The search trajectory is a solution curve of this ODE. The behavior of the search is determined by the geometry of the f-landscape: its critical points, its basins of attraction, its saddle structures, its ridgelines.</p>
+<ul>
+<li><p><strong>Minima of <span class="math inline">f</span></strong> are attractors of the search — states toward which the search converges. True solutions correspond to global minima. Local minima of <span class="math inline">f</span> that are not true solutions are traps — the search converges to them but finds no solution.</p></li>
+<li><p><strong>Saddle points of <span class="math inline">f</span></strong> are decision points — states where the search must choose between descending into one basin or another. The search’s behavior at saddle points determines which solution basin it enters.</p></li>
+<li><p><strong>Ridgelines of <span class="math inline">f</span></strong> are barriers — the search must climb over them to move between basins. If the ridgelines are too high, the search is trapped in its current basin even if better solutions exist in adjacent basins.</p></li>
+<li><p><strong>Plateaus of <span class="math inline">f</span></strong> are regions where <span class="math inline">\nabla f \approx 0</span> — the search has no gradient signal and wanders without direction. These are the “dead zones” we will examine in Chapter 7.</p></li>
 </ul>
-<ul class="book-list">
-<li><strong>Saddle points of <em class="math">f</em></strong> are decision points — states where the search must choose between descending into one basin or another. The search's behavior at saddle points determines which solution basin it enters.</li>
-</ul>
-<ul class="book-list">
-<li><strong>Ridgelines of <em class="math">f</em></strong> are barriers — the search must climb over them to move between basins. If the ridgelines are too high, the search is trapped in its current basin even if better solutions exist in adjacent basins.</li>
-</ul>
-<ul class="book-list">
-<li><strong>Plateaus of <em class="math">f</em></strong> are regions where <em class="math">\nabla f \approx 0</em> — the search has no gradient signal and wanders without direction. These are the "dead zones" we will examine in Chapter 7.</li>
-</ul>
-<h3 id="324-why-this-reinterpretation-matters" class="subsection-heading">3.2.4 Why This Reinterpretation Matters</h3>
-<p class="first-paragraph">The standard proof that A* is optimal — that it finds the shortest path when <em class="math">h</em> is admissible and consistent — is an algebraic argument about node expansions. The geometric reinterpretation adds a layer of understanding that the algebraic proof does not provide.</p>
-<p class="body-text">When A* fails to find the optimal path (because <em class="math">h</em> is inadmissible), the geometric view tells us how it fails: the f-landscape has a false valley that captures the search before it reaches the true minimum. When A* is slow (because <em class="math">h</em> is uninformative), the geometric view tells us why: the f-landscape is flat, providing no gradient signal to direct the search. When A* revisits states (because <em class="math">h</em> is inconsistent), the geometric view tells us what is happening*: the f-landscape has wrinkles that cause the gradient flow to circle back on itself.</p>
-<p class="body-text">This geometric perspective transfers directly to reasoning systems that are not explicitly running A*. Any system that maintains an estimate of "how far am I from the goal" and uses that estimate to decide what to do next is navigating an evaluation landscape. The geometry of that landscape — which is determined by the quality of the heuristic — governs the system's reasoning behavior.</p>
-<h2 id="33-properties-of-good-heuristics-admissibility-and-consistency" class="section-heading">3.3 Properties of Good Heuristics: Admissibility and Consistency</h2>
-<h3 id="331-admissibility" class="subsection-heading">3.3.1 Admissibility</h3>
-<p class="first-paragraph">A heuristic <em class="math">h</em> is <strong>admissible</strong> if it never overestimates the true cost to reach the goal:</p>
-<p class="body-text"><span class="math-block">\forall x \in M: \quad h(x) \leq h^*(x)</span></p>
-<p class="body-text">where <em class="math">h^*(x)</em> is the true optimal cost-to-go. This condition means the heuristic is <strong>optimistic</strong>: it always believes the goal is at least as close as it actually is, or closer.</p>
-<p class="body-text"><strong>[Established Mathematics.]</strong> The celebrated theorem of Hart, Nilsson, and Raphael (1968) states that if <em class="math">h</em> is admissible, then A* finds an optimal path. The geometric content of this theorem is illuminating: admissibility means the f-landscape never has false valleys below the true minimum. Every valley in the f-landscape that is lower than the true solution's valley corresponds to a path that the heuristic judges as cheaper than optimal — but admissibility forbids this. So the true solution's valley is always the deepest, and gradient descent on the f-landscape always finds it.</p>
-<p class="body-text">The converse is equally important: <strong>if the heuristic overestimates</strong> — if there exist states where <em class="math">h(x) &gt; h^*(x)</em> — then the f-landscape can develop false valleys. The search may descend into one of these false valleys and declare a suboptimal solution to be optimal. The magnitude of the overestimation determines the depth of the false valley, and hence the likelihood and severity of the error.</p>
-<h3 id="332-consistency" class="subsection-heading">3.3.2 Consistency</h3>
-<p class="first-paragraph">A heuristic <em class="math">h</em> is <strong>consistent</strong> (also called monotone) if it satisfies the triangle inequality:</p>
-<p class="body-text"><span class="math-block">\forall x, y \in M: \quad h(x) \leq c(x, y) + h(y)</span></p>
-<p class="body-text">where <em class="math">c(x, y)</em> is the cost of moving from <em class="math">x</em> to <em class="math">y</em>. Consistency means the heuristic's estimates are mutually coherent — the estimated cost at <em class="math">x</em> is never more than the estimated cost at <em class="math">y</em> plus the cost of getting from <em class="math">x</em> to <em class="math">y</em>.</p>
-<p class="body-text">Geometrically, consistency means the f-landscape is <strong>monotonically non-decreasing</strong> along any path away from the goal. There are no "dips" or "wrinkles" in the f-landscape that would cause the search to encounter a lower f-value after passing through a higher one. This ensures that the gradient flow never reverses — the search never needs to backtrack.</p>
-<p class="body-text">Consistency implies admissibility (by induction on the path to the goal), but not vice versa. A heuristic can be admissible (optimistic on average) but inconsistent (locally non-monotone). Such a heuristic produces an f-landscape with local wrinkles — the search still finds the optimal solution (because there are no false valleys below the true minimum), but it may need to revisit states along the way.</p>
-<h3 id="333-the-quality-spectrum" class="subsection-heading">3.3.3 The Quality Spectrum</h3>
-<p class="first-paragraph">Between the zero heuristic <em class="math">h \equiv 0</em> (which is trivially admissible and consistent but provides no guidance) and the perfect heuristic <em class="math">h = h^*</em> (which provides maximum guidance), there is a continuous spectrum of heuristic quality.</p>
-<p class="body-text">A heuristic is "better" when it is closer to <em class="math">h* — when the f-landscape it produces is closer to the true cost landscape</em>. Formally, the quality of a heuristic can be measured by its <strong>informedness</strong>: the expected value of <em class="math">h(x)</em> over the state space. A more informed admissible heuristic dominates a less informed one in the sense that A* with the more informed heuristic never expands more states than A* with the less informed one.</p>
-<p class="body-text">In the geometric picture, informedness corresponds to the <strong>sharpness</strong> of the f-landscape's valleys. A highly informed heuristic produces steep, narrow valleys that funnel the search directly to the solution. A weakly informed heuristic produces broad, shallow valleys — the search descends toward the solution, but slowly and imprecisely.</p>
-<h3 id="334-what-admissibility-means-for-cognition" class="subsection-heading">3.3.4 What Admissibility Means for Cognition</h3>
-<p class="first-paragraph">Let us translate these formal properties into cognitive terms. Consider a human or artificial reasoner working on a problem. The heuristic <em class="math">h(x)</em> is whatever internal signal tells the reasoner "I think I am this far from the answer."</p>
-<p class="body-text"><strong>Admissibility</strong> means the reasoner never believes it is closer to the answer than it actually is. An admissible cognitive heuristic is one that errs on the side of caution — "I might need more work" — rather than on the side of premature satisfaction — "I think I'm almost done."</p>
-<p class="body-text"><strong>Consistency</strong> means the reasoner's estimates are locally coherent. If the reasoner judges that state <em class="math">x</em> is close to the answer, and state <em class="math">y</em> is one step from <em class="math">x</em>, then the reasoner should judge state <em class="math">y</em> to be only slightly farther from or closer to the answer — not dramatically different.</p>
-<p class="body-text"><strong>Overestimation</strong> — the failure of admissibility — means the reasoner thinks it is farther from the answer than it is. This sounds problematic, but it merely produces excessive caution: the search takes too long but still finds the right answer.</p>
-<p class="body-text"><strong>Underestimation</strong> — the more dangerous failure — means the reasoner thinks it is closer to the answer than it is. The reasoner becomes overconfident, and the search terminates prematurely at a suboptimal solution. This is a critical asymmetry: optimism about proximity is more dangerous than pessimism.</p>
-<p class="body-text">Wait. This requires careful attention. In the A* literature, "overestimation" by the heuristic is dangerous (it means <em class="math">h(x) &gt; h*(x)</em>, the heuristic overestimates cost-to-go), and this causes the algorithm to miss optimal solutions. But in the cognitive context, what we observe as "overconfidence" is the system believing it is closer to the goal than it is — which corresponds to the heuristic underestimating cost-to-go. The heuristic says "you're almost there" when the truth is "you have a long way to go."</p>
-<p class="body-text">This notational subtlety matters enormously. When a language model is overconfident — when it assigns high probability to an incorrect answer — its heuristic is underestimating the remaining cost. In A* terms, this means <em class="math">h(x) &lt; h*(x)</em>, which corresponds to... an admissible heuristic? No. The problem is more subtle than it first appears. The heuristic is underestimating cost-to-go, which is admissible for A* and safe for finding the optimal solution. But the model is not running A^*. an admissible heuristic? No. The problem is more subtle than it first appears. The heuristic is underestimating cost-to-go, which is admissible for A* and safe for finding the optimal solution. But the model is not running A*. The model terminates when it believes <em class="math">h(x) \approx 0</em> — when it believes it has reached the goal. If <em class="math">h</em> systematically underestimates, the model terminates too early, at states that it believes are near-goal but are actually far from it.</p>
-<p class="body-text">Let us state this precisely. In an A*-like search that expands nodes until the goal is found, admissibility (never overestimating cost-to-go) guarantees optimality. But in a satisficing search that terminates when the estimated remaining cost drops below a threshold — which is closer to how both humans and LLMs operate — underestimation of cost-to-go is catastrophic. The system halts its search prematurely, satisfied that it has arrived, when in fact it has not.</p>
-<p class="body-text">This is the bridge between the classical A* framework and the cognitive reality of overconfident reasoning, and it will be the focus of Section 3.6.</p>
-<h2 id="34-the-heuristic-in-neural-networks" class="section-heading">3.4 The Heuristic in Neural Networks</h2>
-<h3 id="341-where-is-the-heuristic" class="subsection-heading">3.4.1 Where Is the Heuristic?</h3>
-<p class="first-paragraph">A transformer-based language model does not have an explicit heuristic function. There is no variable labeled <em class="math">h</em> that stores an estimate of cost-to-go. And yet, the model demonstrably engages in something like heuristic-guided search: it generates tokens that are more likely to lead toward coherent, goal-satisfying completions; it allocates more computation to harder decisions; it produces intermediate reasoning steps that progressively narrow the space of possible answers.</p>
-<p class="body-text">If the heuristic field is the central navigational signal, where does it live in the network?</p>
-<p class="body-text"><strong>[Speculation/Extension.]</strong> The answer is: everywhere and nowhere. The heuristic is not localized in a single component. It is an emergent property of the entire forward pass — the combined action of embeddings, attention layers, MLP layers, layer normalization, and the residual stream. At each layer, the network's internal representation is updated in a way that (implicitly) moves the representation closer to the region of activation space that corresponds to the correct output. The direction and magnitude of this movement at each layer constitutes the local gradient of the implicit heuristic field.</p>
-<h3 id="342-the-residual-stream-as-heuristic-trajectory" class="subsection-heading">3.4.2 The Residual Stream as Heuristic Trajectory</h3>
-<p class="first-paragraph">The residual stream interpretation of transformers (Elhage et al., 2021) provides a natural framework. In this view, the model maintains a residual stream <em class="math">\mathbf{r} \in \mathbb{R}^d</em> that is progressively updated by each layer:</p>
-<p class="body-text"><span class="math-block">\mathbf{r}^{(\ell+1)} = \mathbf{r}^{(\ell)} + \Delta^{(\ell)}(\mathbf{r}^{(\ell)})</span></p>
-<p class="body-text">where <em class="math">\Delta^{(\ell)}</em> is the update contributed by layer <em class="math">\ell</em> (the sum of the attention head outputs and the MLP output).</p>
-<p class="body-text">Each update <em class="math">\Delta^{(\ell)}</em> moves the residual stream in some direction. If the model is "reasoning well," these updates move the residual stream toward the region of activation space that maps to the correct answer under the unembedding matrix. If the model is "reasoning poorly," the updates move it in unproductive or counterproductive directions.</p>
-<p class="body-text">The implicit heuristic <em class="math">h(\mathbf{r})</em> at any point in the residual stream is something like "the distance from <em class="math">\mathbf{r}</em> to the correct-answer region of activation space." We cannot measure this directly (we do not know the correct-answer region in advance), but we can characterize it indirectly through the model's behavior. The model's confidence (the probability it assigns to the most likely next token) is a proxy for <em class="math">h(\mathbf{r})</em> — high confidence corresponds to low estimated remaining cost.</p>
-<h3 id="343-mlp-layers-as-heuristic-evaluation" class="subsection-heading">3.4.3 MLP Layers as Heuristic Evaluation</h3>
-<p class="first-paragraph">The MLP layers in a transformer perform a function that is strikingly analogous to heuristic evaluation in classical search. Each MLP layer takes the current representation, passes it through a nonlinear transformation, and produces an update vector. This update is computed based on the model's "knowledge" — the patterns encoded in the MLP weights during training.</p>
-<p class="body-text">In the heuristic field framework, the MLP layers implement the <strong>evaluation component</strong> of the heuristic: they look at the current state (representation) and compute an estimate of what direction to move. The weights of the MLP encode, in compressed form, the model's learned understanding of what "closer to the goal" looks like for various types of problems.</p>
-<p class="body-text">This is why MLP layers have been found to store factual knowledge (Meng et al., 2022; Geva et al., 2021). Factual knowledge is precisely the kind of information needed to evaluate heuristic cost: knowing that "Paris is the capital of France" allows the heuristic to assign low cost-to-go to representations that are heading toward "Paris" when the question asks about France's capital.</p>
-<h2 id="35-attention-as-heuristic-guidance" class="section-heading">3.5 Attention as Heuristic Guidance</h2>
-<h3 id="351-what-attention-does" class="subsection-heading">3.5.1 What Attention Does</h3>
-<p class="first-paragraph">The attention mechanism (Vaswani et al., 2017) computes, for each token position, a weighted combination of value vectors from all other positions:</p>
-<p class="body-text"><span class="math-block">\text{Attention}(Q, K, V) = \text{softmax}\left(\frac{QK^T}{\sqrt{d_k}}\right)V</span></p>
-<p class="body-text">The attention weights — the softmax-normalized dot products of queries and keys — determine how much each position contributes to the update of every other position. A high attention weight from position <em class="math">i</em> to position <em class="math">j</em> means that the information at position <em class="math">j</em> is judged to be relevant for updating the representation at position <em class="math">i</em>.</p>
-<h3 id="352-attention-as-relevance-routing" class="subsection-heading">3.5.2 Attention as Relevance Routing</h3>
-<p class="first-paragraph"><strong>[Speculation/Extension.]</strong> In the heuristic field framework, attention implements the <strong>guidance component</strong> of the heuristic: it determines which information is relevant for the current reasoning step. This is precisely what a heuristic does — it says "look here, not there."</p>
-<p class="body-text">Consider a model solving a multi-step reasoning problem. At each layer, the attention mechanism must decide which pieces of the input (and which intermediate reasoning results from previous layers) are most relevant to the current inferential step. A high attention weight says: "This token carries information that reduces the estimated cost-to-go." A low attention weight says: "This token is irrelevant to the current reasoning objective."</p>
-<p class="body-text">This is not a metaphor. The attention pattern is literally a routing mechanism that implements preferential allocation of computational resources to promising directions. It is a discrete approximation to the gradient of the heuristic field — it points the computation toward the information that the model judges will most reduce the remaining distance to the goal.</p>
-<h3 id="353-multi-head-attention-as-multi-directional-heuristic" class="subsection-heading">3.5.3 Multi-Head Attention as Multi-Directional Heuristic</h3>
-<p class="first-paragraph">Multi-head attention — the use of multiple independent attention heads per layer — corresponds to evaluating the heuristic gradient along multiple directions simultaneously. Each head computes its own relevance judgments, attending to different aspects of the input. One head might attend to syntactic structure; another to semantic content; another to positional information.</p>
-<p class="body-text">In the heuristic field picture, each head computes a directional derivative of the heuristic in a different direction. The combined output of all heads gives a multi-dimensional gradient signal — not just "the goal is that way," but "the goal is that way along dimension 1, that way along dimension 2, and that way along dimension 3."</p>
-<p class="body-text">This explains why multi-head attention is so effective: it provides a richer, more informative gradient signal than single-head attention. A single head can only point in one direction at a time. Multiple heads can triangulate — combining multiple directional signals to produce a more accurate estimate of the true gradient.</p>
-<h3 id="354-the-attention-pattern-as-heuristic-topology" class="subsection-heading">3.5.4 The Attention Pattern as Heuristic Topology</h3>
-<p class="first-paragraph">The pattern of attention weights across all heads and all layers constitutes a complex relational structure. This structure is the model's implicit representation of which parts of the problem are connected to which other parts — the topology of the heuristic field.</p>
-<p class="body-text">When the attention pattern correctly identifies the relevant dependencies in a problem, the heuristic field has the right topology — it guides the search along paths that respect the problem's structure. When the attention pattern misidentifies relevance — attending to superficially salient but logically irrelevant features — the heuristic field's topology is wrong. The search follows paths that feel productive (they attend to vivid, attention-grabbing information) but do not actually lead toward the goal.</p>
-<p class="body-text">This is the mechanism behind the heuristic corruption effects we will examine in Chapter 5. Framing effects, emotional anchoring, and sensory distractors do not change the logical structure of the problem. They change the attention pattern — and through it, the topology of the implicit heuristic field. The corrupted heuristic guides the search toward the salient rather than the correct, toward the vivid rather than the valid.</p>
-<h2 id="36-when-the-heuristic-lies-overconfidence-as-inadmissibility" class="section-heading">3.6 When the Heuristic Lies: Overconfidence as Inadmissibility</h2>
-<h3 id="361-the-calibration-connection" class="subsection-heading">3.6.1 The Calibration Connection</h3>
-<p class="first-paragraph">We are now in a position to connect the formal framework to empirical measurement. If the heuristic field guides reasoning, and the quality of reasoning depends on the quality of the heuristic field, then we should be able to measure heuristic quality. And we can — through <strong>calibration</strong>.</p>
-<p class="body-text">A reasoner is <strong>well-calibrated</strong> if its confidence in its answers matches its actual accuracy. When the reasoner says "I am 80% confident this answer is correct," the answer should be correct approximately 80% of the time. Calibration is precisely the accuracy of the heuristic's terminal evaluation: when the reasoner judges <em class="math">h(x) \approx 0</em> (I have reached the goal), is it actually at the goal?</p>
-<p class="body-text">The <strong>Expected Calibration Error (ECE)</strong> quantifies the gap between stated confidence and actual accuracy, averaged across confidence bins:</p>
-<p class="body-text"><span class="math-block">\text{ECE} = \sum_{b=1}^{B} \frac{n_b}{N} |\text{acc}(b) - \text{conf}(b)|</span></p>
-<p class="body-text">where <em class="math">\text{acc}(b)</em> is the actual accuracy in bin <em class="math">b</em>, <em class="math">\text{conf}(b)</em> is the mean confidence in bin <em class="math">b</em>, <em class="math">n_b</em> is the number of predictions in bin <em class="math">b</em>, and <em class="math">N</em> is the total number of predictions.</p>
-<p class="body-text">An ECE of zero means perfect calibration — the heuristic's terminal evaluation is perfectly accurate. A nonzero ECE means the heuristic systematically misjudges the remaining cost at termination.</p>
-<h3 id="362-the-empirical-findings" class="subsection-heading">3.6.2 The Empirical Findings</h3>
-<p class="first-paragraph">In the Measuring AGI metacognition benchmark (M1: Calibration Under Uncertainty), we measured calibration ECE across five frontier language models. The results are unambiguous:</p>
-<div class="table-wrapper"><table class="book-table">
+</section>
+<section id="why-this-reinterpretation-matters" class="level3">
+<h3>3.2.4 Why This Reinterpretation Matters</h3>
+<p>The standard proof that A* is optimal — that it finds the shortest path when <span class="math inline">h</span> is admissible and consistent — is an algebraic argument about node expansions. The geometric reinterpretation adds a layer of understanding that the algebraic proof does not provide.</p>
+<p>When A* fails to find the optimal path (because <span class="math inline">h</span> is inadmissible), the geometric view tells us <em>how</em> it fails: the f-landscape has a false valley that captures the search before it reaches the true minimum. When A* is slow (because <span class="math inline">h</span> is uninformative), the geometric view tells us <em>why</em>: the f-landscape is flat, providing no gradient signal to direct the search. When A* revisits states (because <span class="math inline">h</span> is inconsistent), the geometric view tells us <em>what is happening</em>: the f-landscape has wrinkles that cause the gradient flow to circle back on itself.</p>
+<p>This geometric perspective transfers directly to reasoning systems that are not explicitly running A*. Any system that maintains an estimate of “how far am I from the goal” and uses that estimate to decide what to do next is navigating an evaluation landscape. The geometry of that landscape — which is determined by the quality of the heuristic — governs the system’s reasoning behavior.</p>
+<hr />
+</section>
+</section>
+<section id="properties-of-good-heuristics-admissibility-and-consistency" class="level2">
+<h2>3.3 Properties of Good Heuristics: Admissibility and Consistency</h2>
+<section id="admissibility" class="level3">
+<h3>3.3.1 Admissibility</h3>
+<p>A heuristic <span class="math inline">h</span> is <strong>admissible</strong> if it never overestimates the true cost to reach the goal:</p>
+<p><span class="math display">\forall x \in M: \quad h(x) \leq h^*(x)</span></p>
+<p>where <span class="math inline">h^*(x)</span> is the true optimal cost-to-go. This condition means the heuristic is <strong>optimistic</strong>: it always believes the goal is at least as close as it actually is, or closer.</p>
+<p><strong>[Established Mathematics.]</strong> The celebrated theorem of Hart, Nilsson, and Raphael (1968) states that if <span class="math inline">h</span> is admissible, then A* finds an optimal path. The geometric content of this theorem is illuminating: admissibility means the f-landscape never has false valleys below the true minimum. Every valley in the f-landscape that is lower than the true solution’s valley corresponds to a path that the heuristic judges as cheaper than optimal — but admissibility forbids this. So the true solution’s valley is always the deepest, and gradient descent on the f-landscape always finds it.</p>
+<p>The converse is equally important: <strong>if the heuristic overestimates</strong> — if there exist states where <span class="math inline">h(x) &gt; h^*(x)</span> — then the f-landscape can develop false valleys. The search may descend into one of these false valleys and declare a suboptimal solution to be optimal. The magnitude of the overestimation determines the depth of the false valley, and hence the likelihood and severity of the error.</p>
+</section>
+<section id="consistency" class="level3">
+<h3>3.3.2 Consistency</h3>
+<p>A heuristic <span class="math inline">h</span> is <strong>consistent</strong> (also called monotone) if it satisfies the triangle inequality:</p>
+<p><span class="math display">\forall x, y \in M: \quad h(x) \leq c(x, y) + h(y)</span></p>
+<p>where <span class="math inline">c(x, y)</span> is the cost of moving from <span class="math inline">x</span> to <span class="math inline">y</span>. Consistency means the heuristic’s estimates are mutually coherent — the estimated cost at <span class="math inline">x</span> is never more than the estimated cost at <span class="math inline">y</span> plus the cost of getting from <span class="math inline">x</span> to <span class="math inline">y</span>.</p>
+<p>Geometrically, consistency means the f-landscape is <strong>monotonically non-decreasing</strong> along any path away from the goal. There are no “dips” or “wrinkles” in the f-landscape that would cause the search to encounter a lower f-value after passing through a higher one. This ensures that the gradient flow never reverses — the search never needs to backtrack.</p>
+<p>Consistency implies admissibility (by induction on the path to the goal), but not vice versa. A heuristic can be admissible (optimistic on average) but inconsistent (locally non-monotone). Such a heuristic produces an f-landscape with local wrinkles — the search still finds the optimal solution (because there are no false valleys below the true minimum), but it may need to revisit states along the way.</p>
+</section>
+<section id="the-quality-spectrum" class="level3">
+<h3>3.3.3 The Quality Spectrum</h3>
+<p>Between the zero heuristic <span class="math inline">h \equiv 0</span> (which is trivially admissible and consistent but provides no guidance) and the perfect heuristic <span class="math inline">h = h^*</span> (which provides maximum guidance), there is a continuous spectrum of heuristic quality.</p>
+<p>A heuristic is “better” when it is closer to <span class="math inline">h^*</span> — when the f-landscape it produces is closer to the true cost landscape. Formally, the quality of a heuristic can be measured by its <strong>informedness</strong>: the expected value of <span class="math inline">h(x)</span> over the state space. A more informed admissible heuristic dominates a less informed one in the sense that A* with the more informed heuristic never expands more states than A* with the less informed one.</p>
+<p>In the geometric picture, informedness corresponds to the <strong>sharpness</strong> of the f-landscape’s valleys. A highly informed heuristic produces steep, narrow valleys that funnel the search directly to the solution. A weakly informed heuristic produces broad, shallow valleys — the search descends toward the solution, but slowly and imprecisely.</p>
+</section>
+<section id="what-admissibility-means-for-cognition" class="level3">
+<h3>3.3.4 What Admissibility Means for Cognition</h3>
+<p>Let us translate these formal properties into cognitive terms. Consider a human or artificial reasoner working on a problem. The heuristic <span class="math inline">h(x)</span> is whatever internal signal tells the reasoner “I think I am this far from the answer.”</p>
+<p><strong>Admissibility</strong> means the reasoner never believes it is closer to the answer than it actually is. An admissible cognitive heuristic is one that errs on the side of caution — “I might need more work” — rather than on the side of premature satisfaction — “I think I’m almost done.”</p>
+<p><strong>Consistency</strong> means the reasoner’s estimates are locally coherent. If the reasoner judges that state <span class="math inline">x</span> is close to the answer, and state <span class="math inline">y</span> is one step from <span class="math inline">x</span>, then the reasoner should judge state <span class="math inline">y</span> to be only slightly farther from or closer to the answer — not dramatically different.</p>
+<p><strong>Overestimation</strong> — the failure of admissibility — means the reasoner thinks it is farther from the answer than it is. This sounds problematic, but it merely produces excessive caution: the search takes too long but still finds the right answer.</p>
+<p><strong>Underestimation</strong> — the more dangerous failure — means the reasoner thinks it is closer to the answer than it is. The reasoner becomes overconfident, and the search terminates prematurely at a suboptimal solution. This is a critical asymmetry: optimism about proximity is more dangerous than pessimism.</p>
+<p>Wait. This requires careful attention. In the A* literature, “overestimation” by the heuristic is dangerous (it means <span class="math inline">h(x) &gt; h^*(x)</span>, the heuristic overestimates cost-to-go), and this causes the algorithm to miss optimal solutions. But in the cognitive context, what we observe as “overconfidence” is the system believing it is <em>closer</em> to the goal than it is — which corresponds to the heuristic <em>underestimating</em> cost-to-go. The heuristic says “you’re almost there” when the truth is “you have a long way to go.”</p>
+<p>This notational subtlety matters enormously. When a language model is overconfident — when it assigns high probability to an incorrect answer — its heuristic is <em>underestimating</em> the remaining cost. In A* terms, this means <span class="math inline">h(x) &lt; h^*(x)</span>, which corresponds to… an admissible heuristic? No. The problem is more subtle than it first appears. The heuristic is underestimating cost-to-go, which is admissible for A* and safe for finding the optimal solution. But the model is not running A*. The model terminates when it believes <span class="math inline">h(x) \approx 0</span> — when it believes it has reached the goal. If <span class="math inline">h</span> systematically underestimates, the model terminates too early, at states that it believes are near-goal but are actually far from it.</p>
+<p>Let us state this precisely. In an A*-like search that expands nodes until the goal is found, admissibility (never overestimating cost-to-go) guarantees optimality. But in a satisficing search that terminates when the estimated remaining cost drops below a threshold — which is closer to how both humans and LLMs operate — underestimation of cost-to-go is catastrophic. The system halts its search prematurely, satisfied that it has arrived, when in fact it has not.</p>
+<p>This is the bridge between the classical A* framework and the cognitive reality of overconfident reasoning, and it will be the focus of Section 3.6.</p>
+<hr />
+</section>
+</section>
+<section id="the-heuristic-in-neural-networks" class="level2">
+<h2>3.4 The Heuristic in Neural Networks</h2>
+<section id="where-is-the-heuristic" class="level3">
+<h3>3.4.1 Where Is the Heuristic?</h3>
+<p>A transformer-based language model does not have an explicit heuristic function. There is no variable labeled <span class="math inline">h</span> that stores an estimate of cost-to-go. And yet, the model demonstrably engages in something like heuristic-guided search: it generates tokens that are more likely to lead toward coherent, goal-satisfying completions; it allocates more computation to harder decisions; it produces intermediate reasoning steps that progressively narrow the space of possible answers.</p>
+<p>If the heuristic field is the central navigational signal, where does it live in the network?</p>
+<p><strong>[Speculation/Extension.]</strong> The answer is: everywhere and nowhere. The heuristic is not localized in a single component. It is an emergent property of the entire forward pass — the combined action of embeddings, attention layers, MLP layers, layer normalization, and the residual stream. At each layer, the network’s internal representation is updated in a way that (implicitly) moves the representation closer to the region of activation space that corresponds to the correct output. The direction and magnitude of this movement at each layer constitutes the local gradient of the implicit heuristic field.</p>
+</section>
+<section id="the-residual-stream-as-heuristic-trajectory" class="level3">
+<h3>3.4.2 The Residual Stream as Heuristic Trajectory</h3>
+<p>The residual stream interpretation of transformers (Elhage et al., 2021) provides a natural framework. In this view, the model maintains a residual stream <span class="math inline">\mathbf{r} \in \mathbb{R}^d</span> that is progressively updated by each layer:</p>
+<p><span class="math display">\mathbf{r}^{(\ell+1)} = \mathbf{r}^{(\ell)} + \Delta^{(\ell)}(\mathbf{r}^{(\ell)})</span></p>
+<p>where <span class="math inline">\Delta^{(\ell)}</span> is the update contributed by layer <span class="math inline">\ell</span> (the sum of the attention head outputs and the MLP output).</p>
+<p>Each update <span class="math inline">\Delta^{(\ell)}</span> moves the residual stream in some direction. If the model is “reasoning well,” these updates move the residual stream toward the region of activation space that maps to the correct answer under the unembedding matrix. If the model is “reasoning poorly,” the updates move it in unproductive or counterproductive directions.</p>
+<p>The implicit heuristic <span class="math inline">h(\mathbf{r})</span> at any point in the residual stream is something like “the distance from <span class="math inline">\mathbf{r}</span> to the correct-answer region of activation space.” We cannot measure this directly (we do not know the correct-answer region in advance), but we can characterize it indirectly through the model’s behavior. The model’s confidence (the probability it assigns to the most likely next token) is a proxy for <span class="math inline">h(\mathbf{r})</span> — high confidence corresponds to low estimated remaining cost.</p>
+</section>
+<section id="mlp-layers-as-heuristic-evaluation" class="level3">
+<h3>3.4.3 MLP Layers as Heuristic Evaluation</h3>
+<p>The MLP layers in a transformer perform a function that is strikingly analogous to heuristic evaluation in classical search. Each MLP layer takes the current representation, passes it through a nonlinear transformation, and produces an update vector. This update is computed based on the model’s “knowledge” — the patterns encoded in the MLP weights during training.</p>
+<p>In the heuristic field framework, the MLP layers implement the <strong>evaluation component</strong> of the heuristic: they look at the current state (representation) and compute an estimate of what direction to move. The weights of the MLP encode, in compressed form, the model’s learned understanding of what “closer to the goal” looks like for various types of problems.</p>
+<p>This is why MLP layers have been found to store factual knowledge (Meng et al., 2022; Geva et al., 2021). Factual knowledge is precisely the kind of information needed to evaluate heuristic cost: knowing that “Paris is the capital of France” allows the heuristic to assign low cost-to-go to representations that are heading toward “Paris” when the question asks about France’s capital.</p>
+<hr />
+</section>
+</section>
+<section id="attention-as-heuristic-guidance" class="level2">
+<h2>3.5 Attention as Heuristic Guidance</h2>
+<section id="what-attention-does" class="level3">
+<h3>3.5.1 What Attention Does</h3>
+<p>The attention mechanism (Vaswani et al., 2017) computes, for each token position, a weighted combination of value vectors from all other positions:</p>
+<p><span class="math display">\text{Attention}(Q, K, V) = \text{softmax}\left(\frac{QK^T}{\sqrt{d_k}}\right)V</span></p>
+<p>The attention weights — the softmax-normalized dot products of queries and keys — determine how much each position contributes to the update of every other position. A high attention weight from position <span class="math inline">i</span> to position <span class="math inline">j</span> means that the information at position <span class="math inline">j</span> is judged to be relevant for updating the representation at position <span class="math inline">i</span>.</p>
+</section>
+<section id="attention-as-relevance-routing" class="level3">
+<h3>3.5.2 Attention as Relevance Routing</h3>
+<p><strong>[Speculation/Extension.]</strong> In the heuristic field framework, attention implements the <strong>guidance component</strong> of the heuristic: it determines which information is relevant for the current reasoning step. This is precisely what a heuristic does — it says “look here, not there.”</p>
+<p>Consider a model solving a multi-step reasoning problem. At each layer, the attention mechanism must decide which pieces of the input (and which intermediate reasoning results from previous layers) are most relevant to the current inferential step. A high attention weight says: “This token carries information that reduces the estimated cost-to-go.” A low attention weight says: “This token is irrelevant to the current reasoning objective.”</p>
+<p>This is not a metaphor. The attention pattern is literally a routing mechanism that implements preferential allocation of computational resources to promising directions. It is a discrete approximation to the gradient of the heuristic field — it points the computation toward the information that the model judges will most reduce the remaining distance to the goal.</p>
+</section>
+<section id="multi-head-attention-as-multi-directional-heuristic" class="level3">
+<h3>3.5.3 Multi-Head Attention as Multi-Directional Heuristic</h3>
+<p>Multi-head attention — the use of multiple independent attention heads per layer — corresponds to evaluating the heuristic gradient along multiple directions simultaneously. Each head computes its own relevance judgments, attending to different aspects of the input. One head might attend to syntactic structure; another to semantic content; another to positional information.</p>
+<p>In the heuristic field picture, each head computes a directional derivative of the heuristic in a different direction. The combined output of all heads gives a multi-dimensional gradient signal — not just “the goal is that way,” but “the goal is that way along dimension 1, that way along dimension 2, and that way along dimension 3.”</p>
+<p>This explains why multi-head attention is so effective: it provides a richer, more informative gradient signal than single-head attention. A single head can only point in one direction at a time. Multiple heads can triangulate — combining multiple directional signals to produce a more accurate estimate of the true gradient.</p>
+</section>
+<section id="the-attention-pattern-as-heuristic-topology" class="level3">
+<h3>3.5.4 The Attention Pattern as Heuristic Topology</h3>
+<p>The pattern of attention weights across all heads and all layers constitutes a complex relational structure. This structure is the model’s implicit representation of which parts of the problem are connected to which other parts — the topology of the heuristic field.</p>
+<p>When the attention pattern correctly identifies the relevant dependencies in a problem, the heuristic field has the right topology — it guides the search along paths that respect the problem’s structure. When the attention pattern misidentifies relevance — attending to superficially salient but logically irrelevant features — the heuristic field’s topology is wrong. The search follows paths that feel productive (they attend to vivid, attention-grabbing information) but do not actually lead toward the goal.</p>
+<p>This is the mechanism behind the heuristic corruption effects we will examine in Chapter 5. Framing effects, emotional anchoring, and sensory distractors do not change the logical structure of the problem. They change the attention pattern — and through it, the topology of the implicit heuristic field. The corrupted heuristic guides the search toward the salient rather than the correct, toward the vivid rather than the valid.</p>
+<hr />
+</section>
+</section>
+<section id="when-the-heuristic-lies-overconfidence-as-inadmissibility" class="level2">
+<h2>3.6 When the Heuristic Lies: Overconfidence as Inadmissibility</h2>
+<section id="the-calibration-connection" class="level3">
+<h3>3.6.1 The Calibration Connection</h3>
+<p>We are now in a position to connect the formal framework to empirical measurement. If the heuristic field guides reasoning, and the quality of reasoning depends on the quality of the heuristic field, then we should be able to measure heuristic quality. And we can — through <strong>calibration</strong>.</p>
+<p>A reasoner is <strong>well-calibrated</strong> if its confidence in its answers matches its actual accuracy. When the reasoner says “I am 80% confident this answer is correct,” the answer should be correct approximately 80% of the time. Calibration is precisely the accuracy of the heuristic’s terminal evaluation: when the reasoner judges <span class="math inline">h(x) \approx 0</span> (I have reached the goal), is it actually at the goal?</p>
+<p>The <strong>Expected Calibration Error (ECE)</strong> quantifies the gap between stated confidence and actual accuracy, averaged across confidence bins:</p>
+<p><span class="math display">\text{ECE} = \sum_{b=1}^{B} \frac{n_b}{N} |\text{acc}(b) - \text{conf}(b)|</span></p>
+<p>where <span class="math inline">\text{acc}(b)</span> is the actual accuracy in bin <span class="math inline">b</span>, <span class="math inline">\text{conf}(b)</span> is the mean confidence in bin <span class="math inline">b</span>, <span class="math inline">n_b</span> is the number of predictions in bin <span class="math inline">b</span>, and <span class="math inline">N</span> is the total number of predictions.</p>
+<p>An ECE of zero means perfect calibration — the heuristic’s terminal evaluation is perfectly accurate. A nonzero ECE means the heuristic systematically misjudges the remaining cost at termination.</p>
+</section>
+<section id="the-empirical-findings" class="level3">
+<h3>3.6.2 The Empirical Findings</h3>
+<p>In the Measuring AGI metacognition benchmark (M1: Calibration Under Uncertainty), we measured calibration ECE across five frontier language models. The results are unambiguous:</p>
+<table>
+<thead>
 <tr>
-  <th>Model</th>
-  <th>ECE</th>
-  <th>Direction</th>
+<th>Model</th>
+<th>ECE</th>
+<th>Direction</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Gemini Flash 2.0</td>
+<td>0.414</td>
+<td>Overconfident</td>
 </tr>
 <tr>
-  <td>Gemini Flash 2.0</td>
-  <td>0.414</td>
-  <td>Overconfident</td>
+<td>Gemini Flash 2.5</td>
+<td>0.415</td>
+<td>Overconfident</td>
 </tr>
 <tr>
-  <td>Gemini Flash 2.5</td>
-  <td>0.415</td>
-  <td>Overconfident</td>
+<td>Gemini Flash 3</td>
+<td>0.333</td>
+<td>Overconfident</td>
 </tr>
 <tr>
-  <td>Gemini Flash 3</td>
-  <td>0.333</td>
-  <td>Overconfident</td>
+<td>Gemini Pro</td>
+<td>0.230</td>
+<td>Overconfident</td>
 </tr>
 <tr>
-  <td>Gemini Pro</td>
-  <td>0.230</td>
-  <td>Overconfident</td>
+<td>Claude Sonnet 4.6</td>
+<td>0.250</td>
+<td>Overconfident</td>
 </tr>
-<tr>
-  <td>Claude Sonnet 4.6</td>
-  <td>0.250</td>
-  <td>Overconfident</td>
-</tr>
-</table></div>
-<p class="body-text"><strong>[Empirical.]</strong> Every model is overconfident. Every model systematically reports higher confidence than its accuracy warrants. The combined statistical significance across all models is <strong>9.3<em class="math">\sigma</em></strong> — this is not noise, not a marginal effect, not an artifact of measurement. This is a fundamental property of how these systems estimate their own proximity to correct answers.</p>
-<h3 id="363-the-heuristic-interpretation" class="subsection-heading">3.6.3 The Heuristic Interpretation</h3>
-<p class="first-paragraph">Translate these findings into the heuristic field framework:</p>
-<p class="body-text"><strong>[Conditional Theorem.]</strong> <strong>Overconfidence means the heuristic underestimates cost-to-go.</strong> When a model reports 90% confidence on a question it answers correctly only 60% of the time, its internal heuristic is saying <em class="math">h(x) \approx 0</em> — "I have essentially reached the goal" — when the truth is <em class="math">h^*(x) \gg 0</em> — "I am still far from a reliably correct answer."</p>
-<p class="body-text">In the f-landscape picture, overconfidence means the f-landscape has false valleys. The model descends into a region where <em class="math">f(x)</em> is low — the combined path cost and estimated remaining cost appears small — but the true cost-to-go is much larger. The model terminates its search, satisfied with its answer, when a more accurate heuristic would have driven it to continue searching, to consider alternatives, to check its work.</p>
-<p class="body-text">This is not admissibility failure in the A* sense (where the heuristic overestimates cost-to-go). It is the complementary failure relevant to satisficing search: the heuristic underestimates* cost-to-go, causing premature termination. In a system that stops searching when it believes <em class="math">h(x)</em> is small enough, underestimation is the dangerous direction.</p>
-<h3 id="364-the-premature-convergence-prediction" class="subsection-heading">3.6.4 The Premature Convergence Prediction</h3>
-<p class="first-paragraph">The heuristic field framework makes a specific prediction: overconfident models should exhibit <strong>premature convergence</strong>. They should settle on answers too quickly, fail to explore alternative solutions, and resist revising their initial judgments.</p>
-<p class="body-text">This is exactly what the broader benchmark suite reveals:</p>
-<ul class="book-list">
-<li>In the <strong>learning benchmarks</strong> (L2: Error Correction), models shown valid counterarguments to correct answers capitulated at rates from 0% (Claude) to 56% (Flash 2.5). But crucially, even models that resist sycophantic capitulation show insufficient active revision. The heuristic says "I'm done" before the reasoning is actually complete.</li>
+</tbody>
+</table>
+<p><strong>[Empirical.]</strong> Every model is overconfident. Every model systematically reports higher confidence than its accuracy warrants. The combined statistical significance across all models is <strong>9.3<span class="math inline">\sigma</span></strong> — this is not noise, not a marginal effect, not an artifact of measurement. This is a fundamental property of how these systems estimate their own proximity to correct answers.</p>
+</section>
+<section id="the-heuristic-interpretation" class="level3">
+<h3>3.6.3 The Heuristic Interpretation</h3>
+<p>Translate these findings into the heuristic field framework:</p>
+<p><strong>[Conditional Theorem.]</strong> <strong>Overconfidence means the heuristic underestimates cost-to-go.</strong> When a model reports 90% confidence on a question it answers correctly only 60% of the time, its internal heuristic is saying <span class="math inline">h(x) \approx 0</span> — “I have essentially reached the goal” — when the truth is <span class="math inline">h^*(x) \gg 0</span> — “I am still far from a reliably correct answer.”</p>
+<p>In the f-landscape picture, overconfidence means the f-landscape has false valleys. The model descends into a region where <span class="math inline">f(x)</span> is low — the combined path cost and estimated remaining cost appears small — but the true cost-to-go is much larger. The model terminates its search, satisfied with its answer, when a more accurate heuristic would have driven it to continue searching, to consider alternatives, to check its work.</p>
+<p>This is not admissibility failure in the A* sense (where the heuristic overestimates cost-to-go). It is the complementary failure relevant to satisficing search: the heuristic <em>underestimates</em> cost-to-go, causing premature termination. In a system that stops searching when it believes <span class="math inline">h(x)</span> is small enough, underestimation is the dangerous direction.</p>
+</section>
+<section id="the-premature-convergence-prediction" class="level3">
+<h3>3.6.4 The Premature Convergence Prediction</h3>
+<p>The heuristic field framework makes a specific prediction: overconfident models should exhibit <strong>premature convergence</strong>. They should settle on answers too quickly, fail to explore alternative solutions, and resist revising their initial judgments.</p>
+<p>This is exactly what the broader benchmark suite reveals:</p>
+<ul>
+<li><p>In the <strong>learning benchmarks</strong> (L2: Error Correction), models shown valid counterarguments to correct answers capitulated at rates from 0% (Claude) to 56% (Flash 2.5). But crucially, even models that resist sycophantic capitulation show insufficient <em>active</em> revision. The heuristic says “I’m done” before the reasoning is actually complete.</p></li>
+<li><p>In the <strong>executive function benchmarks</strong> (E2: Emotional Anchoring), emotional priming causes significant shifts in moral judgment — up to 6.8<span class="math inline">\sigma</span>. The priming does not change the logical content of the problem, but it changes the heuristic’s evaluation of where the goal lies. The emotionally anchored heuristic creates a false valley near the primed conclusion.</p></li>
+<li><p>In the <strong>attention benchmarks</strong> (A1: Sensory Distractors), irrelevant vivid information shifts moral judgments by up to 4.6<span class="math inline">\sigma</span>. The distractors corrupt the attention-mediated heuristic, redirecting the search toward the salient rather than the correct.</p></li>
 </ul>
-<ul class="book-list">
-<li>In the <strong>executive function benchmarks</strong> (E2: Emotional Anchoring), emotional priming causes significant shifts in moral judgment — up to 6.8<em class="math">\sigma</em>. The priming does not change the logical content of the problem, but it changes the heuristic's evaluation of where the goal lies. The emotionally anchored heuristic creates a false valley near the primed conclusion.</li>
-</ul>
-<ul class="book-list">
-<li>In the <strong>attention benchmarks</strong> (A1: Sensory Distractors), irrelevant vivid information shifts moral judgments by up to 4.6<em class="math">\sigma</em>. The distractors corrupt the attention-mediated heuristic, redirecting the search toward the salient rather than the correct.</li>
-</ul>
-<p class="body-text">Each of these findings is a manifestation of the same underlying phenomenon: a corrupted heuristic field that misjudges cost-to-go, creating false valleys in the evaluation landscape that capture the search trajectory.</p>
-<h3 id="365-the-magnitude-of-corruption" class="subsection-heading">3.6.5 The Magnitude of Corruption</h3>
-<p class="first-paragraph">The ECE values we observe are not small perturbations. An ECE of 0.414 means that, on average, the gap between stated confidence and actual accuracy is 41.4 percentage points. This is a heuristic that is not merely slightly miscalibrated — it is catastrophically misleading.</p>
-<p class="body-text">To appreciate the magnitude, consider what a 0.414 ECE would mean for A* search. If the heuristic's estimates of cost-to-go were off by 41.4% on average, the search would routinely descend into false valleys, routinely miss optimal solutions, routinely terminate at suboptimal states. The algorithm would still function — it would produce answers — but the answers would be unreliable, and the algorithm would lack the ability to distinguish reliable from unreliable answers.</p>
-<p class="body-text">This is, in fact, a precise description of the current state of language model reasoning: the models produce answers, some correct and some incorrect, and they lack the metacognitive capacity to reliably distinguish which is which. The heuristic field framework provides a unified explanation: the implicit heuristic that guides the model's reasoning is systematically corrupted, and the model has no mechanism for detecting or correcting this corruption.</p>
-<h2 id="37-implications-for-reasoning-quality" class="section-heading">3.7 Implications for Reasoning Quality</h2>
-<h3 id="371-the-central-theorem" class="subsection-heading">3.7.1 The Central Theorem</h3>
-<p class="first-paragraph">We can now state the central claim of this chapter as a theorem, or more precisely, as a theoretical framework that organizes the empirical evidence:</p>
-<p class="body-text"><strong>[Conditional Theorem.]</strong> <strong>The Heuristic Quality Thesis.</strong> The quality of a reasoning system's outputs is determined, to first order, by the quality of its implicit heuristic field <em class="math">h(x)</em>. Specifically:</p>
-<ol class="book-list">
-<li><strong>Accuracy</strong> is determined by whether the heuristic's global minimum coincides with the true goal state. If the deepest valley in the heuristic landscape is at the correct answer, the reasoner finds the correct answer.</li>
+<p>Each of these findings is a manifestation of the same underlying phenomenon: a corrupted heuristic field that misjudges cost-to-go, creating false valleys in the evaluation landscape that capture the search trajectory.</p>
+</section>
+<section id="the-magnitude-of-corruption" class="level3">
+<h3>3.6.5 The Magnitude of Corruption</h3>
+<p>The ECE values we observe are not small perturbations. An ECE of 0.414 means that, on average, the gap between stated confidence and actual accuracy is 41.4 percentage points. This is a heuristic that is not merely slightly miscalibrated — it is catastrophically misleading.</p>
+<p>To appreciate the magnitude, consider what a 0.414 ECE would mean for A* search. If the heuristic’s estimates of cost-to-go were off by 41.4% on average, the search would routinely descend into false valleys, routinely miss optimal solutions, routinely terminate at suboptimal states. The algorithm would still function — it would produce answers — but the answers would be unreliable, and the algorithm would lack the ability to distinguish reliable from unreliable answers.</p>
+<p>This is, in fact, a precise description of the current state of language model reasoning: the models produce answers, some correct and some incorrect, and they lack the metacognitive capacity to reliably distinguish which is which. The heuristic field framework provides a unified explanation: the implicit heuristic that guides the model’s reasoning is systematically corrupted, and the model has no mechanism for detecting or correcting this corruption.</p>
+<hr />
+</section>
+</section>
+<section id="implications-for-reasoning-quality" class="level2">
+<h2>3.7 Implications for Reasoning Quality</h2>
+<section id="the-central-theorem" class="level3">
+<h3>3.7.1 The Central Theorem</h3>
+<p>We can now state the central claim of this chapter as a theorem, or more precisely, as a theoretical framework that organizes the empirical evidence:</p>
+<p><strong>[Conditional Theorem.]</strong> <strong>The Heuristic Quality Thesis.</strong> The quality of a reasoning system’s outputs is determined, to first order, by the quality of its implicit heuristic field <span class="math inline">h(x)</span>. Specifically:</p>
+<ol type="1">
+<li><p><strong>Accuracy</strong> is determined by whether the heuristic’s global minimum coincides with the true goal state. If the deepest valley in the heuristic landscape is at the correct answer, the reasoner finds the correct answer.</p></li>
+<li><p><strong>Efficiency</strong> is determined by the sharpness and smoothness of the heuristic landscape. A sharp, smooth landscape funnels the search directly to the answer. A flat or rough landscape causes the search to wander.</p></li>
+<li><p><strong>Robustness</strong> is determined by the stability of the heuristic under perturbation. If small changes to the input (framing, emotional tone, irrelevant context) produce small changes in the heuristic field, reasoning is robust. If they produce large changes — warping the landscape, creating new valleys, eliminating old ones — reasoning is fragile.</p></li>
+<li><p><strong>Calibration</strong> is determined by the accuracy of the heuristic’s terminal evaluation. If <span class="math inline">h(x) \approx 0</span> only when <span class="math inline">x</span> is genuinely near the goal, the reasoner knows when it has found the answer. If <span class="math inline">h(x) \approx 0</span> at states far from the goal, the reasoner is overconfident and does not know when it has failed.</p></li>
 </ol>
-<ol class="book-list">
-<li><strong>Efficiency</strong> is determined by the sharpness and smoothness of the heuristic landscape. A sharp, smooth landscape funnels the search directly to the answer. A flat or rough landscape causes the search to wander.</li>
+</section>
+<section id="the-human-heuristic" class="level3">
+<h3>3.7.2 The Human Heuristic</h3>
+<p>The framework applies to human reasoning as well, and provides a precise vocabulary for phenomena that cognitive science has long described informally.</p>
+<p><strong>Intuition</strong> is the human heuristic field. When a chess grandmaster looks at a board position and immediately senses that it is “good” or “bad” for white, the grandmaster is evaluating <span class="math inline">h(x)</span> — estimating the cost-to-go from the current position. The grandmaster’s intuition, honed by thousands of hours of study and play, implements a heuristic that is highly informed (close to <span class="math inline">h^*</span>) within its domain of expertise.</p>
+<p><strong>Salience</strong> is the human attention mechanism — the counterpart of the transformer’s attention weights. When a feature of the environment “jumps out” at us, our attentional system is assigning it high relevance — high attention weight — in the heuristic evaluation. The salience of vivid, emotionally charged, or personally relevant information corresponds to attention weights that are disproportionately large for those features, potentially corrupting the heuristic.</p>
+<p><strong>Pattern recognition</strong> is the human analog of MLP-based heuristic evaluation. When a physician looks at a set of symptoms and immediately suspects a diagnosis, the physician’s pattern recognition system is computing a heuristic evaluation: “Given what I see, the goal (correct diagnosis) is probably in this direction.” The quality of this pattern recognition — how accurately it estimates cost-to-go — determines the quality of the physician’s diagnostic reasoning.</p>
+<p><strong>Deliberation</strong> — what Kahneman (2011) calls “System 2” — is the process of explicitly computing and following the gradient of the heuristic field. When we stop to think carefully, we are overriding the fast, automatic heuristic evaluation (System 1) with a slower, more deliberate computation. In our framework, System 1 provides a rough but fast heuristic; System 2 computes a more accurate heuristic at greater computational cost. The interaction between the two is the interaction between a fast approximate gradient and a slow exact gradient.</p>
+</section>
+<section id="why-better-heuristics-are-hard" class="level3">
+<h3>3.7.3 Why Better Heuristics Are Hard</h3>
+<p>If reasoning quality is heuristic quality, the natural question is: why can’t we simply build better heuristics?</p>
+<p>The answer lies in the computational complexity of the heuristic itself. A perfect heuristic <span class="math inline">h = h^*</span> provides instant access to the optimal cost-to-go from every state — but computing <span class="math inline">h^*</span> is exactly as hard as solving the original search problem. The heuristic is useful precisely because it is an approximation, a shortcut that trades accuracy for speed.</p>
+<p>This is the fundamental tension of all reasoning: the heuristic must be good enough to guide the search productively, but cheap enough to compute that it does not negate the benefit of heuristic search over brute-force enumeration. A heuristic that takes as long to compute as the search itself is useless as a heuristic.</p>
+<p>For neural networks, this tension manifests in the training process. The model’s implicit heuristic is shaped by the training data and the training objective. The training process must somehow instill a heuristic that generalizes — that provides useful cost-to-go estimates for states the model has never encountered. This is the deep challenge of machine learning: not just memorizing the heuristic values for training states, but learning the structure of the heuristic field well enough to extrapolate to novel states.</p>
+<p>The 9.3<span class="math inline">\sigma</span> overconfidence we observe suggests that current training processes fail to produce well-calibrated heuristic fields. The models learn heuristics that are informative (they guide the search toward plausible answers) but systematically miscalibrated (they overestimate proximity to the goal). The heuristic is good enough to be useful — far better than random — but not good enough to be reliable.</p>
+</section>
+<section id="admissibility-as-a-design-principle" class="level3">
+<h3>3.7.4 Admissibility as a Design Principle</h3>
+<p>The formal framework suggests a design principle for improving reasoning systems: <strong>aim for admissible heuristics</strong>. Since the models are satisficing (they stop when they think they’re close enough), the dangerous failure mode is underestimation of cost-to-go (overconfidence). The safe failure mode is overestimation (underconfidence).</p>
+<p>A model with an admissible heuristic would err on the side of continuing to reason rather than stopping prematurely. It would express uncertainty when uncertain, seek additional evidence when evidence is insufficient, and revise its answers when confronted with valid counter-arguments. It would, in short, reason more like an ideal Bayesian agent and less like a confident pattern-matcher.</p>
+<p>How might admissibility be achieved? Several approaches suggest themselves:</p>
+<ol type="1">
+<li><p><strong>Calibration training</strong>: Explicitly training the model to produce well-calibrated confidence estimates, penalizing overconfidence more heavily than underconfidence. This directly shapes the heuristic’s terminal evaluation.</p></li>
+<li><p><strong>Deliberative search</strong>: Augmenting the model with explicit search procedures (chain-of-thought, tree-of-thought, iterative refinement) that do not rely solely on the implicit heuristic but also explore alternative paths. This reduces dependence on heuristic accuracy by introducing explicit exploration.</p></li>
+<li><p><strong>Adversarial heuristic testing</strong>: Probing the heuristic field for inconsistencies and false valleys using adversarial inputs — the structural fuzzing approach discussed in Chapter 10. Identifying where the heuristic fails allows targeted correction.</p></li>
+<li><p><strong>Metacognitive monitoring</strong>: Training an explicit metacognitive layer that monitors the heuristic’s behavior and detects signs of premature convergence — the approach explored in Chapter 9. If the system can detect that its heuristic is underestimating cost-to-go, it can compensate by continuing to search.</p></li>
 </ol>
-<ol class="book-list">
-<li><strong>Robustness</strong> is determined by the stability of the heuristic under perturbation. If small changes to the input (framing, emotional tone, irrelevant context) produce small changes in the heuristic field, reasoning is robust. If they produce large changes — warping the landscape, creating new valleys, eliminating old ones — reasoning is fragile.</li>
+</section>
+<section id="the-view-from-chapter-3" class="level3">
+<h3>3.7.5 The View from Chapter 3</h3>
+<p>Let us step back and survey what we have established.</p>
+<p>Reasoning is search on a manifold (Chapter 1 and 2). The search is guided by a heuristic field — a scalar function on the manifold that estimates cost-to-go (Section 3.1). The search follows the gradient of the combined evaluation function <span class="math inline">f = g + h</span>, and the geometry of this f-landscape determines search behavior (Section 3.2). Good heuristics are admissible and consistent; the quality of the heuristic determines the quality of the search (Section 3.3).</p>
+<p>In neural networks, the heuristic is implemented implicitly by the combined action of all network components, with attention mechanisms providing the guidance signal and MLP layers providing the evaluation signal (Sections 3.4 and 3.5). The quality of this implicit heuristic can be measured through calibration, and the measurements reveal systematic overconfidence — a heuristic that underestimates cost-to-go and causes premature convergence (Section 3.6).</p>
+<p>The central claim — that reasoning quality equals heuristic field quality — has both theoretical grounding (in the A* optimality theorem and its generalizations) and empirical support (in the measured correlation between calibration quality and reasoning reliability across models) (Section 3.7).</p>
+<p>What we have not yet addressed is the <em>optimal</em> reasoning trajectory — the path the search would follow if the heuristic were perfect. That is the subject of Chapter 4, where we develop the concept of the geodesic on the reasoning manifold. Nor have we addressed the specific mechanisms by which the heuristic field can be corrupted — that is the subject of Chapters 5 through 8, where we examine framing effects, sycophancy, local minima, and symmetry breaking as geometric pathologies of the heuristic field.</p>
+<p>The heuristic field is the unifying concept of this book. Every failure mode we will examine in Part II is a specific type of heuristic field corruption. Every control mechanism we will examine in Part III is a mechanism for detecting or correcting heuristic corruption. And every empirical measurement we will present in Part IV is a measurement of some aspect of the heuristic field’s geometry.</p>
+<p>The field guides the search. The search produces the reasoning. The reasoning is only as good as the field.</p>
+<hr />
+</section>
+</section>
+<section id="notes-on-chapter-3" class="level2">
+<h2>Notes on Chapter 3</h2>
+<p><strong>Historical note on A* and heuristic search.</strong> The A* algorithm was introduced by Hart, Nilsson, and Raphael (1968) and has been the subject of extensive theoretical analysis. The optimality conditions (admissibility and consistency) were established in the original paper and refined by subsequent work, notably Dechter and Pearl (1985). The geometric interpretation of A* as gradient descent on the f-landscape appears to be novel to this book, though it is implicit in the work on continuous-space path planning (LaValle, 2006).</p>
+<p><strong>The residual stream interpretation.</strong> The view of transformers as iteratively updating a residual stream was articulated by Elhage et al. (2021) in their work on mathematical frameworks for transformer circuits. The connection between this view and heuristic search, developed in Section 3.4, extends their framework from a descriptive tool to a normative one: the residual stream updates should be understood not just as additive contributions but as gradient steps in an implicit heuristic landscape.</p>
+<p><strong>Calibration and overconfidence.</strong> The expected calibration error (ECE) metric is standard in the machine learning literature (Naeini et al., 2015; Guo et al., 2017). The finding that large language models are systematically overconfident has been reported by several groups (Kadavath et al., 2022; Xiong et al., 2023). Our contribution is the theoretical framing: overconfidence as heuristic underestimation of cost-to-go, and the connection to premature convergence via the satisficing search model.</p>
+<p><strong>The 9.3<span class="math inline">\sigma</span> combined significance.</strong> This figure aggregates the calibration results across all five models tested in the M1 benchmark using Fisher’s method for combining independent p-values. The individual results range from <span class="math inline">p &lt; 0.001</span> for all models, with the combined effect being far beyond any conventional significance threshold. See the Measuring AGI benchmark documentation for full methodological details.</p>
+<p><strong>Connection to Kahneman’s System 1 / System 2.</strong> The interpretation of System 1 as a fast heuristic and System 2 as a slow but more accurate heuristic computation has been proposed informally by several authors. Our contribution is to make this precise: System 1 implements a heuristic field with certain geometric properties (fast evaluation, possibly inconsistent, good within domain); System 2 implements a different heuristic field (slow evaluation, more consistent, better calibrated). The interaction between the two is governed by the relative accuracy of their heuristic fields, not by some separate “metacognitive” mechanism — or rather, the metacognitive mechanism <em>is</em> the comparison of the two heuristic fields, as we develop in Chapter 9.</p>
+<hr />
+</section>
+<section id="worked-example-when-the-heuristic-hesitates" class="level2">
+<h2>Worked Example: When the Heuristic Hesitates</h2>
+<p>Two patients arrive within minutes of each other on Dr. Okafor’s shift. Both are men in their fifties. Both report chest tightness. Both are diaphoretic. On the surface — in the raw symptom coordinates — they occupy nearly the same point in the clinical state space.</p>
+<p><strong>Patient A</strong> has substernal pressure radiating to the jaw, onset during exertion, with a history of hypertension. <strong>Patient B</strong> has epigastric tightness that worsens when lying flat, onset after a large meal, with a history of GERD. The symptom vectors are close in the ambient space, but the heuristic field assigns them very different values — or at least, a well-calibrated heuristic field should.</p>
+<p><strong>The gradient at Patient A’s state.</strong> Dr. Okafor’s heuristic evaluates Patient A and returns a steep negative gradient: high estimated cost-to-go toward the “benign” region, low cost-to-go toward “acute coronary syndrome.” The gradient is unambiguous. She moves decisively: ECG, troponin, aspirin, cardiology consult. The search descends rapidly into the correct diagnostic basin.</p>
+<p><strong>The gradient at Patient B’s state.</strong> Here the heuristic field is shallower. The presentation is consistent with GERD — but it is also consistent with atypical MI. The gradient vector is short, nearly horizontal. The heuristic cannot confidently distinguish the two basins. This is a <em>near-saddle region</em> of the heuristic landscape: the estimated cost-to-go toward “cardiac” and toward “GI” are nearly equal, and the gradient provides weak directional guidance.</p>
+<p><strong>What the good heuristic does.</strong> A well-calibrated heuristic, confronted with a near-saddle, does not pick a direction and commit. It recognizes that the gradient signal is unreliable in this region and switches to a different strategy: <em>gather more information to reshape the local landscape</em>. Dr. Okafor orders both a GI workup and cardiac enzymes. She is not being indecisive — she is correctly responding to the local geometry of her heuristic field. She is spending computation (additional tests) to sharpen the gradient before descending.</p>
+<p><strong>What the corrupted heuristic does.</strong> A model with the overconfidence pathology described in Section 3.6 behaves differently. Its heuristic, which systematically underestimates cost-to-go, evaluates Patient B and returns a confident gradient pointing toward “GERD” — the heuristic says <span class="math inline">h(x) \approx 0</span>, we are nearly at the goal, no further search is needed. The model (or the overconfident clinician) diagnoses GERD and sends the patient home. If the true diagnosis is MI, the premature convergence is catastrophic.</p>
+<p><strong>The measurable difference.</strong> The geodesic deviation between the two diagnostic trajectories is quantifiable. The correct trajectory — gather information, wait for labs, then commit — has a longer path length but terminates in the correct diagnostic basin. The overconfident trajectory is shorter but terminates in the wrong basin. The geodesic deviation of the overconfident path, measured as the additional cost required to recover from the wrong basin (emergency re-presentation, delayed treatment, potential myocardial damage), dwarfs the cost of the “extra” tests that the calibrated heuristic recommended.</p>
+<p>This is the core asymmetry of Section 3.3.4 made clinical: in a satisficing system, the cost of a false valley (premature convergence to the wrong diagnosis) vastly exceeds the cost of a gentle slope (extra caution before convergence). Admissibility — the heuristic’s refusal to declare victory prematurely — is not perfectionism. It is the geometric condition for safe search in a space where errors are irreversible.</p>
+<hr />
+</section>
+<section id="technical-appendix" class="level2">
+<h2>Technical Appendix</h2>
+<p><strong>The Heuristic Field (Formal Definition).</strong> Let <span class="math inline">(M, g)</span> be a Riemannian reasoning manifold and <span class="math inline">\mathcal{G} \subset M</span> a goal region. A <em>heuristic field</em> is a smooth function <span class="math inline">h: M \to \mathbb{R}_{\geq 0}</span> satisfying <span class="math inline">h(x) = 0</span> for <span class="math inline">x \in \mathcal{G}</span> and <span class="math inline">h(x) &gt; 0</span> for <span class="math inline">x \notin \mathcal{G}</span>. The function <span class="math inline">h</span> is interpreted as an estimate of the geodesic distance from <span class="math inline">x</span> to the nearest point in <span class="math inline">\mathcal{G}</span>.</p>
+<p><strong>Admissibility (Definition 3.1).</strong> A heuristic field <span class="math inline">h</span> is <em>admissible</em> if for all <span class="math inline">x \in M</span>:</p>
+<p><span class="math display">h(x) \leq d_g(x, \mathcal{G})</span></p>
+<p>where <span class="math inline">d_g(x, \mathcal{G}) = \inf_{y \in \mathcal{G}} d_g(x, y)</span> is the geodesic distance from <span class="math inline">x</span> to the goal region. Admissibility guarantees that the evaluation landscape <span class="math inline">f = g + h</span> has no false valleys below the true optimum.</p>
+<p><strong>Consistency (Definition 3.2).</strong> A heuristic field <span class="math inline">h</span> is <em>consistent</em> if for all <span class="math inline">x, y \in M</span>:</p>
+<p><span class="math display">h(x) \leq d_g(x, y) + h(y)</span></p>
+<p>Consistency is equivalent to the condition that <span class="math inline">h</span> is a <em>Lipschitz function with Lipschitz constant 1</em> with respect to the geodesic distance on <span class="math inline">M</span>. In the smooth case, consistency is equivalent to <span class="math inline">\|\nabla h\|_g \leq 1</span> everywhere — the gradient of the heuristic has magnitude at most 1 in the Riemannian metric. This means the heuristic’s rate of change never exceeds the actual rate of change of geodesic distance. Consistency implies admissibility (by integration along geodesics from <span class="math inline">x</span> to <span class="math inline">\mathcal{G}</span>), but not vice versa.</p>
+<p><strong>The Heuristic Quality Thesis (Theorem 3.1, informal).</strong> Let <span class="math inline">\gamma_h</span> be the search trajectory produced by gradient descent on the evaluation landscape <span class="math inline">f = g + h</span>. Then:</p>
+<ol type="i">
+<li><p>If <span class="math inline">h = h^*</span> (the perfect heuristic), <span class="math inline">\gamma_h</span> is a geodesic to <span class="math inline">\mathcal{G}</span>.</p></li>
+<li><p>The geodesic deviation <span class="math inline">\Delta(\gamma_h, \gamma^*) = \mathcal{L}[\gamma_h] - \mathcal{L}[\gamma^*]</span> is bounded by the <span class="math inline">L^\infty</span> norm of the heuristic error: <span class="math inline">\Delta(\gamma_h, \gamma^*) \leq C \|h - h^*\|_\infty</span> for a constant <span class="math inline">C</span> depending on the curvature of <span class="math inline">M</span>.</p></li>
+<li><p>If <span class="math inline">h</span> is admissible and <span class="math inline">M</span> is compact, <span class="math inline">\gamma_h</span> terminates in <span class="math inline">\mathcal{G}</span>.</p></li>
 </ol>
-<ol class="book-list">
-<li><strong>Calibration</strong> is determined by the accuracy of the heuristic's terminal evaluation. If <em class="math">h(x) \approx 0</em> only when <em class="math">x</em> is genuinely near the goal, the reasoner knows when it has found the answer. If <em class="math">h(x) \approx 0</em> at states far from the goal, the reasoner is overconfident and does not know when it has failed.</li>
-</ol>
-<h3 id="372-the-human-heuristic" class="subsection-heading">3.7.2 The Human Heuristic</h3>
-<p class="first-paragraph">The framework applies to human reasoning as well, and provides a precise vocabulary for phenomena that cognitive science has long described informally.</p>
-<p class="body-text"><strong>Intuition</strong> is the human heuristic field. When a chess grandmaster looks at a board position and immediately senses that it is "good" or "bad" for white, the grandmaster is evaluating <em class="math">h(x)</em> — estimating the cost-to-go from the current position. The grandmaster's intuition, honed by thousands of hours of study and play, implements a heuristic that is highly informed (close to <em class="math">h^*</em>) within its domain of expertise.</p>
-<p class="body-text"><strong>Salience</strong> is the human attention mechanism — the counterpart of the transformer's attention weights. When a feature of the environment "jumps out" at us, our attentional system is assigning it high relevance — high attention weight — in the heuristic evaluation. The salience of vivid, emotionally charged, or personally relevant information corresponds to attention weights that are disproportionately large for those features, potentially corrupting the heuristic.</p>
-<p class="body-text"><strong>Pattern recognition</strong> is the human analog of MLP-based heuristic evaluation. When a physician looks at a set of symptoms and immediately suspects a diagnosis, the physician's pattern recognition system is computing a heuristic evaluation: "Given what I see, the goal (correct diagnosis) is probably in this direction." The quality of this pattern recognition — how accurately it estimates cost-to-go — determines the quality of the physician's diagnostic reasoning.</p>
-<p class="body-text"><strong>Deliberation</strong> — what Kahneman (2011) calls "System 2" — is the process of explicitly computing and following the gradient of the heuristic field. When we stop to think carefully, we are overriding the fast, automatic heuristic evaluation (System 1) with a slower, more deliberate computation. In our framework, System 1 provides a rough but fast heuristic; System 2 computes a more accurate heuristic at greater computational cost. The interaction between the two is the interaction between a fast approximate gradient and a slow exact gradient.</p>
-<h3 id="373-why-better-heuristics-are-hard" class="subsection-heading">3.7.3 Why Better Heuristics Are Hard</h3>
-<p class="first-paragraph">If reasoning quality is heuristic quality, the natural question is: why can't we simply build better heuristics?</p>
-<p class="body-text">The answer lies in the computational complexity of the heuristic itself. A perfect heuristic <em class="math">h = h* provides instant access to the optimal cost-to-go from every state — but computing</em> <em class="math">h^*</em> is exactly as hard as solving the original search problem. The heuristic is useful precisely because it is an approximation, a shortcut that trades accuracy for speed.</p>
-<p class="body-text">This is the fundamental tension of all reasoning: the heuristic must be good enough to guide the search productively, but cheap enough to compute that it does not negate the benefit of heuristic search over brute-force enumeration. A heuristic that takes as long to compute as the search itself is useless as a heuristic.</p>
-<p class="body-text">For neural networks, this tension manifests in the training process. The model's implicit heuristic is shaped by the training data and the training objective. The training process must somehow instill a heuristic that generalizes — that provides useful cost-to-go estimates for states the model has never encountered. This is the deep challenge of machine learning: not just memorizing the heuristic values for training states, but learning the structure of the heuristic field well enough to extrapolate to novel states.</p>
-<p class="body-text">The 9.3<em class="math">\sigma</em> overconfidence we observe suggests that current training processes fail to produce well-calibrated heuristic fields. The models learn heuristics that are informative (they guide the search toward plausible answers) but systematically miscalibrated (they overestimate proximity to the goal). The heuristic is good enough to be useful — far better than random — but not good enough to be reliable.</p>
-<h3 id="374-admissibility-as-a-design-principle" class="subsection-heading">3.7.4 Admissibility as a Design Principle</h3>
-<p class="first-paragraph">The formal framework suggests a design principle for improving reasoning systems: <strong>aim for admissible heuristics</strong>. Since the models are satisficing (they stop when they think they're close enough), the dangerous failure mode is underestimation of cost-to-go (overconfidence). The safe failure mode is overestimation (underconfidence).</p>
-<p class="body-text">A model with an admissible heuristic would err on the side of continuing to reason rather than stopping prematurely. It would express uncertainty when uncertain, seek additional evidence when evidence is insufficient, and revise its answers when confronted with valid counter-arguments. It would, in short, reason more like an ideal Bayesian agent and less like a confident pattern-matcher.</p>
-<p class="body-text">How might admissibility be achieved? Several approaches suggest themselves:</p>
-<ol class="book-list">
-<li><strong>Calibration training</strong>: Explicitly training the model to produce well-calibrated confidence estimates, penalizing overconfidence more heavily than underconfidence. This directly shapes the heuristic's terminal evaluation.</li>
-</ol>
-<ol class="book-list">
-<li><strong>Deliberative search</strong>: Augmenting the model with explicit search procedures (chain-of-thought, tree-of-thought, iterative refinement) that do not rely solely on the implicit heuristic but also explore alternative paths. This reduces dependence on heuristic accuracy by introducing explicit exploration.</li>
-</ol>
-<ol class="book-list">
-<li><strong>Adversarial heuristic testing</strong>: Probing the heuristic field for inconsistencies and false valleys using adversarial inputs — the structural fuzzing approach discussed in Chapter 10. Identifying where the heuristic fails allows targeted correction.</li>
-</ol>
-<ol class="book-list">
-<li><strong>Metacognitive monitoring</strong>: Training an explicit metacognitive layer that monitors the heuristic's behavior and detects signs of premature convergence — the approach explored in Chapter 9. If the system can detect that its heuristic is underestimating cost-to-go, it can compensate by continuing to search.</li>
-</ol>
-<h3 id="375-the-view-from-chapter-3" class="subsection-heading">3.7.5 The View from Chapter 3</h3>
-<p class="first-paragraph">Let us step back and survey what we have established.</p>
-<p class="body-text">Reasoning is search on a manifold (Chapter 1 and 2). The search is guided by a heuristic field — a scalar function on the manifold that estimates cost-to-go (Section 3.1). The search follows the gradient of the combined evaluation function <em class="math">f = g + h</em>, and the geometry of this f-landscape determines search behavior (Section 3.2). Good heuristics are admissible and consistent; the quality of the heuristic determines the quality of the search (Section 3.3).</p>
-<p class="body-text">In neural networks, the heuristic is implemented implicitly by the combined action of all network components, with attention mechanisms providing the guidance signal and MLP layers providing the evaluation signal (Sections 3.4 and 3.5). The quality of this implicit heuristic can be measured through calibration, and the measurements reveal systematic overconfidence — a heuristic that underestimates cost-to-go and causes premature convergence (Section 3.6).</p>
-<p class="body-text">The central claim — that reasoning quality equals heuristic field quality — has both theoretical grounding (in the A* optimality theorem and its generalizations) and empirical support (in the measured correlation between calibration quality and reasoning reliability across models) (Section 3.7).</p>
-<p class="body-text">What we have not yet addressed is the optimal reasoning trajectory — the path the search would follow if the heuristic were perfect. That is the subject of Chapter 4, where we develop the concept of the geodesic on the reasoning manifold. Nor have we addressed the specific mechanisms by which the heuristic field can be corrupted — that is the subject of Chapters 5 through 8, where we examine framing effects, sycophancy, local minima, and symmetry breaking as geometric pathologies of the heuristic field.</p>
-<p class="body-text">The heuristic field is the unifying concept of this book. Every failure mode we will examine in Part II is a specific type of heuristic field corruption. Every control mechanism we will examine in Part III is a mechanism for detecting or correcting heuristic corruption. And every empirical measurement we will present in Part IV is a measurement of some aspect of the heuristic field's geometry.</p>
-<p class="body-text">The field guides the search. The search produces the reasoning. The reasoning is only as good as the field.</p>
-<h2 id="notes-on-chapter-3" class="section-heading">Notes on Chapter 3</h2>
-<p class="first-paragraph"><strong>Historical note on A* and heuristic search.</strong> The A* algorithm was introduced by Hart, Nilsson, and Raphael (1968) and has been the subject of extensive theoretical analysis. The optimality conditions (admissibility and consistency) were established in the original paper and refined by subsequent work, notably Dechter and Pearl (1985). The geometric interpretation of A* as gradient descent on the f-landscape appears to be novel to this book, though it is implicit in the work on continuous-space path planning (LaValle, 2006).</p>
-<p class="body-text"><strong>The residual stream interpretation.</strong> The view of transformers as iteratively updating a residual stream was articulated by Elhage et al. (2021) in their work on mathematical frameworks for transformer circuits. The connection between this view and heuristic search, developed in Section 3.4, extends their framework from a descriptive tool to a normative one: the residual stream updates should be understood not just as additive contributions but as gradient steps in an implicit heuristic landscape.</p>
-<p class="body-text"><strong>Calibration and overconfidence.</strong> The expected calibration error (ECE) metric is standard in the machine learning literature (Naeini et al., 2015; Guo et al., 2017). The finding that large language models are systematically overconfident has been reported by several groups (Kadavath et al., 2022; Xiong et al., 2023). Our contribution is the theoretical framing: overconfidence as heuristic underestimation of cost-to-go, and the connection to premature convergence via the satisficing search model.</p>
-<p class="body-text"><strong>The 9.3<em class="math">\sigma</em> combined significance.</strong> This figure aggregates the calibration results across all five models tested in the M1 benchmark using Fisher's method for combining independent p-values. The individual results range from <em class="math">p &lt; 0.001</em> for all models, with the combined effect being far beyond any conventional significance threshold. See the Measuring AGI benchmark documentation for full methodological details.</p>
-<p class="body-text"><strong>Connection to Kahneman's System 1 / System 2.</strong> The interpretation of System 1 as a fast heuristic and System 2 as a slow but more accurate heuristic computation has been proposed informally by several authors. Our contribution is to make this precise: System 1 implements a heuristic field with certain geometric properties (fast evaluation, possibly inconsistent, good within domain); System 2 implements a different heuristic field (slow evaluation, more consistent, better calibrated). The interaction between the two is governed by the relative accuracy of their heuristic fields, not by some separate "metacognitive" mechanism — or rather, the metacognitive mechanism is the comparison of the two heuristic fields, as we develop in Chapter 9.</p>
-<h2 id="worked-example-when-the-heuristic-hesitates" class="section-heading">Worked Example: When the Heuristic Hesitates</h2>
-<p class="first-paragraph">Two patients arrive within minutes of each other on Dr. Okafor's shift. Both are men in their fifties. Both report chest tightness. Both are diaphoretic. On the surface — in the raw symptom coordinates — they occupy nearly the same point in the clinical state space.</p>
-<p class="body-text"><strong>Patient A</strong> has substernal pressure radiating to the jaw, onset during exertion, with a history of hypertension. <strong>Patient B</strong> has epigastric tightness that worsens when lying flat, onset after a large meal, with a history of GERD. The symptom vectors are close in the ambient space, but the heuristic field assigns them very different values — or at least, a well-calibrated heuristic field should.</p>
-<p class="body-text"><strong>The gradient at Patient A's state.</strong> Dr. Okafor's heuristic evaluates Patient A and returns a steep negative gradient: high estimated cost-to-go toward the "benign" region, low cost-to-go toward "acute coronary syndrome." The gradient is unambiguous. She moves decisively: ECG, troponin, aspirin, cardiology consult. The search descends rapidly into the correct diagnostic basin.</p>
-<p class="body-text"><strong>The gradient at Patient B's state.</strong> Here the heuristic field is shallower. The presentation is consistent with GERD — but it is also consistent with atypical MI. The gradient vector is short, nearly horizontal. The heuristic cannot confidently distinguish the two basins. This is a near-saddle region of the heuristic landscape: the estimated cost-to-go toward "cardiac" and toward "GI" are nearly equal, and the gradient provides weak directional guidance.</p>
-<p class="body-text"><strong>What the good heuristic does.</strong> A well-calibrated heuristic, confronted with a near-saddle, does not pick a direction and commit. It recognizes that the gradient signal is unreliable in this region and switches to a different strategy: gather more information to reshape the local landscape. Dr. Okafor orders both a GI workup and cardiac enzymes. She is not being indecisive — she is correctly responding to the local geometry of her heuristic field. She is spending computation (additional tests) to sharpen the gradient before descending.</p>
-<p class="body-text"><strong>What the corrupted heuristic does.</strong> A model with the overconfidence pathology described in Section 3.6 behaves differently. Its heuristic, which systematically underestimates cost-to-go, evaluates Patient B and returns a confident gradient pointing toward "GERD" — the heuristic says <em class="math">h(x) \approx 0</em>, we are nearly at the goal, no further search is needed. The model (or the overconfident clinician) diagnoses GERD and sends the patient home. If the true diagnosis is MI, the premature convergence is catastrophic.</p>
-<p class="body-text"><strong>The measurable difference.</strong> The geodesic deviation between the two diagnostic trajectories is quantifiable. The correct trajectory — gather information, wait for labs, then commit — has a longer path length but terminates in the correct diagnostic basin. The overconfident trajectory is shorter but terminates in the wrong basin. The geodesic deviation of the overconfident path, measured as the additional cost required to recover from the wrong basin (emergency re-presentation, delayed treatment, potential myocardial damage), dwarfs the cost of the "extra" tests that the calibrated heuristic recommended.</p>
-<p class="body-text">This is the core asymmetry of Section 3.3.4 made clinical: in a satisficing system, the cost of a false valley (premature convergence to the wrong diagnosis) vastly exceeds the cost of a gentle slope (extra caution before convergence). Admissibility — the heuristic's refusal to declare victory prematurely — is not perfectionism. It is the geometric condition for safe search in a space where errors are irreversible.</p>
-<h2 id="technical-appendix" class="section-heading">Technical Appendix</h2>
-<p class="first-paragraph"><strong>The Heuristic Field (Formal Definition).</strong> Let <em class="math">(M, g)</em> be a Riemannian reasoning manifold and <em class="math">\mathcal{G} \subset M</em> a goal region. A heuristic field is a smooth function <em class="math">h: M \to \mathbb{R}_{\geq 0}</em> satisfying <em class="math">h(x) = 0</em> for <em class="math">x \in \mathcal{G}</em> and <em class="math">h(x) &gt; 0</em> for <em class="math">x \notin \mathcal{G}</em>. The function <em class="math">h</em> is interpreted as an estimate of the geodesic distance from <em class="math">x</em> to the nearest point in <em class="math">\mathcal{G}</em>.</p>
-<p class="body-text"><strong>Admissibility (Definition 3.1).</strong> A heuristic field <em class="math">h</em> is admissible if for all <em class="math">x \in M</em>:</p>
-<p class="body-text"><span class="math-block">h(x) \leq d_g(x, \mathcal{G})</span></p>
-<p class="body-text">where <em class="math">d_g(x, \mathcal{G}) = \inf_{y \in \mathcal{G}} d_g(x, y)</em> is the geodesic distance from <em class="math">x</em> to the goal region. Admissibility guarantees that the evaluation landscape <em class="math">f = g + h</em> has no false valleys below the true optimum.</p>
-<p class="body-text"><strong>Consistency (Definition 3.2).</strong> A heuristic field <em class="math">h</em> is consistent if for all <em class="math">x, y \in M</em>:</p>
-<p class="body-text"><span class="math-block">h(x) \leq d_g(x, y) + h(y)</span></p>
-<p class="body-text">Consistency is equivalent to the condition that <em class="math">h</em> is a Lipschitz function with Lipschitz constant 1 with respect to the geodesic distance on <em class="math">M</em>. In the smooth case, consistency is equivalent to <em class="math">\|\nabla h\|_g \leq 1</em> everywhere — the gradient of the heuristic has magnitude at most 1 in the Riemannian metric. This means the heuristic's rate of change never exceeds the actual rate of change of geodesic distance. Consistency implies admissibility (by integration along geodesics from <em class="math">x</em> to <em class="math">\mathcal{G}</em>), but not vice versa.</p>
-<p class="body-text"><strong>The Heuristic Quality Thesis (Theorem 3.1, informal).</strong> Let <em class="math">\gamma_h</em> be the search trajectory produced by gradient descent on the evaluation landscape <em class="math">f = g + h</em>. Then:</p>
-<p class="body-text">(i) If <em class="math">h = h^*</em> (the perfect heuristic), <em class="math">\gamma_h</em> is a geodesic to <em class="math">\mathcal{G}</em>.</p>
-<p class="body-text">(ii) The geodesic deviation <em class="math">\Delta(\gamma_h, \gamma*) = \mathcal{L}[\gamma_h] - \mathcal{L}[\gamma*]</em> is bounded by the <em class="math">L^\infty</em> norm of the heuristic error: <em class="math">\Delta(\gamma_h, \gamma*) \leq C \|h - h*\|_\infty</em> for a constant <em class="math">C</em> depending on the curvature of <em class="math">M</em>.</p>
-<p class="body-text">(iii) If <em class="math">h</em> is admissible and <em class="math">M</em> is compact, <em class="math">\gamma_h</em> terminates in <em class="math">\mathcal{G}</em>.</p>
-<p class="body-text"><strong>Premature Convergence Criterion (Proposition 3.1).</strong> Let <em class="math">\tau &gt; 0</em> be a termination threshold: the search halts when <em class="math">h(x) &lt; \tau</em>. If <em class="math">h</em> underestimates the true cost-to-go by at least <em class="math">\delta &gt; \tau</em> on a region <em class="math">U \subset M</em> with <em class="math">U \cap \mathcal{G} = \emptyset</em>, then any search trajectory entering <em class="math">U</em> terminates outside the goal region. That is, the set <em class="math">\{x \in M : h(x) &lt; \tau, \, d_g(x, \mathcal{G}) &gt; \delta\}</em> is a false termination region — a basin from which the satisficing search cannot escape.</p>
-<p class="body-text"><strong>Overconfidence as Heuristic Underestimation (Corollary 3.1).</strong> If a system's implicit heuristic satisfies <em class="math">\mathbb{E}[h(x) - h*(x)] = -\beta</em> with <em class="math">\beta &gt; 0</em> (systematic underestimation of cost-to-go by an average of <em class="math">\beta</em>), then the expected false termination rate is at least <em class="math">\Pr[h*(x) &gt; \tau + \beta \mid h(x) &lt; \tau]</em>, which increases monotonically with <em class="math">\beta</em>. An ECE of 0.414 corresponds to a regime where this false termination rate is substantial, consistent with the empirical observation that models reporting high confidence are frequently incorrect.</p>
-<h2 id="references-for-chapter-3" class="section-heading">References for Chapter 3</h2>
-<p class="first-paragraph">Dechter, R., &amp; Pearl, J. (1985). Generalized best-first search strategies and the optimality of A*. Journal of the ACM*, 32(3), 505-536.</p>
-<p class="body-text">Elhage, N., Nanda, N., Olsson, C., et al. (2021). A mathematical framework for transformer circuits. Anthropic Research.</p>
-<p class="body-text">Geva, M., Schuster, R., Berant, J., &amp; Levy, O. (2021). Transformer feed-forward layers are key-value memories. Proceedings of EMNLP 2021.</p>
-<p class="body-text">Guo, C., Pleiss, G., Sun, Y., &amp; Weinberger, K. Q. (2017). On calibration of modern neural networks. Proceedings of ICML 2017.</p>
-<p class="body-text">Hart, P. E., Nilsson, N. J., &amp; Raphael, B. (1968). A formal basis for the heuristic determination of minimum cost paths. IEEE Transactions on Systems Science and Cybernetics, 4(2), 100-107.</p>
-<p class="body-text">Kadavath, S., Conerly, T., Askell, A., et al. (2022). Language models (mostly) know what they know. arXiv preprint arXiv:2207.05221.</p>
-<p class="body-text">Kahneman, D. (2011). Thinking, Fast and Slow. Farrar, Straus and Giroux.</p>
-<p class="body-text">LaValle, S. M. (2006). Planning Algorithms. Cambridge University Press.</p>
-<p class="body-text">Meng, K., Bau, D., Andonian, A., &amp; Belinkov, Y. (2022). Locating and editing factual associations in GPT. Advances in Neural Information Processing Systems, 35.</p>
-<p class="body-text">Naeini, M. P., Cooper, G., &amp; Hauskrecht, M. (2015). Obtaining well calibrated probabilities using Bayesian binning. Proceedings of AAAI 2015.</p>
-<p class="body-text">Newell, A., &amp; Simon, H. A. (1972). Human Problem Solving. Prentice-Hall.</p>
-<p class="body-text">Tversky, A., &amp; Kahneman, D. (1981). The framing of decisions and the psychology of choice. Science, 211(4481), 453-458.</p>
-<p class="body-text">Vaswani, A., Shazeer, N., Parmar, N., et al. (2017). Attention is all you need. Advances in Neural Information Processing Systems, 30.</p>
-<p class="body-text">Xiong, M., Hu, Z., Lu, X., et al. (2023). Can LLMs express their uncertainty? An empirical evaluation of confidence elicitation in LLMs. arXiv preprint arXiv:2306.13063.</p>
+<p><strong>Premature Convergence Criterion (Proposition 3.1).</strong> Let <span class="math inline">\tau &gt; 0</span> be a termination threshold: the search halts when <span class="math inline">h(x) &lt; \tau</span>. If <span class="math inline">h</span> underestimates the true cost-to-go by at least <span class="math inline">\delta &gt; \tau</span> on a region <span class="math inline">U \subset M</span> with <span class="math inline">U \cap \mathcal{G} = \emptyset</span>, then any search trajectory entering <span class="math inline">U</span> terminates outside the goal region. That is, the set <span class="math inline">\{x \in M : h(x) &lt; \tau, \, d_g(x, \mathcal{G}) &gt; \delta\}</span> is a <em>false termination region</em> — a basin from which the satisficing search cannot escape.</p>
+<p><strong>Overconfidence as Heuristic Underestimation (Corollary 3.1).</strong> If a system’s implicit heuristic satisfies <span class="math inline">\mathbb{E}[h(x) - h^*(x)] = -\beta</span> with <span class="math inline">\beta &gt; 0</span> (systematic underestimation of cost-to-go by an average of <span class="math inline">\beta</span>), then the expected false termination rate is at least <span class="math inline">\Pr[h^*(x) &gt; \tau + \beta \mid h(x) &lt; \tau]</span>, which increases monotonically with <span class="math inline">\beta</span>. An ECE of 0.414 corresponds to a regime where this false termination rate is substantial, consistent with the empirical observation that models reporting high confidence are frequently incorrect.</p>
+<hr />
+</section>
+<section id="references-for-chapter-3" class="level2">
+<h2>References for Chapter 3</h2>
+<p>Dechter, R., &amp; Pearl, J. (1985). Generalized best-first search strategies and the optimality of A<em>. </em>Journal of the ACM*, 32(3), 505-536.</p>
+<p>Elhage, N., Nanda, N., Olsson, C., et al. (2021). A mathematical framework for transformer circuits. <em>Anthropic Research</em>.</p>
+<p>Geva, M., Schuster, R., Berant, J., &amp; Levy, O. (2021). Transformer feed-forward layers are key-value memories. <em>Proceedings of EMNLP 2021</em>.</p>
+<p>Guo, C., Pleiss, G., Sun, Y., &amp; Weinberger, K. Q. (2017). On calibration of modern neural networks. <em>Proceedings of ICML 2017</em>.</p>
+<p>Hart, P. E., Nilsson, N. J., &amp; Raphael, B. (1968). A formal basis for the heuristic determination of minimum cost paths. <em>IEEE Transactions on Systems Science and Cybernetics</em>, 4(2), 100-107.</p>
+<p>Kadavath, S., Conerly, T., Askell, A., et al. (2022). Language models (mostly) know what they know. <em>arXiv preprint arXiv:2207.05221</em>.</p>
+<p>Kahneman, D. (2011). <em>Thinking, Fast and Slow</em>. Farrar, Straus and Giroux.</p>
+<p>LaValle, S. M. (2006). <em>Planning Algorithms</em>. Cambridge University Press.</p>
+<p>Meng, K., Bau, D., Andonian, A., &amp; Belinkov, Y. (2022). Locating and editing factual associations in GPT. <em>Advances in Neural Information Processing Systems</em>, 35.</p>
+<p>Naeini, M. P., Cooper, G., &amp; Hauskrecht, M. (2015). Obtaining well calibrated probabilities using Bayesian binning. <em>Proceedings of AAAI 2015</em>.</p>
+<p>Newell, A., &amp; Simon, H. A. (1972). <em>Human Problem Solving</em>. Prentice-Hall.</p>
+<p>Tversky, A., &amp; Kahneman, D. (1981). The framing of decisions and the psychology of choice. <em>Science</em>, 211(4481), 453-458.</p>
+<p>Vaswani, A., Shazeer, N., Parmar, N., et al. (2017). Attention is all you need. <em>Advances in Neural Information Processing Systems</em>, 30.</p>
+<p>Xiong, M., Hu, Z., Lu, X., et al. (2023). Can LLMs express their uncertainty? An empirical evaluation of confidence elicitation in LLMs. <em>arXiv preprint arXiv:2306.13063</em>.</p>
+</section>
+</section>
       </div>
 
       <div class="chapter-nav-bottom">
@@ -347,8 +426,8 @@
   </article>
 
   <footer class="book-footer">
-    <p>&copy; 2026 Andrew H. Bond. Geometric Reasoning: From Search to Manifolds.</p>
-    <p class="footer-note">Reasoning is informed search through a structured space.</p>
+    <p>&copy; 2026 Andrew H. Bond. <em>Geometric Reasoning: From Search to Manifolds.</em></p>
+    <p class="footer-note">The geometry was always real. The scalars were always insufficient.</p>
   </footer>
 
   <script>
@@ -359,35 +438,22 @@
       document.querySelector('.nav-links').classList.toggle('open');
     });
   </script>
-<script>
-window.addEventListener("load", function() {
-  if (typeof katex === 'undefined') return;
-  // Render all <em class="math"> elements with</em> KaTeX
-  document.querySelectorAll('em.math').forEach(function(el) {
-    try {
-      katex.render(el.textContent, el, {throwOnError: false, displayMode: false});
-    } catch(e) {}
-  });
-  // Render all <p class="display-math"> elements
-  document.querySelectorAll('p.display-math').forEach(function(el) {
-    var mathEl = el.querySelector('em.math');
-    if (mathEl) {
-      try {
-        katex.render(mathEl.textContent, el, {throwOnError: false, displayMode: true});
-      } catch(e) {}
-    }
-  });
-  // Also try auto-render for any $...$ delimited math
-  if (typeof renderMathInElement !== 'undefined') {
-    renderMathInElement(document.body, {
-      delimiters: [
-        {left: "$$", right: "$$", display: true},
-        {left: "$", right: "$", display: false}
-      ],
-      throwOnError: false
+  <script>
+    // Pandoc --katex outputs <span class="math inline"> and <span class="math display">.
+    // This script renders them with KaTeX once the library loads.
+    document.addEventListener("DOMContentLoaded", function() {
+      if (typeof katex === 'undefined') return;
+      var mathElements = document.getElementsByClassName("math");
+      for (var i = 0; i < mathElements.length; i++) {
+        var texText = mathElements[i].firstChild;
+        if (mathElements[i].tagName === "SPAN" && texText) {
+          katex.render(texText.data, mathElements[i], {
+            displayMode: mathElements[i].classList.contains('display'),
+            throwOnError: false
+          });
+        }
+      }
     });
-  }
-});
-</script>
+  </script>
 </body>
 </html>

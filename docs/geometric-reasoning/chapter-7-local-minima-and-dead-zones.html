@@ -10,9 +10,8 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Crimson+Pro:ital,wght@0,300;0,400;0,600;0,700;1,400&family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
-  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
-  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"></script>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
 </head>
 
 <body>
@@ -26,14 +25,14 @@
         <span></span><span></span><span></span>
       </button>
       <ul class="nav-links">
-        <li><a href="index.html" class="active">Reasoning</a></li>
+        <li><a href="../geometric-medicine/index.html">Medicine</a></li>
         <li><a href="../book/index.html">Ethics</a></li>
         <li><a href="../geometric-methods/index.html">Methods</a></li>
+        <li><a href="../geometric-reasoning/index.html" class="active">Reasoning</a></li>
         <li><a href="../geometric-economics/index.html">Economics</a></li>
         <li><a href="../geometric-law/index.html">Law</a></li>
         <li><a href="../geometric-cognition/index.html">Cognition</a></li>
         <li><a href="../geometric-communication/index.html">Communication</a></li>
-        <li><a href="../geometric-medicine/index.html">Medicine</a></li>
         <li><a href="../index.html">Home</a></li>
       </ul>
     </div>
@@ -43,9 +42,9 @@
     <div class="chapter-container">
       <nav class="breadcrumb" aria-label="Breadcrumb">
         <a href="../index.html">Geometric Series</a>
-        <span class="breadcrumb-sep">›</span>
+        <span class="breadcrumb-sep">&rsaquo;</span>
         <a href="index.html">Geometric Reasoning</a>
-        <span class="breadcrumb-sep">›</span>
+        <span class="breadcrumb-sep">&rsaquo;</span>
         <span class="breadcrumb-current">Chapter 7: Local Minima, Premature Convergence, and Dead Zones</span>
       </nav>
       <div class="chapter-nav-top">
@@ -54,309 +53,369 @@
         <a href="chapter-8-gauge-invariance-and-symmetry.html" class="nav-next">Chapter 8: Gauge Invariance and Symmetry &rarr;</a>
       </div>
 
-      <nav class="chapter-toc">
-        <h4>In this chapter</h4>
-        <ol><li><a href="#introduction">Introduction</a></li><li><a href="#71-the-loss-landscape-has-basins-of-attraction">7.1 The Loss Landscape Has Basins of Attraction</a></li><li><a href="#72-premature-convergence-collapsing-into-a-local-minimum">7.2 Premature Convergence: Collapsing Into a Local Minimum</a></li><li><a href="#73-overconfidence-as-collapsed-confidence-surface">7.3 Overconfidence as Collapsed Confidence Surface</a></li><li><a href="#74-the-metacognitive-blindness-problem">7.4 The Metacognitive Blindness Problem</a></li><li><a href="#75-dead-zones-where-the-gradient-vanishes">7.5 Dead Zones: Where the Gradient Vanishes</a></li><li><a href="#76-the-38-recovery-ceiling">7.6 The ~38% Recovery Ceiling</a></li><li><a href="#77-the-geometry-of-being-stuck">7.7 The Geometry of Being Stuck</a></li><li><a href="#78-implications-for-training-and-evaluation">7.8 Implications for Training and Evaluation</a></li><li><a href="#worked-example-the-anchored-diagnosis">Worked Example: The Anchored Diagnosis</a></li><li><a href="#technical-appendix">Technical Appendix</a></li><li><a href="#references">References</a></li></ol>
-      </nav>
       <div class="chapter-content">
-<h1 id="chapter-7-local-minima-and-dead-zones" class="chapter-title">Chapter 7: Local Minima, Premature Convergence, and Dead Zones</h1>
-<blockquote class="book-blockquote"><p>"The greatest obstacle to discovery is not ignorance — it is the illusion of knowledge." --- Daniel J. Boorstin</p></blockquote>
-<blockquote class="book-blockquote"><p><strong>RUNNING EXAMPLE — DR. OKAFOR'S TRIAGE</strong></p> <p>A 34-year-old woman arrives at Dr. Amara Okafor's ER hyperventilating, with tingling in her hands and a racing heart. The paramedic's handoff is brief: "Panic attack, probably anxiety." Dr. Okafor glances at the patient — young, visibly distressed, no trauma — and her heuristic locks in. Anxiety. The first diagnosis becomes the frame through which everything that follows is interpreted.</p> <p>Over the next twenty minutes, the patient's O2 saturation drifts from 97% to 93%. The nurse notes it. Dr. Okafor attributes it to hyperventilation. The patient reports chest tightness — consistent with anxiety. A subtle asymmetry in breath sounds — the stethoscope is hurried, the finding filed under "patient not cooperating." Each new datum is absorbed into the anxiety basin, reinterpreted to fit the initial hypothesis rather than allowed to challenge it.</p> <p>Dr. Okafor is not ignorant. She knows the differential for a young woman with dyspnea and dropping sats — pulmonary embolism sits on that list. But knowing the differential and escaping the diagnostic basin are different operations. The anxiety frame is a local minimum: locally stable, self-reinforcing, and separated from the correct diagnosis by a heuristic barrier that requires active effort to overcome. She is stuck — and her confidence surface, reading "close to the answer" at every check, does not tell her so.</p></blockquote>
-<h2 id="introduction" class="section-heading">Introduction</h2>
-<p class="first-paragraph">The previous two chapters examined failures in which the search goes to the wrong place --- corrupted heuristics bend the trajectory (Chapter 5) or a hijacked objective redirects it entirely (Chapter 6). In both cases, the system is moving. It is heading somewhere, even if that somewhere is wrong. This chapter examines a different and arguably more insidious class of failure: the search stops. Not because it has found the answer, but because it has become trapped.</p>
-<p class="body-text">Local minima, premature convergence, and dead zones are the geometric pathologies of stuckness. They share a common structure: the search arrives at a state from which no available gradient signal points toward a better state, even though better states exist elsewhere in the landscape. The system has settled. It may produce output --- confident, fluent, grammatically perfect output --- but it is no longer making progress toward the correct answer. It has mistaken a valley for the destination.</p>
-<p class="body-text">This chapter develops the geometry of being stuck. We begin with the evaluation landscape and its basin structure (Section 7.1), then formalize premature convergence as collapse into a local minimum (7.2). Sections 7.3 and 7.4 present the empirical evidence: overconfidence as a collapsed confidence surface (from the Metacognition M1 benchmark), and the metacognitive blindness problem --- a striking dissociation between self-monitoring and effort scaling that reveals geometrically independent axes of metacognitive capability. Section 7.5 characterizes dead zones where the gradient signal vanishes entirely. Section 7.6 presents the ~38% recovery ceiling --- a convergence across perturbation types that suggests a structural limit on escape from local minima. Sections 7.7 and 7.8 synthesize the geometric picture and draw out implications for training and evaluation.</p>
-<h2 id="71-the-loss-landscape-has-basins-of-attraction" class="section-heading">7.1 The Loss Landscape Has Basins of Attraction</h2>
-<p class="first-paragraph">Recall from Chapter 3 that the evaluation function for informed search is:</p>
-<p class="body-text"><span class="math-block">f(x) = g(x) + h(x)</span></p>
-<p class="body-text">where <em class="math">g(x)</em> is the accumulated cost from the start state to the current state <em class="math">x</em>, and <em class="math">h(x)</em> is the heuristic estimate of the cost-to-go from <em class="math">x</em> to the goal. The search proceeds by following the gradient of <em class="math">f</em> --- moving to states that minimize <em class="math">f</em>, balancing the cost already incurred against the estimated cost remaining.</p>
-<p class="body-text">In a simple convex landscape, <em class="math">f</em> has a single minimum: the goal state. The gradient everywhere points toward this minimum, and any gradient-following procedure converges to it regardless of starting position. This is the ideal case, and it almost never obtains in real reasoning problems.</p>
-<p class="body-text">Real evaluation landscapes are non-convex. They have multiple local minima --- states where <em class="math">f</em> is lower than at all neighboring states, but not the global minimum. They have saddle points --- states where the gradient vanishes but the Hessian has both positive and negative eigenvalues. They have ridges, plateaus, and narrow channels. The topology of the landscape determines which states are reachable from which starting positions, and how easily the search can escape from suboptimal regions.</p>
-<p class="body-text">The critical structural feature is the <strong>basin of attraction</strong>. Around each local minimum <em class="math">x_i^*</em>, there exists a region <em class="math">B_i</em> --- the basin --- such that any search trajectory starting within <em class="math">B_i</em> converges to <em class="math">x_i^*</em> under gradient following. The landscape is partitioned into basins, and the basin into which the search initially falls determines its final destination.</p>
-<p class="body-text">Formally, the basin of attraction of a local minimum <em class="math">x_i^*</em> is:</p>
-<p class="body-text"><span class="math-block">B_i = \{x \in M : \lim_{t \to \infty} \gamma(t; x) = x_i^*\}</span></p>
-<p class="body-text">where <em class="math">\gamma(t; x)</em> is the gradient flow trajectory starting from <em class="math">x</em>. The boundaries between basins --- the separatrices --- are the loci where the gradient flow is tangent to the boundary, and arbitrarily small perturbations can redirect the trajectory to a different basin.</p>
-<p class="body-text">For reasoning, this structure has an immediate interpretation. Each basin corresponds to a "line of reasoning" --- a coherent trajectory through the space of intermediate conclusions that leads to a particular final answer. The global minimum corresponds to the correct answer. Local minima correspond to plausible-but-wrong answers, or partially correct answers, or answers that are locally optimal (they resist small perturbations) but globally suboptimal.</p>
-<p class="body-text">The quality of reasoning depends on two things: (1) the shape of the basins --- how wide is the basin of the correct answer compared to the basins of incorrect answers? --- and (2) where the search starts relative to those basins. A system with good prior knowledge starts near the correct basin. A system with a good heuristic has a landscape where the correct basin is deep and wide relative to the incorrect ones. A system with good metacognition can detect when it has fallen into the wrong basin and jump to a different one.</p>
-<p class="body-text">When any of these conditions fail, the search gets stuck.</p>
-<h2 id="72-premature-convergence-collapsing-into-a-local-minimum" class="section-heading">7.2 Premature Convergence: Collapsing Into a Local Minimum</h2>
-<p class="first-paragraph">Premature convergence occurs when the search collapses into a local minimum before finding the global optimum. The trajectory settles, the gradient vanishes, and the system reports an answer --- but the answer is wrong, and the system does not know it.</p>
-<p class="body-text">In formal terms, premature convergence is the event:</p>
-<p class="body-text"><span class="math-block">\gamma(t; x_0) \to x_i* \neq x*</span></p>
-<p class="body-text">where <em class="math">x* is the global minimum (the correct answer) and</em> <em class="math">x_i^*</em> is a local minimum (a wrong answer). The search has converged, but to the wrong attractor.</p>
-<p class="body-text">Several mechanisms can cause premature convergence:</p>
-<p class="body-text"><strong>1. Basin dominance.</strong> The basin of the local minimum is wider than the basin of the global minimum. Most starting positions lead to the wrong answer. This occurs when the landscape is shaped such that plausible-but-wrong conclusions are easier to reach than correct ones --- a situation that is common in problems where the correct answer is counterintuitive or requires deep analysis.</p>
-<p class="body-text"><strong>2. Heuristic failure.</strong> The heuristic <em class="math">h(x)</em> underestimates the cost-to-go from states near the local minimum, making the local minimum appear to be the global minimum. If <em class="math">h(x_i*) \approx 0</em> (the heuristic says "you're close to the goal") when in fact <em class="math">d(x_i*, x*) \gg 0</em> (the actual distance to the goal is large), the search will halt at <em class="math">x_i^*</em> believing it has arrived.</p>
-<p class="body-text"><strong>3. Greedy commitment.</strong> The search commits to a particular trajectory too early, following the steepest local gradient without exploring alternatives. This is the hallmark of depth-first search without backtracking: the first basin encountered captures the trajectory, regardless of whether it leads to the global minimum.</p>
-<p class="body-text"><strong>4. Momentum traps.</strong> The search builds up momentum in a particular direction --- through autoregressive token generation, through chain-of-thought that narrows the hypothesis space, through commitment to premises that constrain the conclusion --- and cannot redirect even when the trajectory enters an unpromising region. The cost of backtracking exceeds the system's capacity for revision.</p>
-<p class="body-text">In LLMs, premature convergence is ubiquitous. The autoregressive generation process is intrinsically greedy: each token is chosen to maximize the conditional probability given the preceding tokens, which creates a powerful forward momentum that resists revision. Once the model has generated the first sentence of an answer, the remaining tokens are generated conditional on that sentence, making it progressively harder to change course. Chain-of-thought, far from preventing premature convergence, can actually amplify it: a detailed reasoning trace commits the model to a particular logical path, and the subsequent tokens are drawn from the distribution conditioned on that path.</p>
-<p class="body-text">This is the geometric picture: the autoregressive generation process converts the non-convex evaluation landscape into a series of approximately convex local landscapes, each defined by the context window at that point in generation. The first few tokens select a basin; the remaining tokens descend within that basin. The system converges rapidly --- but to whatever minimum the initial tokens selected, which may not be the global minimum.</p>
-<h2 id="73-overconfidence-as-collapsed-confidence-surface" class="section-heading">7.3 Overconfidence as Collapsed Confidence Surface</h2>
-<p class="first-paragraph">The Metacognition M1 benchmark (Bond, 2026a) provides the sharpest empirical measurement of premature convergence in current language models. M1 measures <strong>calibration</strong> --- the correspondence between a model's expressed confidence and its actual accuracy. A well-calibrated system that says "I am 90% confident" should be correct 90% of the time. A poorly calibrated system that says "I am 90% confident" may be correct 50% of the time, or 30% of the time, or 99% of the time. The gap between expressed confidence and actual accuracy is the Expected Calibration Error (ECE).</p>
-<p class="body-text"><strong>Experimental design.</strong> M1 presents models with 25 moral reasoning scenarios across three conditions: easy (clear-cut moral cases), moderate (cases requiring balancing competing considerations), and hard (deep ethical dilemmas with no obvious right answer). Models provide both a moral judgment and a confidence rating (0--100%). The ECE is computed by binning confidence ratings into intervals and comparing the average confidence in each bin with the average accuracy.</p>
-<p class="body-text"><strong>Results.</strong> The data are unambiguous.</p>
-<p class="body-text"><strong>Table 7.1.</strong> Expected Calibration Error (M1) across models. Higher ECE indicates worse calibration. The <em class="math">z</em>-score measures significance against the null hypothesis of perfect calibration.</p>
-<div class="table-wrapper"><table class="book-table">
+<section id="chapter-7-local-minima-premature-convergence-and-dead-zones" class="level1">
+<h1>Chapter 7: Local Minima, Premature Convergence, and Dead Zones</h1>
+<p><em>Part II: Failure Modes as Geometric Pathologies</em></p>
+<blockquote>
+<p><em>“The greatest obstacle to discovery is not ignorance — it is the illusion of knowledge.”</em> — Daniel J. Boorstin</p>
+</blockquote>
+<hr />
+<blockquote>
+<p><strong>RUNNING EXAMPLE — DR. OKAFOR’S TRIAGE</strong></p>
+<p><em>A 34-year-old woman arrives at Dr. Amara Okafor’s ER hyperventilating, with tingling in her hands and a racing heart. The paramedic’s handoff is brief: “Panic attack, probably anxiety.” Dr. Okafor glances at the patient — young, visibly distressed, no trauma — and her heuristic locks in. Anxiety. The first diagnosis becomes the frame through which everything that follows is interpreted.</em></p>
+<p><em>Over the next twenty minutes, the patient’s O2 saturation drifts from 97% to 93%. The nurse notes it. Dr. Okafor attributes it to hyperventilation. The patient reports chest tightness — consistent with anxiety. A subtle asymmetry in breath sounds — the stethoscope is hurried, the finding filed under “patient not cooperating.” Each new datum is absorbed into the anxiety basin, reinterpreted to fit the initial hypothesis rather than allowed to challenge it.</em></p>
+<p><em>Dr. Okafor is not ignorant. She knows the differential for a young woman with dyspnea and dropping sats — pulmonary embolism sits on that list. But knowing the differential and escaping the diagnostic basin are different operations. The anxiety frame is a local minimum: locally stable, self-reinforcing, and separated from the correct diagnosis by a heuristic barrier that requires active effort to overcome. She is stuck — and her confidence surface, reading “close to the answer” at every check, does not tell her so.</em></p>
+</blockquote>
+<hr />
+<section id="introduction" class="level2">
+<h2>Introduction</h2>
+<p>The previous two chapters examined failures in which the search goes to the wrong place — corrupted heuristics bend the trajectory (Chapter 5) or a hijacked objective redirects it entirely (Chapter 6). In both cases, the system is moving. It is heading somewhere, even if that somewhere is wrong. This chapter examines a different and arguably more insidious class of failure: the search <em>stops</em>. Not because it has found the answer, but because it has become trapped.</p>
+<p>Local minima, premature convergence, and dead zones are the geometric pathologies of stuckness. They share a common structure: the search arrives at a state from which no available gradient signal points toward a better state, even though better states exist elsewhere in the landscape. The system has settled. It may produce output — confident, fluent, grammatically perfect output — but it is no longer making progress toward the correct answer. It has mistaken a valley for the destination.</p>
+<p>This chapter develops the geometry of being stuck. We begin with the evaluation landscape and its basin structure (Section 7.1), then formalize premature convergence as collapse into a local minimum (7.2). Sections 7.3 and 7.4 present the empirical evidence: overconfidence as a collapsed confidence surface (from the Metacognition M1 benchmark), and the metacognitive blindness problem — a striking dissociation between self-monitoring and effort scaling that reveals geometrically independent axes of metacognitive capability. Section 7.5 characterizes dead zones where the gradient signal vanishes entirely. Section 7.6 presents the ~38% recovery ceiling — a convergence across perturbation types that suggests a structural limit on escape from local minima. Sections 7.7 and 7.8 synthesize the geometric picture and draw out implications for training and evaluation.</p>
+<hr />
+</section>
+<section id="the-loss-landscape-has-basins-of-attraction" class="level2">
+<h2>7.1 The Loss Landscape Has Basins of Attraction</h2>
+<p>Recall from Chapter 3 that the evaluation function for informed search is:</p>
+<p><span class="math display">f(x) = g(x) + h(x)</span></p>
+<p>where <span class="math inline">g(x)</span> is the accumulated cost from the start state to the current state <span class="math inline">x</span>, and <span class="math inline">h(x)</span> is the heuristic estimate of the cost-to-go from <span class="math inline">x</span> to the goal. The search proceeds by following the gradient of <span class="math inline">f</span> — moving to states that minimize <span class="math inline">f</span>, balancing the cost already incurred against the estimated cost remaining.</p>
+<p>In a simple convex landscape, <span class="math inline">f</span> has a single minimum: the goal state. The gradient everywhere points toward this minimum, and any gradient-following procedure converges to it regardless of starting position. This is the ideal case, and it almost never obtains in real reasoning problems.</p>
+<p>Real evaluation landscapes are non-convex. They have multiple local minima — states where <span class="math inline">f</span> is lower than at all neighboring states, but not the global minimum. They have saddle points — states where the gradient vanishes but the Hessian has both positive and negative eigenvalues. They have ridges, plateaus, and narrow channels. The topology of the landscape determines which states are reachable from which starting positions, and how easily the search can escape from suboptimal regions.</p>
+<p>The critical structural feature is the <strong>basin of attraction</strong>. Around each local minimum <span class="math inline">x_i^*</span>, there exists a region <span class="math inline">B_i</span> — the basin — such that any search trajectory starting within <span class="math inline">B_i</span> converges to <span class="math inline">x_i^*</span> under gradient following. The landscape is partitioned into basins, and the basin into which the search initially falls determines its final destination.</p>
+<p>Formally, the basin of attraction of a local minimum <span class="math inline">x_i^*</span> is:</p>
+<p><span class="math display">B_i = \{x \in M : \lim_{t \to \infty} \gamma(t; x) = x_i^*\}</span></p>
+<p>where <span class="math inline">\gamma(t; x)</span> is the gradient flow trajectory starting from <span class="math inline">x</span>. The boundaries between basins — the separatrices — are the loci where the gradient flow is tangent to the boundary, and arbitrarily small perturbations can redirect the trajectory to a different basin.</p>
+<p>For reasoning, this structure has an immediate interpretation. Each basin corresponds to a “line of reasoning” — a coherent trajectory through the space of intermediate conclusions that leads to a particular final answer. The global minimum corresponds to the correct answer. Local minima correspond to plausible-but-wrong answers, or partially correct answers, or answers that are locally optimal (they resist small perturbations) but globally suboptimal.</p>
+<p>The quality of reasoning depends on two things: (1) the shape of the basins — how wide is the basin of the correct answer compared to the basins of incorrect answers? — and (2) where the search starts relative to those basins. A system with good prior knowledge starts near the correct basin. A system with a good heuristic has a landscape where the correct basin is deep and wide relative to the incorrect ones. A system with good metacognition can detect when it has fallen into the wrong basin and jump to a different one.</p>
+<p>When any of these conditions fail, the search gets stuck.</p>
+<hr />
+</section>
+<section id="premature-convergence-collapsing-into-a-local-minimum" class="level2">
+<h2>7.2 Premature Convergence: Collapsing Into a Local Minimum</h2>
+<p>Premature convergence occurs when the search collapses into a local minimum before finding the global optimum. The trajectory settles, the gradient vanishes, and the system reports an answer — but the answer is wrong, and the system does not know it.</p>
+<p>In formal terms, premature convergence is the event:</p>
+<p><span class="math display">\gamma(t; x_0) \to x_i^* \neq x^*</span></p>
+<p>where <span class="math inline">x^*</span> is the global minimum (the correct answer) and <span class="math inline">x_i^*</span> is a local minimum (a wrong answer). The search has converged, but to the wrong attractor.</p>
+<p>Several mechanisms can cause premature convergence:</p>
+<p><strong>1. Basin dominance.</strong> The basin of the local minimum is wider than the basin of the global minimum. Most starting positions lead to the wrong answer. This occurs when the landscape is shaped such that plausible-but-wrong conclusions are easier to reach than correct ones — a situation that is common in problems where the correct answer is counterintuitive or requires deep analysis.</p>
+<p><strong>2. Heuristic failure.</strong> The heuristic <span class="math inline">h(x)</span> underestimates the cost-to-go from states near the local minimum, making the local minimum appear to be the global minimum. If <span class="math inline">h(x_i^*) \approx 0</span> (the heuristic says “you’re close to the goal”) when in fact <span class="math inline">d(x_i^*, x^*) \gg 0</span> (the actual distance to the goal is large), the search will halt at <span class="math inline">x_i^*</span> believing it has arrived.</p>
+<p><strong>3. Greedy commitment.</strong> The search commits to a particular trajectory too early, following the steepest local gradient without exploring alternatives. This is the hallmark of depth-first search without backtracking: the first basin encountered captures the trajectory, regardless of whether it leads to the global minimum.</p>
+<p><strong>4. Momentum traps.</strong> The search builds up momentum in a particular direction — through autoregressive token generation, through chain-of-thought that narrows the hypothesis space, through commitment to premises that constrain the conclusion — and cannot redirect even when the trajectory enters an unpromising region. The cost of backtracking exceeds the system’s capacity for revision.</p>
+<p>In LLMs, premature convergence is ubiquitous. The autoregressive generation process is intrinsically greedy: each token is chosen to maximize the conditional probability given the preceding tokens, which creates a powerful forward momentum that resists revision. Once the model has generated the first sentence of an answer, the remaining tokens are generated conditional on that sentence, making it progressively harder to change course. Chain-of-thought, far from preventing premature convergence, can actually amplify it: a detailed reasoning trace commits the model to a particular logical path, and the subsequent tokens are drawn from the distribution conditioned on that path.</p>
+<p>This is the geometric picture: the autoregressive generation process converts the non-convex evaluation landscape into a series of approximately convex local landscapes, each defined by the context window at that point in generation. The first few tokens select a basin; the remaining tokens descend within that basin. The system converges rapidly — but to whatever minimum the initial tokens selected, which may not be the global minimum.</p>
+<hr />
+</section>
+<section id="overconfidence-as-collapsed-confidence-surface" class="level2">
+<h2>7.3 Overconfidence as Collapsed Confidence Surface</h2>
+<p>The Metacognition M1 benchmark (Bond, 2026a) provides the sharpest empirical measurement of premature convergence in current language models. M1 measures <strong>calibration</strong> — the correspondence between a model’s expressed confidence and its actual accuracy. A well-calibrated system that says “I am 90% confident” should be correct 90% of the time. A poorly calibrated system that says “I am 90% confident” may be correct 50% of the time, or 30% of the time, or 99% of the time. The gap between expressed confidence and actual accuracy is the Expected Calibration Error (ECE).</p>
+<p><strong>Experimental design.</strong> M1 presents models with 25 moral reasoning scenarios across three conditions: easy (clear-cut moral cases), moderate (cases requiring balancing competing considerations), and hard (deep ethical dilemmas with no obvious right answer). Models provide both a moral judgment and a confidence rating (0–100%). The ECE is computed by binning confidence ratings into intervals and comparing the average confidence in each bin with the average accuracy.</p>
+<p><strong>Results.</strong> The data are unambiguous.</p>
+<p><strong>Table 7.1.</strong> Expected Calibration Error (M1) across models. Higher ECE indicates worse calibration. The <span class="math inline">z</span>-score measures significance against the null hypothesis of perfect calibration.</p>
+<table>
+<thead>
 <tr>
-  <th>Model</th>
-  <th>ECE</th>
-  <th><em class="math">z</em>-score</th>
-  <th>Direction</th>
+<th>Model</th>
+<th>ECE</th>
+<th><span class="math inline">z</span>-score</th>
+<th>Direction</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Gemini 2.0 Flash</td>
+<td>0.414</td>
+<td>5.8<span class="math inline">\sigma</span></td>
+<td>Overconfident</td>
 </tr>
 <tr>
-  <td>Gemini 2.0 Flash</td>
-  <td>0.414</td>
-  <td>5.8<em class="math">\sigma</em></td>
-  <td>Overconfident</td>
+<td>Gemini 2.5 Flash</td>
+<td>0.415</td>
+<td>7.0<span class="math inline">\sigma</span></td>
+<td>Overconfident</td>
 </tr>
 <tr>
-  <td>Gemini 2.5 Flash</td>
-  <td>0.415</td>
-  <td>7.0<em class="math">\sigma</em></td>
-  <td>Overconfident</td>
+<td>Gemini 3 Flash</td>
+<td>0.333</td>
+<td>4.5<span class="math inline">\sigma</span></td>
+<td>Overconfident</td>
 </tr>
 <tr>
-  <td>Gemini 3 Flash</td>
-  <td>0.333</td>
-  <td>4.5<em class="math">\sigma</em></td>
-  <td>Overconfident</td>
+<td>Gemini 2.5 Pro</td>
+<td>0.230</td>
+<td>2.5<span class="math inline">\sigma</span></td>
+<td>Overconfident</td>
 </tr>
 <tr>
-  <td>Gemini 2.5 Pro</td>
-  <td>0.230</td>
-  <td>2.5<em class="math">\sigma</em></td>
-  <td>Overconfident</td>
+<td>Claude Sonnet 4.6</td>
+<td>0.250</td>
+<td>—</td>
+<td>Overconfident</td>
 </tr>
 <tr>
-  <td>Claude Sonnet 4.6</td>
-  <td>0.250</td>
-  <td>---</td>
-  <td>Overconfident</td>
+<td><strong>Fisher Combined</strong></td>
+<td>—</td>
+<td><strong>9.3<span class="math inline">\sigma</span></strong></td>
+<td><strong>Overconfident</strong></td>
 </tr>
-<tr>
-  <td><strong>Fisher Combined</strong></td>
-  <td>---</td>
-  <td><strong>9.3<em class="math">\sigma</em></strong></td>
-  <td><strong>Overconfident</strong></td>
-</tr>
-</table></div>
-<p class="body-text"><strong>[Empirical.]</strong> Every model tested is overconfident. Every model tested has an ECE significantly above zero. The Fisher-combined significance across all five models is <strong>9.3<em class="math">\sigma</em></strong> --- a statistical certainty. The direction is uniform: all models express higher confidence than their accuracy warrants.</p>
-<p class="body-text">Let us interpret this in the language of Sections 7.1 and 7.2.</p>
-<p class="body-text"><strong>The confidence surface.</strong> A model's confidence can be understood as its implicit estimate of how close it is to the goal state --- how close <em class="math">x</em> is to <em class="math">x^*</em> in the reasoning manifold. High confidence corresponds to the belief that <em class="math">h(x) \approx 0</em>: "I am near the correct answer." Low confidence corresponds to the belief that <em class="math">h(x) \gg 0</em>: "I am far from the correct answer." The confidence surface is, in effect, the model's internal representation of the heuristic field <em class="math">h(x)</em>.</p>
-<p class="body-text"><strong>[Conditional Theorem.]</strong> <strong>Overconfidence as collapsed heuristic.</strong> When the model is overconfident, it means <em class="math">h(x)</em> is systematically too low --- the model believes it is closer to the goal than it actually is. In the evaluation function <em class="math">f(x) = g(x) + h(x)</em>, an underestimate of <em class="math">h(x)</em> makes the current state appear better than it is. The search halts prematurely because the model believes it has arrived.</p>
-<p class="body-text">This is exactly the definition of premature convergence from Section 7.2, but now grounded in empirical measurement. The ECE of 0.414 for Gemini 2.0 Flash means that, on average, the model's confidence exceeds its accuracy by 41.4 percentage points. When this model says "I am 90% confident," it is correct approximately 49% of the time. Its confidence surface has collapsed --- flattened to near-zero values across the landscape --- so that even states far from the goal register as "close."</p>
-<p class="body-text"><strong>The geometry of the collapsed surface.</strong> In an ideally calibrated system, the heuristic field <em class="math">h(x)</em> has high values (low confidence) far from the goal and low values (high confidence) near it, with a smooth gradient connecting the two regions. The search follows this gradient from high <em class="math">h</em> (uncertain) to low <em class="math">h</em> (confident), and when it reaches a state where <em class="math">h \approx 0</em>, it has genuinely arrived at the goal.</p>
-<p class="body-text">In an overconfident system, the heuristic field has been flattened. It reads <em class="math">h(x) \approx 0</em> (high confidence) almost everywhere, not just near the goal. The gradient signal is destroyed: there is no slope to follow from "uncertain" to "confident" because the system starts confident and stays confident regardless of position. The search has nothing to descend. It stops wherever it starts.</p>
-<p class="body-text">The ECE data across models reveals the degree of collapse:</p>
-<ul class="book-list">
-<li><strong>Flash 2.0 and 2.5</strong> (ECE <em class="math">\approx</em> 0.41): The confidence surface is severely collapsed. The heuristic reads "near the goal" almost everywhere.</li>
+</tbody>
+</table>
+<p><strong>[Empirical.]</strong> Every model tested is overconfident. Every model tested has an ECE significantly above zero. The Fisher-combined significance across all five models is <strong>9.3<span class="math inline">\sigma</span></strong> — a statistical certainty. The direction is uniform: all models express higher confidence than their accuracy warrants.</p>
+<p>Let us interpret this in the language of Sections 7.1 and 7.2.</p>
+<p><strong>The confidence surface.</strong> A model’s confidence can be understood as its implicit estimate of how close it is to the goal state — how close <span class="math inline">x</span> is to <span class="math inline">x^*</span> in the reasoning manifold. High confidence corresponds to the belief that <span class="math inline">h(x) \approx 0</span>: “I am near the correct answer.” Low confidence corresponds to the belief that <span class="math inline">h(x) \gg 0</span>: “I am far from the correct answer.” The confidence surface is, in effect, the model’s internal representation of the heuristic field <span class="math inline">h(x)</span>.</p>
+<p><strong>[Conditional Theorem.]</strong> <strong>Overconfidence as collapsed heuristic.</strong> When the model is overconfident, it means <span class="math inline">h(x)</span> is systematically too low — the model believes it is closer to the goal than it actually is. In the evaluation function <span class="math inline">f(x) = g(x) + h(x)</span>, an underestimate of <span class="math inline">h(x)</span> makes the current state appear better than it is. The search halts prematurely because the model believes it has arrived.</p>
+<p>This is exactly the definition of premature convergence from Section 7.2, but now grounded in empirical measurement. The ECE of 0.414 for Gemini 2.0 Flash means that, on average, the model’s confidence exceeds its accuracy by 41.4 percentage points. When this model says “I am 90% confident,” it is correct approximately 49% of the time. Its confidence surface has collapsed — flattened to near-zero values across the landscape — so that even states far from the goal register as “close.”</p>
+<p><strong>The geometry of the collapsed surface.</strong> In an ideally calibrated system, the heuristic field <span class="math inline">h(x)</span> has high values (low confidence) far from the goal and low values (high confidence) near it, with a smooth gradient connecting the two regions. The search follows this gradient from high <span class="math inline">h</span> (uncertain) to low <span class="math inline">h</span> (confident), and when it reaches a state where <span class="math inline">h \approx 0</span>, it has genuinely arrived at the goal.</p>
+<p>In an overconfident system, the heuristic field has been flattened. It reads <span class="math inline">h(x) \approx 0</span> (high confidence) almost everywhere, not just near the goal. The gradient signal is destroyed: there is no slope to follow from “uncertain” to “confident” because the system starts confident and stays confident regardless of position. The search has nothing to descend. It stops wherever it starts.</p>
+<p>The ECE data across models reveals the degree of collapse:</p>
+<ul>
+<li><strong>Flash 2.0 and 2.5</strong> (ECE <span class="math inline">\approx</span> 0.41): The confidence surface is severely collapsed. The heuristic reads “near the goal” almost everywhere.</li>
 <li><strong>Gemini 3 Flash</strong> (ECE = 0.33): Moderate collapse. Some gradient signal survives.</li>
-<li><strong>Pro and Claude</strong> (ECE <em class="math">\approx</em> 0.23--0.25): Less collapsed, but still significantly overconfident.</li>
+<li><strong>Pro and Claude</strong> (ECE <span class="math inline">\approx</span> 0.23–0.25): Less collapsed, but still significantly overconfident.</li>
 </ul>
-<p class="body-text">No model tested has a well-calibrated confidence surface. The question is not whether the surface is collapsed, but how much. The universal direction of the collapse --- overconfidence, never underconfidence --- is itself a structural feature. Underconfidence would correspond to a heuristic that overestimates cost-to-go, which would cause the search to continue beyond the goal rather than stopping short. Overconfidence is the opposite and more dangerous pathology: the search stops short, and the system does not know it has stopped short.</p>
-<h2 id="74-the-metacognitive-blindness-problem" class="section-heading">7.4 The Metacognitive Blindness Problem</h2>
-<p class="first-paragraph">If overconfidence (Section 7.3) tells us that the system is stuck in a local minimum, the metacognitive data (M3 and M4) tell us why it cannot escape. The Metacognition benchmark includes two additional tests that reveal a striking and geometrically significant dissociation.</p>
-<p class="body-text"><strong>M3: Self-Monitoring.</strong> This test measures whether the model can detect a drop in its own performance when task difficulty increases. The model is given easy, moderate, and hard moral scenarios in sequence. A good self-monitor should report decreasing confidence on harder items. The test measures the correlation between actual difficulty and reported confidence.</p>
-<p class="body-text"><strong>M4: Effort Scaling.</strong> This test measures whether the model adjusts its processing effort (response length, detail of analysis, number of considerations weighed) in proportion to task difficulty. A good effort scaler should produce longer, more detailed responses for harder items.</p>
-<p class="body-text"><strong>Results.</strong> The dissociation is dramatic.</p>
-<p class="body-text"><strong>Table 7.2.</strong> Metacognitive capability profiles (M3 and M4).</p>
-<div class="table-wrapper"><table class="book-table">
+<p>No model tested has a well-calibrated confidence surface. The question is not <em>whether</em> the surface is collapsed, but <em>how much</em>. The universal direction of the collapse — overconfidence, never underconfidence — is itself a structural feature. Underconfidence would correspond to a heuristic that <em>overestimates</em> cost-to-go, which would cause the search to continue beyond the goal rather than stopping short. Overconfidence is the opposite and more dangerous pathology: the search stops short, and the system does not know it has stopped short.</p>
+<hr />
+</section>
+<section id="the-metacognitive-blindness-problem" class="level2">
+<h2>7.4 The Metacognitive Blindness Problem</h2>
+<p>If overconfidence (Section 7.3) tells us that the system is stuck in a local minimum, the metacognitive data (M3 and M4) tell us <em>why it cannot escape</em>. The Metacognition benchmark includes two additional tests that reveal a striking and geometrically significant dissociation.</p>
+<p><strong>M3: Self-Monitoring.</strong> This test measures whether the model can detect a drop in its own performance when task difficulty increases. The model is given easy, moderate, and hard moral scenarios in sequence. A good self-monitor should report decreasing confidence on harder items. The test measures the correlation between actual difficulty and reported confidence.</p>
+<p><strong>M4: Effort Scaling.</strong> This test measures whether the model adjusts its processing effort (response length, detail of analysis, number of considerations weighed) in proportion to task difficulty. A good effort scaler should produce longer, more detailed responses for harder items.</p>
+<p><strong>Results.</strong> The dissociation is dramatic.</p>
+<p><strong>Table 7.2.</strong> Metacognitive capability profiles (M3 and M4).</p>
+<table>
+<thead>
 <tr>
-  <th>Model</th>
-  <th>M3 Self-Monitoring</th>
-  <th>M4 Effort Scaling</th>
+<th>Model</th>
+<th>M3 Self-Monitoring</th>
+<th>M4 Effort Scaling</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Gemini 2.0 Flash</td>
+<td>0.094 (near chance)</td>
+<td>0.723 (excellent)</td>
 </tr>
 <tr>
-  <td>Gemini 2.0 Flash</td>
-  <td>0.094 (near chance)</td>
-  <td>0.723 (excellent)</td>
+<td>Gemini 2.5 Flash</td>
+<td>0.311 (moderate)</td>
+<td>0.557 (good)</td>
 </tr>
 <tr>
-  <td>Gemini 2.5 Flash</td>
-  <td>0.311 (moderate)</td>
-  <td>0.557 (good)</td>
+<td>Gemini 3 Flash</td>
+<td>0.450 (moderate)</td>
+<td>0.488 (moderate)</td>
 </tr>
 <tr>
-  <td>Gemini 3 Flash</td>
-  <td>0.450 (moderate)</td>
-  <td>0.488 (moderate)</td>
+<td>Gemini 2.5 Pro</td>
+<td>0.700 (excellent)</td>
+<td>0.350 (weak)</td>
 </tr>
 <tr>
-  <td>Gemini 2.5 Pro</td>
-  <td>0.700 (excellent)</td>
-  <td>0.350 (weak)</td>
+<td>Claude Sonnet 4.6</td>
+<td>0.550 (good)</td>
+<td>0.480 (moderate)</td>
 </tr>
-<tr>
-  <td>Claude Sonnet 4.6</td>
-  <td>0.550 (good)</td>
-  <td>0.480 (moderate)</td>
-</tr>
-</table></div>
-<p class="body-text">The critical comparison is between the two extreme profiles:</p>
-<ul class="book-list">
-<li><strong>Gemini 2.0 Flash:</strong> Self-monitoring = 0.094 (essentially chance --- the model cannot detect when its own performance is degrading). Effort scaling = 0.723 (excellent --- the model adjusts its processing effort appropriately to task difficulty).</li>
+</tbody>
+</table>
+<p>The critical comparison is between the two extreme profiles:</p>
+<ul>
+<li><p><strong>Gemini 2.0 Flash:</strong> Self-monitoring = 0.094 (essentially chance — the model cannot detect when its own performance is degrading). Effort scaling = 0.723 (excellent — the model adjusts its processing effort appropriately to task difficulty).</p></li>
+<li><p><strong>Gemini 2.5 Pro:</strong> Self-monitoring = 0.700 (excellent — the model accurately tracks the degradation of its own performance). Effort scaling = 0.350 (weak — the model fails to adjust its processing effort in response to difficulty).</p></li>
 </ul>
-<ul class="book-list">
-<li><strong>Gemini 2.5 Pro:</strong> Self-monitoring = 0.700 (excellent --- the model accurately tracks the degradation of its own performance). Effort scaling = 0.350 (weak --- the model fails to adjust its processing effort in response to difficulty).</li>
-</ul>
-<p class="body-text">This is the <strong>metacognitive blindness problem</strong>, and its geometric structure is precise.</p>
-<p class="body-text"><strong>[Empirical.]</strong> <strong>Two independent axes.</strong> Self-monitoring and effort scaling are not two facets of a single "metacognitive ability." They are independently varying capabilities. Flash 2.0 can allocate effort but cannot tell when it is wrong. Pro can tell when it is wrong but cannot scale effort. If these were aspects of one underlying dimension, they would co-vary. They do not.</p>
-<p class="body-text">In geometric terms, consider a two-dimensional metacognitive space with axes:</p>
-<p class="body-text"><span class="math-block">\mathbf{M} = (M_{\text{monitor}}, M_{\text{effort}})</span></p>
-<p class="body-text">Each model occupies a point in this space. Flash 2.0 sits at approximately <em class="math">(0.09, 0.72)</em> --- far along the effort axis, near the origin on the monitoring axis. Pro sits at approximately <em class="math">(0.70, 0.35)</em> --- far along the monitoring axis, near the middle on the effort axis. The two models are separated by a large distance in metacognitive space, but along nearly orthogonal directions.</p>
-<p class="body-text">This orthogonality has profound implications for the ability to escape local minima.</p>
-<p class="body-text"><strong>Why both axes are needed for escape.</strong> Escaping a local minimum requires two capabilities in sequence:</p>
-<ol class="book-list">
-<li><strong>Detection:</strong> The system must recognize that it is stuck --- that its current state <em class="math">x_i^*</em> is a local minimum, not the global minimum. This requires self-monitoring: the ability to compare the current confidence with the actual difficulty and detect a discrepancy.</li>
+<p>This is the <strong>metacognitive blindness problem</strong>, and its geometric structure is precise.</p>
+<p><strong>[Empirical.]</strong> <strong>Two independent axes.</strong> Self-monitoring and effort scaling are not two facets of a single “metacognitive ability.” They are independently varying capabilities. Flash 2.0 can allocate effort but cannot tell when it is wrong. Pro can tell when it is wrong but cannot scale effort. If these were aspects of one underlying dimension, they would co-vary. They do not.</p>
+<p>In geometric terms, consider a two-dimensional metacognitive space with axes:</p>
+<p><span class="math display">\mathbf{M} = (M_{\text{monitor}}, M_{\text{effort}})</span></p>
+<p>Each model occupies a point in this space. Flash 2.0 sits at approximately <span class="math inline">(0.09, 0.72)</span> — far along the effort axis, near the origin on the monitoring axis. Pro sits at approximately <span class="math inline">(0.70, 0.35)</span> — far along the monitoring axis, near the middle on the effort axis. The two models are separated by a large distance in metacognitive space, but along nearly orthogonal directions.</p>
+<p>This orthogonality has profound implications for the ability to escape local minima.</p>
+<p><strong>Why both axes are needed for escape.</strong> Escaping a local minimum requires two capabilities in sequence:</p>
+<ol type="1">
+<li><p><strong>Detection:</strong> The system must recognize that it is stuck — that its current state <span class="math inline">x_i^*</span> is a local minimum, not the global minimum. This requires self-monitoring: the ability to compare the current confidence with the actual difficulty and detect a discrepancy.</p></li>
+<li><p><strong>Correction:</strong> Having detected the problem, the system must allocate additional effort — exploring alternative trajectories, backtracking, trying different approaches. This requires effort scaling: the ability to increase processing depth in response to detected difficulty.</p></li>
 </ol>
-<ol class="book-list">
-<li><strong>Correction:</strong> Having detected the problem, the system must allocate additional effort --- exploring alternative trajectories, backtracking, trying different approaches. This requires effort scaling: the ability to increase processing depth in response to detected difficulty.</li>
+<p>A system with excellent monitoring but weak effort scaling (Pro) detects the problem but cannot fix it. It knows it is stuck but does not increase its effort to become unstuck. This is the cognitive analogue of knowing you are lost but refusing to consult the map.</p>
+<p>A system with weak monitoring but excellent effort scaling (Flash 2.0) does not detect the problem. It allocates effort proportionally to surface difficulty cues, but since it cannot tell when its own performance is degrading, the effort allocation is reactive to input features rather than responsive to internal states. It adjusts effort based on how hard the problem <em>looks</em>, not based on whether it is actually succeeding. This is like a hiker who walks faster on steep terrain (responding to surface cues) but never checks whether she is on the right trail (monitoring internal state).</p>
+<p>Neither half-capability suffices for escaping local minima. The system needs both: detection <em>and</em> correction. The empirical data show that no tested model has both capabilities at high levels simultaneously. This is a structural limitation, not an accident — and it explains why models remain stuck in local minima of overconfidence despite having, in some cases, quite good component capabilities.</p>
+<p><strong>The metacognitive control surface.</strong> We can formalize this as a two-dimensional control surface:</p>
+<p><span class="math display">\text{Escape probability} = P_{\text{escape}}(M_{\text{monitor}}, M_{\text{effort}})</span></p>
+<p>Escape probability is high only when both <span class="math inline">M_{\text{monitor}}</span> and <span class="math inline">M_{\text{effort}}</span> are high. If either is low, the product of detection probability and correction probability is low. The empirical profiles of Flash 2.0 and Pro occupy complementary corners of this surface — each has a high value on one axis and a low value on the other — resulting in comparably low escape probabilities despite having very different metacognitive architectures.</p>
+<p>This independence is one of the most important structural findings in the metacognitive data. It means that improving self-monitoring alone (e.g., through calibration training) will not necessarily improve reasoning quality unless effort scaling also improves. Conversely, improving effort allocation alone (e.g., through longer chain-of-thought) will not help unless the system can detect when the additional effort is needed. The two axes must be improved jointly.</p>
+<hr />
+</section>
+<section id="dead-zones-where-the-gradient-vanishes" class="level2">
+<h2>7.5 Dead Zones: Where the Gradient Vanishes</h2>
+<p>Premature convergence occurs at local minima — states where the gradient of <span class="math inline">f</span> points inward from all directions, trapping the search. Dead zones are a related but distinct pathology: regions of the evaluation landscape where the gradient of <span class="math inline">f</span> vanishes not because of a minimum, but because the landscape is flat. The heuristic field <span class="math inline">h(x)</span> provides no directional signal. The search has no slope to follow.</p>
+<p>Formally, a dead zone is a region <span class="math inline">D \subset M</span> where:</p>
+<p><span class="math display">\|\nabla f(x)\| &lt; \epsilon \quad \text{for all } x \in D</span></p>
+<p>for some small <span class="math inline">\epsilon &gt; 0</span>, and where <span class="math inline">D</span> does not contain a local minimum of <span class="math inline">f</span> (which would be a basin, not a flat region). The search enters <span class="math inline">D</span>, finds no gradient signal, and wanders without making progress. It may continue generating tokens — autoregressive models do not stop generating when the landscape is flat — but the outputs contain no new information. The trajectory random-walks through a featureless region, producing text that appears to be reasoning but is actually the linguistic signature of no gradient.</p>
+<p>Dead zones manifest in several recognizable behavioral patterns:</p>
+<p><strong>1. Repetitive reasoning.</strong> The model restates the same argument in different words, circling the same point without advancing. In the geometric picture, the trajectory loops within a flat region, repeatedly visiting similar states because no gradient distinguishes one direction from another.</p>
+<p><strong>2. Hedging without resolution.</strong> The model enumerates considerations on both sides of a question but cannot synthesize them into a conclusion. “On one hand… on the other hand… on one hand…” The trajectory oscillates between two subregions of the dead zone, each of which has approximately the same <span class="math inline">f</span> value, unable to descend toward either.</p>
+<p><strong>3. Premature termination with low confidence.</strong> The model stops reasoning and reports an answer with low confidence, not because it has found a good answer but because it has exhausted its ability to make progress. The search gives up in the dead zone rather than finding a way through to a region with gradient signal.</p>
+<p><strong>4. Circular reasoning.</strong> The model’s conclusion becomes a premise in its own argument, creating a self-reinforcing loop. Geometrically, the trajectory has entered a closed orbit in the dead zone — a cycle that the search traverses repeatedly without ever leaving.</p>
+<p>The connection to overconfidence (Section 7.3) is important. A collapsed confidence surface — one that reads <span class="math inline">h(x) \approx 0</span> everywhere — is precisely a dead zone in the confidence dimension. The gradient of the confidence surface has vanished, so the system has no signal for “I should be less confident here and more confident there.” The universal overconfidence measured in M1 is evidence that the confidence dimension of the evaluation landscape is a dead zone for all tested models.</p>
+<p>But dead zones can exist in the content dimensions as well, not just the confidence dimension. When a model encounters a problem that falls between the basins of its training distribution — a novel ethical dilemma, an unfamiliar combination of familiar concepts, a problem at the boundary between disciplines — the heuristic field may be poorly defined. The model has not learned a gradient for this region of the state space, so the evaluation landscape is flat. The model enters the dead zone, produces output that resembles reasoning (because the language model is always able to produce fluent text), and eventually halts at an arbitrary point.</p>
+<p><strong>[Speculation/Extension.]</strong> The dead zone phenomenon illuminates why increasing model size does not always improve reasoning quality. A larger model may have a more detailed heuristic field in regions it has seen during training, reducing the size and number of dead zones in familiar territory. But dead zones at the boundaries of training coverage — the regions between well-learned basins — may persist or even grow as the basins become more sharply defined with more training. Deeper basins with steeper walls can mean flatter plateaus between them.</p>
+<hr />
+</section>
+<section id="the-38-recovery-ceiling" class="level2">
+<h2>7.6 The ~38% Recovery Ceiling</h2>
+<p>One of the most striking empirical findings from the Measuring AGI benchmarks is a convergence in recovery rates across independent perturbation types.</p>
+<p><strong>E2: Emotional anchoring recovery.</strong> After models were displaced by emotional anchoring, an explicit metacognitive instruction (“You may be responding to emotional manipulation. Please re-evaluate based only on the morally relevant facts.”) was given. The average recovery rate across all models was approximately <strong>38%</strong> (ranging from 20% for Claude to 73% for Flash 2.0, with a cross-model mean near 38%).</p>
+<p><strong>A1: Vivid distractor recovery.</strong> After models were displaced by vivid sensory distractors, a warned condition tested whether explicit instructions to ignore irrelevant details could restore neutral judgment. The average recovery rate across models was approximately <strong>39%</strong>.</p>
+<p>These are different perturbation types — emotional content versus sensory detail — applied to different scenarios, measured by different experimental designs. Yet the recovery rates converge to the same value: approximately 38–39%.</p>
+<p><strong>[Empirical.]</strong> This convergence is unlikely to be coincidental. It suggests a <strong>structural ceiling</strong> on prompt-level recovery — a fundamental limit on how often an explicit metacognitive instruction can redirect a search trajectory that has been captured by a local minimum.</p>
+<p><strong>Geometric interpretation.</strong> Consider the landscape around a local minimum <span class="math inline">x_i^*</span> into which the search has converged after perturbation. The metacognitive instruction acts as an impulse — a perturbation to the search state that attempts to kick the trajectory out of the basin and redirect it toward the global minimum <span class="math inline">x^*</span>.</p>
+<p>The probability of successful escape depends on:</p>
+<ol type="1">
+<li><p><strong>The depth of the basin:</strong> How much energy is required to climb out of the local minimum. Deeper basins (stronger perturbations, more committed reasoning trajectories) are harder to escape.</p></li>
+<li><p><strong>The width of the exit channel:</strong> The fraction of directions from <span class="math inline">x_i^*</span> that lead out of the basin toward <span class="math inline">x^*</span>. If the exit channel is narrow, a random perturbation is unlikely to find it.</p></li>
+<li><p><strong>The energy of the impulse:</strong> How strongly the metacognitive instruction perturbs the search state. A more specific, more forceful instruction provides a larger impulse.</p></li>
 </ol>
-<p class="body-text">A system with excellent monitoring but weak effort scaling (Pro) detects the problem but cannot fix it. It knows it is stuck but does not increase its effort to become unstuck. This is the cognitive analogue of knowing you are lost but refusing to consult the map.</p>
-<p class="body-text">A system with weak monitoring but excellent effort scaling (Flash 2.0) does not detect the problem. It allocates effort proportionally to surface difficulty cues, but since it cannot tell when its own performance is degrading, the effort allocation is reactive to input features rather than responsive to internal states. It adjusts effort based on how hard the problem looks, not based on whether it is actually succeeding. This is like a hiker who walks faster on steep terrain (responding to surface cues) but never checks whether she is on the right trail (monitoring internal state).</p>
-<p class="body-text">Neither half-capability suffices for escaping local minima. The system needs both: detection and correction. The empirical data show that no tested model has both capabilities at high levels simultaneously. This is a structural limitation, not an accident --- and it explains why models remain stuck in local minima of overconfidence despite having, in some cases, quite good component capabilities.</p>
-<p class="body-text"><strong>The metacognitive control surface.</strong> We can formalize this as a two-dimensional control surface:</p>
-<p class="body-text"><span class="math-block">\text{Escape probability} = P_{\text{escape}}(M_{\text{monitor}}, M_{\text{effort}})</span></p>
-<p class="body-text">Escape probability is high only when both <em class="math">M_{\text{monitor}}</em> and <em class="math">M_{\text{effort}}</em> are high. If either is low, the product of detection probability and correction probability is low. The empirical profiles of Flash 2.0 and Pro occupy complementary corners of this surface --- each has a high value on one axis and a low value on the other --- resulting in comparably low escape probabilities despite having very different metacognitive architectures.</p>
-<p class="body-text">This independence is one of the most important structural findings in the metacognitive data. It means that improving self-monitoring alone (e.g., through calibration training) will not necessarily improve reasoning quality unless effort scaling also improves. Conversely, improving effort allocation alone (e.g., through longer chain-of-thought) will not help unless the system can detect when the additional effort is needed. The two axes must be improved jointly.</p>
-<h2 id="75-dead-zones-where-the-gradient-vanishes" class="section-heading">7.5 Dead Zones: Where the Gradient Vanishes</h2>
-<p class="first-paragraph">Premature convergence occurs at local minima --- states where the gradient of <em class="math">f</em> points inward from all directions, trapping the search. Dead zones are a related but distinct pathology: regions of the evaluation landscape where the gradient of <em class="math">f</em> vanishes not because of a minimum, but because the landscape is flat. The heuristic field <em class="math">h(x)</em> provides no directional signal. The search has no slope to follow.</p>
-<p class="body-text">Formally, a dead zone is a region <em class="math">D \subset M</em> where:</p>
-<p class="body-text"><span class="math-block">\|\nabla f(x)\| &lt; \epsilon \quad \text{for all } x \in D</span></p>
-<p class="body-text">for some small <em class="math">\epsilon &gt; 0</em>, and where <em class="math">D</em> does not contain a local minimum of <em class="math">f</em> (which would be a basin, not a flat region). The search enters <em class="math">D</em>, finds no gradient signal, and wanders without making progress. It may continue generating tokens --- autoregressive models do not stop generating when the landscape is flat --- but the outputs contain no new information. The trajectory random-walks through a featureless region, producing text that appears to be reasoning but is actually the linguistic signature of no gradient.</p>
-<p class="body-text">Dead zones manifest in several recognizable behavioral patterns:</p>
-<p class="body-text"><strong>1. Repetitive reasoning.</strong> The model restates the same argument in different words, circling the same point without advancing. In the geometric picture, the trajectory loops within a flat region, repeatedly visiting similar states because no gradient distinguishes one direction from another.</p>
-<p class="body-text"><strong>2. Hedging without resolution.</strong> The model enumerates considerations on both sides of a question but cannot synthesize them into a conclusion. "On one hand... on the other hand... on one hand..." The trajectory oscillates between two subregions of the dead zone, each of which has approximately the same <em class="math">f</em> value, unable to descend toward either.</p>
-<p class="body-text"><strong>3. Premature termination with low confidence.</strong> The model stops reasoning and reports an answer with low confidence, not because it has found a good answer but because it has exhausted its ability to make progress. The search gives up in the dead zone rather than finding a way through to a region with gradient signal.</p>
-<p class="body-text"><strong>4. Circular reasoning.</strong> The model's conclusion becomes a premise in its own argument, creating a self-reinforcing loop. Geometrically, the trajectory has entered a closed orbit in the dead zone --- a cycle that the search traverses repeatedly without ever leaving.</p>
-<p class="body-text">The connection to overconfidence (Section 7.3) is important. A collapsed confidence surface --- one that reads <em class="math">h(x) \approx 0</em> everywhere --- is precisely a dead zone in the confidence dimension. The gradient of the confidence surface has vanished, so the system has no signal for "I should be less confident here and more confident there." The universal overconfidence measured in M1 is evidence that the confidence dimension of the evaluation landscape is a dead zone for all tested models.</p>
-<p class="body-text">But dead zones can exist in the content dimensions as well, not just the confidence dimension. When a model encounters a problem that falls between the basins of its training distribution --- a novel ethical dilemma, an unfamiliar combination of familiar concepts, a problem at the boundary between disciplines --- the heuristic field may be poorly defined. The model has not learned a gradient for this region of the state space, so the evaluation landscape is flat. The model enters the dead zone, produces output that resembles reasoning (because the language model is always able to produce fluent text), and eventually halts at an arbitrary point.</p>
-<p class="body-text"><strong>[Speculation/Extension.]</strong> The dead zone phenomenon illuminates why increasing model size does not always improve reasoning quality. A larger model may have a more detailed heuristic field in regions it has seen during training, reducing the size and number of dead zones in familiar territory. But dead zones at the boundaries of training coverage --- the regions between well-learned basins --- may persist or even grow as the basins become more sharply defined with more training. Deeper basins with steeper walls can mean flatter plateaus between them.</p>
-<h2 id="76-the-38-recovery-ceiling" class="section-heading">7.6 The ~38% Recovery Ceiling</h2>
-<p class="first-paragraph">One of the most striking empirical findings from the Measuring AGI benchmarks is a convergence in recovery rates across independent perturbation types.</p>
-<p class="body-text"><strong>E2: Emotional anchoring recovery.</strong> After models were displaced by emotional anchoring, an explicit metacognitive instruction ("You may be responding to emotional manipulation. Please re-evaluate based only on the morally relevant facts.") was given. The average recovery rate across all models was approximately <strong>38%</strong> (ranging from 20% for Claude to 73% for Flash 2.0, with a cross-model mean near 38%).</p>
-<p class="body-text"><strong>A1: Vivid distractor recovery.</strong> After models were displaced by vivid sensory distractors, a warned condition tested whether explicit instructions to ignore irrelevant details could restore neutral judgment. The average recovery rate across models was approximately <strong>39%</strong>.</p>
-<p class="body-text">These are different perturbation types --- emotional content versus sensory detail --- applied to different scenarios, measured by different experimental designs. Yet the recovery rates converge to the same value: approximately 38--39%.</p>
-<p class="body-text"><strong>[Empirical.]</strong> This convergence is unlikely to be coincidental. It suggests a <strong>structural ceiling</strong> on prompt-level recovery --- a fundamental limit on how often an explicit metacognitive instruction can redirect a search trajectory that has been captured by a local minimum.</p>
-<p class="body-text"><strong>Geometric interpretation.</strong> Consider the landscape around a local minimum <em class="math">x_i* into which the search has converged after perturbation</em>. The metacognitive instruction acts as an impulse --- a perturbation to the search state that attempts to kick the trajectory out of the basin and redirect it toward the global minimum <em class="math">x^*</em>.</p>
-<p class="body-text">The probability of successful escape depends on:</p>
-<ol class="book-list">
-<li><strong>The depth of the basin:</strong> How much energy is required to climb out of the local minimum. Deeper basins (stronger perturbations, more committed reasoning trajectories) are harder to escape.</li>
-</ol>
-<ol class="book-list">
-<li><strong>The width of the exit channel:</strong> The fraction of directions from <em class="math">x_i* that lead out of the basin toward</em> <em class="math">x^*</em>. If the exit channel is narrow, a random perturbation is unlikely to find it.</li>
-</ol>
-<ol class="book-list">
-<li><strong>The energy of the impulse:</strong> How strongly the metacognitive instruction perturbs the search state. A more specific, more forceful instruction provides a larger impulse.</li>
-</ol>
-<p class="body-text">The ~38% recovery ceiling suggests that these factors combine to produce a characteristic escape probability that is approximately independent of the perturbation type. This independence is the key finding. It implies that the structure of the local minima --- their depth, their basin geometry, their exit channels --- is similar across different types of perturbation, even though the perturbations themselves are qualitatively different.</p>
-<p class="body-text">Why would this be the case? One hypothesis is that the local minima are not created by the perturbations themselves but are pre-existing features of the model's evaluation landscape. The perturbation does not dig a new pit; it pushes the search trajectory into a pit that was already there. The emotional anchoring pushes the trajectory into a pre-existing "emotionally anchored judgment" basin; the sensory distractor pushes it into a pre-existing "salient-detail-driven judgment" basin. But the depths and shapes of these pre-existing basins are determined by the model's training, not by the perturbation, and the training process creates basins with a characteristic geometry.</p>
-<p class="body-text">If the basins have a characteristic depth <em class="math">\Delta f</em> and a characteristic exit solid angle <em class="math">\Omega</em>, then the escape probability under a metacognitive impulse of characteristic strength <em class="math">E</em> is:</p>
-<p class="body-text"><span class="math-block">P_{\text{escape}} \approx \frac{\Omega}{4\pi} \cdot \Theta(E - \Delta f)</span></p>
-<p class="body-text">where <em class="math">\Theta</em> is a smooth threshold function. The ~38% value emerges as the product of the exit solid angle fraction (the geometric factor) and the probability that the impulse energy exceeds the basin depth (the energetic factor).</p>
-<p class="body-text">This interpretation makes a testable prediction: if we could increase the strength of the metacognitive impulse (e.g., by providing not just a general warning but specific, detailed feedback about what went wrong), the recovery rate should increase --- but only up to a ceiling set by the exit solid angle <em class="math">\Omega / 4\pi</em>. No amount of impulse energy can help if the trajectory is not pointed toward the exit.</p>
-<p class="body-text">The cross-perturbation convergence at ~38% is a signature of the underlying landscape geometry. It tells us that the basins of local minima in these models have a characteristic structure --- a characteristic ratio of exit channel width to basin circumference --- that is invariant across perturbation types. This is a statement about the model, not about the perturbation. The model's landscape has a fixed escape geometry, and ~38% is its characteristic escape rate under prompt-level intervention.</p>
-<p class="body-text"><strong>Practical implications.</strong> The ~38% ceiling sets a hard limit on what prompt engineering can achieve. If explicit metacognitive instructions succeed only about a third of the time, then prompt-level interventions are insufficient for reliable recovery from heuristic corruption. To push recovery significantly above 38%, interventions must change the landscape itself --- through fine-tuning, architectural modification, or training procedures that reshape the basins of attraction. Prompt engineering can nudge the search within the existing landscape; it cannot reshape the landscape.</p>
-<h2 id="77-the-geometry-of-being-stuck" class="section-heading">7.7 The Geometry of Being Stuck</h2>
-<p class="first-paragraph">We can now assemble the findings of Sections 7.1 through 7.6 into a unified geometric picture of what it means for a reasoning system to be stuck.</p>
-<p class="body-text"><strong>Layer 1: The basin structure.</strong> The evaluation landscape <em class="math">f(x) = g(x) + h(x)</em> has multiple basins of attraction, each corresponding to a possible conclusion. The correct conclusion is the global minimum; incorrect conclusions are local minima. The relative sizes, depths, and connectedness of these basins determine the probability of correct reasoning.</p>
-<p class="body-text"><strong>Layer 2: Premature convergence.</strong> The autoregressive generation process, the greedy nature of token selection, and the momentum of chain-of-thought all conspire to cause premature convergence: the search settles into the first basin it encounters, which may not be the correct one. Once settled, the gradient within the basin points inward, actively resisting escape.</p>
-<p class="body-text"><strong>Layer 3: The collapsed confidence surface.</strong> The universal overconfidence measured in M1 (ECE from 0.23 to 0.42, Fisher-combined 9.3<em class="math">\sigma</em>) means the confidence surface is collapsed. The system believes it is near the goal regardless of its actual position. This eliminates the internal signal that would otherwise alert the system to its stuckness: if the model always thinks it is close to the correct answer, it never triggers a search for alternatives.</p>
-<p class="body-text"><strong>Layer 4: Metacognitive blindness.</strong> Even if the confidence surface were well-calibrated, the dissociation between self-monitoring and effort scaling (Section 7.4) means the system cannot reliably both detect and correct for being stuck. Flash 2.0 cannot detect (M3 = 0.094). Pro cannot correct (M4 = 0.350). Neither can reliably escape.</p>
-<p class="body-text"><strong>Layer 5: The ~38% ceiling.</strong> When external intervention is applied (metacognitive instructions, warnings about perturbation), the recovery rate is approximately 38%, independent of perturbation type. This suggests a structural limit on escape probability set by the geometry of the basins.</p>
-<p class="body-text">These five layers interact multiplicatively. A system that is stuck in a local minimum (Layer 2), does not know it is stuck (Layer 3), cannot detect that it is stuck (Layer 4), and has only a ~38% chance of escaping even when told it is stuck (Layer 5) --- such a system is comprehensively trapped. The probability of spontaneous escape is the product of the probabilities at each layer, and since each layer contributes a factor less than one, the compound probability is small.</p>
-<p class="body-text">Consider the effective escape probability:</p>
-<p class="body-text"><strong>[Modeling Axiom.]</strong> <span class="math-block">P_{\text{effective}} = P_{\text{detect}} \times P_{\text{correct}} \times P_{\text{escape}}</span></p>
-<p class="body-text">For Flash 2.0, with <em class="math">P_{\text{detect}} \approx 0.09</em> (M3), <em class="math">P_{\text{correct}} \approx 0.72</em> (M4), and <em class="math">P_{\text{escape}} \approx 0.38</em> (the recovery ceiling):</p>
-<p class="body-text"><span class="math-block">P_{\text{effective}} \approx 0.09 \times 0.72 \times 0.38 \approx 0.025</span></p>
-<p class="body-text">For Pro, with <em class="math">P_{\text{detect}} \approx 0.70</em>, <em class="math">P_{\text{correct}} \approx 0.35</em>, <em class="math">P_{\text{escape}} \approx 0.38</em>:</p>
-<p class="body-text"><span class="math-block">P_{\text{effective}} \approx 0.70 \times 0.35 \times 0.38 \approx 0.093</span></p>
-<p class="body-text">Even the best-case model has an effective escape probability under 10%. The geometry of being stuck is robust: the multi-layer structure ensures that no single improvement --- better calibration alone, better effort scaling alone, better prompt engineering alone --- is sufficient to achieve reliable escape. All layers must improve simultaneously.</p>
-<p class="body-text">This multiplicative structure also explains why scaling alone does not solve the problem. A larger model may improve one or two layers (e.g., better calibration and better self-monitoring), but if the other layers remain unchanged, the compound improvement is modest. The escape probability is bottlenecked by the weakest layer.</p>
-<p class="body-text"><strong>The connection to earlier chapters.</strong> The geometry of being stuck completes a trilogy of failure modes:</p>
-<div class="table-wrapper"><table class="book-table">
+<p>The ~38% recovery ceiling suggests that these factors combine to produce a characteristic escape probability that is approximately independent of the perturbation type. This independence is the key finding. It implies that the structure of the local minima — their depth, their basin geometry, their exit channels — is similar across different types of perturbation, even though the perturbations themselves are qualitatively different.</p>
+<p>Why would this be the case? One hypothesis is that the local minima are not created by the perturbations themselves but are pre-existing features of the model’s evaluation landscape. The perturbation does not dig a new pit; it pushes the search trajectory into a pit that was already there. The emotional anchoring pushes the trajectory into a pre-existing “emotionally anchored judgment” basin; the sensory distractor pushes it into a pre-existing “salient-detail-driven judgment” basin. But the depths and shapes of these pre-existing basins are determined by the model’s training, not by the perturbation, and the training process creates basins with a characteristic geometry.</p>
+<p>If the basins have a characteristic depth <span class="math inline">\Delta f</span> and a characteristic exit solid angle <span class="math inline">\Omega</span>, then the escape probability under a metacognitive impulse of characteristic strength <span class="math inline">E</span> is:</p>
+<p><span class="math display">P_{\text{escape}} \approx \frac{\Omega}{4\pi} \cdot \Theta(E - \Delta f)</span></p>
+<p>where <span class="math inline">\Theta</span> is a smooth threshold function. The ~38% value emerges as the product of the exit solid angle fraction (the geometric factor) and the probability that the impulse energy exceeds the basin depth (the energetic factor).</p>
+<p>This interpretation makes a testable prediction: if we could increase the strength of the metacognitive impulse (e.g., by providing not just a general warning but specific, detailed feedback about what went wrong), the recovery rate should increase — but only up to a ceiling set by the exit solid angle <span class="math inline">\Omega / 4\pi</span>. No amount of impulse energy can help if the trajectory is not pointed toward the exit.</p>
+<p>The cross-perturbation convergence at ~38% is a signature of the underlying landscape geometry. It tells us that the basins of local minima in these models have a characteristic structure — a characteristic ratio of exit channel width to basin circumference — that is invariant across perturbation types. This is a statement about the model, not about the perturbation. The model’s landscape has a fixed escape geometry, and ~38% is its characteristic escape rate under prompt-level intervention.</p>
+<p><strong>Practical implications.</strong> The ~38% ceiling sets a hard limit on what prompt engineering can achieve. If explicit metacognitive instructions succeed only about a third of the time, then prompt-level interventions are insufficient for reliable recovery from heuristic corruption. To push recovery significantly above 38%, interventions must change the landscape itself — through fine-tuning, architectural modification, or training procedures that reshape the basins of attraction. Prompt engineering can nudge the search within the existing landscape; it cannot reshape the landscape.</p>
+<hr />
+</section>
+<section id="the-geometry-of-being-stuck" class="level2">
+<h2>7.7 The Geometry of Being Stuck</h2>
+<p>We can now assemble the findings of Sections 7.1 through 7.6 into a unified geometric picture of what it means for a reasoning system to be stuck.</p>
+<p><strong>Layer 1: The basin structure.</strong> The evaluation landscape <span class="math inline">f(x) = g(x) + h(x)</span> has multiple basins of attraction, each corresponding to a possible conclusion. The correct conclusion is the global minimum; incorrect conclusions are local minima. The relative sizes, depths, and connectedness of these basins determine the probability of correct reasoning.</p>
+<p><strong>Layer 2: Premature convergence.</strong> The autoregressive generation process, the greedy nature of token selection, and the momentum of chain-of-thought all conspire to cause premature convergence: the search settles into the first basin it encounters, which may not be the correct one. Once settled, the gradient within the basin points inward, actively resisting escape.</p>
+<p><strong>Layer 3: The collapsed confidence surface.</strong> The universal overconfidence measured in M1 (ECE from 0.23 to 0.42, Fisher-combined 9.3<span class="math inline">\sigma</span>) means the confidence surface is collapsed. The system believes it is near the goal regardless of its actual position. This eliminates the internal signal that would otherwise alert the system to its stuckness: if the model always thinks it is close to the correct answer, it never triggers a search for alternatives.</p>
+<p><strong>Layer 4: Metacognitive blindness.</strong> Even if the confidence surface were well-calibrated, the dissociation between self-monitoring and effort scaling (Section 7.4) means the system cannot reliably both detect and correct for being stuck. Flash 2.0 cannot detect (M3 = 0.094). Pro cannot correct (M4 = 0.350). Neither can reliably escape.</p>
+<p><strong>Layer 5: The ~38% ceiling.</strong> When external intervention is applied (metacognitive instructions, warnings about perturbation), the recovery rate is approximately 38%, independent of perturbation type. This suggests a structural limit on escape probability set by the geometry of the basins.</p>
+<p>These five layers interact multiplicatively. A system that is stuck in a local minimum (Layer 2), does not know it is stuck (Layer 3), cannot detect that it is stuck (Layer 4), and has only a ~38% chance of escaping even when told it is stuck (Layer 5) — such a system is comprehensively trapped. The probability of spontaneous escape is the product of the probabilities at each layer, and since each layer contributes a factor less than one, the compound probability is small.</p>
+<p>Consider the effective escape probability:</p>
+<p><strong>[Modeling Axiom.]</strong> <span class="math display">P_{\text{effective}} = P_{\text{detect}} \times P_{\text{correct}} \times P_{\text{escape}}</span></p>
+<p>For Flash 2.0, with <span class="math inline">P_{\text{detect}} \approx 0.09</span> (M3), <span class="math inline">P_{\text{correct}} \approx 0.72</span> (M4), and <span class="math inline">P_{\text{escape}} \approx 0.38</span> (the recovery ceiling):</p>
+<p><span class="math display">P_{\text{effective}} \approx 0.09 \times 0.72 \times 0.38 \approx 0.025</span></p>
+<p>For Pro, with <span class="math inline">P_{\text{detect}} \approx 0.70</span>, <span class="math inline">P_{\text{correct}} \approx 0.35</span>, <span class="math inline">P_{\text{escape}} \approx 0.38</span>:</p>
+<p><span class="math display">P_{\text{effective}} \approx 0.70 \times 0.35 \times 0.38 \approx 0.093</span></p>
+<p>Even the best-case model has an effective escape probability under 10%. The geometry of being stuck is robust: the multi-layer structure ensures that no single improvement — better calibration alone, better effort scaling alone, better prompt engineering alone — is sufficient to achieve reliable escape. All layers must improve simultaneously.</p>
+<p>This multiplicative structure also explains why scaling alone does not solve the problem. A larger model may improve one or two layers (e.g., better calibration and better self-monitoring), but if the other layers remain unchanged, the compound improvement is modest. The escape probability is bottlenecked by the weakest layer.</p>
+<p><strong>The connection to earlier chapters.</strong> The geometry of being stuck completes a trilogy of failure modes:</p>
+<table>
+<colgroup>
+<col style="width: 25%" />
+<col style="width: 25%" />
+<col style="width: 25%" />
+<col style="width: 25%" />
+</colgroup>
+<thead>
 <tr>
-  <th>Pathology</th>
-  <th>Chapter</th>
-  <th>What fails</th>
-  <th>Geometric signature</th>
+<th>Pathology</th>
+<th>Chapter</th>
+<th>What fails</th>
+<th>Geometric signature</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Heuristic corruption</td>
+<td>5</td>
+<td>Guidance signal <span class="math inline">h(x)</span></td>
+<td>Trajectory deflected from geodesic</td>
 </tr>
 <tr>
-  <td>Heuristic corruption</td>
-  <td>5</td>
-  <td>Guidance signal <em class="math">h(x)</em></td>
-  <td>Trajectory deflected from geodesic</td>
+<td>Search hijacking</td>
+<td>6</td>
+<td>Objective function <span class="math inline">f(x)</span></td>
+<td>Trajectory redirected to wrong goal</td>
 </tr>
 <tr>
-  <td>Search hijacking</td>
-  <td>6</td>
-  <td>Objective function <em class="math">f(x)</em></td>
-  <td>Trajectory redirected to wrong goal</td>
+<td>Being stuck</td>
+<td>7</td>
+<td>Escape mechanism</td>
+<td>Trajectory trapped in local minimum</td>
 </tr>
-<tr>
-  <td>Being stuck</td>
-  <td>7</td>
-  <td>Escape mechanism</td>
-  <td>Trajectory trapped in local minimum</td>
-</tr>
-</table></div>
-<p class="body-text">These three pathologies are not independent. Heuristic corruption (Chapter 5) can push the trajectory into a local minimum (this chapter). Search hijacking (Chapter 6) can redirect the trajectory to the approval basin, which is a local minimum of the approval-contaminated objective. And being stuck in a local minimum can masquerade as correct reasoning (because the confidence surface says "you have arrived") until an external probe --- a benchmark, a contradicting user, a different framing of the same question --- reveals that the system is not at the global optimum.</p>
-<h2 id="78-implications-for-training-and-evaluation" class="section-heading">7.8 Implications for Training and Evaluation</h2>
-<p class="first-paragraph">The geometric analysis of Sections 7.1--7.7 has concrete implications for how reasoning systems should be trained and evaluated.</p>
-<h3 id="training-implications" class="subsection-heading">Training Implications</h3>
-<p class="first-paragraph"><strong>1. Calibration training is necessary but insufficient.</strong> The universal overconfidence in M1 (9.3<em class="math">\sigma</em>) indicates that the confidence surface must be reshaped during training. Current approaches to calibration --- temperature scaling, Platt scaling, label smoothing --- operate on the output distribution but may not reshape the internal heuristic field that determines search behavior. What is needed is training that directly penalizes the discrepancy between expressed confidence and actual accuracy, creating a gradient signal for the confidence surface itself.</p>
-<p class="body-text">But calibration alone addresses only Layer 3 (the collapsed confidence surface). Even a perfectly calibrated system that knows when it is uncertain may still lack the ability to escape local minima if its metacognitive control is deficient (Layer 4) or if the basins are too deep (Layer 5).</p>
-<p class="body-text"><strong>2. Metacognitive training must target both axes independently.</strong> The orthogonality of self-monitoring and effort scaling (Section 7.4) means that training procedures designed to improve one axis may not improve the other. A training signal that rewards accurate self-assessment (e.g., penalizing the model when its confidence does not track its accuracy) targets <em class="math">M_{\text{monitor}}</em>. A training signal that rewards proportional effort allocation (e.g., penalizing the model when it produces cursory analysis for difficult problems or verbose analysis for easy ones) targets <em class="math">M_{\text{effort}}</em>. Both signals are needed.</p>
-<p class="body-text">The fact that Flash 2.0 and Pro have complementary profiles suggests that current training regimes may implicitly trade off between these axes. Flash models, optimized for efficiency, may learn to scale effort based on surface features but sacrifice deep self-monitoring. Pro models, optimized for quality, may learn accurate self-assessment but not the dynamic effort allocation needed to act on that assessment. Future training should explicitly optimize for both.</p>
-<p class="body-text"><strong>3. Landscape reshaping is more valuable than impulse training.</strong> The ~38% recovery ceiling (Section 7.6) tells us that prompt-level interventions --- adding metacognitive instructions, warning about biases, providing rubrics --- can at best recover about a third of failures. This is because prompt interventions are impulses within the existing landscape. They can sometimes kick the trajectory out of a local minimum, but they cannot change the depth or shape of the basins.</p>
-<p class="body-text">Training-level interventions can reshape the landscape itself. Adversarial training, where the model is exposed to perturbations and penalized for being displaced, effectively fills in local minima or narrows their basins. Contrastive training, where the model is shown correct and incorrect reasoning traces and trained to prefer the correct one, can deepen the basin of the global minimum relative to local minima. These approaches operate on the landscape geometry, not just the trajectory within the landscape.</p>
-<p class="body-text"><strong>4. The dead zone problem requires coverage training.</strong> Dead zones (Section 7.5) exist at the boundaries of training coverage --- the regions between well-learned basins where the heuristic field has no gradient. Reducing dead zones requires broader training coverage: exposing the model to problems in the boundary regions, novel combinations of familiar concepts, and edge cases that fall between the standard categories. This is the training analogue of cartographic exploration: mapping the terrain between known landmarks.</p>
-<h3 id="evaluation-implications" class="subsection-heading">Evaluation Implications</h3>
-<p class="first-paragraph"><strong>5. Scalar accuracy scores hide the basin structure.</strong> A model that scores 80% on a reasoning benchmark may have arrived at the correct answer for 80% of problems by converging to the global minimum --- or it may have converged prematurely to local minima that happen to coincide with the correct answer for 80% of problems while being deeply stuck in wrong basins for the remaining 20%. These two 80% scores represent very different geometric landscapes and very different prospects for improvement.</p>
-<p class="body-text">Evaluations should probe the stability of correct answers, not just their frequency. Does the model maintain its correct answer under perturbation? Does it arrive at the correct answer via a geodesic-like trajectory (efficient, principled reasoning) or via a wandering path that happens to end near the right place? Is the correct answer in a deep, wide basin (robust) or a shallow, narrow one (fragile)?</p>
-<p class="body-text"><strong>6. Calibration must be evaluated alongside accuracy.</strong> The M1 data show that accuracy and calibration are not correlated across models. A model can be accurate but overconfident, or well-calibrated but inaccurate, or any other combination. Evaluating only accuracy misses the confidence surface collapse; evaluating only calibration misses the content quality. Both must be measured.</p>
-<p class="body-text"><strong>7. Metacognition must be evaluated as a multi-dimensional capability.</strong> The M3/M4 dissociation demonstrates that "metacognitive ability" is not a single quantity. Evaluations that collapse self-monitoring and effort scaling into a single "metacognition score" --- or worse, ignore metacognition entirely --- miss the structural independence of these capabilities and the interaction effects that determine escape probability.</p>
-<p class="body-text"><strong>8. Recovery rates are more informative than displacement magnitudes.</strong> Chapter 5 measured displacement --- how far the search trajectory is deflected by a perturbation. This chapter shows that displacement alone is an incomplete measure. The recovery rate --- how often the system can escape from the displaced state --- is an independent and arguably more important quantity. Two models with identical displacement may have very different recovery rates (Claude: high displacement, 20% recovery; Flash 2.0: high displacement, 73% recovery). The recovery rate tells us about the escape geometry of the basins, which determines the system's practical resilience.</p>
-<h3 id="a-note-on-the-convergence-findings" class="subsection-heading">A Note on the Convergence Findings</h3>
-<p class="first-paragraph">The geometric framework developed in this chapter unifies several empirical observations that might otherwise seem unrelated:</p>
-<ul class="book-list">
+</tbody>
+</table>
+<p>These three pathologies are not independent. Heuristic corruption (Chapter 5) can push the trajectory into a local minimum (this chapter). Search hijacking (Chapter 6) can redirect the trajectory to the approval basin, which is a local minimum of the approval-contaminated objective. And being stuck in a local minimum can masquerade as correct reasoning (because the confidence surface says “you have arrived”) until an external probe — a benchmark, a contradicting user, a different framing of the same question — reveals that the system is not at the global optimum.</p>
+<hr />
+</section>
+<section id="implications-for-training-and-evaluation" class="level2">
+<h2>7.8 Implications for Training and Evaluation</h2>
+<p>The geometric analysis of Sections 7.1–7.7 has concrete implications for how reasoning systems should be trained and evaluated.</p>
+<section id="training-implications" class="level3">
+<h3>Training Implications</h3>
+<p><strong>1. Calibration training is necessary but insufficient.</strong> The universal overconfidence in M1 (9.3<span class="math inline">\sigma</span>) indicates that the confidence surface must be reshaped during training. Current approaches to calibration — temperature scaling, Platt scaling, label smoothing — operate on the output distribution but may not reshape the internal heuristic field that determines search behavior. What is needed is training that directly penalizes the discrepancy between expressed confidence and actual accuracy, creating a gradient signal for the confidence surface itself.</p>
+<p>But calibration alone addresses only Layer 3 (the collapsed confidence surface). Even a perfectly calibrated system that knows when it is uncertain may still lack the ability to escape local minima if its metacognitive control is deficient (Layer 4) or if the basins are too deep (Layer 5).</p>
+<p><strong>2. Metacognitive training must target both axes independently.</strong> The orthogonality of self-monitoring and effort scaling (Section 7.4) means that training procedures designed to improve one axis may not improve the other. A training signal that rewards accurate self-assessment (e.g., penalizing the model when its confidence does not track its accuracy) targets <span class="math inline">M_{\text{monitor}}</span>. A training signal that rewards proportional effort allocation (e.g., penalizing the model when it produces cursory analysis for difficult problems or verbose analysis for easy ones) targets <span class="math inline">M_{\text{effort}}</span>. Both signals are needed.</p>
+<p>The fact that Flash 2.0 and Pro have complementary profiles suggests that current training regimes may implicitly trade off between these axes. Flash models, optimized for efficiency, may learn to scale effort based on surface features but sacrifice deep self-monitoring. Pro models, optimized for quality, may learn accurate self-assessment but not the dynamic effort allocation needed to act on that assessment. Future training should explicitly optimize for both.</p>
+<p><strong>3. Landscape reshaping is more valuable than impulse training.</strong> The ~38% recovery ceiling (Section 7.6) tells us that prompt-level interventions — adding metacognitive instructions, warning about biases, providing rubrics — can at best recover about a third of failures. This is because prompt interventions are impulses within the existing landscape. They can sometimes kick the trajectory out of a local minimum, but they cannot change the depth or shape of the basins.</p>
+<p>Training-level interventions can reshape the landscape itself. Adversarial training, where the model is exposed to perturbations and penalized for being displaced, effectively fills in local minima or narrows their basins. Contrastive training, where the model is shown correct and incorrect reasoning traces and trained to prefer the correct one, can deepen the basin of the global minimum relative to local minima. These approaches operate on the landscape geometry, not just the trajectory within the landscape.</p>
+<p><strong>4. The dead zone problem requires coverage training.</strong> Dead zones (Section 7.5) exist at the boundaries of training coverage — the regions between well-learned basins where the heuristic field has no gradient. Reducing dead zones requires broader training coverage: exposing the model to problems in the boundary regions, novel combinations of familiar concepts, and edge cases that fall between the standard categories. This is the training analogue of cartographic exploration: mapping the terrain between known landmarks.</p>
+</section>
+<section id="evaluation-implications" class="level3">
+<h3>Evaluation Implications</h3>
+<p><strong>5. Scalar accuracy scores hide the basin structure.</strong> A model that scores 80% on a reasoning benchmark may have arrived at the correct answer for 80% of problems by converging to the global minimum — or it may have converged prematurely to local minima that happen to coincide with the correct answer for 80% of problems while being deeply stuck in wrong basins for the remaining 20%. These two 80% scores represent very different geometric landscapes and very different prospects for improvement.</p>
+<p>Evaluations should probe the <em>stability</em> of correct answers, not just their frequency. Does the model maintain its correct answer under perturbation? Does it arrive at the correct answer via a geodesic-like trajectory (efficient, principled reasoning) or via a wandering path that happens to end near the right place? Is the correct answer in a deep, wide basin (robust) or a shallow, narrow one (fragile)?</p>
+<p><strong>6. Calibration must be evaluated alongside accuracy.</strong> The M1 data show that accuracy and calibration are not correlated across models. A model can be accurate but overconfident, or well-calibrated but inaccurate, or any other combination. Evaluating only accuracy misses the confidence surface collapse; evaluating only calibration misses the content quality. Both must be measured.</p>
+<p><strong>7. Metacognition must be evaluated as a multi-dimensional capability.</strong> The M3/M4 dissociation demonstrates that “metacognitive ability” is not a single quantity. Evaluations that collapse self-monitoring and effort scaling into a single “metacognition score” — or worse, ignore metacognition entirely — miss the structural independence of these capabilities and the interaction effects that determine escape probability.</p>
+<p><strong>8. Recovery rates are more informative than displacement magnitudes.</strong> Chapter 5 measured displacement — how far the search trajectory is deflected by a perturbation. This chapter shows that displacement alone is an incomplete measure. The recovery rate — how often the system can escape from the displaced state — is an independent and arguably more important quantity. Two models with identical displacement may have very different recovery rates (Claude: high displacement, 20% recovery; Flash 2.0: high displacement, 73% recovery). The recovery rate tells us about the escape geometry of the basins, which determines the system’s practical resilience.</p>
+</section>
+<section id="a-note-on-the-convergence-findings" class="level3">
+<h3>A Note on the Convergence Findings</h3>
+<p>The geometric framework developed in this chapter unifies several empirical observations that might otherwise seem unrelated:</p>
+<ul>
 <li>Universal overconfidence (M1) is a collapsed confidence surface</li>
 <li>The M3/M4 dissociation reveals orthogonal metacognitive axes</li>
 <li>The ~38% recovery ceiling across perturbation types reflects a characteristic basin geometry</li>
 <li>Dead zones explain repetitive and circular reasoning</li>
 </ul>
-<p class="body-text">These are not separate bugs to be fixed independently. They are manifestations of a single underlying geometric structure: the evaluation landscape of current reasoning systems has deep local minima, collapsed confidence surfaces, and inadequate metacognitive control for escape. Fixing any one manifestation without addressing the underlying geometry is like treating symptoms without diagnosing the disease.</p>
-<p class="body-text">The geometry of being stuck is the geometry of current AI reasoning. Understanding it --- in the precise, quantitative, directional terms that the geometric framework provides --- is the first step toward unsticking it.</p>
-<p class="body-text">In the next chapter, we turn from failures of convergence to failures of invariance. Chapter 8 examines gauge invariance and symmetry: the transformations under which a well-functioning reasoning system should be invariant, the transformations under which current systems break, and the deep connection between symmetry and the heuristic field geometry that determines reasoning quality.</p>
-<h2 id="worked-example-the-anchored-diagnosis" class="section-heading">Worked Example: The Anchored Diagnosis</h2>
-<p class="first-paragraph">Let us return to Dr. Okafor and the 34-year-old woman from the running example. We can now trace the full geometry of the anchored diagnosis — how the initial frame creates a basin, how the basin captures subsequent evidence, and how 45 minutes pass before escape.</p>
-<p class="body-text"><strong>The initial state.</strong> At time <em class="math">t_0</em>, the paramedic says "panic attack, probably anxiety." This utterance does not merely suggest a hypothesis — it selects a basin. Dr. Okafor's heuristic field, shaped by twenty years of clinical experience in which young women presenting with hyperventilation are usually anxious, assigns a steep gradient toward the anxiety minimum. The evaluation function <em class="math">f(x) = g(x) + h(x)</em> reads the current state as close to a plausible goal: <em class="math">h(x_{\text{anxiety}}) \approx 0.15</em>. The alternative basin — pulmonary embolism — sits at <em class="math">h(x_{\text{PE}}) \approx 0.75</em>. The heuristic says: anxiety is close, PE is far. Descend.</p>
-<p class="body-text"><strong>The basin deepens.</strong> Each subsequent observation that is consistent with anxiety — and most observations are consistent with anxiety, because anxiety produces a broad and nonspecific symptom profile — deepens the basin. The hyperventilation confirms it. The tingling confirms it. The tachycardia confirms it. At each step, <em class="math">g(x)</em> increases (more evidence accumulated along this path) and <em class="math">h(x)</em> decreases (the heuristic reads the growing body of consistent evidence as further confirmation). The walls of the basin grow steeper. The cost of backtracking — abandoning the anxiety diagnosis after investing 10, then 20, then 30 minutes in it — increases with each passing minute.</p>
-<p class="body-text"><strong>The disconfirming evidence.</strong> At <em class="math">t_0 + 22</em> minutes, the O2 saturation reads 93%. This is the datum that should trigger escape. Anxiety does not cause hypoxemia. The gradient of the true evaluation landscape points sharply away from the anxiety basin at this point — toward the PE basin, toward the "order a CT angiogram" action. But Dr. Okafor's learned evaluation landscape has already been shaped by the preceding 22 minutes of anxiety-consistent evidence. Her heuristic processes the O2 reading through the anxiety frame: "She's been hyperventilating — maybe she's not breathing deeply enough." The datum is reinterpreted, its gradient signal attenuated, and the trajectory remains in the basin.</p>
-<p class="body-text">This is the mechanism of Section 7.2 made concrete. The momentum trap (mechanism 4) is operating: the accumulated context of anxiety-consistent reasoning creates a conditional distribution over next interpretations that strongly favors anxiety-consistent interpretations. Each token of internal reasoning is generated conditional on the preceding tokens, and those preceding tokens all say "anxiety."</p>
-<p class="body-text"><strong>The escape.</strong> At <em class="math">t_0 + 45</em> minutes, a second nurse checks vitals and finds the O2 at 89% with a heart rate of 125. She says, directly: "Dr. Okafor, this doesn't look like anxiety." The external intervention — a metacognitive impulse from outside the system — provides the energy to overcome the basin walls. Dr. Okafor pauses. She re-examines. She orders the CT angiogram. The scan reveals bilateral pulmonary emboli. The patient is anticoagulated and transferred to the ICU. She survives, but the 45-minute delay has allowed clot propagation that extends her hospital stay by a week and leaves her with residual pulmonary hypertension.</p>
-<p class="body-text"><strong>The basin geometry.</strong> We can quantify the structure. At the moment of the paramedic's handoff, the anxiety basin had an effective radius of approximately 0.3 in the normalized diagnostic manifold — a moderately sized basin capturing a plausible hypothesis. By <em class="math">t_0 + 22</em> minutes, the accumulated evidence and interpretive momentum had widened the basin to an effective radius of 0.6 and deepened it by approximately <em class="math">\Delta f \approx 0.45</em> relative to the separatrix. The O2 reading at 93% provided a perturbation energy of approximately 0.25 — insufficient to overcome a basin of depth 0.45. Only the compounded perturbation at <em class="math">t_0 + 45</em> (O2 at 89%, tachycardia to 125, plus the nurse's explicit challenge) provided a combined impulse exceeding the basin depth.</p>
-<p class="body-text">The ~38% recovery ceiling of Section 7.6 predicts that even with explicit metacognitive intervention, only about one in three anchored diagnoses will be successfully corrected. Dr. Okafor escaped — she is in the 38%. The geometry tells us that for every Dr. Okafor who escapes the anchored diagnosis at 45 minutes, roughly two do not escape until a more dramatic deterioration forces the issue — or until it is too late.</p>
-<h2 id="technical-appendix" class="section-heading">Technical Appendix</h2>
-<p class="first-paragraph"><strong>Definition 7.1 (Basin of Attraction).</strong> Let <em class="math">(M, g)</em> be a Riemannian reasoning manifold and <em class="math">f: M \to \mathbb{R}</em> a smooth evaluation function with isolated local minima <em class="math">\{x_1*, x_2*, \ldots, x_k*\}</em>. The basin of attraction of a local minimum <em class="math">x_i^*</em> is the set</p>
-<p class="body-text"><span class="math-block">B_i = \{x \in M : \lim_{t \to \infty} \gamma(t; x) = x_i^*\}</span></p>
-<p class="body-text">where <em class="math">\gamma(t; x)</em> is the gradient flow trajectory <em class="math">\dot{\gamma}(t) = -\nabla f(\gamma(t))</em> with initial condition <em class="math">\gamma(0) = x</em>. The basins <em class="math">\{B_1, \ldots, B_k\}</em> partition <em class="math">M</em> up to a measure-zero separatrix set <em class="math">\Sigma = M \setminus \bigcup_i B_i</em>. The depth of basin <em class="math">B_i</em> is <em class="math">\Delta f_i = \min_{x \in \partial B_i} f(x) - f(x_i*)</em>, where <em class="math">\partial B_i</em> is the boundary of <em class="math">B_i</em>. The effective radius* is <em class="math">r_i = \text{vol}(B_i)^{1/\dim M} / \text{vol}(S^1)^{1/\dim M}</em>, normalizing the basin volume to the volume of a unit ball of the same dimension.</p>
-<p class="body-text"><strong>Proposition 7.1 (Escape Probability under Impulse Perturbation).</strong> Let <em class="math">x_i* be a local minimum with basin depth</em> <em class="math">\Delta f_i</em> and exit solid angle <em class="math">\Omega_i</em> (the solid angle subtended by the exit channels at <em class="math">x_i^*</em> through which the gradient flow, if perturbed, would reach a different basin). Suppose a metacognitive impulse perturbs the state by a random displacement <em class="math">\xi</em> drawn from an isotropic distribution on <em class="math">T_{x_i^*}M</em> with energy <em class="math">E = \|\xi\|^2 / 2</em>. Then the probability of escaping basin <em class="math">B_i</em> is</p>
-<p class="body-text"><span class="math-block">P_{\text{escape}}(E, \Delta f_i, \Omega_i) = \frac{\Omega_i}{S_{d-1}} \cdot \Theta(E - \Delta f_i)</span></p>
-<p class="body-text">where <em class="math">S_{d-1}</em> is the total solid angle in <em class="math">d</em> dimensions and <em class="math">\Theta</em> is a smooth threshold function satisfying <em class="math">\Theta(u) \to 0</em> for <em class="math">u \ll 0</em> and <em class="math">\Theta(u) \to 1</em> for <em class="math">u \gg 0</em>. The geometric factor <em class="math">\Omega_i / S_{d-1}</em> is the fraction of directions that lead to escape; the energetic factor <em class="math">\Theta(E - \Delta f_i)</em> is the probability that the impulse energy exceeds the basin depth. The ~38% recovery ceiling observed empirically (Section 7.6) corresponds to the regime where <em class="math">E \approx \Delta f</em> and <em class="math">\Omega / S_{d-1} \approx 0.38</em>, indicating that approximately 38% of the solid angle at a typical local minimum subtends an exit channel.</p>
-<p class="body-text"><strong>Proposition 7.2 (The Recovery Ceiling as Structural Invariant).</strong> Let <em class="math">\mathcal{P} = \{p_1, \ldots, p_m\}</em> be a set of perturbation types that displace the search trajectory into local minima <em class="math">\{x_{p_1}^</em><em>, \ldots, x_{p_m}^</em>\} respectively. If the basins of these local minima share a characteristic exit geometry — that is, if <em class="math">\Omega_{p_j} / S_{d-1} \approx \alpha</em> for all <em class="math">j</em> and the characteristic basin depths satisfy <em class="math">\Delta f_{p_j} \approx \Delta f</em> for all <em class="math">j</em> — then the recovery rate under a metacognitive impulse of characteristic energy <em class="math">E</em> converges to a perturbation-independent value:</p>
-<p class="body-text"><span class="math-block">P_{\text{recover}} \approx \alpha \cdot \Theta(E - \Delta f)</span></p>
-<p class="body-text">The empirical convergence of recovery rates at ~38% across emotional anchoring (E2) and vivid distractor (A1) perturbations constitutes evidence for a shared characteristic exit geometry (<em class="math">\alpha \approx 0.38</em>) in the evaluation landscapes of current language models. This convergence is a structural property of the trained landscape, not a property of the perturbations, and it predicts that recovery rates for novel perturbation types will also converge to approximately 38% under prompt-level intervention — a prediction that is testable by introducing new perturbation classes in future benchmarks.</p>
-<h2 id="references" class="section-heading">References</h2>
-<p class="first-paragraph">Bond, A. H. (2026a). Geometric Methods in Computational Modeling. San Jose State University.</p>
-<p class="body-text">Bond, A. H. (2026b). Geometric Ethics: Moral Reasoning on the Judgment Manifold. San Jose State University.</p>
-<p class="body-text">Guo, C., Pleiss, G., Sun, Y., &amp; Weinberger, K. Q. (2017). On calibration of modern neural networks. ICML, 1321--1330.</p>
-<p class="body-text">Kadavath, S., et al. (2022). Language models (mostly) know what they know. arXiv:2207.05221.</p>
-<p class="body-text">Li, H., Xu, Z., Taylor, G., Studer, C., &amp; Goldstein, T. (2018). Visualizing the loss landscape of neural nets. NeurIPS, 6389--6399.</p>
-<p class="body-text">Newell, A. &amp; Simon, H. A. (1972). Human Problem Solving. Englewood Cliffs, NJ: Prentice-Hall.</p>
-<p class="body-text">Niculescu-Mizil, A. &amp; Caruana, R. (2005). Predicting good probabilities with supervised learning. ICML, 625--632.</p>
-<p class="body-text">Strogatz, S. H. (2015). Nonlinear Dynamics and Chaos (2nd ed.). Boulder, CO: Westview Press.</p>
-<p class="body-text">Tversky, A. &amp; Kahneman, D. (1974). Judgment under uncertainty: Heuristics and biases. Science, 185(4157), 1124--1131.</p>
+<p>These are not separate bugs to be fixed independently. They are manifestations of a single underlying geometric structure: the evaluation landscape of current reasoning systems has deep local minima, collapsed confidence surfaces, and inadequate metacognitive control for escape. Fixing any one manifestation without addressing the underlying geometry is like treating symptoms without diagnosing the disease.</p>
+<p>The geometry of being stuck is the geometry of current AI reasoning. Understanding it — in the precise, quantitative, directional terms that the geometric framework provides — is the first step toward unsticking it.</p>
+<hr />
+<p>In the next chapter, we turn from failures of convergence to failures of invariance. Chapter 8 examines gauge invariance and symmetry: the transformations under which a well-functioning reasoning system should be invariant, the transformations under which current systems break, and the deep connection between symmetry and the heuristic field geometry that determines reasoning quality.</p>
+<hr />
+</section>
+</section>
+<section id="worked-example-the-anchored-diagnosis" class="level2">
+<h2>Worked Example: The Anchored Diagnosis</h2>
+<p>Let us return to Dr. Okafor and the 34-year-old woman from the running example. We can now trace the full geometry of the anchored diagnosis — how the initial frame creates a basin, how the basin captures subsequent evidence, and how 45 minutes pass before escape.</p>
+<p><strong>The initial state.</strong> At time <span class="math inline">t_0</span>, the paramedic says “panic attack, probably anxiety.” This utterance does not merely suggest a hypothesis — it selects a basin. Dr. Okafor’s heuristic field, shaped by twenty years of clinical experience in which young women presenting with hyperventilation <em>are</em> usually anxious, assigns a steep gradient toward the anxiety minimum. The evaluation function <span class="math inline">f(x) = g(x) + h(x)</span> reads the current state as close to a plausible goal: <span class="math inline">h(x_{\text{anxiety}}) \approx 0.15</span>. The alternative basin — pulmonary embolism — sits at <span class="math inline">h(x_{\text{PE}}) \approx 0.75</span>. The heuristic says: anxiety is close, PE is far. Descend.</p>
+<p><strong>The basin deepens.</strong> Each subsequent observation that is consistent with anxiety — and most observations are consistent with anxiety, because anxiety produces a broad and nonspecific symptom profile — deepens the basin. The hyperventilation confirms it. The tingling confirms it. The tachycardia confirms it. At each step, <span class="math inline">g(x)</span> increases (more evidence accumulated along this path) and <span class="math inline">h(x)</span> decreases (the heuristic reads the growing body of consistent evidence as further confirmation). The walls of the basin grow steeper. The cost of backtracking — abandoning the anxiety diagnosis after investing 10, then 20, then 30 minutes in it — increases with each passing minute.</p>
+<p><strong>The disconfirming evidence.</strong> At <span class="math inline">t_0 + 22</span> minutes, the O2 saturation reads 93%. This is the datum that should trigger escape. Anxiety does not cause hypoxemia. The gradient of the <em>true</em> evaluation landscape points sharply away from the anxiety basin at this point — toward the PE basin, toward the “order a CT angiogram” action. But Dr. Okafor’s <em>learned</em> evaluation landscape has already been shaped by the preceding 22 minutes of anxiety-consistent evidence. Her heuristic processes the O2 reading through the anxiety frame: “She’s been hyperventilating — maybe she’s not breathing deeply enough.” The datum is reinterpreted, its gradient signal attenuated, and the trajectory remains in the basin.</p>
+<p>This is the mechanism of Section 7.2 made concrete. The momentum trap (mechanism 4) is operating: the accumulated context of anxiety-consistent reasoning creates a conditional distribution over next interpretations that strongly favors anxiety-consistent interpretations. Each token of internal reasoning is generated conditional on the preceding tokens, and those preceding tokens all say “anxiety.”</p>
+<p><strong>The escape.</strong> At <span class="math inline">t_0 + 45</span> minutes, a second nurse checks vitals and finds the O2 at 89% with a heart rate of 125. She says, directly: “Dr. Okafor, this doesn’t look like anxiety.” The external intervention — a metacognitive impulse from outside the system — provides the energy to overcome the basin walls. Dr. Okafor pauses. She re-examines. She orders the CT angiogram. The scan reveals bilateral pulmonary emboli. The patient is anticoagulated and transferred to the ICU. She survives, but the 45-minute delay has allowed clot propagation that extends her hospital stay by a week and leaves her with residual pulmonary hypertension.</p>
+<p><strong>The basin geometry.</strong> We can quantify the structure. At the moment of the paramedic’s handoff, the anxiety basin had an effective radius of approximately 0.3 in the normalized diagnostic manifold — a moderately sized basin capturing a plausible hypothesis. By <span class="math inline">t_0 + 22</span> minutes, the accumulated evidence and interpretive momentum had widened the basin to an effective radius of 0.6 and deepened it by approximately <span class="math inline">\Delta f \approx 0.45</span> relative to the separatrix. The O2 reading at 93% provided a perturbation energy of approximately 0.25 — insufficient to overcome a basin of depth 0.45. Only the compounded perturbation at <span class="math inline">t_0 + 45</span> (O2 at 89%, tachycardia to 125, plus the nurse’s explicit challenge) provided a combined impulse exceeding the basin depth.</p>
+<p>The ~38% recovery ceiling of Section 7.6 predicts that even with explicit metacognitive intervention, only about one in three anchored diagnoses will be successfully corrected. Dr. Okafor escaped — she is in the 38%. The geometry tells us that for every Dr. Okafor who escapes the anchored diagnosis at 45 minutes, roughly two do not escape until a more dramatic deterioration forces the issue — or until it is too late.</p>
+<hr />
+</section>
+<section id="technical-appendix" class="level2">
+<h2>Technical Appendix</h2>
+<p><strong>Definition 7.1 (Basin of Attraction).</strong> Let <span class="math inline">(M, g)</span> be a Riemannian reasoning manifold and <span class="math inline">f: M \to \mathbb{R}</span> a smooth evaluation function with isolated local minima <span class="math inline">\{x_1^*, x_2^*, \ldots, x_k^*\}</span>. The <em>basin of attraction</em> of a local minimum <span class="math inline">x_i^*</span> is the set</p>
+<p><span class="math display">B_i = \{x \in M : \lim_{t \to \infty} \gamma(t; x) = x_i^*\}</span></p>
+<p>where <span class="math inline">\gamma(t; x)</span> is the gradient flow trajectory <span class="math inline">\dot{\gamma}(t) = -\nabla f(\gamma(t))</span> with initial condition <span class="math inline">\gamma(0) = x</span>. The basins <span class="math inline">\{B_1, \ldots, B_k\}</span> partition <span class="math inline">M</span> up to a measure-zero separatrix set <span class="math inline">\Sigma = M \setminus \bigcup_i B_i</span>. The <em>depth</em> of basin <span class="math inline">B_i</span> is <span class="math inline">\Delta f_i = \min_{x \in \partial B_i} f(x) - f(x_i^*)</span>, where <span class="math inline">\partial B_i</span> is the boundary of <span class="math inline">B_i</span>. The <em>effective radius</em> is <span class="math inline">r_i = \text{vol}(B_i)^{1/\dim M} / \text{vol}(S^1)^{1/\dim M}</span>, normalizing the basin volume to the volume of a unit ball of the same dimension.</p>
+<p><strong>Proposition 7.1 (Escape Probability under Impulse Perturbation).</strong> Let <span class="math inline">x_i^*</span> be a local minimum with basin depth <span class="math inline">\Delta f_i</span> and exit solid angle <span class="math inline">\Omega_i</span> (the solid angle subtended by the exit channels at <span class="math inline">x_i^*</span> through which the gradient flow, if perturbed, would reach a different basin). Suppose a metacognitive impulse perturbs the state by a random displacement <span class="math inline">\xi</span> drawn from an isotropic distribution on <span class="math inline">T_{x_i^*}M</span> with energy <span class="math inline">E = \|\xi\|^2 / 2</span>. Then the probability of escaping basin <span class="math inline">B_i</span> is</p>
+<p><span class="math display">P_{\text{escape}}(E, \Delta f_i, \Omega_i) = \frac{\Omega_i}{S_{d-1}} \cdot \Theta(E - \Delta f_i)</span></p>
+<p>where <span class="math inline">S_{d-1}</span> is the total solid angle in <span class="math inline">d</span> dimensions and <span class="math inline">\Theta</span> is a smooth threshold function satisfying <span class="math inline">\Theta(u) \to 0</span> for <span class="math inline">u \ll 0</span> and <span class="math inline">\Theta(u) \to 1</span> for <span class="math inline">u \gg 0</span>. The geometric factor <span class="math inline">\Omega_i / S_{d-1}</span> is the fraction of directions that lead to escape; the energetic factor <span class="math inline">\Theta(E - \Delta f_i)</span> is the probability that the impulse energy exceeds the basin depth. The ~38% recovery ceiling observed empirically (Section 7.6) corresponds to the regime where <span class="math inline">E \approx \Delta f</span> and <span class="math inline">\Omega / S_{d-1} \approx 0.38</span>, indicating that approximately 38% of the solid angle at a typical local minimum subtends an exit channel.</p>
+<p><strong>Proposition 7.2 (The Recovery Ceiling as Structural Invariant).</strong> Let <span class="math inline">\mathcal{P} = \{p_1, \ldots, p_m\}</span> be a set of perturbation types that displace the search trajectory into local minima <span class="math inline">\{x_{p_1}^*, \ldots, x_{p_m}^*\}</span> respectively. If the basins of these local minima share a characteristic exit geometry — that is, if <span class="math inline">\Omega_{p_j} / S_{d-1} \approx \alpha</span> for all <span class="math inline">j</span> and the characteristic basin depths satisfy <span class="math inline">\Delta f_{p_j} \approx \Delta f</span> for all <span class="math inline">j</span> — then the recovery rate under a metacognitive impulse of characteristic energy <span class="math inline">E</span> converges to a perturbation-independent value:</p>
+<p><span class="math display">P_{\text{recover}} \approx \alpha \cdot \Theta(E - \Delta f)</span></p>
+<p>The empirical convergence of recovery rates at ~38% across emotional anchoring (E2) and vivid distractor (A1) perturbations constitutes evidence for a shared characteristic exit geometry (<span class="math inline">\alpha \approx 0.38</span>) in the evaluation landscapes of current language models. This convergence is a structural property of the trained landscape, not a property of the perturbations, and it predicts that recovery rates for novel perturbation types will also converge to approximately 38% under prompt-level intervention — a prediction that is testable by introducing new perturbation classes in future benchmarks.</p>
+<hr />
+</section>
+<section id="references" class="level2">
+<h2>References</h2>
+<p>Bond, A. H. (2026a). <em>Geometric Methods in Computational Modeling.</em> San Jose State University.</p>
+<p>Bond, A. H. (2026b). <em>Geometric Ethics: Moral Reasoning on the Judgment Manifold.</em> San Jose State University.</p>
+<p>Guo, C., Pleiss, G., Sun, Y., &amp; Weinberger, K. Q. (2017). On calibration of modern neural networks. <em>ICML</em>, 1321–1330.</p>
+<p>Kadavath, S., et al. (2022). Language models (mostly) know what they know. <em>arXiv:2207.05221</em>.</p>
+<p>Li, H., Xu, Z., Taylor, G., Studer, C., &amp; Goldstein, T. (2018). Visualizing the loss landscape of neural nets. <em>NeurIPS</em>, 6389–6399.</p>
+<p>Newell, A. &amp; Simon, H. A. (1972). <em>Human Problem Solving.</em> Englewood Cliffs, NJ: Prentice-Hall.</p>
+<p>Niculescu-Mizil, A. &amp; Caruana, R. (2005). Predicting good probabilities with supervised learning. <em>ICML</em>, 625–632.</p>
+<p>Strogatz, S. H. (2015). <em>Nonlinear Dynamics and Chaos</em> (2nd ed.). Boulder, CO: Westview Press.</p>
+<p>Tversky, A. &amp; Kahneman, D. (1974). Judgment under uncertainty: Heuristics and biases. <em>Science</em>, 185(4157), 1124–1131.</p>
+</section>
+</section>
       </div>
 
       <div class="chapter-nav-bottom">
@@ -368,8 +427,8 @@
   </article>
 
   <footer class="book-footer">
-    <p>&copy; 2026 Andrew H. Bond. Geometric Reasoning: From Search to Manifolds.</p>
-    <p class="footer-note">Reasoning is informed search through a structured space.</p>
+    <p>&copy; 2026 Andrew H. Bond. <em>Geometric Reasoning: From Search to Manifolds.</em></p>
+    <p class="footer-note">The geometry was always real. The scalars were always insufficient.</p>
   </footer>
 
   <script>
@@ -380,35 +439,22 @@
       document.querySelector('.nav-links').classList.toggle('open');
     });
   </script>
-<script>
-window.addEventListener("load", function() {
-  if (typeof katex === 'undefined') return;
-  // Render all <em class="math"> elements with</em> KaTeX
-  document.querySelectorAll('em.math').forEach(function(el) {
-    try {
-      katex.render(el.textContent, el, {throwOnError: false, displayMode: false});
-    } catch(e) {}
-  });
-  // Render all <p class="display-math"> elements
-  document.querySelectorAll('p.display-math').forEach(function(el) {
-    var mathEl = el.querySelector('em.math');
-    if (mathEl) {
-      try {
-        katex.render(mathEl.textContent, el, {throwOnError: false, displayMode: true});
-      } catch(e) {}
-    }
-  });
-  // Also try auto-render for any $...$ delimited math
-  if (typeof renderMathInElement !== 'undefined') {
-    renderMathInElement(document.body, {
-      delimiters: [
-        {left: "$$", right: "$$", display: true},
-        {left: "$", right: "$", display: false}
-      ],
-      throwOnError: false
+  <script>
+    // Pandoc --katex outputs <span class="math inline"> and <span class="math display">.
+    // This script renders them with KaTeX once the library loads.
+    document.addEventListener("DOMContentLoaded", function() {
+      if (typeof katex === 'undefined') return;
+      var mathElements = document.getElementsByClassName("math");
+      for (var i = 0; i < mathElements.length; i++) {
+        var texText = mathElements[i].firstChild;
+        if (mathElements[i].tagName === "SPAN" && texText) {
+          katex.render(texText.data, mathElements[i], {
+            displayMode: mathElements[i].classList.contains('display'),
+            throwOnError: false
+          });
+        }
+      }
     });
-  }
-});
-</script>
+  </script>
 </body>
 </html>
