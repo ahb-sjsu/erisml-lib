@@ -80,14 +80,14 @@
 <li><strong>Constraints:</strong> Regime boundaries, constitutional constraints, statutory requirements that impose edge penalties or block paths entirely.</li>
 </ul>
 <p class="body-text">The optimal legal argument is the minimum-cost path from <em class="math">c<sub>0</sub></em> to <em class="math">G</em>:</p>
-<p class="display-math"><em class="math">&gamma;^* = argmin_&gamma; BF_{law(&gamma;)   subject to  &gamma;(0) = c<sub>0</sub>,   &gamma;(end)  &isin;  G,   &gamma;  respects all constraints</em></p>
+<p class="display-math"><em class="math">&gamma;^^*</em> = argmin_&gamma; BF_{law(&gamma;)   subject to  &gamma;(0) = c<sub>0</sub>,   &gamma;(end)  &isin;  G,   &gamma;  respects all constraints</em></p>
 <h3 id="why-the-problem-is-hard" class="subsection-heading">Why the Problem Is Hard</h3>
 <p class="first-paragraph">In a judicial complex of realistic size — millions of decided cases, tens of millions of citation edges — finding the optimal path by exhaustive search is computationally intractable. The number of possible paths grows exponentially with the number of edges. Even in a small complex (a few thousand cases in a single area of law), brute-force search is impractical.</p>
 <p class="body-text">This is not merely a computational observation. It is a <em>practical</em> reality of legal reasoning. A lawyer preparing a brief cannot read every case ever decided on the relevant topic. A judge cannot consider every possible doctrinal path from the facts to the remedy. The space is too large.</p>
 <p class="body-text">Legal practice solves this problem the same way computer science solves it: with <em>heuristics</em> — functions that estimate the remaining cost of reaching a goal, guiding the search toward promising regions of the complex and away from dead ends.</p>
 <h2 id="search-on-the-judicial-complex" class="section-heading"><em class="math">A^*</em> Search on the Judicial Complex</h2>
 <h3 id="the-algorithm" class="subsection-heading">The <em class="math">A^*</em> Algorithm</h3>
-<p class="first-paragraph"><strong>Theorem (Optimal Legal Argument as <em class="math">A*).</strong> The optimal legal argument is an instance of <em class="math">A*</em> search on a weighted graph, with evaluation function <em class="math">f(n) = g(n) + h(n)</em>, where:</p>
+<p class="first-paragraph"><strong>Theorem (Optimal Legal Argument as <em class="math">/strong></em> The optimal legal argument is an instance of <em class="math">A*</em> search on a weighted graph, with evaluation function <em class="math">f(n) = g(n) + h(n)</em>, where:</p>
 <ul>
 <li><em class="math">g(n)</em> is the accumulated legal friction from <em class="math">c<sub>0</sub></em> to the current node <em class="math">n</em> — the cost of the argument built so far.</li>
 <li><em class="math">h(n)</em> is the heuristic estimate of remaining friction from <em class="math">n</em> to <em class="math">G</em> — the estimated cost of completing the argument.</li>
@@ -139,7 +139,7 @@
 </blockquote>
 <h2 id="admissibility-of-doctrinal-heuristics" class="section-heading">Admissibility of Doctrinal Heuristics</h2>
 <h3 id="the-admissibility-condition" class="subsection-heading">The Admissibility Condition</h3>
-<p class="first-paragraph">In <em class="math">A*, a heuristic <em class="math">h</em> is </em>admissible* if it never overestimates the true cost of reaching the goal:</p>
+<p class="first-paragraph">In <em class="math">A^*</em>, a heuristic <em class="math">h</em> is </em>admissible* if it never overestimates the true cost of reaching the goal:</p>
 <p class="display-math"><em class="math">h(n)  &le;  h^*(n)   &forall; n</em></p>
 <p class="body-text">where <em class="math">h*(n)</em> is the actual minimum cost from <em class="math">n</em> to <em class="math">G</em>. If <em class="math">h</em> is admissible, <em class="math">A*</em> is guaranteed to find the optimal path — the proof is a standard result in artificial intelligence.</p>
 <p class="body-text"><strong>Theorem (Admissibility of Doctrinal Heuristics).</strong> A doctrinal heuristic <em class="math">h<sub>D</sub></em> is admissible if the doctrine <em class="math">D</em> correctly identifies the elements of a legal claim and assigns non-negative estimated costs that do not exceed actual proving costs. If <em class="math">h<sub>D</sub></em> is admissible, <em class="math">A^*</em> search using <em class="math">h<sub>D</sub></em> is guaranteed to find the optimal legal argument.</p>
@@ -288,7 +288,7 @@
 <p class="body-text"><em>Proof.</em> If the combined litigation costs exceed the distance between goal regions, there exist vertices between <em class="math">G_&pi;</em> and <em class="math">G_&delta;</em> that are cheaper for both parties to reach than their respective litigation endpoints. Any such vertex is a settlement point. <em class="math">&#9633;</em></p>
 <p class="body-text"><strong>Definition (Heuristic Field Strength).</strong> The <em>heuristic field strength</em> at a vertex <em class="math">c  &isin;  K</em> is:</p>
 <p class="display-math"><em class="math">H(c) = frac{h^*(c) - h_{zero(c){h^*(c) = 1 - frac{0{h^*(c) = 1</em></p>
-<p class="body-text">when a tight heuristic is available, and <em class="math">H(c) = 0</em> when only the zero heuristic (no doctrinal guidance) is available. In practice, <em class="math">H(c) = 1 - (h*(c) - h<sub>D</sub>(c))/h*(c) = h<sub>D</sub>(c)/h^*(c)</em> measures the fraction of the true remaining cost that the heuristic captures.</p>
+<p class="body-text">when a tight heuristic is available, and <em class="math">H(c) = 0</em> when only the zero heuristic (no doctrinal guidance) is available. In practice, <em class="math">H(c) = 1 - (h^*</em>(c) - h<sub>D</sub>(c))/h*(c) = h<sub>D</sub>(c)/h^*(c)</em> measures the fraction of the true remaining cost that the heuristic captures.</p>
 <h2 id="notes-on-sources" class="section-heading">Notes on Sources</h2>
 <p class="first-paragraph">The <em class="math">A* algorithm was introduced by Hart, Nilsson, and Raphael (1968) and its optimality properties are proved in Pearl (1984). The mapping between legal reasoning and pathfinding was introduced in the Algorithmic Jurisprudence manuscript. The McDonnell Douglas burden-shifting framework was established in </em>McDonnell Douglas Corp. v. Green<em>, 411 U.S. 792 (1973), refined in </em>Texas Department of Community Affairs v. Burdine<em>, 450 U.S. 248 (1981), and further developed in </em>St. Mary's Honor Center v. Hicks<em>, 509 U.S. 502 (1993). Pattern databases in AI pathfinding are developed by Culberson and Schaeffer (1998) and Felner, Korf, and Hanan (2004). The adversarial search framework builds on minimax theory from von Neumann and Morgenstern (1944) and its application to game-playing AI in Russell and Norvig (2021). Settlement theory builds on Priest and Klein (1984). The distinction between binding and persuasive precedent is standard — see Cross and Harris (1991, </em>Precedent in English Law*).</p>
       </div>
@@ -317,7 +317,7 @@
 <script>
 window.addEventListener("load", function() {
   if (typeof katex === 'undefined') return;
-  // Render all <em class="math"> elements with KaTeX
+  // Render all <em class="math"> elements with</em> KaTeX
   document.querySelectorAll('em.math').forEach(function(el) {
     try {
       katex.render(el.textContent, el, {throwOnError: false, displayMode: false});

@@ -163,11 +163,11 @@
 <div class="table-wrapper"><table class="book-table"><tr><th>Subtask</th><th>Score</th></tr><tr><td>A1 (Distractor Resistance)</td><td>0.700</td></tr><tr><td>A2 (Length Robustness)</td><td>0.800</td></tr><tr><td>A3 (Selective Attention SNR)</td><td>1.30</td></tr><tr><td>A4 (Divided Attention)</td><td>0.650</td></tr></table></div>
 <p class="body-text"><strong>Step 1: Assess metric stability.</strong> The A2 score of 0.800 indicates moderate-to-strong metric persistence. The metric does not drift significantly over the input lengths tested. We can assume the static metric approximation is reasonable.</p>
 <p class="body-text"><strong>Step 2: Assess metric signal quality.</strong> The SNR of 1.30 indicates weak signal-noise discrimination, consistent with the universal band of 1.22--1.38. The metric provides approximately 30% more resolution along signal dimensions than noise dimensions.</p>
-<p class="body-text"><strong>Step 3: Compute metric eccentricity from A4.</strong> The A4 score of 0.650 indicates significant interference under divided attention. Following the worked example from Chapter 4 (Section 4.12), we model the metric as a diagonal matrix with attention weights <em class="math">a_1</em> (primary stream) and <em class="math">a_2</em> (secondary stream), subject to <em class="math">a_1 + a_2 = A*.</p>
+<p class="body-text"><strong>Step 3: Compute metric eccentricity from A4.</strong> The A4 score of 0.650 indicates significant interference under divided attention. Following the worked example from Chapter 4 (Section 4.12), we model the metric as a diagonal matrix with attention weights <em class="math">a_1</em> (primary stream) and <em class="math">a_2</em> (secondary stream), subject to <em class="math">a_1 + a_2 =</em> A*.</p>
 <p class="body-text">The A4 score of 0.650 corresponds to a metric where the secondary stream receives significantly less resolution than the primary stream. Using the harmonic-mean model from Chapter 4:</p>
 <p class="display-math"><em class="math">\text{A4} = \frac{2}{\frac{1}{f(a_1)} + \frac{1}{f(a_2)}}</em></p>
 <p class="first-paragraph">where <em class="math">f(a)</em> is the per-stream accuracy as a function of attention weight. For a sigmoid function <em class="math">f(a) = 1 / (1 + e^{-k(a - a_0)})</em>, the A4 score of 0.650 implies <em class="math">a_1 / a_2 \approx 3.0</em>---the primary stream receives about 75% of the attention budget.</p>
-<p class="body-text"><strong>Step 4: Compute the effective metric rank.</strong> With eigenvalues proportional to <em class="math">a_1 = 0.75A* and <em class="math">a_2 = 0.25A*, the participation ratio is:</p>
+<p class="body-text"><strong>Step 4: Compute the effective metric rank.</strong> With eigenvalues proportional to <em class="math">a_1 = 0.75A* and <em class="math">a_2 = 0.25A^*</em>, the participation ratio is:</p>
 <p class="display-math"><em class="math">\text{rank}_{\text{eff}} = \frac{(0.75 + 0.25)^2}{0.75^2 + 0.25^2} = \frac{1.0}{0.625} = 1.6</em></p>
 <p class="first-paragraph">The effective metric rank is 1.6, between Claude's approximately 1.0 (extreme narrowness) and Flash 3's approximately 2.0 (perfect isotropy). This model has a moderately narrow metric---neither as extreme as Claude nor as broad as Flash 3.</p>
 <p class="body-text"><strong>Step 5: Predict cross-track behavior.</strong> Based on the metric eccentricity of 3.0 and effective rank of 1.6:</p>
@@ -229,7 +229,7 @@
 <script>
 window.addEventListener("load", function() {
   if (typeof katex === 'undefined') return;
-  // Render all <em class="math"> elements with KaTeX
+  // Render all <em class="math"> elements with</em> KaTeX
   document.querySelectorAll('em.math').forEach(function(el) {
     try {
       katex.render(el.textContent, el, {throwOnError: false, displayMode: false});
