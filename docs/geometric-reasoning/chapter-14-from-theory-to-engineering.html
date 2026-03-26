@@ -10,6 +10,9 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Crimson+Pro:ital,wght@0,300;0,400;0,600;0,700;1,400&family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"></script>
 </head>
 
 <body>
@@ -220,8 +223,8 @@ qpatch.patch_all(compute_dtype=torch.float16)  # Volta = fp16</code></pre>
 </ol>
 <p class="body-text">Standard transformer tokenization (BPE, WordPiece) operates at a single level --- it splits the transliterated text into subword tokens without encoding the hierarchical relationships between sign form, reading, and word. The model must learn these relationships from the training data alone, which is severely limited for ancient languages (the entire digitized Sumerian corpus is orders of magnitude smaller than modern NLP training sets).</p>
 <p class="body-text"><strong>The geometric attention bias.</strong> To inject the sign hierarchy as a structural prior, we embed cuneiform signs in the Poincare ball and use the hyperbolic distance between signs as an attention bias in the T5 encoder:</p>
-<p class="body-text"><span class="math-block">\text{attention}(Q, K) = \text{softmax}\left(\frac{QK^T}{\sqrt{d}} + \text{pos\_bias} + \alpha \cdot (-d_{\text{hyp}}(s_i, s_j))\right)</span></p>
-<p class="body-text">where <em class="math">d_{\text{hyp}}(s_i, s_j)</em> is the hyperbolic distance between the signs at positions <em class="math">i</em> and <em class="math">j</em> in the Poincare ball embedding, <em class="math">\alpha</em> is a learnable scaling parameter, and <em class="math">\text{pos\_bias}</em> is the standard positional bias.</p>
+<p class="body-text"><span class="math-block">\text{attention}(Q, K) = \text{softmax}\left(\frac{QK^T}{\sqrt{d}} + \text{pos_bias} + \alpha \cdot (-d_{\text{hyp}}(s_i, s_j))\right)</span></p>
+<p class="body-text">where <em class="math">d_{\text{hyp}}(s_i, s_j)</em> is the hyperbolic distance between the signs at positions <em class="math">i</em> and <em class="math">j</em> in the Poincare ball embedding, <em class="math">\alpha</em> is a learnable scaling parameter, and <em class="math">\text{pos_bias}</em> is the standard positional bias.</p>
 <p class="body-text">The negative sign is critical: signs that are <em>close</em> in the hierarchy (low hyperbolic distance) receive a <em>positive</em> attention bias (the negative of a small distance), while signs that are <em>far apart</em> in the hierarchy (high hyperbolic distance) receive a <em>negative</em> attention bias (the negative of a large distance). The effect is that the attention mechanism preferentially connects tokens that are structurally related in the sign hierarchy.</p>
 <p class="body-text"><strong>How hyperbolic distance serves as a prior.</strong> The key insight is that hyperbolic distance in the Poincare ball encodes <em>both</em> semantic similarity and hierarchical relationship. Two signs at the same level of the hierarchy (both readings, or both sign forms) that are semantically related will be close in hyperbolic distance. A sign form and one of its readings will be at different radial distances from the origin (the form closer to the origin, the reading further out) but connected by a short geodesic. A sign form and an unrelated reading will be far apart in hyperbolic distance.</p>
 <p class="body-text">This is precisely the prior that cuneiform analysis requires: the model should attend more to tokens that are related in the sign hierarchy and less to tokens that are unrelated. In a standard transformer, this relationship must be learned entirely from training data. With the geometric attention bias, it is encoded directly in the attention computation, reducing the data requirement and improving performance on the small cuneiform corpora that exist.</p>
@@ -365,5 +368,16 @@ qpatch.patch_all(compute_dtype=torch.float16)  # Volta = fp16</code></pre>
       document.querySelector('.nav-links').classList.toggle('open');
     });
   </script>
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+  renderMathInElement(document.body, {
+    delimiters: [
+      {left: "$$", right: "$$", display: true},
+      {left: "$", right: "$", display: false}
+    ],
+    throwOnError: false
+  });
+});
+</script>
 </body>
 </html>
