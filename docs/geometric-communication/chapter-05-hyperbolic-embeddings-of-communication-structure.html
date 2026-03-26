@@ -38,6 +38,13 @@
 
   <article class="book-chapter">
     <div class="chapter-container">
+      <nav class="breadcrumb" aria-label="Breadcrumb">
+        <a href="../index.html">Geometric Series</a>
+        <span class="breadcrumb-sep">›</span>
+        <a href="index.html">Geometric Communication</a>
+        <span class="breadcrumb-sep">›</span>
+        <span class="breadcrumb-current">Chapter 5: Hyperbolic Embeddings of Communication Structure</span>
+      </nav>
       <div class="chapter-nav-top">
         <a href="chapter-04-three-geometries-for-communication.html" class="nav-prev">&larr; Chapter 4: Three Geometries for Communication</a>
         <a href="index.html" class="nav-toc">Contents</a>
@@ -87,11 +94,7 @@
 <p class="body-text">Three properties of this distance are critical for communication applications:</p>
 <ol>
 <li><strong>Near the origin, it approximates Euclidean distance.</strong> When <em class="math">\|x\|</em> and <em class="math">\|y\|</em> are small relative to <em class="math">1/\sqrt{c}</em>, the conformal factor is approximately 2 and <em class="math">d_{\mathbb{B}}(x, y) \approx 2\|x - y\|</em>. Abstract concepts placed near the origin interact approximately Euclideanly.</li>
-</ol>
-<ol>
 <li><strong>Near the boundary, distances explode.</strong> Two points that are Euclidean-close but near the boundary can be hyperbolically far apart. Specific instances placed near the boundary are well-separated even if they are close in Euclidean coordinates.</li>
-</ol>
-<ol>
 <li><strong>Radial and angular contributions decouple.</strong> Moving a point radially (toward or away from the origin) corresponds to moving up or down the hierarchy. Moving a point angularly (around the origin at fixed radius) corresponds to moving between siblings at the same level. This radial-angular decomposition makes Poincare embeddings naturally interpretable for hierarchical data.</li>
 </ol>
 <p class="body-text">A special case is the distance from a point to the origin, which simplifies considerably:</p>
@@ -215,14 +218,8 @@
 <p class="body-text">This construction has several notable properties:</p>
 <ol>
 <li><strong>No model surgery.</strong> The bias is injected via forward hooks on the self-attention layers&mdash;a few lines of code that modify attention logits without touching the pretrained model weights. The total number of additional parameters is <em class="math">384 \times 32 + 1 = 12{,}289</em> (the embedding matrix plus the scale), a negligible fraction of ByT5-base's 250 million parameters.</li>
-</ol>
-<ol>
 <li><strong>The embeddings are learnable.</strong> Unlike a fixed geometric prior, the Poincare embeddings are trained jointly with the rest of the model. The model can learn to place sign-related bytes close together on the ball and unrelated bytes far apart. The curvature parameter <em class="math">c = 1.0</em> is fixed; a future extension could learn <em class="math">c</em> as well.</li>
-</ol>
-<ol>
 <li><strong>The bias operates at the byte level.</strong> Because ByT5 operates on UTF-8 bytes, each token is a single byte. The Poincare embeddings assign each of the 384 possible byte values a position on the hyperbolic ball. The model must learn that certain byte sequences (e.g., the bytes encoding <code>{d}</code>) are hierarchically related to certain other byte sequences (e.g., the bytes encoding <code>UTU</code>), even though the individual bytes are not meaningful in isolation.</li>
-</ol>
-<ol>
 <li><strong>The bias is additive, not multiplicative.</strong> It augments the attention logits alongside the existing position bias, leaving the model free to learn attention patterns that override the geometric prior when the data warrants it. The learnable scale <em class="math">\alpha</em> (initialised to 0.1) controls how strongly the geometric bias influences attention; if the hierarchy is uninformative, <em class="math">\alpha</em> can shrink toward zero.</li>
 </ol>
 <p class="body-text"><em>[Figure 5.6: The geometric attention bias for cuneiform. Left: schematic of the ByT5 encoder with additive geometric bias. The bias matrix <em class="math">B_{\text{geo}}</em> is computed from pairwise Poincare distances between byte-level embeddings and added to the attention logits in the first 4 encoder layers. Right: a visualisation of learned Poincare embeddings for a sample of byte tokens, coloured by their most common sign association.]</em></p>
@@ -273,11 +270,7 @@
 <p class="first-paragraph">A brief digression on the augmentation strategies, which are relevant to the geometric framework even though they are not themselves hyperbolic. The three cuneiform-aware augmentations simulate real phenomena in Assyriology:</p>
 <ul>
 <li><strong>Sign dropout</strong> (probability <em class="math">p_{\text{drop}} = 0.15</em>): Each sign is independently replaced with <code>[x]</code>, simulating the damaged or illegible portions of real clay tablets. This is noise along the <em>signal dimension</em> of the communication manifold&mdash;the physical substrate is corrupted, but the message is unchanged.</li>
-</ul>
-<ul>
 <li><strong>Word-order shuffle</strong> (probability <em class="math">p_{\text{shuffle}} = 0.3</em>): Words are swapped with bounded neighbours (<em class="math">k = 2</em>), exploiting Akkadian's relatively free word order (SOV default but with permissible reordering). This is noise along the <em>syntactic dimension</em>&mdash;the word order changes, but the meaning is preserved.</li>
-</ul>
-<ul>
 <li><strong>Determinative variation</strong> (probability <em class="math">p_{\text{det}} = 0.2</em>): Determinatives are swapped between equivalent notations (e.g., <code>{d}</code> for "divine" and <code>{DINGIR}</code> for the same semantic class). This is noise along the <em>convention dimension</em>&mdash;scribal notation varies, but the reading is unchanged.</li>
 </ul>
 <p class="body-text">In the language of Chapter 3, each augmentation is a perturbation along a specific direction of the communication manifold. Sign dropout perturbs along <em class="math">S</em> (signal). Word-order shuffle perturbs along <em class="math">P</em> (pragmatic/syntactic structure). Determinative variation perturbs along the gauge orbit of the writing convention group. All three preserve the content&mdash;they are approximate isometries of the content manifold <em class="math">C</em>&mdash;and therefore train the model to be invariant to exactly the right variations.</p>
@@ -336,14 +329,8 @@
 <p class="first-paragraph">This chapter has developed the Poincare ball model of hyperbolic space as a tool for representing hierarchical communication structure. The key results are:</p>
 <ol>
 <li><strong>The distortion theorem</strong> (Section 5.3) provides the theoretical justification: trees embed with bounded distortion in hyperbolic space of dimension <em class="math">O(\log b)</em>, but require Euclidean dimension <em class="math">O(b^h)</em>, where <em class="math">b</em> is branching factor and <em class="math">h</em> is depth.</li>
-</ol>
-<ol>
 <li><strong>Sperm whale coda taxonomy</strong> (Section 5.5): A 32-dimensional Poincare embedding of the 28-type coda hierarchy achieves 74.3% classification accuracy via HyperbolicMLR, competitive with the 72.8% of the best Euclidean baseline. The embedding reveals the radial-angular structure of coda space&mdash;rhythm class along the angular axis, click count along the radial axis&mdash;and captures social unit dialect structure that Euclidean representations attenuate.</li>
-</ol>
-<ol>
 <li><strong>Cuneiform sign taxonomy</strong> (Section 5.6): A Poincare ball embedding of byte-level tokens, injected as an additive attention bias into a ByT5 transformer, encodes the three-level cuneiform hierarchy (sign form, reading, word) directly into the model's attention mechanism. The bias is learnable, lightweight (12,289 parameters), and complementary to data augmentation.</li>
-</ol>
-<ol>
 <li><strong>Euclidean comparison</strong> (Section 5.7): Hyperbolic embeddings offer modest quantitative advantages at the scale of the hierarchies examined here (28&ndash;384 nodes) and significant interpretive advantages. The distortion theorem predicts that quantitative advantages will grow for larger hierarchies.</li>
 </ol>
 <p class="body-text">The chapter also established formal properties&mdash;hierarchy coarsening via Einstein midpoints, attention bias monotonicity, curvature sensitivity&mdash;that will be used in the cuneiform deep dive of Chapter 9 and the synthesis of Chapter 16.</p>

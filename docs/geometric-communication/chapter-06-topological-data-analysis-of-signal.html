@@ -38,6 +38,13 @@
 
   <article class="book-chapter">
     <div class="chapter-container">
+      <nav class="breadcrumb" aria-label="Breadcrumb">
+        <a href="../index.html">Geometric Series</a>
+        <span class="breadcrumb-sep">›</span>
+        <a href="index.html">Geometric Communication</a>
+        <span class="breadcrumb-sep">›</span>
+        <span class="breadcrumb-current">Chapter 6: Topological Data Analysis of Signal</span>
+      </nav>
       <div class="chapter-nav-top">
         <a href="chapter-05-hyperbolic-embeddings-of-communication-structure.html" class="nav-prev">&larr; Chapter 5: Hyperbolic Embeddings of Communication Structure</a>
         <a href="index.html" class="nav-toc">Contents</a>
@@ -98,11 +105,7 @@
 <p class="body-text">The theorem has three critical implications for our purposes:</p>
 <ol>
 <li><strong>Topological faithfulness.</strong> Because <em class="math">F_{\Phi,h}</em> is an embedding (not merely a continuous map), it preserves the topology of <em class="math">\mathcal{M}</em>. Connected components, loops, and voids in the original state space appear as connected components, loops, and voids in the reconstructed point cloud. This is why persistent homology on the embedded point cloud recovers genuine dynamical structure.</li>
-</ol>
-<ol>
 <li><strong>The dimension bound <em class="math">d \geq 2m + 1</em>.</strong> The embedding dimension must be at least <em class="math">2m + 1</em>, where <em class="math">m</em> is the dimension of the attractor. For a periodic orbit (<em class="math">m = 1</em>), <em class="math">d = 3</em> suffices. For a strange attractor on a surface (<em class="math">m = 2</em>), <em class="math">d = 5</em> suffices. In practice, the attractor dimension is rarely known <em>a priori</em>, but low-dimensional embeddings (<em class="math">d = 3</em> or <em class="math">d = 5</em>) work well for acoustic signals because the dominant dynamics are low-dimensional &mdash; the vocal production apparatus has far fewer degrees of freedom than the sampling rate would suggest.</li>
-</ol>
-<ol>
 <li><strong>Genericity of <em class="math">\tau</em>.</strong> The theorem holds for <em>generic</em> delay <em class="math">\tau</em> &mdash; almost every value works. But "almost every" is a topological statement, not a practical one. Some values of <em class="math">\tau</em> work much better than others in finite, noisy data. If <em class="math">\tau</em> is too small, consecutive coordinates are nearly identical and the point cloud collapses to the diagonal. If <em class="math">\tau</em> is too large, consecutive coordinates are nearly independent and the embedding captures noise rather than dynamics. The choice of <em class="math">\tau</em> matters in practice, even though it does not matter in principle.</li>
 </ol>
 <h3 id="614-choosing-tau-and-d-in-practice" class="subsection-heading">6.1.4 Choosing <em class="math">\tau</em> and <em class="math">d</em> in Practice</h3>
@@ -152,26 +155,12 @@
 <p class="body-text">The eight statistics are:</p>
 <ol>
 <li><strong>Count</strong> (<em class="math">n</em>): The number of finite-lifetime features in dimension <em class="math">k</em>. This measures the topological complexity at the given scale &mdash; how many independent components (<em class="math">k=0</em>) or loops (<em class="math">k=1</em>) were detected.</li>
-</ol>
-<ol>
 <li><strong>Mean lifetime</strong> (<em class="math">\bar{\ell} = \frac{1}{n}\sum_{i} \ell_i</em>): The average persistence of features. High mean lifetime indicates that topological features are robust; low mean lifetime indicates that they are ephemeral and likely noise.</li>
-</ol>
-<ol>
 <li><strong>Standard deviation of lifetime</strong> (<em class="math">\sigma_\ell</em>): The dispersion of persistence values. High standard deviation indicates a mixture of persistent and ephemeral features &mdash; some genuine structure and some noise. Low standard deviation indicates homogeneous features (either all robust or all noisy).</li>
-</ol>
-<ol>
 <li><strong>Maximum lifetime</strong> (<em class="math">\max_i \ell_i</em>): The persistence of the single most prominent feature. This is the most stable statistic under noise (by the stability theorem, the longest-lived feature is the last to be destroyed by perturbation).</li>
-</ol>
-<ol>
 <li><strong>75th percentile of lifetime</strong> (<em class="math">\ell_{75}</em>): A robust alternative to the maximum, less sensitive to outliers. Captures the persistence of the "typical prominent feature."</li>
-</ol>
-<ol>
 <li><strong>Mean birth time</strong> (<em class="math">\bar{b} = \frac{1}{n}\sum_i b_i</em>): The average scale at which features appear. For <em class="math">H_0</em>, all features are born at <em class="math">\varepsilon = 0</em> (every point is its own component at zero scale), so the mean birth is identically zero &mdash; but for <em class="math">H_1</em>, the mean birth time indicates the scale at which cyclic structure begins to appear. Early birth means cycles at small scales (fine-grained periodicity); late birth means cycles at large scales (coarse periodicity).</li>
-</ol>
-<ol>
 <li><strong>Total persistence</strong> (<em class="math">L^2 = \sum_i \ell_i^2</em>): The sum of squared lifetimes. This is the <em class="math">L^2</em> norm of the persistence, which weights long-lived features more heavily than short-lived ones. It provides a single scalar measure of the total topological complexity, with the quadratic weighting serving as a natural importance filter.</li>
-</ol>
-<ol>
 <li><strong>Normalized persistence</strong> (<em class="math">\hat{L} = \sqrt{L^2} / (n + \epsilon)</em>): The root-mean-square lifetime, or equivalently the <em class="math">L^2</em> norm divided by the count. This compensates for the number of features: a diagram with one very persistent loop has higher normalized persistence than a diagram with many short-lived loops, even if their total persistence is similar.</li>
 </ol>
 <p class="body-text">The implementation from <code>geometric_features.py</code>:</p>
@@ -272,17 +261,9 @@
 <p class="first-paragraph">The pipeline operates in five stages:</p>
 <ol>
 <li><strong>Normalization.</strong> The signal is zero-centered and scaled to unit variance. This removes absolute amplitude information, which is desirable: we want features that are invariant to recording gain and distance. The normalization also ensures that the Rips complex threshold (<em class="math">\varepsilon = 2.0</em>) is calibrated to the signal's intrinsic scale.</li>
-</ol>
-<ol>
 <li><strong>Time-delay embedding.</strong> The normalized 1D signal is embedded in <em class="math">\mathbb{R}^3</em> with delay <em class="math">\tau = 10</em> samples. For birdsong recorded at 22,050 Hz, this corresponds to a delay of approximately 0.45 ms &mdash; well within the timescale of individual harmonic cycles for birdsong in the 2&ndash;8 kHz range (where one cycle takes 0.125&ndash;0.5 ms).</li>
-</ol>
-<ol>
 <li><strong>Subsampling.</strong> The point cloud is subsampled to at most 1,000 points (or 500 in the combined feature pipeline). Ripser's computational complexity is approximately <em class="math">O(n^3)</em> in the number of points, and subsampling to 1,000 points keeps the TDA computation under a fraction of a second per recording &mdash; critical for the BirdCLEF submission constraint of 90 minutes for the full test set on CPU.</li>
-</ol>
-<ol>
 <li><strong>Cloud normalization.</strong> The point cloud is re-centered and rescaled per coordinate. This is a second normalization, applied in the embedding space rather than the signal space, and it ensures that the Rips filtration explores the relevant scale range regardless of the signal's absolute characteristics.</li>
-</ol>
-<ol>
 <li><strong>Persistent homology.</strong> The Vietoris&ndash;Rips complex is computed to dimension 1 with a filtration threshold of <em class="math">\varepsilon_{\max} = 2.0</em>. Features beyond this threshold are unlikely to represent genuine structure (they would correspond to topological features at scales larger than two standard deviations in the normalized cloud).</li>
 </ol>
 <h3 id="652-species-specific-topology" class="subsection-heading">6.5.2 Species-Specific Topology</h3>
@@ -380,11 +361,7 @@
 <p class="first-paragraph">Persistent homology captures the <em>shape</em> of the point cloud &mdash; its connected components, loops, and voids. It does not capture:</p>
 <ul>
 <li><strong>Metric structure</strong>: Two point clouds can have identical persistence diagrams but different metrics. A circle of radius 1 and a circle of radius 10 have the same topology (one <em class="math">H_1</em> loop) but different metrics. For classification, metric information matters &mdash; it tells us <em>which</em> frequency, <em>how fast</em> the trill, <em>what size</em> the loop. The SPD features capture this metric structure; TDA does not.</li>
-</ul>
-<ul>
 <li><strong>Orientation</strong>: Persistent homology is not sensitive to orientation. A clockwise spiral and a counterclockwise spiral have the same persistence diagram. For acoustic signals, orientation in the embedding space can carry information (e.g., rising vs. falling frequency sweeps), and this information is lost in the topological summary.</li>
-</ul>
-<ul>
 <li><strong>Fine-grained distributional structure</strong>: The eight summary statistics compress the full persistence diagram into a coarse summary. The spatial arrangement of birth-death pairs &mdash; which features are born at similar scales, which die together &mdash; is lost. Persistence landscapes and persistence images preserve more of this structure, at the cost of higher dimensionality.</li>
 </ul>
 <p class="body-text">These limitations are precisely why TDA is one component of a three-geometry pipeline, not a standalone solution. The SPD features capture metric structure. The trajectory features capture directional dynamics. TDA captures topology. Together, they cover more of the geometric content of the signal than any single method.</p>

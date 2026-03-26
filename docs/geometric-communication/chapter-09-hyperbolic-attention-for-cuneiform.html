@@ -38,6 +38,13 @@
 
   <article class="book-chapter">
     <div class="chapter-container">
+      <nav class="breadcrumb" aria-label="Breadcrumb">
+        <a href="../index.html">Geometric Series</a>
+        <span class="breadcrumb-sep">›</span>
+        <a href="index.html">Geometric Communication</a>
+        <span class="breadcrumb-sep">›</span>
+        <span class="breadcrumb-current">Chapter 9: Hyperbolic Attention for Cuneiform</span>
+      </nav>
       <div class="chapter-nav-top">
         <a href="chapter-08-the-geometry-of-birdsong.html" class="nav-prev">&larr; Chapter 8: The Geometry of Birdsong</a>
         <a href="index.html" class="nav-toc">Contents</a>
@@ -95,11 +102,7 @@
 <p class="first-paragraph">Chapter 5 developed the mathematical framework for embedding hierarchies into the Poincare ball. The procedure, briefly recapitulated:</p>
 <ol>
 <li><strong>Construct the taxonomic distance matrix.</strong> For each pair of byte tokens, compute the number of levels at which their most common sign associations first diverge. Two bytes that typically encode the same sign form have distance 0. Two bytes that encode different readings of the same sign have distance 1. Two bytes that encode readings of different signs have distance 2.</li>
-</ol>
-<ol>
 <li><strong>Embed via spectral initialisation.</strong> Compute a Gaussian kernel from the distance matrix, take its top eigenvectors, and project onto the Poincare ball <em class="math">\mathbb{B}^{32}_c</em> with <em class="math">c = 1.0</em>.</li>
-</ol>
-<ol>
 <li><strong>Make the embeddings learnable.</strong> Unlike the fixed cetacean embedding of Chapter 5, the cuneiform embeddings are initialised from the taxonomy but updated by gradient descent during training. The model can refine the geometric prior as it encounters actual translation examples.</li>
 </ol>
 <p class="body-text">The result is a matrix of 384 Poincare ball embeddings (one per byte token), each a 32-dimensional vector constrained to lie inside the unit ball. The total parameter count is <em class="math">384 \times 32 + 1 = 12{,}289</em>&mdash;the embedding matrix plus a learnable scale parameter. This is 0.005% of the 250 million parameters in ByT5-base. The geometric prior is extremely lightweight.</p>
@@ -225,14 +228,8 @@ Augmented: a-na {DINGIR}UTU be-lí-ni</code></pre>
 <p class="body-text">The progression is clear:</p>
 <ol>
 <li><strong>A <em class="math">\to</em> B (adding data + augmentation)</strong>: The largest improvement. Expanding the training set from 1,561 to approximately 58,000 pairs produces substantial gains on both BLEU and chrF++. This is unsurprising: in extreme low-resource settings, more data is the single most powerful intervention.</li>
-</ol>
-<ol>
 <li><strong>A <em class="math">\to</em> C (adding geometric bias only)</strong>: A smaller but measurable improvement. The geometric bias alone&mdash;without additional data&mdash;improves the baseline, with gains concentrated on chrF++ (sub-word accuracy) as predicted. The improvement is larger on sentences containing polysemous signs or complex determinative constructions.</li>
-</ol>
-<ol>
 <li><strong>B <em class="math">\to</em> D (adding geometric bias to data + augmentation)</strong>: A further improvement beyond the already-strong Configuration B. The gains are again concentrated on chrF++, confirming that the geometric bias and the data augmentation are complementary rather than redundant.</li>
-</ol>
-<ol>
 <li><strong>The full model (D) outperforms all individual components.</strong> The geometric mean of BLEU and chrF++ is highest for Configuration D, confirming the superadditive hypothesis.</li>
 </ol>
 <p class="body-text"><em>[Figure 9.4: Ablation results. Bar chart showing the competition score (<em class="math">\sqrt{\text{BLEU} \times \text{chrF++}}</em>) for each configuration. Configuration D (full model) achieves the highest score, with the gap between B and D attributable to the geometric attention bias.]</em></p>
@@ -287,14 +284,8 @@ Augmented: a-na {DINGIR}UTU be-lí-ni</code></pre>
 <p class="first-paragraph">This chapter has presented the Deep Past project: geometric deep learning for translating 4,000-year-old Akkadian cuneiform. The key contributions are:</p>
 <ol>
 <li><strong>The hyperbolic attention bias.</strong> A Poincare ball embedding of byte-level tokens, injected as an additive bias into ByT5's encoder self-attention via forward hooks. The bias encodes the cuneiform sign hierarchy (sign form <em class="math">\to</em> reading <em class="math">\to</em> word) directly into the transformer's attention mechanism, at a cost of 12,289 additional parameters (0.005% of the base model).</li>
-</ol>
-<ol>
 <li><strong>Cuneiform-aware augmentation.</strong> Three augmentation strategies&mdash;sign dropout (simulating damaged tablets), word-order shuffle (exploiting free word order), and determinative variation (modelling scribal inconsistency)&mdash;that perturb the source text along specific axes of the communication manifold while preserving the target translation.</li>
-</ol>
-<ol>
 <li><strong>The ablation study.</strong> A four-configuration ablation isolating the contributions of supplementary data, augmentation, and geometric bias. The geometric bias provides consistent improvement, complementary to data augmentation, with gains concentrated on sentences containing rare and polysemous signs.</li>
-</ol>
-<ol>
 <li><strong>The rare-sign effect.</strong> The geometric prior helps most where data is scarcest&mdash;for rare signs, polysemous signs, and determinative constructions. This is the signature of a good inductive bias: it provides structural knowledge that compensates for data scarcity, and it is neutral where data suffices.</li>
 </ol>
 <p class="body-text">The broader message connects to the book's central claim. The cuneiform sign hierarchy is geometric structure&mdash;a tree, embedded in hyperbolic space&mdash;that scalar evaluation destroys and geometric methods recover. A BLEU score tells you how many words the model got right. The hyperbolic attention map tells you <em>why</em> it got them right: because structurally related tokens attended to each other, because the Poincare distance encoded the Assyriologist's knowledge of the sign taxonomy, because the geometry of the writing system was built into the architecture of the model.</p>

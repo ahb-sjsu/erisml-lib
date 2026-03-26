@@ -38,6 +38,13 @@
 
   <article class="book-chapter">
     <div class="chapter-container">
+      <nav class="breadcrumb" aria-label="Breadcrumb">
+        <a href="../index.html">Geometric Series</a>
+        <span class="breadcrumb-sep">›</span>
+        <a href="index.html">Geometric Communication</a>
+        <span class="breadcrumb-sep">›</span>
+        <span class="breadcrumb-current">Chapter 4: Three Geometries for Communication</span>
+      </nav>
       <div class="chapter-nav-top">
         <a href="chapter-03-the-communication-manifold.html" class="nav-prev">&larr; Chapter 3: The Communication Manifold</a>
         <a href="index.html" class="nav-toc">Contents</a>
@@ -46,7 +53,7 @@
 
       <nav class="chapter-toc">
         <h4>In this chapter</h4>
-        <ol><li><a href="#41-hyperbolic-geometry-the-poincare-ball">4.1 Hyperbolic Geometry: The Poincare Ball</a></li><li><a href="#411-why-hyperbolic">4.1.1 Why Hyperbolic?</a></li><li><a href="#412-the-poincare-ball-model">4.1.2 The Poincare Ball Model</a></li><li><a href="#413-the-four-fundamental-operations">4.1.3 The Four Fundamental Operations</a></li><li><a href="#422-the-space-spdn">4.2.2 The Space SPD(n)</a></li><li><a href="#423-the-log-euclidean-metric">4.2.3 The Log-Euclidean Metric</a></li><li><a href="#424-computing-the-covariance-matrix">4.2.4 Computing the Covariance Matrix</a></li><li><a href="#425-from-spd-matrix-to-feature-vector">4.2.5 From SPD Matrix to Feature Vector</a></li><li><a href="#426-the-spectral-trajectory">4.2.6 The Spectral Trajectory</a></li></ol>
+        <ol><li><a href="#41-hyperbolic-geometry-the-poincare-ball">4.1 Hyperbolic Geometry: The Poincare Ball</a></li><li><a href="#411-why-hyperbolic">4.1.1 Why Hyperbolic?</a></li><li><a href="#412-the-poincare-ball-model">4.1.2 The Poincare Ball Model</a></li><li><a href="#413-the-four-fundamental-operations">4.1.3 The Four Fundamental Operations</a></li><li><a href="#414-classification-via-hyperbolic-prototypes">4.1.4 Classification via Hyperbolic Prototypes</a></li><li><a href="#415-the-curvature-parameter">4.1.5 The Curvature Parameter</a></li><li><a href="#416-applications-in-communication">4.1.6 Applications in Communication</a></li><li><a href="#42-riemannian-geometry-the-spd-manifold">4.2 Riemannian Geometry: The SPD Manifold</a></li><li><a href="#421-why-covariance">4.2.1 Why Covariance?</a></li><li><a href="#422-the-space-spdn">4.2.2 The Space SPD(n)</a></li><li><a href="#423-the-log-euclidean-metric">4.2.3 The Log-Euclidean Metric</a></li><li><a href="#424-computing-the-covariance-matrix">4.2.4 Computing the Covariance Matrix</a></li><li><a href="#425-from-spd-matrix-to-feature-vector">4.2.5 From SPD Matrix to Feature Vector</a></li><li><a href="#426-the-spectral-trajectory">4.2.6 The Spectral Trajectory</a></li><li><a href="#427-the-frechet-mean-and-population-statistics">4.2.7 The Frechet Mean and Population Statistics</a></li><li><a href="#43-algebraic-topology-persistent-homology">4.3 Algebraic Topology: Persistent Homology</a></li><li><a href="#431-why-topology">4.3.1 Why Topology?</a></li><li><a href="#432-takens-time-delay-embedding">4.3.2 Takens&#x27; Time-Delay Embedding</a></li><li><a href="#433-the-rips-complex-and-persistent-homology">4.3.3 The Rips Complex and Persistent Homology</a></li><li><a href="#434-the-feature-extraction-pipeline">4.3.4 The Feature Extraction Pipeline</a></li><li><a href="#435-topological-invariance">4.3.5 Topological Invariance</a></li><li><a href="#436-interpreting-topological-features">4.3.6 Interpreting Topological Features</a></li><li><a href="#44-the-combined-feature-vector">4.4 The Combined Feature Vector</a></li><li><a href="#441-orthogonality-of-structure">4.4.1 Orthogonality of Structure</a></li><li><a href="#442-the-156-dimensional-vector">4.4.2 The 156-Dimensional Vector</a></li><li><a href="#443-why-156-dimensions">4.4.3 Why 156 Dimensions?</a></li><li><a href="#444-the-complementarity-argument">4.4.4 The Complementarity Argument</a></li><li><a href="#45-connections-and-preview">4.5 Connections and Preview</a></li><li><a href="#451-the-three-geometries-on-the-communication-manifold">4.5.1 The Three Geometries on the Communication Manifold</a></li><li><a href="#452-from-toolkit-to-application">4.5.2 From Toolkit to Application</a></li><li><a href="#453-the-deeper-pattern">4.5.3 The Deeper Pattern</a></li><li><a href="#chapter-summary">Chapter Summary</a></li><li><a href="#definitions-and-propositions-index">Definitions and Propositions Index</a></li></ol>
       </nav>
       <div class="chapter-content">
 <h1 id="chapter-4-three-geometries-for-communication" class="chapter-title">Chapter 4: Three Geometries for Communication</h1>
@@ -125,8 +132,59 @@
     add_result = self.mobius_add(neg_x, y)
     norm = add_result.norm(dim=-1).clamp(max=(1 / self.sqrt_c) - 1e-5)
     return (2.0 / self.sqrt_c) * torch.arctanh(self.sqrt_c * norm)</code></pre>
-<p class="body-text"><em>[Figure 4.1] <em>The Poincare disk (2D ball with <em class="math">c = 1</em>). Left: a binary tree of depth 5 embedded in the disk, with the root at the center and leaves near the boundary. Geodesics (shortest paths) are arcs of circles perpendicular to the boundary. Right: concentric geodesic circles at equal distance increments from the origin. The circles bunch together in Euclidean coordinates near the boundary but are equally spaced in hyperbolic distance, illustrating the exponential volume growth.</em>  ### 4.1.4 Classification via Hyperbolic Prototypes  The fundamental operations above provide the vocabulary for hyperbolic computation. To use them for classification &mdash; assigning a whale coda to a type, a birdsong to a species, a cuneiform sign to a reading &mdash; we need a classification head that respects the hyperbolic geometry.  The standard approach is <strong>Hyperbolic Multinomial Logistic Regression</strong> (HypMLR): place a learned prototype <em class="math">\mathbf{p}_k</em> on the ball for each class <em class="math">k</em>, and classify a point <em class="math">\mathbf{x}</em> by its distances to the prototypes:  $$\text{logit}_k(\mathbf{x}) = -\alpha_k \cdot d_c(\mathbf{x}, \mathbf{p}_k)$$  where <em class="math">\alpha_k = e^{s_k}</em> is a per-class learnable temperature and <em class="math">s_k</em> is the log-scale parameter. The negative sign converts distance to similarity: closer to a prototype means higher logit.  The prototypes are parameterized in tangent space at the origin and mapped to the ball via the exponential map, which ensures they remain inside the ball throughout training:  ``<code>python class HyperbolicMLR(nn.Module):     def __init__(self, embed_dim: int, num_classes: int, c: float = 1.0):         super().__init__()         self.ball = PoincareBall(c)         self.proto_tangent = nn.Parameter(             torch.randn(num_classes, embed_dim) * 0.01         )         self.log_scale = nn.Parameter(torch.zeros(num_classes))      @property     def prototypes(self) -&gt; torch.Tensor:         return self.ball.expmap0(self.proto_tangent)      def forward(self, x: torch.Tensor) -&gt; torch.Tensor:         protos = self.prototypes         dists = self.ball.dist(x.unsqueeze(1), protos.unsqueeze(0))         return -dists * self.log_scale.exp() </code>``  The prototypes can be initialized from a taxonomic tree. Given a distance matrix encoding the hierarchical relationships between classes (e.g., same family = distance 1, same order = distance 2, different order = distance 3), spectral decomposition of a Gaussian kernel over the matrix produces an initial embedding where taxonomically close classes start near each other on the ball:  $$K_{ij} = \exp\!\left(-\frac{d_{\text{tax}}(i,j)^2}{2}\right)$$  $$\mathbf{p}_i^{(0)} = \sum_{k=1}^{d} \sqrt{|\lambda_k|}\, v_{ik}$$  where <em class="math">\lambda_k</em> and <em class="math">v_k</em> are the top-<em class="math">d</em> eigenvalues and eigenvectors of <em class="math">K</em>. This initialization means the classifier does not need to "discover" the hierarchy from scratch &mdash; it begins with a geometrically faithful representation and refines it during training.  ### 4.1.5 The Curvature Parameter  The curvature parameter <em class="math">c</em> is the single most important hyperparameter of hyperbolic embeddings, and it deserves explicit discussion.  Setting <em class="math">c</em> too low makes the ball nearly Euclidean near the origin and wastes the hyperbolic advantage. Setting <em class="math">c</em> too high concentrates all points near the boundary, where numerical precision suffers and gradient signals are weak (because the conformal factor amplifies small perturbations into large distance changes).  The optimal <em class="math">c</em> depends on the branching factor and depth of the hierarchy. For a tree with branching factor <em class="math">b</em> and depth <em class="math">k</em>, a heuristic that has proven reliable in practice is:  $$c \approx \frac{(\log b)^2}{4k^2}$$  This ensures that the first level of the hierarchy (direct children of the root) occupies the middle band of the ball (neither too close to the origin nor too close to the boundary), leaving room for deeper levels without requiring extreme precision.  For the empirical systems in this book:  - <strong>Whale codas</strong> (<em class="math">b \approx 5</em>, <em class="math">k = 3</em>): <em class="math">c \approx 0.07</em>, though the implementations use <em class="math">c = 1.0</em> for simplicity and compensate by scaling the initial tangent vectors. - <strong>Cuneiform signs</strong> (<em class="math">b \approx 10</em>, <em class="math">k = 3</em>): <em class="math">c \approx 0.15</em>. - <strong>WordNet nouns</strong> (<em class="math">b \approx 400</em>, <em class="math">k = 8</em>): <em class="math">c \approx 0.14</em>, which is close to the <em class="math">c = 0.1</em> used in the original Nickel and Kiela (2017) Poincare embedding paper.  [Figure 4.2] <em>Effect of curvature parameter <em class="math">c</em> on the same tree embedding. Left: <em class="math">c = 0.1</em> (mildly hyperbolic) &mdash; the tree is compact, with leaves well inside the ball. Center: <em class="math">c = 1.0</em> (moderately hyperbolic) &mdash; the tree fills the ball, with leaves near but not at the boundary. Right: <em class="math">c = 10.0</em> (strongly hyperbolic) &mdash; leaves are compressed against the boundary, with poor numerical resolution. The optimal <em class="math">c</em> places the deepest leaves in the outer half of the ball without exceeding <em class="math">\|\mathbf{x}\| &gt; 0.95/\sqrt{c}</em>.</em>  ### 4.1.6 Applications in Communication  Hyperbolic geometry applies wherever communication exhibits hierarchical organization. In this book, it appears in three principal roles:  1. <strong>Coda taxonomy</strong> (Chapter 5). The 21 sperm whale coda types embed in a 32-dimensional Poincare ball with prototypes initialized from the combinatorial hierarchy (click count <em class="math">\times</em> rhythm class <em class="math">\times</em> ornamentation). Hyperbolic classification achieves 74.3% accuracy versus 72.8% Euclidean &mdash; a modest improvement in accuracy, but a substantial improvement in interpretability, because the embedding directly reflects the biological taxonomy.  2. <strong>Cuneiform sign hierarchy</strong> (Chapter 9). The three-level structure of Akkadian writing (sign <em class="math">\to</em> reading <em class="math">\to</em> word) is encoded as an additive attention bias in a transformer: tokens whose signs are hierarchically close attend to each other more strongly, with the bias computed as the hyperbolic distance between sign embeddings on the Poincare ball. This is a fixed geometric prior, not a learned embedding &mdash; it injects Assyriological knowledge directly into the model architecture.  3. <strong>Semantic taxonomies</strong> (Chapter 11). The Hohfeldian relations (Right, Duty, Liberty, No-Right) form a shallow hierarchy that embeds trivially in hyperbolic space. The deeper insight is that the <em>connections</em> between normative positions &mdash; the D4 symmetry group explored in Chapter 13 &mdash; are naturally represented as isometries of the ball.  &mdash;  ## 4.2 Riemannian Geometry: The SPD Manifold  ### 4.2.1 Why Covariance?  A spectrogram is a matrix. Each column is a snapshot of the frequency content at a single moment in time; each row is the evolution of a single frequency band across the duration of the signal. Standard machine learning treats the spectrogram as a flat image &mdash; a grid of pixels to be fed to a convolutional neural network. This works well enough for classification, but it discards a specific and important kind of structure: the <em>correlations between frequency bands</em>.  Consider a bird that produces a whistle with a strong fundamental frequency at 3 kHz and a harmonic at 6 kHz. These two frequency bands are not independent: when the fundamental rises, the harmonic rises in lockstep. This correlation is invisible in the spectrogram's pixel values (which record only the energy at each time-frequency point) but is captured by the <strong>covariance matrix</strong> of the frequency bands. The covariance matrix records how each pair of bands co-varies across time, encoding the harmonic structure &mdash; the "vowel space" &mdash; of the vocalization.[^3]</em></p>
-<p class="first-paragraph">The covariance matrix of <em class="math">n</em> frequency bands is an <em class="math">n \times n</em> symmetric positive-definite (SPD) matrix. The space of all such matrices is not a vector space &mdash; it is a <strong>Riemannian manifold</strong> with rich geometric structure. Using Euclidean distance on SPD matrices (the Frobenius norm of their difference) violates the manifold geometry: it can produce "distances" that fail to respect the positive-definite constraint, and it treats the space as flat when it is intrinsically curved. The correct distance requires a Riemannian metric that respects the manifold's curvature.</p>
+<p class="body-text"><em>[Figure 4.1] <em>The Poincare disk (2D ball with <em class="math">c = 1</em>). Left: a binary tree of depth 5 embedded in the disk, with the root at the center and leaves near the boundary. Geodesics (shortest paths) are arcs of circles perpendicular to the boundary. Right: concentric geodesic circles at equal distance increments from the origin. The circles bunch together in Euclidean coordinates near the boundary but are equally spaced in hyperbolic distance, illustrating the exponential volume growth.</em>]</em></p>
+<h3 id="414-classification-via-hyperbolic-prototypes" class="subsection-heading">4.1.4 Classification via Hyperbolic Prototypes</h3>
+<p class="first-paragraph">The fundamental operations above provide the vocabulary for hyperbolic computation. To use them for classification &mdash; assigning a whale coda to a type, a birdsong to a species, a cuneiform sign to a reading &mdash; we need a classification head that respects the hyperbolic geometry.</p>
+<p class="body-text">The standard approach is <strong>Hyperbolic Multinomial Logistic Regression</strong> (HypMLR): place a learned prototype <em class="math">\mathbf{p}_k</em> on the ball for each class <em class="math">k</em>, and classify a point <em class="math">\mathbf{x}</em> by its distances to the prototypes:</p>
+<p class="display-math"><em class="math">\text{logit}_k(\mathbf{x}) = -\alpha_k \cdot d_c(\mathbf{x}, \mathbf{p}_k)</em></p>
+<p class="first-paragraph">where <em class="math">\alpha_k = e^{s_k}</em> is a per-class learnable temperature and <em class="math">s_k</em> is the log-scale parameter. The negative sign converts distance to similarity: closer to a prototype means higher logit.</p>
+<p class="body-text">The prototypes are parameterized in tangent space at the origin and mapped to the ball via the exponential map, which ensures they remain inside the ball throughout training:</p>
+<pre><code class="language-python">class HyperbolicMLR(nn.Module):
+    def __init__(self, embed_dim: int, num_classes: int, c: float = 1.0):
+        super().__init__()
+        self.ball = PoincareBall(c)
+        self.proto_tangent = nn.Parameter(
+            torch.randn(num_classes, embed_dim) * 0.01
+        )
+        self.log_scale = nn.Parameter(torch.zeros(num_classes))
+
+    @property
+    def prototypes(self) -&gt; torch.Tensor:
+        return self.ball.expmap0(self.proto_tangent)
+
+    def forward(self, x: torch.Tensor) -&gt; torch.Tensor:
+        protos = self.prototypes
+        dists = self.ball.dist(x.unsqueeze(1), protos.unsqueeze(0))
+        return -dists * self.log_scale.exp()</code></pre>
+<p class="first-paragraph">The prototypes can be initialized from a taxonomic tree. Given a distance matrix encoding the hierarchical relationships between classes (e.g., same family = distance 1, same order = distance 2, different order = distance 3), spectral decomposition of a Gaussian kernel over the matrix produces an initial embedding where taxonomically close classes start near each other on the ball:</p>
+<p class="display-math"><em class="math">K_{ij} = \exp\!\left(-\frac{d_{\text{tax}}(i,j)^2}{2}\right)</em></p>
+<p class="display-math"><em class="math">\mathbf{p}_i^{(0)} = \sum_{k=1}^{d} \sqrt{|\lambda_k|}\, v_{ik}</em></p>
+<p class="first-paragraph">where <em class="math">\lambda_k</em> and <em class="math">v_k</em> are the top-<em class="math">d</em> eigenvalues and eigenvectors of <em class="math">K</em>. This initialization means the classifier does not need to "discover" the hierarchy from scratch &mdash; it begins with a geometrically faithful representation and refines it during training.</p>
+<h3 id="415-the-curvature-parameter" class="subsection-heading">4.1.5 The Curvature Parameter</h3>
+<p class="first-paragraph">The curvature parameter <em class="math">c</em> is the single most important hyperparameter of hyperbolic embeddings, and it deserves explicit discussion.</p>
+<p class="body-text">Setting <em class="math">c</em> too low makes the ball nearly Euclidean near the origin and wastes the hyperbolic advantage. Setting <em class="math">c</em> too high concentrates all points near the boundary, where numerical precision suffers and gradient signals are weak (because the conformal factor amplifies small perturbations into large distance changes).</p>
+<p class="body-text">The optimal <em class="math">c</em> depends on the branching factor and depth of the hierarchy. For a tree with branching factor <em class="math">b</em> and depth <em class="math">k</em>, a heuristic that has proven reliable in practice is:</p>
+<p class="display-math"><em class="math">c \approx \frac{(\log b)^2}{4k^2}</em></p>
+<p class="first-paragraph">This ensures that the first level of the hierarchy (direct children of the root) occupies the middle band of the ball (neither too close to the origin nor too close to the boundary), leaving room for deeper levels without requiring extreme precision.</p>
+<p class="body-text">For the empirical systems in this book:</p>
+<ul>
+<li><strong>Whale codas</strong> (<em class="math">b \approx 5</em>, <em class="math">k = 3</em>): <em class="math">c \approx 0.07</em>, though the implementations use <em class="math">c = 1.0</em> for simplicity and compensate by scaling the initial tangent vectors.</li>
+<li><strong>Cuneiform signs</strong> (<em class="math">b \approx 10</em>, <em class="math">k = 3</em>): <em class="math">c \approx 0.15</em>.</li>
+<li><strong>WordNet nouns</strong> (<em class="math">b \approx 400</em>, <em class="math">k = 8</em>): <em class="math">c \approx 0.14</em>, which is close to the <em class="math">c = 0.1</em> used in the original Nickel and Kiela (2017) Poincare embedding paper.</li>
+</ul>
+<p class="body-text"><em>[Figure 4.2] <em>Effect of curvature parameter <em class="math">c</em> on the same tree embedding. Left: <em class="math">c = 0.1</em> (mildly hyperbolic) &mdash; the tree is compact, with leaves well inside the ball. Center: <em class="math">c = 1.0</em> (moderately hyperbolic) &mdash; the tree fills the ball, with leaves near but not at the boundary. Right: <em class="math">c = 10.0</em> (strongly hyperbolic) &mdash; leaves are compressed against the boundary, with poor numerical resolution. The optimal <em class="math">c</em> places the deepest leaves in the outer half of the ball without exceeding <em class="math">\|\mathbf{x}\| &gt; 0.95/\sqrt{c}</em>.</em>]</em></p>
+<h3 id="416-applications-in-communication" class="subsection-heading">4.1.6 Applications in Communication</h3>
+<p class="first-paragraph">Hyperbolic geometry applies wherever communication exhibits hierarchical organization. In this book, it appears in three principal roles:</p>
+<ol>
+<li><strong>Coda taxonomy</strong> (Chapter 5). The 21 sperm whale coda types embed in a 32-dimensional Poincare ball with prototypes initialized from the combinatorial hierarchy (click count <em class="math">\times</em> rhythm class <em class="math">\times</em> ornamentation). Hyperbolic classification achieves 74.3% accuracy versus 72.8% Euclidean &mdash; a modest improvement in accuracy, but a substantial improvement in interpretability, because the embedding directly reflects the biological taxonomy.</li>
+<li><strong>Cuneiform sign hierarchy</strong> (Chapter 9). The three-level structure of Akkadian writing (sign <em class="math">\to</em> reading <em class="math">\to</em> word) is encoded as an additive attention bias in a transformer: tokens whose signs are hierarchically close attend to each other more strongly, with the bias computed as the hyperbolic distance between sign embeddings on the Poincare ball. This is a fixed geometric prior, not a learned embedding &mdash; it injects Assyriological knowledge directly into the model architecture.</li>
+<li><strong>Semantic taxonomies</strong> (Chapter 11). The Hohfeldian relations (Right, Duty, Liberty, No-Right) form a shallow hierarchy that embeds trivially in hyperbolic space. The deeper insight is that the <em>connections</em> between normative positions &mdash; the D4 symmetry group explored in Chapter 13 &mdash; are naturally represented as isometries of the ball.</li>
+</ol>
+<h2 id="42-riemannian-geometry-the-spd-manifold" class="section-heading">4.2 Riemannian Geometry: The SPD Manifold</h2>
+<h3 id="421-why-covariance" class="subsection-heading">4.2.1 Why Covariance?</h3>
+<p class="first-paragraph">A spectrogram is a matrix. Each column is a snapshot of the frequency content at a single moment in time; each row is the evolution of a single frequency band across the duration of the signal. Standard machine learning treats the spectrogram as a flat image &mdash; a grid of pixels to be fed to a convolutional neural network. This works well enough for classification, but it discards a specific and important kind of structure: the <em>correlations between frequency bands</em>.</p>
+<p class="body-text">Consider a bird that produces a whistle with a strong fundamental frequency at 3 kHz and a harmonic at 6 kHz. These two frequency bands are not independent: when the fundamental rises, the harmonic rises in lockstep. This correlation is invisible in the spectrogram's pixel values (which record only the energy at each time-frequency point) but is captured by the <strong>covariance matrix</strong> of the frequency bands. The covariance matrix records how each pair of bands co-varies across time, encoding the harmonic structure &mdash; the "vowel space" &mdash; of the vocalization.<sup>[3]</sup></p>
+<p class="body-text">The covariance matrix of <em class="math">n</em> frequency bands is an <em class="math">n \times n</em> symmetric positive-definite (SPD) matrix. The space of all such matrices is not a vector space &mdash; it is a <strong>Riemannian manifold</strong> with rich geometric structure. Using Euclidean distance on SPD matrices (the Frobenius norm of their difference) violates the manifold geometry: it can produce "distances" that fail to respect the positive-definite constraint, and it treats the space as flat when it is intrinsically curved. The correct distance requires a Riemannian metric that respects the manifold's curvature.</p>
 <h3 id="422-the-space-spdn" class="subsection-heading">4.2.2 The Space SPD(n)</h3>
 <p class="first-paragraph"><strong>Definition 4.6</strong> (SPD Manifold). <em>The manifold of <em class="math">n \times n</em> symmetric positive-definite matrices is</em></p>
 <p class="display-math"><em class="math">\operatorname{SPD}(n) = \left\{ S \in \mathbb{R}^{n \times n} : S = S^\top,\, S \succ 0 \right\}</em></p>
@@ -214,136 +272,261 @@ def log_map(S: torch.Tensor) -&gt; torch.Tensor:
         &quot;n_steps&quot;: len(covs),
     }</code></pre>
 <p class="first-paragraph">These four values &mdash; path length, geodesic distance, deviation, and number of trajectory steps &mdash; form the trajectory component of the combined feature vector.</p>
-<p class="body-text"><em>[Figure 4.3] <em>Spectral trajectories on <em class="math">\operatorname{SPD}(2)</em> (schematic, projected to 2D for visualization). Left: a trill &mdash; the trajectory oscillates between two covariance states, producing high path length and low geodesic distance. Center: a descending whistle &mdash; the trajectory traces a nearly straight path, with path length close to geodesic distance. Right: a complex song &mdash; the trajectory wanders through covariance space, visiting multiple distinct states. The geodesic deviation <em class="math">\delta</em> distinguishes all three.</em>  ### 4.2.7 The Frechet Mean and Population Statistics  When comparing populations &mdash; all songs of one species versus all songs of another &mdash; we need a notion of the "average" covariance matrix. The Euclidean mean of SPD matrices is not necessarily SPD (the eigenvalues of the average can be smaller than the minimum eigenvalue of any individual matrix). The correct notion is the <strong>Frechet mean</strong>: the matrix that minimizes the sum of squared Riemannian distances to all matrices in the population.  <strong>Definition 4.11</strong> (Frechet Mean on SPD(n)). <em>Given SPD matrices <em class="math">S_1, \ldots, S_m \in \operatorname{SPD}(n)</em>, the Frechet mean is</em>  $$\bar{S} = \operatorname{arg\,min}_{S \in \operatorname{SPD}(n)} \sum_{i=1}^{m} d_{LE}(S, S_i)^2$$  <em>In the log-Euclidean metric, this has the closed-form solution <em class="math">\bar{S} = \exp\!\left(\frac{1}{m}\sum_{i=1}^{m} \log(S_i)\right)</em>.</em>  The closed-form solution is a major advantage of the log-Euclidean metric over the affine-invariant metric (where the Frechet mean must be computed iteratively). In the <code>eris-ketos</code> implementation:  ``<code>python @staticmethod def frechet_mean(matrices: torch.Tensor,                  weights: torch.Tensor | None = None) -&gt; torch.Tensor:     logs = SPDManifold.log_map(matrices)     if weights is not None:         w = weights / weights.sum()         mean_log = (logs * w.view(-1, 1, 1)).sum(dim=0)     else:         mean_log = logs.mean(dim=0)     return SPDManifold.exp_map(mean_log) </code>`<code>  The Frechet mean of a species&#x27; covariance matrices is the &quot;average spectral fingerprint&quot; of that species --- the prototypical cross-frequency correlation pattern, computed in a geometrically principled way. The distance from an individual song&#x27;s covariance to the Frechet mean of its species measures how &quot;typical&quot; that song is. The distance between two species&#x27; Frechet means measures how spectrally different the species are. These distances are proper metrics on $\operatorname{SPD}(n)$, respecting the manifold geometry that Euclidean averaging would violate.  ---  ## 4.3 Algebraic Topology: Persistent Homology  ### 4.3.1 Why Topology?  Hyperbolic geometry captures hierarchy. SPD geometry captures covariance. But there is a third kind of structure that neither addresses: **shape**.  Consider a bird that produces a periodic trill --- a rapid alternation between two frequency values. The time series of the dominant frequency looks like a sine wave. Now consider a bird that produces a single descending whistle. The time series looks like a monotone decreasing function. Both signals can be characterized by their spectral covariance (the trill has strong inter-band correlation due to the alternation; the whistle has a different correlation pattern). But the fundamental *topological* difference --- the trill has a periodic structure (a loop in phase space) while the whistle does not --- requires a different mathematical tool.  That tool is **persistent homology**, a method from algebraic topology that extracts topological invariants from point cloud data. The key property of topological invariants is that they are robust to continuous deformations: stretching, bending, and compressing a shape does not change its topology. A circle can be deformed into an ellipse without changing its homology (both have one connected component and one loop). This robustness is exactly what we need for field recordings, where amplitude variation, background noise, and recording distance continuously deform the signal without (typically) changing its underlying structure.  ### 4.3.2 Takens&#x27; Time-Delay Embedding  The starting point of the TDA pipeline is a 1D time series: an audio waveform, a sequence of inter-click intervals, or an energy contour extracted from a spectrogram. The problem is that topology is a property of *spaces*, not of sequences. We need to convert the 1D time series into a point cloud in some ambient space where topological methods can be applied.  The solution is Takens&#x27; time-delay embedding, one of the most remarkable results in dynamical systems theory.  **Theorem 4.1** (Takens, 1981). *Let $f: \mathcal{M} \to \mathbb{R}$ be a smooth observation function on a compact manifold $\mathcal{M}$ of dimension $m$, and let $\phi_t: \mathcal{M} \to \mathcal{M}$ be a smooth flow. For generic $f$ and delay $\tau &gt; 0$, the delay-coordinate map $\Phi: \mathcal{M} \to \mathbb{R}^{2m+1}$ defined by*  $$\Phi(\mathbf{x}) = \left(f(\mathbf{x}),\, f(\phi_\tau(\mathbf{x})),\, f(\phi_{2\tau}(\mathbf{x})),\, \ldots,\, f(\phi_{2m\tau}(\mathbf{x}))\right)$$  *is an embedding --- a homeomorphism onto its image. In particular, $\Phi(\mathcal{M})$ is topologically equivalent to $\mathcal{M}$: the topology of the attractor is recovered from the time series of a single observable.*  The practical consequence of Takens&#x27; theorem is that we can reconstruct the topology of the system that produced a signal by looking at the signal alone. We do not need to observe the full state of the whale&#x27;s vocal apparatus, or the bird&#x27;s syrinx, or the scribe&#x27;s hand. A single 1D recording suffices, provided the embedding dimension is large enough and the delay is chosen generically.  **Definition 4.12** (Time-Delay Embedding). *Given a discrete time series $x(1), x(2), \ldots, x(N)$, a delay $\tau \in \mathbb{Z}_{&gt;0}$, and an embedding dimension $d \in \mathbb{Z}_{&gt;0}$, the time-delay embedding is the set of vectors*  $$\mathbf{v}(t) = \left(x(t),\, x(t + \tau),\, x(t + 2\tau),\, \ldots,\, x(t + (d-1)\tau)\right) \in \mathbb{R}^d$$  *for $t = 1, 2, \ldots, N - (d-1)\tau$. The collection $\{\mathbf{v}(t)\}$ is a point cloud in $\mathbb{R}^d$.*  In the implementations (both </code>eris-ketos<code> and the BirdCLEF pipeline), the embedding uses default parameters $\tau = 10$ and $d = 3$:  </code>``python def time_delay_embedding(signal: np.ndarray, delay: int = 10,                           dim: int = 3) -> np.ndarray:     n = len(signal) - (dim - 1) <em> delay     if n <= 0:         return np.zeros((1, dim))     embedded = np.empty((n, dim))     for d in range(dim):         embedded[:, d] = signal[d </em> delay: d * delay + n]</em></p>
-<p class="first-paragraph">    return embedded</p>
-<pre><code>
-The choice $d = 3$ is conservative: by Takens&#x27; theorem, $d = 3$ suffices to embed attractors of dimension up to $m = 1$ (since $2m + 1 = 3$). For more complex attractors, a higher dimension may be needed. In practice, $d = 3$ captures the periodic and quasi-periodic structures that dominate acoustic signals, and increasing $d$ adds features that are largely redundant.
+<p class="body-text"><em>[Figure 4.3] <em>Spectral trajectories on <em class="math">\operatorname{SPD}(2)</em> (schematic, projected to 2D for visualization). Left: a trill &mdash; the trajectory oscillates between two covariance states, producing high path length and low geodesic distance. Center: a descending whistle &mdash; the trajectory traces a nearly straight path, with path length close to geodesic distance. Right: a complex song &mdash; the trajectory wanders through covariance space, visiting multiple distinct states. The geodesic deviation <em class="math">\delta</em> distinguishes all three.</em>]</em></p>
+<h3 id="427-the-frechet-mean-and-population-statistics" class="subsection-heading">4.2.7 The Frechet Mean and Population Statistics</h3>
+<p class="first-paragraph">When comparing populations &mdash; all songs of one species versus all songs of another &mdash; we need a notion of the "average" covariance matrix. The Euclidean mean of SPD matrices is not necessarily SPD (the eigenvalues of the average can be smaller than the minimum eigenvalue of any individual matrix). The correct notion is the <strong>Frechet mean</strong>: the matrix that minimizes the sum of squared Riemannian distances to all matrices in the population.</p>
+<p class="body-text"><strong>Definition 4.11</strong> (Frechet Mean on SPD(n)). <em>Given SPD matrices <em class="math">S_1, \ldots, S_m \in \operatorname{SPD}(n)</em>, the Frechet mean is</em></p>
+<p class="display-math"><em class="math">\bar{S} = \operatorname{arg\,min}_{S \in \operatorname{SPD}(n)} \sum_{i=1}^{m} d_{LE}(S, S_i)^2</em></p>
+<p class="first-paragraph"><em>In the log-Euclidean metric, this has the closed-form solution <em class="math">\bar{S} = \exp\!\left(\frac{1}{m}\sum_{i=1}^{m} \log(S_i)\right)</em>.</em></p>
+<p class="body-text">The closed-form solution is a major advantage of the log-Euclidean metric over the affine-invariant metric (where the Frechet mean must be computed iteratively). In the <code>eris-ketos</code> implementation:</p>
+<pre><code class="language-python">@staticmethod
+def frechet_mean(matrices: torch.Tensor,
+                 weights: torch.Tensor | None = None) -&gt; torch.Tensor:
+    logs = SPDManifold.log_map(matrices)
+    if weights is not None:
+        w = weights / weights.sum()
+        mean_log = (logs * w.view(-1, 1, 1)).sum(dim=0)
+    else:
+        mean_log = logs.mean(dim=0)
+    return SPDManifold.exp_map(mean_log)</code></pre>
+<p class="first-paragraph">The Frechet mean of a species' covariance matrices is the "average spectral fingerprint" of that species &mdash; the prototypical cross-frequency correlation pattern, computed in a geometrically principled way. The distance from an individual song's covariance to the Frechet mean of its species measures how "typical" that song is. The distance between two species' Frechet means measures how spectrally different the species are. These distances are proper metrics on <em class="math">\operatorname{SPD}(n)</em>, respecting the manifold geometry that Euclidean averaging would violate.</p>
+<h2 id="43-algebraic-topology-persistent-homology" class="section-heading">4.3 Algebraic Topology: Persistent Homology</h2>
+<h3 id="431-why-topology" class="subsection-heading">4.3.1 Why Topology?</h3>
+<p class="first-paragraph">Hyperbolic geometry captures hierarchy. SPD geometry captures covariance. But there is a third kind of structure that neither addresses: <strong>shape</strong>.</p>
+<p class="body-text">Consider a bird that produces a periodic trill &mdash; a rapid alternation between two frequency values. The time series of the dominant frequency looks like a sine wave. Now consider a bird that produces a single descending whistle. The time series looks like a monotone decreasing function. Both signals can be characterized by their spectral covariance (the trill has strong inter-band correlation due to the alternation; the whistle has a different correlation pattern). But the fundamental <em>topological</em> difference &mdash; the trill has a periodic structure (a loop in phase space) while the whistle does not &mdash; requires a different mathematical tool.</p>
+<p class="body-text">That tool is <strong>persistent homology</strong>, a method from algebraic topology that extracts topological invariants from point cloud data. The key property of topological invariants is that they are robust to continuous deformations: stretching, bending, and compressing a shape does not change its topology. A circle can be deformed into an ellipse without changing its homology (both have one connected component and one loop). This robustness is exactly what we need for field recordings, where amplitude variation, background noise, and recording distance continuously deform the signal without (typically) changing its underlying structure.</p>
+<h3 id="432-takens-time-delay-embedding" class="subsection-heading">4.3.2 Takens' Time-Delay Embedding</h3>
+<p class="first-paragraph">The starting point of the TDA pipeline is a 1D time series: an audio waveform, a sequence of inter-click intervals, or an energy contour extracted from a spectrogram. The problem is that topology is a property of <em>spaces</em>, not of sequences. We need to convert the 1D time series into a point cloud in some ambient space where topological methods can be applied.</p>
+<p class="body-text">The solution is Takens' time-delay embedding, one of the most remarkable results in dynamical systems theory.</p>
+<p class="body-text"><strong>Theorem 4.1</strong> (Takens, 1981). <em>Let <em class="math">f: \mathcal{M} \to \mathbb{R}</em> be a smooth observation function on a compact manifold <em class="math">\mathcal{M}</em> of dimension <em class="math">m</em>, and let <em class="math">\phi_t: \mathcal{M} \to \mathcal{M}</em> be a smooth flow. For generic <em class="math">f</em> and delay <em class="math">\tau &gt; 0</em>, the delay-coordinate map <em class="math">\Phi: \mathcal{M} \to \mathbb{R}^{2m+1}</em> defined by</em></p>
+<p class="display-math"><em class="math">\Phi(\mathbf{x}) = \left(f(\mathbf{x}),\, f(\phi_\tau(\mathbf{x})),\, f(\phi_{2\tau}(\mathbf{x})),\, \ldots,\, f(\phi_{2m\tau}(\mathbf{x}))\right)</em></p>
+<p class="first-paragraph"><em>is an embedding &mdash; a homeomorphism onto its image. In particular, <em class="math">\Phi(\mathcal{M})</em> is topologically equivalent to <em class="math">\mathcal{M}</em>: the topology of the attractor is recovered from the time series of a single observable.</em></p>
+<p class="body-text">The practical consequence of Takens' theorem is that we can reconstruct the topology of the system that produced a signal by looking at the signal alone. We do not need to observe the full state of the whale's vocal apparatus, or the bird's syrinx, or the scribe's hand. A single 1D recording suffices, provided the embedding dimension is large enough and the delay is chosen generically.</p>
+<p class="body-text"><strong>Definition 4.12</strong> (Time-Delay Embedding). <em>Given a discrete time series <em class="math">x(1), x(2), \ldots, x(N)</em>, a delay <em class="math">\tau \in \mathbb{Z}_{&gt;0}</em>, and an embedding dimension <em class="math">d \in \mathbb{Z}_{&gt;0}</em>, the time-delay embedding is the set of vectors</em></p>
+<p class="display-math"><em class="math">\mathbf{v}(t) = \left(x(t),\, x(t + \tau),\, x(t + 2\tau),\, \ldots,\, x(t + (d-1)\tau)\right) \in \mathbb{R}^d</em></p>
+<p class="first-paragraph"><em>for <em class="math">t = 1, 2, \ldots, N - (d-1)\tau</em>. The collection <em class="math">\{\mathbf{v}(t)\}</em> is a point cloud in <em class="math">\mathbb{R}^d</em>.</em></p>
+<p class="body-text">In the implementations (both <code>eris-ketos</code> and the BirdCLEF pipeline), the embedding uses default parameters <em class="math">\tau = 10</em> and <em class="math">d = 3</em>:</p>
+<pre><code class="language-python">def time_delay_embedding(signal: np.ndarray, delay: int = 10,
+                          dim: int = 3) -&gt; np.ndarray:
+    n = len(signal) - (dim - 1) * delay
+    if n &lt;= 0:
+        return np.zeros((1, dim))
+    embedded = np.empty((n, dim))
+    for d in range(dim):
+        embedded[:, d] = signal[d * delay: d * delay + n]
+    return embedded</code></pre>
+<p class="first-paragraph">The choice <em class="math">d = 3</em> is conservative: by Takens' theorem, <em class="math">d = 3</em> suffices to embed attractors of dimension up to <em class="math">m = 1</em> (since <em class="math">2m + 1 = 3</em>). For more complex attractors, a higher dimension may be needed. In practice, <em class="math">d = 3</em> captures the periodic and quasi-periodic structures that dominate acoustic signals, and increasing <em class="math">d</em> adds features that are largely redundant.</p>
+<p class="body-text">The delay <em class="math">\tau = 10</em> corresponds to approximately 0.3 milliseconds at 32 kHz sample rate, or about 6 milliseconds at 1.6 kHz (the effective sample rate after subsampling a mel-spectrogram energy contour). The choice of <em class="math">\tau</em> affects the resolution: too small, and consecutive points in the embedding are nearly identical (the point cloud collapses onto the diagonal); too large, and the temporal structure is lost (the points appear random). A common heuristic is to set <em class="math">\tau</em> to the first zero-crossing of the autocorrelation function, which decorrelates consecutive coordinates in the embedding.</p>
+<p class="body-text"><em>[Figure 4.4] <em>Takens' time-delay embedding. Left: a sinusoidal signal <em class="math">x(t) = \sin(2\pi t / T)</em> and its 3D embedding <em class="math">\mathbf{v}(t) = (x(t), x(t+\tau), x(t+2\tau))</em> &mdash; the point cloud traces an ellipse in <em class="math">\mathbb{R}^3</em>, whose single loop corresponds to the periodic structure. Center: an exponentially decaying signal <em class="math">x(t) = e^{-\alpha t}</em> &mdash; the point cloud traces a monotone curve with no loops. Right: a signal with two incommensurate frequencies <em class="math">x(t) = \sin(2\pi t / T_1) + \sin(2\pi t / T_2)</em> &mdash; the point cloud traces a torus-like structure with two independent loops.</em>]</em></p>
+<h3 id="433-the-rips-complex-and-persistent-homology" class="subsection-heading">4.3.3 The Rips Complex and Persistent Homology</h3>
+<p class="first-paragraph">Given a point cloud <em class="math">\mathcal{P} = \{\mathbf{v}_1, \ldots, \mathbf{v}_N\} \subset \mathbb{R}^d</em>, we need to extract its topological features. The standard approach is to build a <strong>Vietoris-Rips complex</strong> &mdash; a simplicial complex that approximates the topology of the underlying space at a given resolution.</p>
+<p class="body-text"><strong>Definition 4.13</strong> (Vietoris-Rips Complex). <em>The Vietoris-Rips complex of a point cloud <em class="math">\mathcal{P}</em> at scale <em class="math">\epsilon</em> is the simplicial complex</em></p>
+<p class="display-math"><em class="math">\operatorname{VR}_\epsilon(\mathcal{P}) = \left\{ \sigma \subseteq \mathcal{P} : \operatorname{diam}(\sigma) \leq \epsilon \right\}</em></p>
+<p class="first-paragraph"><em>where <em class="math">\operatorname{diam}(\sigma) = \max_{\mathbf{v}_i, \mathbf{v}_j \in \sigma} \|\mathbf{v}_i - \mathbf{v}_j\|</em>. That is, a subset of points forms a simplex if and only if every pair of points in the subset is within distance <em class="math">\epsilon</em>.</em></p>
+<p class="body-text">At <em class="math">\epsilon = 0</em>, the complex consists only of isolated points (<em class="math">0</em>-simplices). As <em class="math">\epsilon</em> increases, edges (<em class="math">1</em>-simplices) appear between nearby points, then triangles (<em class="math">2</em>-simplices) fill in among triples of mutually close points, and so on. The topology of the complex changes as <em class="math">\epsilon</em> grows: connected components merge, loops form and then fill in, voids appear and then close.</p>
+<p class="body-text"><strong>Persistent homology</strong> tracks these topological changes across all scales simultaneously, recording the "birth" and "death" of each topological feature.</p>
+<p class="body-text"><strong>Definition 4.14</strong> (Persistence Diagram). <em>The persistence diagram in homology dimension <em class="math">k</em> is the multiset of points</em></p>
+<p class="display-math"><em class="math">\operatorname{Dgm}_k = \left\{ (b_i, d_i) : i \in I_k \right\} \subset \{(b,d) \in \mathbb{R}^2 : b \leq d\}</em></p>
+<p class="first-paragraph"><em>where <em class="math">(b_i, d_i)</em> records the birth (appearance) and death (disappearance) of the <em class="math">i</em>-th <em class="math">k</em>-dimensional topological feature. The lifetime <em class="math">d_i - b_i</em> measures the feature's persistence &mdash; how robust it is to changes in scale.</em></p>
+<p class="body-text">The two most important homology dimensions are:</p>
+<ul>
+<li><strong><em class="math">H_0</em> (connected components)</strong>: A point <em class="math">(b, d)</em> in <em class="math">\operatorname{Dgm}_0</em> records the merger of two connected components at scale <em class="math">d</em>. The number of high-persistence <em class="math">H_0</em> features indicates how many distinct clusters the point cloud has &mdash; for acoustic signals, this corresponds to the number of distinct spectral states.</li>
+<li><strong><em class="math">H_1</em> (loops)</strong>: A point <em class="math">(b, d)</em> in <em class="math">\operatorname{Dgm}_1</em> records the birth of a loop at scale <em class="math">b</em> (when edges close a cycle) and its death at scale <em class="math">d</em> (when triangles fill in the loop). High-persistence <em class="math">H_1</em> features correspond to robust periodic structure &mdash; for acoustic signals, this is the signature of trills, repeated phrases, and harmonic periodicity.</li>
+</ul>
+<h3 id="434-the-feature-extraction-pipeline" class="subsection-heading">4.3.4 The Feature Extraction Pipeline</h3>
+<p class="first-paragraph">The persistence diagram is a variable-sized multiset, which is inconvenient for standard machine learning methods that require fixed-length inputs. We summarize each diagram into 8 statistics, yielding a fixed-length vector.</p>
+<p class="body-text"><strong>Definition 4.15</strong> (Persistence Summary Statistics). <em>For a persistence diagram <em class="math">\operatorname{Dgm}_k</em> with <em class="math">n</em> finite-lifetime features having lifetimes <em class="math">\ell_1, \ldots, \ell_n</em>, define the summary vector:</em></p>
+<p class="display-math"><em class="math">\mathbf{f}_k = \begin{pmatrix} n \\ \bar{\ell} \\ \sigma_\ell \\ \max(\ell_i) \\ Q_{75}(\ell_i) \\ \bar{b} \\ \sum \ell_i^2 \\ \sqrt{\sum \ell_i^2} / n \end{pmatrix} \in \mathbb{R}^8</em></p>
+<p class="first-paragraph"><em>where <em class="math">\bar{\ell}</em> is the mean lifetime, <em class="math">\sigma_\ell</em> is the standard deviation, <em class="math">Q_{75}</em> is the 75th percentile, and <em class="math">\bar{b}</em> is the mean birth time.</em></p>
+<p class="body-text">These 8 features per homology dimension capture the essential topological information:</p>
+<ul>
+<li><strong>Count</strong> (<em class="math">n</em>): How many distinct topological features of this dimension exist. For <em class="math">H_0</em>, this is the number of cluster mergers. For <em class="math">H_1</em>, this is the number of loops detected.</li>
+<li><strong>Mean and std of lifetime</strong>: The typical persistence and its variability. A high mean lifetime indicates dominant, robust features; high standard deviation indicates a mixture of prominent and marginal features.</li>
+<li><strong>Max lifetime</strong>: The most persistent feature &mdash; the single strongest topological signal.</li>
+<li><strong>75th percentile</strong>: A robust measure of the "typical strong" feature, less sensitive to outliers than the maximum.</li>
+<li><strong>Mean birth time</strong>: When features typically appear. Early birth (small <em class="math">\bar{b}</em>) indicates structure visible at coarse scales; late birth indicates structure that emerges only at fine resolution.</li>
+<li><strong>Total persistence</strong> (<em class="math">\sum \ell_i^2</em>): The <em class="math">L^2</em> norm of the persistence diagram, measuring the total topological signal.</li>
+<li><strong>Normalized persistence</strong> (<em class="math">\sqrt{\sum \ell_i^2}/n</em>): Total persistence divided by count, measuring the average topological "weight" per feature.</li>
+</ul>
+<p class="body-text">For <em class="math">H_0</em> and <em class="math">H_1</em>, this gives <em class="math">8 + 8 = 16</em> features. In the implementation:</p>
+<pre><code class="language-python">def tda_features(signal, delay=10, dim=3, max_points=1000,
+                  max_homology_dim=1, thresh=2.0, seed=42) -&gt; np.ndarray:
+    signal = (signal - signal.mean()) / (signal.std() + 1e-10)
+    cloud = time_delay_embedding(signal, delay=delay, dim=dim)
+    cloud = subsample_cloud(cloud, max_points=max_points, seed=seed)
+    cloud = (cloud - cloud.mean(axis=0)) / (cloud.std(axis=0) + 1e-10)
+    diagrams = _persistence_diagrams_ripser(cloud, max_dim=max_homology_dim,
+                                             thresh=thresh)
+    features = []
+    for d in range(max_homology_dim + 1):
+        if d &lt; len(diagrams):
+            features.append(_diagram_features(diagrams[d]))
+        else:
+            features.append(np.zeros(8, dtype=np.float32))
+    return np.concatenate(features)</code></pre>
+<p class="first-paragraph">Note the normalization steps: the input signal is standardized (zero mean, unit variance), and the embedded point cloud is independently standardized per coordinate. This ensures that the persistence computation is invariant to amplitude scaling and DC offset &mdash; the topology depends only on the <em>shape</em> of the attractor, not its scale or position.</p>
+<h3 id="435-topological-invariance" class="subsection-heading">4.3.5 Topological Invariance</h3>
+<p class="first-paragraph">The power of persistent homology lies in its robustness. Topological features are invariant to a wide class of transformations:</p>
+<p class="body-text"><strong>Proposition 4.2</strong> (Stability of Persistence Diagrams). <em>For point clouds <em class="math">\mathcal{P}</em> and <em class="math">\mathcal{Q}</em> with bottleneck distance <em class="math">d_B(\operatorname{Dgm}_k(\mathcal{P}), \operatorname{Dgm}_k(\mathcal{Q})) \leq d_H(\mathcal{P}, \mathcal{Q})</em>, where <em class="math">d_H</em> is the Hausdorff distance. That is, small perturbations of the point cloud produce small perturbations of the persistence diagram.</em></p>
+<p class="body-text">This stability theorem (Cohen-Steiner, Edelsbrunner, and Harer, 2007) means that the topological features are robust to:</p>
+<ul>
+<li><strong>Additive noise</strong>: Background noise perturbs each point in the cloud by a small amount, producing a small Hausdorff perturbation and hence a small change in the persistence diagram.</li>
+<li><strong>Amplitude scaling</strong>: After normalization, amplitude scaling has no effect on the point cloud.</li>
+<li><strong>Recording distance</strong>: For acoustic signals, recording distance primarily affects amplitude (inverse square law), which is removed by normalization.</li>
+<li><strong>Equipment variation</strong>: Different hydrophones or microphones produce different frequency responses, which amount to a continuous (and hence topology-preserving) deformation of the signal.</li>
+</ul>
+<p class="body-text">This invariance is precisely what makes TDA valuable for field recordings, where the signal is always corrupted by some combination of noise, distance effects, and equipment artifacts. The topology of the vocal attractor &mdash; the <em>shape</em> of the communication signal in phase space &mdash; survives these corruptions in a way that spectral features often do not.</p>
+<h3 id="436-interpreting-topological-features" class="subsection-heading">4.3.6 Interpreting Topological Features</h3>
+<p class="first-paragraph">What do the persistence features <em>mean</em> for communication signals? The interpretation depends on the signal type:</p>
+<p class="body-text"><strong>For whale coda inter-click intervals.</strong> The ICI sequence of a regular coda (e.g., "1+1+3" with evenly spaced clicks within each group) produces a point cloud with tight clusters &mdash; one cluster per ICI value. The <em class="math">H_0</em> features capture the number and separation of these clusters. An accelerating coda (where ICI progressively shortens) produces a point cloud that traces a spiral &mdash; a curve with <em class="math">H_1</em> features capturing the winding. The topological distinction between "clustered" and "spiraling" point clouds is exactly the distinction between regular and accelerating codas.</p>
+<p class="body-text"><strong>For birdsong waveforms.</strong> The waveform of a pure-tone whistle produces a nearly circular point cloud (a single dominant loop, one strong <em class="math">H_1</em> feature). A harmonic stack (fundamental plus overtones) produces a more complex cloud with multiple nested loops (strong <em class="math">H_1</em> features at multiple persistence levels). A noisy broadband call produces a diffuse cloud with no persistent loops (weak <em class="math">H_1</em> features). The 16 TDA features thus encode the harmonic structure &mdash; the "shape" of the sound in phase space &mdash; in a way that is complementary to the covariance structure captured by SPD features.</p>
+<p class="body-text"><strong>For speech prosody.</strong> The pitch contour of a declarative sentence (falling intonation) produces a monotone trajectory with no loops. A yes/no question (rising intonation) produces a trajectory that curves upward. A list intonation ("apples, bananas, and cherries") produces a trajectory with multiple small loops. These topological distinctions correspond to pragmatic categories on the manifold <em class="math">P</em> &mdash; the shape of the prosodic contour encodes the illocutionary force.</p>
+<p class="body-text"><em>[Figure 4.5] <em>Persistence diagrams for three acoustic signals. Left: a regular sperm whale coda (5 clicks, even spacing) &mdash; the <em class="math">H_0</em> diagram shows two dominant points (corresponding to two distinct ICI values), and the <em class="math">H_1</em> diagram is nearly empty (no periodic structure in the ICI sequence). Center: an accelerating coda &mdash; the <em class="math">H_0</em> diagram is diffuse (no clean clusters), and the <em class="math">H_1</em> diagram shows one persistent loop (the spiral structure of progressively shortening intervals). Right: a bird trill &mdash; the <em class="math">H_1</em> diagram shows a single highly persistent loop (the periodic alternation between two frequencies).</em>]</em></p>
+<h2 id="44-the-combined-feature-vector" class="section-heading">4.4 The Combined Feature Vector</h2>
+<h3 id="441-orthogonality-of-structure" class="subsection-heading">4.4.1 Orthogonality of Structure</h3>
+<p class="first-paragraph">We have introduced three geometric frameworks, each capturing a distinct kind of structure in communication signals. But why three? And why <em>these</em> three?</p>
+<p class="body-text">The answer lies in a decomposition of the information content of an acoustic signal into three orthogonal components:</p>
+<ol>
+<li><strong>Hierarchical structure</strong>: How the signal's identity relates to other signals in a taxonomy. This is <em>relational</em> information &mdash; it depends not on the signal itself but on its position in a system of signals. Hyperbolic geometry captures it.</li>
+<li><strong>Covariance structure</strong>: How the signal's frequency components co-vary over time. This is <em>second-order statistical</em> information &mdash; it depends on the pairwise correlations between features, not on individual feature values. SPD Riemannian geometry captures it.</li>
+<li><strong>Topological structure</strong>: The shape of the signal's attractor in phase space. This is <em>dynamical</em> information &mdash; it depends on the temporal evolution of the signal, not on its static spectral profile. Persistent homology captures it.</li>
+</ol>
+<p class="body-text">These three kinds of information are mathematically independent. Knowing the taxonomy of a coda type tells you nothing about its spectral covariance. Knowing the covariance structure of a birdsong tells you nothing about its attractor topology (two species can have identical covariance matrices but different temporal dynamics, producing different point clouds under Takens embedding). Knowing the attractor topology tells you nothing about the hierarchical position (many different species can have the same attractor topology &mdash; e.g., all species with simple trills have a single loop &mdash; while being at very different positions in the Linnaean tree).</p>
+<p class="body-text">This independence is not merely theoretical. In the BirdCLEF experiments (Chapter 8), the correlation between SPD features and TDA features across the 206-species dataset is low (mean absolute Pearson <em class="math">r &lt; 0.15</em> across feature pairs), confirming that the two feature sets capture largely non-overlapping information. The trajectory features correlate moderately with SPD features (they are derived from the same covariance computation, applied across time) but provide additional information about temporal dynamics that static covariance does not encode.</p>
+<h3 id="442-the-156-dimensional-vector" class="subsection-heading">4.4.2 The 156-Dimensional Vector</h3>
+<p class="first-paragraph">The three geometries combine into a single feature vector for each audio signal:</p>
+<p class="body-text"><strong>Definition 4.16</strong> (Geometric Feature Vector). <em>The geometric feature vector of an audio signal with waveform <em class="math">\mathbf{w} \in \mathbb{R}^N</em> and mel spectrogram <em class="math">\mathbf{X} \in \mathbb{R}^{n_{\text{mel}} \times T}</em> is</em></p>
+<p class="display-math"><em class="math">\mathbf{g} = \left(\mathbf{f}_{\text{SPD}},\, \mathbf{f}_{\text{traj}},\, \mathbf{f}_{\text{TDA}}\right) \in \mathbb{R}^{156}</em></p>
+<p class="first-paragraph"><em>where:</em></p>
+<ul>
+<li><em class="math">\mathbf{f}_{\text{SPD}} \in \mathbb{R}^{136}</em> <em>is the upper triangle of <em class="math">\log(\Sigma)</em> with <em class="math">\Sigma \in \operatorname{SPD}(16)</em> the frequency-band covariance (Section 4.2.5),</em></li>
+<li><em class="math">\mathbf{f}_{\text{traj}} \in \mathbb{R}^4</em> <em>consists of path length, geodesic distance, deviation, and step count from the spectral trajectory (Section 4.2.6),</em></li>
+<li><em class="math">\mathbf{f}_{\text{TDA}} \in \mathbb{R}^{16}</em> <em>consists of 8 persistence summary statistics each for <em class="math">H_0</em> and <em class="math">H_1</em> (Section 4.3.4).</em></li>
+</ul>
+<p class="body-text">The breakdown is: <em class="math">136 + 4 + 16 = 156</em>.</p>
+<p class="body-text">In the implementation, the full pipeline is:</p>
+<pre><code class="language-python">def extract_geometric_features(waveform: np.ndarray,
+                                spectrogram: np.ndarray,
+                                n_bands: int = 16,
+                                tda_delay: int = 10,
+                                tda_dim: int = 3,
+                                tda_max_points: int = 500) -&gt; np.ndarray:
+    # SPD features from spectrogram
+    spd = spd_features_from_spectrogram(spectrogram, n_bands=n_bands)
 
-The delay $\tau = 10$ corresponds to approximately 0.3 milliseconds at 32 kHz sample rate, or about 6 milliseconds at 1.6 kHz (the effective sample rate after subsampling a mel-spectrogram energy contour). The choice of $\tau$ affects the resolution: too small, and consecutive points in the embedding are nearly identical (the point cloud collapses onto the diagonal); too large, and the temporal structure is lost (the points appear random). A common heuristic is to set $\tau$ to the first zero-crossing of the autocorrelation function, which decorrelates consecutive coordinates in the embedding.
+    # Spectral trajectory
+    traj = spectral_trajectory(spec2d, n_bands=n_bands)
+    traj_vec = np.array([
+        traj[&quot;path_length&quot;], traj[&quot;geodesic_distance&quot;],
+        traj[&quot;deviation&quot;], traj[&quot;n_steps&quot;],
+    ], dtype=np.float32)
 
-[Figure 4.4] *Takens&#x27; time-delay embedding. Left: a sinusoidal signal $x(t) = \sin(2\pi t / T)$ and its 3D embedding $\mathbf{v}(t) = (x(t), x(t+\tau), x(t+2\tau))$ --- the point cloud traces an ellipse in $\mathbb{R}^3$, whose single loop corresponds to the periodic structure. Center: an exponentially decaying signal $x(t) = e^{-\alpha t}$ --- the point cloud traces a monotone curve with no loops. Right: a signal with two incommensurate frequencies $x(t) = \sin(2\pi t / T_1) + \sin(2\pi t / T_2)$ --- the point cloud traces a torus-like structure with two independent loops.*
+    # TDA features from waveform
+    tda = tda_features(waveform, delay=tda_delay, dim=tda_dim,
+                       max_points=tda_max_points)
 
-### 4.3.3 The Rips Complex and Persistent Homology
-
-Given a point cloud $\mathcal{P} = \{\mathbf{v}_1, \ldots, \mathbf{v}_N\} \subset \mathbb{R}^d$, we need to extract its topological features. The standard approach is to build a **Vietoris-Rips complex** --- a simplicial complex that approximates the topology of the underlying space at a given resolution.
-
-**Definition 4.13** (Vietoris-Rips Complex). *The Vietoris-Rips complex of a point cloud $\mathcal{P}$ at scale $\epsilon$ is the simplicial complex*
-
-$$\operatorname{VR}_\epsilon(\mathcal{P}) = \left\{ \sigma \subseteq \mathcal{P} : \operatorname{diam}(\sigma) \leq \epsilon \right\}$$
-
-*where $\operatorname{diam}(\sigma) = \max_{\mathbf{v}_i, \mathbf{v}_j \in \sigma} \|\mathbf{v}_i - \mathbf{v}_j\|$. That is, a subset of points forms a simplex if and only if every pair of points in the subset is within distance $\epsilon$.*
-
-At $\epsilon = 0$, the complex consists only of isolated points ($0$-simplices). As $\epsilon$ increases, edges ($1$-simplices) appear between nearby points, then triangles ($2$-simplices) fill in among triples of mutually close points, and so on. The topology of the complex changes as $\epsilon$ grows: connected components merge, loops form and then fill in, voids appear and then close.
-
-**Persistent homology** tracks these topological changes across all scales simultaneously, recording the &quot;birth&quot; and &quot;death&quot; of each topological feature.
-
-**Definition 4.14** (Persistence Diagram). *The persistence diagram in homology dimension $k$ is the multiset of points*
-
-$$\operatorname{Dgm}_k = \left\{ (b_i, d_i) : i \in I_k \right\} \subset \{(b,d) \in \mathbb{R}^2 : b \leq d\}$$
-
-*where $(b_i, d_i)$ records the birth (appearance) and death (disappearance) of the $i$-th $k$-dimensional topological feature. The lifetime $d_i - b_i$ measures the feature&#x27;s persistence --- how robust it is to changes in scale.*
-
-The two most important homology dimensions are:
-
-- **$H_0$ (connected components)**: A point $(b, d)$ in $\operatorname{Dgm}_0$ records the merger of two connected components at scale $d$. The number of high-persistence $H_0$ features indicates how many distinct clusters the point cloud has --- for acoustic signals, this corresponds to the number of distinct spectral states.
-
-- **$H_1$ (loops)**: A point $(b, d)$ in $\operatorname{Dgm}_1$ records the birth of a loop at scale $b$ (when edges close a cycle) and its death at scale $d$ (when triangles fill in the loop). High-persistence $H_1$ features correspond to robust periodic structure --- for acoustic signals, this is the signature of trills, repeated phrases, and harmonic periodicity.
-
-### 4.3.4 The Feature Extraction Pipeline
-
-The persistence diagram is a variable-sized multiset, which is inconvenient for standard machine learning methods that require fixed-length inputs. We summarize each diagram into 8 statistics, yielding a fixed-length vector.
-
-**Definition 4.15** (Persistence Summary Statistics). *For a persistence diagram $\operatorname{Dgm}_k$ with $n$ finite-lifetime features having lifetimes $\ell_1, \ldots, \ell_n$, define the summary vector:*
-
-$$\mathbf{f}_k = \begin{pmatrix} n \\ \bar{\ell} \\ \sigma_\ell \\ \max(\ell_i) \\ Q_{75}(\ell_i) \\ \bar{b} \\ \sum \ell_i^2 \\ \sqrt{\sum \ell_i^2} / n \end{pmatrix} \in \mathbb{R}^8$$
-
-*where $\bar{\ell}$ is the mean lifetime, $\sigma_\ell$ is the standard deviation, $Q_{75}$ is the 75th percentile, and $\bar{b}$ is the mean birth time.*
-
-These 8 features per homology dimension capture the essential topological information:
-
-- **Count** ($n$): How many distinct topological features of this dimension exist. For $H_0$, this is the number of cluster mergers. For $H_1$, this is the number of loops detected.
-- **Mean and std of lifetime**: The typical persistence and its variability. A high mean lifetime indicates dominant, robust features; high standard deviation indicates a mixture of prominent and marginal features.
-- **Max lifetime**: The most persistent feature --- the single strongest topological signal.
-- **75th percentile**: A robust measure of the &quot;typical strong&quot; feature, less sensitive to outliers than the maximum.
-- **Mean birth time**: When features typically appear. Early birth (small $\bar{b}$) indicates structure visible at coarse scales; late birth indicates structure that emerges only at fine resolution.
-- **Total persistence** ($\sum \ell_i^2$): The $L^2$ norm of the persistence diagram, measuring the total topological signal.
-- **Normalized persistence** ($\sqrt{\sum \ell_i^2}/n$): Total persistence divided by count, measuring the average topological &quot;weight&quot; per feature.
-
-For $H_0$ and $H_1$, this gives $8 + 8 = 16$ features. In the implementation:
-</code></pre>
-<p class="first-paragraph">def tda_features(signal, delay=10, dim=3, max_points=1000,                   max_homology_dim=1, thresh=2.0, seed=42) -> np.ndarray:     signal = (signal - signal.mean()) / (signal.std() + 1e-10)     cloud = time_delay_embedding(signal, delay=delay, dim=dim)     cloud = subsample_cloud(cloud, max_points=max_points, seed=seed)     cloud = (cloud - cloud.mean(axis=0)) / (cloud.std(axis=0) + 1e-10)     diagrams = _persistence_diagrams_ripser(cloud, max_dim=max_homology_dim,                                              thresh=thresh)     features = []     for d in range(max_homology_dim + 1):         if d < len(diagrams):             features.append(_diagram_features(diagrams[d]))         else:             features.append(np.zeros(8, dtype=np.float32))     return np.concatenate(features)</p>
-<pre><code>
-Note the normalization steps: the input signal is standardized (zero mean, unit variance), and the embedded point cloud is independently standardized per coordinate. This ensures that the persistence computation is invariant to amplitude scaling and DC offset --- the topology depends only on the *shape* of the attractor, not its scale or position.
-
-### 4.3.5 Topological Invariance
-
-The power of persistent homology lies in its robustness. Topological features are invariant to a wide class of transformations:
-
-**Proposition 4.2** (Stability of Persistence Diagrams). *For point clouds $\mathcal{P}$ and $\mathcal{Q}$ with bottleneck distance $d_B(\operatorname{Dgm}_k(\mathcal{P}), \operatorname{Dgm}_k(\mathcal{Q})) \leq d_H(\mathcal{P}, \mathcal{Q})$, where $d_H$ is the Hausdorff distance. That is, small perturbations of the point cloud produce small perturbations of the persistence diagram.*
-
-This stability theorem (Cohen-Steiner, Edelsbrunner, and Harer, 2007) means that the topological features are robust to:
-
-- **Additive noise**: Background noise perturbs each point in the cloud by a small amount, producing a small Hausdorff perturbation and hence a small change in the persistence diagram.
-- **Amplitude scaling**: After normalization, amplitude scaling has no effect on the point cloud.
-- **Recording distance**: For acoustic signals, recording distance primarily affects amplitude (inverse square law), which is removed by normalization.
-- **Equipment variation**: Different hydrophones or microphones produce different frequency responses, which amount to a continuous (and hence topology-preserving) deformation of the signal.
-
-This invariance is precisely what makes TDA valuable for field recordings, where the signal is always corrupted by some combination of noise, distance effects, and equipment artifacts. The topology of the vocal attractor --- the *shape* of the communication signal in phase space --- survives these corruptions in a way that spectral features often do not.
-
-### 4.3.6 Interpreting Topological Features
-
-What do the persistence features *mean* for communication signals? The interpretation depends on the signal type:
-
-**For whale coda inter-click intervals.** The ICI sequence of a regular coda (e.g., &quot;1+1+3&quot; with evenly spaced clicks within each group) produces a point cloud with tight clusters --- one cluster per ICI value. The $H_0$ features capture the number and separation of these clusters. An accelerating coda (where ICI progressively shortens) produces a point cloud that traces a spiral --- a curve with $H_1$ features capturing the winding. The topological distinction between &quot;clustered&quot; and &quot;spiraling&quot; point clouds is exactly the distinction between regular and accelerating codas.
-
-**For birdsong waveforms.** The waveform of a pure-tone whistle produces a nearly circular point cloud (a single dominant loop, one strong $H_1$ feature). A harmonic stack (fundamental plus overtones) produces a more complex cloud with multiple nested loops (strong $H_1$ features at multiple persistence levels). A noisy broadband call produces a diffuse cloud with no persistent loops (weak $H_1$ features). The 16 TDA features thus encode the harmonic structure --- the &quot;shape&quot; of the sound in phase space --- in a way that is complementary to the covariance structure captured by SPD features.
-
-**For speech prosody.** The pitch contour of a declarative sentence (falling intonation) produces a monotone trajectory with no loops. A yes/no question (rising intonation) produces a trajectory that curves upward. A list intonation (&quot;apples, bananas, and cherries&quot;) produces a trajectory with multiple small loops. These topological distinctions correspond to pragmatic categories on the manifold $P$ --- the shape of the prosodic contour encodes the illocutionary force.
-
-[Figure 4.5] *Persistence diagrams for three acoustic signals. Left: a regular sperm whale coda (5 clicks, even spacing) --- the $H_0$ diagram shows two dominant points (corresponding to two distinct ICI values), and the $H_1$ diagram is nearly empty (no periodic structure in the ICI sequence). Center: an accelerating coda --- the $H_0$ diagram is diffuse (no clean clusters), and the $H_1$ diagram shows one persistent loop (the spiral structure of progressively shortening intervals). Right: a bird trill --- the $H_1$ diagram shows a single highly persistent loop (the periodic alternation between two frequencies).*
-
----
-
-## 4.4 The Combined Feature Vector
-
-### 4.4.1 Orthogonality of Structure
-
-We have introduced three geometric frameworks, each capturing a distinct kind of structure in communication signals. But why three? And why *these* three?
-
-The answer lies in a decomposition of the information content of an acoustic signal into three orthogonal components:
-
-1. **Hierarchical structure**: How the signal&#x27;s identity relates to other signals in a taxonomy. This is *relational* information --- it depends not on the signal itself but on its position in a system of signals. Hyperbolic geometry captures it.
-
-2. **Covariance structure**: How the signal&#x27;s frequency components co-vary over time. This is *second-order statistical* information --- it depends on the pairwise correlations between features, not on individual feature values. SPD Riemannian geometry captures it.
-
-3. **Topological structure**: The shape of the signal&#x27;s attractor in phase space. This is *dynamical* information --- it depends on the temporal evolution of the signal, not on its static spectral profile. Persistent homology captures it.
-
-These three kinds of information are mathematically independent. Knowing the taxonomy of a coda type tells you nothing about its spectral covariance. Knowing the covariance structure of a birdsong tells you nothing about its attractor topology (two species can have identical covariance matrices but different temporal dynamics, producing different point clouds under Takens embedding). Knowing the attractor topology tells you nothing about the hierarchical position (many different species can have the same attractor topology --- e.g., all species with simple trills have a single loop --- while being at very different positions in the Linnaean tree).
-
-This independence is not merely theoretical. In the BirdCLEF experiments (Chapter 8), the correlation between SPD features and TDA features across the 206-species dataset is low (mean absolute Pearson $r &lt; 0.15$ across feature pairs), confirming that the two feature sets capture largely non-overlapping information. The trajectory features correlate moderately with SPD features (they are derived from the same covariance computation, applied across time) but provide additional information about temporal dynamics that static covariance does not encode.
-
-### 4.4.2 The 156-Dimensional Vector
-
-The three geometries combine into a single feature vector for each audio signal:
-
-**Definition 4.16** (Geometric Feature Vector). *The geometric feature vector of an audio signal with waveform $\mathbf{w} \in \mathbb{R}^N$ and mel spectrogram $\mathbf{X} \in \mathbb{R}^{n_{\text{mel}} \times T}$ is*
-
-$$\mathbf{g} = \left(\mathbf{f}_{\text{SPD}},\, \mathbf{f}_{\text{traj}},\, \mathbf{f}_{\text{TDA}}\right) \in \mathbb{R}^{156}$$
-
-*where:*
-
-- $\mathbf{f}_{\text{SPD}} \in \mathbb{R}^{136}$ *is the upper triangle of $\log(\Sigma)$ with $\Sigma \in \operatorname{SPD}(16)$ the frequency-band covariance (Section 4.2.5),*
-- $\mathbf{f}_{\text{traj}} \in \mathbb{R}^4$ *consists of path length, geodesic distance, deviation, and step count from the spectral trajectory (Section 4.2.6),*
-- $\mathbf{f}_{\text{TDA}} \in \mathbb{R}^{16}$ *consists of 8 persistence summary statistics each for $H_0$ and $H_1$ (Section 4.3.4).*
-
-The breakdown is: $136 + 4 + 16 = 156$.
-
-In the implementation, the full pipeline is:
-</code></pre>
-<p class="first-paragraph">def extract_geometric_features(waveform: np.ndarray,                                 spectrogram: np.ndarray,                                 n_bands: int = 16,                                 tda_delay: int = 10,                                 tda_dim: int = 3,                                 tda_max_points: int = 500) -> np.ndarray:     # SPD features from spectrogram     spd = spd_features_from_spectrogram(spectrogram, n_bands=n_bands)</p>
-<p class="body-text">    # Spectral trajectory     traj = spectral_trajectory(spec2d, n_bands=n_bands)     traj_vec = np.array([         traj["path_length"], traj["geodesic_distance"],         traj["deviation"], traj["n_steps"],     ], dtype=np.float32)</p>
-<p class="body-text">    # TDA features from waveform     tda = tda_features(waveform, delay=tda_delay, dim=tda_dim,                        max_points=tda_max_points)</p>
-<p class="body-text">    return np.concatenate([spd, traj_vec, tda])</p>
+    return np.concatenate([spd, traj_vec, tda])</code></pre>
+<p class="first-paragraph">Note that the SPD and trajectory features are computed from the <em>spectrogram</em> (a frequency-domain representation), while the TDA features are computed from the <em>waveform</em> (a time-domain representation). This is deliberate: the spectrogram discards phase information, which is irrelevant for covariance but essential for the temporal dynamics that TDA captures. By operating on different representations of the same signal, the two halves of the pipeline extract complementary information.</p>
+<h3 id="443-why-156-dimensions" class="subsection-heading">4.4.3 Why 156 Dimensions?</h3>
+<p class="first-paragraph">The choice of 156 dimensions is not arbitrary &mdash; it is the minimum sufficient representation under the chosen parameterization.</p>
+<p class="body-text"><strong>136 SPD features.</strong> The covariance matrix is <em class="math">16 \times 16</em> because 16 frequency bands provide sufficient resolution to capture cross-frequency correlations (harmonics, formant structure) without incurring excessive computational cost. Doubling to 32 bands would yield <em class="math">32 \times 33/2 = 528</em> features &mdash; nearly four times as many &mdash; with diminishing returns because adjacent bands in a 32-band partition are strongly correlated. Halving to 8 bands would yield only 36 features and lose resolution in the harmonic structure that distinguishes closely related species. The choice of 16 bands at <em class="math">n(n+1)/2 = 136</em> features is the empirical sweet spot.</p>
+<p class="body-text"><strong>4 trajectory features.</strong> The trajectory captures the dynamics of spectral evolution with the minimal set of geometric descriptors: how far the trajectory travels (path length), how far it ends up from where it started (geodesic distance), how much it deviates from a straight line (deviation), and how many windows it spans (step count, which serves as a normalization proxy for signal duration). Richer trajectory descriptors are possible &mdash; curvature, torsion, geodesic acceleration &mdash; but the marginal information they add does not justify the added dimensionality in practice.</p>
+<p class="body-text"><strong>16 TDA features.</strong> Eight statistics per homology dimension, for two dimensions (<em class="math">H_0</em> and <em class="math">H_1</em>). Higher homology (<em class="math">H_2</em>, voids) could in principle capture additional structure, but for 3-dimensional embeddings of 1D signals, <em class="math">H_2</em> features are rare and typically noise. The choice of 8 statistics per diagram (count, mean, std, max, 75th percentile, mean birth, total persistence, normalized persistence) is standard in the TDA literature and provides a balance between completeness and redundancy.</p>
+<p class="body-text">The total of 156 dimensions is modest by modern standards &mdash; far fewer than the thousands or millions of parameters in a typical neural network. The geometric features are a <em>compressed representation</em> of the signal's structure, not a raw encoding of its content. They discard information that is irrelevant to communication structure (absolute amplitude, phase, recording noise) and retain information that is relevant (harmonic correlations, temporal dynamics, attractor topology). This compression is lossy, but the losses are by design: the features are invariant to precisely the transformations that should not affect the analysis of communication.</p>
+<h3 id="444-the-complementarity-argument" class="subsection-heading">4.4.4 The Complementarity Argument</h3>
+<p class="first-paragraph">The central claim of this chapter is that no single geometry suffices for communication analysis, and the three geometries together capture more than any one alone. This claim can be stated precisely.</p>
+<p class="body-text"><strong>Proposition 4.3</strong> (Complementarity of Geometric Features). <em>Let <em class="math">A_{\text{SPD}}</em>, <em class="math">A_{\text{traj}}</em>, <em class="math">A_{\text{TDA}}</em>, and <em class="math">A_{\text{combined}}</em> be the classification accuracies of a fixed classifier trained on SPD features alone, trajectory features alone, TDA features alone, and the combined 156-dimensional vector, respectively. For the BirdCLEF 206-species dataset (Chapter 8):</em></p>
+<p class="display-math"><em class="math">A_{\text{combined}} &gt; \max(A_{\text{SPD}}, A_{\text{traj}}, A_{\text{TDA}})</em></p>
+<p class="first-paragraph"><em>The improvement is not merely additive: the combined accuracy exceeds the sum of the individual improvements over baseline, indicating synergistic interaction between the feature sets.</em></p>
+<p class="body-text">The synergy arises because the three geometries resolve different confusions. SPD features distinguish species with different harmonic structure but confuse species with similar spectral profiles (e.g., two warbler species with similar frequency ranges but different temporal patterns). TDA features distinguish species with different temporal dynamics but confuse species whose dynamics produce similar attractor topology (e.g., all trilling species have similar <em class="math">H_1</em> features regardless of their spectral content). The combination resolves both confusions simultaneously.</p>
+<p class="body-text">This is the geometric analogue of a principle well known in ensemble learning: diverse classifiers combined outperform any individual, and the benefit of combination is greatest when the individual classifiers make <em>different</em> errors. The three geometries are the ultimate diverse ensemble &mdash; they do not merely use different algorithms on the same features but extract <em>structurally different kinds of information</em> from the same signal.</p>
+<h2 id="45-connections-and-preview" class="section-heading">4.5 Connections and Preview</h2>
+<h3 id="451-the-three-geometries-on-the-communication-manifold" class="subsection-heading">4.5.1 The Three Geometries on the Communication Manifold</h3>
+<p class="first-paragraph">How do the three geometries relate to the communication manifold <em class="math">M = S \times P \times C</em> constructed in Chapter 3?</p>
+<p class="body-text">The SPD and TDA features operate primarily on the <strong>signal manifold <em class="math">S</em></strong>. They extract physical structure from the acoustic signal &mdash; covariance, trajectory, topology &mdash; without requiring any knowledge of what the signal means. This makes them universally applicable: the same pipeline produces meaningful features for whale clicks, birdsong, and cuneiform readings (when the signs are vocalized), without any domain-specific modification.</p>
+<p class="body-text">The hyperbolic geometry operates primarily on the <strong>content manifold <em class="math">C</em></strong> and the <strong>pragmatic manifold <em class="math">P</em></strong>, encoding hierarchical relationships between meanings and communicative functions. The coda taxonomy is a structure on <em class="math">C</em> (different coda types are different communicative contents). The cuneiform sign hierarchy is a structure that bridges <em class="math">S</em> and <em class="math">C</em> (sign forms are signals; readings and words are content). The Hohfeldian square is a structure on <em class="math">P</em> (the four normative positions are pragmatic categories).</p>
+<p class="body-text">This division of labor &mdash; signal geometry (SPD + TDA) on <em class="math">S</em>, hierarchical geometry (hyperbolic) on <em class="math">C</em> and <em class="math">P</em> &mdash; is not accidental. It reflects the product structure of <em class="math">M</em>. Each factor of the product has its own geometric character: <em class="math">S</em> is characterized by covariance and dynamics, <em class="math">C</em> by hierarchical organization, <em class="math">P</em> by symmetry and group structure. The three geometries of this chapter provide concrete metrics on these factors, turning the abstract manifold of Chapter 3 into a space where distances can be computed and structure can be measured.</p>
+<h3 id="452-from-toolkit-to-application" class="subsection-heading">4.5.2 From Toolkit to Application</h3>
+<p class="first-paragraph">The remainder of Part II applies the toolkit developed here. Chapter 5 takes the hyperbolic framework of Section 4.1 and applies it in depth to the hierarchical structure of communication systems: whale coda taxonomies, cuneiform sign hierarchies, and semantic ontologies. Chapter 6 takes the TDA framework of Section 4.3 and applies it in depth to acoustic signals: click patterns, birdsong waveforms, and prosodic contours.</p>
+<p class="body-text">Part III then applies the full three-geometry pipeline to non-human communication. Chapter 7 presents the complete geometric analysis of sperm whale codas using all three frameworks, yielding the five principal findings described in the outline: Poincare embedding of the coda hierarchy, topological signatures per rhythm class, adversarial robustness mapping, linguistic universals (Menzerath's law), and individual identity encoding. Chapter 8 presents the BirdCLEF pipeline &mdash; the 156-dimensional geometric feature vector applied to 206 bird species &mdash; as a second case study in non-human acoustic communication.</p>
+<p class="body-text">Part IV applies hyperbolic geometry to ancient communication. Chapter 9 uses the Poincare ball to encode the cuneiform sign hierarchy as an attention bias in a transformer architecture for Akkadian translation. Chapter 10 develops the geometric interpretation of translation as parallel transport on the semantic manifold.</p>
+<p class="body-text">In each case, the toolkit developed in this chapter is not merely applied but tested. The three geometries make specific, falsifiable predictions about the structure of communication signals &mdash; that hierarchical structure will embed with lower distortion in hyperbolic than Euclidean space, that covariance features will respect the SPD manifold geometry, that topological features will be robust to noise and deformation. These predictions are confirmed empirically, chapter by chapter, across the five communication systems that form the book's empirical core.</p>
+<h3 id="453-the-deeper-pattern" class="subsection-heading">4.5.3 The Deeper Pattern</h3>
+<p class="first-paragraph">There is a deeper pattern here, one that this chapter can only gesture at but that the rest of the book develops fully.</p>
+<p class="body-text">The three geometries are not merely useful tools. They correspond to three fundamental aspects of how information is organized:</p>
+<ul>
+<li><strong>Hyperbolic geometry</strong> captures <strong>abstraction</strong> &mdash; the vertical dimension of meaning, from general to specific, from category to instance, from genus to species.</li>
+<li><strong>SPD Riemannian geometry</strong> captures <strong>association</strong> &mdash; the horizontal dimension of meaning, the correlations between features, the joint structure of co-occurring elements.</li>
+<li><strong>Persistent homology</strong> captures <strong>dynamics</strong> &mdash; the temporal dimension of meaning, the shape of processes, the topology of change.</li>
+</ul>
+<p class="body-text">Any communication system &mdash; indeed, any information-bearing system &mdash; can be analyzed along these three dimensions. The specific parameterization (16 frequency bands, delay <em class="math">\tau = 10</em>, embedding dimension <em class="math">d = 3</em>) is a design choice that can be adjusted for different domains. But the <em>kinds</em> of structure captured by the three geometries &mdash; abstraction, association, and dynamics &mdash; are not design choices. They are, we claim, the fundamental axes along which communicative structure is organized.</p>
+<p class="body-text">The rest of the book is an extended argument for this claim.</p>
+<p class="body-text"><em>[Figure 4.6] <em>Summary of the three geometries for communication. Hyperbolic geometry captures hierarchical structure (trees, taxonomies, levels of abstraction). SPD Riemannian geometry captures covariance structure (cross-frequency correlations, spectral fingerprints). Persistent homology captures topological structure (attractor shape, periodicity, connected components). The combined 156-dimensional feature vector <em class="math">(136 + 4 + 16)</em> captures all three. No single geometry suffices: hierarchical information is orthogonal to covariance information, which is orthogonal to topological information.</em>]</em></p>
+<h2 id="chapter-summary" class="section-heading">Chapter Summary</h2>
+<div class="table-wrapper"><table class="book-table">
+<tr>
+<th>Geometry</th>
+<th>Space</th>
+<th>Metric</th>
+<th>Captures</th>
+<th>Dimension</th>
+</tr>
+<tr>
+<td>Hyperbolic</td>
+<td>Poincare ball <em class="math">\mathbb{B}^d_c</em></td>
+<td>$d_c(\mathbf{x}, \mathbf{y}) = \frac{2}{\sqrt{c}} \operatorname{arctanh}(\sqrt{c}\,\</td>
+<td>(-\mathbf{x}) \oplus_c \mathbf{y}\</td>
+<td>)$</td>
+<td>Hierarchical structure</td>
+<td><em class="math">d</em> (typically 32)</td>
+</tr>
+<tr>
+<td>SPD Riemannian</td>
+<td><em class="math">\operatorname{SPD}(n)</em></td>
+<td>$d_{LE}(S_1, S_2) = \</td>
+<td>\log(S_1) - \log(S_2)\</td>
+<td>_F$</td>
+<td>Covariance structure</td>
+<td><em class="math">n(n+1)/2</em> (136 for <em class="math">n=16</em>)</td>
+</tr>
+<tr>
+<td>Topological</td>
+<td>Persistence diagrams</td>
+<td>Bottleneck / Wasserstein distance</td>
+<td>Attractor shape</td>
+<td><em class="math">8 \times (k_{\max}+1)</em> (16 for <em class="math">k_{\max}=1</em>)</td>
+</tr>
+<tr>
+<td><strong>Combined</strong></td>
+<td><em class="math">\mathbb{R}^{156}</em></td>
+<td>Euclidean (in log-mapped space)</td>
+<td>All three</td>
+<td><strong>156</strong></td>
+</tr>
+</table></div>
+<h3 id="definitions-and-propositions-index" class="subsection-heading">Definitions and Propositions Index</h3>
+<ul>
+<li><strong>Definition 4.1</strong>: Poincare Ball (<em class="math">\mathbb{B}^d_c</em> with conformal metric)</li>
+<li><strong>Definition 4.2</strong>: Exponential Map at the Origin (<em class="math">\exp_{\mathbf{0}}^c</em>)</li>
+<li><strong>Definition 4.3</strong>: Logarithmic Map to the Origin (<em class="math">\log_{\mathbf{0}}^c</em>)</li>
+<li><strong>Definition 4.4</strong>: Mobius Addition (<em class="math">\oplus_c</em>)</li>
+<li><strong>Definition 4.5</strong>: Hyperbolic Distance (<em class="math">d_c</em>)</li>
+<li><strong>Definition 4.6</strong>: SPD Manifold (<em class="math">\operatorname{SPD}(n)</em>)</li>
+<li><strong>Definition 4.7</strong>: Log-Euclidean Distance (<em class="math">d_{LE}</em>)</li>
+<li><strong>Definition 4.8</strong>: Frequency-Band Covariance (from spectrogram to SPD matrix)</li>
+<li><strong>Definition 4.9</strong>: Spectral Trajectory (time-varying covariance on SPD)</li>
+<li><strong>Definition 4.10</strong>: Geodesic Deviation (path length minus geodesic distance)</li>
+<li><strong>Definition 4.11</strong>: Frechet Mean on SPD(n) (log-Euclidean closed form)</li>
+<li><strong>Definition 4.12</strong>: Time-Delay Embedding (Takens reconstruction)</li>
+<li><strong>Definition 4.13</strong>: Vietoris-Rips Complex (simplicial approximation of point cloud)</li>
+<li><strong>Definition 4.14</strong>: Persistence Diagram (birth-death pairs of topological features)</li>
+<li><strong>Definition 4.15</strong>: Persistence Summary Statistics (8 features per homology dimension)</li>
+<li><strong>Definition 4.16</strong>: Geometric Feature Vector (156-dimensional combined representation)</li>
+<li><strong>Theorem 4.1</strong>: Takens' Embedding Theorem (topology recovery from 1D observation)</li>
+<li><strong>Proposition 4.1</strong>: SPD Feature Dimension (<em class="math">n(n+1)/2</em>)</li>
+<li><strong>Proposition 4.2</strong>: Stability of Persistence Diagrams (bottleneck bound)</li>
+<li><strong>Proposition 4.3</strong>: Complementarity of Geometric Features (combined > max individual)</li>
+</ul>
 <div class="footnotes">
 <hr>
 <ol class="footnote-list">

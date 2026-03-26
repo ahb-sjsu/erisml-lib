@@ -38,6 +38,13 @@
 
   <article class="book-chapter">
     <div class="chapter-container">
+      <nav class="breadcrumb" aria-label="Breadcrumb">
+        <a href="../index.html">Geometric Series</a>
+        <span class="breadcrumb-sep">›</span>
+        <a href="index.html">Geometric Communication</a>
+        <span class="breadcrumb-sep">›</span>
+        <span class="breadcrumb-current">Chapter 8: The Geometry of Birdsong</span>
+      </nav>
       <div class="chapter-nav-top">
         <a href="chapter-07-the-geometry-of-whale-communication.html" class="nav-prev">&larr; Chapter 7: The Geometry of Whale Communication</a>
         <a href="index.html" class="nav-toc">Contents</a>
@@ -72,11 +79,7 @@
 <p class="first-paragraph">The deployment system, as implemented in <code>inference_notebook.py</code>, combines three models in a weighted ensemble:</p>
 <ol>
 <li><strong>EfficientNet-B3</strong> (weight 0.45): The primary CNN, pretrained on ImageNet with noisy student training, fine-tuned on BirdCLEF training data with mixup augmentation. Processes mel spectrograms of shape <em class="math">(1, 128, T)</em>.</li>
-</ol>
-<ol>
 <li><strong>EfficientNet-B0</strong> (weight 0.25): A smaller CNN providing architectural diversity for ensemble decorrelation. Same spectrogram input, different model capacity.</li>
-</ol>
-<ol>
 <li><strong>LightGBM on geometric features</strong> (weight 0.30): A gradient-boosted decision tree classifier operating on the 156-dimensional geometric feature vector. No neural network. No GPU.</li>
 </ol>
 <p class="body-text">The ensemble weights were tuned on a validation set. The geometric component carries 30% of the ensemble weight &mdash; substantial for a model with no learned convolutional features, no pretraining, and no deep architecture. This weight reflects the degree to which geometric features provide <em>complementary</em> rather than <em>redundant</em> information.</p>
@@ -385,11 +388,7 @@ if elapsed_total &gt; 5000:
 <p class="body-text">The fact that the same pipeline works for birdsong suggests something deeper: the geometric features capture <strong>structural properties of acoustic communication</strong> that transcend the specifics of any one system. These properties are:</p>
 <ol>
 <li><strong>Cross-frequency correlation structure</strong> (SPD features): Any vocalization produced by a resonant system (vocal tract, syrinx, phonic lips) creates correlations between frequency bands. The SPD manifold is the natural space for these correlations, regardless of the species.</li>
-</ol>
-<ol>
 <li><strong>Spectral trajectory complexity</strong> (geodesic deviation): Any vocalization that changes its spectral structure over time traces a curve on the SPD manifold. The deviation of this curve from a geodesic is a geometry-independent measure of temporal complexity.</li>
-</ol>
-<ol>
 <li><strong>Attractor topology</strong> (TDA features): Any vocalization produced by a dynamical system (and all vocalizations are, since they are produced by physical systems with finite degrees of freedom) has an attractor whose topology can be reconstructed from the waveform via Takens' embedding.</li>
 </ol>
 <p class="body-text">These three properties are consequences of physics and mathematics, not of biology. They hold for any acoustic signal produced by a dynamical system and recorded by a transducer. The geometric pipeline extracts them without domain-specific knowledge &mdash; without knowing what a whale coda is, what a bird song means, or how a syrinx works.</p>
@@ -413,17 +412,9 @@ if elapsed_total &gt; 5000:
 <p class="first-paragraph">This chapter has presented the geometric analysis of birdsong as the second empirical case study in non-human acoustic communication. The main contributions are:</p>
 <ol>
 <li><strong>SPD manifold features</strong> (136 dimensions): The <em class="math">16 \times 16</em> frequency-band covariance matrix, projected to log-Euclidean space via the matrix logarithm, captures the cross-frequency correlation structure of birdsong &mdash; the "vowel space" that distinguishes species by their harmonic binding patterns.</li>
-</ol>
-<ol>
 <li><strong>Spectral trajectory features</strong> (4 dimensions): Sliding a window across time and tracking the covariance matrix on <em class="math">\text{SPD}(16)</em> produces a curve whose geodesic deviation &mdash; path length minus direct distance &mdash; measures the geometric complexity of the song. Trills have low deviation; complex songs have high deviation.</li>
-</ol>
-<ol>
 <li><strong>TDA features</strong> (16 dimensions): Takens' time-delay embedding of the raw waveform reconstructs the vocal attractor in <em class="math">\mathbb{R}^3</em>. Persistent homology of the point cloud extracts topological invariants &mdash; connected components (<em class="math">H_0</em>) and loops (<em class="math">H_1</em>) &mdash; that encode the dynamical structure of the vocal production system.</li>
-</ol>
-<ol>
 <li><strong>The 156-dimensional combined vector</strong>: The three components complement each other, capturing what (spectral structure), how (temporal evolution), and the shape (attractor topology) of the vocalization. Combined with CNN spectrograms in a LightGBM ensemble, the geometric features carry 30% of the ensemble weight while consuming 4% of the computational budget.</li>
-</ol>
-<ol>
 <li><strong>Domain generality</strong>: The same three-geometry pipeline that extracted meaningful features from whale codas in Chapter 7 produces meaningful features for birdsong without modification to the mathematical framework. This is evidence that the geometric toolkit captures structural properties of acoustic communication that are independent of species, medium, and communicative function.</li>
 </ol>
 <p class="body-text">The geometric features work because birdsong has geometric structure. The covariance matrix is a point on a Riemannian manifold. The song is a trajectory on that manifold. The vocal production system is a dynamical system whose attractor has a topology. These are not metaphors. They are mathematical facts, implemented in code, validated in competition, and ready to be applied to any acoustic communication system we encounter next.</p>
