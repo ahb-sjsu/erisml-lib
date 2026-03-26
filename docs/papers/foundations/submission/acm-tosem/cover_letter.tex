@@ -1,0 +1,51 @@
+\documentclass[12pt]{letter}
+\usepackage{geometry}
+\geometry{margin=1in}
+\usepackage{hyperref}
+
+\begin{document}
+
+\begin{letter}{%
+Editor-in-Chief\\
+\emph{ACM Transactions on Software Engineering and Methodology}}
+
+\opening{Dear Editor,}
+
+I am pleased to submit the manuscript ``Structural Fuzzing: Adapting Input Mutation Testing for Parameterized Model Validation'' for consideration in \emph{ACM Transactions on Software Engineering and Methodology}.
+
+Software fuzzing---from Miller's 1990 Unix utility study through AFL and LibFuzzer---has transformed how we discover latent software failures by systematically mutating inputs.  This paper adapts the fuzzing paradigm to a new domain: validating parameterized predictive models.  Instead of mutating program inputs (bytes) to find crashes, we mutate model parameters (dimensional weights) to find prediction failures.
+
+The paper introduces \emph{structural fuzzing}, a six-component validation framework:
+\begin{enumerate}
+    \item \textbf{Dimension enumeration:} Exhaustive subset search to discover minimal sufficient model structure---analogous to crash minimization in AFL.
+    \item \textbf{Pareto frontier extraction:} Identification of optimal models at each complexity level.
+    \item \textbf{Sensitivity profiling:} Ablation-based importance ranking of model inputs.
+    \item \textbf{Model Robustness Index (MRI):} A single scalar measuring prediction stability under random parameter perturbation, adapted from the Bond Index for LLM evaluator robustness.  Uses the same weighted-percentile formula: $0.5 \cdot \mathrm{mean}(\omega) + 0.3 \cdot P_{75}(\omega) + 0.2 \cdot P_{95}(\omega)$.
+    \item \textbf{Adversarial threshold search:} Binary search for the minimal parameter change that flips a prediction---the model validation analog of finding the smallest crashing input.
+    \item \textbf{Compositional testing:} Greedy parameter addition to reveal optimal ordering and diminishing returns.
+\end{enumerate}
+
+The framework is demonstrated on a geometric economics model with 16 prediction targets.  The structural fuzzing campaign automatically discovers that only 3 of 9 available dimensions are necessary (with the monetary dimension contributing zero sensitivity), achieving 2.70\% MAE with a Model Robustness Index of 1.39.  All parameters are discovered by automated search, not hand-tuned.
+
+This work is relevant to \emph{TOSEM} because it extends the fuzzing methodology---a core software engineering technique---to a new and important application domain.  The framework is implemented in Python and is applicable to any parameterized model with identifiable input dimensions and quantitative prediction targets, including ML models, agent-based simulations, and cognitive architectures.
+
+The manuscript has not been published previously and is not under consideration elsewhere.  The software implementation is publicly available under the MIT open-source license.
+
+\medskip
+\noindent\textbf{Journal-First Novelty Attestation.}
+This manuscript is submitted as a Journal-First paper.  The structural fuzzing framework, including all six components (dimension enumeration, Pareto frontier extraction, sensitivity profiling, Model Robustness Index, adversarial threshold search, and compositional testing), is entirely novel and has not appeared in any prior publication.  The MRI metric adapts the Bond Index formula from the LLM evaluation domain to parameterized model validation---a new application.  A companion empirical paper (under review at IEEE TCSS) applies the framework to validate a geometric economics model, but that paper's contribution is the \emph{empirical results} (cross-domain prediction accuracy), not the validation methodology.  The present manuscript's contribution is the \emph{methodology itself}: six algorithms with formal pseudocode, complexity analysis, SE analogies, comparison with cross-validation/BIC/Bayes, generalizability analysis, and threats to validity.  The methodological content, SE framing, algorithm specifications, implementation analysis, and discussion of applicability to ML models, agent-based simulations, and cognitive architectures are entirely unique to this manuscript.  The only shared material is approximately two pages of case study prediction data (out of 19 pages), representing less than 11\% overlap---well within the 30\% threshold.
+
+\medskip
+Generative AI tools (Claude, Anthropic) were used for manuscript preparation and formatting; all intellectual content, methodology design, and experimental analysis are the author's own.
+
+Thank you for considering this submission.
+
+\closing{Sincerely,\\[2em]
+Andrew H. Bond\\
+Senior Lecturer, Department of Computer Engineering\\
+San Jos\'{e} State University\\
+\href{mailto:andrew.bond@sjsu.edu}{andrew.bond@sjsu.edu}\\
+ORCID: 0009-0003-2599-6158}
+
+\end{letter}
+\end{document}

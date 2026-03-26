@@ -1,0 +1,495 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Multi-Attribute Equilibrium: A Manifold Generalization of Nash</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"
+  onload="renderMathInElement(document.body, {
+    delimiters: [
+      {left: '$$', right: '$$', display: true},
+      {left: '$', right: '$', display: false}
+    ],
+    throwOnError: false
+  })"></script>
+<style>
+  :root {
+    --text: #1a1a2e;
+    --text-light: #4a4a6a;
+    --accent: #2c5282;
+    --accent-light: #ebf4ff;
+    --border: #e2e8f0;
+    --bg: #ffffff;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: 'Times New Roman', 'Nimbus Roman', Georgia, serif;
+    color: var(--text);
+    max-width: 720px;
+    margin: 0 auto;
+    padding: 40px 24px;
+    line-height: 1.65;
+    font-size: 11.5pt;
+  }
+
+  /* Title block */
+  .title-block { text-align: center; margin-bottom: 36px; padding-bottom: 24px; border-bottom: 1px solid var(--border); }
+  .title-block h1 { font-size: 20pt; font-weight: 700; margin-bottom: 8px; line-height: 1.3; }
+  .title-block .subtitle { font-size: 13pt; color: var(--text-light); font-style: italic; margin-bottom: 16px; }
+  .title-block .authors { font-size: 11pt; margin-bottom: 4px; }
+  .title-block .affiliation { font-size: 10pt; color: var(--text-light); }
+  .title-block .date { font-size: 10pt; color: var(--text-light); margin-top: 8px; }
+
+  /* Abstract */
+  .abstract { background: var(--accent-light); padding: 20px 24px; border-radius: 4px; margin-bottom: 32px; font-size: 10.5pt; }
+  .abstract h2 { font-size: 11pt; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 8px; }
+  .abstract p { margin-bottom: 8px; }
+  .abstract .keywords { font-style: italic; font-size: 10pt; color: var(--text-light); margin-top: 12px; }
+
+  /* Sections */
+  h2 { font-size: 14pt; margin-top: 32px; margin-bottom: 12px; color: var(--accent); }
+  h3 { font-size: 12pt; margin-top: 20px; margin-bottom: 8px; }
+  p { margin-bottom: 12px; text-align: justify; }
+
+  /* Theorem environments */
+  .theorem, .definition, .proposition, .corollary, .remark, .example, .proof {
+    margin: 16px 0;
+    padding: 12px 16px;
+    border-radius: 3px;
+  }
+  .definition { background: #f0f7ff; border-left: 3px solid #3182ce; }
+  .theorem { background: #f0fff4; border-left: 3px solid #38a169; }
+  .proposition { background: #f0fff4; border-left: 3px solid #38a169; }
+  .corollary { background: #fffff0; border-left: 3px solid #d69e2e; }
+  .remark { background: #faf5ff; border-left: 3px solid #805ad5; }
+  .example { background: #fff5f5; border-left: 3px solid #e53e3e; }
+  .proof { background: #f7fafc; border-left: 3px solid #a0aec0; }
+  .env-label { font-weight: 700; font-variant: small-caps; }
+  .proof .env-label::after { content: "."; }
+  .qed { float: right; }
+
+  /* Figures */
+  .figure { margin: 24px 0; text-align: center; }
+  .figure svg { max-width: 100%; }
+  .figure .caption { font-size: 10pt; color: var(--text-light); margin-top: 8px; text-align: center; }
+  .figure .caption strong { color: var(--text); }
+
+  /* Lists */
+  ol, ul { margin: 8px 0 12px 24px; }
+  li { margin-bottom: 4px; }
+
+  /* Tables */
+  table { border-collapse: collapse; margin: 16px auto; font-size: 10.5pt; }
+  th, td { padding: 6px 12px; border: 1px solid var(--border); }
+  th { background: var(--accent-light); font-weight: 600; }
+
+  /* References */
+  .references { font-size: 10pt; }
+  .references p { text-indent: -24px; padding-left: 24px; margin-bottom: 6px; }
+
+  /* Display math spacing */
+  .katex-display { margin: 16px 0; }
+
+  /* Footnotes */
+  .footnote { font-size: 9pt; color: var(--text-light); }
+</style>
+</head>
+<body>
+
+<div class="title-block">
+  <h1>Multi-Attribute Equilibrium:<br>A Manifold Generalization of Nash</h1>
+  <div class="authors">Andrew H. Bond</div>
+  <div class="affiliation">Department of Computer Engineering<br>San Jos&eacute; State University</div>
+  <div class="date">March 2026</div>
+</div>
+
+<div class="abstract">
+  <h2>Abstract</h2>
+  <p>
+    We introduce the <em>multi-attribute equilibrium</em> (MAE), a generalization of Nash equilibrium in which agents optimize over a multi-dimensional attribute space rather than a scalar payoff. Each agent's strategy is a minimum-cost path on a weighted simplicial complex whose edge weights are Mahalanobis distances over a $d$-dimensional attribute vector&mdash;capturing not only monetary payoff but additional dimensions such as fairness, reputation, trust, and constraint compliance.
+  </p>
+  <p>
+    We prove three principal results: (1) every MAE is a Nash equilibrium of an appropriately constructed augmented game, establishing formal equivalence; (2) when the attribute space collapses to a single monetary dimension, the MAE reduces exactly to the standard Nash equilibrium, so the classical theory is nested as a special case; (3) when non-monetary dimensions carry positive weight, the MAE refines Nash by excluding equilibria that require crossing high-cost attribute boundaries. We derive comparative statics showing when and why the MAE and Nash predictions diverge, characterize the divergence in terms of the spectral properties of the attribute covariance matrix, and demonstrate the framework on three canonical games where Nash predictions are known to fail empirically: the ultimatum game, the trust game, and the public goods game.
+  </p>
+  <div class="keywords"><strong>Keywords:</strong> Nash equilibrium, multi-attribute decision, Mahalanobis distance, game theory, behavioral economics, fairness, manifold, simplicial complex</div>
+</div>
+
+<!-- ════════════════════════════════════════════════════════════════ -->
+<h2>1. Introduction</h2>
+
+<p>
+  Nash equilibrium is the dominant solution concept in non-cooperative game theory: a strategy profile from which no player can unilaterally deviate to improve their payoff. The framework assumes that each player maximizes a scalar payoff function $u_i : S \to \mathbb{R}$, where $S$ is the joint strategy space. This assumption produces clean existence theorems (Nash, 1950), a rich refinement literature, and predictions that are systematically violated in laboratory and field experiments involving fairness, trust, reciprocity, and social norms.
+</p>
+<p>
+  The standard response has been to modify the payoff function. Fehr and Schmidt (1999) add inequality aversion; Bolton and Ockenfels (2000) add equity concerns; Rabin (1993) adds reciprocity; Levine (1998) adds altruism and spite. Each modification improves predictions for specific games but introduces new parameters, and the modifications are not derived from a common principle&mdash;they are fitted to the anomalies they target.
+</p>
+<p>
+  We propose a different approach. Rather than modifying the payoff function, we generalize the <em>space on which optimization occurs</em>. We replace the scalar payoff $u_i \in \mathbb{R}$ with a $d$-dimensional attribute vector $\mathbf{a}_i \in \mathbb{R}^d$, and we replace payoff maximization with path-cost minimization on a weighted simplicial complex whose edge weights are Mahalanobis distances over attribute vectors. The resulting solution concept&mdash;the <em>multi-attribute equilibrium</em> (MAE)&mdash;nests Nash equilibrium as the special case $d = 1$ and refines it when $d > 1$.
+</p>
+<p>
+  The key insight is geometric: a preference relation that is transitive in $d$ dimensions can appear intransitive when projected to one dimension, just as a helix that ascends monotonically in three dimensions appears to reverse direction when projected onto a plane. The "anomalies" of behavioral game theory are not failures of rationality&mdash;they are artifacts of dimensional projection.
+</p>
+
+<!-- Figure 1: Projection illustration -->
+<div class="figure">
+  <svg viewBox="0 0 600 280" xmlns="http://www.w3.org/2000/svg" style="max-width:540px">
+    <!-- Left: 3D helix -->
+    <text x="150" y="20" text-anchor="middle" font-size="12" font-weight="bold" fill="#2c5282">Full Attribute Space (d = 3)</text>
+    <!-- Axes -->
+    <line x1="40" y1="240" x2="260" y2="240" stroke="#a0aec0" stroke-width="1"/>
+    <line x1="40" y1="240" x2="40" y2="40" stroke="#a0aec0" stroke-width="1"/>
+    <line x1="40" y1="240" x2="120" y2="270" stroke="#a0aec0" stroke-width="1"/>
+    <text x="260" y="255" font-size="9" fill="#4a4a6a">monetary (d₁)</text>
+    <text x="15" y="40" font-size="9" fill="#4a4a6a">fairness (d₂)</text>
+    <text x="115" y="268" font-size="9" fill="#4a4a6a">trust (d₃)</text>
+    <!-- Helix path (monotonically ascending in 3D) -->
+    <path d="M 60,220 C 80,200 120,180 100,160 C 80,140 140,120 120,100 C 100,80 160,60 140,50"
+          fill="none" stroke="#38a169" stroke-width="2.5" stroke-linecap="round"/>
+    <circle cx="60" cy="220" r="4" fill="#38a169"/>
+    <circle cx="140" cy="50" r="4" fill="#38a169"/>
+    <text x="70" y="232" font-size="9" fill="#38a169" font-weight="600">start</text>
+    <text x="148" y="48" font-size="9" fill="#38a169" font-weight="600">goal</text>
+    <!-- Arrow showing monotonic ascent -->
+    <path d="M 170,180 L 170,80" fill="none" stroke="#38a169" stroke-width="1" stroke-dasharray="3,3" marker-end="url(#arr-g)"/>
+    <text x="178" y="130" font-size="8" fill="#38a169">monotonic</text>
+    <defs>
+      <marker id="arr-g" markerWidth="6" markerHeight="6" refX="5" refY="3" orient="auto"><path d="M 0 0 L 6 3 L 0 6 Z" fill="#38a169"/></marker>
+      <marker id="arr-r" markerWidth="6" markerHeight="6" refX="5" refY="3" orient="auto"><path d="M 0 0 L 6 3 L 0 6 Z" fill="#e53e3e"/></marker>
+    </defs>
+
+    <!-- Arrow between panels -->
+    <text x="300" y="130" text-anchor="middle" font-size="28" fill="#a0aec0">→</text>
+    <text x="300" y="150" text-anchor="middle" font-size="9" fill="#a0aec0">project to d₁</text>
+
+    <!-- Right: Projected (appears non-monotonic) -->
+    <text x="450" y="20" text-anchor="middle" font-size="12" font-weight="bold" fill="#e53e3e">Scalar Projection (d = 1)</text>
+    <line x1="340" y1="240" x2="560" y2="240" stroke="#a0aec0" stroke-width="1"/>
+    <line x1="340" y1="240" x2="340" y2="40" stroke="#a0aec0" stroke-width="1"/>
+    <text x="560" y="255" font-size="9" fill="#4a4a6a">monetary (d₁)</text>
+    <text x="315" y="40" font-size="9" fill="#4a4a6a">payoff</text>
+    <!-- Projected path (non-monotonic, appears to reverse) -->
+    <path d="M 370,200 L 410,160 L 390,140 L 440,100 L 420,80 L 480,50"
+          fill="none" stroke="#e53e3e" stroke-width="2.5" stroke-linecap="round"/>
+    <circle cx="370" cy="200" r="4" fill="#e53e3e"/>
+    <circle cx="480" cy="50" r="4" fill="#e53e3e"/>
+    <!-- Highlight reversals -->
+    <circle cx="410" cy="160" r="8" fill="none" stroke="#e53e3e" stroke-width="1" stroke-dasharray="2,2"/>
+    <circle cx="440" cy="100" r="8" fill="none" stroke="#e53e3e" stroke-width="1" stroke-dasharray="2,2"/>
+    <text x="430" y="175" font-size="8" fill="#e53e3e">"irrational"</text>
+    <text x="458" y="115" font-size="8" fill="#e53e3e">reversal</text>
+  </svg>
+  <div class="caption"><strong>Figure 1.</strong> A path that is monotonically optimal on the full attribute manifold (left) can exhibit apparent preference reversals when projected to a single monetary dimension (right). The "irrationalities" are projection artifacts.</div>
+</div>
+
+<h2>2. The Model</h2>
+
+<h3>2.1 Attribute Vectors and the Decision Complex</h3>
+
+<div class="definition">
+  <p><span class="env-label">Definition 1</span> (Attribute Vector). Each economic state $v$ carries an <em>attribute vector</em> $\mathbf{a}(v) \in \mathbb{R}^d$ whose components represent evaluatively distinct dimensions of the decision. In the general case we identify $d = 9$ dimensions: consequences ($a_1$, monetary), rights ($a_2$), fairness ($a_3$), autonomy ($a_4$), trust ($a_5$), social impact ($a_6$), identity ($a_7$), legitimacy ($a_8$), and epistemic status ($a_9$). The framework applies for any $d \geq 1$.</p>
+</div>
+
+<div class="definition">
+  <p><span class="env-label">Definition 2</span> (Decision Complex). The <em>decision complex</em> $\mathcal{C}_i$ for agent $i$ is a weighted simplicial complex:
+  <ul>
+    <li><em>Vertices</em> (0-simplices): economic states $v$ with attribute vectors $\mathbf{a}(v)$.</li>
+    <li><em>Edges</em> (1-simplices): available actions, each connecting state $v$ to state $v'$.</li>
+    <li><em>Edge weights</em>: the <em>behavioral friction</em> of the action (defined below).</li>
+  </ul>
+  </p>
+</div>
+
+<div class="definition">
+  <p><span class="env-label">Definition 3</span> (Behavioral Friction). The cost of an action (edge) from state $v$ to state $v'$ is the <em>behavioral friction</em>:
+  $$\mathrm{BF}(v, v') = \sqrt{(\mathbf{a}(v') - \mathbf{a}(v))^\top \Sigma^{-1} (\mathbf{a}(v') - \mathbf{a}(v))} + \sum_{k} \beta_k \cdot \mathbf{1}[\text{action crosses boundary } k]$$
+  where $\Sigma \in \mathbb{R}^{d \times d}$ is the attribute covariance matrix (capturing cross-dimensional correlations) and $\beta_k \geq 0$ are boundary penalties for crossing discrete constraint boundaries (e.g., legality, taboo).</p>
+</div>
+
+<p>
+  The Mahalanobis distance $\sqrt{\Delta\mathbf{a}^\top \Sigma^{-1} \Delta\mathbf{a}}$ is essential, not ornamental. Economic dimensions are correlated: fairness ($a_3$) interacts with consequences ($a_1$); trust ($a_5$) gates the weight of social impact ($a_6$). An $L^2$ norm treats dimensions as orthogonal and systematically mispredicts. The inverse covariance $\Sigma^{-1}$ is estimated from observed economic behavior&mdash;precisely as Mahalanobis (1936) intended.
+</p>
+
+<!-- Figure 2: Mahalanobis vs Euclidean -->
+<div class="figure">
+  <svg viewBox="0 0 560 250" xmlns="http://www.w3.org/2000/svg" style="max-width:500px">
+    <!-- Left panel: Euclidean -->
+    <text x="130" y="18" text-anchor="middle" font-size="11" font-weight="bold" fill="#4a4a6a">Euclidean (L²)</text>
+    <circle cx="130" cy="130" r="80" fill="none" stroke="#a0aec0" stroke-width="1.5" stroke-dasharray="4,3"/>
+    <circle cx="130" cy="130" r="50" fill="none" stroke="#a0aec0" stroke-width="1" stroke-dasharray="4,3"/>
+    <line x1="30" y1="130" x2="230" y2="130" stroke="#e2e8f0" stroke-width="0.5"/>
+    <line x1="130" y1="30" x2="130" y2="230" stroke="#e2e8f0" stroke-width="0.5"/>
+    <circle cx="130" cy="130" r="3" fill="#2c5282"/>
+    <text x="235" y="135" font-size="9" fill="#4a4a6a">monetary</text>
+    <text x="120" y="28" font-size="9" fill="#4a4a6a">fairness</text>
+    <!-- Points A, B equidistant in L2 -->
+    <circle cx="180" cy="80" r="5" fill="#e53e3e"/>
+    <text x="188" y="78" font-size="9" fill="#e53e3e" font-weight="600">A</text>
+    <circle cx="80" cy="180" r="5" fill="#38a169"/>
+    <text x="62" y="185" font-size="9" fill="#38a169" font-weight="600">B</text>
+    <text x="130" y="245" font-size="9" fill="#4a4a6a" text-anchor="middle">d(A) = d(B) — no preference</text>
+
+    <!-- Arrow -->
+    <text x="280" y="130" font-size="22" fill="#a0aec0">→</text>
+
+    <!-- Right panel: Mahalanobis -->
+    <text x="420" y="18" text-anchor="middle" font-size="11" font-weight="bold" fill="#2c5282">Mahalanobis</text>
+    <!-- Ellipses (tilted — fairness-monetary correlated) -->
+    <g transform="translate(420,130) rotate(-30)">
+      <ellipse rx="90" ry="40" fill="none" stroke="#2c5282" stroke-width="1.5" stroke-dasharray="4,3"/>
+      <ellipse rx="56" ry="25" fill="none" stroke="#2c5282" stroke-width="1" stroke-dasharray="4,3"/>
+    </g>
+    <line x1="320" y1="130" x2="520" y2="130" stroke="#e2e8f0" stroke-width="0.5"/>
+    <line x1="420" y1="30" x2="420" y2="230" stroke="#e2e8f0" stroke-width="0.5"/>
+    <circle cx="420" cy="130" r="3" fill="#2c5282"/>
+    <text x="525" y="135" font-size="9" fill="#4a4a6a">monetary</text>
+    <text x="410" y="28" font-size="9" fill="#4a4a6a">fairness</text>
+    <!-- Same points A, B — different Mahalanobis distances -->
+    <circle cx="470" cy="80" r="5" fill="#e53e3e"/>
+    <text x="478" y="78" font-size="9" fill="#e53e3e" font-weight="600">A</text>
+    <circle cx="370" cy="180" r="5" fill="#38a169"/>
+    <text x="352" y="185" font-size="9" fill="#38a169" font-weight="600">B</text>
+    <text x="420" y="245" font-size="9" fill="#2c5282" text-anchor="middle" font-weight="600">d(A) &lt; d(B) — A preferred (along correlation)</text>
+  </svg>
+  <div class="caption"><strong>Figure 2.</strong> Euclidean distance treats monetary and fairness dimensions as independent, yielding equal distance to options A and B. Mahalanobis distance captures the correlation structure: option A (high monetary, high fairness) aligns with the principal axis of observed behavior, making it closer&mdash;i.e., lower friction.</div>
+</div>
+
+<h3>2.2 Multi-Attribute Equilibrium</h3>
+
+<div class="definition">
+  <p><span class="env-label">Definition 4</span> (Strategy as Path). A <em>strategy</em> for agent $i$ is a path $\gamma_i$ through agent $i$'s decision complex $\mathcal{C}_i$&mdash;a sequence of actions from the initial state $v_0^i$ to a goal state in $G_i$. The <em>total behavioral friction</em> of a strategy is:
+  $$\mathrm{BF}_i(\gamma_i) = \sum_{t=0}^{m-1} \mathrm{BF}(v_t, v_{t+1})$$
+  </p>
+</div>
+
+<div class="definition">
+  <p><span class="env-label">Definition 5</span> (Multi-Attribute Equilibrium). A strategy profile $(\gamma_1^*, \ldots, \gamma_n^*)$ is a <em>multi-attribute equilibrium</em> (MAE) if each $\gamma_i^*$ minimizes agent $i$'s behavioral friction given the others' strategies:
+  $$\gamma_i^* = \arg\min_{\gamma_i \in \Gamma_i} \mathrm{BF}_i(\gamma_i \mid \gamma_{-i}^*) \quad \forall\, i = 1, \ldots, n$$
+  where $\Gamma_i$ is the set of feasible paths for agent $i$ and $\gamma_{-i}^*$ denotes the strategies of all agents except $i$.
+  </p>
+</div>
+
+<h2>3. Main Results</h2>
+
+<h3>3.1 Equivalence with Nash</h3>
+
+<div class="definition">
+  <p><span class="env-label">Definition 6</span> (Augmented Game). Given a multi-agent setting with decision complexes $(\mathcal{C}_1, \ldots, \mathcal{C}_n)$, the <em>augmented game</em> $\hat{G}$ is the normal-form game $\hat{G} = \langle N, (\Gamma_i)_{i \in N}, (\hat{u}_i)_{i \in N} \rangle$ where:
+  <ul>
+    <li>$N = \{1, \ldots, n\}$ is the set of players.</li>
+    <li>$\Gamma_i$ is the finite set of simple paths from $v_0^i$ to $G_i$ in $\mathcal{C}_i$ (player $i$'s pure strategies).</li>
+    <li>$\hat{u}_i(\gamma_i, \gamma_{-i}) = -\mathrm{BF}_i(\gamma_i \mid \gamma_{-i})$ (payoff = negative friction).</li>
+  </ul>
+  </p>
+</div>
+
+<div class="theorem">
+  <p><span class="env-label">Theorem 1</span> (MAE&ndash;Nash Equivalence). A strategy profile $(\gamma_1^*, \ldots, \gamma_n^*)$ is a multi-attribute equilibrium if and only if it is a Nash equilibrium of the augmented game $\hat{G}$.</p>
+</div>
+
+<div class="proof">
+  <p><span class="env-label">Proof</span> By construction, $\gamma_i^*$ minimizes $\mathrm{BF}_i$ over $\Gamma_i$ if and only if $\gamma_i^*$ maximizes $\hat{u}_i = -\mathrm{BF}_i$ over $\Gamma_i$. The MAE condition (Definition 5) is therefore identical to the Nash best-response condition on $\hat{G}$.
+  <span class="qed">$\square$</span></p>
+</div>
+
+<p>
+  This equivalence is structural, not trivial. It means that the MAE inherits all existence results for Nash equilibrium: if the augmented game has finite strategy spaces (guaranteed when the decision complex is finite), then a mixed MAE exists by Nash's theorem. The contribution is not a new existence result but a new <em>construction</em> of the game&mdash;one that captures multi-dimensional attribute trade-offs within the standard Nash machinery.
+</p>
+
+<h3>3.2 Scalar Nesting: Nash as a Special Case</h3>
+
+<div class="theorem">
+  <p><span class="env-label">Theorem 2</span> (Scalar Nesting). Consider a single-action game in which each agent $i$ chooses one action $a_i \in A_i$ (so each "path" is a single edge). If the attribute space is one-dimensional ($d = 1$) and all boundary penalties are zero ($\beta_k = 0\ \forall k$), then $\mathrm{BF}_i$ reduces to:
+  $$\mathrm{BF}_i(a_i, a_{-i}) = \sigma_1^{-1} |\Delta a_1(a_i, a_{-i})|$$
+  and the MAE coincides with the Nash equilibrium of the standard monetary game.</p>
+</div>
+
+<div class="proof">
+  <p><span class="env-label">Proof</span> When $d = 1$, the Mahalanobis distance reduces to $|\Delta a_1| / \sigma_1$, which is a positive monotone transformation of the absolute change in the single attribute. Since $\sigma_1 > 0$ is constant across strategies, minimizing $\mathrm{BF}_i$ is equivalent to minimizing $|\Delta a_1|$, which in the single-action case (where the goal is to maximize $a_1$) selects the action that maximizes the monetary payoff. This is the standard Nash best-response.
+  <span class="qed">$\square$</span></p>
+</div>
+
+<!-- Figure 3: Nesting diagram -->
+<div class="figure">
+  <svg viewBox="0 0 500 200" xmlns="http://www.w3.org/2000/svg" style="max-width:460px">
+    <!-- Nested circles -->
+    <ellipse cx="250" cy="100" rx="230" ry="90" fill="#f0fff4" stroke="#38a169" stroke-width="2"/>
+    <text x="250" y="30" text-anchor="middle" font-size="11" font-weight="600" fill="#38a169">Multi-Attribute Equilibrium (d ≥ 1, β ≥ 0)</text>
+
+    <ellipse cx="250" cy="110" rx="160" ry="60" fill="#fffff0" stroke="#d69e2e" stroke-width="1.5"/>
+    <text x="250" y="72" text-anchor="middle" font-size="10" fill="#d69e2e">MAE with β > 0 (boundary refinement)</text>
+
+    <ellipse cx="250" cy="118" rx="90" ry="35" fill="#ebf4ff" stroke="#2c5282" stroke-width="1.5"/>
+    <text x="250" y="113" text-anchor="middle" font-size="10" font-weight="600" fill="#2c5282">Nash Equilibrium</text>
+    <text x="250" y="128" text-anchor="middle" font-size="9" fill="#4a4a6a">(d = 1, β = 0)</text>
+
+    <!-- Labels for regions -->
+    <text x="420" y="165" font-size="8" fill="#38a169">Multi-step path</text>
+    <text x="420" y="177" font-size="8" fill="#38a169">equilibria</text>
+    <text x="80" y="80" font-size="8" fill="#d69e2e">Fairness-</text>
+    <text x="80" y="92" font-size="8" fill="#d69e2e">constrained</text>
+  </svg>
+  <div class="caption"><strong>Figure 3.</strong> Nesting structure. Nash equilibrium is the innermost case ($d = 1$, $\beta = 0$). Adding boundary penalties excludes equilibria that cross attribute constraints. Adding multi-step paths and higher-dimensional attributes further enriches the equilibrium set.</div>
+</div>
+
+<h3>3.3 Boundary Refinement</h3>
+
+<div class="theorem">
+  <p><span class="env-label">Theorem 3</span> (Boundary Refinement). Let $(\gamma_1^*, \ldots, \gamma_n^*)$ be a Nash equilibrium of the scalar monetary game in which agent $i$'s strategy requires crossing boundary $k$ with penalty $\beta_k > 0$. Let $\gamma_i'$ be an alternative strategy for agent $i$ that avoids boundary $k$ with monetary cost disadvantage $\delta_i > 0$. If $\beta_k > \delta_i$, then the boundary-crossing profile is not an MAE.</p>
+</div>
+
+<div class="proof">
+  <p><span class="env-label">Proof</span> In the augmented game, agent $i$'s payoff for the boundary-crossing strategy is $\hat{u}_i(\gamma_i^*) = -\mathrm{BF}_i(\gamma_i^*)$, which includes the boundary penalty $\beta_k$. The alternative strategy yields $\hat{u}_i(\gamma_i') = -\mathrm{BF}_i(\gamma_i')$, which avoids $\beta_k$ at monetary cost $\delta_i$. The net deviation gain is:
+  $$\hat{u}_i(\gamma_i') - \hat{u}_i(\gamma_i^*) = \beta_k - \sigma_1^{-1}\delta_i$$
+  When $\beta_k > \sigma_1^{-1}\delta_i$, agent $i$ strictly prefers the boundary-avoiding strategy, and the original profile is not a best response in $\hat{G}$, hence not an MAE.
+  <span class="qed">$\square$</span></p>
+</div>
+
+<p>
+  Theorem 3 is the key refinement result. It explains, within a single framework, why agents reject positive-expected-value transactions that cross moral or social boundaries. The "irrationality" is rational on the full attribute space; it is only irrational on the scalar projection.
+</p>
+
+<h3>3.4 Spectral Characterization of Divergence</h3>
+
+<div class="proposition">
+  <p><span class="env-label">Proposition 4</span> (Spectral Divergence Bound). Let $\Sigma$ be the $d \times d$ attribute covariance matrix with eigenvalues $\lambda_1 \geq \cdots \geq \lambda_d > 0$. The maximum divergence between the MAE path cost and the scalar-projected path cost is bounded by:
+  $$\frac{\mathrm{BF}_{\text{MAE}}}{\mathrm{BF}_{\text{scalar}}} \leq \sqrt{\frac{\lambda_1}{\lambda_d}} = \kappa(\Sigma)^{1/2}$$
+  where $\kappa(\Sigma) = \lambda_1 / \lambda_d$ is the condition number of $\Sigma$. When $\Sigma = \sigma^2 I$ (isotropic, uncorrelated dimensions), the bound is 1 and the MAE and scalar predictions agree. The divergence grows with the anisotropy of $\Sigma$.</p>
+</div>
+
+<p>
+  This result gives an empirically testable prediction: the MAE diverges from Nash most strongly in domains where the attribute dimensions are highly correlated and unequally weighted&mdash;precisely the domains (fairness-loaded bargaining, trust-dependent exchange) where behavioral anomalies are most pronounced.
+</p>
+
+<h2>4. Applications</h2>
+
+<h3>4.1 The Ultimatum Game</h3>
+
+<p>
+  In the standard ultimatum game, a proposer offers a division of a sum $M$ to a responder, who accepts or rejects (destroying the entire sum). Nash equilibrium predicts that the proposer offers the minimum positive amount and the responder accepts&mdash;since any positive amount exceeds zero. Empirically, modal offers are 40&ndash;50% of $M$, and offers below 20% are rejected roughly half the time (G&uuml;th et al., 1982; Camerer, 2003).
+</p>
+
+<!-- Figure 4: Ultimatum game on attribute space -->
+<div class="figure">
+  <svg viewBox="0 0 520 280" xmlns="http://www.w3.org/2000/svg" style="max-width:480px">
+    <!-- Attribute space plot -->
+    <line x1="60" y1="240" x2="480" y2="240" stroke="#a0aec0" stroke-width="1"/>
+    <line x1="60" y1="240" x2="60" y2="20" stroke="#a0aec0" stroke-width="1"/>
+    <text x="480" y="258" font-size="10" fill="#4a4a6a">monetary payoff (a₁)</text>
+    <text x="15" y="20" font-size="10" fill="#4a4a6a">fairness (a₃)</text>
+
+    <!-- Nash prediction region -->
+    <rect x="380" y="180" width="80" height="50" rx="3" fill="#fee2e2" stroke="#e53e3e" stroke-width="1" stroke-dasharray="3,2"/>
+    <text x="420" y="200" text-anchor="middle" font-size="9" fill="#e53e3e" font-weight="600">Nash</text>
+    <text x="420" y="213" text-anchor="middle" font-size="8" fill="#e53e3e">(high $, low fair)</text>
+
+    <!-- MAE prediction region -->
+    <rect x="200" y="50" width="100" height="60" rx="3" fill="#f0fff4" stroke="#38a169" stroke-width="1.5"/>
+    <text x="250" y="75" text-anchor="middle" font-size="9" fill="#38a169" font-weight="600">MAE</text>
+    <text x="250" y="90" text-anchor="middle" font-size="8" fill="#38a169">(moderate $, high fair)</text>
+
+    <!-- Empirical data cluster -->
+    <g fill="#2c5282" opacity="0.5">
+      <circle cx="220" cy="70" r="3"/><circle cx="240" cy="60" r="3"/>
+      <circle cx="230" cy="80" r="3"/><circle cx="260" cy="65" r="3"/>
+      <circle cx="245" cy="75" r="3"/><circle cx="235" cy="55" r="3"/>
+      <circle cx="255" cy="85" r="3"/><circle cx="225" cy="68" r="3"/>
+      <circle cx="250" cy="58" r="3"/><circle cx="238" cy="72" r="3"/>
+      <circle cx="215" cy="78" r="3"/><circle cx="265" cy="70" r="3"/>
+    </g>
+    <text x="310" y="55" font-size="9" fill="#2c5282" font-style="italic">empirical offers</text>
+    <text x="310" y="67" font-size="9" fill="#2c5282" font-style="italic">(40–50% splits)</text>
+
+    <!-- Fairness boundary -->
+    <line x1="60" y1="150" x2="480" y2="150" stroke="#d69e2e" stroke-width="1.5" stroke-dasharray="6,3"/>
+    <text x="395" y="145" font-size="9" fill="#d69e2e" font-weight="600">fairness boundary (β₃ &gt; 0)</text>
+
+    <!-- Arrow from Nash to "rejected" -->
+    <path d="M 420,235 L 420,260" stroke="#e53e3e" stroke-width="1" marker-end="url(#arr-r)"/>
+    <text x="420" y="275" text-anchor="middle" font-size="8" fill="#e53e3e">rejected ≈50% of the time</text>
+  </svg>
+  <div class="caption"><strong>Figure 4.</strong> Ultimatum game in attribute space. Nash equilibrium (bottom-right) maximizes monetary payoff but falls below the fairness boundary. The MAE (top-center) balances monetary and fairness dimensions, predicting the empirically observed 40&ndash;50% offers.</div>
+</div>
+
+<div class="example">
+  <p><span class="env-label">Example 1</span> (Ultimatum Game MAE). Model the responder's decision on $d = 2$: monetary payoff ($a_1$) and fairness ($a_3$). The responder's attribute vector for accepting an offer of $x$ out of $M$ is $\mathbf{a}_{\text{accept}} = (x,\; f(x/M))$ where $f$ is increasing in the offer fraction. The attribute vector for rejection is $\mathbf{a}_{\text{reject}} = (0,\; f_0)$ where $f_0$ reflects the fairness value of "punishing an unfair proposer."</p>
+  <p>The responder rejects when $\mathrm{BF}(\text{reject}) < \mathrm{BF}(\text{accept})$. With Mahalanobis distance incorporating the fairness-monetary correlation, this occurs when the offer is sufficiently low that the fairness deficit outweighs the monetary gain&mdash;precisely the pattern observed experimentally. The threshold offer depends on $\Sigma$, which varies across cultures (Henrich et al., 2001), explaining cross-cultural variation in ultimatum game behavior without changing the model structure.</p>
+</div>
+
+<h3>4.2 The Trust Game</h3>
+
+<p>
+  In the trust game (Berg et al., 1995), a sender can transfer money to a receiver; the transfer is tripled, and the receiver decides how much to return. Nash equilibrium predicts zero transfer (backward induction: the receiver returns nothing, so the sender sends nothing). Experimentally, senders transfer 40&ndash;60% of their endowment, and receivers return roughly the tripled amount's proportion (McCabe et al., 2003).
+</p>
+
+<div class="example">
+  <p><span class="env-label">Example 2</span> (Trust Game MAE). The sender's decision complex has $d \geq 3$: monetary ($a_1$), trust ($a_5$), and social impact ($a_6$). Sending money increases $a_5$ (trust extended) and $a_6$ (positive social signal) while decreasing $a_1$ (monetary risk). On the full manifold, the minimum-friction path sends a moderate amount&mdash;the point where the marginal trust/social gain balances the marginal monetary risk, weighted by $\Sigma^{-1}$. This predicts the observed interior optimum without introducing ad hoc "trust preferences" into the utility function.</p>
+</div>
+
+<h3>4.3 The Public Goods Game</h3>
+
+<p>
+  In the public goods game with $n$ players, each contributing from an endowment to a public pool multiplied by a factor $r$ ($1 < r < n$) and divided equally, Nash predicts zero contribution (free-riding dominates). Experiments show average contributions of 40&ndash;60% initially, declining over rounds but never reaching zero (Ledyard, 1995).
+</p>
+
+<div class="example">
+  <p><span class="env-label">Example 3</span> (Public Goods MAE). Contribution activates fairness ($a_3$: doing one's share), identity ($a_7$: "I am a cooperator"), and social impact ($a_6$). The MAE predicts interior contributions&mdash;the friction-minimizing path balances monetary loss against multi-dimensional attribute gains. The observed decline over rounds reflects learning about others' strategies, which shifts the conditional $\Sigma$ (updating beliefs about social-norm compliance), not a convergence to the Nash prediction.</p>
+</div>
+
+<h2>5. Comparative Statics</h2>
+
+<p>The MAE framework yields testable predictions about when behavioral divergence from Nash increases:</p>
+
+<div class="proposition">
+  <p><span class="env-label">Proposition 5</span> (Divergence Increases With). The MAE diverges from Nash when:
+  <ol>
+    <li><em>Anonymity decreases</em>: non-anonymous settings activate $a_6$ (social impact), increasing $d_{\text{effective}}$.</li>
+    <li><em>Moral loading increases</em>: transactions involving fairness, trust, or identity activate more dimensions and higher $\beta_k$.</li>
+    <li><em>Attribute correlation increases</em>: higher $\kappa(\Sigma)$ amplifies cross-dimensional effects (Proposition 4).</li>
+    <li><em>Stakes are moderate</em>: very high monetary stakes compress the relative weight of non-monetary dimensions; very low stakes make monetary dimensions irrelevant. Maximum divergence occurs at intermediate stakes where multiple dimensions are simultaneously active.</li>
+  </ol>
+  These predictions are consistent with the experimental literature (Camerer, 2003; Henrich et al., 2001).
+  </p>
+</div>
+
+<h2>6. Discussion</h2>
+
+<p>
+  The MAE framework makes a specific structural claim: the "irrational" behavior observed in experimental economics is rational optimization on a richer attribute space, not failure of optimization. This claim is falsifiable. If the attribute covariance matrix $\Sigma$ can be estimated from a calibration task (e.g., multi-attribute stated preferences), then the MAE makes quantitative, out-of-sample predictions about game behavior that can be tested against both Nash and existing behavioral models (Fehr&ndash;Schmidt, Bolton&ndash;Ockenfels, Rabin).
+</p>
+<p>
+  A limitation of the present work is that the dimension count $d$ and the covariance $\Sigma$ must be specified or estimated. We do not claim that $d = 9$ is universal&mdash;the framework operates for any $d \geq 1$, and the appropriate $d$ is an empirical question for each domain. What we do claim is that $d = 1$ is systematically insufficient for morally and socially loaded decisions, and that the specific failures of $d = 1$ (the anomalies catalogued by behavioral economics) are predicted by the structure of the MAE for $d > 1$.
+</p>
+<p>
+  The framework also subsumes existing social-preference models. Fehr&ndash;Schmidt inequality aversion is the special case where $d = 2$ (monetary + fairness), $\Sigma$ is diagonal, and the fairness dimension has asymmetric weights for advantageous vs. disadvantageous inequality. Bolton&ndash;Ockenfels ERC is a different $\Sigma$ parameterization on the same two dimensions. The MAE provides the common structure from which these models are derived as special cases, just as it derives Nash as the special case $d = 1$.
+</p>
+
+<h2>7. Conclusion</h2>
+
+<p>
+  We have introduced the multi-attribute equilibrium, a generalization of Nash equilibrium that replaces scalar payoff maximization with path-cost minimization on a multi-dimensional attribute manifold. The framework nests Nash as the zero-curvature, single-dimensional special case and refines it when additional dimensions carry positive weight. It explains, within a single geometric structure, why agents reject unfair offers, extend trust, contribute to public goods, and comply with social norms&mdash;without modifying the payoff function or abandoning the assumption of rational optimization.
+</p>
+<p>
+  The core message is simple: agents are not irrational. Economists have been computing on the wrong manifold.
+</p>
+
+<h2>References</h2>
+
+<div class="references">
+  <p>Berg, J., Dickhaut, J., & McCabe, K. (1995). Trust, reciprocity, and social history. <em>Games and Economic Behavior</em>, 10(1), 122&ndash;142.</p>
+  <p>Bolton, G.E., & Ockenfels, A. (2000). ERC: A theory of equity, reciprocity, and competition. <em>American Economic Review</em>, 90(1), 166&ndash;193.</p>
+  <p>Camerer, C.F. (2003). <em>Behavioral Game Theory: Experiments in Strategic Interaction</em>. Princeton University Press.</p>
+  <p>Fehr, E., & Schmidt, K.M. (1999). A theory of fairness, competition, and cooperation. <em>Quarterly Journal of Economics</em>, 114(3), 817&ndash;868.</p>
+  <p>G&uuml;th, W., Schmittberger, R., & Schwarze, B. (1982). An experimental analysis of ultimatum bargaining. <em>Journal of Economic Behavior & Organization</em>, 3(4), 367&ndash;388.</p>
+  <p>Henrich, J., et al. (2001). In search of Homo economicus: Behavioral experiments in 15 small-scale societies. <em>American Economic Review</em>, 91(2), 73&ndash;78.</p>
+  <p>Ledyard, J.O. (1995). Public goods: A survey of experimental research. In <em>The Handbook of Experimental Economics</em> (pp. 111&ndash;194). Princeton University Press.</p>
+  <p>Levine, D.K. (1998). Modeling altruism and spitefulness in experiments. <em>Review of Economic Dynamics</em>, 1(3), 593&ndash;622.</p>
+  <p>Mahalanobis, P.C. (1936). On the generalized distance in statistics. <em>Proceedings of the National Institute of Sciences of India</em>, 2(1), 49&ndash;55.</p>
+  <p>McCabe, K.A., Rigdon, M.L., & Smith, V.L. (2003). Positive reciprocity and intentions in trust games. <em>Journal of Economic Behavior & Organization</em>, 52(2), 267&ndash;275.</p>
+  <p>Nash, J.F. (1950). Equilibrium points in n-person games. <em>Proceedings of the National Academy of Sciences</em>, 36(1), 48&ndash;49.</p>
+  <p>Rabin, M. (1993). Incorporating fairness into game theory and economics. <em>American Economic Review</em>, 83(5), 1281&ndash;1302.</p>
+</div>
+
+</body>
+</html>

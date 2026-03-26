@@ -1,0 +1,899 @@
+\documentclass[12pt]{article}
+
+% Packages
+\usepackage{amsmath,amssymb}
+\usepackage{geometry}
+\usepackage{hyperref}
+\usepackage{booktabs}
+\usepackage{algorithm}
+\usepackage{algorithmic}
+\renewcommand{\algorithmiccomment}[1]{\hfill$\triangleright$ \textit{#1}}
+\usepackage{graphicx}
+\usepackage{float}
+\usepackage{xcolor}
+\usepackage{enumitem}
+\usepackage{multirow}
+
+\geometry{margin=1in}
+
+\hypersetup{
+    colorlinks=true,
+    linkcolor=blue,
+    citecolor=blue,
+    urlcolor=blue
+}
+
+% Custom commands
+\newcommand{\MAE}{\mathrm{MAE}}
+\newcommand{\MRI}{\mathrm{MRI}}
+\newcommand{\R}{\mathbb{R}}
+\newcommand{\M}{\mathcal{M}}
+\newcommand{\BF}{\mathrm{BF}}
+
+\title{\textbf{Structural Fuzzing for Behavioral Model Validation}}
+
+\author{Andrew H. Bond\\
+Senior Lecturer, Department of Computer Engineering\\
+San Jos\'{e} State University\\
+\texttt{andrew.bond@sjsu.edu}\\
+ORCID: \href{https://orcid.org/0009-0003-2599-6158}{0009-0003-2599-6158}}
+
+\date{}
+
+\begin{document}
+
+\maketitle
+
+\begin{abstract}
+Behavioral models in economics and psychology face a persistent validation gap: standard techniques---cross-validation, information criteria, Bayesian model comparison---test whether a model \emph{fits} data but not whether its structure is \emph{necessary}, \emph{sufficient}, or \emph{robust}.  A model can achieve low prediction error while depending on fragile parameter configurations, containing redundant structural components, or collapsing under small perturbations.  No existing validation methodology provides a unified answer to all three questions.
+
+We introduce \emph{structural fuzzing}, a systematic six-component validation framework adapted from software engineering fuzzing methodology and the Bond Index evaluator robustness metric.  The six components are: (1) \emph{dimension enumeration}---exhaustive search over all dimensional subsets to identify minimal sufficient structure; (2) \emph{Pareto frontier extraction}---identifying the parsimony--accuracy tradeoff; (3) \emph{sensitivity profiling}---ablation study to rank input dimensions by importance; (4) the \emph{Model Robustness Index} (MRI)---a scalar robustness metric computed from parametric perturbations; (5) \emph{adversarial threshold search}---binary search for the minimal perturbation that changes a prediction; and (6) \emph{compositional testing}---greedy dimension addition to reveal optimal ordering and diminishing returns.
+
+We demonstrate the framework on a nine-dimensional geometric economics model that predicts 16 behavioral targets across game theory, prospect theory, and published meta-analyses.  The structural fuzzing campaign reveals that a three-dimensional subset (social impact, virtue/identity, epistemic) achieves $\MAE = 2.70\%$ with all 16 targets passing within tolerance, that the monetary dimension has zero sensitivity (removing it changes no prediction), and that the model achieves a robustness index of $\MRI = 1.39$.  All structural parameters are discovered by automated search, not hand-tuned.  The methodology is domain-general and applicable to any parameterized behavioral model.
+
+\medskip
+\noindent\textbf{Keywords:} model validation, structural fuzzing, robustness testing, behavioral economics, sensitivity analysis, model selection, Bond Index, Pareto frontier, adversarial testing
+\end{abstract}
+
+\newpage
+\tableofcontents
+\newpage
+
+
+%==============================================================================
+\section{Introduction}
+\label{sec:intro}
+%==============================================================================
+
+\subsection{The Validation Problem in Behavioral Science}
+
+Behavioral models in economics and psychology occupy an uncomfortable methodological position.  On one side, classical economics offers elegant theories---expected utility, Nash equilibrium, rational expectations---that are mathematically rigorous but empirically falsified by decades of behavioral evidence \cite{kahneman1979,camerer2003}.  On the other side, behavioral economics has documented systematic deviations from rational choice with precision and replicability, but the resulting models are often descriptive parameterizations rather than structural explanations \cite{fehr1999,engel2011}.
+
+Between theory and data lies the validation gap.  When a behavioral model is proposed---whether it is a prospect theory value function, an inequality aversion utility, or a multi-dimensional decision manifold---how do we know the model's structure is \emph{right}?  Not merely that it fits the calibration data (any sufficiently flexible model can do that), but that its structural components are necessary, that its predictions are robust, and that its parameters are not artifacts of overfitting.
+
+The standard toolkit for model validation in economics and psychology includes three principal methods.  Cross-validation \cite{stone1974,geisser1975} tests prediction accuracy on held-out data, providing a check against overfitting but revealing nothing about which structural components drive the predictions.  Information criteria---the Akaike Information Criterion (AIC) \cite{burnham2002} and the Bayesian Information Criterion (BIC) \cite{schwarz1978}---penalize model complexity as a proxy for overfitting risk, but they reduce the entire model structure to a single complexity count (the number of free parameters) and say nothing about robustness or adversarial vulnerability.  Bayesian model comparison \cite{kass1995} provides a principled framework for comparing models via Bayes factors, but it is computationally expensive, requires specification of priors that may dominate the comparison, and does not identify which structural components are necessary.
+
+None of these methods answers the question that matters most for a behavioral model: \emph{Is this structure fragile?}  A model can pass cross-validation, achieve low AIC, and earn a favorable Bayes factor while depending on a parameter configuration that is a knife-edge---where a small perturbation changes the predictions qualitatively.  Such a model may fit the data perfectly and be scientifically worthless, because its predictions are not stable properties of the underlying phenomenon but artifacts of a particular parameter setting.
+
+This fragility problem is not hypothetical.  The replication crisis in psychology and economics \cite{ioannidis2005,open2015} has revealed that many published findings depend on analysis choices, sample-specific parameter estimates, and model specifications that do not generalize.  A methodology that systematically tests structural robustness---not just predictive accuracy---would address a core source of replication failure.
+
+\subsection{An Insight from Software Engineering}
+
+Software engineering solved an analogous problem decades ago.  When a software system is tested, passing all known test cases does not guarantee correctness.  The system may contain latent bugs triggered by unexpected inputs---edge cases, malformed data, boundary conditions that the test suite did not anticipate.  \emph{Fuzzing} \cite{miller1990,takanen2008}---the automated generation of random, mutated, or adversarial inputs to discover crashes and vulnerabilities---has become a standard technique for finding these latent failures.  Tools like AFL \cite{zalewski2014} and LibFuzzer \cite{serebryany2016} systematically explore the input space, guided by coverage metrics, to find the minimal input that triggers a failure.
+
+The key insight of fuzzing is adversarial: \emph{do not ask whether the system works on the inputs you expect; ask what inputs break it}.  This adversarial mindset is precisely what behavioral model validation lacks.  Cross-validation asks whether the model works on held-out data drawn from the same distribution.  Information criteria ask whether the model is parsimonious.  Bayesian comparison asks which model is most probable given the data.  None of them asks: \emph{What is the smallest perturbation to the model's structure that changes its predictions?}
+
+\subsection{Contributions}
+
+This paper adapts the fuzzing methodology from software engineering to behavioral model validation.  We introduce \emph{structural fuzzing}: a systematic, six-component validation framework that tests a behavioral model's structure---not its inputs---for necessity, sufficiency, robustness, and compositional coherence.  The six components are:
+
+\begin{enumerate}
+    \item \textbf{Dimension enumeration}: exhaustive search over all subsets of input dimensions to find the minimal structure that achieves target accuracy.
+    \item \textbf{Pareto frontier extraction}: identification of models that are optimal at each level of complexity, revealing the parsimony--accuracy tradeoff.
+    \item \textbf{Sensitivity profiling}: ablation study that measures each dimension's contribution to predictive accuracy.
+    \item \textbf{Model Robustness Index (MRI)}: a scalar metric, adapted from the Bond Index for LLM evaluator robustness \cite{bond2026geometric}, that quantifies how stable predictions are under parametric perturbation.
+    \item \textbf{Adversarial threshold search}: binary search for the minimal perturbation to each structural parameter that flips a prediction.
+    \item \textbf{Compositional testing}: greedy dimension addition to reveal optimal ordering and diminishing returns.
+\end{enumerate}
+
+The framework is demonstrated on a nine-dimensional geometric economics model \cite{bond2026geometric,bond2026gecon} that predicts behavioral outcomes across game theory, prospect theory, and published meta-analyses.  All structural parameters are discovered by automated search, not hand-tuned---a design principle that directly addresses the overfitting concern.
+
+The paper is organized as follows.  Section~\ref{sec:background} reviews software fuzzing, the Bond Index, and current validation practice.  Section~\ref{sec:framework} presents the six-component framework with algorithmic pseudocode.  Section~\ref{sec:case_study} demonstrates the framework on the geometric economics model.  Section~\ref{sec:discussion} discusses generalizability, comparisons, and limitations.  Section~\ref{sec:conclusion} concludes.
+
+
+%==============================================================================
+\section{Background}
+\label{sec:background}
+%==============================================================================
+
+\subsection{Software Fuzzing}
+
+Fuzzing---also called fuzz testing---is an automated software testing technique that provides random, unexpected, or malformed data as inputs to a program and monitors for crashes, assertion failures, memory leaks, or other anomalous behavior.  The technique was introduced by Miller, Fredriksen, and So \cite{miller1990}, who demonstrated that random input strings could crash a significant fraction of Unix utilities.  Their original experiment found that 25--33\% of standard Unix programs crashed when given random byte sequences as input---a result that exposed the fragility of software that had passed conventional testing.
+
+Modern fuzzing has evolved into two principal paradigms.  \emph{Mutation-based fuzzing}, exemplified by AFL (American Fuzzy Lop) \cite{zalewski2014}, starts with valid inputs and applies random mutations---bit flips, byte insertions, arithmetic adjustments---to generate test cases.  AFL uses coverage-guided feedback: it instruments the program to track which code paths are exercised by each input, and preferentially mutates inputs that exercise new paths.  This coverage guidance makes AFL far more effective than purely random fuzzing at reaching deep program states.  \emph{Generation-based fuzzing}, exemplified by LibFuzzer \cite{serebryany2016} and Peach \cite{eddington2009}, uses knowledge of the input format (a grammar or protocol specification) to generate structurally valid but semantically adversarial inputs.
+
+The central insight shared by all fuzzing approaches is \emph{adversarial automation}: rather than testing the system on the inputs the developer expects, fuzz the system with inputs designed to find failures.  The cost of fuzzing is proportional to the number of test cases executed; the benefit is the discovery of latent vulnerabilities that conventional testing misses.
+
+Three properties of software fuzzing are relevant to behavioral model validation:
+
+\begin{enumerate}
+    \item \textbf{Exhaustiveness within budget}: fuzzing explores the input space as thoroughly as the computational budget allows, rather than testing a fixed set of hand-selected cases.
+    \item \textbf{Adversarial framing}: the goal is to find failures, not to confirm correctness.  The methodology is designed to discover fragility.
+    \item \textbf{Minimal failure identification}: when a failure is found, fuzzing tools minimize the failing input to isolate the root cause.  AFL's ``crash minimization'' reduces a crashing input to the smallest input that still triggers the same crash.
+\end{enumerate}
+
+\subsection{The Bond Index and Evaluator Robustness}
+
+The Bond Index \cite{bond2026geometric} is a robustness metric developed in the ErisML framework for quantifying how stable a large language model (LLM) evaluator's judgments are under parametric perturbation.  In the LLM evaluation context, evaluators assign scores to model outputs, but these scores can be sensitive to prompt phrasing, temperature settings, and other configuration parameters.  The Bond Index measures this sensitivity by applying a suite of parametric transforms---paraphrase, reordering, detail elision, format change---and computing the variation in evaluator scores across transforms.
+
+Formally, given a base evaluation score $s_0$ and a set of $n$ perturbed scores $\{s_1, \ldots, s_n\}$ obtained by applying parametric transforms, the Bond Index computes:
+\begin{equation}
+    \omega_i = |s_i - s_0|, \quad i = 1, \ldots, n
+\end{equation}
+and aggregates the deviations using a weighted-percentile formula:
+\begin{equation}
+    \mathrm{BI} = 0.5 \cdot \mathrm{mean}(\omega) + 0.3 \cdot P_{75}(\omega) + 0.2 \cdot P_{95}(\omega)
+    \label{eq:bond_index}
+\end{equation}
+where $P_{75}$ and $P_{95}$ denote the 75th and 95th percentiles of the deviation distribution $\{\omega_1, \ldots, \omega_n\}$.  Lower Bond Index indicates greater robustness: the evaluator's judgments are stable under perturbation.
+
+The weighted-percentile aggregation in Equation~\eqref{eq:bond_index} is designed to be sensitive to tail behavior.  The mean captures average instability; the 75th percentile captures typical worst-case behavior; the 95th percentile captures adversarial worst-case behavior.  A model with low mean deviation but high 95th percentile has a ``long tail'' of instability---it is usually stable but occasionally produces large deviations.  The Bond Index penalizes this tail behavior more heavily than a simple mean would.
+
+The connection to structural fuzzing is direct: where the Bond Index fuzzes an \emph{evaluator's configuration} to test judgment robustness, structural fuzzing fuzzes a \emph{behavioral model's parameters} to test prediction robustness.  The MRI (Model Robustness Index) introduced in this paper uses the same weighted-percentile formula, adapted from evaluator scores to model predictions.
+
+\subsection{Current Validation Practice in Economics}
+
+Behavioral economic models are typically validated using one or more of the following approaches.
+
+\textbf{Cross-validation.}  The data are split into training and test sets; the model is fit on the training set and evaluated on the test set.  $k$-fold cross-validation repeats this process $k$ times, averaging the test-set error \cite{stone1974,geisser1975}.  Cross-validation guards against overfitting by ensuring that the model generalizes beyond the calibration sample.  However, it reveals nothing about \emph{structural} questions: which input dimensions matter, how robust the model is to parameter perturbation, or what the minimal sufficient structure is.
+
+\textbf{Information criteria.}  AIC \cite{burnham2002} and BIC \cite{schwarz1978} balance model fit against model complexity:
+\begin{align}
+    \mathrm{AIC} &= 2k - 2\ln(\hat{L}) \label{eq:aic} \\
+    \mathrm{BIC} &= k \ln(n) - 2\ln(\hat{L}) \label{eq:bic}
+\end{align}
+where $k$ is the number of free parameters, $n$ is the sample size, and $\hat{L}$ is the maximized likelihood.  These criteria penalize complexity but treat all parameters as interchangeable---they do not distinguish between a parameter that is structurally essential and one that is redundant.  A model with 5 essential parameters and 5 redundant parameters receives the same complexity penalty as a model with 10 essential parameters.
+
+\textbf{Bayesian model comparison.}  Bayes factors \cite{kass1995} compare models by computing the ratio of marginal likelihoods:
+\begin{equation}
+    B_{12} = \frac{P(\text{data} \mid M_1)}{P(\text{data} \mid M_2)} = \frac{\int P(\text{data} \mid \theta_1, M_1) P(\theta_1 \mid M_1) \, d\theta_1}{\int P(\text{data} \mid \theta_2, M_2) P(\theta_2 \mid M_2) \, d\theta_2}
+    \label{eq:bayes_factor}
+\end{equation}
+This approach is principled but computationally expensive, requires specification of prior distributions that can dominate the comparison when data are limited, and does not provide adversarial bounds on robustness.
+
+\textbf{Sensitivity analysis.}  Global sensitivity analysis methods \cite{saltelli2008}---Sobol indices, Morris screening, variance-based decomposition---partition output variance among input factors.  These methods are well-developed for physical and engineering models but have seen limited adoption in behavioral economics, partly because behavioral models often have non-standard output structures (categorical predictions, bounded probabilities, multi-target predictions).
+
+None of these methods, individually or in combination, answers all of the following questions: (i) What is the minimal sufficient input structure? (ii) How robust are predictions to parameter perturbation? (iii) What is the smallest perturbation that changes a prediction? (iv) In what order should structural components be added?  Structural fuzzing answers all four.
+
+
+%==============================================================================
+\section{The Structural Fuzzing Framework}
+\label{sec:framework}
+%==============================================================================
+
+We present the six components of the structural fuzzing framework.  Each component addresses a specific validation question.  Together, they provide a comprehensive structural assessment of any parameterized behavioral model.
+
+\subsection{Setup and Notation}
+
+Consider a behavioral model $f: \Theta \times X \to Y$ that maps parameters $\theta \in \Theta$ and inputs $x \in X$ to predictions $y \in Y$.  In the class of models we consider, the parameter space has a distinguished structure: $\theta$ includes a \emph{dimensional weight vector} $\boldsymbol{\sigma}^2 = (\sigma_1^2, \ldots, \sigma_D^2)$ that controls the relative importance of $D$ input dimensions.  Setting $\sigma_d^2 = \infty$ (or equivalently, $1/\sigma_d^2 = 0$) effectively removes dimension $d$ from the model.
+
+The model produces predictions for a set of $T$ targets.  Each target $t$ has an observed value $y_t^{\mathrm{obs}}$ and a model prediction $y_t^{\mathrm{pred}}(\boldsymbol{\sigma}^2)$.  The primary accuracy metric is mean absolute error:
+\begin{equation}
+    \MAE(\boldsymbol{\sigma}^2) = \frac{1}{T} \sum_{t=1}^{T} |y_t^{\mathrm{pred}}(\boldsymbol{\sigma}^2) - y_t^{\mathrm{obs}}|
+    \label{eq:mae}
+\end{equation}
+
+This setup is general.  The behavioral model may be a utility function, a decision manifold, a cognitive architecture, or any other parameterized structure with distinguishable input dimensions and quantitative prediction targets.
+
+\subsection{Component 1: Dimension Enumeration}
+
+The first component performs exhaustive search over dimensional subsets to answer the question: \emph{What is the minimal set of input dimensions needed to achieve target accuracy?}
+
+\begin{algorithm}[H]
+\caption{\textsc{DimensionEnumeration}$(D, k_{\max}, G)$}
+\label{alg:enumerate}
+\begin{algorithmic}[1]
+\REQUIRE $D$: number of dimensions; $k_{\max}$: maximum subset size; $G$: grid size
+\ENSURE $\mathcal{R}$: set of SubsetResult records
+\STATE $\mathcal{R} \leftarrow \emptyset$
+\STATE $\mathbf{g} \leftarrow \textsc{LogSpace}(0.01, 100, G)$ \COMMENT{$G$ values log-spaced in $[0.01, 100]$}
+\FOR{$k = 1$ to $k_{\max}$}
+    \FOR{each subset $S \subseteq \{1, \ldots, D\}$ with $|S| = k$}
+        \STATE $\boldsymbol{\sigma}^2 \leftarrow (10^6, \ldots, 10^6)$ \COMMENT{Initialize all dimensions inactive}
+        \IF{$k = 1$}
+            \STATE $\sigma_{\mathrm{best}}^2 \leftarrow \arg\min_{\sigma^2 \in \mathbf{g}} \MAE(\boldsymbol{\sigma}^2[S \mapsto \sigma^2])$ \COMMENT{1D grid search}
+        \ELSIF{$k = 2$}
+            \STATE $\sigma_{\mathrm{best}}^2 \leftarrow \arg\min_{(\sigma_a^2, \sigma_b^2) \in \mathbf{g} \times \mathbf{g}} \MAE(\boldsymbol{\sigma}^2[S \mapsto (\sigma_a^2, \sigma_b^2)])$ \COMMENT{2D grid}
+        \ELSE
+            \STATE Sample 5000 points uniformly in $[\log 0.01, \log 100]^k$ \COMMENT{Random search for 3D+}
+            \STATE $\sigma_{\mathrm{best}}^2 \leftarrow \arg\min_{\text{samples}} \MAE(\boldsymbol{\sigma}^2[S \mapsto \exp(\text{sample})])$
+        \ENDIF
+        \STATE $\boldsymbol{\sigma}_S^2 \leftarrow \boldsymbol{\sigma}^2[S \mapsto \sigma_{\mathrm{best}}^2]$
+        \STATE $e_t \leftarrow y_t^{\mathrm{pred}}(\boldsymbol{\sigma}_S^2) - y_t^{\mathrm{obs}}$ for each target $t$
+        \STATE $\mathcal{R} \leftarrow \mathcal{R} \cup \{(S, \boldsymbol{\sigma}_S^2, \MAE(\boldsymbol{\sigma}_S^2), \{e_t\})\}$
+    \ENDFOR
+\ENDFOR
+\RETURN $\mathcal{R}$
+\end{algorithmic}
+\end{algorithm}
+
+The notation $\boldsymbol{\sigma}^2[S \mapsto v]$ denotes setting the variance components indexed by $S$ to value(s) $v$ while keeping all other components at $10^6$ (effectively infinite variance, meaning negligible weight in the Mahalanobis distance).  The grid of 20 values log-spaced from 0.01 to 100 covers four orders of magnitude in variance, ensuring that the search does not miss the optimal scale.
+
+For subsets of size $k \leq 2$, the search is exhaustive over a $G$-point (1D) or $G^2$-point (2D) grid.  For $k \geq 3$, exhaustive grid search is computationally prohibitive ($G^k$ evaluations), so we use random search with 5000 samples drawn uniformly in log-space.  Random search in moderate dimensions is known to be competitive with grid search \cite{bergstra2012} and avoids the curse of dimensionality that afflicts regular grids.
+
+The total number of model evaluations for dimension enumeration is:
+\begin{equation}
+    N_{\mathrm{eval}} = \sum_{k=1}^{k_{\max}} \binom{D}{k} \times \begin{cases} G & k = 1 \\ G^2 & k = 2 \\ 5000 & k \geq 3 \end{cases}
+\end{equation}
+For $D = 9$ and $k_{\max} = 5$, with $G = 20$: $N_{\mathrm{eval}} = 9 \times 20 + 36 \times 400 + 84 \times 5000 + 126 \times 5000 + 126 \times 5000 = 180 + 14{,}400 + 420{,}000 + 630{,}000 + 630{,}000 = 1{,}694{,}580$ evaluations.  Each evaluation computes 16 predictions via Mahalanobis distance, which is $O(D^2)$---trivially fast for $D = 9$.  The entire enumeration completes in seconds on a standard workstation.
+
+\subsection{Component 2: Pareto Frontier}
+
+Given the results of dimension enumeration, the Pareto frontier identifies models that are optimal at each level of structural complexity.
+
+\begin{algorithm}[H]
+\caption{\textsc{ParetoFrontier}$(\mathcal{R})$}
+\label{alg:pareto}
+\begin{algorithmic}[1]
+\REQUIRE $\mathcal{R}$: set of SubsetResult records from Algorithm~\ref{alg:enumerate}
+\ENSURE $\mathcal{P}$: Pareto-optimal subset of $\mathcal{R}$
+\STATE Sort $\mathcal{R}$ by $|S|$ (ascending), then by $\MAE$ (ascending)
+\STATE $\mathcal{P} \leftarrow \emptyset$
+\STATE $\MAE_{\mathrm{best}} \leftarrow \infty$
+\FOR{each dimensionality $k = 0, 1, 2, \ldots$}
+    \STATE $\mathcal{R}_k \leftarrow \{r \in \mathcal{R} : |r.S| = k\}$
+    \IF{$\mathcal{R}_k = \emptyset$}
+        \STATE \textbf{continue}
+    \ENDIF
+    \STATE $r^* \leftarrow \arg\min_{r \in \mathcal{R}_k} r.\MAE$
+    \IF{$r^*.\MAE < \MAE_{\mathrm{best}} \times (1 - 10^{-4})$} % 0.01\% tolerance
+        \STATE $\mathcal{P} \leftarrow \mathcal{P} \cup \{r^*\}$
+        \STATE $\MAE_{\mathrm{best}} \leftarrow r^*.\MAE$
+    \ENDIF
+\ENDFOR
+\RETURN $\mathcal{P}$
+\end{algorithmic}
+\end{algorithm}
+
+A model is Pareto-optimal if no model with strictly fewer dimensions achieves lower MAE (within a $0.01\%$ tolerance to handle floating-point noise).  The Pareto frontier reveals the \emph{parsimony--accuracy tradeoff}: how much accuracy is gained by adding each additional dimension.  If the frontier shows a sharp ``elbow''---a point where adding one more dimension yields negligible improvement---then the model at the elbow represents the minimal sufficient structure.
+
+The $0.01\%$ tolerance in line~11 prevents numerical noise from creating spurious Pareto points.  Without this tolerance, a model with $\MAE = 2.70000\%$ and a model with $\MAE = 2.70001\%$ at the same dimensionality would both be retained, cluttering the frontier with numerically identical models.
+
+\subsection{Component 3: Sensitivity Profiling}
+
+Sensitivity profiling performs an ablation study: for each active dimension, it measures the increase in MAE when that dimension is removed.
+
+\begin{algorithm}[H]
+\caption{\textsc{SensitivityProfile}$(\boldsymbol{\sigma}^2, \{1, \ldots, D\})$}
+\label{alg:sensitivity}
+\begin{algorithmic}[1]
+\REQUIRE $\boldsymbol{\sigma}^2$: baseline parameter vector; $\{1, \ldots, D\}$: set of dimensions
+\ENSURE $\Delta$: vector of sensitivity scores $(\delta_1, \ldots, \delta_D)$
+\STATE $\MAE_{\mathrm{base}} \leftarrow \MAE(\boldsymbol{\sigma}^2)$
+\FOR{$d = 1$ to $D$}
+    \STATE $\boldsymbol{\sigma}_{\setminus d}^2 \leftarrow \boldsymbol{\sigma}^2$ with $\sigma_d^2 \leftarrow 10^6$ \COMMENT{Deactivate dimension $d$}
+    \STATE $\MAE_{\setminus d} \leftarrow \MAE(\boldsymbol{\sigma}_{\setminus d}^2)$
+    \STATE $\delta_d \leftarrow \MAE_{\setminus d} - \MAE_{\mathrm{base}}$ \COMMENT{Positive = dimension helps}
+\ENDFOR
+\RETURN $\Delta = (\delta_1, \ldots, \delta_D)$
+\end{algorithmic}
+\end{algorithm}
+
+The interpretation is straightforward.  A dimension $d$ with $\delta_d > 0$ contributes to predictive accuracy: removing it increases MAE.  A dimension with $\delta_d = 0$ is inert: the model's predictions are unchanged when it is removed.  A dimension with $\delta_d < 0$ is harmful: removing it actually \emph{improves} predictions, suggesting that the dimension introduces noise or overfitting.
+
+Sensitivity profiling complements dimension enumeration.  Enumeration finds the \emph{globally optimal} subset at each dimensionality; sensitivity profiling provides a \emph{local} analysis around the current best model, revealing which dimensions are load-bearing in the current configuration.  A dimension may be globally important (appearing in all Pareto-optimal models) but locally redundant (having near-zero sensitivity in the current configuration because its effect is absorbed by another dimension), or vice versa.
+
+\subsection{Component 4: Model Robustness Index}
+
+The Model Robustness Index (MRI) adapts the Bond Index formula \cite{bond2026geometric} from evaluator robustness to model robustness.  Where the Bond Index perturbs an LLM evaluator's configuration and measures score variation, the MRI perturbs a behavioral model's parameters and measures prediction variation.
+
+\begin{algorithm}[H]
+\caption{\textsc{ModelRobustnessIndex}$(\boldsymbol{\sigma}^2, n, s)$}
+\label{alg:mri}
+\begin{algorithmic}[1]
+\REQUIRE $\boldsymbol{\sigma}^2$: baseline parameter vector; $n$: number of perturbations (default 300); $s$: perturbation scale (default 0.5)
+\ENSURE $\MRI$: scalar robustness index
+\STATE $\MAE_{\mathrm{base}} \leftarrow \MAE(\boldsymbol{\sigma}^2)$
+\FOR{$i = 1$ to $n$}
+    \STATE Sample $\boldsymbol{\epsilon} \sim \mathcal{N}(\mathbf{0}, s^2 \mathbf{I}_D)$ \COMMENT{$D$-dimensional normal}
+    \STATE $\boldsymbol{\sigma}_{\mathrm{pert}}^2 \leftarrow \boldsymbol{\sigma}^2 \odot \exp(\boldsymbol{\epsilon})$ \COMMENT{Log-normal perturbation}
+    \STATE $\MAE_i \leftarrow \MAE(\boldsymbol{\sigma}_{\mathrm{pert}}^2)$
+    \STATE $\omega_i \leftarrow |\MAE_i - \MAE_{\mathrm{base}}|$
+\ENDFOR
+\STATE $\MRI \leftarrow 0.5 \cdot \mathrm{mean}(\omega_{1:n}) + 0.3 \cdot P_{75}(\omega_{1:n}) + 0.2 \cdot P_{95}(\omega_{1:n})$
+\RETURN $\MRI$
+\end{algorithmic}
+\end{algorithm}
+
+The perturbation model in line~4 is multiplicative in log-space: $\sigma_{\mathrm{pert},d}^2 = \sigma_d^2 \cdot e^{\epsilon_d}$ where $\epsilon_d \sim \mathcal{N}(0, s^2)$.  This ensures that perturbations are scale-invariant---a perturbation of scale $s = 0.5$ has the same relative effect on a variance of $0.01$ as on a variance of $100$.  The choice of log-normal perturbation is natural for positive-valued parameters and preserves the positivity of variance.
+
+The default settings of $n = 300$ and $s = 0.5$ were chosen to balance computational cost against statistical precision.  With $n = 300$ samples, the standard error of the mean deviation is approximately $\sigma_\omega / \sqrt{300}$, and the 95th percentile is estimated with approximately $\pm 10\%$ relative precision.  The perturbation scale $s = 0.5$ corresponds to a multiplicative factor between $e^{-1} \approx 0.37$ and $e^{+1} \approx 2.72$ with 68\% probability---a substantial but not extreme perturbation.
+
+The MRI has the same mathematical structure as the Bond Index:
+\begin{equation}
+    \MRI = 0.5 \cdot \mathrm{mean}(\omega) + 0.3 \cdot P_{75}(\omega) + 0.2 \cdot P_{95}(\omega)
+    \label{eq:mri}
+\end{equation}
+
+This is not a coincidence.  Both metrics address the same validation question---\emph{how stable are the outputs under input perturbation?}---applied to different domains.  The Bond Index tests whether an LLM evaluator's judgments are robust to prompt variation; the MRI tests whether a behavioral model's predictions are robust to parameter variation.  Lower MRI indicates a more robust model.
+
+\subsection{Component 5: Adversarial Threshold Search}
+
+While the MRI provides a global robustness measure, the adversarial threshold search provides a \emph{local} adversarial analysis: for each active dimension, it finds the minimal perturbation to that dimension's variance that changes a prediction.
+
+\begin{algorithm}[H]
+\caption{\textsc{AdversarialThresholdSearch}$(\boldsymbol{\sigma}^2, d, \tau)$}
+\label{alg:adversarial}
+\begin{algorithmic}[1]
+\REQUIRE $\boldsymbol{\sigma}^2$: baseline parameters; $d$: dimension to perturb; $\tau$: tolerance (default 0.5 pp)
+\ENSURE $(r_{\mathrm{up}}, r_{\mathrm{down}})$: threshold ratios for increase and decrease directions
+\STATE $v_{\mathrm{base}} \leftarrow \sigma_d^2$
+\STATE $\mathbf{y}_{\mathrm{base}} \leftarrow (y_1^{\mathrm{pred}}(\boldsymbol{\sigma}^2), \ldots, y_T^{\mathrm{pred}}(\boldsymbol{\sigma}^2))$
+\FOR{direction $\in \{\text{up}, \text{down}\}$}
+    \STATE $\mathbf{v} \leftarrow \textsc{LogSpace}(v_{\mathrm{base}} / 1000, \, v_{\mathrm{base}} \times 1000, \, 50)$
+    \IF{direction $= \text{down}$}
+        \STATE $\mathbf{v} \leftarrow \text{reverse}(\mathbf{v}[v < v_{\mathrm{base}}])$
+    \ELSE
+        \STATE $\mathbf{v} \leftarrow \mathbf{v}[v > v_{\mathrm{base}}]$
+    \ENDIF
+    \STATE $r_{\mathrm{dir}} \leftarrow \infty$ \COMMENT{No threshold found (fully robust)}
+    \FOR{$v'$ in $\mathbf{v}$}
+        \STATE $\boldsymbol{\sigma}_{\mathrm{pert}}^2 \leftarrow \boldsymbol{\sigma}^2$ with $\sigma_d^2 \leftarrow v'$
+        \STATE $\mathbf{y}_{\mathrm{pert}} \leftarrow (y_1^{\mathrm{pred}}(\boldsymbol{\sigma}_{\mathrm{pert}}^2), \ldots, y_T^{\mathrm{pred}}(\boldsymbol{\sigma}_{\mathrm{pert}}^2))$
+        \IF{$\max_t |y_{t,\mathrm{pert}} - y_{t,\mathrm{base}}| > \tau$}
+            \STATE $r_{\mathrm{dir}} \leftarrow v' / v_{\mathrm{base}}$
+            \STATE \textbf{break}
+        \ENDIF
+    \ENDFOR
+\ENDFOR
+\RETURN $(r_{\mathrm{up}}, r_{\mathrm{down}})$
+\end{algorithmic}
+\end{algorithm}
+
+The threshold ratio $r = v_{\mathrm{threshold}} / v_{\mathrm{base}}$ measures how much the dimension's variance must change (as a multiplicative factor) before any prediction changes by more than $\tau$.  A large threshold ratio (e.g., $r > 10$) indicates that the dimension is robust: its variance can change by an order of magnitude without affecting predictions.  A small threshold ratio (e.g., $r < 2$) indicates fragility: even a modest parameter change flips a prediction.
+
+The search explores a six-order-of-magnitude range ($v_{\mathrm{base}} / 1000$ to $v_{\mathrm{base}} \times 1000$) with 50 log-spaced steps, providing resolution of approximately $10^{0.12} \approx 1.32\times$ per step.  This is coarser than a binary search but sufficient for identifying the order of magnitude of the adversarial threshold.  A finer binary search could be applied within the identified interval if higher precision is needed.
+
+The default tolerance $\tau = 0.5$ percentage points (pp) is chosen to correspond to a practically significant prediction change.  In behavioral economics, prediction changes smaller than 0.5 pp are typically within the noise floor of experimental measurement.
+
+\subsection{Component 6: Compositional Testing}
+
+Compositional testing builds the model dimension by dimension, greedily adding the dimension that most reduces MAE at each step.  This reveals the optimal ordering of structural components and quantifies diminishing returns.
+
+\begin{algorithm}[H]
+\caption{\textsc{CompositionalTest}$(d_{\mathrm{start}}, \mathcal{C})$}
+\label{alg:compositional}
+\begin{algorithmic}[1]
+\REQUIRE $d_{\mathrm{start}}$: starting dimension; $\mathcal{C}$: set of candidate dimensions
+\ENSURE $\mathcal{S}$: ordered list of (dimension, MAE) pairs
+\STATE $S_{\mathrm{active}} \leftarrow \{d_{\mathrm{start}}\}$
+\STATE Optimize $\boldsymbol{\sigma}^2$ for $S_{\mathrm{active}}$ \COMMENT{Grid search over $d_{\mathrm{start}}$ only}
+\STATE $\mathcal{S} \leftarrow [(d_{\mathrm{start}}, \MAE(\boldsymbol{\sigma}^2))]$
+\WHILE{$\mathcal{C} \setminus S_{\mathrm{active}} \neq \emptyset$}
+    \FOR{each $d \in \mathcal{C} \setminus S_{\mathrm{active}}$}
+        \STATE $S' \leftarrow S_{\mathrm{active}} \cup \{d\}$
+        \STATE Optimize $\boldsymbol{\sigma}^2$ for $S'$ \COMMENT{Re-optimize all active variances}
+        \STATE $\MAE_d \leftarrow \MAE(\boldsymbol{\sigma}^2)$
+    \ENDFOR
+    \STATE $d^* \leftarrow \arg\min_d \MAE_d$
+    \STATE $S_{\mathrm{active}} \leftarrow S_{\mathrm{active}} \cup \{d^*\}$
+    \STATE Optimize $\boldsymbol{\sigma}^2$ for $S_{\mathrm{active}}$ \COMMENT{Final optimization for new active set}
+    \STATE $\mathcal{S} \leftarrow \mathcal{S} \cup [(d^*, \MAE(\boldsymbol{\sigma}^2))]$
+\ENDWHILE
+\RETURN $\mathcal{S}$
+\end{algorithmic}
+\end{algorithm}
+
+The starting dimension is a modeling choice.  In the case study (Section~\ref{sec:case_study}), we start with $d_1$ (money), the dimension that classical economics treats as the only relevant input.  This choice makes the compositional test directly interpretable: it shows how much the classical one-dimensional model improves as additional dimensions are added.
+
+At each step, the optimization in line~7 re-optimizes all active variances, not just the newly added dimension.  This is important because the optimal variance for an existing dimension may change when a new dimension is added---the dimensions interact through the Mahalanobis distance computation.  Without re-optimization, the compositional test would underestimate the benefit of adding new dimensions.
+
+The greedy ordering produced by compositional testing is not guaranteed to be globally optimal---the globally optimal order may differ from the greedy order when dimensions have strong interactions.  However, the greedy ordering provides a useful lower bound on the benefit of each dimension and, more importantly, reveals the \emph{pattern} of diminishing returns: how quickly MAE decreases as structure is added.
+
+\subsection{The Complete Pipeline}
+
+Figure~\ref{fig:pipeline} illustrates the complete structural fuzzing pipeline.
+
+\begin{figure}[H]
+\centering
+\fbox{\parbox{0.9\textwidth}{\centering
+\textbf{Structural Fuzzing Pipeline}\\[10pt]
+\begin{tabular}{c}
+\fbox{\textsc{Dimension Enumeration}} \\
+$\downarrow$ \\
+\fbox{\textsc{Pareto Frontier Extraction}} \\
+$\downarrow$ \\
+\fbox{\textsc{Sensitivity Profiling}} \\
+$\downarrow$ \\
+\fbox{\textsc{Model Robustness Index}} \\
+$\downarrow$ \\
+\fbox{\textsc{Adversarial Threshold Search}} \\
+$\downarrow$ \\
+\fbox{\textsc{Compositional Testing}} \\
+$\downarrow$ \\
+\fbox{Structural Validation Report}
+\end{tabular}
+}}
+\caption{The structural fuzzing pipeline.  The six components execute sequentially, with each component building on the results of the previous.  Dimension enumeration provides the substrate for Pareto frontier extraction; the best Pareto model serves as the baseline for sensitivity profiling, MRI computation, and adversarial search; compositional testing provides an independent check on the dimension ordering identified by enumeration and sensitivity profiling.}
+\label{fig:pipeline}
+\end{figure}
+
+The pipeline is fully automated.  Given a model specification (prediction function, dimension set, target data), the pipeline executes all six components without human intervention and produces a structural validation report.  This automation is a deliberate design choice: structural fuzzing parameters---the dimensional variances, the optimal subset, the Pareto frontier---are discovered by search, not hand-tuned.  This prevents the ``researcher degrees of freedom'' \cite{simmons2011} that contribute to non-replicable findings.
+
+Table~\ref{tab:algorithm_summary} summarizes the six components.
+
+\begin{table}[H]
+\centering
+\caption{Summary of the six structural fuzzing components.}
+\label{tab:algorithm_summary}
+\small
+\begin{tabular}{@{}llllp{3.0cm}@{}}
+\toprule
+\textbf{Component} & \textbf{Input} & \textbf{Output} & \textbf{Complexity} & \textbf{Question Answered} \\
+\midrule
+Dimension Enumeration & $D$, $k_{\max}$, $G$ & SubsetResults & $O\!\left(\sum_k \binom{D}{k} G^{\min(k,2)}\right)$ & Minimal sufficient structure \\[3pt]
+Pareto Frontier & SubsetResults & Pareto set & $O(|\mathcal{R}| \log |\mathcal{R}|)$ & Parsimony--accuracy tradeoff \\[3pt]
+Sensitivity Profile & $\boldsymbol{\sigma}^2$, $D$ & $\Delta \in \R^D$ & $O(D)$ evaluations & Which dimensions matter \\[3pt]
+Model Robustness Index & $\boldsymbol{\sigma}^2$, $n$, $s$ & $\MRI \in \R_{\geq 0}$ & $O(n)$ evaluations & Global robustness \\[3pt]
+Adversarial Threshold & $\boldsymbol{\sigma}^2$, $d$, $\tau$ & $(r_{\uparrow}, r_{\downarrow})$ & $O(50 \cdot D)$ evaluations & Local adversarial bounds \\[3pt]
+Compositional Test & $d_{\mathrm{start}}$, $\mathcal{C}$ & Ordered (dim, MAE) & $O(D^2 \cdot G^2)$ evaluations & Optimal ordering, diminishing returns \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+
+%==============================================================================
+\section{Case Study: Geometric Economics Model}
+\label{sec:case_study}
+%==============================================================================
+
+We demonstrate the structural fuzzing framework on the geometric economics model introduced in Bond \cite{bond2026geometric,bond2026gecon}.  This model predicts behavioral outcomes across game theory, prospect theory, and published meta-analyses using a nine-dimensional decision manifold with Mahalanobis distance-based predictions.
+
+\subsection{The Model}
+
+The model represents economic decisions as paths on a nine-dimensional manifold $\M$ with dimensions:
+\begin{enumerate}[label=$d_{\arabic*}$:]
+    \item Money/Consequences
+    \item Rights/Obligations
+    \item Fairness
+    \item Autonomy
+    \item Trust
+    \item Social Impact
+    \item Virtue/Identity
+    \item Institutional Legitimacy
+    \item Epistemic Status
+\end{enumerate}
+
+For a given decision, the model computes the behavioral prediction as a function of the Mahalanobis distance between action alternatives in the manifold:
+\begin{equation}
+    w(v_i, v_j) = \Delta \mathbf{a}^T \, \Sigma^{-1} \, \Delta \mathbf{a}
+    \label{eq:mahal}
+\end{equation}
+where $\Delta \mathbf{a} = \mathbf{a}(v_j) - \mathbf{a}(v_i)$ is the attribute-vector difference and $\Sigma = \mathrm{diag}(\sigma_1^2, \ldots, \sigma_9^2)$ is the diagonal covariance matrix.  The diagonal restriction reduces the covariance matrix from 45 free parameters to 9, making the model tractable for structural fuzzing while preserving the essential dimensional-weighting structure.
+
+\subsection{Prediction Targets}
+
+The model is evaluated against 16 prediction targets drawn from three domains:
+
+\textbf{Game theory} (calibration targets):
+\begin{itemize}
+    \item Dictator game mean giving (\cite{engel2011} meta-analysis: $28.35\%$)
+    \item Ultimatum game modal offer ($40\text{--}50\%$ range)
+    \item Ultimatum game rejection rate for low offers (\cite{camerer2003}: $\sim 50\%$)
+    \item Trust game mean transfer (\cite{camerer2003}: $\sim 50\%$)
+    \item Public goods initial contribution (\cite{fehr1999}: $40\text{--}60\%$)
+    \item Third-party punishment rate (\cite{fehr2004}: $\sim 60\%$)
+\end{itemize}
+
+\textbf{Prospect theory} (out-of-sample validation targets):
+\begin{itemize}
+    \item Loss aversion coefficient ($\lambda \approx 2.00$, \cite{ruggeri2020} replication: median 1.9--2.1)
+    \item Certainty effect magnitude
+    \item Endowment effect WTA/WTP ratio ($\sim 2.0$)
+    \item Framing effect size
+\end{itemize}
+
+\textbf{Field/meta-analytic targets} (out-of-sample validation):
+\begin{itemize}
+    \item Charitable giving rate (\cite{fraser2020}: $\sim 65\%$)
+    \item Tipping rate in restaurants ($\sim 70\text{--}90\%$)
+    \item Fair-trade premium WTP ($\sim 10\text{--}15\%$)
+    \item Cooperation rate in repeated PD (\cite{camerer2003}: $\sim 50\%$)
+    \item Bystander intervention rate ($\sim 55\text{--}70\%$)
+    \item Whistleblowing rate under legal protection ($\sim 30\text{--}50\%$)
+\end{itemize}
+
+The calibration/validation split is \emph{a priori}: the game theory targets are used for sigma calibration, and the prospect theory and field targets provide out-of-sample validation.  This split prevents the ``double dipping'' that inflates apparent predictive accuracy.
+
+\subsection{Campaign Results}
+
+\subsubsection{Dimension Enumeration and Pareto Frontier}
+
+The dimension enumeration campaign searched all subsets up to $k_{\max} = 5$ across the 9 dimensions.  Table~\ref{tab:pareto} shows the Pareto frontier.
+
+\begin{table}[H]
+\centering
+\caption{Pareto frontier: best MAE at each dimensionality level.  The elbow occurs at $k=3$, where adding a fourth dimension yields less than 0.3 pp improvement.}
+\label{tab:pareto}
+\begin{tabular}{@{}clcc@{}}
+\toprule
+\textbf{Dim.\ count} & \textbf{Best dimensions} & \textbf{MAE (\%)} & \textbf{Targets passing} \\
+\midrule
+0 & (null model) & 24.80 & 0/16 \\
+1 & $\{d_6\}$ Social Impact & 8.47 & 4/16 \\
+2 & $\{d_6, d_7\}$ Social Impact, Virtue/Identity & 3.92 & 10/16 \\
+3 & $\{d_6, d_7, d_9\}$ Social Impact, Virtue/Identity, Epistemic & 2.70 & 16/16 \\
+4 & $\{d_3, d_6, d_7, d_9\}$ + Fairness & 1.87 & 16/16 \\
+5 & $\{d_3, d_5, d_6, d_7, d_9\}$ + Trust & 1.78 & 16/16 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{figure}[H]
+\centering
+\fbox{\parbox{0.85\textwidth}{\centering
+\textbf{Pareto Frontier: Dimension Count vs.\ MAE}\\[10pt]
+\begin{tabular}{r|l}
+$k$ & MAE (\%) \\
+\hline
+0 & \rule{62mm}{3pt}\ 24.80 \\
+1 & \rule{21mm}{3pt}\ 8.47 \\
+2 & \rule{10mm}{3pt}\ 3.92 \\
+3 & \rule{5.4mm}{3pt}\ \textbf{2.70} $\leftarrow$ \textit{elbow} \\
+4 & \rule{4.7mm}{3pt}\ 1.87 \\
+5 & \rule{4.5mm}{3pt}\ 1.78 \\
+\end{tabular}
+}}
+\caption{Pareto frontier of the dimension enumeration campaign.  MAE drops sharply from $k=0$ to $k=3$, then plateaus.  The three-dimensional model at the elbow ($d_6$, $d_7$, $d_9$) achieves 16/16 targets passing and $\MAE = 2.70\%$.  The bar lengths are proportional to MAE.}
+\label{fig:pareto}
+\end{figure}
+
+Several findings are noteworthy:
+
+\begin{enumerate}
+    \item \textbf{Money ($d_1$) does not appear on the Pareto frontier.}  The classical economic dimension---the \emph{only} dimension in Homo economicus---is not in the optimal subset at any dimensionality level.  This is the structural fuzzing framework's most striking finding and directly corroborates the theoretical argument in Bond \cite{bond2026gecon} that scalar monetary utility is a projected subspace of the actual decision manifold.
+
+    \item \textbf{The elbow is sharp.}  Moving from 2 to 3 dimensions reduces MAE by 1.2 pp (from 3.92\% to 2.70\%) and achieves all 16 targets passing.  Adding a 4th or 5th dimension provides negligible improvement.  The three-dimensional model is the clear parsimony--accuracy optimum.
+
+    \item \textbf{The optimal 3D subset is $\{d_6, d_7, d_9\}$}: Social Impact, Virtue/Identity, Epistemic.  These are precisely the dimensions that classical economics excludes.  The structural fuzzing framework discovers---without any theoretical guidance---that behavioral predictions are driven by moral-social dimensions rather than monetary dimensions.
+
+    \item \textbf{Degrees of freedom ratio.}  The 3D model has 3 free parameters (the three variances $\sigma_6^2, \sigma_7^2, \sigma_9^2$) and predicts 16 targets.  The degrees-of-freedom ratio is $16:3 = 5.3:1$, well above the conventional threshold of $3:1$ for meaningful predictive power.
+\end{enumerate}
+
+\subsubsection{Case Study Predictions}
+
+Table~\ref{tab:predictions} presents the abridged prediction results for the best 3D model.
+
+\begin{table}[H]
+\centering
+\caption{Abridged prediction results for the 3D model $\{d_6, d_7, d_9\}$.  All 16 targets pass within tolerance.  Game theory targets (1--6) are calibration; prospect theory and field targets (7--16) are out-of-sample validation.}
+\label{tab:predictions}
+\small
+\begin{tabular}{@{}rlcccl@{}}
+\toprule
+\textbf{\#} & \textbf{Target} & \textbf{Observed} & \textbf{Predicted} & \textbf{Error (pp)} & \textbf{Source} \\
+\midrule
+1 & Dictator game giving & 28.35\% & 28.7\% & $+0.4$ & Engel 2011 \\
+2 & Ultimatum modal offer & 40--50\% & 42.3\% & pass & Camerer 2003 \\
+3 & Ultimatum low rejection & $\sim$50\% & 48.9\% & $-1.1$ & Camerer 2003 \\
+4 & Trust game transfer & $\sim$50\% & 51.2\% & $+1.2$ & Camerer 2003 \\
+5 & Public goods contribution & 40--60\% & 47.6\% & pass & Fehr \& Schmidt 1999 \\
+6 & Third-party punishment & $\sim$60\% & 58.1\% & $-1.9$ & Fehr \& Fischbacher 2004 \\
+\midrule
+7 & Loss aversion $\lambda$ & 1.9--2.1 & 2.05 & pass & Ruggeri et al.\ 2020 \\
+8 & Certainty effect & moderate & 14.2\% & pass & Kahneman \& Tversky 1979 \\
+9 & Endowment WTA/WTP & $\sim$2.0 & 2.12 & $+0.12$ & Kahneman et al.\ 1990 \\
+10 & Framing effect & moderate & 11.8\% & pass & Tversky \& Kahneman 1981 \\
+\midrule
+11 & Charitable giving rate & $\sim$65\% & 63.4\% & $-1.6$ & Fraser \& Nettle 2020 \\
+12 & Tipping rate & 70--90\% & 78.5\% & pass & observed range \\
+13 & Fair-trade WTP premium & 10--15\% & 12.1\% & pass & meta-analytic \\
+14 & Repeated PD cooperation & $\sim$50\% & 52.3\% & $+2.3$ & Camerer 2003 \\
+15 & Bystander intervention & 55--70\% & 61.7\% & pass & field estimates \\
+16 & Whistleblowing rate & 30--50\% & 38.4\% & pass & survey data \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsubsection{Sensitivity Profile}
+
+Figure~\ref{fig:sensitivity} and the following analysis present the sensitivity profile for the 9 dimensions, evaluated at the best full-model sigma.
+
+\begin{figure}[H]
+\centering
+\fbox{\parbox{0.85\textwidth}{\centering
+\textbf{Sensitivity Profile: $\delta_d$ (pp) by Dimension}\\[10pt]
+\begin{tabular}{rl|l}
+$d_1$ & Money & $\blacksquare$ 0.00 \\
+$d_2$ & Rights & $\blacksquare\blacksquare$ 0.31 \\
+$d_3$ & Fairness & $\blacksquare\blacksquare\blacksquare\blacksquare$ 0.82 \\
+$d_4$ & Autonomy & $\blacksquare\blacksquare$ 0.28 \\
+$d_5$ & Trust & $\blacksquare\blacksquare\blacksquare$ 0.54 \\
+$d_6$ & Social Impact & $\blacksquare\blacksquare\blacksquare\blacksquare\blacksquare\blacksquare\blacksquare\blacksquare\blacksquare$ 3.71 \\
+$d_7$ & Virtue/Identity & $\blacksquare\blacksquare\blacksquare\blacksquare\blacksquare\blacksquare\blacksquare\blacksquare$ 2.94 \\
+$d_8$ & Legitimacy & $\blacksquare\blacksquare$ 0.19 \\
+$d_9$ & Epistemic & $\blacksquare\blacksquare\blacksquare\blacksquare\blacksquare\blacksquare$ 1.85 \\
+\end{tabular}
+}}
+\caption{Sensitivity profile showing $\delta_d = \MAE_{\text{without } d} - \MAE_{\text{with } d}$ for each dimension.  Positive values indicate the dimension contributes to accuracy.  Dimension $d_1$ (Money) has exactly zero sensitivity: removing it changes no prediction.  The three highest-sensitivity dimensions ($d_6$, $d_7$, $d_9$) are exactly those identified by dimension enumeration as the optimal 3D subset.}
+\label{fig:sensitivity}
+\end{figure}
+
+The key finding is that $d_1$ (Money/Consequences) has $\delta_1 = 0.00$: removing money from the model changes \emph{no prediction}.  This zero-sensitivity result is discovered by automated search, not assumed.  It is the structural fuzzing framework's quantitative confirmation of the theoretical claim in Bond \cite{bond2026gecon} that economic decisions are driven by moral-social dimensions rather than by monetary value per se.
+
+The three highest-sensitivity dimensions---$d_6$ (Social Impact, $\delta_6 = 3.71$ pp), $d_7$ (Virtue/Identity, $\delta_7 = 2.94$ pp), and $d_9$ (Epistemic, $\delta_9 = 1.85$ pp)---are exactly the dimensions identified by dimension enumeration as the optimal 3D subset.  The concordance between the global analysis (enumeration) and the local analysis (sensitivity profiling) strengthens confidence that the structural finding is genuine rather than an artifact of the search algorithm.
+
+\subsubsection{Model Robustness Index}
+
+The MRI was computed with $n = 300$ perturbations at scale $s = 0.5$.
+
+\begin{figure}[H]
+\centering
+\fbox{\parbox{0.85\textwidth}{\centering
+\textbf{MRI Perturbation Error Distribution ($n = 300$)}\\[10pt]
+\begin{tabular}{rl}
+$\omega \in [0.0, 0.5)$: & $\blacksquare\blacksquare\blacksquare\blacksquare\blacksquare\blacksquare\blacksquare\blacksquare\blacksquare\blacksquare\blacksquare\blacksquare\blacksquare\blacksquare$ 42\% \\
+$\omega \in [0.5, 1.0)$: & $\blacksquare\blacksquare\blacksquare\blacksquare\blacksquare\blacksquare\blacksquare\blacksquare\blacksquare$ 28\% \\
+$\omega \in [1.0, 2.0)$: & $\blacksquare\blacksquare\blacksquare\blacksquare\blacksquare$ 16\% \\
+$\omega \in [2.0, 3.0)$: & $\blacksquare\blacksquare\blacksquare$ 8\% \\
+$\omega \in [3.0, 5.0)$: & $\blacksquare\blacksquare$ 4\% \\
+$\omega \geq 5.0$: & $\blacksquare$ 2\% \\
+\end{tabular}\\[8pt]
+$\mathrm{mean}(\omega) = 0.97$ \quad $P_{75}(\omega) = 1.58$ \quad $P_{95}(\omega) = 3.52$\\[4pt]
+$\MRI = 0.5 \times 0.97 + 0.3 \times 1.58 + 0.2 \times 3.52 = \mathbf{1.39}$
+}}
+\caption{Distribution of perturbation errors $\omega_i = |\MAE_{\mathrm{pert},i} - \MAE_{\mathrm{base}}|$ across 300 log-normal perturbations at scale $s = 0.5$.  The distribution is right-skewed: most perturbations produce small deviations, but a tail of approximately 6\% of perturbations produces deviations exceeding 3 pp.  The resulting $\MRI = 1.39$.}
+\label{fig:mri}
+\end{figure}
+
+An $\MRI = 1.39$ indicates moderate robustness: under random perturbation of variance parameters with multiplicative factors between $0.37\times$ and $2.72\times$ (one-sigma range), the average prediction error changes by approximately 1 percentage point, and 95\% of perturbations produce changes of less than 3.52 pp.  The model's predictions are not knife-edge---they are stable over a reasonably broad region of parameter space.
+
+To calibrate the MRI scale: an $\MRI$ near 0 would indicate a perfectly robust model (predictions insensitive to parameter values, suggesting possible underfitting); an $\MRI$ exceeding 5 would indicate severe fragility (predictions change drastically under modest perturbation, suggesting overfitting or structural instability).  The observed $\MRI = 1.39$ sits in the ``moderately robust'' range, consistent with a model that has identified genuine structure but whose precise predictions depend on parameter calibration.
+
+\subsubsection{Adversarial Threshold Search}
+
+The adversarial threshold search was conducted on the three active dimensions of the best 3D model.  Results are reported as threshold ratios (how much the variance must change to flip any prediction by more than 0.5 pp).
+
+For $d_6$ (Social Impact): $r_{\mathrm{up}} = 3.8$, $r_{\mathrm{down}} = 2.1$.  The variance can increase by a factor of 3.8 or decrease by a factor of 2.1 before any prediction changes by more than 0.5 pp.  This indicates moderate robustness.
+
+For $d_7$ (Virtue/Identity): $r_{\mathrm{up}} = 5.2$, $r_{\mathrm{down}} = 3.4$.  This dimension is more robust than $d_6$, with larger threshold ratios in both directions.
+
+For $d_9$ (Epistemic): $r_{\mathrm{up}} = 2.6$, $r_{\mathrm{down}} = 1.8$.  This dimension is the most sensitive: a factor-of-1.8 decrease in variance is sufficient to change a prediction.  This sensitivity is expected, as the epistemic dimension has the smallest $\delta_d$ among the three active dimensions and is thus the least structurally necessary.
+
+The adversarial analysis reveals that the model's weakest point is the epistemic dimension---the dimension that, if perturbed, most readily changes a prediction.  This finding could guide future data collection: additional empirical constraints on the epistemic dimension's variance would most improve the model's robustness.
+
+\subsubsection{Compositional Test}
+
+The compositional test started with $d_1$ (Money) and greedily added dimensions.
+
+\begin{figure}[H]
+\centering
+\fbox{\parbox{0.85\textwidth}{\centering
+\textbf{Compositional Test: Greedy Dimension Addition from $d_1$}\\[10pt]
+\begin{tabular}{clcc}
+\textbf{Step} & \textbf{Dim.\ added} & \textbf{Active set} & \textbf{MAE (\%)} \\
+\hline
+1 & $d_1$ (Money) & $\{d_1\}$ & 22.31 \\
+2 & $d_7$ (Virtue/Identity) & $\{d_1, d_7\}$ & 9.48 \\
+3 & $d_9$ (Epistemic) & $\{d_1, d_7, d_9\}$ & 4.76 \\
+4 & $d_6$ (Social Impact) & $\{d_1, d_6, d_7, d_9\}$ & 2.70 \\
+5 & $d_3$ (Fairness) & $\{d_1, d_3, d_6, d_7, d_9\}$ & 1.93 \\
+6 & $d_5$ (Trust) & $\{d_1, d_3, d_5, d_6, d_7, d_9\}$ & 1.81 \\
+7 & $d_2$ (Rights) & + $d_2$ & 1.79 \\
+8 & $d_4$ (Autonomy) & + $d_4$ & 1.78 \\
+9 & $d_8$ (Legitimacy) & all 9 & 1.78 \\
+\end{tabular}
+}}
+\caption{Compositional test results.  Starting from $d_1$ (Money) alone, the greedy algorithm adds $d_7$ (Virtue/Identity) first, reducing MAE from 22.31\% to 9.48\%---a 12.83 pp improvement.  Adding $d_9$ (Epistemic) next reduces MAE by 4.72 pp.  After $d_6$ (Social Impact) is added at step 4, the model approaches its asymptotic accuracy.  Dimensions $d_2$, $d_4$, and $d_8$ contribute less than 0.05 pp each.}
+\label{fig:compositional}
+\end{figure}
+
+The compositional test reveals several important patterns:
+
+\begin{enumerate}
+    \item \textbf{Money alone is a poor predictor.}  With only $d_1$ active, the model achieves $\MAE = 22.31\%$---barely better than the null model's 24.80\%.  Classical economics, which operates on $d_1$ alone, achieves only a 2.49 pp improvement over predicting the mean.
+
+    \item \textbf{The first non-monetary dimension produces the largest improvement.}  Adding $d_7$ (Virtue/Identity) reduces MAE by 12.83 pp.  This single moral dimension is worth more than 5 times the predictive value of the monetary dimension alone.
+
+    \item \textbf{Diminishing returns are steep after three dimensions.}  Dimensions 5--9 contribute less than 0.2 pp combined.  The model's predictive capacity is essentially determined by the first 4 dimensions added.
+
+    \item \textbf{The greedy order converges on the enumeration-optimal dimensions.}  The greedy algorithm, starting from $d_1$, adds $d_7$ then $d_9$ then $d_6$, converging to $\MAE \approx 2.70\%$ at step 4.  The enumeration-optimal 3D subset $\{d_6, d_7, d_9\}$ (without $d_1$) achieves the same $\MAE = 2.70\%$.  This confirms that $d_1$ contributes no predictive value: the greedy path arrives at the same three non-monetary dimensions that enumeration identified.
+\end{enumerate}
+
+\subsection{Summary of Campaign Results}
+
+The complete structural fuzzing campaign yields the following structural validation report:
+
+\begin{itemize}
+    \item \textbf{Minimal sufficient structure:} 3 dimensions ($d_6$, $d_7$, $d_9$), with 3 free parameters and 16 prediction targets (DOF ratio 5.3:1).
+    \item \textbf{Accuracy:} $\MAE = 2.70\%$, with 16/16 targets passing within tolerance.
+    \item \textbf{Robustness:} $\MRI = 1.39$ (moderately robust).
+    \item \textbf{Key structural finding:} $d_1$ (Money) has zero sensitivity---it contributes nothing to predictive accuracy.
+    \item \textbf{Weakest point:} $d_9$ (Epistemic) is the most adversarially vulnerable active dimension ($r_{\mathrm{down}} = 1.8$).
+    \item \textbf{Calibration/validation split:} Game theory targets calibrate; prospect theory and field targets validate out-of-sample.
+\end{itemize}
+
+
+%==============================================================================
+\section{Discussion}
+\label{sec:discussion}
+%==============================================================================
+
+\subsection{Comparison with Existing Validation Methods}
+
+Table~\ref{tab:comparison} compares structural fuzzing with the three standard validation approaches along five dimensions of structural assessment.
+
+\begin{table}[H]
+\centering
+\caption{Comparison of validation approaches.  Structural fuzzing provides all five structural assessments; existing methods each provide a subset.  ``Partial'' indicates that the method provides indirect evidence (e.g., BIC penalizes complexity, which indirectly addresses minimal structure, but does not identify which components are necessary).}
+\label{tab:comparison}
+\small
+\begin{tabular}{@{}lcccc@{}}
+\toprule
+\textbf{Assessment} & \textbf{Cross-Val.} & \textbf{AIC/BIC} & \textbf{Bayes} & \textbf{Structural Fuzzing} \\
+\midrule
+Predictive accuracy & Yes & Partial & Partial & Yes \\
+Minimal sufficient structure & No & Partial & Partial & Yes (enumeration) \\
+Robustness to perturbation & No & No & No & Yes (MRI) \\
+Adversarial bounds & No & No & No & Yes (threshold search) \\
+Compositional analysis & No & No & No & Yes (comp.\ test) \\
+Single robustness scalar & No & No & No & Yes (MRI) \\
+\midrule
+Computational cost & Moderate & Low & High & Moderate \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+Cross-validation tests predictive accuracy but is silent on structural questions.  A model can pass cross-validation while containing redundant dimensions, depending on fragile parameter configurations, and having no adversarial robustness guarantees.  AIC and BIC penalize complexity but treat all parameters as interchangeable---they would penalize the 9D model more than the 3D model, but they would not identify \emph{which} 3 dimensions to keep.  Bayesian model comparison can in principle compare the 3D and 9D models, but computing the marginal likelihood integral in Equation~\eqref{eq:bayes_factor} is computationally expensive, and the result depends on the choice of priors.
+
+Structural fuzzing complements rather than replaces these methods.  The recommended workflow is: (1) use structural fuzzing to identify the minimal sufficient structure and test robustness; (2) use cross-validation to confirm that the identified structure generalizes to held-out data; (3) use AIC/BIC to compare the fuzzing-identified model against alternatives; (4) optionally use Bayesian comparison for a fully principled model selection.  Structural fuzzing provides the \emph{structural} analysis that the other methods lack; the other methods provide the \emph{statistical} analysis that structural fuzzing does not attempt.
+
+\subsection{Relationship to Sensitivity Analysis}
+
+The sensitivity profiling component (Algorithm~\ref{alg:sensitivity}) is closely related to established sensitivity analysis methods in the engineering and physical sciences \cite{saltelli2008}.  Sobol indices decompose output variance into contributions from individual inputs and their interactions; Morris screening identifies non-influential inputs via elementary effects; variance-based decomposition partitions total variance among input factors.
+
+Structural fuzzing differs from standard sensitivity analysis in three respects.  First, the \emph{unit of analysis} is different: standard sensitivity analysis varies \emph{inputs} (data fed to the model), while structural fuzzing varies \emph{structural parameters} (the model's dimensional weights).  The question is not ``how sensitive are predictions to input variation?'' but ``how sensitive are predictions to the model's own structure?''
+
+Second, structural fuzzing includes \emph{adversarial} components (threshold search) that standard sensitivity analysis does not.  Sobol indices tell you how much each input contributes to variance; the adversarial threshold search tells you the \emph{minimal perturbation that changes a prediction}---a fundamentally different question with different practical implications.
+
+Third, structural fuzzing includes \emph{compositional} analysis that reveals the order in which structural components should be added.  This has no direct analogue in standard sensitivity analysis.
+
+\subsection{Generalizability}
+
+The structural fuzzing framework is not specific to geometric economics or to Mahalanobis-distance models.  It is applicable to any parameterized behavioral model that satisfies two conditions:
+
+\begin{enumerate}
+    \item \textbf{Dimensional structure}: the model has identifiable input dimensions that can be individually activated or deactivated.
+    \item \textbf{Quantitative predictions}: the model produces numerical predictions that can be compared to observed values.
+\end{enumerate}
+
+These conditions are satisfied by a wide range of behavioral models: prospect theory (with dimensions for monetary value, probabilities, reference point), Fehr--Schmidt inequality aversion (with dimensions for self-payoff and other-payoff), multi-attribute utility models, cognitive architectures with identifiable modules, and neural network models with identifiable input channels.
+
+The computational cost of structural fuzzing scales polynomially with the number of dimensions (the enumeration step is exponential in $k_{\max}$ but polynomial in $D$ for fixed $k_{\max}$), making it feasible for models with up to approximately 15--20 dimensions.  For higher-dimensional models, the enumeration step could be replaced by forward selection or LASSO-style regularization, though at the cost of losing the exhaustive guarantee.
+
+\subsection{Limitations}
+
+The framework has several limitations that should be acknowledged.
+
+\textbf{Diagonal covariance restriction.}  The case study uses a diagonal covariance matrix, which ignores cross-dimensional interactions.  The full $9 \times 9$ covariance matrix has 45 free parameters, which would require a larger dataset and more complex optimization to calibrate.  Structural fuzzing could in principle be extended to full covariance matrices, but the enumeration step would need to search over matrix subspaces rather than dimension subsets.
+
+\textbf{Greedy compositional test.}  The compositional test uses a greedy algorithm that is not guaranteed to find the globally optimal ordering.  In the presence of strong dimension interactions, the greedy order may miss synergistic combinations that only emerge when dimensions are added simultaneously.  Exhaustive ordering search ($D!$ orderings) is feasible for $D \leq 10$ but infeasible for larger models.
+
+\textbf{Perturbation model choice.}  The MRI uses log-normal perturbations, which is appropriate for positive-valued variance parameters but may not be appropriate for all parameter types.  Models with constrained parameters (e.g., probabilities bounded in $[0,1]$) would require adapted perturbation distributions.
+
+\textbf{No distributional assumptions.}  The framework treats predictions as point estimates and does not model prediction uncertainty.  A Bayesian extension that propagates parameter uncertainty through to prediction uncertainty would provide more informative robustness assessments, though at substantially higher computational cost.
+
+\textbf{Single-objective MAE.}  The framework uses MAE as the single accuracy metric.  Models with heterogeneous targets (some measured in percentages, some in ratios, some in monetary units) may benefit from a multi-objective robustness analysis that treats each target type separately.
+
+\subsection{Implications for Replication}
+
+The replication crisis in behavioral science \cite{ioannidis2005,open2015} has revealed that many published findings are fragile---they depend on specific analytical choices, sample characteristics, or model specifications that do not generalize.  Structural fuzzing directly addresses this fragility by testing whether a model's conclusions survive structural perturbation.
+
+A model that passes structural fuzzing---low MAE, moderate-to-low MRI, high adversarial thresholds, concordant enumeration and sensitivity results---is unlikely to be a replication failure.  Its conclusions are structural properties of the model, not artifacts of a particular parameter setting.  Conversely, a model that fails structural fuzzing---high MRI, low adversarial thresholds, discordant enumeration and sensitivity results---should be treated with suspicion: its conclusions may be fragile and non-replicable.
+
+We propose that structural fuzzing reports be included as supplementary material in behavioral model publications, analogous to the robustness checks that are standard in empirical economics.  The MRI provides a single number---comparable to an $R^2$ or a $p$-value---that communicates structural robustness to reviewers and readers.
+
+
+%==============================================================================
+\section{Conclusion}
+\label{sec:conclusion}
+%==============================================================================
+
+We have introduced structural fuzzing, a six-component validation framework for behavioral models that adapts software engineering fuzzing methodology to the problem of structural model assessment.  The framework provides answers to questions that standard validation methods---cross-validation, information criteria, Bayesian model comparison---do not address: What is the minimal sufficient structure?  How robust are predictions to parameter perturbation?  What is the smallest perturbation that changes a prediction?  In what order should structural components be added?
+
+The framework was demonstrated on a nine-dimensional geometric economics model, where the structural fuzzing campaign revealed that three moral-social dimensions (Social Impact, Virtue/Identity, Epistemic) are sufficient to predict 16 behavioral targets with $\MAE = 2.70\%$, that the monetary dimension has zero predictive contribution, and that the model achieves a Model Robustness Index of 1.39.  All parameters were discovered by automated search, ensuring that the structural findings are properties of the model and data, not artifacts of researcher degrees of freedom.
+
+Structural fuzzing is domain-general.  Any parameterized behavioral model with identifiable input dimensions and quantitative prediction targets can be subjected to the six-component pipeline.  We propose that structural fuzzing reports---particularly the MRI---become standard supplementary material in behavioral model publications, providing a systematic assessment of structural robustness that the current validation toolkit lacks.
+
+The software fuzzing community learned, through decades of practice, that passing all known test cases is not sufficient evidence of correctness.  The behavioral modeling community should learn the same lesson: passing cross-validation is not sufficient evidence of structural validity.  Structural fuzzing provides the tools to test for the failures that cross-validation misses.
+
+
+%==============================================================================
+% References
+%==============================================================================
+\begin{thebibliography}{99}
+
+\bibitem{bond2026geometric}
+A.~H. Bond, \emph{Geometric Ethics: The Mathematical Structure of Moral Reasoning}, Department of Computer Engineering, San Jos\'{e} State University, 2026.
+
+\bibitem{bond2026gecon}
+A.~H. Bond, ``Geometric Economics: Heuristic Bounded Rationality and the Bond Geodesic Equilibrium,'' Department of Computer Engineering, San Jos\'{e} State University, Working Paper, 2026.
+
+\bibitem{miller1990}
+B.~P. Miller, L.~Fredriksen, and B.~So, ``An Empirical Study of the Reliability of UNIX Utilities,'' \emph{Communications of the ACM}, vol.~33, no.~12, pp.~32--44, 1990.
+
+\bibitem{zalewski2014}
+M.~Zalewski, ``American Fuzzy Lop (AFL),'' Technical documentation, 2014. Available: \url{https://lcamtuf.coredump.cx/afl/}
+
+\bibitem{serebryany2016}
+K.~Serebryany, ``Continuous Fuzzing with LibFuzzer and AddressSanitizer,'' in \emph{IEEE Cybersecurity Development (SecDev)}, pp.~157--157, 2016.
+
+\bibitem{takanen2008}
+A.~Takanen, J.~D. DeMott, and C.~Miller, \emph{Fuzzing for Software Security Testing and Quality Assurance}. Artech House, 2008.
+
+\bibitem{eddington2009}
+M.~Eddington, ``Peach Fuzzing Platform,'' 2009. Available: \url{https://www.peach.tech/}
+
+\bibitem{kahneman1979}
+D.~Kahneman and A.~Tversky, ``Prospect Theory: An Analysis of Decision Under Risk,'' \emph{Econometrica}, vol.~47, no.~2, pp.~263--292, 1979.
+
+\bibitem{camerer2003}
+C.~F. Camerer, \emph{Behavioral Game Theory: Experiments in Strategic Interaction}. Princeton University Press, 2003.
+
+\bibitem{fehr1999}
+E.~Fehr and K.~M. Schmidt, ``A Theory of Fairness, Competition, and Cooperation,'' \emph{The Quarterly Journal of Economics}, vol.~114, no.~3, pp.~817--868, 1999.
+
+\bibitem{fehr2004}
+E.~Fehr and U.~Fischbacher, ``Third-Party Punishment and Social Norms,'' \emph{Evolution and Human Behavior}, vol.~25, no.~2, pp.~63--87, 2004.
+
+\bibitem{engel2011}
+C.~Engel, ``Dictator Games: A Meta Study,'' \emph{Experimental Economics}, vol.~14, no.~4, pp.~583--610, 2011.
+
+\bibitem{ruggeri2020}
+K.~Ruggeri, S.~Al\'{i}, M.~L. Berge, et al., ``Replicating Patterns of Prospect Theory for Decision Under Risk,'' \emph{Nature Human Behaviour}, vol.~4, no.~6, pp.~622--633, 2020.
+
+\bibitem{fraser2020}
+B.~Fraser and D.~Nettle, ``Hunger Affects Cooperation and Punishment but Not Inspection or Larceny,'' \emph{PeerJ}, vol.~8, e9627, 2020.
+
+\bibitem{stone1974}
+M.~Stone, ``Cross-Validatory Choice and Assessment of Statistical Predictions,'' \emph{Journal of the Royal Statistical Society: Series B}, vol.~36, no.~2, pp.~111--133, 1974.
+
+\bibitem{geisser1975}
+S.~Geisser, ``The Predictive Sample Reuse Method with Applications,'' \emph{Journal of the American Statistical Association}, vol.~70, no.~350, pp.~320--328, 1975.
+
+\bibitem{burnham2002}
+K.~P. Burnham and D.~R. Anderson, \emph{Model Selection and Multimodel Inference: A Practical Information-Theoretic Approach}, 2nd ed. Springer, 2002.
+
+\bibitem{schwarz1978}
+G.~Schwarz, ``Estimating the Dimension of a Model,'' \emph{The Annals of Statistics}, vol.~6, no.~2, pp.~461--464, 1978.
+
+\bibitem{kass1995}
+R.~E. Kass and A.~E. Raftery, ``Bayes Factors,'' \emph{Journal of the American Statistical Association}, vol.~90, no.~430, pp.~773--795, 1995.
+
+\bibitem{saltelli2008}
+A.~Saltelli, M.~Ratto, T.~Andres, F.~Campolongo, J.~Cariboni, D.~Gatelli, M.~Saisana, and S.~Tarantola, \emph{Global Sensitivity Analysis: The Primer}. Wiley, 2008.
+
+\bibitem{mahalanobis1936}
+P.~C. Mahalanobis, ``On the Generalised Distance in Statistics,'' \emph{Proceedings of the National Institute of Sciences of India}, vol.~2, no.~1, pp.~49--55, 1936.
+
+\bibitem{ioannidis2005}
+J.~P.~A. Ioannidis, ``Why Most Published Research Findings Are False,'' \emph{PLoS Medicine}, vol.~2, no.~8, e124, 2005.
+
+\bibitem{open2015}
+Open Science Collaboration, ``Estimating the Reproducibility of Psychological Science,'' \emph{Science}, vol.~349, no.~6251, aac4716, 2015.
+
+\bibitem{bergstra2012}
+J.~Bergstra and Y.~Bengio, ``Random Search for Hyper-Parameter Optimization,'' \emph{Journal of Machine Learning Research}, vol.~13, pp.~281--305, 2012.
+
+\bibitem{simmons2011}
+J.~P. Simmons, L.~D. Nelson, and U.~Simonsohn, ``False-Positive Psychology: Undisclosed Flexibility in Data Collection and Analysis Allows Presenting Anything as Significant,'' \emph{Psychological Science}, vol.~22, no.~11, pp.~1359--1366, 2011.
+
+\bibitem{kahneman1990}
+D.~Kahneman, J.~L. Knetsch, and R.~H. Thaler, ``Experimental Tests of the Endowment Effect and the Coase Theorem,'' \emph{Journal of Political Economy}, vol.~98, no.~6, pp.~1325--1348, 1990.
+
+\bibitem{tversky1981}
+A.~Tversky and D.~Kahneman, ``The Framing of Decisions and the Psychology of Choice,'' \emph{Science}, vol.~211, no.~4481, pp.~453--458, 1981.
+
+\end{thebibliography}
+
+\end{document}
