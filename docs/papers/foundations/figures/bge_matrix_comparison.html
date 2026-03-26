@@ -1,0 +1,484 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>BGE vs Nash: Ultimatum Game Matrix Comparison</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: 'IBM Plex Mono', 'Consolas', monospace;
+    background: #f8f7f4;
+    color: #1a1a1a;
+    padding: 40px;
+    max-width: 1400px;
+    margin: 0 auto;
+  }
+  h1 {
+    font-family: 'Fraunces', 'Georgia', serif;
+    font-size: 28px;
+    font-weight: 600;
+    margin-bottom: 8px;
+    color: #1a1a1a;
+  }
+  .subtitle {
+    font-size: 14px;
+    color: #666;
+    margin-bottom: 40px;
+    font-style: italic;
+  }
+  .comparison {
+    display: flex;
+    gap: 60px;
+    align-items: flex-start;
+    flex-wrap: wrap;
+  }
+  .matrix-panel {
+    flex: 1;
+    min-width: 480px;
+  }
+  .panel-header {
+    font-family: 'Fraunces', 'Georgia', serif;
+    font-size: 20px;
+    font-weight: 600;
+    margin-bottom: 4px;
+  }
+  .panel-subheader {
+    font-size: 12px;
+    color: #888;
+    margin-bottom: 20px;
+  }
+  .scalar-panel .panel-header { color: #b33; }
+  .manifold-panel .panel-header { color: #2a7; }
+
+  /* Matrix styles */
+  .game-matrix {
+    border-collapse: collapse;
+    margin-bottom: 16px;
+    width: 100%;
+  }
+  .game-matrix th, .game-matrix td {
+    border: 1px solid #ccc;
+    padding: 12px 8px;
+    text-align: center;
+    font-size: 13px;
+    line-height: 1.4;
+  }
+  .game-matrix th {
+    background: #eee;
+    font-weight: 600;
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+  .game-matrix .corner { background: transparent; border: none; }
+  .game-matrix .row-header {
+    background: #eee;
+    font-weight: 600;
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    text-align: right;
+    padding-right: 12px;
+  }
+
+  /* Scalar matrix colors */
+  .scalar-panel .nash-eq {
+    background: #fdd;
+    font-weight: 700;
+  }
+  .scalar-panel .pareto-dom {
+    background: #dfd;
+  }
+  .scalar-panel td .payoff { font-size: 16px; font-weight: 700; }
+  .scalar-panel td .label { font-size: 10px; color: #888; display: block; }
+
+  /* Manifold matrix colors */
+  .manifold-panel .bge-eq {
+    background: #d4f0e0;
+    font-weight: 700;
+  }
+  .manifold-panel .dominated {
+    background: #fef3e0;
+  }
+  .manifold-panel .boundary-violation {
+    background: #fdd;
+  }
+  .manifold-panel td .dim { font-size: 10px; color: #666; }
+  .manifold-panel td .dim-label { font-size: 9px; color: #999; }
+  .manifold-panel td .bf-total { font-size: 14px; font-weight: 700; display: block; margin-top: 4px; }
+  .manifold-panel td .bf-label { font-size: 9px; color: #888; }
+
+  /* Dimension breakdown */
+  .dim-bar {
+    display: flex;
+    align-items: center;
+    margin: 2px 0;
+    font-size: 10px;
+  }
+  .dim-bar .dim-name {
+    width: 28px;
+    text-align: right;
+    padding-right: 4px;
+    color: #888;
+    font-size: 9px;
+  }
+  .dim-bar .bar {
+    height: 8px;
+    border-radius: 2px;
+    min-width: 1px;
+  }
+  .dim-bar .bar-d1 { background: #4a90d9; }
+  .dim-bar .bar-d3 { background: #e74c3c; }
+  .dim-bar .bar-d5 { background: #f39c12; }
+  .dim-bar .bar-d6 { background: #9b59b6; }
+  .dim-bar .bar-d7 { background: #1abc9c; }
+  .dim-bar .bar-val {
+    margin-left: 4px;
+    color: #666;
+    font-size: 9px;
+  }
+
+  /* Arrow */
+  .arrow-container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 40px 0;
+    flex-basis: 80px;
+    flex-shrink: 0;
+  }
+  .arrow-container svg { flex-shrink: 0; }
+
+  /* Legend */
+  .legend {
+    margin-top: 30px;
+    padding: 16px 20px;
+    background: #fff;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    font-size: 12px;
+    line-height: 1.8;
+  }
+  .legend-title {
+    font-weight: 700;
+    font-size: 13px;
+    margin-bottom: 8px;
+  }
+  .legend-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .legend-swatch {
+    width: 16px;
+    height: 16px;
+    border-radius: 3px;
+    border: 1px solid #ccc;
+    flex-shrink: 0;
+  }
+
+  /* Bottom annotation */
+  .annotation {
+    margin-top: 30px;
+    padding: 20px;
+    background: #fff;
+    border-left: 4px solid #2a7;
+    font-size: 13px;
+    line-height: 1.7;
+    color: #333;
+  }
+  .annotation strong { color: #1a1a1a; }
+  .annotation .eq {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 12px;
+    background: #f0f0f0;
+    padding: 2px 6px;
+    border-radius: 3px;
+  }
+
+  /* Second comparison: Prisoner's Dilemma */
+  .section-divider {
+    margin: 60px 0 40px;
+    border-top: 2px solid #ddd;
+    padding-top: 20px;
+  }
+  h2 {
+    font-family: 'Fraunces', 'Georgia', serif;
+    font-size: 22px;
+    font-weight: 600;
+    margin-bottom: 6px;
+  }
+</style>
+</head>
+<body>
+
+<h1>Figure 20.1: Nash Equilibrium vs Bond Geodesic Equilibrium</h1>
+<p class="subtitle">The Ultimatum Game: $10 split between Proposer and Responder</p>
+
+<div class="comparison">
+
+  <!-- SCALAR PANEL -->
+  <div class="matrix-panel scalar-panel">
+    <div class="panel-header">A. Classical Nash (d<sub>1</sub> only)</div>
+    <div class="panel-subheader">Payoff = monetary return only. u<sub>i</sub> = d<sub>1</sub></div>
+    <table class="game-matrix">
+      <tr>
+        <th class="corner"></th>
+        <th>Accept</th>
+        <th>Reject</th>
+      </tr>
+      <tr>
+        <td class="row-header">Offer $5</td>
+        <td><span class="payoff">5, 5</span><span class="label">fair split</span></td>
+        <td><span class="payoff">0, 0</span><span class="label">both lose</span></td>
+      </tr>
+      <tr>
+        <td class="row-header">Offer $1</td>
+        <td class="nash-eq"><span class="payoff">9, 1</span><span class="label">Nash equilibrium *</span></td>
+        <td><span class="payoff">0, 0</span><span class="label">both lose</span></td>
+      </tr>
+    </table>
+    <div style="font-size: 11px; color: #b33; margin-bottom: 8px;">
+      * Nash prediction: Proposer offers $1, Responder accepts (any positive amount).<br>
+      Empirically falsified: offers below ~30% are rejected ~50% of the time.
+    </div>
+    <div style="font-size: 11px; color: #888;">
+      The scalar model sees only one dimension. The (9,1) cell appears optimal<br>
+      because monetary return is the only signal. The 8 destroyed dimensions<br>
+      are invisible.
+    </div>
+  </div>
+
+  <!-- ARROW -->
+  <div class="arrow-container">
+    <svg width="80" height="120" viewBox="0 0 80 120">
+      <defs>
+        <marker id="arrowhead" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+          <polygon points="0 0, 10 3.5, 0 7" fill="#2a7"/>
+        </marker>
+      </defs>
+      <line x1="10" y1="60" x2="65" y2="60" stroke="#2a7" stroke-width="2" marker-end="url(#arrowhead)"/>
+      <text x="40" y="40" text-anchor="middle" font-size="10" fill="#2a7" font-weight="600">LIFT TO</text>
+      <text x="40" y="52" text-anchor="middle" font-size="10" fill="#2a7" font-weight="600">MANIFOLD</text>
+      <text x="40" y="80" text-anchor="middle" font-size="9" fill="#888">R&#x00B9; &#x2192; R&#x2079;</text>
+    </svg>
+  </div>
+
+  <!-- MANIFOLD PANEL -->
+  <div class="matrix-panel manifold-panel">
+    <div class="panel-header">B. Bond Geodesic Equilibrium (full manifold)</div>
+    <div class="panel-subheader">Payoff = &minus;BF<sub>i</sub> (negative behavioral friction on R<sup>9</sup>)</div>
+    <table class="game-matrix">
+      <tr>
+        <th class="corner"></th>
+        <th>Accept</th>
+        <th>Reject</th>
+      </tr>
+      <tr>
+        <td class="row-header">Offer $5</td>
+        <td class="bge-eq">
+          <div class="dim-bar"><span class="dim-name">d<sub>1</sub></span><span class="bar bar-d1" style="width:50px"></span><span class="bar-val">5.0</span></div>
+          <div class="dim-bar"><span class="dim-name">d<sub>3</sub></span><span class="bar bar-d3" style="width:5px"></span><span class="bar-val">0.0</span></div>
+          <div class="dim-bar"><span class="dim-name">d<sub>5</sub></span><span class="bar bar-d5" style="width:5px"></span><span class="bar-val">0.0</span></div>
+          <div class="dim-bar"><span class="dim-name">d<sub>7</sub></span><span class="bar bar-d7" style="width:5px"></span><span class="bar-val">0.0</span></div>
+          <span class="bf-label">BF =</span><span class="bf-total" style="color:#2a7;">5.0</span>
+          <span class="bf-label">BGE equilibrium</span>
+        </td>
+        <td class="dominated">
+          <div class="dim-bar"><span class="dim-name">d<sub>1</sub></span><span class="bar bar-d1" style="width:5px"></span><span class="bar-val">0.0</span></div>
+          <div class="dim-bar"><span class="dim-name">d<sub>3</sub></span><span class="bar bar-d3" style="width:5px"></span><span class="bar-val">0.0</span></div>
+          <div class="dim-bar"><span class="dim-name">d<sub>5</sub></span><span class="bar bar-d5" style="width:30px"></span><span class="bar-val">3.0</span></div>
+          <div class="dim-bar"><span class="dim-name">d<sub>7</sub></span><span class="bar bar-d7" style="width:10px"></span><span class="bar-val">1.0</span></div>
+          <span class="bf-label">BF =</span><span class="bf-total">4.0</span>
+        </td>
+      </tr>
+      <tr>
+        <td class="row-header">Offer $1</td>
+        <td class="boundary-violation">
+          <div class="dim-bar"><span class="dim-name">d<sub>1</sub></span><span class="bar bar-d1" style="width:90px"></span><span class="bar-val">9.0</span></div>
+          <div class="dim-bar"><span class="dim-name">d<sub>3</sub></span><span class="bar bar-d3" style="width:80px"></span><span class="bar-val">&beta;<sub>fair</sub> = 8.0</span></div>
+          <div class="dim-bar"><span class="dim-name">d<sub>5</sub></span><span class="bar bar-d5" style="width:40px"></span><span class="bar-val">4.0</span></div>
+          <div class="dim-bar"><span class="dim-name">d<sub>7</sub></span><span class="bar bar-d7" style="width:50px"></span><span class="bar-val">5.0</span></div>
+          <span class="bf-label">BF =</span><span class="bf-total" style="color:#b33;">26.0</span>
+          <span class="bf-label" style="color:#b33;">&beta;<sub>fairness</sub> crossed!</span>
+        </td>
+        <td>
+          <div class="dim-bar"><span class="dim-name">d<sub>1</sub></span><span class="bar bar-d1" style="width:5px"></span><span class="bar-val">0.0</span></div>
+          <div class="dim-bar"><span class="dim-name">d<sub>3</sub></span><span class="bar bar-d3" style="width:5px"></span><span class="bar-val">0.0</span></div>
+          <div class="dim-bar"><span class="dim-name">d<sub>5</sub></span><span class="bar bar-d5" style="width:30px"></span><span class="bar-val">3.0</span></div>
+          <div class="dim-bar"><span class="dim-name">d<sub>7</sub></span><span class="bar bar-d7" style="width:20px"></span><span class="bar-val">2.0</span></div>
+          <span class="bf-label">BF =</span><span class="bf-total">5.0</span>
+        </td>
+      </tr>
+    </table>
+    <div style="font-size: 11px; color: #2a7; margin-bottom: 8px;">
+      BGE prediction: Proposer offers $5, Responder accepts.<br>
+      The (9,1) cell carries BF = 26.0 due to &beta;<sub>fairness</sub> = 8.0 on d<sub>3</sub> + trust/identity costs.
+    </div>
+    <div style="font-size: 11px; color: #888;">
+      Behavioral friction (BF) = Da<sup>T</sup> &Sigma;<sup>&minus;1</sup> Da + &Sigma;<sub>k</sub> &beta;<sub>k</sub> &middot; 1[boundary k crossed]<br>
+      The manifold sees all nine dimensions. The $1 offer triggers the fairness<br>
+      boundary (&beta;<sub>fair</sub> = 8.0), making it catastrophically costly on the full manifold.
+    </div>
+  </div>
+
+</div>
+
+<!-- Legend -->
+<div class="legend">
+  <div class="legend-title">Dimensional Key</div>
+  <div style="display: flex; gap: 24px; flex-wrap: wrap;">
+    <div class="legend-item"><div class="legend-swatch" style="background:#4a90d9"></div> d<sub>1</sub>: Monetary return ($)</div>
+    <div class="legend-item"><div class="legend-swatch" style="background:#e74c3c"></div> d<sub>3</sub>: Fairness (boundary penalty when violated)</div>
+    <div class="legend-item"><div class="legend-swatch" style="background:#f39c12"></div> d<sub>5</sub>: Trust (destroyed by unfair offers)</div>
+    <div class="legend-item"><div class="legend-swatch" style="background:#1abc9c"></div> d<sub>7</sub>: Identity/virtue (self-image as fair person)</div>
+  </div>
+  <div style="display: flex; gap: 24px; flex-wrap: wrap; margin-top: 8px;">
+    <div class="legend-item"><div class="legend-swatch" style="background:#d4f0e0"></div> BGE equilibrium (minimum BF on full manifold)</div>
+    <div class="legend-item"><div class="legend-swatch" style="background:#fdd"></div> Nash eq on d<sub>1</sub> / boundary violation on manifold</div>
+    <div class="legend-item"><div class="legend-swatch" style="background:#fef3e0"></div> Dominated strategy</div>
+  </div>
+</div>
+
+<!-- Annotation -->
+<div class="annotation">
+  <strong>Key insight:</strong> The Nash equilibrium (Offer $1, Accept) is the <span class="eq">d<sub>1</sub></span>-only projection
+  of the BGE (Theorem 20.3, part 2). When the manifold collapses to monetary return alone, the $1 offer
+  appears optimal because the <span class="eq">&beta;<sub>fairness</sub> = 8.0</span> penalty on d<sub>3</sub>, the
+  <span class="eq">d<sub>5</sub> = 4.0</span> trust cost, and the <span class="eq">d<sub>7</sub> = 5.0</span> identity
+  cost are all projected to zero. The responder's rejection of low offers is not "irrational" &mdash; it is
+  <em>rational on the full manifold</em>. The BGE correctly predicts the ~50% rejection rate for offers below 30%
+  that Nash cannot explain.
+  <br><br>
+  <strong>Formal relationship:</strong> <span class="eq">Nash = lim<sub>&beta;&rarr;0, &Sigma;&rarr;diag(1,0,...,0)</sub> BGE</span>
+  &mdash; Nash is the degenerate limit of BGE where all non-monetary dimensions are zeroed.
+</div>
+
+<!-- SECTION 2: Prisoner's Dilemma -->
+<div class="section-divider">
+  <h2>Figure 20.2: Prisoner's Dilemma &mdash; Nash vs BGE</h2>
+  <p class="subtitle">Why cooperation emerges on the manifold but not on the scalar</p>
+</div>
+
+<div class="comparison">
+
+  <!-- SCALAR PD -->
+  <div class="matrix-panel scalar-panel">
+    <div class="panel-header">A. Classical Nash (d<sub>1</sub> only)</div>
+    <div class="panel-subheader">Payoff = years of sentence reduction</div>
+    <table class="game-matrix">
+      <tr>
+        <th class="corner"></th>
+        <th>Cooperate</th>
+        <th>Defect</th>
+      </tr>
+      <tr>
+        <td class="row-header">Cooperate</td>
+        <td class="pareto-dom"><span class="payoff">3, 3</span><span class="label">Pareto optimal</span></td>
+        <td><span class="payoff">0, 5</span><span class="label">sucker's payoff</span></td>
+      </tr>
+      <tr>
+        <td class="row-header">Defect</td>
+        <td><span class="payoff">5, 0</span><span class="label">temptation</span></td>
+        <td class="nash-eq"><span class="payoff">1, 1</span><span class="label">Nash equilibrium *</span></td>
+      </tr>
+    </table>
+    <div style="font-size: 11px; color: #b33;">
+      * Nash: both defect. Pareto-dominated by (Cooperate, Cooperate).<br>
+      The "dilemma" exists only on the scalar.
+    </div>
+  </div>
+
+  <!-- ARROW -->
+  <div class="arrow-container">
+    <svg width="80" height="120" viewBox="0 0 80 120">
+      <defs>
+        <marker id="arrowhead2" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+          <polygon points="0 0, 10 3.5, 0 7" fill="#2a7"/>
+        </marker>
+      </defs>
+      <line x1="10" y1="60" x2="65" y2="60" stroke="#2a7" stroke-width="2" marker-end="url(#arrowhead2)"/>
+      <text x="40" y="40" text-anchor="middle" font-size="10" fill="#2a7" font-weight="600">LIFT TO</text>
+      <text x="40" y="52" text-anchor="middle" font-size="10" fill="#2a7" font-weight="600">MANIFOLD</text>
+      <text x="40" y="80" text-anchor="middle" font-size="9" fill="#888">R&#x00B9; &#x2192; R&#x2079;</text>
+    </svg>
+  </div>
+
+  <!-- MANIFOLD PD -->
+  <div class="matrix-panel manifold-panel">
+    <div class="panel-header">B. Bond Geodesic Equilibrium (full manifold)</div>
+    <div class="panel-subheader">Payoff = &minus;BF<sub>i</sub> (negative behavioral friction on R<sup>9</sup>)</div>
+    <table class="game-matrix">
+      <tr>
+        <th class="corner"></th>
+        <th>Cooperate</th>
+        <th>Defect</th>
+      </tr>
+      <tr>
+        <td class="row-header">Cooperate</td>
+        <td class="bge-eq">
+          <div class="dim-bar"><span class="dim-name">d<sub>1</sub></span><span class="bar bar-d1" style="width:30px"></span><span class="bar-val">3.0</span></div>
+          <div class="dim-bar"><span class="dim-name">d<sub>3</sub></span><span class="bar bar-d3" style="width:5px"></span><span class="bar-val">0.0</span></div>
+          <div class="dim-bar"><span class="dim-name">d<sub>5</sub></span><span class="bar bar-d5" style="width:5px"></span><span class="bar-val">0.0</span></div>
+          <div class="dim-bar"><span class="dim-name">d<sub>6</sub></span><span class="bar bar-d6" style="width:5px"></span><span class="bar-val">0.0</span></div>
+          <span class="bf-label">BF =</span><span class="bf-total" style="color:#2a7;">3.0</span>
+          <span class="bf-label">BGE when d<sub>5</sub> active</span>
+        </td>
+        <td>
+          <div class="dim-bar"><span class="dim-name">d<sub>1</sub></span><span class="bar bar-d1" style="width:5px"></span><span class="bar-val">0.0</span></div>
+          <div class="dim-bar"><span class="dim-name">d<sub>3</sub></span><span class="bar bar-d3" style="width:30px"></span><span class="bar-val">3.0</span></div>
+          <div class="dim-bar"><span class="dim-name">d<sub>5</sub></span><span class="bar bar-d5" style="width:60px"></span><span class="bar-val">6.0</span></div>
+          <div class="dim-bar"><span class="dim-name">d<sub>6</sub></span><span class="bar bar-d6" style="width:20px"></span><span class="bar-val">2.0</span></div>
+          <span class="bf-label">BF =</span><span class="bf-total">11.0</span>
+          <span class="bf-label" style="color:#b33;">betrayal cost on d<sub>5</sub></span>
+        </td>
+      </tr>
+      <tr>
+        <td class="row-header">Defect</td>
+        <td>
+          <div class="dim-bar"><span class="dim-name">d<sub>1</sub></span><span class="bar bar-d1" style="width:50px"></span><span class="bar-val">5.0</span></div>
+          <div class="dim-bar"><span class="dim-name">d<sub>3</sub></span><span class="bar bar-d3" style="width:30px"></span><span class="bar-val">3.0</span></div>
+          <div class="dim-bar"><span class="dim-name">d<sub>5</sub></span><span class="bar bar-d5" style="width:60px"></span><span class="bar-val">6.0</span></div>
+          <div class="dim-bar"><span class="dim-name">d<sub>6</sub></span><span class="bar bar-d6" style="width:20px"></span><span class="bar-val">2.0</span></div>
+          <span class="bf-label">BF =</span><span class="bf-total">16.0</span>
+          <span class="bf-label" style="color:#b33;">betrayal + free-rider costs</span>
+        </td>
+        <td class="boundary-violation">
+          <div class="dim-bar"><span class="dim-name">d<sub>1</sub></span><span class="bar bar-d1" style="width:10px"></span><span class="bar-val">1.0</span></div>
+          <div class="dim-bar"><span class="dim-name">d<sub>3</sub></span><span class="bar bar-d3" style="width:20px"></span><span class="bar-val">2.0</span></div>
+          <div class="dim-bar"><span class="dim-name">d<sub>5</sub></span><span class="bar bar-d5" style="width:80px"></span><span class="bar-val">8.0</span></div>
+          <div class="dim-bar"><span class="dim-name">d<sub>6</sub></span><span class="bar bar-d6" style="width:40px"></span><span class="bar-val">4.0</span></div>
+          <span class="bf-label">BF =</span><span class="bf-total" style="color:#b33;">15.0</span>
+          <span class="bf-label">Nash eq on d<sub>1</sub></span>
+        </td>
+      </tr>
+    </table>
+    <div style="font-size: 11px; color: #2a7;">
+      BGE prediction: when d<sub>5</sub> (trust) carries sufficient weight, mutual cooperation<br>
+      IS the equilibrium. The "dilemma" dissolves on the full manifold.
+    </div>
+  </div>
+
+</div>
+
+<div class="annotation">
+  <strong>The Prisoner's "Dilemma" is an artifact of dimensional collapse.</strong>
+  On <span class="eq">d<sub>1</sub></span> alone, (Defect, Defect) is the unique Nash equilibrium with BF = 1.0 each.
+  But on the full manifold, defection incurs massive costs on <span class="eq">d<sub>5</sub></span> (trust destruction = 6.0&ndash;8.0)
+  and <span class="eq">d<sub>6</sub></span> (social impact = 2.0&ndash;4.0) that make mutual cooperation the minimum-BF outcome.
+  <br><br>
+  <strong>The contraction lemma (Lemma 20.1) predicts:</strong> when the self-separation &alpha;<sub>i</sub> &gt; cross-sensitivity &kappa;<sub>i</sub>
+  (i.e., each agent's d<sub>5</sub> cost is dominated by their own decision, not by the other's), mutual cooperation
+  is the <em>unique</em> BGE. This condition holds in repeated interactions with stable social ties &mdash; explaining why
+  cooperation is the norm in ongoing relationships and rare in one-shot anonymous interactions (where d<sub>5</sub> weight
+  approaches zero and BGE collapses back to Nash).
+</div>
+
+<div style="margin-top: 40px; padding-top: 20px; border-top: 1px solid #ddd; font-size: 11px; color: #888;">
+  <em>From: Geometric Ethics &mdash; The Mathematical Structure of Moral Reasoning (Bond, v1.18, March 2026), Chapter 20.</em><br>
+  These figures are also available as SVG for inclusion in the manuscript.
+</div>
+
+</body>
+</html>

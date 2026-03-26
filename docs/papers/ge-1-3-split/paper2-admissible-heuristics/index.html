@@ -1,0 +1,357 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Moral Heuristics as Admissible Search: A Computational Theory of Dual-Process Decision-Making</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"
+  onload="renderMathInElement(document.body, {
+    delimiters: [
+      {left: '$$', right: '$$', display: true},
+      {left: '$', right: '$', display: false}
+    ],
+    throwOnError: false
+  })"></script>
+<style>
+  :root {
+    --text: #1a1a2e;
+    --text-light: #4a4a6a;
+    --accent: #6b46c1;
+    --accent-light: #f3e8ff;
+    --border: #e2e8f0;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: 'Times New Roman', Georgia, serif;
+    color: var(--text);
+    max-width: 720px;
+    margin: 0 auto;
+    padding: 40px 24px;
+    line-height: 1.65;
+    font-size: 11.5pt;
+  }
+  .title-block { text-align: center; margin-bottom: 36px; padding-bottom: 24px; border-bottom: 1px solid var(--border); }
+  .title-block h1 { font-size: 18pt; font-weight: 700; margin-bottom: 8px; line-height: 1.3; }
+  .title-block .authors { font-size: 11pt; margin-bottom: 4px; }
+  .title-block .affiliation { font-size: 10pt; color: var(--text-light); }
+  .title-block .date { font-size: 10pt; color: var(--text-light); margin-top: 8px; }
+  .abstract { background: var(--accent-light); padding: 20px 24px; border-radius: 4px; margin-bottom: 32px; font-size: 10.5pt; }
+  .abstract h2 { font-size: 11pt; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 8px; }
+  .abstract p { margin-bottom: 8px; }
+  .abstract .keywords { font-style: italic; font-size: 10pt; color: var(--text-light); margin-top: 12px; }
+  h2 { font-size: 14pt; margin-top: 32px; margin-bottom: 12px; color: var(--accent); }
+  h3 { font-size: 12pt; margin-top: 20px; margin-bottom: 8px; }
+  p { margin-bottom: 12px; text-align: justify; }
+  .theorem, .definition, .proposition, .corollary, .remark, .proof {
+    margin: 16px 0; padding: 12px 16px; border-radius: 3px;
+  }
+  .definition { background: #f0f0ff; border-left: 3px solid #6b46c1; }
+  .theorem { background: #f0fff4; border-left: 3px solid #38a169; }
+  .proposition { background: #f0fff4; border-left: 3px solid #38a169; }
+  .corollary { background: #fffff0; border-left: 3px solid #d69e2e; }
+  .remark { background: #faf5ff; border-left: 3px solid #805ad5; }
+  .proof { background: #f7fafc; border-left: 3px solid #a0aec0; }
+  .env-label { font-weight: 700; font-variant: small-caps; }
+  .qed { float: right; }
+  .figure { margin: 24px 0; text-align: center; }
+  .figure svg { max-width: 100%; }
+  .figure .caption { font-size: 10pt; color: var(--text-light); margin-top: 8px; }
+  .figure .caption strong { color: var(--text); }
+  ol, ul { margin: 8px 0 12px 24px; }
+  li { margin-bottom: 4px; }
+  table { border-collapse: collapse; margin: 16px auto; font-size: 10.5pt; }
+  th, td { padding: 6px 12px; border: 1px solid var(--border); }
+  th { background: var(--accent-light); font-weight: 600; }
+  .references { font-size: 10pt; }
+  .references p { text-indent: -24px; padding-left: 24px; margin-bottom: 6px; }
+</style>
+</head>
+<body>
+
+<div class="title-block">
+  <h1>Moral Heuristics as Admissible Search:<br>A Computational Theory of Dual-Process Decision-Making</h1>
+  <div class="authors">Andrew H. Bond</div>
+  <div class="affiliation">Department of Computer Engineering, San Jos&eacute; State University</div>
+  <div class="date">March 2026</div>
+</div>
+
+<div class="abstract">
+  <h2>Abstract</h2>
+  <p>
+    We propose that Kahneman's dual-process architecture&mdash;System 1 (fast, automatic) and System 2 (slow, deliberate)&mdash;is not merely a psychological description but an instance of a well-characterized computational architecture: A* search with a heuristic evaluation function. System 2 computes the accumulated cost $g(n)$ of the path so far (deliberate cost-benefit analysis); System 1 provides the heuristic estimate $h(n)$ of the remaining cost to the goal (moral intuitions, social norms, cultural rules). The agent's decision is the path that minimizes $f(n) = g(n) + h(n)$.
+  </p>
+  <p>
+    We prove that moral and cultural heuristics, under mild conditions, are <em>admissible</em>&mdash;they never overestimate the true cost-to-go on the full decision manifold&mdash;and therefore A* search with System 1 as the heuristic is guaranteed to find the optimal path. The "biases" identified by behavioral economics are classified into four categories: (1) strictly admissible heuristics (not biases&mdash;optimal on the full manifold), (2) $\varepsilon$-admissible heuristics (bounded suboptimality, the evolutionary sweet spot), (3) inadmissible heuristics (genuine cognitive errors), and (4) gauge-variant heuristics (framing effects). Only categories 3 and 4 warrant the label "bias." Categories 1 and 2 are features of an efficient search architecture.
+  </p>
+  <div class="keywords"><strong>Keywords:</strong> dual-process theory, A* search, admissible heuristic, bounded rationality, moral heuristics, System 1, System 2, behavioral economics, decision-making</div>
+</div>
+
+<!-- ════════════════════════════════════════════════════════════════ -->
+<h2>1. Introduction</h2>
+
+<p>
+  Kahneman's (2011) dual-process theory partitions cognition into two systems: System 1 operates automatically and quickly, with little effort and no sense of voluntary control; System 2 allocates attention to effortful mental activities, including complex computations. This architecture has become the default framework for understanding judgment and decision-making across psychology, behavioral economics, and cognitive science.
+</p>
+<p>
+  Yet dual-process theory lacks a formal computational account. What computation does System 1 perform? What computation does System 2 perform? What is the formal relationship between them? Why does their interaction produce the specific pattern of "biases" documented by behavioral economics? Without a computational theory, dual-process theory remains a description&mdash;it names the phenomena but does not explain them.
+</p>
+<p>
+  We provide the missing computational theory. We show that the dual-process architecture is an instance of <em>A* search</em> (Hart, Nilsson, &amp; Raphael, 1968)&mdash;the most studied algorithm in artificial intelligence for optimal pathfinding. The mapping is not metaphorical. It is exact:
+</p>
+
+<table>
+  <tr><th>A* Component</th><th>Dual-Process Component</th><th>Function</th></tr>
+  <tr><td>Search graph</td><td>Decision manifold $\mathcal{C}$</td><td>Space of possible states and actions</td></tr>
+  <tr><td>$g(n)$: path cost so far</td><td>System 2: deliberate calculation</td><td>Accumulated cost-benefit analysis</td></tr>
+  <tr><td>$h(n)$: heuristic estimate</td><td>System 1: moral/social intuition</td><td>Fast estimate of remaining cost</td></tr>
+  <tr><td>$f(n) = g(n) + h(n)$</td><td>Total evaluation</td><td>Combined judgment</td></tr>
+  <tr><td>Admissibility: $h(n) \leq h^*(n)$</td><td>Calibrated intuition</td><td>Heuristic doesn't overestimate</td></tr>
+  <tr><td>$\varepsilon$-admissibility</td><td>Bounded rationality</td><td>Near-optimal, tractable</td></tr>
+</table>
+
+<p>
+  The key result: if System 1's moral heuristics are admissible (never overestimate the true cost-to-go), then the dual-process system finds the optimal action. The "biases" are not errors&mdash;they are the signature of an efficient search algorithm that trades exhaustive computation for heuristic-guided pruning.
+</p>
+
+<!-- Figure 1: A* search tree illustration -->
+<div class="figure">
+  <svg viewBox="0 0 580 320" xmlns="http://www.w3.org/2000/svg" style="max-width:540px">
+    <defs>
+      <marker id="a1" markerWidth="6" markerHeight="6" refX="5" refY="3" orient="auto"><path d="M 0 0 L 6 3 L 0 6 Z" fill="#4a4a6a"/></marker>
+      <marker id="a2" markerWidth="6" markerHeight="6" refX="5" refY="3" orient="auto"><path d="M 0 0 L 6 3 L 0 6 Z" fill="#e53e3e"/></marker>
+      <marker id="a3" markerWidth="6" markerHeight="6" refX="5" refY="3" orient="auto"><path d="M 0 0 L 6 3 L 0 6 Z" fill="#38a169"/></marker>
+    </defs>
+
+    <text x="290" y="18" text-anchor="middle" font-size="13" font-weight="bold" fill="#6b46c1">Decision Search Tree</text>
+
+    <!-- Root node -->
+    <circle cx="290" cy="50" r="20" fill="#ebf4ff" stroke="#2c5282" stroke-width="2"/>
+    <text x="290" y="54" text-anchor="middle" font-size="10" font-weight="600" fill="#2c5282">start</text>
+
+    <!-- Level 1 branches -->
+    <!-- Left: "Buy" path (moral, low h) -->
+    <line x1="275" y1="68" x2="140" y2="120" stroke="#38a169" stroke-width="2" marker-end="url(#a3)"/>
+    <circle cx="140" cy="130" r="18" fill="#f0fff4" stroke="#38a169" stroke-width="2"/>
+    <text x="140" y="127" text-anchor="middle" font-size="8" fill="#38a169">buy</text>
+    <text x="140" y="137" text-anchor="middle" font-size="7" fill="#38a169">g=50, h=0</text>
+    <!-- Cost labels -->
+    <text x="195" y="87" font-size="9" fill="#38a169" transform="rotate(-25,195,87)">g: $50 cost</text>
+
+    <!-- Middle: "Negotiate" path -->
+    <line x1="290" y1="70" x2="290" y2="118" stroke="#4a4a6a" stroke-width="1.5" marker-end="url(#a1)"/>
+    <circle cx="290" cy="130" r="18" fill="#f7fafc" stroke="#4a4a6a" stroke-width="1.5"/>
+    <text x="290" y="127" text-anchor="middle" font-size="8" fill="#4a4a6a">negotiate</text>
+    <text x="290" y="137" text-anchor="middle" font-size="7" fill="#4a4a6a">g=20, h=15</text>
+
+    <!-- Right: "Steal" path (immoral, high h) -->
+    <line x1="305" y1="68" x2="440" y2="120" stroke="#e53e3e" stroke-width="2" marker-end="url(#a2)"/>
+    <circle cx="440" cy="130" r="18" fill="#fee2e2" stroke="#e53e3e" stroke-width="2"/>
+    <text x="440" y="127" text-anchor="middle" font-size="8" fill="#e53e3e">steal</text>
+    <text x="440" y="137" text-anchor="middle" font-size="7" fill="#e53e3e">g=0, h=∞</text>
+    <text x="385" y="87" font-size="9" fill="#e53e3e" transform="rotate(25,385,87)">g: $0 cost</text>
+
+    <!-- System 1 / System 2 labels -->
+    <rect x="30" y="175" width="120" height="50" rx="4" fill="#ebf4ff" stroke="#2c5282" stroke-width="1"/>
+    <text x="90" y="196" text-anchor="middle" font-size="10" font-weight="600" fill="#2c5282">System 2</text>
+    <text x="90" y="212" text-anchor="middle" font-size="9" fill="#4a4a6a">computes g(n)</text>
+
+    <rect x="230" y="175" width="120" height="50" rx="4" fill="#faf5ff" stroke="#6b46c1" stroke-width="1"/>
+    <text x="290" y="196" text-anchor="middle" font-size="10" font-weight="600" fill="#6b46c1">System 1</text>
+    <text x="290" y="212" text-anchor="middle" font-size="9" fill="#4a4a6a">provides h(n)</text>
+
+    <rect x="430" y="175" width="120" height="50" rx="4" fill="#f0fff4" stroke="#38a169" stroke-width="1"/>
+    <text x="490" y="196" text-anchor="middle" font-size="10" font-weight="600" fill="#38a169">Decision</text>
+    <text x="490" y="212" text-anchor="middle" font-size="9" fill="#4a4a6a">min f = g + h</text>
+
+    <!-- Arrows connecting -->
+    <line x1="150" y1="200" x2="225" y2="200" stroke="#a0aec0" stroke-width="1" marker-end="url(#a1)"/>
+    <line x1="355" y1="200" x2="425" y2="200" stroke="#a0aec0" stroke-width="1" marker-end="url(#a1)"/>
+
+    <!-- Pruning illustration -->
+    <line x1="440" y1="150" x2="440" y2="155" stroke="#e53e3e" stroke-width="2"/>
+    <text x="440" y="168" text-anchor="middle" font-size="20" fill="#e53e3e">&#x2717;</text>
+    <text x="500" y="160" font-size="8" fill="#e53e3e">h(n) = ∞</text>
+    <text x="500" y="172" font-size="8" fill="#e53e3e">pruned by System 1</text>
+
+    <!-- f-value comparison -->
+    <text x="90" y="260" text-anchor="middle" font-size="9" fill="#38a169" font-weight="600">f(buy) = 50 + 0 = 50 ✓</text>
+    <text x="290" y="260" text-anchor="middle" font-size="9" fill="#4a4a6a">f(negotiate) = 20 + 15 = 35</text>
+    <text x="470" y="260" text-anchor="middle" font-size="9" fill="#e53e3e">f(steal) = 0 + ∞ = ∞ ✗</text>
+
+    <text x="290" y="290" text-anchor="middle" font-size="10" fill="#6b46c1" font-weight="600">A* selects: negotiate (lowest f)</text>
+    <text x="290" y="308" text-anchor="middle" font-size="9" fill="#4a4a6a">System 1 pruned "steal" instantly; System 2 compared "buy" vs "negotiate"</text>
+  </svg>
+  <div class="caption"><strong>Figure 1.</strong> A* decision search. System 1 provides the heuristic $h(n)$, instantly pruning morally inadmissible paths ($h = \infty$ for theft). System 2 computes $g(n)$ for remaining options. The decision minimizes $f = g + h$. This is not a metaphor&mdash;it is the exact A* algorithm.</div>
+</div>
+
+<h2>2. The Formal Mapping</h2>
+
+<h3>2.1 The Decision Space</h3>
+
+<p>
+  The agent's decision problem is defined on a weighted graph $\mathcal{C} = (V, E, w)$ where vertices $V$ are economic/social states, edges $E$ are available actions, and $w : E \to \mathbb{R}_{\geq 0}$ assigns multi-dimensional costs (behavioral friction) to actions. The agent seeks a minimum-cost path from the current state $v_0$ to a goal region $G \subset V$.
+</p>
+
+<h3>2.2 System 2 as $g(n)$</h3>
+
+<div class="definition">
+  <p><span class="env-label">Definition 1</span> (System 2 cost). For a partial path $\pi = (v_0, v_1, \ldots, v_k)$, the System 2 evaluation is:
+  $$g(v_k) = \sum_{t=0}^{k-1} w(v_t, v_{t+1})$$
+  This is the accumulated behavioral friction along the path so far&mdash;the explicit, deliberate cost-benefit calculation.</p>
+</div>
+
+<h3>2.3 System 1 as $h(n)$</h3>
+
+<div class="definition">
+  <p><span class="env-label">Definition 2</span> (System 1 heuristic). The System 1 evaluation at state $v$ is:
+  $$h(v) = \sum_{k \in \mathcal{B}(v)} \beta_k$$
+  where $\mathcal{B}(v)$ is the set of moral/social boundaries that must be crossed on any path from $v$ to the goal, and $\beta_k$ is the estimated boundary penalty. This is the fast, automatic assessment: "how morally/socially costly is it to get from here to where I want to be?"</p>
+</div>
+
+<h2>3. Main Results</h2>
+
+<h3>3.1 The Admissibility Theorem</h3>
+
+<div class="theorem">
+  <p><span class="env-label">Theorem 1</span> (Heuristic Admissibility). Let $h^*(v)$ denote the true minimum remaining cost from $v$ to the goal on the full decision manifold $\mathcal{C}$. If the boundary penalties $\beta_k$ are lower bounds on the true cost of crossing boundary $k$ (i.e., $\beta_k \leq \beta_k^*$ where $\beta_k^*$ includes legal, social, psychological, and reputational costs across all attribute dimensions), then $h(v) \leq h^*(v)$ for all $v$, and A* search with heuristic $h$ finds the optimal path on $\mathcal{C}$.</p>
+</div>
+
+<div class="proof">
+  <p><span class="env-label">Proof</span> The true remaining cost $h^*(v)$ includes the actual boundary penalties $\beta_k^*$ plus the Mahalanobis distance to the goal along the optimal remaining path. Since $\beta_k \leq \beta_k^*$ and the Mahalanobis component is non-negative, $h(v) = \sum_k \beta_k \leq \sum_k \beta_k^* \leq h^*(v)$. By the admissibility theorem for A* (Hart et al., 1968), the search finds the optimal path.
+  <span class="qed">$\square$</span></p>
+</div>
+
+<div class="corollary">
+  <p><span class="env-label">Corollary 1</span> (Moral Rules Are Not Biases). If moral heuristics are admissible, then following them produces optimal behavior on the full decision manifold. The behavior appears suboptimal only when evaluated on a scalar projection (e.g., monetary payoff alone). The "bias" is in the evaluation metric, not in the behavior.</p>
+</div>
+
+<h3>3.2 The Admissibility Hierarchy</h3>
+
+<!-- Figure 2: Hierarchy -->
+<div class="figure">
+  <svg viewBox="0 0 540 300" xmlns="http://www.w3.org/2000/svg" style="max-width:500px">
+    <text x="270" y="18" text-anchor="middle" font-size="12" font-weight="bold" fill="#6b46c1">The Admissibility Hierarchy of Heuristics</text>
+
+    <!-- Category 1: Strictly admissible -->
+    <rect x="20" y="40" width="500" height="55" rx="4" fill="#f0fff4" stroke="#38a169" stroke-width="2"/>
+    <text x="35" y="60" font-size="11" font-weight="700" fill="#38a169">1. Strictly Admissible (h ≤ h*)</text>
+    <text x="35" y="76" font-size="9.5" fill="#4a4a6a">Not biases. Optimal on the full manifold. Example: "do not murder" — true cost</text>
+    <text x="35" y="88" font-size="9.5" fill="#4a4a6a">(execution, imprisonment, social exclusion) genuinely exceeds any finite heuristic estimate.</text>
+
+    <!-- Category 2: ε-admissible -->
+    <rect x="20" y="105" width="500" height="55" rx="4" fill="#fffff0" stroke="#d69e2e" stroke-width="2"/>
+    <text x="35" y="125" font-size="11" font-weight="700" fill="#d69e2e">2. ε-Admissible (h ≤ (1+ε)h*)</text>
+    <text x="35" y="141" font-size="9.5" fill="#4a4a6a">Bounded suboptimality. The evolutionary sweet spot. Finds near-optimal paths in</text>
+    <text x="35" y="153" font-size="9.5" fill="#4a4a6a">polynomial time. Example: tipping norms, reciprocity expectations, queue etiquette.</text>
+
+    <!-- Category 3: Inadmissible -->
+    <rect x="20" y="170" width="500" height="55" rx="4" fill="#fee2e2" stroke="#e53e3e" stroke-width="2"/>
+    <text x="35" y="190" font-size="11" font-weight="700" fill="#e53e3e">3. Inadmissible (h > (1+ε)h*)</text>
+    <text x="35" y="206" font-size="9.5" fill="#4a4a6a">Genuine cognitive errors. Heuristic substantially overestimates cost.</text>
+    <text x="35" y="218" font-size="9.5" fill="#4a4a6a">Example: phobias, excessive guilt, pathological risk aversion.</text>
+
+    <!-- Category 4: Gauge-variant -->
+    <rect x="20" y="235" width="500" height="55" rx="4" fill="#fff5f5" stroke="#c53030" stroke-width="2"/>
+    <text x="35" y="255" font-size="11" font-weight="700" fill="#c53030">4. Gauge-Variant (h depends on framing, not state)</text>
+    <text x="35" y="271" font-size="9.5" fill="#4a4a6a">Not even a consistent function of position. Framing effects, anchoring,</text>
+    <text x="35" y="283" font-size="9.5" fill="#4a4a6a">availability bias. These are the only phenomena that fully deserve "bias."</text>
+
+    <!-- Bracket: "Features" vs "Errors" -->
+    <line x1="530" y1="45" x2="540" y2="45" stroke="#38a169" stroke-width="1.5"/>
+    <line x1="540" y1="45" x2="540" y2="155" stroke="#38a169" stroke-width="1.5"/>
+    <line x1="530" y1="155" x2="540" y2="155" stroke="#38a169" stroke-width="1.5"/>
+    <text x="548" y="105" font-size="9" fill="#38a169" font-weight="600" transform="rotate(90,548,105)">features</text>
+
+    <line x1="530" y1="175" x2="540" y2="175" stroke="#e53e3e" stroke-width="1.5"/>
+    <line x1="540" y1="175" x2="540" y2="285" stroke="#e53e3e" stroke-width="1.5"/>
+    <line x1="530" y1="285" x2="540" y2="285" stroke="#e53e3e" stroke-width="1.5"/>
+    <text x="548" y="235" font-size="9" fill="#e53e3e" font-weight="600" transform="rotate(90,548,235)">errors</text>
+  </svg>
+  <div class="caption"><strong>Figure 2.</strong> The admissibility hierarchy. Behavioral economics has classified all four categories as "biases." Categories 1&ndash;2 are architectural features of an efficient search algorithm; only categories 3&ndash;4 are genuine cognitive errors.</div>
+</div>
+
+<div class="definition">
+  <p><span class="env-label">Definition 3</span> ($\varepsilon$-Admissibility). A heuristic $h$ is $\varepsilon$-admissible if $h(v) \leq (1 + \varepsilon) h^*(v)$ for all $v$. Weighted A* with an $\varepsilon$-admissible heuristic finds a path whose cost is at most $(1 + \varepsilon)$ times the optimal cost, while exploring exponentially fewer states than exact search (Pohl, 1970).</p>
+</div>
+
+<div class="theorem">
+  <p><span class="env-label">Theorem 2</span> (Evolutionary Optimality of $\varepsilon$-Admissibility). Natural selection favors $\varepsilon$-admissible moral heuristics with small $\varepsilon > 0$ over strictly admissible heuristics ($\varepsilon = 0$) because:
+  <ol>
+    <li>Weighted A* with $\varepsilon > 0$ explores $O(n^{1/(1+\varepsilon)})$ states vs. $O(n)$ for exact A*, yielding faster decisions.</li>
+    <li>Heuristics biased toward <em>overestimation</em> of boundary costs ($h > h^*$ for dangerous boundaries) avoid catastrophic paths at the cost of small opportunity losses.</li>
+    <li>An organism with $h < h^*$ (underestimates boundary costs) occasionally crosses catastrophic boundaries and is eliminated from the gene pool.</li>
+  </ol>
+  Evolution therefore produces System 1 heuristics that are conservative: slightly overestimating sacred-boundary costs ($\varepsilon > 0$) while maintaining near-optimality.</p>
+</div>
+
+<h3>3.3 The Jean Valjean Problem</h3>
+
+<div class="remark">
+  <p><span class="env-label">Remark 1</span> (When Systems Conflict). A natural objection: if "never steal" assigns $h = \infty$ but the true cost of not stealing (starvation) also approaches infinity, then Systems 1 and 2 conflict. The framework predicts what is observed empirically: (1) the decision is experienced as agonizing moral conflict ($g$ and $h$ give contradictory signals); (2) the agent deliberates slowly (System 2 overrides System 1's automatic pruning); (3) society treats the transgression with nuance (the community recognizes the manifold distortion). This is not a failure of the model&mdash;it is the model's prediction for extreme boundary cases.</p>
+</div>
+
+<h2>4. Reclassifying Behavioral "Biases"</h2>
+
+<p>
+  We reclassify the major findings of behavioral economics within the admissibility hierarchy:
+</p>
+
+<table>
+  <tr><th>Phenomenon</th><th>Category</th><th>Mechanism</th></tr>
+  <tr><td>Theft aversion</td><td>1 (admissible)</td><td>$h = \infty$ for theft boundary; true cost is indeed effectively infinite</td></tr>
+  <tr><td>Fairness in ultimatum game</td><td>1&ndash;2</td><td>$h$ includes social-norm penalty; admissible on full manifold</td></tr>
+  <tr><td>Tipping, reciprocity</td><td>2 ($\varepsilon$-admissible)</td><td>Small overestimate of social cost; near-optimal</td></tr>
+  <tr><td>Loss aversion</td><td>2</td><td>Losses traverse moral dimensions (rights, fairness) that gains do not; $h$ is larger for loss paths&mdash;this is correct, not biased</td></tr>
+  <tr><td>Phobias</td><td>3 (inadmissible)</td><td>$h \gg h^*$ for harmless stimuli; genuine miscalibration</td></tr>
+  <tr><td>Framing effects</td><td>4 (gauge-variant)</td><td>$h$ depends on description, not state; inconsistent function</td></tr>
+  <tr><td>Anchoring</td><td>4</td><td>$h$ contaminated by irrelevant initial value</td></tr>
+  <tr><td>Availability bias</td><td>4</td><td>$h$ driven by memory salience, not actual frequency</td></tr>
+</table>
+
+<p>
+  This reclassification has a sharp empirical prediction: Category 1&ndash;2 phenomena should be <em>stable across cultures and contexts</em> (they reflect manifold structure, not cognitive error), while Category 3&ndash;4 phenomena should be <em>variable</em> (they reflect individual miscalibration or informational manipulation). This prediction is consistent with the cross-cultural evidence: fairness norms and theft aversion are near-universal (Henrich et al., 2001), while framing effects and anchoring vary substantially across populations and experimental conditions (Kahneman, 2011).
+</p>
+
+<h2>5. Computational Complexity: Why Heuristics Are Necessary</h2>
+
+<div class="proposition">
+  <p><span class="env-label">Proposition 1</span> (Intractability of Exact Optimization). Finding the optimal path on a $d$-dimensional decision manifold with $n$ states requires evaluating $O(n^d)$ attribute-vector comparisons in the worst case. For realistic parameters ($n \sim 10^4$ available actions, $d = 9$ dimensions), exact optimization is intractable in the milliseconds available for real-time decision-making. A* with an admissible heuristic reduces this to $O(n \cdot b^{d_{\text{eff}}})$ where $b$ is the branching factor and $d_{\text{eff}} \ll d$ is the effective search depth after heuristic pruning.</p>
+</div>
+
+<p>
+  This is why evolution produced System 1. Not because organisms are "irrational," but because exact optimization on a 9-dimensional manifold is computationally intractable. The heuristic-guided search trades global optimality for tractable near-optimality&mdash;precisely the trade-off that bounded rationality (Simon, 1955) identified but did not formalize.
+</p>
+
+<h2>6. Discussion</h2>
+
+<p>
+  The A* mapping resolves a persistent tension in cognitive science. Dual-process theories describe the architecture; rational-agent models prescribe the objective; behavioral economics documents the gap between them. The A* framework unifies all three: the architecture <em>is</em> the rational agent, implemented as heuristic search rather than exhaustive optimization.
+</p>
+<p>
+  Several testable predictions follow: (1) Decisions that activate more moral dimensions ($d_{\text{eff}}$ increases) should take longer (more nodes expanded in A*). (2) Decisions near infinite-weight boundaries should be fast (System 1 prunes instantly) unless the alternative path is also high-cost (System 1/2 conflict, predicting slow agonized deliberation). (3) Expertise in a domain should improve heuristic calibration ($\varepsilon$ decreases), making experts' intuitions <em>more</em> optimal, not less&mdash;consistent with Gigerenzer's findings on fast-and-frugal heuristics in experts.
+</p>
+<p>
+  The framework also makes a normative claim: calling admissible heuristics "biases" is a category error. When the full attribute space is the correct optimization domain, System 1's moral intuitions are not obstacles to rationality&mdash;they are components of it.
+</p>
+
+<h2>7. Conclusion</h2>
+
+<p>
+  We have shown that Kahneman's dual-process architecture has a precise computational identity: A* search with System 1 as the heuristic function and System 2 as the path-cost accumulator. Moral and cultural heuristics, under mild conditions, are admissible&mdash;guaranteeing optimal or near-optimal decisions on the full multi-dimensional decision manifold. The "biases" of behavioral economics decompose into architectural features (admissible and $\varepsilon$-admissible heuristics) and genuine cognitive errors (inadmissible and gauge-variant heuristics). This decomposition is falsifiable, culturally testable, and computationally precise.
+</p>
+
+<h2>References</h2>
+
+<div class="references">
+  <p>Gigerenzer, G., Todd, P.M., &amp; the ABC Research Group. (1999). <em>Simple Heuristics That Make Us Smart</em>. Oxford University Press.</p>
+  <p>Hart, P.E., Nilsson, N.J., &amp; Raphael, B. (1968). A formal basis for the heuristic determination of minimum cost paths. <em>IEEE Transactions on Systems Science and Cybernetics</em>, 4(2), 100&ndash;107.</p>
+  <p>Henrich, J., et al. (2001). In search of Homo economicus. <em>American Economic Review</em>, 91(2), 73&ndash;78.</p>
+  <p>Kahneman, D. (2011). <em>Thinking, Fast and Slow</em>. Farrar, Straus and Giroux.</p>
+  <p>Pohl, I. (1970). Heuristic search viewed as path finding in a graph. <em>Artificial Intelligence</em>, 1(3&ndash;4), 193&ndash;204.</p>
+  <p>Simon, H.A. (1955). A behavioral model of rational choice. <em>Quarterly Journal of Economics</em>, 69(1), 99&ndash;118.</p>
+</div>
+
+</body>
+</html>
