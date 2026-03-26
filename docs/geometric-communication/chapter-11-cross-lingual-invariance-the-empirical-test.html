@@ -317,7 +317,7 @@
 <p class="body-text">Second, the transfer to Arabic (40.7%) is comparable to English (41.5%) despite Arabic being a Semitic language like Hebrew. If transfer were linguistic rather than structural, Arabic should outperform English substantially. The near-equality suggests that the model is not leveraging Semitic language similarity&mdash;the adversarial training has stripped it away&mdash;but rather detecting moral structure that is equally present in both test languages.</p>
 <p class="body-text"><em>[Figure 11.4] <em>Cross-lingual transfer performance by language. Bars show macro F1 for Hohfeldian classification. The dashed line at 25% marks chance. All languages substantially exceed chance. The striking result is Classical Chinese (64.9%), which achieves the highest transfer despite being maximally distant from the training language on every typological and cultural dimension.</em>]</em></p>
 <h3 id="1133-bidirectional-transfer" class="subsection-heading">11.3.3 Bidirectional Transfer</h3>
-<p class="first-paragraph">Direction B (Dear Abby to Hebrew) confirms that transfer is symmetric. The model trained on 68,000 English letters achieves above-chance Hohfeldian classification on Hebrew test passages. The consistency across directions rules out the hypothesis that transfer is an artifact of corpus size, encoder bias, or training direction. The invariance is bidirectional, as gauge invariance requires: if meaning is preserved under the gauge transformation Hebrew <em class="math">\to</em> English, it must also be preserved under the inverse transformation English <em class="math">\to</em> Hebrew.</p>
+<p class="first-paragraph">Direction B (Dear Abby to Hebrew) confirms that transfer is symmetric. The model trained on 68,000 English letters achieves above-chance Hohfeldian classification on Hebrew test passages. The consistency across directions rules out the hypothesis that transfer is an artifact of corpus size, encoder bias, or training direction. The invariance is bidirectional, as gauge invariance requires: if meaning is preserved under the gauge transformation Hebrew <em class="math">→</em> English, it must also be preserved under the inverse transformation English <em class="math">→</em> Hebrew.</p>
 <h3 id="1134-the-control-ceiling" class="subsection-heading">11.3.4 The Control Ceiling</h3>
 <p class="first-paragraph">Mixed training establishes the in-distribution ceiling:</p>
 <div class="table-wrapper"><table class="book-table">
@@ -344,13 +344,13 @@
 <p class="body-text">We applied two types of perturbation to 500 randomly sampled test passages:</p>
 <p class="body-text"><strong>Surface perturbations</strong> (bond-preserving; should cause small embedding shifts):</p>
 <ul>
-<li>Name changes ("John" <em class="math">\to</em> "Maria")</li>
+<li>Name changes ("John" <em class="math">→</em> "Maria")</li>
 <li>Synonym substitution</li>
 <li>Irrelevant detail insertion</li>
 </ul>
 <p class="body-text"><strong>Structural perturbations</strong> (bond-altering; should cause large embedding shifts):</p>
 <ul>
-<li>Obligation <em class="math">\to</em> Permission flip</li>
+<li>Obligation <em class="math">→</em> Permission flip</li>
 <li>Adding a harm element</li>
 <li>Agent <em class="math">↔</em> Patient role swap</li>
 </ul>
@@ -362,7 +362,7 @@
 <th><em class="math">n</em></th>
 </tr>
 <tr>
-<td>Structural (O <em class="math">\to</em> P, harm <em class="math">\to</em> care)</td>
+<td>Structural (O <em class="math">→</em> P, harm <em class="math">→</em> care)</td>
 <td>0.132</td>
 <td>0.098</td>
 <td>16</td>
@@ -404,7 +404,7 @@
 <td>[0.006, 0.010]</td>
 </tr>
 <tr>
-<td>Obligation <em class="math">\to</em> Permission</td>
+<td>Obligation <em class="math">→</em> Permission</td>
 <td>0.0890</td>
 <td>[0.072, 0.108]</td>
 </tr>
@@ -502,9 +502,9 @@
 <p class="body-text">The structural fuzzing analysis (Section 11.3.5) provides the answer. The bond space is sensitive to moral-structural changes (11:1 to 14:1 structural/surface ratio) and insensitive to surface changes. It encodes the <em>relations</em> between agents&mdash;who owes what to whom, who may do what, who is exposed to what&mdash;without encoding the <em>words</em> used to express those relations.</p>
 <p class="body-text">This is what the communication manifold framework predicts. The bond space is a coordinate representation of a region of the content manifold <em class="math">C</em>&mdash;specifically, the Hohfeldian submanifold where moral relations live. Different languages are different charts on this submanifold. The bond space, by construction, is chart-independent: it depends on the base point (the moral relation) but not on the chart (the language and era). It is, in the precise sense of Chapter 3, a gauge-invariant quantity.</p>
 <h3 id="1152-the-gauge-transformation-tested" class="subsection-heading">11.5.2 The Gauge Transformation Tested</h3>
-<p class="first-paragraph">Let us be precise about what gauge transformation the experiment tests. The BIP architecture trains on text expressed in chart <em class="math">\varphi<sub>Hebrew</sub></em>, which maps a region of <em class="math">C</em> to Hebrew expressions. It is tested on text expressed in chart <em class="math">\varphi<sub>English</sub></em>, which maps a (partially overlapping) region of <em class="math">C</em> to English expressions. The transition map <em class="math">T<sub>Hebrew \to English</sub> = \varphi<sub>English</sub> \circ \varphi<sub>Hebrew</sub><sup>-1</sup></em> is the gauge transformation.</p>
+<p class="first-paragraph">Let us be precise about what gauge transformation the experiment tests. The BIP architecture trains on text expressed in chart <em class="math">φ<sub>Hebrew</sub></em>, which maps a region of <em class="math">C</em> to Hebrew expressions. It is tested on text expressed in chart <em class="math">φ<sub>English</sub></em>, which maps a (partially overlapping) region of <em class="math">C</em> to English expressions. The transition map <em class="math">T<sub>Hebrew → English</sub> = φ<sub>English</sub> ∘ φ<sub>Hebrew</sub><sup>-1</sup></em> is the gauge transformation.</p>
 <p class="body-text">The model's success demonstrates that the bond space representation is invariant under this gauge transformation:</p>
-<p class="display-math"><em class="math"><strong>z</strong><sub>bond</sub>(\varphi<sub>Hebrew</sub>(c)) ≈ <strong>z</strong><sub>bond</sub>(\varphi<sub>English</sub>(c))    for  c ∈ U<sub>Hebrew</sub> ∩ U<sub>English</sub></em></p>
+<p class="display-math"><em class="math"><strong>z</strong><sub>bond</sub>(φ<sub>Hebrew</sub>(c)) ≈ <strong>z</strong><sub>bond</sub>(φ<sub>English</sub>(c))    for  c ∈ U<sub>Hebrew</sub> ∩ U<sub>English</sub></em></p>
 <p class="first-paragraph">The approximate equality&mdash;reflected in the 44.5% F1 rather than 100%&mdash;measures the degree to which the invariance is imperfect. Some of the imperfection is attributable to label noise, encoder limitations, and the difficulty of the four-way classification task. But the 100% binary transfer on the obligation-liberty axis shows that on the strongest structural invariant, the gauge invariance is exact.</p>
 <h3 id="1153-connecting-to-parallel-transport" class="subsection-heading">11.5.3 Connecting to Parallel Transport</h3>
 <p class="first-paragraph">In Chapter 10, we defined translation as parallel transport on the content manifold: carrying meaning from one coordinate system to another along a path. The BIP experiment provides the first empirical measurement of that transport.</p>
