@@ -10,9 +10,8 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Crimson+Pro:ital,wght@0,300;0,400;0,600;0,700;1,400&family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
-  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
-  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"></script>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
 </head>
 
 <body>
@@ -26,7 +25,7 @@
         <span></span><span></span><span></span>
       </button>
       <ul class="nav-links">
-        <li><a href="index.html" class="active">Medicine</a></li>
+        <li><a href="../geometric-medicine/index.html" class="active">Medicine</a></li>
         <li><a href="../book/index.html">Ethics</a></li>
         <li><a href="../geometric-methods/index.html">Methods</a></li>
         <li><a href="../geometric-reasoning/index.html">Reasoning</a></li>
@@ -43,9 +42,9 @@
     <div class="chapter-container">
       <nav class="breadcrumb" aria-label="Breadcrumb">
         <a href="../index.html">Geometric Series</a>
-        <span class="breadcrumb-sep">›</span>
+        <span class="breadcrumb-sep">&rsaquo;</span>
         <a href="index.html">Geometric Medicine</a>
-        <span class="breadcrumb-sep">›</span>
+        <span class="breadcrumb-sep">&rsaquo;</span>
         <span class="breadcrumb-current">Chapter 17: Measuring the Clinical Metric</span>
       </nav>
       <div class="chapter-nav-top">
@@ -54,224 +53,265 @@
         <a href="chapter-18-open-questions-and-the-frontier.html" class="nav-next">Chapter 18: Open Questions and the Frontier &rarr;</a>
       </div>
 
-      <nav class="chapter-toc"><h4>In this chapter</h4><ol><li><a href="#171-the-central-empirical-challenge-estimating-sigma">17.1 The Central Empirical Challenge: Estimating <em class="math">\Sigma</em></a></li><li><a href="#172-measuring-the-bond-index-from-ehr-data">17.2 Measuring the Bond Index from EHR Data</a></li><li><a href="#173-the-falsifiable-prediction-suite">17.3 The Falsifiable Prediction Suite</a></li><li><a href="#174-power-analysis-and-feasibility">17.4 Power Analysis and Feasibility</a></li><li><a href="#175-the-falsifiability-standard">17.5 The Falsifiability Standard</a></li><li><a href="#175-sarahs-experiment">17.5 Sarah's Experiment</a></li><li><a href="#chapter-summary">Chapter Summary</a></li></ol></nav>
       <div class="chapter-content">
-<h1 id="chapter-17-measuring-the-clinical-metric" class="chapter-title">Chapter 17: Measuring the Clinical Metric</h1>
-<blockquote class="book-blockquote"><p>"The framework will be judged not by the elegance of its mathematics but by the accuracy of its predictions. Here are the predictions, the experiments to test them, and the criteria for falsification."</p></blockquote>
-<p class="body-text">Every theoretical framework must face the empirical challenge. The clinical decision complex, the <em class="math">A^*</em> pathfinding model, the moral injury accumulation theorem, the Bond Index, the consent gauge-invariance test — all of these are formal constructions. They generate predictions. The predictions must be tested. If they survive testing, the framework is supported. If they do not, the framework is wrong.</p>
-<p class="body-text">This chapter is the empirical interface between theory and data. It addresses three questions: How do we estimate the <em class="math">9 \times 9</em> clinical-moral covariance matrix <em class="math">\Sigma</em> from clinical data? What specific, falsifiable predictions does the framework generate? And what experimental designs can test those predictions with available instruments and feasible sample sizes?</p>
-<h2 id="171-the-central-empirical-challenge-estimating-sigma" class="section-heading">17.1 The Central Empirical Challenge: Estimating <em class="math">\Sigma</em></h2>
-<h3 id="what-sigma-encodes" class="subsection-heading">What <em class="math">\Sigma</em> Encodes</h3>
-<p class="body-text">The <em class="math">9 \times 9</em> clinical-moral covariance matrix <em class="math">\Sigma</em> is the framework's central empirical object. It encodes the cross-dimensional dependencies that make clinical ethics hard:</p>
+<section id="chapter-17-measuring-the-clinical-metric" class="level1">
+<h1>Chapter 17: Measuring the Clinical Metric</h1>
+<blockquote>
+<p><em>“The framework will be judged not by the elegance of its mathematics but by the accuracy of its predictions. Here are the predictions, the experiments to test them, and the criteria for falsification.”</em></p>
+</blockquote>
+<hr />
+<p>Every theoretical framework must face the empirical challenge. The clinical decision complex, the <span class="math inline">A^*</span> pathfinding model, the moral injury accumulation theorem, the Bond Index, the consent gauge-invariance test — all of these are formal constructions. They generate predictions. The predictions must be tested. If they survive testing, the framework is supported. If they do not, the framework is wrong.</p>
+<p>This chapter is the empirical interface between theory and data. It addresses three questions: How do we estimate the <span class="math inline">9 \times 9</span> clinical-moral covariance matrix <span class="math inline">\Sigma</span> from clinical data? What specific, falsifiable predictions does the framework generate? And what experimental designs can test those predictions with available instruments and feasible sample sizes?</p>
+<hr />
+<section id="the-central-empirical-challenge-estimating-sigma" class="level2">
+<h2>17.1 The Central Empirical Challenge: Estimating <span class="math inline">\Sigma</span></h2>
+<section id="what-sigma-encodes" class="level3">
+<h3>What <span class="math inline">\Sigma</span> Encodes</h3>
+<p>The <span class="math inline">9 \times 9</span> clinical-moral covariance matrix <span class="math inline">\Sigma</span> is the framework’s central empirical object. It encodes the cross-dimensional dependencies that make clinical ethics hard:</p>
 <ul>
-<li><em class="math">\Sigma_{15}</em> (outcomes <em class="math">\times</em> trust): A treatment with uncertain outcomes (<em class="math">d_1</em>) is more costly when the trust relationship is fragile (<em class="math">d_5</em>). The cross-term captures the interaction.</li>
-<li><em class="math">\Sigma_{49}</em> (autonomy <em class="math">\times</em> epistemic): Respecting autonomy (<em class="math">d_4</em>) requires that the patient has adequate understanding (<em class="math">d_9</em>). When <em class="math">d_9</em> is low, invoking <em class="math">d_4</em> is more costly.</li>
-<li><em class="math">\Sigma_{37}</em> (justice <em class="math">\times</em> dignity): A resource-allocation decision that is fair (<em class="math">d_3</em>) but strips dignity (<em class="math">d_7</em>) has high cross-dimensional cost.</li>
+<li><span class="math inline">\Sigma_{15}</span> (outcomes <span class="math inline">\times</span> trust): A treatment with uncertain outcomes (<span class="math inline">d_1</span>) is more costly when the trust relationship is fragile (<span class="math inline">d_5</span>). The cross-term captures the interaction.</li>
+<li><span class="math inline">\Sigma_{49}</span> (autonomy <span class="math inline">\times</span> epistemic): Respecting autonomy (<span class="math inline">d_4</span>) requires that the patient has adequate understanding (<span class="math inline">d_9</span>). When <span class="math inline">d_9</span> is low, invoking <span class="math inline">d_4</span> is more costly.</li>
+<li><span class="math inline">\Sigma_{37}</span> (justice <span class="math inline">\times</span> dignity): A resource-allocation decision that is fair (<span class="math inline">d_3</span>) but strips dignity (<span class="math inline">d_7</span>) has high cross-dimensional cost.</li>
 </ul>
-<p class="body-text">These cross-terms are not philosophical abstractions. They are empirically estimable quantities — entries in a covariance matrix that can be computed from clinical decision data.</p>
-<h3 id="why-sigma-has-not-been-estimated" class="subsection-heading">Why <em class="math">\Sigma</em> Has Not Been Estimated</h3>
-<p class="body-text">The covariance matrix has 45 unique entries (9 diagonal + 36 off-diagonal, divided by 2 for symmetry). Estimating 45 parameters from clinical data requires:</p>
-<ol>
-<li><strong>Dimensional measurement</strong>: A coding scheme that assigns each clinical decision a nine-dimensional attribute vector. This requires trained coders (clinicians who can evaluate decisions along all nine dimensions) and a validated coding protocol.</li>
-<li><strong>Sufficient sample size</strong>: Estimating a <em class="math">9 \times 9</em> covariance matrix with reasonable precision requires at least <em class="math">n = 200</em> observations per condition (Maydeu-Olivares and Coffman, 2006). For ethics consultations, this means coding at least 500 consultations (allowing for incomplete data and stratification).</li>
-<li><strong>Representative sampling</strong>: The consultations must be representative of the clinical contexts where the framework applies — not just the dramatic cases (which are overrepresented in ethics consultations) but also the routine cases (which are underrepresented).</li>
+<p>These cross-terms are not philosophical abstractions. They are empirically estimable quantities — entries in a covariance matrix that can be computed from clinical decision data.</p>
+</section>
+<section id="why-sigma-has-not-been-estimated" class="level3">
+<h3>Why <span class="math inline">\Sigma</span> Has Not Been Estimated</h3>
+<p>The covariance matrix has 45 unique entries (9 diagonal + 36 off-diagonal, divided by 2 for symmetry). Estimating 45 parameters from clinical data requires:</p>
+<ol type="1">
+<li><p><strong>Dimensional measurement</strong>: A coding scheme that assigns each clinical decision a nine-dimensional attribute vector. This requires trained coders (clinicians who can evaluate decisions along all nine dimensions) and a validated coding protocol.</p></li>
+<li><p><strong>Sufficient sample size</strong>: Estimating a <span class="math inline">9 \times 9</span> covariance matrix with reasonable precision requires at least <span class="math inline">n = 200</span> observations per condition (Maydeu-Olivares and Coffman, 2006). For ethics consultations, this means coding at least 500 consultations (allowing for incomplete data and stratification).</p></li>
+<li><p><strong>Representative sampling</strong>: The consultations must be representative of the clinical contexts where the framework applies — not just the dramatic cases (which are overrepresented in ethics consultations) but also the routine cases (which are underrepresented).</p></li>
 </ol>
-<p class="body-text">These requirements are feasible but have not been met — the framework is new, and the measurement infrastructure does not yet exist.</p>
-<h3 id="proposed-experimental-design-for-estimating-sigma" class="subsection-heading">Proposed Experimental Design for Estimating <em class="math">\Sigma</em></h3>
-<p class="body-text"><strong>Study 1: Retrospective Ethics Consultation Coding</strong></p>
-<p class="body-text">Design: Code <em class="math">\geq 500</em> ethics committee consultations from a large academic medical center, retrospectively, along all nine clinical-moral dimensions.</p>
-<p class="body-text">Coding protocol:</p>
-<ol>
-<li>For each consultation, two trained clinician-coders independently assign an attribute vector <em class="math">\mathbf{a}(v_0) \in \mathbb{R}^9</em> for the initial clinical state and <em class="math">\mathbf{a}(v_{\text{rec}}) \in \mathbb{R}^9</em> for the recommended resolution.</li>
-<li>Each dimension is scored on a calibrated scale (e.g., <em class="math">[-1, +1]</em> or <em class="math">[0, 10]</em>) with anchor descriptions at key points.</li>
-<li>Inter-rater reliability is assessed via intraclass correlation coefficient (ICC) for each dimension.</li>
-<li>Disagreements are resolved by a third clinician-coder.</li>
+<p>These requirements are feasible but have not been met — the framework is new, and the measurement infrastructure does not yet exist.</p>
+</section>
+<section id="proposed-experimental-design-for-estimating-sigma" class="level3">
+<h3>Proposed Experimental Design for Estimating <span class="math inline">\Sigma</span></h3>
+<p><strong>Study 1: Retrospective Ethics Consultation Coding</strong></p>
+<p><em>Design:</em> Code <span class="math inline">\geq 500</span> ethics committee consultations from a large academic medical center, retrospectively, along all nine clinical-moral dimensions.</p>
+<p><em>Coding protocol:</em> 1. For each consultation, two trained clinician-coders independently assign an attribute vector <span class="math inline">\mathbf{a}(v_0) \in \mathbb{R}^9</span> for the initial clinical state and <span class="math inline">\mathbf{a}(v_{\text{rec}}) \in \mathbb{R}^9</span> for the recommended resolution. 2. Each dimension is scored on a calibrated scale (e.g., <span class="math inline">[-1, +1]</span> or <span class="math inline">[0, 10]</span>) with anchor descriptions at key points. 3. Inter-rater reliability is assessed via intraclass correlation coefficient (ICC) for each dimension. 4. Disagreements are resolved by a third clinician-coder.</p>
+<p><em>Analysis:</em> 1. Compute the sample covariance matrix <span class="math inline">\hat{\Sigma} = \frac{1}{n-1} \sum_{i=1}^{n} (\mathbf{a}_i - \bar{\mathbf{a}})(\mathbf{a}_i - \bar{\mathbf{a}})^T</span>. 2. Test for positive definiteness (required for the Mahalanobis metric to be well-defined). 3. Identify the largest off-diagonal elements — these are the cross-dimensional dependencies that drive the most clinical-ethical complexity. 4. Bootstrap confidence intervals for all 45 entries.</p>
+<p><em>Feasibility:</em> Ethics consultation records are maintained at most academic medical centers. Retrospective coding requires clinical expertise but not patient contact, IRB consent (the records already exist), or prospective recruitment. The primary cost is coder time — approximately 30 minutes per consultation for nine-dimensional coding, or 250 coder-hours for 500 consultations.</p>
+<p><strong>Study 2: Prospective Discrete Choice Experiment</strong></p>
+<p><em>Design:</em> A fractional-factorial discrete choice experiment using clinical vignettes. Each vignette presents a clinical scenario with two treatment options, and the clinician chooses between them. The vignettes systematically vary the nine-dimensional attribute vectors of the options.</p>
+<p><em>Sample:</em> <span class="math inline">n \geq 200</span> clinicians (physicians, nurses, and allied health professionals) from at least three clinical settings (ICU, general medicine, palliative care).</p>
+<p><em>Vignette design:</em> Fractional-factorial design with the nine clinical-moral dimensions as factors and two levels per factor (high/low). The full factorial design would require <span class="math inline">2^9 = 512</span> vignettes per participant — infeasible. A fractional-factorial design with resolution V (estimating all main effects and two-factor interactions) requires approximately 50–80 vignettes per participant, administrable in a 45-minute session.</p>
+<p><em>Analysis:</em> Conditional logit regression to estimate marginal rates of substitution (MRS) between dimensions:</p>
+<p><span class="math display">\text{MRS}_{ij} = \frac{\partial U / \partial d_i}{\partial U / \partial d_j}</span></p>
+<p>The MRS matrix is related to the inverse covariance matrix <span class="math inline">\Sigma^{-1}</span> — dimensions that clinicians are willing to trade off at low rates have high covariance (substitutes); dimensions that clinicians are unwilling to trade off have low covariance (complements or incommensurables).</p>
+<p><em>Cross-validation:</em> Use the estimated <span class="math inline">\Sigma</span> from Study 2 to predict the recommendations in Study 1’s held-out ethics consultations. If the <span class="math inline">\Sigma</span>-based clinical geodesic matches the ethics committee’s recommendation in <span class="math inline">&gt; 70\%</span> of cases, the covariance matrix has predictive validity.</p>
+<hr />
+</section>
+</section>
+<section id="measuring-the-bond-index-from-ehr-data" class="level2">
+<h2>17.2 Measuring the Bond Index from EHR Data</h2>
+<section id="which-dimensions-are-already-in-ehr-systems" class="level3">
+<h3>Which Dimensions Are Already in EHR Systems?</h3>
+<p>Electronic health records contain vast quantities of clinical data, but the data is organized for billing and clinical documentation, not for nine-dimensional manifold measurement. The mapping from EHR data to manifold dimensions:</p>
+<table>
+<colgroup>
+<col style="width: 33%" />
+<col style="width: 33%" />
+<col style="width: 33%" />
+</colgroup>
+<thead>
+<tr>
+<th>Dimension</th>
+<th>EHR Data Source</th>
+<th>Quality</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><span class="math inline">d_1</span>: Outcomes</td>
+<td>Lab values, vital signs, ICD codes, mortality</td>
+<td>Excellent</td>
+</tr>
+<tr>
+<td><span class="math inline">d_2</span>: Rights</td>
+<td>Consent forms, advance directives, DNR orders</td>
+<td>Good (when documented)</td>
+</tr>
+<tr>
+<td><span class="math inline">d_3</span>: Justice</td>
+<td>Demographics, insurance type, zip code (proxy)</td>
+<td>Indirect</td>
+</tr>
+<tr>
+<td><span class="math inline">d_4</span>: Autonomy</td>
+<td>Treatment refusal documentation, AMA discharges</td>
+<td>Moderate</td>
+</tr>
+<tr>
+<td><span class="math inline">d_5</span>: Trust</td>
+<td>Not directly measured</td>
+<td>Requires proxy</td>
+</tr>
+<tr>
+<td><span class="math inline">d_6</span>: Social</td>
+<td>Social work assessments, discharge planning</td>
+<td>Variable</td>
+</tr>
+<tr>
+<td><span class="math inline">d_7</span>: Dignity</td>
+<td>Not directly measured</td>
+<td>Requires proxy</td>
+</tr>
+<tr>
+<td><span class="math inline">d_8</span>: Institutional</td>
+<td>Protocol adherence, guideline compliance</td>
+<td>Good</td>
+</tr>
+<tr>
+<td><span class="math inline">d_9</span>: Epistemic</td>
+<td>Not directly measured</td>
+<td>Requires proxy</td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="validated-proxies-for-d_5-d_7-d_9" class="level3">
+<h3>Validated Proxies for <span class="math inline">d_5</span>, <span class="math inline">d_7</span>, <span class="math inline">d_9</span></h3>
+<p>The three dimensions not routinely captured in EHRs require validated proxy instruments:</p>
+<p><strong><span class="math inline">d_5</span> (Trust) — Three proxy options:</strong></p>
+<ol type="1">
+<li><p><em>Wake Forest Trust in Physician Scale</em> (Hall et al., 2002). Ten items measuring fidelity, competence, honesty, confidentiality, and global trust. Cronbach’s alpha: 0.85–0.93. Validated across racial and ethnic groups. Administration time: 3 minutes.</p></li>
+<li><p><em>HCAHPS Communication Composite</em> (CMS). Items: “How often did doctors explain things in a way you could understand?” “How often did doctors listen carefully to you?” “How often did doctors treat you with courtesy and respect?” Available for all US hospitals as part of Medicare quality reporting. Advantage: already collected; disadvantage: coarse granularity.</p></li>
+<li><p><em>Interpersonal Processes of Care Survey — Short Form</em> (Stewart et al., 2011). Measures patient perceptions of discrimination, condescension, and communication quality. Specifically designed to capture trust-relevant experiences of minority patients. Administration time: 5 minutes.</p></li>
 </ol>
-<p class="body-text">Analysis:</p>
-<ol>
-<li>Compute the sample covariance matrix <em class="math">\hat{\Sigma} = \frac{1}{n-1} \sum_{i=1}^{n} (\mathbf{a}_i - \bar{\mathbf{a}})(\mathbf{a}_i - \bar{\mathbf{a}})^T</em>.</li>
-<li>Test for positive definiteness (required for the Mahalanobis metric to be well-defined).</li>
-<li>Identify the largest off-diagonal elements — these are the cross-dimensional dependencies that drive the most clinical-ethical complexity.</li>
-<li>Bootstrap confidence intervals for all 45 entries.</li>
+<p><strong><span class="math inline">d_7</span> (Dignity) — Two proxy options:</strong></p>
+<ol type="1">
+<li><p><em>Patient Dignity Inventory</em> (Chochinov et al., 2008). Twenty-five items measuring dignity-related distress: sense of being a burden, loss of control, uncertainty, feeling unheard. Originally validated in palliative care. Cronbach’s alpha: 0.93. Administration time: 10 minutes.</p></li>
+<li><p><em>HCAHPS “Treated with Respect” Item</em> (CMS). Single item: “During this hospital stay, how often were you treated with courtesy and respect?” Advantage: already collected at all US hospitals. Disadvantage: single item, limited sensitivity.</p></li>
 </ol>
-<p class="body-text">Feasibility: Ethics consultation records are maintained at most academic medical centers. Retrospective coding requires clinical expertise but not patient contact, IRB consent (the records already exist), or prospective recruitment. The primary cost is coder time — approximately 30 minutes per consultation for nine-dimensional coding, or 250 coder-hours for 500 consultations.</p>
-<p class="body-text"><strong>Study 2: Prospective Discrete Choice Experiment</strong></p>
-<p class="body-text">Design: A fractional-factorial discrete choice experiment using clinical vignettes. Each vignette presents a clinical scenario with two treatment options, and the clinician chooses between them. The vignettes systematically vary the nine-dimensional attribute vectors of the options.</p>
-<p class="body-text">Sample: <em class="math">n \geq 200</em> clinicians (physicians, nurses, and allied health professionals) from at least three clinical settings (ICU, general medicine, palliative care).</p>
-<p class="body-text">Vignette design: Fractional-factorial design with the nine clinical-moral dimensions as factors and two levels per factor (high/low). The full factorial design would require <em class="math">2^9 = 512</em> vignettes per participant — infeasible. A fractional-factorial design with resolution V (estimating all main effects and two-factor interactions) requires approximately 50–80 vignettes per participant, administrable in a 45-minute session.</p>
-<p class="body-text">Analysis: Conditional logit regression to estimate marginal rates of substitution (MRS) between dimensions:</p>
-<p class="display-math"><em class="math">\text{MRS}_{ij} = \frac{\partial U / \partial d_i}{\partial U / \partial d_j}</em></p>
-<p class="body-text">The MRS matrix is related to the inverse covariance matrix <em class="math">\Sigma^{-1}</em> — dimensions that clinicians are willing to trade off at low rates have high covariance (substitutes); dimensions that clinicians are unwilling to trade off have low covariance (complements or incommensurables).</p>
-<p class="body-text">Cross-validation: Use the estimated <em class="math">\Sigma</em> from Study 2 to predict the recommendations in Study 1's held-out ethics consultations. If the <em class="math">\Sigma</em>-based clinical geodesic matches the ethics committee's recommendation in <em class="math">> 70\%</em> of cases, the covariance matrix has predictive validity.</p>
-<h2 id="172-measuring-the-bond-index-from-ehr-data" class="section-heading">17.2 Measuring the Bond Index from EHR Data</h2>
-<h3 id="which-dimensions-are-already-in-ehr-systems" class="subsection-heading">Which Dimensions Are Already in EHR Systems?</h3>
-<p class="body-text">Electronic health records contain vast quantities of clinical data, but the data is organized for billing and clinical documentation, not for nine-dimensional manifold measurement. The mapping from EHR data to manifold dimensions:</p>
-<div class="table-wrapper"><table>
-<tr><th>Dimension</th><th>EHR Data Source</th><th>Quality</th></tr>
-<tr><td><em class="math">d_1</em>: Outcomes</td><td>Lab values, vital signs, ICD codes, mortality</td><td>Excellent</td></tr>
-<tr><td><em class="math">d_2</em>: Rights</td><td>Consent forms, advance directives, DNR orders</td><td>Good (when documented)</td></tr>
-<tr><td><em class="math">d_3</em>: Justice</td><td>Demographics, insurance type, zip code (proxy)</td><td>Indirect</td></tr>
-<tr><td><em class="math">d_4</em>: Autonomy</td><td>Treatment refusal documentation, AMA discharges</td><td>Moderate</td></tr>
-<tr><td><em class="math">d_5</em>: Trust</td><td>Not directly measured</td><td>Requires proxy</td></tr>
-<tr><td><em class="math">d_6</em>: Social</td><td>Social work assessments, discharge planning</td><td>Variable</td></tr>
-<tr><td><em class="math">d_7</em>: Dignity</td><td>Not directly measured</td><td>Requires proxy</td></tr>
-<tr><td><em class="math">d_8</em>: Institutional</td><td>Protocol adherence, guideline compliance</td><td>Good</td></tr>
-<tr><td><em class="math">d_9</em>: Epistemic</td><td>Not directly measured</td><td>Requires proxy</td></tr>
-</table></div>
-<h3 id="validated-proxies-for-d5-d7-d9" class="subsection-heading">Validated Proxies for <em class="math">d_5</em>, <em class="math">d_7</em>, <em class="math">d_9</em></h3>
-<p class="body-text">The three dimensions not routinely captured in EHRs require validated proxy instruments:</p>
-<p class="body-text"><strong><em class="math">d_5</em> (Trust) — Three proxy options:</strong></p>
-<ol>
-<li>Wake Forest Trust in Physician Scale (Hall et al., 2002). Ten items measuring fidelity, competence, honesty, confidentiality, and global trust. Cronbach's alpha: 0.85–0.93. Validated across racial and ethnic groups. Administration time: 3 minutes.</li>
-<li>HCAHPS Communication Composite (CMS). Items: "How often did doctors explain things in a way you could understand?" "How often did doctors listen carefully to you?" "How often did doctors treat you with courtesy and respect?" Available for all US hospitals as part of Medicare quality reporting. Advantage: already collected; disadvantage: coarse granularity.</li>
-<li>Interpersonal Processes of Care Survey — Short Form (Stewart et al., 2011). Measures patient perceptions of discrimination, condescension, and communication quality. Specifically designed to capture trust-relevant experiences of minority patients. Administration time: 5 minutes.</li>
+<p><strong><span class="math inline">d_9</span> (Epistemic Status) — Three proxy options:</strong></p>
+<ol type="1">
+<li><p><em>REALM</em> (Rapid Estimate of Adult Literacy in Medicine; Davis et al., 1993). A 66-word recognition test that estimates health literacy in under 3 minutes. Correlates with reading comprehension and numeracy. Widely used in clinical research.</p></li>
+<li><p><em>Newest Vital Sign</em> (Weiss et al., 2005). A six-item assessment based on a nutrition label. Measures both literacy and numeracy. Administration time: 3 minutes.</p></li>
+<li><p><em>Gauge-invariance test</em> (from Chapter 8). Present clinical information in two semantically equivalent framings (e.g., “90% survival” vs. “10% mortality”) and measure decision consistency. Patients whose decisions change under reframing have inadequate <span class="math inline">d_9</span> calibration, regardless of literacy scores. This test is novel to the geometric framework and has not been independently validated — it is itself a falsifiable prediction (Prediction 3 below).</p></li>
 </ol>
-<p class="body-text"><strong><em class="math">d_7</em> (Dignity) — Two proxy options:</strong></p>
-<ol>
-<li>Patient Dignity Inventory (Chochinov et al., 2008). Twenty-five items measuring dignity-related distress: sense of being a burden, loss of control, uncertainty, feeling unheard. Originally validated in palliative care. Cronbach's alpha: 0.93. Administration time: 10 minutes.</li>
-<li>HCAHPS "Treated with Respect" Item (CMS). Single item: "During this hospital stay, how often were you treated with courtesy and respect?" Advantage: already collected at all US hospitals. Disadvantage: single item, limited sensitivity.</li>
+</section>
+<section id="the-bond-index-computation-pipeline" class="level3">
+<h3>The Bond Index Computation Pipeline</h3>
+<p><strong>Step 1:</strong> For a patient population <span class="math inline">S</span> at a healthcare institution, extract <span class="math inline">d_1</span>, <span class="math inline">d_2</span>, <span class="math inline">d_4</span>, <span class="math inline">d_6</span>, <span class="math inline">d_8</span> from EHR data.</p>
+<p><strong>Step 2:</strong> Administer proxy instruments for <span class="math inline">d_5</span>, <span class="math inline">d_7</span>, <span class="math inline">d_9</span> to a representative subsample. Use the subsample to train a predictive model that estimates <span class="math inline">d_5</span>, <span class="math inline">d_7</span>, <span class="math inline">d_9</span> from available EHR features (demographics, utilization patterns, communication notes).</p>
+<p><strong>Step 3:</strong> For each patient, construct the nine-dimensional attribute vector <span class="math inline">\mathbf{a}(s)</span>.</p>
+<p><strong>Step 4:</strong> Compute the policy-mandated path <span class="math inline">\gamma_P^*</span> from documented clinical events (treatments, tests, referrals, outcomes).</p>
+<p><strong>Step 5:</strong> Compute the clinical geodesic <span class="math inline">\gamma_{\mathcal{C}}^*</span> using <span class="math inline">A^*</span> search on the estimated clinical decision complex with the estimated <span class="math inline">\Sigma</span>.</p>
+<p><strong>Step 6:</strong> Compute <span class="math inline">\text{BI}(P, S) = \frac{1}{|S|} \sum_{s \in S} [\text{CF}(\gamma_P^*(s)) - \text{CF}(\gamma_{\mathcal{C}}^*(s))]</span>.</p>
+<p><strong>Step 7:</strong> Stratify by demographics and compute disparity ratios.</p>
+<hr />
+</section>
+</section>
+<section id="the-falsifiable-prediction-suite" class="level2">
+<h2>17.3 The Falsifiable Prediction Suite</h2>
+<p>The framework generates six specific predictions, each with an experimental design, instruments, and falsification criteria. These predictions are not post hoc rationalizations — they are pre-registered claims that the framework makes and that the data can reject.</p>
+<section id="prediction-1-dimensional-moral-distress" class="level3">
+<h3>Prediction 1: Dimensional Moral Distress</h3>
+<p><strong>Claim:</strong> Clinician moral distress (measured by MDS-R) correlates with the number of manifold dimensions activated in the distressing situation, not just with the severity on any single dimension.</p>
+<p><strong>Experimental design:</strong> Present <span class="math inline">n \geq 200</span> clinicians with 20 clinical vignettes, systematically varying the number of activated dimensions (2, 4, 6, 8) while holding <span class="math inline">d_1</span> severity constant. After each vignette, administer the MDS-R (or a vignette-adapted version) and a dimensional activation checklist.</p>
+<p><strong>Predicted result:</strong> MDS-R scores increase monotonically with dimension count, controlling for <span class="math inline">d_1</span> severity. The partial correlation between dimension count and MDS-R, controlling for <span class="math inline">d_1</span>, is <span class="math inline">r &gt; 0.3</span>.</p>
+<p><strong>What would falsify:</strong> No correlation between dimension count and distress after controlling for <span class="math inline">d_1</span> severity. This would indicate that moral distress is a function of clinical severity alone, not of dimensional complexity — refuting the framework’s core claim.</p>
+</section>
+<section id="prediction-2-moral-injury-vs.-burnout-dissociation" class="level3">
+<h3>Prediction 2: Moral Injury vs. Burnout Dissociation</h3>
+<p><strong>Claim:</strong> Moral injury (MISS-HP) and burnout (MBI) are statistically dissociable constructs with different correlates.</p>
+<p><strong>Experimental design:</strong> Administer both MISS-HP and MBI to <span class="math inline">n \geq 300</span> clinicians across three settings (ICU, general medicine, palliative care). Collect covariates: workload (hours per week, patient volume), triage decision frequency, protocol disagreement score, and staffing ratio.</p>
+<p><strong>Predicted result:</strong> MISS-HP and MBI have <span class="math inline">r &lt; 0.7</span> (moderate correlation, not identity). In a multiple regression, MISS-HP is predicted by triage decision frequency and protocol disagreement (moral injury predictors), while MBI is predicted by workload and staffing ratio (burnout predictors). The regression models have distinguishable predictor profiles.</p>
+<p><strong>What would falsify:</strong> <span class="math inline">r &gt; 0.9</span> between MISS-HP and MBI with identical predictor profiles. This would indicate that moral injury and burnout are empirically indistinguishable — refuting the structural distinction between <span class="math inline">g(n)</span>-depletion and <span class="math inline">h(n)</span>-damage.</p>
+</section>
+<section id="prediction-3-consent-gauge-invariance-test" class="level3">
+<h3>Prediction 3: Consent Gauge-Invariance Test</h3>
+<p><strong>Claim:</strong> Patients with genuinely informed consent show framing invariance; patients who show framing effects have inadequate <span class="math inline">d_9</span> calibration.</p>
+<p><strong>Experimental design:</strong> Present <span class="math inline">n \geq 200</span> patients (pre-procedure, in a consent context) with clinical information in two framings: - Framing A: “This procedure has a 90% success rate.” - Framing B: “This procedure has a 10% failure rate.”</p>
+<p>Measure: (a) treatment preference after each framing (same/different), (b) health literacy (REALM or NVS), (c) self-reported understanding of the procedure.</p>
+<p><strong>Predicted result:</strong> Framing-variant patients (those whose preferences change) have lower health literacy scores (<span class="math inline">r = -0.4</span>) and lower self-reported understanding than framing-invariant patients. The gauge-invariance test identifies consent quality better than form completion alone.</p>
+<p><strong>What would falsify:</strong> No correlation between framing invariance and comprehension. This would indicate that framing effects are independent of understanding — refuting the claim that consent is a gauge-invariance condition.</p>
+</section>
+<section id="prediction-4-bond-index-predicts-disparities" class="level3">
+<h3>Prediction 4: Bond Index Predicts Disparities</h3>
+<p><strong>Claim:</strong> The clinical Bond Index, computed from institutional policy analysis, predicts patient-reported experience disparities across demographic groups.</p>
+<p><strong>Experimental design:</strong> Compute <span class="math inline">\text{BI}(P, S_k)</span> for a hospital’s triage, consent, and discharge policies, stratified by race, age, and disability status. Correlate with HCAHPS patient experience scores stratified by the same demographics.</p>
+<p><strong>Predicted result:</strong> Groups with higher <span class="math inline">\text{BI}</span> report worse experience on HCAHPS trust, communication, and respect dimensions. Correlation <span class="math inline">r &gt; 0.4</span> between <span class="math inline">\text{BI}</span> and HCAHPS composite, with the strongest correlation on the trust dimension (<span class="math inline">d_5</span>).</p>
+<p><strong>What would falsify:</strong> No correlation between <span class="math inline">\text{BI}</span> and HCAHPS disparities. This would indicate that the Bond Index does not capture experientially meaningful injustice — refuting the claim that manifold cost is clinically relevant.</p>
+</section>
+<section id="prediction-5-triage-resistance-correlates" class="level3">
+<h3>Prediction 5: Triage Resistance Correlates</h3>
+<p><strong>Claim:</strong> Clinician resistance to utilitarian triage protocols correlates with pre-crisis <span class="math inline">\beta_k</span> profiles.</p>
+<p><strong>Experimental design:</strong> During a non-crisis period, survey <span class="math inline">n \geq 200</span> clinicians for <span class="math inline">\beta_k</span> profiles (boundary penalty estimates for abandonment, justice, dignity, etc.) using calibrated vignettes. Then, during a subsequent crisis (or using a triage simulation), measure clinician resistance to utilitarian triage (protest, non-compliance, distress scores).</p>
+<p><strong>Predicted result:</strong> Clinicians with high <span class="math inline">\beta_{\text{abandon}}</span> and <span class="math inline">\beta_{\text{justice}}</span> show more resistance (<span class="math inline">r &gt; 0.4</span>). The prediction is specific: resistance should correlate with the <em>relevant</em> boundary penalties (those crossed by the triage protocol) and not with <em>irrelevant</em> boundary penalties (those not crossed).</p>
+<p><strong>What would falsify:</strong> No correlation between pre-crisis <span class="math inline">\beta_k</span> profiles and triage resistance. This would indicate that resistance is situational rather than dispositional — refuting the claim that <span class="math inline">\beta_k</span> profiles predict moral injury vulnerability.</p>
+</section>
+<section id="prediction-6-process-path-superiority" class="level3">
+<h3>Prediction 6: Process-Path Superiority</h3>
+<p><strong>Claim:</strong> In end-of-life decisions, family satisfaction is higher when the clinical geodesic includes process steps (family meetings, values conversations) than when the same endpoint is reached directly.</p>
+<p><strong>Experimental design:</strong> Retrospective comparison of end-of-life cases at <span class="math inline">n \geq 3</span> hospitals, stratified by whether the clinical path included formal family meetings and values conversations (process-path group) or reached the same clinical endpoint without them (direct-path group). Measure: family satisfaction (post-bereavement survey), clinician satisfaction, and grief outcomes at 6 months.</p>
+<p><strong>Predicted result:</strong> The process-path group reports higher satisfaction on trust, communication, and respect dimensions, even when the clinical outcome (patient death) is identical. The <span class="math inline">d_1</span> outcome is the same; the manifold cost is different.</p>
+<p><strong>What would falsify:</strong> No satisfaction difference between process-path and direct-path groups. This would indicate that the path does not matter — only the endpoint — refuting the framework’s claim that the clinical geodesic optimizes process, not just outcome.</p>
+<hr />
+</section>
+</section>
+<section id="power-analysis-and-feasibility" class="level2">
+<h2>17.4 Power Analysis and Feasibility</h2>
+<section id="sample-size-requirements" class="level3">
+<h3>Sample Size Requirements</h3>
+<p>Each prediction requires a specific sample size for adequate statistical power. The following power analyses assume <span class="math inline">\alpha = 0.05</span>, <span class="math inline">\beta = 0.20</span> (80% power), and the effect sizes specified in each prediction.</p>
+<p><strong>Prediction 1 (Dimensional Moral Distress):</strong> - Effect size: Partial <span class="math inline">r = 0.3</span> (medium) - Required <span class="math inline">n</span>: 84 clinicians (for the partial correlation test) - Proposed <span class="math inline">n</span>: 200 clinicians (to accommodate subgroup analyses by specialty) - Vignettes per participant: 20 - Total vignette evaluations: 4,000</p>
+<p><strong>Prediction 2 (MI-Burnout Dissociation):</strong> - Effect size: <span class="math inline">r &lt; 0.7</span> between MISS-HP and MBI (upper bound for “not identical”) - Required <span class="math inline">n</span>: 300 clinicians (to detect the difference in predictor profiles with adequate power in multiple regression) - Settings: 3 (ICU, general medicine, palliative care), 100 per setting</p>
+<p><strong>Prediction 3 (Consent Gauge-Invariance):</strong> - Effect size: <span class="math inline">r = -0.4</span> between framing invariance and health literacy - Required <span class="math inline">n</span>: 47 patients (for the correlation test) - Proposed <span class="math inline">n</span>: 200 patients (for subgroup analysis by literacy level and procedure type) - Sarah’s pilot: <span class="math inline">n = 84</span>, <span class="math inline">r = -0.41</span> — effect size confirmed</p>
+<p><strong>Prediction 4 (Bond Index Predicts Disparities):</strong> - Effect size: <span class="math inline">r = 0.4</span> between BI and HCAHPS composite - Required <span class="math inline">n</span>: 47 (for the correlation) but the practical requirement is larger — computing BI requires a sample of patients large enough to stratify by demographics - Proposed <span class="math inline">n</span>: 500+ patients with both BI computation and HCAHPS data</p>
+<p><strong>Prediction 5 (Triage Resistance Correlates):</strong> - Effect size: <span class="math inline">r = 0.4</span> between pre-crisis <span class="math inline">\beta_k</span> and resistance - Required <span class="math inline">n</span>: 200 clinicians with pre-crisis survey and post-crisis resistance data - Challenge: Requires prospective measurement before a crisis, which is logistically difficult - Alternative: Use triage simulations as the “crisis” and measure resistance in a controlled setting</p>
+<p><strong>Prediction 6 (Process-Path Superiority):</strong> - Effect size: <span class="math inline">d = 0.5</span> (medium) on satisfaction between process-path and direct-path groups - Required <span class="math inline">n</span>: 64 per group (128 total) for a two-sample <span class="math inline">t</span>-test - Proposed <span class="math inline">n</span>: 200 end-of-life cases (100 process-path, 100 direct-path) for adequate power with covariates</p>
+</section>
+<section id="total-research-program-scope" class="level3">
+<h3>Total Research Program Scope</h3>
+<p>The complete six-prediction program requires approximately: - 200 clinicians for Prediction 1 (vignette study) - 300 clinicians for Prediction 2 (cross-sectional survey) - 200 patients for Prediction 3 (consent experiment) - 500+ patients for Prediction 4 (Bond Index computation) - 200 clinicians for Prediction 5 (pre-crisis survey + simulation) - 200 end-of-life cases for Prediction 6 (retrospective comparison)</p>
+<p>With overlap between studies (clinicians in Predictions 1, 2, and 5 can be the same individuals; patients in Predictions 3, 4, and 6 can overlap), the total requirement is approximately 500 clinicians and 500 patients across three sites — feasible for a multi-site study with a three-year timeline and $1–2 million budget.</p>
+<hr />
+</section>
+</section>
+<section id="the-falsifiability-standard" class="level2">
+<h2>17.5 The Falsifiability Standard</h2>
+<section id="what-would-falsify-the-framework" class="level3">
+<h3>What Would Falsify the Framework</h3>
+<p>The framework would be falsified by any of the following:</p>
+<ol type="1">
+<li><p><strong>Moral distress is purely a function of <span class="math inline">d_1</span> severity.</strong> If dimension count has no independent effect on distress after controlling for clinical severity, the multi-dimensional structure is unnecessary.</p></li>
+<li><p><strong>Moral injury and burnout are empirically indistinguishable.</strong> If MISS-HP and MBI are perfectly correlated with identical predictor profiles, the <span class="math inline">g(n)</span>/<span class="math inline">h(n)</span> distinction is not supported.</p></li>
+<li><p><strong>QALY allocation produces no demographic disparities beyond what <span class="math inline">d_1</span> differences explain.</strong> If the Bond Index reveals no disparities after controlling for clinical severity, the dimensional omission hypothesis is wrong.</p></li>
+<li><p><strong>A clinical dilemma is identified that cannot be decomposed into the nine-dimensional attribute space.</strong> If a clinically relevant dimension is found that is independent of all nine existing dimensions, the manifold is under-specified and requires extension.</p></li>
+<li><p><strong>The consent gauge-invariance test does not predict consent quality.</strong> If framing invariance is unrelated to comprehension, the consent-as-gauge-invariance formulation is wrong.</p></li>
+<li><p><strong>Clinicians’ pre-crisis <span class="math inline">\beta_k</span> profiles do not predict post-crisis moral injury.</strong> If vulnerability is entirely situational rather than dispositional, the accumulation model’s mechanism is wrong.</p></li>
 </ol>
-<p class="body-text"><strong><em class="math">d_9</em> (Epistemic Status) — Three proxy options:</strong></p>
-<ol>
-<li>REALM (Rapid Estimate of Adult Literacy in Medicine; Davis et al., 1993). A 66-word recognition test that estimates health literacy in under 3 minutes. Correlates with reading comprehension and numeracy. Widely used in clinical research.</li>
-<li>Newest Vital Sign (Weiss et al., 2005). A six-item assessment based on a nutrition label. Measures both literacy and numeracy. Administration time: 3 minutes.</li>
-<li>Gauge-invariance test (from Chapter 8). Present clinical information in two semantically equivalent framings (e.g., "90% survival" vs. "10% mortality") and measure decision consistency. Patients whose decisions change under reframing have inadequate <em class="math">d_9</em> calibration, regardless of literacy scores. This test is novel to the geometric framework and has not been independently validated — it is itself a falsifiable prediction (Prediction 3 below).</li>
-</ol>
-<h3 id="the-bond-index-computation-pipeline" class="subsection-heading">The Bond Index Computation Pipeline</h3>
-<p class="body-text"><strong>Step 1:</strong> For a patient population <em class="math">S</em> at a healthcare institution, extract <em class="math">d_1</em>, <em class="math">d_2</em>, <em class="math">d_4</em>, <em class="math">d_6</em>, <em class="math">d_8</em> from EHR data.</p>
-<p class="body-text"><strong>Step 2:</strong> Administer proxy instruments for <em class="math">d_5</em>, <em class="math">d_7</em>, <em class="math">d_9</em> to a representative subsample. Use the subsample to train a predictive model that estimates <em class="math">d_5</em>, <em class="math">d_7</em>, <em class="math">d_9</em> from available EHR features (demographics, utilization patterns, communication notes).</p>
-<p class="body-text"><strong>Step 3:</strong> For each patient, construct the nine-dimensional attribute vector <em class="math">\mathbf{a}(s)</em>.</p>
-<p class="body-text"><strong>Step 4:</strong> Compute the policy-mandated path <em class="math">\gamma_P^*</em> from documented clinical events (treatments, tests, referrals, outcomes).</p>
-<p class="body-text"><strong>Step 5:</strong> Compute the clinical geodesic <em class="math">\gamma_{\mathcal{C}}^</em><em></em> using <em class="math">A^*</em> search on the estimated clinical decision complex with the estimated <em class="math">\Sigma</em>.</p>
-<p class="body-text"><strong>Step 6:</strong> Compute <em class="math">\text{BI}(P, S) = \frac{1}{|S|} \sum_{s \in S} [\text{CF}(\gamma_P*(s)) - \text{CF}(\gamma_{\mathcal{C}}^</em>(s))].</p>
-<p class="body-text"><strong>Step 7:</strong> Stratify by demographics and compute disparity ratios.</p>
-<h2 id="173-the-falsifiable-prediction-suite" class="section-heading">17.3 The Falsifiable Prediction Suite</h2>
-<p class="body-text">The framework generates six specific predictions, each with an experimental design, instruments, and falsification criteria. These predictions are not post hoc rationalizations — they are pre-registered claims that the framework makes and that the data can reject.</p>
-<h3 id="prediction-1-dimensional-moral-distress" class="subsection-heading">Prediction 1: Dimensional Moral Distress</h3>
-<p class="body-text"><strong>Claim:</strong> Clinician moral distress (measured by MDS-R) correlates with the number of manifold dimensions activated in the distressing situation, not just with the severity on any single dimension.</p>
-<p class="body-text"><strong>Experimental design:</strong> Present <em class="math">n \geq 200</em> clinicians with 20 clinical vignettes, systematically varying the number of activated dimensions (2, 4, 6, 8) while holding <em class="math">d_1</em> severity constant. After each vignette, administer the MDS-R (or a vignette-adapted version) and a dimensional activation checklist.</p>
-<p class="body-text"><strong>Predicted result:</strong> MDS-R scores increase monotonically with dimension count, controlling for <em class="math">d_1</em> severity. The partial correlation between dimension count and MDS-R, controlling for <em class="math">d_1</em>, is <em class="math">r > 0.3</em>.</p>
-<p class="body-text"><strong>What would falsify:</strong> No correlation between dimension count and distress after controlling for <em class="math">d_1</em> severity. This would indicate that moral distress is a function of clinical severity alone, not of dimensional complexity — refuting the framework's core claim.</p>
-<h3 id="prediction-2-moral-injury-vs-burnout-dissociation" class="subsection-heading">Prediction 2: Moral Injury vs. Burnout Dissociation</h3>
-<p class="body-text"><strong>Claim:</strong> Moral injury (MISS-HP) and burnout (MBI) are statistically dissociable constructs with different correlates.</p>
-<p class="body-text"><strong>Experimental design:</strong> Administer both MISS-HP and MBI to <em class="math">n \geq 300</em> clinicians across three settings (ICU, general medicine, palliative care). Collect covariates: workload (hours per week, patient volume), triage decision frequency, protocol disagreement score, and staffing ratio.</p>
-<p class="body-text"><strong>Predicted result:</strong> MISS-HP and MBI have <em class="math">r</em> < 0.7</em> (moderate correlation, not identity). In a multiple regression, MISS-HP is predicted by triage decision frequency and protocol disagreement (moral injury predictors), while MBI is predicted by workload and staffing ratio (burnout predictors). The regression models have distinguishable predictor profiles.</p>
-<p class="body-text"><strong>What would falsify:</strong> <em class="math">r > 0.9</em> between MISS-HP and MBI with identical predictor profiles. This would indicate that moral injury and burnout are empirically indistinguishable — refuting the structural distinction between <em class="math">g(n)</em>-depletion and <em class="math">h(n)</em>-damage.</p>
-<h3 id="prediction-3-consent-gauge-invariance-test" class="subsection-heading">Prediction 3: Consent Gauge-Invariance Test</h3>
-<p class="body-text"><strong>Claim:</strong> Patients with genuinely informed consent show framing invariance; patients who show framing effects have inadequate <em class="math">d_9</em> calibration.</p>
-<p class="body-text"><strong>Experimental design:</strong> Present <em class="math">n \geq 200</em> patients (pre-procedure, in a consent context) with clinical information in two framings:</p>
+<p>Each of these falsification criteria is specific, testable, and decisive. The framework stands or falls on the evidence.</p>
+<hr />
+</section>
+</section>
+<section id="sarahs-experiment" class="level2">
+<h2>17.5 Sarah’s Experiment</h2>
+<p>Sarah designs her first study: a prospective consent gauge-invariance experiment. She presents patients scheduled for elective surgery with consent information in two framings:</p>
 <ul>
-<li>Framing A: "This procedure has a 90% success rate."</li>
-<li>Framing B: "This procedure has a 10% failure rate."</li>
+<li>Version A: “This surgery has a 95% success rate. 5 out of 100 patients experience a complication.”</li>
+<li>Version B: “This surgery has a 5% complication rate. 95 out of 100 patients have no complications.”</li>
 </ul>
-<p class="body-text">Measure: (a) treatment preference after each framing (same/different), (b) health literacy (REALM or NVS), (c) self-reported understanding of the procedure.</p>
-<p class="body-text"><strong>Predicted result:</strong> Framing-variant patients (those whose preferences change) have lower health literacy scores (<em class="math">r = -0.4</em>) and lower self-reported understanding than framing-invariant patients. The gauge-invariance test identifies consent quality better than form completion alone.</p>
-<p class="body-text"><strong>What would falsify:</strong> No correlation between framing invariance and comprehension. This would indicate that framing effects are independent of understanding — refuting the claim that consent is a gauge-invariance condition.</p>
-<h3 id="prediction-4-bond-index-predicts-disparities" class="subsection-heading">Prediction 4: Bond Index Predicts Disparities</h3>
-<p class="body-text"><strong>Claim:</strong> The clinical Bond Index, computed from institutional policy analysis, predicts patient-reported experience disparities across demographic groups.</p>
-<p class="body-text"><strong>Experimental design:</strong> Compute <em class="math">\text{BI}(P, S_k)</em> for a hospital's triage, consent, and discharge policies, stratified by race, age, and disability status. Correlate with HCAHPS patient experience scores stratified by the same demographics.</p>
-<p class="body-text"><strong>Predicted result:</strong> Groups with higher <em class="math">\text{BI}</em> report worse experience on HCAHPS trust, communication, and respect dimensions. Correlation <em class="math">r > 0.4</em> between <em class="math">\text{BI}</em> and HCAHPS composite, with the strongest correlation on the trust dimension (<em class="math">d_5</em>).</p>
-<p class="body-text"><strong>What would falsify:</strong> No correlation between <em class="math">\text{BI}</em> and HCAHPS disparities. This would indicate that the Bond Index does not capture experientially meaningful injustice — refuting the claim that manifold cost is clinically relevant.</p>
-<h3 id="prediction-5-triage-resistance-correlates" class="subsection-heading">Prediction 5: Triage Resistance Correlates</h3>
-<p class="body-text"><strong>Claim:</strong> Clinician resistance to utilitarian triage protocols correlates with pre-crisis <em class="math">\beta_k</em> profiles.</p>
-<p class="body-text"><strong>Experimental design:</strong> During a non-crisis period, survey <em class="math">n \geq 200</em> clinicians for <em class="math">\beta_k</em> profiles (boundary penalty estimates for abandonment, justice, dignity, etc.) using calibrated vignettes. Then, during a subsequent crisis (or using a triage simulation), measure clinician resistance to utilitarian triage (protest, non-compliance, distress scores).</p>
-<p class="body-text"><strong>Predicted result:</strong> Clinicians with high <em class="math">\beta_{\text{abandon}}</em> and <em class="math">\beta_{\text{justice}}</em> show more resistance (<em class="math">r > 0.4</em>). The prediction is specific: resistance should correlate with the relevant boundary penalties (those crossed by the triage protocol) and not with irrelevant boundary penalties (those not crossed).</p>
-<p class="body-text"><strong>What would falsify:</strong> No correlation between pre-crisis <em class="math">\beta_k</em> profiles and triage resistance. This would indicate that resistance is situational rather than dispositional — refuting the claim that <em class="math">\beta_k</em> profiles predict moral injury vulnerability.</p>
-<h3 id="prediction-6-process-path-superiority" class="subsection-heading">Prediction 6: Process-Path Superiority</h3>
-<p class="body-text"><strong>Claim:</strong> In end-of-life decisions, family satisfaction is higher when the clinical geodesic includes process steps (family meetings, values conversations) than when the same endpoint is reached directly.</p>
-<p class="body-text"><strong>Experimental design:</strong> Retrospective comparison of end-of-life cases at <em class="math">n \geq 3</em> hospitals, stratified by whether the clinical path included formal family meetings and values conversations (process-path group) or reached the same clinical endpoint without them (direct-path group). Measure: family satisfaction (post-bereavement survey), clinician satisfaction, and grief outcomes at 6 months.</p>
-<p class="body-text"><strong>Predicted result:</strong> The process-path group reports higher satisfaction on trust, communication, and respect dimensions, even when the clinical outcome (patient death) is identical. The <em class="math">d_1</em> outcome is the same; the manifold cost is different.</p>
-<p class="body-text"><strong>What would falsify:</strong> No satisfaction difference between process-path and direct-path groups. This would indicate that the path does not matter — only the endpoint — refuting the framework's claim that the clinical geodesic optimizes process, not just outcome.</p>
-<h2 id="174-power-analysis-and-feasibility" class="section-heading">17.4 Power Analysis and Feasibility</h2>
-<h3 id="sample-size-requirements" class="subsection-heading">Sample Size Requirements</h3>
-<p class="body-text">Each prediction requires a specific sample size for adequate statistical power. The following power analyses assume <em class="math">\alpha = 0.05</em>, <em class="math">\beta = 0.20</em> (80% power), and the effect sizes specified in each prediction.</p>
-<p class="body-text"><strong>Prediction 1 (Dimensional Moral Distress):</strong></p>
+<p>She measures: (a) treatment preference after each version (proceed/defer), (b) REALM health literacy score, (c) three-item understanding assessment.</p>
+<p>Her preliminary results (<span class="math inline">n = 84</span>, pilot study):</p>
 <ul>
-<li>Effect size: Partial <em class="math">r = 0.3</em> (medium)</li>
-<li>Required <em class="math">n</em>: 84 clinicians (for the partial correlation test)</li>
-<li>Proposed <em class="math">n</em>: 200 clinicians (to accommodate subgroup analyses by specialty)</li>
-<li>Vignettes per participant: 20</li>
-<li>Total vignette evaluations: 4,000</li>
+<li>23% of patients showed framing effects (different preference under Version A vs. Version B)</li>
+<li>Framing-variant patients had lower REALM scores (mean 48 vs. 61, <span class="math inline">p &lt; 0.001</span>)</li>
+<li>Framing-variant patients had lower self-reported understanding (mean 2.1 vs. 3.4 on 5-point scale, <span class="math inline">p &lt; 0.001</span>)</li>
+<li>Correlation between framing invariance and health literacy: <span class="math inline">r = -0.41</span>, <span class="math inline">p &lt; 0.01</span></li>
 </ul>
-<p class="body-text"><strong>Prediction 2 (MI-Burnout Dissociation):</strong></p>
-<ul>
-<li>Effect size: <em class="math">r</em> < 0.7</em> between MISS-HP and MBI (upper bound for "not identical")</li>
-<li>Required <em class="math">n</em>: 300 clinicians (to detect the difference in predictor profiles with adequate power in multiple regression)</li>
-<li>Settings: 3 (ICU, general medicine, palliative care), 100 per setting</li>
-</ul>
-<p class="body-text"><strong>Prediction 3 (Consent Gauge-Invariance):</strong></p>
-<ul>
-<li>Effect size: <em class="math">r = -0.4</em> between framing invariance and health literacy</li>
-<li>Required <em class="math">n</em>: 47 patients (for the correlation test)</li>
-<li>Proposed <em class="math">n</em>: 200 patients (for subgroup analysis by literacy level and procedure type)</li>
-<li>Sarah's pilot: <em class="math">n = 84</em>, <em class="math">r = -0.41</em> — effect size confirmed</li>
-</ul>
-<p class="body-text"><strong>Prediction 4 (Bond Index Predicts Disparities):</strong></p>
-<ul>
-<li>Effect size: <em class="math">r = 0.4</em> between BI and HCAHPS composite</li>
-<li>Required <em class="math">n</em>: 47 (for the correlation) but the practical requirement is larger — computing BI requires a sample of patients large enough to stratify by demographics</li>
-<li>Proposed <em class="math">n</em>: 500+ patients with both BI computation and HCAHPS data</li>
-</ul>
-<p class="body-text"><strong>Prediction 5 (Triage Resistance Correlates):</strong></p>
-<ul>
-<li>Effect size: <em class="math">r = 0.4</em> between pre-crisis <em class="math">\beta_k</em> and resistance</li>
-<li>Required <em class="math">n</em>: 200 clinicians with pre-crisis survey and post-crisis resistance data</li>
-<li>Challenge: Requires prospective measurement before a crisis, which is logistically difficult</li>
-<li>Alternative: Use triage simulations as the "crisis" and measure resistance in a controlled setting</li>
-</ul>
-<p class="body-text"><strong>Prediction 6 (Process-Path Superiority):</strong></p>
-<ul>
-<li>Effect size: <em class="math">d = 0.5</em> (medium) on satisfaction between process-path and direct-path groups</li>
-<li>Required <em class="math">n</em>: 64 per group (128 total) for a two-sample <em class="math">t</em>-test</li>
-<li>Proposed <em class="math">n</em>: 200 end-of-life cases (100 process-path, 100 direct-path) for adequate power with covariates</li>
-</ul>
-<h3 id="total-research-program-scope" class="subsection-heading">Total Research Program Scope</h3>
-<p class="body-text">The complete six-prediction program requires approximately:</p>
-<ul>
-<li>200 clinicians for Prediction 1 (vignette study)</li>
-<li>300 clinicians for Prediction 2 (cross-sectional survey)</li>
-<li>200 patients for Prediction 3 (consent experiment)</li>
-<li>500+ patients for Prediction 4 (Bond Index computation)</li>
-<li>200 clinicians for Prediction 5 (pre-crisis survey + simulation)</li>
-<li>200 end-of-life cases for Prediction 6 (retrospective comparison)</li>
-</ul>
-<p class="body-text">With overlap between studies (clinicians in Predictions 1, 2, and 5 can be the same individuals; patients in Predictions 3, 4, and 6 can overlap), the total requirement is approximately 500 clinicians and 500 patients across three sites — feasible for a multi-site study with a three-year timeline and $1–2 million budget.</p>
-<h2 id="175-the-falsifiability-standard" class="section-heading">17.5 The Falsifiability Standard</h2>
-<h3 id="what-would-falsify-the-framework" class="subsection-heading">What Would Falsify the Framework</h3>
-<p class="body-text">The framework would be falsified by any of the following:</p>
-<ol>
-<li><strong>Moral distress is purely a function of <em class="math">d_1</em> severity.</strong> If dimension count has no independent effect on distress after controlling for clinical severity, the multi-dimensional structure is unnecessary.</li>
-<li><strong>Moral injury and burnout are empirically indistinguishable.</strong> If MISS-HP and MBI are perfectly correlated with identical predictor profiles, the <em class="math">g(n)</em>/<em class="math">h(n)</em> distinction is not supported.</li>
-<li><strong>QALY allocation produces no demographic disparities beyond what <em class="math">d_1</em> differences explain.</strong> If the Bond Index reveals no disparities after controlling for clinical severity, the dimensional omission hypothesis is wrong.</li>
-<li><strong>A clinical dilemma is identified that cannot be decomposed into the nine-dimensional attribute space.</strong> If a clinically relevant dimension is found that is independent of all nine existing dimensions, the manifold is under-specified and requires extension.</li>
-<li><strong>The consent gauge-invariance test does not predict consent quality.</strong> If framing invariance is unrelated to comprehension, the consent-as-gauge-invariance formulation is wrong.</li>
-<li><strong>Clinicians' pre-crisis <em class="math">\beta_k</em> profiles do not predict post-crisis moral injury.</strong> If vulnerability is entirely situational rather than dispositional, the accumulation model's mechanism is wrong.</li>
-</ol>
-<p class="body-text">Each of these falsification criteria is specific, testable, and decisive. The framework stands or falls on the evidence.</p>
-<h2 id="175-sarahs-experiment" class="section-heading">17.5 Sarah's Experiment</h2>
-<p class="body-text">Sarah designs her first study: a prospective consent gauge-invariance experiment. She presents patients scheduled for elective surgery with consent information in two framings:</p>
-<ul>
-<li>Version A: "This surgery has a 95% success rate. 5 out of 100 patients experience a complication."</li>
-<li>Version B: "This surgery has a 5% complication rate. 95 out of 100 patients have no complications."</li>
-</ul>
-<p class="body-text">She measures: (a) treatment preference after each version (proceed/defer), (b) REALM health literacy score, (c) three-item understanding assessment.</p>
-<p class="body-text">Her preliminary results (<em class="math">n = 84</em>, pilot study):</p>
-<ul>
-<li>23% of patients showed framing effects (different preference under Version A vs. Version B)</li>
-<li>Framing-variant patients had lower REALM scores (mean 48 vs. 61, <em class="math">p</em> < 0.001</em>)</li>
-<li>Framing-variant patients had lower self-reported understanding (mean 2.1 vs. 3.4 on 5-point scale, <em class="math">p</em> < 0.001</em>)</li>
-<li>Correlation between framing invariance and health literacy: <em class="math">r = -0.41</em>, <em class="math">p</em> < 0.01</em></li>
-</ul>
-<p class="body-text">The geometric prediction is confirmed in the pilot: framing-variant patients have lower health literacy and lower self-reported understanding. The consent form — which all patients signed — does not distinguish between framing-variant and framing-invariant patients. The gauge-invariance test does.</p>
-<p class="body-text">Sarah submits a grant proposal for the full study (<em class="math">n = 300</em>) with pre-registration of the six predictions. She does not know whether all six will be confirmed. She knows that the framework has made specific, falsifiable claims, and she knows how to test them. The manifold is a mathematical structure. Whether it corresponds to clinical reality is an empirical question. Sarah intends to answer it.</p>
-<h2 id="chapter-summary" class="section-heading">Chapter Summary</h2>
-<p class="body-text">The framework's central empirical challenge — estimating the <em class="math">9 \times 9</em> clinical-moral covariance matrix <em class="math">\Sigma</em> — is feasible using retrospective ethics consultation coding and prospective discrete choice experiments. Six of nine dimensions are already captured in electronic health records; the remaining three (trust, dignity, epistemic status) have validated proxy instruments. The Bond Index can be computed from EHR data supplemented by proxy measurements. The framework generates six falsifiable predictions — dimensional moral distress, MI-burnout dissociation, consent gauge invariance, Bond Index predicting disparities, triage resistance correlates, and process-path superiority — each with specific experimental designs, instruments, and falsification criteria. The predictions are pre-specified and decisive: the framework stands or falls on the evidence.</p>
-<div class="footnotes"><h4>Notes</h4><ol>
-<li id="fn-1">The <em class="math">9 \times 9</em> covariance matrix may vary across clinical cultures. Japanese medicine, with its emphasis on family-centered decision-making, likely has different <em class="math">\Sigma_{46}</em> (autonomy <em class="math">\times</em> social impact) than American medicine. The framework can accommodate this variation, but the variation itself must be mapped empirically — which means estimating <em class="math">\Sigma</em> in multiple cultural contexts.</li>
-<li id="fn-2">The consent gauge-invariance test is the most immediately actionable prediction: it can be implemented at the bedside today, using two versions of a consent form. If the patient's decision changes when the framing changes, the consent is not genuinely informed — regardless of what the signed form says.</li>
-<li id="fn-3">The prediction suite was designed to be falsifiable in the strong sense: each prediction specifies what the framework claims, what data would confirm it, and what data would refute it. A framework that cannot be refuted by any conceivable evidence is not a scientific framework.</li>
-</ol></div>
-
+<p>The geometric prediction is confirmed in the pilot: framing-variant patients have lower health literacy and lower self-reported understanding. The consent form — which all patients signed — does not distinguish between framing-variant and framing-invariant patients. The gauge-invariance test does.</p>
+<p>Sarah submits a grant proposal for the full study (<span class="math inline">n = 300</span>) with pre-registration of the six predictions. She does not know whether all six will be confirmed. She knows that the framework has made specific, falsifiable claims, and she knows how to test them. The manifold is a mathematical structure. Whether it corresponds to clinical reality is an empirical question. Sarah intends to answer it.</p>
+<hr />
+</section>
+<section id="chapter-summary" class="level2">
+<h2>Chapter Summary</h2>
+<p>The framework’s central empirical challenge — estimating the <span class="math inline">9 \times 9</span> clinical-moral covariance matrix <span class="math inline">\Sigma</span> — is feasible using retrospective ethics consultation coding and prospective discrete choice experiments. Six of nine dimensions are already captured in electronic health records; the remaining three (trust, dignity, epistemic status) have validated proxy instruments. The Bond Index can be computed from EHR data supplemented by proxy measurements. The framework generates six falsifiable predictions — dimensional moral distress, MI-burnout dissociation, consent gauge invariance, Bond Index predicting disparities, triage resistance correlates, and process-path superiority — each with specific experimental designs, instruments, and falsification criteria. The predictions are pre-specified and decisive: the framework stands or falls on the evidence.</p>
+<hr />
+</section>
+</section>
       </div>
 
       <div class="chapter-nav-bottom">
@@ -283,7 +323,7 @@
   </article>
 
   <footer class="book-footer">
-    <p>&copy; 2026 Andrew H. Bond. Geometric Medicine: Clinical Reasoning, Triage, and the Ethics of Allocation.</p>
+    <p>&copy; 2026 Andrew H. Bond. <em>Geometric Medicine: Clinical Reasoning, Triage, and the Ethics of Allocation.</em></p>
     <p class="footer-note">The geometry was always real. The scalars were always insufficient.</p>
   </footer>
 
@@ -295,35 +335,22 @@
       document.querySelector('.nav-links').classList.toggle('open');
     });
   </script>
-<script>
-window.addEventListener("load", function() {
-  if (typeof katex === 'undefined') return;
-  // Render all <em class="math"> elements with</em> KaTeX
-  document.querySelectorAll('em.math').forEach(function(el) {
-    try {
-      katex.render(el.textContent, el, {throwOnError: false, displayMode: false});
-    } catch(e) {}
-  });
-  // Render all <p class="display-math"> elements
-  document.querySelectorAll('p.display-math').forEach(function(el) {
-    var mathEl = el.querySelector('em.math');
-    if (mathEl) {
-      try {
-        katex.render(mathEl.textContent, el, {throwOnError: false, displayMode: true});
-      } catch(e) {}
-    }
-  });
-  // Also try auto-render for any $...$ delimited math
-  if (typeof renderMathInElement !== 'undefined') {
-    renderMathInElement(document.body, {
-      delimiters: [
-        {left: "$$", right: "$$", display: true},
-        {left: "$", right: "$", display: false}
-      ],
-      throwOnError: false
+  <script>
+    // Pandoc --katex outputs <span class="math inline"> and <span class="math display">.
+    // This script renders them with KaTeX once the library loads.
+    document.addEventListener("DOMContentLoaded", function() {
+      if (typeof katex === 'undefined') return;
+      var mathElements = document.getElementsByClassName("math");
+      for (var i = 0; i < mathElements.length; i++) {
+        var texText = mathElements[i].firstChild;
+        if (mathElements[i].tagName === "SPAN" && texText) {
+          katex.render(texText.data, mathElements[i], {
+            displayMode: mathElements[i].classList.contains('display'),
+            throwOnError: false
+          });
+        }
+      }
     });
-  }
-});
-</script>
+  </script>
 </body>
 </html>

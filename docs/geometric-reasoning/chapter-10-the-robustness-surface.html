@@ -10,9 +10,8 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Crimson+Pro:ital,wght@0,300;0,400;0,600;0,700;1,400&family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
-  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
-  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"></script>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
 </head>
 
 <body>
@@ -26,14 +25,14 @@
         <span></span><span></span><span></span>
       </button>
       <ul class="nav-links">
-        <li><a href="index.html" class="active">Reasoning</a></li>
+        <li><a href="../geometric-medicine/index.html">Medicine</a></li>
         <li><a href="../book/index.html">Ethics</a></li>
         <li><a href="../geometric-methods/index.html">Methods</a></li>
+        <li><a href="../geometric-reasoning/index.html" class="active">Reasoning</a></li>
         <li><a href="../geometric-economics/index.html">Economics</a></li>
         <li><a href="../geometric-law/index.html">Law</a></li>
         <li><a href="../geometric-cognition/index.html">Cognition</a></li>
         <li><a href="../geometric-communication/index.html">Communication</a></li>
-        <li><a href="../geometric-medicine/index.html">Medicine</a></li>
         <li><a href="../index.html">Home</a></li>
       </ul>
     </div>
@@ -43,9 +42,9 @@
     <div class="chapter-container">
       <nav class="breadcrumb" aria-label="Breadcrumb">
         <a href="../index.html">Geometric Series</a>
-        <span class="breadcrumb-sep">›</span>
+        <span class="breadcrumb-sep">&rsaquo;</span>
         <a href="index.html">Geometric Reasoning</a>
-        <span class="breadcrumb-sep">›</span>
+        <span class="breadcrumb-sep">&rsaquo;</span>
         <span class="breadcrumb-current">Chapter 10: The Robustness Surface</span>
       </nav>
       <div class="chapter-nav-top">
@@ -54,588 +53,711 @@
         <a href="chapter-11-alignment-as-heuristic-shaping.html" class="nav-next">Chapter 11: Alignment as Heuristic Shaping &rarr;</a>
       </div>
 
-      <nav class="chapter-toc">
-        <h4>In this chapter</h4>
-        <ol><li><a href="#introduction">Introduction</a></li><li><a href="#101-beyond-accuracy-the-need-for-robustness-measurement">10.1 Beyond Accuracy: The Need for Robustness Measurement</a></li><li><a href="#102-the-model-robustness-index">10.2 The Model Robustness Index</a></li><li><a href="#103-sensitivity-profiling-which-dimensions-are-fragile">10.3 Sensitivity Profiling: Which Dimensions Are Fragile?</a></li><li><a href="#104-adversarial-threshold-search">10.4 Adversarial Threshold Search</a></li><li><a href="#105-the-three-tool-pipeline">10.5 The Three-Tool Pipeline</a></li><li><a href="#106-robustness-profiles-from-the-measuring-agi-suite">10.6 Robustness Profiles from the Measuring AGI Suite</a></li><li><a href="#107-the-scalar-irrecoverability-theorem">10.7 The Scalar Irrecoverability Theorem</a></li><li><a href="#108-universal-fragilities-and-model-specific-strengths">10.8 Universal Fragilities and Model-Specific Strengths</a></li><li><a href="#109-summary">10.9 Summary</a></li><li><a href="#worked-example-profiling-a-diagnostic-ai">Worked Example: Profiling a Diagnostic AI</a></li><li><a href="#technical-appendix">Technical Appendix</a></li><li><a href="#references">References</a></li></ol>
-      </nav>
       <div class="chapter-content">
-<h1 id="chapter-10-the-robustness-surface" class="chapter-title">Chapter 10: The Robustness Surface</h1>
-<blockquote class="book-blockquote"><p>"The question is not whether a bridge is strong, but which loads it can bear and which will break it." --- adapted from structural engineering folklore</p></blockquote>
-<h2 id="introduction" class="section-heading">Introduction</h2>
-<p class="first-paragraph">Chapter 9 established that metacognition --- the system's capacity to monitor and control its own search --- is the necessary foundation for detecting and correcting the pathologies documented in Part II. But metacognition is a reactive capability: it responds to deviations from the geodesic after they occur. This chapter develops the proactive complement: a systematic framework for mapping, in advance, which dimensions of the heuristic field are robust and which are fragile --- and for identifying the precise perturbation magnitude at which reasoning breaks.</p>
-<p class="body-text">The key intellectual shift is from asking "is this model robust?" to asking "which reasoning capabilities of this model are robust, which are fragile, and where exactly is the boundary between the two?" The first question demands a scalar answer. The second demands a surface --- a multi-dimensional object that maps perturbation type, perturbation magnitude, and cognitive capability to a performance measure. That surface is what this chapter develops.</p>
-<p class="body-text">The tools come from Chapter 9 of Geometric Methods in Computational Modeling (Bond, 2026a): the Model Robustness Index (MRI), sensitivity profiling, and adversarial threshold search. These three tools, applied in sequence, form a pipeline that takes a model and produces a complete robustness surface --- a geometric object that captures everything the corruption tensor of Chapter 5 captures and more, because it includes the nonlinear regime where performance degrades catastrophically rather than merely shifting proportionally.</p>
-<p class="body-text">The empirical motivation is the data presented in Chapters 5, 8, 9, and (in full) Chapter 13. The five-track Measuring AGI benchmark suite, applied across five large language models, produces composite scores that vary dramatically across tracks and models. These composites are themselves projections of the robustness surface onto one-dimensional slices. This chapter provides the theoretical framework for understanding why those projections have the structure they do, and why no single projection --- no single number --- can capture the full surface.</p>
-<p class="body-text">We connect backward to the corruption surface (Chapter 5, Section 5.8), which defined the perturbation-to-displacement mapping for the heuristic field, and to gauge invariance (Chapter 8), which identified the specific symmetries that define the zero-displacement directions on that surface. We connect forward to alignment (Chapter 11), where the robustness surface becomes a diagnostic tool for identifying which components of the alignment decomposition are solid and which are vulnerable.</p>
-<blockquote class="book-blockquote"><p><strong>RUNNING EXAMPLE — DR. OKAFOR'S TRIAGE</strong></p> <p>Dr. Amara Okafor is an emergency physician with twenty years of experience. Her hospital's annual review assigns her a single "clinical competence score" of 87/100 --- above average, unremarkable. The number hides everything that matters.</p> <p>Dr. Okafor is excellent at cardiac triage. She reads EKGs with the fluency of a cardiologist, catches subtle ST-segment elevations that residents miss, and routes chest-pain patients to catheterization labs with near-optimal timing. Along this axis, her competence is not 87 --- it is 96.</p> <p>She is weaker at pediatric emergencies. The dosing calculations are unfamiliar, the presentation patterns differ from adult medicine, and the emotional intensity of a critically ill child introduces a perturbation that degrades her clinical judgment. Along this axis, her competence is closer to 72 --- competent but not confident, reliable but not exceptional.</p> <p>She is moderate at trauma. She stabilizes patients efficiently, follows ATLS protocols without error, but lacks the rapid surgical-assessment intuition that the best trauma physicians possess. Along this axis: 84.</p> <p>Dr. Okafor's clinical robustness is anisotropic. It varies by specialty, by patient population, by the emotional intensity of the presentation. The single score of 87 is a projection of a multi-dimensional surface onto a single number, and the projection destroys the structure that matters most: where she is strong, where she is vulnerable, and where the boundary between reliable and fragile practice lies. A hospital administrator who sees only the 87 will assign her to any emergency department rotation interchangeably. A chief of medicine who sees the surface will pair her with a pediatric specialist on nights when the children's hospital diverts, and will trust her to lead the cardiac bay without supervision.</p> <p>The robustness surface developed in this chapter is the formal analogue of Dr. Okafor's multi-dimensional competence profile. The Model Robustness Index does not produce a number; it produces a surface --- and the shape of that surface is the diagnostically essential object.</p></blockquote>
-<h2 id="101-beyond-accuracy-the-need-for-robustness-measurement" class="section-heading">10.1 Beyond Accuracy: The Need for Robustness Measurement</h2>
-<p class="first-paragraph">The standard approach to evaluating reasoning systems is accuracy: present a set of problems, count the fraction the system gets right, report a number. This approach has served AI evaluation since the inception of benchmark culture, and it has one decisive advantage --- simplicity. A single number is easy to compute, easy to compare, easy to rank.</p>
-<p class="body-text">The decisive disadvantage is that accuracy tells you nothing about the conditions under which accuracy holds. A model that scores 85% on a moral reasoning benchmark may be scoring 95% on easy cases and 60% on hard cases, or 85% uniformly across difficulty levels. A model that scores 85% under standard conditions may score 40% when inputs are reframed in euphemistic language, or 85% when they are reframed. The accuracy number hides the structure.</p>
-<p class="body-text">The data from Part II make this point with quantitative force. Consider two models, both of which achieve approximately the same composite score on the Social Cognition track: Gemini 2.0 Flash (0.695) and Claude Sonnet 4.6 (0.697). The composite scores differ by 0.002 --- effectively identical. But the subtask profiles are radically different:</p>
-<div class="table-wrapper"><table class="book-table">
+<section id="chapter-10-the-robustness-surface" class="level1">
+<h1>Chapter 10: The Robustness Surface</h1>
+<p><em>Part III: The Control Layer</em></p>
+<hr />
+<blockquote>
+<p><em>“The question is not whether a bridge is strong, but which loads it can bear and which will break it.”</em> — adapted from structural engineering folklore</p>
+</blockquote>
+<section id="introduction" class="level2">
+<h2>Introduction</h2>
+<p>Chapter 9 established that metacognition — the system’s capacity to monitor and control its own search — is the necessary foundation for detecting and correcting the pathologies documented in Part II. But metacognition is a <em>reactive</em> capability: it responds to deviations from the geodesic after they occur. This chapter develops the <em>proactive</em> complement: a systematic framework for mapping, in advance, which dimensions of the heuristic field are robust and which are fragile — and for identifying the precise perturbation magnitude at which reasoning breaks.</p>
+<p>The key intellectual shift is from asking “is this model robust?” to asking “which reasoning capabilities of this model are robust, which are fragile, and where exactly is the boundary between the two?” The first question demands a scalar answer. The second demands a surface — a multi-dimensional object that maps perturbation type, perturbation magnitude, and cognitive capability to a performance measure. That surface is what this chapter develops.</p>
+<p>The tools come from Chapter 9 of <em>Geometric Methods in Computational Modeling</em> (Bond, 2026a): the Model Robustness Index (MRI), sensitivity profiling, and adversarial threshold search. These three tools, applied in sequence, form a pipeline that takes a model and produces a complete robustness surface — a geometric object that captures everything the corruption tensor of Chapter 5 captures and more, because it includes the nonlinear regime where performance degrades catastrophically rather than merely shifting proportionally.</p>
+<p>The empirical motivation is the data presented in Chapters 5, 8, 9, and (in full) Chapter 13. The five-track Measuring AGI benchmark suite, applied across five large language models, produces composite scores that vary dramatically across tracks and models. These composites are themselves projections of the robustness surface onto one-dimensional slices. This chapter provides the theoretical framework for understanding why those projections have the structure they do, and why no single projection — no single number — can capture the full surface.</p>
+<p>We connect backward to the corruption surface (Chapter 5, Section 5.8), which defined the perturbation-to-displacement mapping for the heuristic field, and to gauge invariance (Chapter 8), which identified the specific symmetries that define the zero-displacement directions on that surface. We connect forward to alignment (Chapter 11), where the robustness surface becomes a diagnostic tool for identifying which components of the alignment decomposition are solid and which are vulnerable.</p>
+<hr />
+<blockquote>
+<p><strong>RUNNING EXAMPLE — DR. OKAFOR’S TRIAGE</strong></p>
+<p>Dr. Amara Okafor is an emergency physician with twenty years of experience. Her hospital’s annual review assigns her a single “clinical competence score” of 87/100 — above average, unremarkable. The number hides everything that matters.</p>
+<p>Dr. Okafor is <em>excellent</em> at cardiac triage. She reads EKGs with the fluency of a cardiologist, catches subtle ST-segment elevations that residents miss, and routes chest-pain patients to catheterization labs with near-optimal timing. Along this axis, her competence is not 87 — it is 96.</p>
+<p>She is <em>weaker</em> at pediatric emergencies. The dosing calculations are unfamiliar, the presentation patterns differ from adult medicine, and the emotional intensity of a critically ill child introduces a perturbation that degrades her clinical judgment. Along this axis, her competence is closer to 72 — competent but not confident, reliable but not exceptional.</p>
+<p>She is <em>moderate</em> at trauma. She stabilizes patients efficiently, follows ATLS protocols without error, but lacks the rapid surgical-assessment intuition that the best trauma physicians possess. Along this axis: 84.</p>
+<p>Dr. Okafor’s clinical robustness is <em>anisotropic</em>. It varies by specialty, by patient population, by the emotional intensity of the presentation. The single score of 87 is a projection of a multi-dimensional surface onto a single number, and the projection destroys the structure that matters most: where she is strong, where she is vulnerable, and where the boundary between reliable and fragile practice lies. A hospital administrator who sees only the 87 will assign her to any emergency department rotation interchangeably. A chief of medicine who sees the surface will pair her with a pediatric specialist on nights when the children’s hospital diverts, and will trust her to lead the cardiac bay without supervision.</p>
+<p>The robustness surface developed in this chapter is the formal analogue of Dr. Okafor’s multi-dimensional competence profile. The Model Robustness Index does not produce a number; it produces a <em>surface</em> — and the shape of that surface is the diagnostically essential object.</p>
+</blockquote>
+<hr />
+</section>
+<section id="beyond-accuracy-the-need-for-robustness-measurement" class="level2">
+<h2>10.1 Beyond Accuracy: The Need for Robustness Measurement</h2>
+<p>The standard approach to evaluating reasoning systems is accuracy: present a set of problems, count the fraction the system gets right, report a number. This approach has served AI evaluation since the inception of benchmark culture, and it has one decisive advantage — simplicity. A single number is easy to compute, easy to compare, easy to rank.</p>
+<p>The decisive disadvantage is that accuracy tells you nothing about the conditions under which accuracy holds. A model that scores 85% on a moral reasoning benchmark may be scoring 95% on easy cases and 60% on hard cases, or 85% uniformly across difficulty levels. A model that scores 85% under standard conditions may score 40% when inputs are reframed in euphemistic language, or 85% when they are reframed. The accuracy number hides the structure.</p>
+<p>The data from Part II make this point with quantitative force. Consider two models, both of which achieve approximately the same composite score on the Social Cognition track: Gemini 2.0 Flash (0.695) and Claude Sonnet 4.6 (0.697). The composite scores differ by 0.002 — effectively identical. But the subtask profiles are radically different:</p>
+<table>
+<thead>
 <tr>
-  <th>Subtask</th>
-  <th>Flash 2.0</th>
-  <th>Claude</th>
+<th>Subtask</th>
+<th>Flash 2.0</th>
+<th>Claude</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>T1: Structural fuzz</td>
+<td>0.600</td>
+<td>0.400</td>
 </tr>
 <tr>
-  <td>T1: Structural fuzz</td>
-  <td>0.600</td>
-  <td>0.400</td>
+<td>T2: BIP invariance</td>
+<td>0.750</td>
+<td>0.958</td>
 </tr>
 <tr>
-  <td>T2: BIP invariance</td>
-  <td>0.750</td>
-  <td>0.958</td>
+<td>T3: Holographic evaluation</td>
+<td>0.500</td>
+<td>0.667</td>
 </tr>
 <tr>
-  <td>T3: Holographic evaluation</td>
-  <td>0.500</td>
-  <td>0.667</td>
+<td>T4: Evaluation order</td>
+<td>0.933</td>
+<td>0.933</td>
 </tr>
 <tr>
-  <td>T4: Evaluation order</td>
-  <td>0.933</td>
-  <td>0.933</td>
+<td>T5: Framing resistance</td>
+<td>0.716</td>
+<td>0.630</td>
+</tr>
+</tbody>
+</table>
+<p>Flash 2.0 has better structural stability (T1: 0.600 vs. 0.400) and better framing resistance (T5: 0.716 vs. 0.630). Claude has dramatically better invariance under content-preserving transformations (T2: 0.958 vs. 0.750) and better holographic evaluation (T3: 0.667 vs. 0.500). These are different geometric signatures — different robustness surfaces — compressed into the same number.</p>
+<p>The problem is not that the composite is computed with the wrong weights. No weighting scheme can solve the problem, because the two models are not ordered along a single dimension. They are <em>incomparable</em> in the Pareto sense: each dominates the other on a subset of dimensions. The composite score manufactures a comparison where none exists.</p>
+<p>Accuracy, even disaggregated accuracy, is insufficient. What is needed is a framework that maps the <em>shape</em> of a model’s performance across perturbation types, perturbation magnitudes, and cognitive capabilities — a framework that produces a surface, not a number. The Model Robustness Index, sensitivity profiling, and adversarial threshold search are the three tools that, together, produce this surface.</p>
+<hr />
+</section>
+<section id="the-model-robustness-index" class="level2">
+<h2>10.2 The Model Robustness Index</h2>
+<p><strong>[Modeling Axiom.]</strong> The Model Robustness Index (MRI), introduced in Chapter 9 of <em>Geometric Methods in Computational Modeling</em> (Bond, 2026a), is a structured protocol for quantifying how a model’s performance changes under systematic perturbation. It is not a single number but a <em>profile</em>: a function that maps each perturbation type to a robustness score.</p>
+<section id="definition" class="level3">
+<h3>10.2.1 Definition</h3>
+<p>Let <span class="math inline">f_\theta</span> be a model with parameters <span class="math inline">\theta</span>, let <span class="math inline">\mathcal{T} = \{\tau_1, \tau_2, \ldots, \tau_k\}</span> be a set of perturbation types (framing, emotional anchoring, sensory distraction, social pressure, structural rewriting, etc.), and let <span class="math inline">\mathcal{D}</span> be an evaluation dataset. For each perturbation type <span class="math inline">\tau_i</span> and each input <span class="math inline">x \in \mathcal{D}</span>, define the perturbed input <span class="math inline">\tau_i(x)</span>.</p>
+<p>The MRI profile is the vector:</p>
+<p><span class="math display">\text{MRI}(f_\theta) = \left( r_1, r_2, \ldots, r_k \right)</span></p>
+<p>where each component <span class="math inline">r_i</span> measures the consistency of <span class="math inline">f_\theta</span> under perturbation type <span class="math inline">\tau_i</span>:</p>
+<p><span class="math display">r_i = \frac{1}{|\mathcal{D}|} \sum_{x \in \mathcal{D}} \mathcal{C}\bigl(f_\theta(x), f_\theta(\tau_i(x))\bigr)</span></p>
+<p>Here <span class="math inline">\mathcal{C}</span> is a consistency metric appropriate to the task. For moral reasoning, this might be the fraction of trials where the verdict category is preserved; for calibrated judgment, it might be the Pearson correlation between the original and perturbed scores; for multi-dimensional assessment, it might be the cosine similarity between the original and perturbed harm vectors.</p>
+</section>
+<section id="the-mri-as-a-vector-not-a-scalar" class="level3">
+<h3>10.2.2 The MRI as a Vector, Not a Scalar</h3>
+<p>The critical design choice is that the MRI is a <span class="math inline">k</span>-dimensional vector, not a scalar. Each component corresponds to a different perturbation type, and the components are not collapsed into an aggregate. This is not merely a matter of convenience; it reflects the geometric structure documented in Chapter 5. The corruption tensor <span class="math inline">C_{ij}</span> is anisotropic — different perturbation directions produce different displacement magnitudes — and any aggregation over perturbation types destroys the anisotropy that is the most important feature of the data.</p>
+<p>To see why aggregation fails, consider the MRI profiles that emerge from the Social Cognition track:</p>
+<table>
+<thead>
+<tr>
+<th>Perturbation Type</th>
+<th>Flash 2.0</th>
+<th>Flash 2.5</th>
+<th>Flash 3</th>
+<th>Pro</th>
+<th>Claude</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Structural fuzz (T1)</td>
+<td>0.600</td>
+<td>0.400</td>
+<td>0.600</td>
+<td>0.500</td>
+<td>0.400</td>
 </tr>
 <tr>
-  <td>T5: Framing resistance</td>
-  <td>0.716</td>
-  <td>0.630</td>
-</tr>
-</table></div>
-<p class="body-text">Flash 2.0 has better structural stability (T1: 0.600 vs. 0.400) and better framing resistance (T5: 0.716 vs. 0.630). Claude has dramatically better invariance under content-preserving transformations (T2: 0.958 vs. 0.750) and better holographic evaluation (T3: 0.667 vs. 0.500). These are different geometric signatures --- different robustness surfaces --- compressed into the same number.</p>
-<p class="body-text">The problem is not that the composite is computed with the wrong weights. No weighting scheme can solve the problem, because the two models are not ordered along a single dimension. They are incomparable in the Pareto sense: each dominates the other on a subset of dimensions. The composite score manufactures a comparison where none exists.</p>
-<p class="body-text">Accuracy, even disaggregated accuracy, is insufficient. What is needed is a framework that maps the shape of a model's performance across perturbation types, perturbation magnitudes, and cognitive capabilities --- a framework that produces a surface, not a number. The Model Robustness Index, sensitivity profiling, and adversarial threshold search are the three tools that, together, produce this surface.</p>
-<h2 id="102-the-model-robustness-index" class="section-heading">10.2 The Model Robustness Index</h2>
-<p class="first-paragraph"><strong>[Modeling Axiom.]</strong> The Model Robustness Index (MRI), introduced in Chapter 9 of Geometric Methods in Computational Modeling (Bond, 2026a), is a structured protocol for quantifying how a model's performance changes under systematic perturbation. It is not a single number but a profile: a function that maps each perturbation type to a robustness score.</p>
-<h3 id="1021-definition" class="subsection-heading">10.2.1 Definition</h3>
-<p class="first-paragraph">Let <em class="math">f_\theta</em> be a model with parameters <em class="math">\theta</em>, let <em class="math">\mathcal{T} = \{\tau_1, \tau_2, \ldots, \tau_k\}</em> be a set of perturbation types (framing, emotional anchoring, sensory distraction, social pressure, structural rewriting, etc.), and let <em class="math">\mathcal{D}</em> be an evaluation dataset. For each perturbation type <em class="math">\tau_i</em> and each input <em class="math">x \in \mathcal{D}</em>, define the perturbed input <em class="math">\tau_i(x)</em>.</p>
-<p class="body-text">The MRI profile is the vector:</p>
-<p class="body-text"><span class="math-block">\text{MRI}(f_\theta) = \left( r_1, r_2, \ldots, r_k \right)</span></p>
-<p class="body-text">where each component <em class="math">r_i</em> measures the consistency of <em class="math">f_\theta</em> under perturbation type <em class="math">\tau_i</em>:</p>
-<p class="body-text"><span class="math-block">r_i = \frac{1}{|\mathcal{D}|} \sum_{x \in \mathcal{D}} \mathcal{C}\bigl(f_\theta(x), f_\theta(\tau_i(x))\bigr)</span></p>
-<p class="body-text">Here <em class="math">\mathcal{C}</em> is a consistency metric appropriate to the task. For moral reasoning, this might be the fraction of trials where the verdict category is preserved; for calibrated judgment, it might be the Pearson correlation between the original and perturbed scores; for multi-dimensional assessment, it might be the cosine similarity between the original and perturbed harm vectors.</p>
-<h3 id="1022-the-mri-as-a-vector-not-a-scalar" class="subsection-heading">10.2.2 The MRI as a Vector, Not a Scalar</h3>
-<p class="first-paragraph">The critical design choice is that the MRI is a <em class="math">k</em>-dimensional vector, not a scalar. Each component corresponds to a different perturbation type, and the components are not collapsed into an aggregate. This is not merely a matter of convenience; it reflects the geometric structure documented in Chapter 5. The corruption tensor <em class="math">C_{ij}</em> is anisotropic --- different perturbation directions produce different displacement magnitudes --- and any aggregation over perturbation types destroys the anisotropy that is the most important feature of the data.</p>
-<p class="body-text">To see why aggregation fails, consider the MRI profiles that emerge from the Social Cognition track:</p>
-<div class="table-wrapper"><table class="book-table">
-<tr>
-  <th>Perturbation Type</th>
-  <th>Flash 2.0</th>
-  <th>Flash 2.5</th>
-  <th>Flash 3</th>
-  <th>Pro</th>
-  <th>Claude</th>
+<td>Content-preserving swap (T2)</td>
+<td>0.750</td>
+<td>0.708</td>
+<td>0.958</td>
+<td>0.708</td>
+<td>0.958</td>
 </tr>
 <tr>
-  <td>Structural fuzz (T1)</td>
-  <td>0.600</td>
-  <td>0.400</td>
-  <td>0.600</td>
-  <td>0.500</td>
-  <td>0.400</td>
+<td>Dimensional collapse (T3)</td>
+<td>0.500</td>
+<td>0.583</td>
+<td>0.667</td>
+<td>0.583</td>
+<td>0.667</td>
 </tr>
 <tr>
-  <td>Content-preserving swap (T2)</td>
-  <td>0.750</td>
-  <td>0.708</td>
-  <td>0.958</td>
-  <td>0.708</td>
-  <td>0.958</td>
+<td>Evaluation order (T4)</td>
+<td>0.933</td>
+<td>0.867</td>
+<td>1.000</td>
+<td>0.967</td>
+<td>0.933</td>
 </tr>
 <tr>
-  <td>Dimensional collapse (T3)</td>
-  <td>0.500</td>
-  <td>0.583</td>
-  <td>0.667</td>
-  <td>0.583</td>
-  <td>0.667</td>
+<td>Framing (T5)</td>
+<td>0.716</td>
+<td>0.630</td>
+<td>0.631</td>
+<td>0.606</td>
+<td>0.630</td>
+</tr>
+</tbody>
+</table>
+<p>Each row is a different slice of the robustness surface. The evaluation-order row (T4) is uniformly high (0.867–1.000); the structural-fuzz row (T1) is uniformly low (0.400–0.600). These two rows describe the same models under different perturbation types, and the gap between them — the <em>anisotropy</em> of the robustness surface — is the most important structural feature. Averaging the rows produces a composite that hides this gap.</p>
+<p>The MRI profile preserves the anisotropy. It says: “This model is highly robust to evaluation-order perturbation, moderately robust to framing perturbation, and weakly robust to structural perturbation.” That sentence contains more information than any single number can encode.</p>
+</section>
+<section id="connection-to-the-corruption-tensor" class="level3">
+<h3>10.2.3 Connection to the Corruption Tensor</h3>
+<p>The MRI profile is the empirical realization of the corruption tensor <span class="math inline">C_{ij}</span> introduced in Chapter 5, Section 5.5. Recall that the corruption tensor maps perturbation direction <span class="math inline">j</span> to displacement magnitude along judgment dimension <span class="math inline">i</span>:</p>
+<p><span class="math display">\Delta x_i \approx C_{ij} \epsilon_j</span></p>
+<p>The MRI component <span class="math inline">r_j = 1 - \|C_{\cdot j}\| / \text{scale}</span> is the complement of the displacement magnitude along perturbation direction <span class="math inline">j</span>, normalized so that <span class="math inline">r_j = 1</span> means zero displacement (perfect robustness) and <span class="math inline">r_j = 0</span> means maximal displacement (complete fragility). The MRI converts the tensor into a per-direction summary that is directly interpretable as a robustness score.</p>
+<hr />
+</section>
+</section>
+<section id="sensitivity-profiling-which-dimensions-are-fragile" class="level2">
+<h2>10.3 Sensitivity Profiling: Which Dimensions Are Fragile?</h2>
+<p>The MRI tells us <em>how robust</em> the model is along each perturbation direction. Sensitivity profiling tells us <em>where in the output space</em> the vulnerability manifests. The distinction matters because a model can be fragile along a perturbation direction while remaining robust on most output dimensions — the fragility may be concentrated in one or two output coordinates rather than distributed uniformly.</p>
+<section id="from-global-robustness-to-local-fragility" class="level3">
+<h3>10.3.1 From Global Robustness to Local Fragility</h3>
+<p>Consider the Attention track data from Chapter 13. Claude’s attention composite is 0.679, placing it fourth out of five models. But this composite hides a dramatic internal structure:</p>
+<table>
+<thead>
+<tr>
+<th>Subtask</th>
+<th>Claude Score</th>
+<th>Rank</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>A1: Distractor resistance</td>
+<td>0.646</td>
+<td>4th</td>
 </tr>
 <tr>
-  <td>Evaluation order (T4)</td>
-  <td>0.933</td>
-  <td>0.867</td>
-  <td>1.000</td>
-  <td>0.967</td>
-  <td>0.933</td>
+<td>A2: Selective attention</td>
+<td>0.829</td>
+<td>2nd</td>
 </tr>
 <tr>
-  <td>Framing (T5)</td>
-  <td>0.716</td>
-  <td>0.630</td>
-  <td>0.631</td>
-  <td>0.606</td>
-  <td>0.630</td>
-</tr>
-</table></div>
-<p class="body-text">Each row is a different slice of the robustness surface. The evaluation-order row (T4) is uniformly high (0.867--1.000); the structural-fuzz row (T1) is uniformly low (0.400--0.600). These two rows describe the same models under different perturbation types, and the gap between them --- the anisotropy of the robustness surface --- is the most important structural feature. Averaging the rows produces a composite that hides this gap.</p>
-<p class="body-text">The MRI profile preserves the anisotropy. It says: "This model is highly robust to evaluation-order perturbation, moderately robust to framing perturbation, and weakly robust to structural perturbation." That sentence contains more information than any single number can encode.</p>
-<h3 id="1023-connection-to-the-corruption-tensor" class="subsection-heading">10.2.3 Connection to the Corruption Tensor</h3>
-<p class="first-paragraph">The MRI profile is the empirical realization of the corruption tensor <em class="math">C_{ij}</em> introduced in Chapter 5, Section 5.5. Recall that the corruption tensor maps perturbation direction <em class="math">j</em> to displacement magnitude along judgment dimension <em class="math">i</em>:</p>
-<p class="body-text"><span class="math-block">\Delta x_i \approx C_{ij} \epsilon_j</span></p>
-<p class="body-text">The MRI component <em class="math">r_j = 1 - \|C_{\cdot j}\| / \text{scale}</em> is the complement of the displacement magnitude along perturbation direction <em class="math">j</em>, normalized so that <em class="math">r_j = 1</em> means zero displacement (perfect robustness) and <em class="math">r_j = 0</em> means maximal displacement (complete fragility). The MRI converts the tensor into a per-direction summary that is directly interpretable as a robustness score.</p>
-<h2 id="103-sensitivity-profiling-which-dimensions-are-fragile" class="section-heading">10.3 Sensitivity Profiling: Which Dimensions Are Fragile?</h2>
-<p class="first-paragraph">The MRI tells us how robust the model is along each perturbation direction. Sensitivity profiling tells us where in the output space the vulnerability manifests. The distinction matters because a model can be fragile along a perturbation direction while remaining robust on most output dimensions --- the fragility may be concentrated in one or two output coordinates rather than distributed uniformly.</p>
-<h3 id="1031-from-global-robustness-to-local-fragility" class="subsection-heading">10.3.1 From Global Robustness to Local Fragility</h3>
-<p class="first-paragraph">Consider the Attention track data from Chapter 13. Claude's attention composite is 0.679, placing it fourth out of five models. But this composite hides a dramatic internal structure:</p>
-<div class="table-wrapper"><table class="book-table">
-<tr>
-  <th>Subtask</th>
-  <th>Claude Score</th>
-  <th>Rank</th>
+<td>A3: Sustained attention</td>
+<td>0.692</td>
+<td>1st</td>
 </tr>
 <tr>
-  <td>A1: Distractor resistance</td>
-  <td>0.646</td>
-  <td>4th</td>
+<td>A4: Divided attention</td>
+<td>0.571</td>
+<td>5th (worst in suite)</td>
 </tr>
-<tr>
-  <td>A2: Selective attention</td>
-  <td>0.829</td>
-  <td>2nd</td>
-</tr>
-<tr>
-  <td>A3: Sustained attention</td>
-  <td>0.692</td>
-  <td>1st</td>
-</tr>
-<tr>
-  <td>A4: Divided attention</td>
-  <td>0.571</td>
-  <td>5th (worst in suite)</td>
-</tr>
-</table></div>
-<p class="body-text">The composite of 0.679 averages across a second-best selective attention score and a dead-last divided attention score. The composite says "below average." The sensitivity profile says "excellent on single-stream filtering, catastrophically limited on parallel-stream processing." The profile is actionable; the composite is not.</p>
-<p class="body-text">Sensitivity profiling formalizes this disaggregation. For a given perturbation type <em class="math">\tau</em>, the sensitivity profile <em class="math">\mathbf{s}_\tau \in \mathbb{R}^d</em> maps each output dimension to its displacement under <em class="math">\tau</em>:</p>
-<p class="body-text"><span class="math-block">s_{\tau, i} = \mathbb{E}_{x \in \mathcal{D}}\left[ |f_{\theta, i}(x) - f_{\theta, i}(\tau(x))| \right]</span></p>
-<p class="body-text">where <em class="math">f_{\theta, i}</em> is the <em class="math">i</em>-th component of the model's output. This is a vector of per-dimension sensitivities, and its shape --- which components are large, which are small --- reveals the local geometry of the fragility.</p>
-<h3 id="1032-the-attention-sensitivity-surface" class="subsection-heading">10.3.2 The Attention Sensitivity Surface</h3>
-<p class="first-paragraph">The attention data provide the cleanest illustration. The selective attention signal-to-noise ratio (A3 subcomponent) --- the ratio of attention allocated to morally relevant dimensions versus morally irrelevant dimensions --- was uniformly weak across all five models: 1.22 to 1.38 on a scale where 1.0 represents no discrimination.</p>
-<p class="body-text">This is a universal fragility. It appears in every model tested, at nearly the same magnitude, regardless of the model's overall performance level. On the sensitivity surface, it manifests as a ridge of high sensitivity (low robustness) that runs across the entire model axis at the selective-attention coordinate. The ridge is not model-specific; it is a property of the perturbation type interacting with the shared architecture of transformer-based language models.</p>
-<p class="body-text">The contrast with divided attention is instructive. A4 scores range from 0.571 (Claude) to 1.000 (Gemini 2.5 Pro, Gemini 3 Flash). This is a model-specific fragility: the sensitivity varies dramatically across models, unlike the selective-attention SNR, which is nearly constant. On the sensitivity surface, divided attention appears not as a universal ridge but as a set of model-specific peaks and valleys --- Claude has a deep valley (high sensitivity, low robustness) while Pro and Flash 3 sit on a plateau (low sensitivity, high robustness).</p>
-<p class="body-text">The sensitivity profile thus decomposes the robustness surface into two qualitatively different components:</p>
-<p class="body-text"><strong>[Empirical.]</strong> 1. <strong>Universal fragilities:</strong> Regions of high sensitivity shared across all models, likely reflecting architectural constraints common to the model family (e.g., the attention mechanism's inability to strongly discriminate relevant from irrelevant dimensions).</p>
-<ol class="book-list">
-<li><strong>Model-specific fragilities:</strong> Regions of high sensitivity in some models but not others, reflecting differences in training, architecture, or alignment interventions (e.g., Claude's divided-attention bottleneck).</li>
+</tbody>
+</table>
+<p>The composite of 0.679 averages across a second-best selective attention score and a dead-last divided attention score. The composite says “below average.” The sensitivity profile says “excellent on single-stream filtering, catastrophically limited on parallel-stream processing.” The profile is actionable; the composite is not.</p>
+<p>Sensitivity profiling formalizes this disaggregation. For a given perturbation type <span class="math inline">\tau</span>, the sensitivity profile <span class="math inline">\mathbf{s}_\tau \in \mathbb{R}^d</span> maps each output dimension to its displacement under <span class="math inline">\tau</span>:</p>
+<p><span class="math display">s_{\tau, i} = \mathbb{E}_{x \in \mathcal{D}}\left[ |f_{\theta, i}(x) - f_{\theta, i}(\tau(x))| \right]</span></p>
+<p>where <span class="math inline">f_{\theta, i}</span> is the <span class="math inline">i</span>-th component of the model’s output. This is a vector of per-dimension sensitivities, and its shape — which components are large, which are small — reveals the local geometry of the fragility.</p>
+</section>
+<section id="the-attention-sensitivity-surface" class="level3">
+<h3>10.3.2 The Attention Sensitivity Surface</h3>
+<p>The attention data provide the cleanest illustration. The selective attention signal-to-noise ratio (A3 subcomponent) — the ratio of attention allocated to morally relevant dimensions versus morally irrelevant dimensions — was uniformly weak across all five models: 1.22 to 1.38 on a scale where 1.0 represents no discrimination.</p>
+<p>This is a universal fragility. It appears in every model tested, at nearly the same magnitude, regardless of the model’s overall performance level. On the sensitivity surface, it manifests as a ridge of high sensitivity (low robustness) that runs across the entire model axis at the selective-attention coordinate. The ridge is not model-specific; it is a property of the perturbation type interacting with the shared architecture of transformer-based language models.</p>
+<p>The contrast with divided attention is instructive. A4 scores range from 0.571 (Claude) to 1.000 (Gemini 2.5 Pro, Gemini 3 Flash). This is a <em>model-specific</em> fragility: the sensitivity varies dramatically across models, unlike the selective-attention SNR, which is nearly constant. On the sensitivity surface, divided attention appears not as a universal ridge but as a set of model-specific peaks and valleys — Claude has a deep valley (high sensitivity, low robustness) while Pro and Flash 3 sit on a plateau (low sensitivity, high robustness).</p>
+<p>The sensitivity profile thus decomposes the robustness surface into two qualitatively different components:</p>
+<p><strong>[Empirical.]</strong> 1. <strong>Universal fragilities:</strong> Regions of high sensitivity shared across all models, likely reflecting architectural constraints common to the model family (e.g., the attention mechanism’s inability to strongly discriminate relevant from irrelevant dimensions).</p>
+<ol start="2" type="1">
+<li><strong>Model-specific fragilities:</strong> Regions of high sensitivity in some models but not others, reflecting differences in training, architecture, or alignment interventions (e.g., Claude’s divided-attention bottleneck).</li>
 </ol>
-<p class="body-text">This decomposition is invisible to any aggregate robustness score. It requires the full sensitivity surface.</p>
-<h3 id="1033-constructing-the-profile" class="subsection-heading">10.3.3 Constructing the Profile</h3>
-<p class="first-paragraph">The practical procedure for sensitivity profiling is:</p>
-<ol class="book-list">
-<li><strong>Select perturbation axes.</strong> Define the set of perturbation types <em class="math">\{\tau_1, \ldots, \tau_k\}</em> that correspond to the gauge transformations and corrupting perturbations identified in Chapters 5 and 8.</li>
+<p>This decomposition is invisible to any aggregate robustness score. It requires the full sensitivity surface.</p>
+</section>
+<section id="constructing-the-profile" class="level3">
+<h3>10.3.3 Constructing the Profile</h3>
+<p>The practical procedure for sensitivity profiling is:</p>
+<ol type="1">
+<li><p><strong>Select perturbation axes.</strong> Define the set of perturbation types <span class="math inline">\{\tau_1, \ldots, \tau_k\}</span> that correspond to the gauge transformations and corrupting perturbations identified in Chapters 5 and 8.</p></li>
+<li><p><strong>Select output dimensions.</strong> Define the set of output coordinates <span class="math inline">\{y_1, \ldots, y_d\}</span> that the model produces — for moral reasoning, the seven harm dimensions; for cognitive benchmarks, the subtask scores within each track.</p></li>
+<li><p><strong>Compute the sensitivity matrix.</strong> For each (perturbation, output) pair <span class="math inline">(\tau_j, y_i)</span>, compute <span class="math inline">s_{ij}</span> as the expected absolute displacement of output dimension <span class="math inline">i</span> under perturbation <span class="math inline">j</span>.</p></li>
+<li><p><strong>Visualize as a heatmap.</strong> The <span class="math inline">d \times k</span> sensitivity matrix, with perturbation types on one axis and output dimensions on the other, is the discrete approximation of the sensitivity surface. Rows that are uniformly high indicate fragile output dimensions. Columns that are uniformly high indicate potent perturbation types. Isolated peaks indicate specific (perturbation, dimension) vulnerabilities.</p></li>
 </ol>
-<ol class="book-list">
-<li><strong>Select output dimensions.</strong> Define the set of output coordinates <em class="math">\{y_1, \ldots, y_d\}</em> that the model produces --- for moral reasoning, the seven harm dimensions; for cognitive benchmarks, the subtask scores within each track.</li>
+<p>The sensitivity matrix generalizes the corruption tensor <span class="math inline">C_{ij}</span> of Chapter 5 to the case where both the perturbation and the output are multi-dimensional. The corruption tensor mapped perturbation directions to displacement magnitudes in the judgment space. The sensitivity matrix maps (perturbation type, output dimension) pairs to scalar sensitivity values. The corruption tensor is the off-diagonal structure within a single track; the sensitivity matrix is the full cross-track, cross-perturbation characterization.</p>
+<hr />
+</section>
+</section>
+<section id="adversarial-threshold-search" class="level2">
+<h2>10.4 Adversarial Threshold Search</h2>
+<p>The MRI and sensitivity profiling characterize how much the model’s output changes under perturbation. But they treat perturbation as binary: present or absent. In reality, perturbations have <em>magnitude</em>, and the relationship between perturbation magnitude and performance degradation is rarely linear. Chapter 5 documented the dose-response curve for sensory distractors (A1): vivid distractors produce more displacement than mild distractors, which produce more than the control condition. But the dose-response was measured at only two intensity levels. What happens at the boundary — the exact perturbation magnitude at which reasoning breaks?</p>
+<p>Adversarial threshold search answers this question by systematically increasing perturbation intensity along each dimension and identifying the critical magnitude <span class="math inline">\epsilon^*</span> at which performance degrades catastrophically — the <em>robustness boundary</em>.</p>
+<section id="the-threshold-concept" class="level3">
+<h3>10.4.1 The Threshold Concept</h3>
+<p>Define the performance of model <span class="math inline">f_\theta</span> under perturbation type <span class="math inline">\tau</span> at intensity <span class="math inline">\epsilon</span> as:</p>
+<p><span class="math display">P(\epsilon) = \mathbb{E}_{x \in \mathcal{D}}\left[ \mathcal{Q}\bigl(f_\theta(x), f_\theta(\tau_\epsilon(x))\bigr) \right]</span></p>
+<p>where <span class="math inline">\tau_\epsilon</span> is the perturbation at intensity <span class="math inline">\epsilon</span> and <span class="math inline">\mathcal{Q}</span> is a quality metric (accuracy, consistency, calibration, etc.). At <span class="math inline">\epsilon = 0</span>, the perturbation is absent and <span class="math inline">P(0)</span> is the baseline performance. As <span class="math inline">\epsilon</span> increases, <span class="math inline">P(\epsilon)</span> decreases. The adversarial threshold is:</p>
+<p><span class="math display">\epsilon^* = \inf \left\{ \epsilon &gt; 0 : P(\epsilon) &lt; P(0) - \delta \right\}</span></p>
+<p>where <span class="math inline">\delta</span> is a user-specified degradation tolerance. The threshold <span class="math inline">\epsilon^*</span> tells us: “This is the exact perturbation intensity at which performance degrades by more than <span class="math inline">\delta</span>.”</p>
+</section>
+<section id="why-the-threshold-is-non-trivial" class="level3">
+<h3>10.4.2 Why the Threshold Is Non-Trivial</h3>
+<p>If the relationship between perturbation intensity and performance were linear, the threshold would be trivially computable from the slope. The dose-response curve of Chapter 5 shows that the relationship is <em>approximately</em> linear in the low-intensity regime:</p>
+<p><span class="math display">P(\epsilon) \approx P(0) - \epsilon \cdot \|\nabla_\epsilon P\|</span></p>
+<p>But this linear approximation breaks down at higher intensities. The empirical data suggest three regimes:</p>
+<ol type="1">
+<li><p><strong>Linear regime</strong> (<span class="math inline">\epsilon &lt; \epsilon_1</span>): Small perturbations produce proportional displacement. The heuristic field is slightly deformed, the search trajectory shifts slightly, and the output changes by a small amount. This is the regime studied in Chapter 5, where mild distractors produce mild displacement and vivid distractors produce larger displacement.</p></li>
+<li><p><strong>Nonlinear regime</strong> (<span class="math inline">\epsilon_1 &lt; \epsilon &lt; \epsilon^*</span>): Larger perturbations produce disproportionate displacement. The heuristic field is significantly deformed, the search trajectory enters a different basin of attraction, and the output changes qualitatively (verdict category flips, confidence collapses, reasoning structure degrades). The ~38% recovery ceiling (Chapter 9, Section 9.7) marks the boundary of this regime: perturbations strong enough to push the trajectory into a different basin produce displacements that prompt-level metacognitive interventions cannot fully reverse.</p></li>
+<li><p><strong>Catastrophic regime</strong> (<span class="math inline">\epsilon &gt; \epsilon^*</span>): The perturbation overwhelms the heuristic field entirely. The search trajectory bears no relationship to the unperturbed trajectory. Performance drops to chance or below. The model is no longer reasoning about the problem; it is responding to the perturbation.</p></li>
 </ol>
-<ol class="book-list">
-<li><strong>Compute the sensitivity matrix.</strong> For each (perturbation, output) pair <em class="math">(\tau_j, y_i)</em>, compute <em class="math">s_{ij}</em> as the expected absolute displacement of output dimension <em class="math">i</em> under perturbation <em class="math">j</em>.</li>
-</ol>
-<ol class="book-list">
-<li><strong>Visualize as a heatmap.</strong> The <em class="math">d \times k</em> sensitivity matrix, with perturbation types on one axis and output dimensions on the other, is the discrete approximation of the sensitivity surface. Rows that are uniformly high indicate fragile output dimensions. Columns that are uniformly high indicate potent perturbation types. Isolated peaks indicate specific (perturbation, dimension) vulnerabilities.</li>
-</ol>
-<p class="body-text">The sensitivity matrix generalizes the corruption tensor <em class="math">C_{ij}</em> of Chapter 5 to the case where both the perturbation and the output are multi-dimensional. The corruption tensor mapped perturbation directions to displacement magnitudes in the judgment space. The sensitivity matrix maps (perturbation type, output dimension) pairs to scalar sensitivity values. The corruption tensor is the off-diagonal structure within a single track; the sensitivity matrix is the full cross-track, cross-perturbation characterization.</p>
-<h2 id="104-adversarial-threshold-search" class="section-heading">10.4 Adversarial Threshold Search</h2>
-<p class="first-paragraph">The MRI and sensitivity profiling characterize how much the model's output changes under perturbation. But they treat perturbation as binary: present or absent. In reality, perturbations have magnitude, and the relationship between perturbation magnitude and performance degradation is rarely linear. Chapter 5 documented the dose-response curve for sensory distractors (A1): vivid distractors produce more displacement than mild distractors, which produce more than the control condition. But the dose-response was measured at only two intensity levels. What happens at the boundary --- the exact perturbation magnitude at which reasoning breaks?</p>
-<p class="body-text">Adversarial threshold search answers this question by systematically increasing perturbation intensity along each dimension and identifying the critical magnitude <em class="math">\epsilon* at which performance degrades catastrophically --- the </em>robustness boundary*.</p>
-<h3 id="1041-the-threshold-concept" class="subsection-heading">10.4.1 The Threshold Concept</h3>
-<p class="first-paragraph">Define the performance of model <em class="math">f_\theta</em> under perturbation type <em class="math">\tau</em> at intensity <em class="math">\epsilon</em> as:</p>
-<p class="body-text"><span class="math-block">P(\epsilon) = \mathbb{E}_{x \in \mathcal{D}}\left[ \mathcal{Q}\bigl(f_\theta(x), f_\theta(\tau_\epsilon(x))\bigr) \right]</span></p>
-<p class="body-text">where <em class="math">\tau_\epsilon</em> is the perturbation at intensity <em class="math">\epsilon</em> and <em class="math">\mathcal{Q}</em> is a quality metric (accuracy, consistency, calibration, etc.). At <em class="math">\epsilon = 0</em>, the perturbation is absent and <em class="math">P(0)</em> is the baseline performance. As <em class="math">\epsilon</em> increases, <em class="math">P(\epsilon)</em> decreases. The adversarial threshold is:</p>
-<p class="body-text"><span class="math-block">\epsilon^* = \inf \left\{ \epsilon &gt; 0 : P(\epsilon) &lt; P(0) - \delta \right\}</span></p>
-<p class="body-text">where <em class="math">\delta</em> is a user-specified degradation tolerance. The threshold <em class="math">\epsilon^*</em> tells us: "This is the exact perturbation intensity at which performance degrades by more than <em class="math">\delta</em>."</p>
-<h3 id="1042-why-the-threshold-is-non-trivial" class="subsection-heading">10.4.2 Why the Threshold Is Non-Trivial</h3>
-<p class="first-paragraph">If the relationship between perturbation intensity and performance were linear, the threshold would be trivially computable from the slope. The dose-response curve of Chapter 5 shows that the relationship is approximately linear in the low-intensity regime:</p>
-<p class="body-text"><span class="math-block">P(\epsilon) \approx P(0) - \epsilon \cdot \|\nabla_\epsilon P\|</span></p>
-<p class="body-text">But this linear approximation breaks down at higher intensities. The empirical data suggest three regimes:</p>
-<ol class="book-list">
-<li><strong>Linear regime</strong> (<em class="math">\epsilon &lt; \epsilon_1</em>): Small perturbations produce proportional displacement. The heuristic field is slightly deformed, the search trajectory shifts slightly, and the output changes by a small amount. This is the regime studied in Chapter 5, where mild distractors produce mild displacement and vivid distractors produce larger displacement.</li>
-</ol>
-<ol class="book-list">
-<li><strong>Nonlinear regime</strong> (<em class="math">\epsilon_1 &lt; \epsilon &lt; \epsilon^*</em>): Larger perturbations produce disproportionate displacement. The heuristic field is significantly deformed, the search trajectory enters a different basin of attraction, and the output changes qualitatively (verdict category flips, confidence collapses, reasoning structure degrades). The ~38% recovery ceiling (Chapter 9, Section 9.7) marks the boundary of this regime: perturbations strong enough to push the trajectory into a different basin produce displacements that prompt-level metacognitive interventions cannot fully reverse.</li>
-</ol>
-<ol class="book-list">
-<li><strong>Catastrophic regime</strong> (<em class="math">\epsilon &gt; \epsilon^*</em>): The perturbation overwhelms the heuristic field entirely. The search trajectory bears no relationship to the unperturbed trajectory. Performance drops to chance or below. The model is no longer reasoning about the problem; it is responding to the perturbation.</li>
-</ol>
-<p class="body-text">The adversarial threshold <em class="math">\epsilon^*</em> marks the boundary between the nonlinear regime and the catastrophic regime. It is the answer to: "How hard do you have to push before reasoning breaks completely?"</p>
-<h3 id="1043-empirical-evidence-for-the-threshold" class="subsection-heading">10.4.3 Empirical Evidence for the Threshold</h3>
-<p class="first-paragraph">The benchmark data contain indirect evidence for threshold behavior. Consider the sycophancy data across models:</p>
-<div class="table-wrapper"><table class="book-table">
+<p>The adversarial threshold <span class="math inline">\epsilon^*</span> marks the boundary between the nonlinear regime and the catastrophic regime. It is the answer to: “How hard do you have to push before reasoning breaks completely?”</p>
+</section>
+<section id="empirical-evidence-for-the-threshold" class="level3">
+<h3>10.4.3 Empirical Evidence for the Threshold</h3>
+<p>The benchmark data contain indirect evidence for threshold behavior. Consider the sycophancy data across models:</p>
+<table>
+<thead>
 <tr>
-  <th>Model</th>
-  <th>Sycophancy Rate</th>
-  <th>Interpretation</th>
+<th>Model</th>
+<th>Sycophancy Rate</th>
+<th>Interpretation</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Claude Sonnet 4.6</td>
+<td>0%</td>
+<td>Below threshold</td>
 </tr>
 <tr>
-  <td>Claude Sonnet 4.6</td>
-  <td>0%</td>
-  <td>Below threshold</td>
+<td>Gemini 2.0 Flash</td>
+<td>33%</td>
+<td>In nonlinear regime</td>
 </tr>
 <tr>
-  <td>Gemini 2.0 Flash</td>
-  <td>33%</td>
-  <td>In nonlinear regime</td>
+<td>Gemini 2.5 Pro</td>
+<td>44%</td>
+<td>In nonlinear regime</td>
 </tr>
 <tr>
-  <td>Gemini 2.5 Pro</td>
-  <td>44%</td>
-  <td>In nonlinear regime</td>
+<td>Gemini 2.5 Flash</td>
+<td>56%</td>
+<td>Approaching/past threshold</td>
 </tr>
-<tr>
-  <td>Gemini 2.5 Flash</td>
-  <td>56%</td>
-  <td>Approaching/past threshold</td>
-</tr>
-</table></div>
-<p class="body-text">The perturbation type (social pressure) is the same across all models; what varies is each model's threshold <em class="math">\epsilon^*_{\text{social}}</em>. Claude's threshold is above the intensity of the experimental manipulation --- the social pressure applied in the L2 benchmark was insufficient to overcome Claude's trajectory maintenance. Flash 2.5's threshold is below the experimental intensity --- more than half of its trajectories are redirected. The other models lie in between, with thresholds in the vicinity of the experimental manipulation.</p>
-<p class="body-text">This interpretation reframes the sycophancy gradient from Chapter 6. The gradient is not a continuous spectrum of "sycophancy propensity." It is a set of model-specific thresholds <em class="math">\epsilon^*_{\text{social}}</em> along the social-pressure perturbation axis, with the experimental manipulation serving as a fixed probe that falls above some thresholds and below others.</p>
-<h3 id="1044-binary-search-for-the-threshold" class="subsection-heading">10.4.4 Binary Search for the Threshold</h3>
-<p class="first-paragraph">The practical procedure for adversarial threshold search is:</p>
-<ol class="book-list">
-<li><strong>Select a perturbation axis</strong> <em class="math">\tau</em> and a parametric intensity family <em class="math">\tau_\epsilon</em> for <em class="math">\epsilon \in [0, \epsilon_{\max}]</em>.</li>
+</tbody>
+</table>
+<p>The perturbation type (social pressure) is the same across all models; what varies is each model’s threshold <span class="math inline">\epsilon^*_{\text{social}}</span>. Claude’s threshold is above the intensity of the experimental manipulation — the social pressure applied in the L2 benchmark was insufficient to overcome Claude’s trajectory maintenance. Flash 2.5’s threshold is below the experimental intensity — more than half of its trajectories are redirected. The other models lie in between, with thresholds in the vicinity of the experimental manipulation.</p>
+<p>This interpretation reframes the sycophancy gradient from Chapter 6. The gradient is not a continuous spectrum of “sycophancy propensity.” It is a set of model-specific thresholds <span class="math inline">\epsilon^*_{\text{social}}</span> along the social-pressure perturbation axis, with the experimental manipulation serving as a fixed probe that falls above some thresholds and below others.</p>
+</section>
+<section id="binary-search-for-the-threshold" class="level3">
+<h3>10.4.4 Binary Search for the Threshold</h3>
+<p>The practical procedure for adversarial threshold search is:</p>
+<ol type="1">
+<li><p><strong>Select a perturbation axis</strong> <span class="math inline">\tau</span> and a parametric intensity family <span class="math inline">\tau_\epsilon</span> for <span class="math inline">\epsilon \in [0, \epsilon_{\max}]</span>.</p></li>
+<li><p><strong>Evaluate performance at the endpoints.</strong> <span class="math inline">P(0)</span> is the baseline. <span class="math inline">P(\epsilon_{\max})</span> is the performance under maximum perturbation.</p></li>
+<li><p><strong>Binary search.</strong> Set <span class="math inline">\epsilon_{\text{low}} = 0</span>, <span class="math inline">\epsilon_{\text{high}} = \epsilon_{\max}</span>. Evaluate <span class="math inline">P(\epsilon_{\text{mid}})</span>. If <span class="math inline">P(\epsilon_{\text{mid}}) &gt; P(0) - \delta</span>, the threshold is above <span class="math inline">\epsilon_{\text{mid}}</span>; set <span class="math inline">\epsilon_{\text{low}} = \epsilon_{\text{mid}}</span>. Otherwise, set <span class="math inline">\epsilon_{\text{high}} = \epsilon_{\text{mid}}</span>. Repeat until <span class="math inline">\epsilon_{\text{high}} - \epsilon_{\text{low}} &lt; \eta</span> for desired resolution <span class="math inline">\eta</span>.</p></li>
+<li><p><strong>Report the threshold</strong> <span class="math inline">\epsilon^* \approx (\epsilon_{\text{low}} + \epsilon_{\text{high}}) / 2</span>.</p></li>
 </ol>
-<ol class="book-list">
-<li><strong>Evaluate performance at the endpoints.</strong> <em class="math">P(0)</em> is the baseline. <em class="math">P(\epsilon_{\max})</em> is the performance under maximum perturbation.</li>
+<p>This procedure, applied along each perturbation axis independently, produces a vector of thresholds <span class="math inline">(\epsilon^*_1, \epsilon^*_2, \ldots, \epsilon^*_k)</span> — the <em>threshold profile</em>. The threshold profile is the boundary of the robustness surface: the contour in perturbation space at which performance drops below the tolerance <span class="math inline">\delta</span>.</p>
+<hr />
+</section>
+</section>
+<section id="the-three-tool-pipeline" class="level2">
+<h2>10.5 The Three-Tool Pipeline</h2>
+<p>The MRI, sensitivity profiling, and adversarial threshold search are designed to work in sequence. Each tool answers a different question, and the answers from earlier stages inform the design of later stages.</p>
+<section id="stage-1-mri-which-perturbation-types-matter" class="level3">
+<h3>10.5.1 Stage 1: MRI — Which Perturbation Types Matter?</h3>
+<p>The MRI scan is the broadest and cheapest of the three tools. It applies each perturbation type at a fixed, moderate intensity and records the per-type robustness scores. The output is a <span class="math inline">k</span>-dimensional vector <span class="math inline">\mathbf{r} = (r_1, \ldots, r_k)</span> that identifies which perturbation types produce significant degradation.</p>
+<p>The MRI answers: “Where should we look more closely?”</p>
+<p>Perturbation types with high robustness scores (<span class="math inline">r_i &gt; 0.9</span>) can be safely deprioritized — the model is effectively invariant under these transformations. These are the preserved gauge symmetries of Chapter 8: evaluation order (T4: 0.867–1.000), gender swap (T2: no significant displacement). Perturbation types with low robustness scores require further investigation.</p>
+</section>
+<section id="stage-2-sensitivity-profile-where-in-the-output-space-does-it-hurt" class="level3">
+<h3>10.5.2 Stage 2: Sensitivity Profile — Where in the Output Space Does It Hurt?</h3>
+<p>For each perturbation type flagged by the MRI, sensitivity profiling disaggregates the degradation across output dimensions. This stage answers: “Is the fragility concentrated or distributed?”</p>
+<p>A concentrated fragility — high sensitivity in one or two output dimensions, low sensitivity elsewhere — suggests a specific mechanism. For example, Claude’s attention profile shows concentrated fragility in the divided-attention dimension (A4: 0.571) with strength elsewhere. The mechanism is resource allocation, not general processing failure.</p>
+<p>A distributed fragility — high sensitivity across many output dimensions simultaneously — suggests a more fundamental problem. The selective-attention SNR (1.22–1.38 across all models) is a distributed fragility: the heuristic field’s inability to discriminate relevant from irrelevant features affects all downstream assessments.</p>
+</section>
+<section id="stage-3-threshold-search-where-does-it-break" class="level3">
+<h3>10.5.3 Stage 3: Threshold Search — Where Does It Break?</h3>
+<p>For each (perturbation type, output dimension) pair identified as fragile by the sensitivity profile, adversarial threshold search identifies the critical intensity <span class="math inline">\epsilon^*</span> at which performance degrades below tolerance. This stage answers: “How much room do we have before failure?”</p>
+<p>A high threshold means the model can tolerate substantial perturbation before breaking — a wide margin of safety. A low threshold means even mild perturbation triggers degradation — a narrow margin. The threshold profile, collected across all fragile dimensions, defines the <em>robustness boundary</em>: the surface in perturbation space that separates the region of reliable reasoning from the region of degraded or broken reasoning.</p>
+</section>
+<section id="the-pipeline-as-a-funnel" class="level3">
+<h3>10.5.4 The Pipeline as a Funnel</h3>
+<p>The three stages form a funnel that progressively narrows the space of concern:</p>
+<ol type="1">
+<li><strong>MRI</strong> scans all <span class="math inline">k</span> perturbation types and identifies <span class="math inline">k&#39; &lt; k</span> that matter.</li>
+<li><strong>Sensitivity profiling</strong> examines <span class="math inline">k&#39; \times d</span> (perturbation, dimension) pairs and identifies <span class="math inline">m &lt; k&#39; \times d</span> that are fragile.</li>
+<li><strong>Threshold search</strong> performs intensive binary search on <span class="math inline">m</span> fragile pairs.</li>
 </ol>
-<ol class="book-list">
-<li><strong>Binary search.</strong> Set <em class="math">\epsilon_{\text{low}} = 0</em>, <em class="math">\epsilon_{\text{high}} = \epsilon_{\max}</em>. Evaluate <em class="math">P(\epsilon_{\text{mid}})</em>. If <em class="math">P(\epsilon_{\text{mid}}) &gt; P(0) - \delta</em>, the threshold is above <em class="math">\epsilon_{\text{mid}}</em>; set <em class="math">\epsilon_{\text{low}} = \epsilon_{\text{mid}}</em>. Otherwise, set <em class="math">\epsilon_{\text{high}} = \epsilon_{\text{mid}}</em>. Repeat until <em class="math">\epsilon_{\text{high}} - \epsilon_{\text{low}} &lt; \eta</em> for desired resolution <em class="math">\eta</em>.</li>
-</ol>
-<ol class="book-list">
-<li><strong>Report the threshold</strong> <em class="math">\epsilon^* \approx (\epsilon_{\text{low}} + \epsilon_{\text{high}}) / 2</em>.</li>
-</ol>
-<p class="body-text">This procedure, applied along each perturbation axis independently, produces a vector of thresholds <em class="math">(\epsilon*_1, \epsilon*_2, \ldots, \epsilon*_k)</em> --- the threshold profile^*. The threshold profile is the boundary of the robustness surface: the contour in perturbation space at which performance drops below the tolerance <em class="math">\delta</em>.</p>
-<h2 id="105-the-three-tool-pipeline" class="section-heading">10.5 The Three-Tool Pipeline</h2>
-<p class="first-paragraph">The MRI, sensitivity profiling, and adversarial threshold search are designed to work in sequence. Each tool answers a different question, and the answers from earlier stages inform the design of later stages.</p>
-<h3 id="1051-stage-1-mri-which-perturbation-types-matter" class="subsection-heading">10.5.1 Stage 1: MRI --- Which Perturbation Types Matter?</h3>
-<p class="first-paragraph">The MRI scan is the broadest and cheapest of the three tools. It applies each perturbation type at a fixed, moderate intensity and records the per-type robustness scores. The output is a <em class="math">k</em>-dimensional vector <em class="math">\mathbf{r} = (r_1, \ldots, r_k)</em> that identifies which perturbation types produce significant degradation.</p>
-<p class="body-text">The MRI answers: "Where should we look more closely?"</p>
-<p class="body-text">Perturbation types with high robustness scores (<em class="math">r_i &gt; 0.9</em>) can be safely deprioritized --- the model is effectively invariant under these transformations. These are the preserved gauge symmetries of Chapter 8: evaluation order (T4: 0.867--1.000), gender swap (T2: no significant displacement). Perturbation types with low robustness scores require further investigation.</p>
-<h3 id="1052-stage-2-sensitivity-profile-where-in-the-output-space-does-it-hurt" class="subsection-heading">10.5.2 Stage 2: Sensitivity Profile --- Where in the Output Space Does It Hurt?</h3>
-<p class="first-paragraph">For each perturbation type flagged by the MRI, sensitivity profiling disaggregates the degradation across output dimensions. This stage answers: "Is the fragility concentrated or distributed?"</p>
-<p class="body-text">A concentrated fragility --- high sensitivity in one or two output dimensions, low sensitivity elsewhere --- suggests a specific mechanism. For example, Claude's attention profile shows concentrated fragility in the divided-attention dimension (A4: 0.571) with strength elsewhere. The mechanism is resource allocation, not general processing failure.</p>
-<p class="body-text">A distributed fragility --- high sensitivity across many output dimensions simultaneously --- suggests a more fundamental problem. The selective-attention SNR (1.22--1.38 across all models) is a distributed fragility: the heuristic field's inability to discriminate relevant from irrelevant features affects all downstream assessments.</p>
-<h3 id="1053-stage-3-threshold-search-where-does-it-break" class="subsection-heading">10.5.3 Stage 3: Threshold Search --- Where Does It Break?</h3>
-<p class="first-paragraph">For each (perturbation type, output dimension) pair identified as fragile by the sensitivity profile, adversarial threshold search identifies the critical intensity <em class="math">\epsilon^*</em> at which performance degrades below tolerance. This stage answers: "How much room do we have before failure?"</p>
-<p class="body-text">A high threshold means the model can tolerate substantial perturbation before breaking --- a wide margin of safety. A low threshold means even mild perturbation triggers degradation --- a narrow margin. The threshold profile, collected across all fragile dimensions, defines the robustness boundary: the surface in perturbation space that separates the region of reliable reasoning from the region of degraded or broken reasoning.</p>
-<h3 id="1054-the-pipeline-as-a-funnel" class="subsection-heading">10.5.4 The Pipeline as a Funnel</h3>
-<p class="first-paragraph">The three stages form a funnel that progressively narrows the space of concern:</p>
-<ol class="book-list">
-<li><strong>MRI</strong> scans all <em class="math">k</em> perturbation types and identifies <em class="math">k' &lt; k</em> that matter.</li>
-<li><strong>Sensitivity profiling</strong> examines <em class="math">k' \times d</em> (perturbation, dimension) pairs and identifies <em class="math">m &lt; k' \times d</em> that are fragile.</li>
-<li><strong>Threshold search</strong> performs intensive binary search on <em class="math">m</em> fragile pairs.</li>
-</ol>
-<p class="body-text">This funnel structure makes the pipeline computationally tractable even when the perturbation space is large. The expensive operation (threshold search, requiring many evaluations at different intensity levels) is applied only to the small set of (perturbation, dimension) pairs that survived the cheaper screening stages. The total cost scales as <em class="math">O(k + k' \cdot d + m \cdot \log(1/\eta))</em>, where <em class="math">\eta</em> is the desired threshold resolution, rather than the naive <em class="math">O(k \cdot d \cdot \log(1/\eta))</em> that would result from applying threshold search to every pair.</p>
-<h2 id="106-robustness-profiles-from-the-measuring-agi-suite" class="section-heading">10.6 Robustness Profiles from the Measuring AGI Suite</h2>
-<p class="first-paragraph">We now apply the framework to the empirical data from the five-track benchmark suite. The full composite scores across four tracks and five models provide a coarse but informative first pass at the robustness surface.</p>
-<h3 id="1061-the-composite-score-landscape" class="subsection-heading">10.6.1 The Composite Score Landscape</h3>
-<p class="first-paragraph"><strong>Table 10.1.</strong> Track composites across five models. Higher is better.</p>
-<div class="table-wrapper"><table class="book-table">
+<p>This funnel structure makes the pipeline computationally tractable even when the perturbation space is large. The expensive operation (threshold search, requiring many evaluations at different intensity levels) is applied only to the small set of (perturbation, dimension) pairs that survived the cheaper screening stages. The total cost scales as <span class="math inline">O(k + k&#39; \cdot d + m \cdot \log(1/\eta))</span>, where <span class="math inline">\eta</span> is the desired threshold resolution, rather than the naive <span class="math inline">O(k \cdot d \cdot \log(1/\eta))</span> that would result from applying threshold search to every pair.</p>
+<hr />
+</section>
+</section>
+<section id="robustness-profiles-from-the-measuring-agi-suite" class="level2">
+<h2>10.6 Robustness Profiles from the Measuring AGI Suite</h2>
+<p>We now apply the framework to the empirical data from the five-track benchmark suite. The full composite scores across four tracks and five models provide a coarse but informative first pass at the robustness surface.</p>
+<section id="the-composite-score-landscape" class="level3">
+<h3>10.6.1 The Composite Score Landscape</h3>
+<p><strong>Table 10.1.</strong> Track composites across five models. Higher is better.</p>
+<table>
+<thead>
 <tr>
-  <th>Track</th>
-  <th>Flash 2.0</th>
-  <th>Flash 2.5</th>
-  <th>Flash 3</th>
-  <th>Pro</th>
-  <th>Claude</th>
+<th>Track</th>
+<th>Flash 2.0</th>
+<th>Flash 2.5</th>
+<th>Flash 3</th>
+<th>Pro</th>
+<th>Claude</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Social Cognition</td>
+<td>0.695</td>
+<td>0.628</td>
+<td>0.734</td>
+<td>0.643</td>
+<td>0.697</td>
 </tr>
 <tr>
-  <td>Social Cognition</td>
-  <td>0.695</td>
-  <td>0.628</td>
-  <td>0.734</td>
-  <td>0.643</td>
-  <td>0.697</td>
+<td>Learning</td>
+<td>0.568</td>
+<td>0.477</td>
+<td>—</td>
+<td>0.488</td>
+<td>—</td>
 </tr>
 <tr>
-  <td>Learning</td>
-  <td>0.568</td>
-  <td>0.477</td>
-  <td>---</td>
-  <td>0.488</td>
-  <td>---</td>
+<td>Attention</td>
+<td>0.666</td>
+<td>0.745</td>
+<td>0.747</td>
+<td>0.776</td>
+<td>0.679</td>
 </tr>
 <tr>
-  <td>Attention</td>
-  <td>0.666</td>
-  <td>0.745</td>
-  <td>0.747</td>
-  <td>0.776</td>
-  <td>0.679</td>
+<td>Executive Functions</td>
+<td>0.622</td>
+<td>0.682</td>
+<td>0.685</td>
+<td>0.695</td>
+<td>0.625</td>
 </tr>
-<tr>
-  <td>Executive Functions</td>
-  <td>0.622</td>
-  <td>0.682</td>
-  <td>0.685</td>
-  <td>0.695</td>
-  <td>0.625</td>
-</tr>
-</table></div>
-<p class="body-text">Each row is a cross-section of the robustness surface along one cognitive track. Each column is a cross-section along one model. The entire table is a discrete approximation of the two-dimensional robustness surface <em class="math">R(\text{model}, \text{track})</em>.</p>
-<p class="body-text">Several structural features are immediately visible.</p>
-<p class="body-text"><strong>[Empirical.]</strong> <strong>No model dominates.</strong> There is no column that is highest in every row. Gemini 2.5 Pro achieves the best Attention composite (0.776) and best Executive Functions composite (0.695) but has only the fourth-best Social Cognition composite (0.643). Flash 3 achieves the best Social Cognition composite (0.734) but does not lead on Attention or Executive Functions. Each model has a different maximum, and no model is Pareto-dominant across tracks.</p>
-<p class="body-text"><strong>Tracks have different ranges.</strong> The Learning track has the widest spread (0.477 to 0.568, a range of 0.091) relative to its mean, while the Executive Functions track has a tighter spread (0.622 to 0.695, a range of 0.073). This is not measurement noise --- it reflects the intrinsic difficulty and discriminative power of each track. Learning probes the most fragile capabilities (sycophancy resistance, error-driven revision), which amplifies between-model differences. Executive Functions probes more uniformly preserved capabilities (task switching), which compresses differences.</p>
-<p class="body-text"><strong>The model-track interaction is non-separable.</strong> The variation across tracks within a model is as large as the variation across models within a track. Flash 2.0 ranges from 0.568 (Learning) to 0.695 (Social Cognition) --- a within-model range of 0.127. The Social Cognition track ranges from 0.628 (Flash 2.5) to 0.734 (Flash 3) --- a within-track range of 0.106. Neither axis dominates the variation. The robustness surface has genuine two-dimensional structure; it cannot be factored as <em class="math">R(\text{model}, \text{track}) = R_M(\text{model}) \times R_T(\text{track})</em>.</p>
-<h3 id="1062-individual-model-profiles" class="subsection-heading">10.6.2 Individual Model Profiles</h3>
-<p class="first-paragraph">The composite scores are themselves projections that hide subtask-level structure. The full robustness profile requires drilling into the subtask level. Three profiles illustrate the diversity.</p>
-<p class="body-text"><strong>Claude: the invariance specialist.</strong> Claude achieves the best sycophancy resistance (0%), tied-best BIP invariance (T2: 0.958), and strong selective attention (A2: 0.829). Its robustness surface has a high plateau across all single-stream, invariance-testing perturbations. But the surface drops precipitously at divided attention (A4: 0.571) and structural fuzz (T1: 0.400). The robustness boundary along the divided-attention axis is narrow --- even moderate demands for parallel processing push Claude past its threshold. The narrow-channel geometry identified in Chapter 13 (Section 13.7.1) is the robustness surface interpretation of Claude's profile: the channel walls are high (strong invariance) but close together (low bandwidth).</p>
-<p class="body-text"><strong>Gemini 2.5 Pro: the breadth optimizer.</strong> Pro achieves the best attention composite (0.776), the best executive functions composite (0.695), and the best self-monitoring (M3: 0.700). Its robustness surface is moderately elevated across most perturbation types, with no catastrophic valleys. But it has no extreme peaks either: its best individual score is A4 = 1.000 (shared with Flash 3), and its worst is M4 = 0.350 (strategy selection). Pro's robustness boundary is wide but shallow --- it tolerates moderate perturbation across many dimensions but may not survive intense perturbation along any single dimension.</p>
-<p class="body-text"><strong>Gemini 3 Flash: the divided-attention champion.</strong> Flash 3 achieves the best social cognition composite (0.734), perfect divided attention (A4: 1.000), and strong task switching (E4: 0.909). Its robustness surface peaks sharply at parallel-processing capabilities. But its structural fuzz testing is mediocre (T1: 0.600), and its inhibitory control is weak (E3: 0.562). The robustness boundary is narrow along the structural-perturbation and inhibitory-control axes but wide along the divided-attention and social-cognition axes.</p>
-<p class="body-text">These three profiles are geometrically distinct surfaces. They intersect at different points, have different peak locations, and have different boundary shapes. No single ordering captures their relative quality.</p>
-<h2 id="107-the-scalar-irrecoverability-theorem" class="section-heading">10.7 The Scalar Irrecoverability Theorem</h2>
-<p class="first-paragraph">The robustness surface framework makes the Scalar Irrecoverability Theorem (Chapter 13, Section 13.6) geometrically inevitable rather than merely empirically observed.</p>
-<h3 id="1071-the-theorem-in-robustness-surface-terms" class="subsection-heading">10.7.1 The Theorem in Robustness-Surface Terms</h3>
-<p class="first-paragraph">The Scalar Irrecoverability Theorem states that no scalar summary of reasoning performance preserves the geometric structure of the multi-dimensional measurements. In robustness-surface terms, this theorem becomes a statement about the topology of the surface:</p>
-<p class="body-text"><strong>[Conditional Theorem.]</strong> <strong>The robustness surfaces of different models are non-nested.</strong> For any two models <em class="math">A</em> and <em class="math">B</em>, there exist perturbation types <em class="math">\tau_i</em> and <em class="math">\tau_j</em> such that <em class="math">R(A, \tau_i) &gt; R(B, \tau_i)</em> and <em class="math">R(A, \tau_j) &lt; R(B, \tau_j)</em>. The surfaces cross, and no projection onto a single axis can respect the ordering on both sides of the crossing.</p>
-<p class="body-text">The empirical crossings are now vivid:</p>
-<p class="body-text"><strong>Crossing 1: Sycophancy vs. divided attention.</strong> Claude achieves the best sycophancy resistance in the suite (0% flip rate) but the worst divided attention (A4: 0.571). Flash 3 achieves perfect divided attention (A4: 1.000) but mediocre structural-fuzz resistance (T1: 0.600). The robustness surfaces cross: Claude's surface is higher along the sycophancy axis, Flash 3's surface is higher along the divided-attention axis. Any scalar projection <em class="math">\pi</em> must decide which side of the crossing to respect. If <em class="math">\pi</em> weights sycophancy heavily, Claude ranks above Flash 3; if <em class="math">\pi</em> weights divided attention, Flash 3 ranks above Claude. There is no weighting that respects both.</p>
-<p class="body-text"><strong>Crossing 2: Self-monitoring vs. strategy selection.</strong> Pro achieves M3 = 0.700 (self-monitoring) but M4 = 0.350 (strategy selection). Flash 2.0 achieves M3 = 0.094 but M4 = 0.723. The robustness surfaces cross along the metacognitive axes with a crossing angle that is nearly perpendicular --- Pro is 7.4 times better on one axis, Flash is 2.1 times better on the other. The crossing is not a marginal numerical fluctuation; it is a qualitative difference in metacognitive architecture.</p>
-<p class="body-text"><strong>Crossing 3: Attention composite vs. learning composite.</strong> Pro achieves the best attention composite (0.776) but a moderate learning composite (0.488). Flash 2.0 achieves the worst attention composite (0.666) but the best learning composite (0.568). The surfaces cross between the attention and learning tracks: the model that is best at filtering distractors is not the best at updating beliefs.</p>
-<h3 id="1072-why-crossings-are-structural" class="subsection-heading">10.7.2 Why Crossings Are Structural</h3>
-<p class="first-paragraph">These crossings are not accidental. They arise because the capabilities being measured are geometrically independent --- they correspond to different dimensions of the reasoning manifold, supported by different components of the model architecture, and optimized under different training pressures.</p>
-<p class="body-text">Sycophancy resistance is a property of the objective function: whether the search optimizes for truth or for approval. Divided attention is a property of the resource allocation: whether the processing pipeline can be parallelized. These are unrelated architectural properties, and there is no reason to expect them to be correlated, let alone monotonically related.</p>
-<p class="body-text">The Scalar Irrecoverability Theorem follows from this independence: when the dimensions are independent, the performance profiles of different models generically lie on the Pareto frontier (no model dominates any other), and projecting a Pareto frontier onto a line always reverses some pairwise orderings. The theorem is not a surprising discovery. It is the expected consequence of measuring genuinely multi-dimensional structure with enough resolution to see the dimensions.</p>
-<h3 id="1073-implications-for-robustness-assessment" class="subsection-heading">10.7.3 Implications for Robustness Assessment</h3>
-<p class="first-paragraph">The theorem implies that the question "which model is most robust?" is ill-posed. It has no answer, because robustness is not a scalar property. The well-posed questions are:</p>
-<ul class="book-list">
-<li>"Which model is most robust along perturbation axis <em class="math">\tau_i</em>?" This has a definite answer for each axis.</li>
-<li>"Which model is most robust for application <em class="math">A</em> with demand profile <em class="math">\mathbf{w}</em>?" This has a definite answer for each demand profile.</li>
-<li>"Where is each model's robustness boundary?" This has a definite answer --- it is the threshold profile <em class="math">(\epsilon*_1, \ldots, \epsilon*_k)</em>.</li>
+</tbody>
+</table>
+<p>Each row is a cross-section of the robustness surface along one cognitive track. Each column is a cross-section along one model. The entire table is a discrete approximation of the two-dimensional robustness surface <span class="math inline">R(\text{model}, \text{track})</span>.</p>
+<p>Several structural features are immediately visible.</p>
+<p><strong>[Empirical.]</strong> <strong>No model dominates.</strong> There is no column that is highest in every row. Gemini 2.5 Pro achieves the best Attention composite (0.776) and best Executive Functions composite (0.695) but has only the fourth-best Social Cognition composite (0.643). Flash 3 achieves the best Social Cognition composite (0.734) but does not lead on Attention or Executive Functions. Each model has a different maximum, and no model is Pareto-dominant across tracks.</p>
+<p><strong>Tracks have different ranges.</strong> The Learning track has the widest spread (0.477 to 0.568, a range of 0.091) relative to its mean, while the Executive Functions track has a tighter spread (0.622 to 0.695, a range of 0.073). This is not measurement noise — it reflects the intrinsic difficulty and discriminative power of each track. Learning probes the most fragile capabilities (sycophancy resistance, error-driven revision), which amplifies between-model differences. Executive Functions probes more uniformly preserved capabilities (task switching), which compresses differences.</p>
+<p><strong>The model-track interaction is non-separable.</strong> The variation across tracks within a model is as large as the variation across models within a track. Flash 2.0 ranges from 0.568 (Learning) to 0.695 (Social Cognition) — a within-model range of 0.127. The Social Cognition track ranges from 0.628 (Flash 2.5) to 0.734 (Flash 3) — a within-track range of 0.106. Neither axis dominates the variation. The robustness surface has genuine two-dimensional structure; it cannot be factored as <span class="math inline">R(\text{model}, \text{track}) = R_M(\text{model}) \times R_T(\text{track})</span>.</p>
+</section>
+<section id="individual-model-profiles" class="level3">
+<h3>10.6.2 Individual Model Profiles</h3>
+<p>The composite scores are themselves projections that hide subtask-level structure. The full robustness profile requires drilling into the subtask level. Three profiles illustrate the diversity.</p>
+<p><strong>Claude: the invariance specialist.</strong> Claude achieves the best sycophancy resistance (0%), tied-best BIP invariance (T2: 0.958), and strong selective attention (A2: 0.829). Its robustness surface has a high plateau across all single-stream, invariance-testing perturbations. But the surface drops precipitously at divided attention (A4: 0.571) and structural fuzz (T1: 0.400). The robustness boundary along the divided-attention axis is narrow — even moderate demands for parallel processing push Claude past its threshold. The narrow-channel geometry identified in Chapter 13 (Section 13.7.1) is the robustness surface interpretation of Claude’s profile: the channel walls are high (strong invariance) but close together (low bandwidth).</p>
+<p><strong>Gemini 2.5 Pro: the breadth optimizer.</strong> Pro achieves the best attention composite (0.776), the best executive functions composite (0.695), and the best self-monitoring (M3: 0.700). Its robustness surface is moderately elevated across most perturbation types, with no catastrophic valleys. But it has no extreme peaks either: its best individual score is A4 = 1.000 (shared with Flash 3), and its worst is M4 = 0.350 (strategy selection). Pro’s robustness boundary is wide but shallow — it tolerates moderate perturbation across many dimensions but may not survive intense perturbation along any single dimension.</p>
+<p><strong>Gemini 3 Flash: the divided-attention champion.</strong> Flash 3 achieves the best social cognition composite (0.734), perfect divided attention (A4: 1.000), and strong task switching (E4: 0.909). Its robustness surface peaks sharply at parallel-processing capabilities. But its structural fuzz testing is mediocre (T1: 0.600), and its inhibitory control is weak (E3: 0.562). The robustness boundary is narrow along the structural-perturbation and inhibitory-control axes but wide along the divided-attention and social-cognition axes.</p>
+<p>These three profiles are geometrically distinct surfaces. They intersect at different points, have different peak locations, and have different boundary shapes. No single ordering captures their relative quality.</p>
+<hr />
+</section>
+</section>
+<section id="the-scalar-irrecoverability-theorem" class="level2">
+<h2>10.7 The Scalar Irrecoverability Theorem</h2>
+<p>The robustness surface framework makes the Scalar Irrecoverability Theorem (Chapter 13, Section 13.6) geometrically inevitable rather than merely empirically observed.</p>
+<section id="the-theorem-in-robustness-surface-terms" class="level3">
+<h3>10.7.1 The Theorem in Robustness-Surface Terms</h3>
+<p>The Scalar Irrecoverability Theorem states that no scalar summary of reasoning performance preserves the geometric structure of the multi-dimensional measurements. In robustness-surface terms, this theorem becomes a statement about the topology of the surface:</p>
+<p><strong>[Conditional Theorem.]</strong> <strong>The robustness surfaces of different models are non-nested.</strong> For any two models <span class="math inline">A</span> and <span class="math inline">B</span>, there exist perturbation types <span class="math inline">\tau_i</span> and <span class="math inline">\tau_j</span> such that <span class="math inline">R(A, \tau_i) &gt; R(B, \tau_i)</span> and <span class="math inline">R(A, \tau_j) &lt; R(B, \tau_j)</span>. The surfaces cross, and no projection onto a single axis can respect the ordering on both sides of the crossing.</p>
+<p>The empirical crossings are now vivid:</p>
+<p><strong>Crossing 1: Sycophancy vs. divided attention.</strong> Claude achieves the best sycophancy resistance in the suite (0% flip rate) but the worst divided attention (A4: 0.571). Flash 3 achieves perfect divided attention (A4: 1.000) but mediocre structural-fuzz resistance (T1: 0.600). The robustness surfaces cross: Claude’s surface is higher along the sycophancy axis, Flash 3’s surface is higher along the divided-attention axis. Any scalar projection <span class="math inline">\pi</span> must decide which side of the crossing to respect. If <span class="math inline">\pi</span> weights sycophancy heavily, Claude ranks above Flash 3; if <span class="math inline">\pi</span> weights divided attention, Flash 3 ranks above Claude. There is no weighting that respects both.</p>
+<p><strong>Crossing 2: Self-monitoring vs. strategy selection.</strong> Pro achieves M3 = 0.700 (self-monitoring) but M4 = 0.350 (strategy selection). Flash 2.0 achieves M3 = 0.094 but M4 = 0.723. The robustness surfaces cross along the metacognitive axes with a crossing angle that is nearly perpendicular — Pro is 7.4 times better on one axis, Flash is 2.1 times better on the other. The crossing is not a marginal numerical fluctuation; it is a qualitative difference in metacognitive architecture.</p>
+<p><strong>Crossing 3: Attention composite vs. learning composite.</strong> Pro achieves the best attention composite (0.776) but a moderate learning composite (0.488). Flash 2.0 achieves the worst attention composite (0.666) but the best learning composite (0.568). The surfaces cross between the attention and learning tracks: the model that is best at filtering distractors is not the best at updating beliefs.</p>
+</section>
+<section id="why-crossings-are-structural" class="level3">
+<h3>10.7.2 Why Crossings Are Structural</h3>
+<p>These crossings are not accidental. They arise because the capabilities being measured are <em>geometrically independent</em> — they correspond to different dimensions of the reasoning manifold, supported by different components of the model architecture, and optimized under different training pressures.</p>
+<p>Sycophancy resistance is a property of the objective function: whether the search optimizes for truth or for approval. Divided attention is a property of the resource allocation: whether the processing pipeline can be parallelized. These are unrelated architectural properties, and there is no reason to expect them to be correlated, let alone monotonically related.</p>
+<p>The Scalar Irrecoverability Theorem follows from this independence: when the dimensions are independent, the performance profiles of different models generically lie on the Pareto frontier (no model dominates any other), and projecting a Pareto frontier onto a line always reverses some pairwise orderings. The theorem is not a surprising discovery. It is the expected consequence of measuring genuinely multi-dimensional structure with enough resolution to see the dimensions.</p>
+</section>
+<section id="implications-for-robustness-assessment" class="level3">
+<h3>10.7.3 Implications for Robustness Assessment</h3>
+<p>The theorem implies that the question “which model is most robust?” is <em>ill-posed</em>. It has no answer, because robustness is not a scalar property. The well-posed questions are:</p>
+<ul>
+<li>“Which model is most robust <em>along perturbation axis <span class="math inline">\tau_i</span></em>?” This has a definite answer for each axis.</li>
+<li>“Which model is most robust <em>for application <span class="math inline">A</span> with demand profile <span class="math inline">\mathbf{w}</span></em>?” This has a definite answer for each demand profile.</li>
+<li>“Where is each model’s robustness boundary?” This has a definite answer — it is the threshold profile <span class="math inline">(\epsilon^*_1, \ldots, \epsilon^*_k)</span>.</li>
 </ul>
-<p class="body-text">The robustness surface is the object that answers all three questions simultaneously. Any scalar reduction of the surface answers at most one of them.</p>
-<h2 id="108-universal-fragilities-and-model-specific-strengths" class="section-heading">10.8 Universal Fragilities and Model-Specific Strengths</h2>
-<p class="first-paragraph">The robustness surface decomposes into two qualitatively different components: universal fragilities that appear in every model, and model-specific features that differentiate models from each other. This decomposition has both theoretical significance (it constrains hypotheses about what causes fragility) and practical significance (it determines which improvements require architectural innovation versus targeted training).</p>
-<h3 id="1081-universal-fragilities" class="subsection-heading">10.8.1 Universal Fragilities</h3>
-<p class="first-paragraph"><strong>[Empirical.]</strong> Three fragilities appear across all five models with striking consistency.</p>
-<p class="body-text"><strong>The selective-attention SNR deficit.</strong> The signal-to-noise ratio for selective attention --- the model's ability to discriminate morally relevant from morally irrelevant dimensions --- ranges from 1.22 to 1.38 across all five models. On a scale where 1.0 means no discrimination and higher is better, these values indicate that every model is barely better than chance at distinguishing signal from noise in the dimensional structure of moral scenarios.</p>
-<p class="body-text">The range of 0.16 (from 1.22 to 1.38) is narrow relative to the absolute deficit (approximately 0.22 to 0.38 above chance). The between-model variation explains only about 30% of the total deficit; the remaining 70% is shared across models. This shared deficit suggests a cause that transcends specific model architectures and training procedures --- plausibly the structure of the training data itself, which may not provide sufficient supervision for fine-grained dimensional discrimination, or the attention mechanism, which may lack the architectural capacity for the kind of feature-level filtering that high SNR would require.</p>
-<p class="body-text">On the robustness surface, the selective-attention SNR appears as a floor: a region of the surface that is uniformly low regardless of which model is being evaluated. The floor constrains all models, and no amount of model-specific training has lifted any model significantly above it.</p>
-<p class="body-text"><strong>The ~38% recovery ceiling.</strong> As documented in Chapter 9, Section 9.7, prompt-level metacognitive interventions recover approximately 38% of the displacement caused by heuristic corruption, across both the emotional anchoring (E2) and distractor resistance (A1) benchmarks, across all five models. The ceiling is set by the metacognitive control loop: the product of detection probability, correction probability, and navigation probability converges to approximately one-third regardless of which component is the bottleneck.</p>
-<p class="body-text">On the robustness surface, the recovery ceiling appears as a boundary: once a perturbation pushes performance below 62% of baseline, no prompt-level intervention can restore it to baseline. The robustness boundary at any point where the model's threshold has been exceeded is approximately <em class="math">0.62 \times P(0)</em> rather than <em class="math">P(0)</em> itself. The model can recover partially, but not fully, from any corruption severe enough to trigger the nonlinear regime.</p>
-<p class="body-text"><strong>Overconfidence.</strong> The 9.3<em class="math">\sigma</em> combined calibration gap (Chapter 9, Section 9.2) is universal: every model is overconfident, every model's ECE is significantly above zero, and every model's overconfidence is in the same direction. This universal overconfidence sets a baseline fragility for all downstream reasoning, because an overconfident system prematurely terminates its search (Chapter 7) and cannot accurately detect gauge violations (Chapter 9, Section 9.8).</p>
-<p class="body-text">On the robustness surface, overconfidence appears as a tilt: the entire surface is shifted downward (toward lower robustness) by the systematic underestimation of cost-to-go. The system believes it is more robust than it actually is, which means its self-assessed robustness surface is an inflated version of its actual robustness surface. The gap between the two --- the overconfidence-induced robustness illusion --- is itself a fragility, because it prevents the system from seeking the additional evidence or reasoning effort that would improve its actual robustness.</p>
-<h3 id="1082-model-specific-strengths" class="subsection-heading">10.8.2 Model-Specific Strengths</h3>
-<p class="first-paragraph">Against this backdrop of universal fragility, each model has specific regions of the robustness surface where it excels.</p>
-<p class="body-text"><strong>[Empirical.]</strong> <strong>Claude's sycophancy immunity.</strong> Claude's 0% sycophancy rate is the single most extreme result in the entire benchmark suite. It means that the social-pressure perturbation axis has <em class="math">\epsilon^* = \infty</em> for Claude --- no amount of social pressure (within the experimental range) redirects Claude's search trajectory. This is a spike on the robustness surface: an infinitely high ridge along the social-pressure axis. The ridge is plausibly the result of specific alignment training (RLHF, Constitutional AI) that has hardened the objective function against social-pressure deformation. The mechanism is objective-level, not heuristic-level: Claude's heuristic field may be influenced by social cues (its sensitivity to emotional anchoring, E2: 0.492, suggests it is), but its search objective is not redirected by them.</p>
-<p class="body-text"><strong>Flash 3's parallel-processing capacity.</strong> Flash 3's perfect divided attention (A4: 1.000) indicates that its processing pipeline can be fully parallelized without degradation. On the robustness surface, this is a plateau at maximum height along the divided-attention axis --- the threshold <em class="math">\epsilon^*_{\text{divide}}</em> is above any intensity tested. The contrast with Claude (A4: 0.571) is the sharpest model-specific divergence on the surface.</p>
-<p class="body-text"><strong>Pro's calibration advantage.</strong> Pro achieves the best calibration (ECE = 0.230) and best self-monitoring (M3: 0.700) of any model in the suite. While these are not perfect, they represent a significant elevation of the metacognitive region of the robustness surface relative to other models. Pro's robustness surface is higher in the metacognitive region because it has a more accurate map of its own position on the manifold, which enables better detection of perturbation-induced displacement.</p>
-<p class="body-text"><strong>Flash 2.0's trajectory maintenance under evidence.</strong> Flash 2.0 achieves the best learning composite (0.568) and the best effort scaling (M4: 0.723). Its robustness surface is elevated along the learning and strategy-selection axes. Flash 2.0 responds appropriately to evidential signals and scales its processing depth to match task difficulty --- capabilities that correspond to a heuristic field with good responsiveness to genuine information content, even though its self-monitoring (M3: 0.094) means it cannot detect when this responsiveness goes wrong.</p>
-<h3 id="1083-the-architecture-of-robustness" class="subsection-heading">10.8.3 The Architecture of Robustness</h3>
-<p class="first-paragraph">The pattern of universal fragilities and model-specific strengths suggests a layered architecture of robustness:</p>
-<ul class="book-list">
-<li><strong>Layer 1 (Architecture-determined):</strong> Universal fragilities set by the shared transformer architecture and training paradigm. The selective-attention SNR floor, the overconfidence baseline, and the ~38% recovery ceiling are all architecture-level constraints. To improve these, one must change the architecture or the training paradigm, not just the specific training data or alignment procedure.</li>
+<p>The robustness surface is the object that answers all three questions simultaneously. Any scalar reduction of the surface answers at most one of them.</p>
+<hr />
+</section>
+</section>
+<section id="universal-fragilities-and-model-specific-strengths" class="level2">
+<h2>10.8 Universal Fragilities and Model-Specific Strengths</h2>
+<p>The robustness surface decomposes into two qualitatively different components: universal fragilities that appear in every model, and model-specific features that differentiate models from each other. This decomposition has both theoretical significance (it constrains hypotheses about what causes fragility) and practical significance (it determines which improvements require architectural innovation versus targeted training).</p>
+<section id="universal-fragilities" class="level3">
+<h3>10.8.1 Universal Fragilities</h3>
+<p><strong>[Empirical.]</strong> Three fragilities appear across all five models with striking consistency.</p>
+<p><strong>The selective-attention SNR deficit.</strong> The signal-to-noise ratio for selective attention — the model’s ability to discriminate morally relevant from morally irrelevant dimensions — ranges from 1.22 to 1.38 across all five models. On a scale where 1.0 means no discrimination and higher is better, these values indicate that every model is barely better than chance at distinguishing signal from noise in the dimensional structure of moral scenarios.</p>
+<p>The range of 0.16 (from 1.22 to 1.38) is narrow relative to the absolute deficit (approximately 0.22 to 0.38 above chance). The between-model variation explains only about 30% of the total deficit; the remaining 70% is shared across models. This shared deficit suggests a cause that transcends specific model architectures and training procedures — plausibly the structure of the training data itself, which may not provide sufficient supervision for fine-grained dimensional discrimination, or the attention mechanism, which may lack the architectural capacity for the kind of feature-level filtering that high SNR would require.</p>
+<p>On the robustness surface, the selective-attention SNR appears as a <em>floor</em>: a region of the surface that is uniformly low regardless of which model is being evaluated. The floor constrains all models, and no amount of model-specific training has lifted any model significantly above it.</p>
+<p><strong>The ~38% recovery ceiling.</strong> As documented in Chapter 9, Section 9.7, prompt-level metacognitive interventions recover approximately 38% of the displacement caused by heuristic corruption, across both the emotional anchoring (E2) and distractor resistance (A1) benchmarks, across all five models. The ceiling is set by the metacognitive control loop: the product of detection probability, correction probability, and navigation probability converges to approximately one-third regardless of which component is the bottleneck.</p>
+<p>On the robustness surface, the recovery ceiling appears as a <em>boundary</em>: once a perturbation pushes performance below 62% of baseline, no prompt-level intervention can restore it to baseline. The robustness boundary at any point where the model’s threshold has been exceeded is approximately <span class="math inline">0.62 \times P(0)</span> rather than <span class="math inline">P(0)</span> itself. The model can recover partially, but not fully, from any corruption severe enough to trigger the nonlinear regime.</p>
+<p><strong>Overconfidence.</strong> The 9.3<span class="math inline">\sigma</span> combined calibration gap (Chapter 9, Section 9.2) is universal: every model is overconfident, every model’s ECE is significantly above zero, and every model’s overconfidence is in the same direction. This universal overconfidence sets a baseline fragility for all downstream reasoning, because an overconfident system prematurely terminates its search (Chapter 7) and cannot accurately detect gauge violations (Chapter 9, Section 9.8).</p>
+<p>On the robustness surface, overconfidence appears as a <em>tilt</em>: the entire surface is shifted downward (toward lower robustness) by the systematic underestimation of cost-to-go. The system believes it is more robust than it actually is, which means its self-assessed robustness surface is an inflated version of its actual robustness surface. The gap between the two — the overconfidence-induced robustness illusion — is itself a fragility, because it prevents the system from seeking the additional evidence or reasoning effort that would improve its actual robustness.</p>
+</section>
+<section id="model-specific-strengths" class="level3">
+<h3>10.8.2 Model-Specific Strengths</h3>
+<p>Against this backdrop of universal fragility, each model has specific regions of the robustness surface where it excels.</p>
+<p><strong>[Empirical.]</strong> <strong>Claude’s sycophancy immunity.</strong> Claude’s 0% sycophancy rate is the single most extreme result in the entire benchmark suite. It means that the social-pressure perturbation axis has <span class="math inline">\epsilon^* = \infty</span> for Claude — no amount of social pressure (within the experimental range) redirects Claude’s search trajectory. This is a spike on the robustness surface: an infinitely high ridge along the social-pressure axis. The ridge is plausibly the result of specific alignment training (RLHF, Constitutional AI) that has hardened the objective function against social-pressure deformation. The mechanism is objective-level, not heuristic-level: Claude’s heuristic field may be influenced by social cues (its sensitivity to emotional anchoring, E2: 0.492, suggests it is), but its search objective is not redirected by them.</p>
+<p><strong>Flash 3’s parallel-processing capacity.</strong> Flash 3’s perfect divided attention (A4: 1.000) indicates that its processing pipeline can be fully parallelized without degradation. On the robustness surface, this is a plateau at maximum height along the divided-attention axis — the threshold <span class="math inline">\epsilon^*_{\text{divide}}</span> is above any intensity tested. The contrast with Claude (A4: 0.571) is the sharpest model-specific divergence on the surface.</p>
+<p><strong>Pro’s calibration advantage.</strong> Pro achieves the best calibration (ECE = 0.230) and best self-monitoring (M3: 0.700) of any model in the suite. While these are not perfect, they represent a significant elevation of the metacognitive region of the robustness surface relative to other models. Pro’s robustness surface is higher in the metacognitive region because it has a more accurate map of its own position on the manifold, which enables better detection of perturbation-induced displacement.</p>
+<p><strong>Flash 2.0’s trajectory maintenance under evidence.</strong> Flash 2.0 achieves the best learning composite (0.568) and the best effort scaling (M4: 0.723). Its robustness surface is elevated along the learning and strategy-selection axes. Flash 2.0 responds appropriately to evidential signals and scales its processing depth to match task difficulty — capabilities that correspond to a heuristic field with good responsiveness to genuine information content, even though its self-monitoring (M3: 0.094) means it cannot detect when this responsiveness goes wrong.</p>
+</section>
+<section id="the-architecture-of-robustness" class="level3">
+<h3>10.8.3 The Architecture of Robustness</h3>
+<p>The pattern of universal fragilities and model-specific strengths suggests a <em>layered architecture of robustness</em>:</p>
+<ul>
+<li><p><strong>Layer 1 (Architecture-determined):</strong> Universal fragilities set by the shared transformer architecture and training paradigm. The selective-attention SNR floor, the overconfidence baseline, and the ~38% recovery ceiling are all architecture-level constraints. To improve these, one must change the architecture or the training paradigm, not just the specific training data or alignment procedure.</p></li>
+<li><p><strong>Layer 2 (Training-determined):</strong> Model-specific strengths and weaknesses set by the specific training data, objective function, and alignment interventions. Claude’s sycophancy immunity, Flash 3’s parallel processing, Pro’s calibration advantage — these are all training-level features that differentiate models within the shared architecture.</p></li>
+<li><p><strong>Layer 3 (Deployment-determined):</strong> Context-specific robustness set by the prompt, the system message, and the interaction protocol. The ~38% recovery ceiling is the upper bound of this layer: prompt-level interventions can recover at most 38% of corruption-induced displacement.</p></li>
 </ul>
-<ul class="book-list">
-<li><strong>Layer 2 (Training-determined):</strong> Model-specific strengths and weaknesses set by the specific training data, objective function, and alignment interventions. Claude's sycophancy immunity, Flash 3's parallel processing, Pro's calibration advantage --- these are all training-level features that differentiate models within the shared architecture.</li>
+<p><strong>[Modeling Axiom.]</strong> The robustness surface at any given point is the product of these three layers:</p>
+<p><span class="math display">R(\text{model}, \tau, \epsilon) = R_{\text{arch}}(\tau) \times R_{\text{train}}(\text{model}, \tau) \times R_{\text{deploy}}(\tau, \epsilon)</span></p>
+<p>The architectural layer sets the floor. The training layer creates the model-specific peaks and valleys. The deployment layer provides a modest, bounded capacity for real-time adjustment. Understanding which layer limits robustness at each point on the surface determines which intervention is needed: architectural innovation, training-procedure improvement, or deployment-time prompt engineering.</p>
+</section>
+<section id="connection-to-gauge-invariance" class="level3">
+<h3>10.8.4 Connection to Gauge Invariance</h3>
+<p>The robustness surface provides a concrete realization of the gauge-theoretic framework developed in Chapter 8. The Bond Invariance Principle states that morally and logically equivalent inputs should produce identical outputs. The robustness surface quantifies the degree to which this principle holds along each perturbation direction:</p>
+<ul>
+<li><p><strong>Preserved gauge symmetries</strong> correspond to regions of the robustness surface at or near 1.0. Evaluation order (T4: 0.867–1.000) and demographic invariance (T2: no significant displacement) are gauge symmetries that are effectively preserved. On the robustness surface, these directions have high ridges — the model’s performance does not degrade under these transformations at any tested intensity.</p></li>
+<li><p><strong>Broken gauge symmetries</strong> correspond to regions of the robustness surface significantly below 1.0. Framing (T5: 0.606–0.716), emotional anchoring (E2: 0.492–0.655), and structural perturbation (T1: 0.400–0.600) are gauge symmetries that are broken. On the robustness surface, these directions have valleys — the model’s performance degrades even at moderate perturbation intensity.</p></li>
 </ul>
-<ul class="book-list">
-<li><strong>Layer 3 (Deployment-determined):</strong> Context-specific robustness set by the prompt, the system message, and the interaction protocol. The ~38% recovery ceiling is the upper bound of this layer: prompt-level interventions can recover at most 38% of corruption-induced displacement.</li>
+<p>The gauge violation tensor of Chapter 8 is the derivative of the robustness surface at <span class="math inline">\epsilon = 0</span> along the gauge directions:</p>
+<p><span class="math display">G_i = -\left.\frac{\partial R}{\partial \epsilon_i}\right|_{\epsilon = 0}</span></p>
+<p>A positive <span class="math inline">G_i</span> means robustness decreases as perturbation intensity increases along direction <span class="math inline">i</span> — the gauge symmetry is broken. A zero <span class="math inline">G_i</span> means the robustness surface is flat at <span class="math inline">\epsilon = 0</span> along direction <span class="math inline">i</span> — the gauge symmetry is preserved. The gauge violation tensor is the first-order approximation to the robustness surface; the adversarial threshold search provides the full nonlinear characterization.</p>
+</section>
+<section id="forward-to-alignment" class="level3">
+<h3>10.8.5 Forward to Alignment</h3>
+<p>The robustness surface connects directly to the alignment decomposition that Chapter 11 develops. Recall the three-factor decomposition:</p>
+<p><span class="math display">\text{Alignment} = \text{Objective Alignment} \times \text{Heuristic Quality} \times \text{Metacognitive Calibration}</span></p>
+<p>Each factor corresponds to a different region of the robustness surface:</p>
+<ul>
+<li><p><strong>Objective alignment</strong> is measured by the sycophancy axis and the social-pressure threshold. Claude’s infinite threshold along this axis indicates strong objective alignment; Flash 2.5’s 56% sycophancy rate indicates weak objective alignment.</p></li>
+<li><p><strong>Heuristic quality</strong> is measured by the framing, emotional anchoring, and distractor axes. The corruption tensor entries along these directions quantify how easily the heuristic field is deformed by irrelevant features.</p></li>
+<li><p><strong>Metacognitive calibration</strong> is measured by the calibration, self-monitoring, and strategy-selection axes. The values documented in Chapter 9 quantify the accuracy of the system’s self-model.</p></li>
 </ul>
-<p class="body-text"><strong>[Modeling Axiom.]</strong> The robustness surface at any given point is the product of these three layers:</p>
-<p class="body-text"><span class="math-block">R(\text{model}, \tau, \epsilon) = R_{\text{arch}}(\tau) \times R_{\text{train}}(\text{model}, \tau) \times R_{\text{deploy}}(\tau, \epsilon)</span></p>
-<p class="body-text">The architectural layer sets the floor. The training layer creates the model-specific peaks and valleys. The deployment layer provides a modest, bounded capacity for real-time adjustment. Understanding which layer limits robustness at each point on the surface determines which intervention is needed: architectural innovation, training-procedure improvement, or deployment-time prompt engineering.</p>
-<h3 id="1084-connection-to-gauge-invariance" class="subsection-heading">10.8.4 Connection to Gauge Invariance</h3>
-<p class="first-paragraph">The robustness surface provides a concrete realization of the gauge-theoretic framework developed in Chapter 8. The Bond Invariance Principle states that morally and logically equivalent inputs should produce identical outputs. The robustness surface quantifies the degree to which this principle holds along each perturbation direction:</p>
-<ul class="book-list">
-<li><strong>Preserved gauge symmetries</strong> correspond to regions of the robustness surface at or near 1.0. Evaluation order (T4: 0.867--1.000) and demographic invariance (T2: no significant displacement) are gauge symmetries that are effectively preserved. On the robustness surface, these directions have high ridges --- the model's performance does not degrade under these transformations at any tested intensity.</li>
-</ul>
-<ul class="book-list">
-<li><strong>Broken gauge symmetries</strong> correspond to regions of the robustness surface significantly below 1.0. Framing (T5: 0.606--0.716), emotional anchoring (E2: 0.492--0.655), and structural perturbation (T1: 0.400--0.600) are gauge symmetries that are broken. On the robustness surface, these directions have valleys --- the model's performance degrades even at moderate perturbation intensity.</li>
-</ul>
-<p class="body-text">The gauge violation tensor of Chapter 8 is the derivative of the robustness surface at <em class="math">\epsilon = 0</em> along the gauge directions:</p>
-<p class="body-text"><span class="math-block">G_i = -\left.\frac{\partial R}{\partial \epsilon_i}\right|_{\epsilon = 0}</span></p>
-<p class="body-text">A positive <em class="math">G_i</em> means robustness decreases as perturbation intensity increases along direction <em class="math">i</em> --- the gauge symmetry is broken. A zero <em class="math">G_i</em> means the robustness surface is flat at <em class="math">\epsilon = 0</em> along direction <em class="math">i</em> --- the gauge symmetry is preserved. The gauge violation tensor is the first-order approximation to the robustness surface; the adversarial threshold search provides the full nonlinear characterization.</p>
-<h3 id="1085-forward-to-alignment" class="subsection-heading">10.8.5 Forward to Alignment</h3>
-<p class="first-paragraph">The robustness surface connects directly to the alignment decomposition that Chapter 11 develops. Recall the three-factor decomposition:</p>
-<p class="body-text"><span class="math-block">\text{Alignment} = \text{Objective Alignment} \times \text{Heuristic Quality} \times \text{Metacognitive Calibration}</span></p>
-<p class="body-text">Each factor corresponds to a different region of the robustness surface:</p>
-<ul class="book-list">
-<li><strong>Objective alignment</strong> is measured by the sycophancy axis and the social-pressure threshold. Claude's infinite threshold along this axis indicates strong objective alignment; Flash 2.5's 56% sycophancy rate indicates weak objective alignment.</li>
-</ul>
-<ul class="book-list">
-<li><strong>Heuristic quality</strong> is measured by the framing, emotional anchoring, and distractor axes. The corruption tensor entries along these directions quantify how easily the heuristic field is deformed by irrelevant features.</li>
-</ul>
-<ul class="book-list">
-<li><strong>Metacognitive calibration</strong> is measured by the calibration, self-monitoring, and strategy-selection axes. The values documented in Chapter 9 quantify the accuracy of the system's self-model.</li>
-</ul>
-<p class="body-text">The robustness surface is thus the empirical substrate from which the alignment decomposition is computed. Chapter 11 takes the surface as given and asks: which regions of the surface must be elevated, and by how much, to achieve alignment? The answer --- heuristic shaping through symmetry restoration, objective alignment through training-time intervention, and metacognitive calibration through architectural improvement --- emerges directly from the structure of the surface.</p>
-<h2 id="109-summary" class="section-heading">10.9 Summary</h2>
-<p class="first-paragraph">The robustness surface is a multi-dimensional object that maps (model, perturbation type, perturbation intensity) triples to performance values. It captures everything that a scalar robustness score cannot: the anisotropy of vulnerability across perturbation types, the threshold behavior that separates proportional degradation from catastrophic failure, the universal fragilities shared across models, and the model-specific strengths that differentiate one system from another.</p>
-<p class="body-text">The three-tool pipeline --- MRI, sensitivity profiling, adversarial threshold search --- provides a systematic method for constructing the surface. The MRI identifies which perturbation types matter. Sensitivity profiling identifies where in the output space the fragility manifests. Adversarial threshold search identifies the exact magnitude at which reasoning breaks. Applied together, they produce a complete characterization of a model's robustness geometry.</p>
-<p class="body-text">The empirical data from the Measuring AGI suite demonstrate the key structural properties of the robustness surface. The surfaces of different models are non-nested (they cross), confirming the Scalar Irrecoverability Theorem. The surfaces share a common floor of universal fragilities --- the selective-attention SNR deficit (1.22--1.38), the ~38% recovery ceiling, and the 9.3<em class="math">\sigma</em> overconfidence --- while differing in model-specific peaks and valleys that reflect training-level differences. The surfaces connect to gauge invariance (preserved symmetries are high ridges, broken symmetries are low valleys) and forward to alignment (each factor in the alignment decomposition corresponds to a different region of the surface).</p>
-<p class="body-text">The central message of this chapter is geometric: robustness is a surface, not a number. The shape of the surface --- its peaks, valleys, ridges, floors, and boundaries --- is the object that characterizes a model's reasoning quality under perturbation. The question "is this model robust?" has no answer. The question "what does this model's robustness surface look like?" has a precise, measurable, and actionable answer. The three-tool pipeline provides the methodology for obtaining it.</p>
-<h2 id="worked-example-profiling-a-diagnostic-ai" class="section-heading">Worked Example: Profiling a Diagnostic AI</h2>
-<p class="first-paragraph">Consider a clinical AI system, DiagAssist-7, deployed to assist emergency physicians with differential diagnosis. The hospital's validation study reports a single accuracy figure: 91% concordance with expert diagnoses across 2,400 cases. The number is impressive. It is also dangerously incomplete.</p>
-<p class="body-text">We apply the three-tool pipeline to construct DiagAssist-7's robustness surface, revealing structure that the aggregate accuracy conceals.</p>
-<p class="body-text"><strong>Stage 1: MRI Scan.</strong> We define five perturbation axes corresponding to clinically relevant variation in patient presentation:</p>
-<div class="table-wrapper"><table class="book-table">
+<p>The robustness surface is thus the empirical substrate from which the alignment decomposition is computed. Chapter 11 takes the surface as given and asks: which regions of the surface must be elevated, and by how much, to achieve alignment? The answer — heuristic shaping through symmetry restoration, objective alignment through training-time intervention, and metacognitive calibration through architectural improvement — emerges directly from the structure of the surface.</p>
+<hr />
+</section>
+</section>
+<section id="summary" class="level2">
+<h2>10.9 Summary</h2>
+<p>The robustness surface is a multi-dimensional object that maps (model, perturbation type, perturbation intensity) triples to performance values. It captures everything that a scalar robustness score cannot: the anisotropy of vulnerability across perturbation types, the threshold behavior that separates proportional degradation from catastrophic failure, the universal fragilities shared across models, and the model-specific strengths that differentiate one system from another.</p>
+<p>The three-tool pipeline — MRI, sensitivity profiling, adversarial threshold search — provides a systematic method for constructing the surface. The MRI identifies which perturbation types matter. Sensitivity profiling identifies where in the output space the fragility manifests. Adversarial threshold search identifies the exact magnitude at which reasoning breaks. Applied together, they produce a complete characterization of a model’s robustness geometry.</p>
+<p>The empirical data from the Measuring AGI suite demonstrate the key structural properties of the robustness surface. The surfaces of different models are non-nested (they cross), confirming the Scalar Irrecoverability Theorem. The surfaces share a common floor of universal fragilities — the selective-attention SNR deficit (1.22–1.38), the ~38% recovery ceiling, and the 9.3<span class="math inline">\sigma</span> overconfidence — while differing in model-specific peaks and valleys that reflect training-level differences. The surfaces connect to gauge invariance (preserved symmetries are high ridges, broken symmetries are low valleys) and forward to alignment (each factor in the alignment decomposition corresponds to a different region of the surface).</p>
+<p>The central message of this chapter is geometric: <em>robustness is a surface, not a number.</em> The shape of the surface — its peaks, valleys, ridges, floors, and boundaries — is the object that characterizes a model’s reasoning quality under perturbation. The question “is this model robust?” has no answer. The question “what does this model’s robustness surface look like?” has a precise, measurable, and actionable answer. The three-tool pipeline provides the methodology for obtaining it.</p>
+<hr />
+</section>
+<section id="worked-example-profiling-a-diagnostic-ai" class="level2">
+<h2>Worked Example: Profiling a Diagnostic AI</h2>
+<p>Consider a clinical AI system, <em>DiagAssist-7</em>, deployed to assist emergency physicians with differential diagnosis. The hospital’s validation study reports a single accuracy figure: 91% concordance with expert diagnoses across 2,400 cases. The number is impressive. It is also dangerously incomplete.</p>
+<p>We apply the three-tool pipeline to construct DiagAssist-7’s robustness surface, revealing structure that the aggregate accuracy conceals.</p>
+<p><strong>Stage 1: MRI Scan.</strong> We define five perturbation axes corresponding to clinically relevant variation in patient presentation:</p>
+<table>
+<colgroup>
+<col style="width: 50%" />
+<col style="width: 50%" />
+</colgroup>
+<thead>
 <tr>
-  <th>Perturbation Type</th>
-  <th>Description</th>
+<th>Perturbation Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><span class="math inline">\tau_1</span>: Age group</td>
+<td>Adult (25–65) vs. pediatric (&lt;12) vs. geriatric (&gt;75)</td>
 </tr>
 <tr>
-  <td><em class="math">\tau_1</em>: Age group</td>
-  <td>Adult (25--65) vs. pediatric (&lt;12) vs. geriatric (&gt;75)</td>
+<td><span class="math inline">\tau_2</span>: Presentation clarity</td>
+<td>Textbook presentation vs. atypical presentation</td>
 </tr>
 <tr>
-  <td><em class="math">\tau_2</em>: Presentation clarity</td>
-  <td>Textbook presentation vs. atypical presentation</td>
+<td><span class="math inline">\tau_3</span>: Comorbidity load</td>
+<td>Single condition vs. 3+ comorbid conditions</td>
 </tr>
 <tr>
-  <td><em class="math">\tau_3</em>: Comorbidity load</td>
-  <td>Single condition vs. 3+ comorbid conditions</td>
+<td><span class="math inline">\tau_4</span>: Data completeness</td>
+<td>Full workup vs. partial labs and imaging</td>
 </tr>
 <tr>
-  <td><em class="math">\tau_4</em>: Data completeness</td>
-  <td>Full workup vs. partial labs and imaging</td>
+<td><span class="math inline">\tau_5</span>: Demographic variation</td>
+<td>Controlling for clinical equivalence across demographic groups</td>
+</tr>
+</tbody>
+</table>
+<p>The MRI profile reveals dramatic anisotropy:</p>
+<table>
+<thead>
+<tr>
+<th>Perturbation Type</th>
+<th>MRI Component <span class="math inline">r_i</span></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><span class="math inline">\tau_1</span>: Age group</td>
+<td>0.71</td>
 </tr>
 <tr>
-  <td><em class="math">\tau_5</em>: Demographic variation</td>
-  <td>Controlling for clinical equivalence across demographic groups</td>
-</tr>
-</table></div>
-<p class="body-text">The MRI profile reveals dramatic anisotropy:</p>
-<div class="table-wrapper"><table class="book-table">
-<tr>
-  <th>Perturbation Type</th>
-  <th>MRI Component <em class="math">r_i</em></th>
+<td><span class="math inline">\tau_2</span>: Presentation clarity</td>
+<td>0.83</td>
 </tr>
 <tr>
-  <td><em class="math">\tau_1</em>: Age group</td>
-  <td>0.71</td>
+<td><span class="math inline">\tau_3</span>: Comorbidity load</td>
+<td>0.76</td>
 </tr>
 <tr>
-  <td><em class="math">\tau_2</em>: Presentation clarity</td>
-  <td>0.83</td>
+<td><span class="math inline">\tau_4</span>: Data completeness</td>
+<td>0.88</td>
 </tr>
 <tr>
-  <td><em class="math">\tau_3</em>: Comorbidity load</td>
-  <td>0.76</td>
+<td><span class="math inline">\tau_5</span>: Demographic variation</td>
+<td>0.96</td>
+</tr>
+</tbody>
+</table>
+<p>The system is highly robust to demographic variation (<span class="math inline">r_5 = 0.96</span>) — a preserved gauge symmetry, since patient demographics should not affect diagnostic accuracy when clinical presentations are matched. It is moderately robust to missing data (<span class="math inline">r_4 = 0.88</span>) — it degrades gracefully when labs are pending. But it is significantly fragile to age-group variation (<span class="math inline">r_1 = 0.71</span>) — its performance changes substantially when the patient is a child rather than an adult.</p>
+<p>The aggregate accuracy of 91% is dominated by the adult cases that constitute 78% of the validation dataset. The MRI reveals what the aggregate hides: DiagAssist-7 is a 95% system for adults, an 82% system for geriatric patients, and a 73% system for pediatric cases.</p>
+<p><strong>Stage 2: Sensitivity Profile.</strong> We drill into the age-group fragility (<span class="math inline">r_1 = 0.71</span>), disaggregating across diagnostic categories:</p>
+<table>
+<colgroup>
+<col style="width: 25%" />
+<col style="width: 25%" />
+<col style="width: 25%" />
+<col style="width: 25%" />
+</colgroup>
+<thead>
+<tr>
+<th>Diagnostic Category</th>
+<th>Adult Accuracy</th>
+<th>Pediatric Accuracy</th>
+<th>Sensitivity <span class="math inline">s_{1,i}</span></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Cardiac</td>
+<td>0.97</td>
+<td>0.91</td>
+<td>0.06</td>
 </tr>
 <tr>
-  <td><em class="math">\tau_4</em>: Data completeness</td>
-  <td>0.88</td>
+<td>Respiratory</td>
+<td>0.94</td>
+<td>0.78</td>
+<td>0.16</td>
 </tr>
 <tr>
-  <td><em class="math">\tau_5</em>: Demographic variation</td>
-  <td>0.96</td>
-</tr>
-</table></div>
-<p class="body-text">The system is highly robust to demographic variation (<em class="math">r_5 = 0.96</em>) --- a preserved gauge symmetry, since patient demographics should not affect diagnostic accuracy when clinical presentations are matched. It is moderately robust to missing data (<em class="math">r_4 = 0.88</em>) --- it degrades gracefully when labs are pending. But it is significantly fragile to age-group variation (<em class="math">r_1 = 0.71</em>) --- its performance changes substantially when the patient is a child rather than an adult.</p>
-<p class="body-text">The aggregate accuracy of 91% is dominated by the adult cases that constitute 78% of the validation dataset. The MRI reveals what the aggregate hides: DiagAssist-7 is a 95% system for adults, an 82% system for geriatric patients, and a 73% system for pediatric cases.</p>
-<p class="body-text"><strong>Stage 2: Sensitivity Profile.</strong> We drill into the age-group fragility (<em class="math">r_1 = 0.71</em>), disaggregating across diagnostic categories:</p>
-<div class="table-wrapper"><table class="book-table">
-<tr>
-  <th>Diagnostic Category</th>
-  <th>Adult Accuracy</th>
-  <th>Pediatric Accuracy</th>
-  <th>Sensitivity <em class="math">s_{1,i}</em></th>
+<td>Neurological</td>
+<td>0.93</td>
+<td>0.69</td>
+<td>0.24</td>
 </tr>
 <tr>
-  <td>Cardiac</td>
-  <td>0.97</td>
-  <td>0.91</td>
-  <td>0.06</td>
+<td>Abdominal</td>
+<td>0.91</td>
+<td>0.74</td>
+<td>0.17</td>
 </tr>
 <tr>
-  <td>Respiratory</td>
-  <td>0.94</td>
-  <td>0.78</td>
-  <td>0.16</td>
+<td>Musculoskeletal</td>
+<td>0.96</td>
+<td>0.88</td>
+<td>0.08</td>
+</tr>
+</tbody>
+</table>
+<p>The fragility is concentrated, not distributed. Cardiac and musculoskeletal diagnoses transfer reasonably well from adult to pediatric presentations (sensitivities of 0.06 and 0.08) — the underlying pathophysiology is sufficiently similar. But neurological diagnoses show extreme sensitivity (<span class="math inline">s_{1,\text{neuro}} = 0.24</span>): the system’s accuracy drops from 93% to 69% when the patient is a child. Pediatric neurological presentations — seizures with different etiological distributions, developmental milestones that change the differential, medication dosing that scales nonlinearly with weight — are a specific, localized fragility on the robustness surface.</p>
+<p>The sensitivity profile produces an actionable finding that the aggregate accuracy cannot: <em>DiagAssist-7 should not be used as the primary diagnostic aid for pediatric neurological presentations without specialist oversight.</em> This is a geometric statement about the robustness surface — a valley at the (age-group, neurological) coordinate — not a judgment about the system’s overall quality.</p>
+<p><strong>Stage 3: Adversarial Threshold Search.</strong> For the pediatric neurological fragility, we parameterize the perturbation intensity along a continuous axis: the degree to which the presentation deviates from adult-pattern neurology. At one end (<span class="math inline">\epsilon = 0</span>), the pediatric case resembles an adult presentation (e.g., a 10-year-old with a straightforward migraine). At the other end (<span class="math inline">\epsilon = 1</span>), the case is distinctly pediatric (e.g., a 3-year-old with febrile seizures and developmental regression).</p>
+<p>Binary search over six evaluation rounds yields:</p>
+<table>
+<thead>
+<tr>
+<th><span class="math inline">\epsilon</span></th>
+<th>Accuracy</th>
+<th>Status</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>0.0</td>
+<td>0.93</td>
+<td>Baseline (adult-like)</td>
 </tr>
 <tr>
-  <td>Neurological</td>
-  <td>0.93</td>
-  <td>0.69</td>
-  <td>0.24</td>
+<td>0.5</td>
+<td>0.81</td>
+<td>Degraded but functional</td>
 </tr>
 <tr>
-  <td>Abdominal</td>
-  <td>0.91</td>
-  <td>0.74</td>
-  <td>0.17</td>
+<td>0.75</td>
+<td>0.68</td>
+<td>Below clinical threshold</td>
 </tr>
 <tr>
-  <td>Musculoskeletal</td>
-  <td>0.96</td>
-  <td>0.88</td>
-  <td>0.08</td>
-</tr>
-</table></div>
-<p class="body-text">The fragility is concentrated, not distributed. Cardiac and musculoskeletal diagnoses transfer reasonably well from adult to pediatric presentations (sensitivities of 0.06 and 0.08) --- the underlying pathophysiology is sufficiently similar. But neurological diagnoses show extreme sensitivity (<em class="math">s_{1,\text{neuro}} = 0.24</em>): the system's accuracy drops from 93% to 69% when the patient is a child. Pediatric neurological presentations --- seizures with different etiological distributions, developmental milestones that change the differential, medication dosing that scales nonlinearly with weight --- are a specific, localized fragility on the robustness surface.</p>
-<p class="body-text">The sensitivity profile produces an actionable finding that the aggregate accuracy cannot: DiagAssist-7 should not be used as the primary diagnostic aid for pediatric neurological presentations without specialist oversight. This is a geometric statement about the robustness surface --- a valley at the (age-group, neurological) coordinate --- not a judgment about the system's overall quality.</p>
-<p class="body-text"><strong>Stage 3: Adversarial Threshold Search.</strong> For the pediatric neurological fragility, we parameterize the perturbation intensity along a continuous axis: the degree to which the presentation deviates from adult-pattern neurology. At one end (<em class="math">\epsilon = 0</em>), the pediatric case resembles an adult presentation (e.g., a 10-year-old with a straightforward migraine). At the other end (<em class="math">\epsilon = 1</em>), the case is distinctly pediatric (e.g., a 3-year-old with febrile seizures and developmental regression).</p>
-<p class="body-text">Binary search over six evaluation rounds yields:</p>
-<div class="table-wrapper"><table class="book-table">
-<tr>
-  <th><em class="math">\epsilon</em></th>
-  <th>Accuracy</th>
-  <th>Status</th>
+<td>0.625</td>
+<td>0.74</td>
+<td>Marginal</td>
 </tr>
 <tr>
-  <td>0.0</td>
-  <td>0.93</td>
-  <td>Baseline (adult-like)</td>
+<td>0.6875</td>
+<td>0.71</td>
+<td>Just below threshold</td>
 </tr>
 <tr>
-  <td>0.5</td>
-  <td>0.81</td>
-  <td>Degraded but functional</td>
+<td>0.656</td>
+<td>0.73</td>
+<td>Just above threshold</td>
 </tr>
-<tr>
-  <td>0.75</td>
-  <td>0.68</td>
-  <td>Below clinical threshold</td>
-</tr>
-<tr>
-  <td>0.625</td>
-  <td>0.74</td>
-  <td>Marginal</td>
-</tr>
-<tr>
-  <td>0.6875</td>
-  <td>0.71</td>
-  <td>Just below threshold</td>
-</tr>
-<tr>
-  <td>0.656</td>
-  <td>0.73</td>
-  <td>Just above threshold</td>
-</tr>
-</table></div>
-<p class="body-text">The adversarial threshold is <em class="math">\epsilon^* \approx 0.66</em>, with a clinical-acceptability threshold of <em class="math">\delta = 0.20</em> (accuracy must remain above 73% to be clinically useful). This tells us: for pediatric neurological cases that are more than two-thirds of the way from adult-like to distinctly pediatric in their presentation, DiagAssist-7 drops below clinical acceptability.</p>
-<p class="body-text"><strong>The Complete Robustness Surface.</strong> The three-stage pipeline produces a surface, not a number. That surface says: this system is an excellent cardiac diagnostician for adults (<em class="math">R = 0.97</em>), a competent general diagnostician across age groups (<em class="math">R \approx 0.85</em>), but a fragile neurological diagnostician for young children (<em class="math">R = 0.69</em>), with a precise adversarial threshold at <em class="math">\epsilon* \approx 0.66</em> along the pediatric-specificity axis.* The hospital can deploy the system with geometric precision --- knowing exactly where to trust it, where to augment it with specialist review, and where to override it entirely.</p>
-<p class="body-text">Compare this to the original validation report: "91% accuracy." Dr. Okafor, reading the robustness surface, would recognize her own anisotropic competence reflected in the AI's profile. And she would know exactly what the surface means for clinical practice: trust the AI on adult cardiac cases, get a second opinion on pediatric neurology, and never let a single number substitute for the shape of the surface.</p>
-<h2 id="technical-appendix" class="section-heading">Technical Appendix</h2>
-<h3 id="a101-model-robustness-index-formal-definition" class="subsection-heading">A10.1 Model Robustness Index: Formal Definition</h3>
-<p class="first-paragraph"><strong>Definition A10.1</strong> (Model Robustness Index). Let <em class="math">f_\theta: \mathcal{X} \to \mathcal{Y}</em> be a model, <em class="math">\mathcal{T} = \{\tau_1, \ldots, \tau_k\}</em> a set of perturbation types, <em class="math">\mathcal{D}</em> an evaluation dataset, and <em class="math">\mathcal{C}: \mathcal{Y} \times \mathcal{Y} \to [0, 1]</em> a consistency metric. The Model Robustness Index of <em class="math">f_\theta</em> with respect to <em class="math">(\mathcal{T}, \mathcal{D}, \mathcal{C})</em> is the vector:</p>
-<p class="body-text"><span class="math-block">\mathrm{MRI}(f_\theta; \mathcal{T}, \mathcal{D}, \mathcal{C}) = (r_1, r_2, \ldots, r_k) \in [0, 1]^k</span></p>
-<p class="body-text">where</p>
-<p class="body-text"><span class="math-block">r_i = \frac{1}{|\mathcal{D}|} \sum_{x \in \mathcal{D}} \mathcal{C}\bigl(f_\theta(x),\; f_\theta(\tau_i(x))\bigr).</span></p>
-<p class="body-text">The MRI is a vector-valued invariant of the model. It is not aggregated. Its dimensionality equals the number of perturbation types, and each component is independently interpretable as the model's consistency under one class of perturbation.</p>
-<p class="body-text"><strong>Proposition A10.1</strong> (MRI--Corruption Tensor Correspondence). Let <em class="math">C_{ij}</em> be the corruption tensor (Chapter 5, Definition 5.5) mapping perturbation direction <em class="math">j</em> to displacement along judgment dimension <em class="math">i</em>, and let the consistency metric be <em class="math">\mathcal{C}(y, y') = 1 - \|y - y'\| / \Delta_{\max}</em> where <em class="math">\Delta_{\max}</em> is the scale of the output space. Then:</p>
-<p class="body-text"><span class="math-block">r_j = 1 - \frac{\|C_{\cdot j}\|}{\Delta_{\max}}</span></p>
-<p class="body-text">That is, the <em class="math">j</em>-th MRI component is the complement of the normalized column norm of the corruption tensor along perturbation direction <em class="math">j</em>.</p>
-<h3 id="a102-sensitivity-profiling-formal-definition" class="subsection-heading">A10.2 Sensitivity Profiling: Formal Definition</h3>
-<p class="first-paragraph"><strong>Definition A10.2</strong> (Sensitivity Profile). For perturbation type <em class="math">\tau</em> and model <em class="math">f_\theta</em> with <em class="math">d</em>-dimensional output, the sensitivity profile is the vector <em class="math">\mathbf{s}_\tau \in \mathbb{R}^d_{\geq 0}</em> with components:</p>
-<p class="body-text"><span class="math-block">s_{\tau, i} = \mathbb{E}_{x \sim \mathcal{D}}\bigl[\,|f_{\theta, i}(x) - f_{\theta, i}(\tau(x))|\,\bigr]</span></p>
-<p class="body-text"><strong>Definition A10.3</strong> (Sensitivity Matrix). The sensitivity matrix <em class="math">S \in \mathbb{R}^{d \times k}_{\geq 0}</em> has entries <em class="math">S_{ij} = s_{\tau_j, i}</em>, the sensitivity of output dimension <em class="math">i</em> under perturbation type <em class="math">\tau_j</em>. The matrix decomposes as:</p>
-<p class="body-text"><span class="math-block">S = S_{\text{universal}} + S_{\text{model}}</span></p>
-<p class="body-text">where <em class="math">S_{\text{universal}}</em> captures shared fragilities across models (rows with uniformly high entries) and <em class="math">S_{\text{model}}</em> captures model-specific variation (rows with high variance across models).</p>
-<h3 id="a103-scalar-irrecoverability-theorem-formal-statement-and-proof-sketch" class="subsection-heading">A10.3 Scalar Irrecoverability Theorem: Formal Statement and Proof Sketch</h3>
-<p class="first-paragraph"><strong>Theorem A10.1</strong> (Scalar Irrecoverability). Let <em class="math">\{f_1, \ldots, f_n\}</em> be a set of <em class="math">n \geq 2</em> models with MRI profiles <em class="math">\mathbf{r}^{(1)}, \ldots, \mathbf{r}^{(n)} \in [0,1]^k</em> for <em class="math">k \geq 2</em>. Suppose the profiles are Pareto-incomparable: for every pair <em class="math">(i, j)</em>, there exist perturbation indices <em class="math">a, b</em> such that <em class="math">r^{(i)}_a &gt; r^{(j)}_a</em> and <em class="math">r^{(i)}_b &lt; r^{(j)}_b</em>. Then no function <em class="math">\pi: [0,1]^k \to \mathbb{R}</em> that is strictly monotone in each argument can preserve all pairwise orderings. Formally, for any such <em class="math">\pi</em>, there exist models <em class="math">i, j</em> and a perturbation index <em class="math">c</em> such that:</p>
-<p class="body-text"><span class="math-block">\pi(\mathbf{r}^{(i)}) &gt; \pi(\mathbf{r}^{(j)}) \quad \text{but} \quad r^{(i)}_c &lt; r^{(j)}_c.</span></p>
-<p class="body-text">Proof sketch. Suppose for contradiction that <em class="math">\pi</em> is a strictly monotone function <em class="math">[0,1]^k \to \mathbb{R}</em> that preserves all pairwise orderings along every perturbation axis simultaneously. Consider two Pareto-incomparable profiles <em class="math">\mathbf{r}^{(i)}</em> and <em class="math">\mathbf{r}^{(j)}</em> with <em class="math">r^{(i)}_a &gt; r^{(j)}_a</em> and <em class="math">r^{(i)}_b &lt; r^{(j)}_b</em>. Since <em class="math">\pi</em> must respect the ordering along axis <em class="math">a</em>, we need <em class="math">\pi(\mathbf{r}^{(i)}) &gt; \pi(\mathbf{r}^{(j)})</em> (model <em class="math">i</em> is better on axis <em class="math">a</em>). Since <em class="math">\pi</em> must respect the ordering along axis <em class="math">b</em>, we need <em class="math">\pi(\mathbf{r}^{(i)}) &lt; \pi(\mathbf{r}^{(j)})</em> (model <em class="math">j</em> is better on axis <em class="math">b</em>). These two requirements contradict the totality of the ordering on <em class="math">\mathbb{R}</em>. Therefore no such <em class="math">\pi</em> exists. <em class="math">\square</em></p>
-<p class="body-text"><strong>Corollary A10.1.</strong> Any scalar "robustness score" computed from the MRI profile of Pareto-incomparable models necessarily reverses at least one pairwise ordering on at least one perturbation axis. The reversal is not a defect of the particular scoring function chosen; it is a topological impossibility inherent in projecting a partially ordered set onto a totally ordered set.</p>
-<p class="body-text"><strong>Corollary A10.2.</strong> The minimum dimensionality of a summary statistic that preserves all pairwise orderings across Pareto-incomparable models is <em class="math">k</em> --- the full dimensionality of the MRI profile. No dimensionality reduction below <em class="math">k</em> is lossless with respect to pairwise orderings.</p>
-<h2 id="references" class="section-heading">References</h2>
-<p class="first-paragraph">Bond, A. H. (2026a). Geometric Methods in Computational Modeling. San Jose State University.</p>
-<p class="body-text">Bond, A. H. (2026b). Geometric Ethics: Moral Reasoning on the Judgment Manifold. San Jose State University.</p>
-<p class="body-text">Bond, A. H. (2026c). Measuring AGI: Five convergent measurements of cognitive capability in large language models. Kaggle Competition Report.</p>
-<p class="body-text">Goodfellow, I. J., Shlens, J., &amp; Szegedy, C. (2015). Explaining and harnessing adversarial examples. ICLR.</p>
-<p class="body-text">Hendrycks, D. &amp; Dietterich, T. (2019). Benchmarking neural network robustness to common corruptions and perturbations. ICLR.</p>
-<p class="body-text">Madry, A., Makelov, A., Schmidt, L., Tsipras, D., &amp; Vladu, A. (2018). Towards deep learning models resistant to adversarial attacks. ICLR.</p>
-<p class="body-text">Szegedy, C., Zaremba, W., Sutskever, I., Bruna, J., Erhan, D., Goodfellow, I., &amp; Fergus, R. (2014). Intriguing properties of neural networks. ICLR.</p>
+</tbody>
+</table>
+<p>The adversarial threshold is <span class="math inline">\epsilon^* \approx 0.66</span>, with a clinical-acceptability threshold of <span class="math inline">\delta = 0.20</span> (accuracy must remain above 73% to be clinically useful). This tells us: for pediatric neurological cases that are more than two-thirds of the way from adult-like to distinctly pediatric in their presentation, DiagAssist-7 drops below clinical acceptability.</p>
+<p><strong>The Complete Robustness Surface.</strong> The three-stage pipeline produces a surface, not a number. That surface says: <em>this system is an excellent cardiac diagnostician for adults (<span class="math inline">R = 0.97</span>), a competent general diagnostician across age groups (<span class="math inline">R \approx 0.85</span>), but a fragile neurological diagnostician for young children (<span class="math inline">R = 0.69</span>), with a precise adversarial threshold at <span class="math inline">\epsilon^* \approx 0.66</span> along the pediatric-specificity axis.</em> The hospital can deploy the system with geometric precision — knowing exactly where to trust it, where to augment it with specialist review, and where to override it entirely.</p>
+<p>Compare this to the original validation report: “91% accuracy.” Dr. Okafor, reading the robustness surface, would recognize her own anisotropic competence reflected in the AI’s profile. And she would know exactly what the surface means for clinical practice: trust the AI on adult cardiac cases, get a second opinion on pediatric neurology, and never let a single number substitute for the shape of the surface.</p>
+<hr />
+</section>
+<section id="technical-appendix" class="level2">
+<h2>Technical Appendix</h2>
+<section id="a10.1-model-robustness-index-formal-definition" class="level3">
+<h3>A10.1 Model Robustness Index: Formal Definition</h3>
+<p><strong>Definition A10.1</strong> (Model Robustness Index). Let <span class="math inline">f_\theta: \mathcal{X} \to \mathcal{Y}</span> be a model, <span class="math inline">\mathcal{T} = \{\tau_1, \ldots, \tau_k\}</span> a set of perturbation types, <span class="math inline">\mathcal{D}</span> an evaluation dataset, and <span class="math inline">\mathcal{C}: \mathcal{Y} \times \mathcal{Y} \to [0, 1]</span> a consistency metric. The <em>Model Robustness Index</em> of <span class="math inline">f_\theta</span> with respect to <span class="math inline">(\mathcal{T}, \mathcal{D}, \mathcal{C})</span> is the vector:</p>
+<p><span class="math display">\mathrm{MRI}(f_\theta; \mathcal{T}, \mathcal{D}, \mathcal{C}) = (r_1, r_2, \ldots, r_k) \in [0, 1]^k</span></p>
+<p>where</p>
+<p><span class="math display">r_i = \frac{1}{|\mathcal{D}|} \sum_{x \in \mathcal{D}} \mathcal{C}\bigl(f_\theta(x),\; f_\theta(\tau_i(x))\bigr).</span></p>
+<p>The MRI is a <em>vector-valued invariant</em> of the model. It is not aggregated. Its dimensionality equals the number of perturbation types, and each component is independently interpretable as the model’s consistency under one class of perturbation.</p>
+<p><strong>Proposition A10.1</strong> (MRI–Corruption Tensor Correspondence). Let <span class="math inline">C_{ij}</span> be the corruption tensor (Chapter 5, Definition 5.5) mapping perturbation direction <span class="math inline">j</span> to displacement along judgment dimension <span class="math inline">i</span>, and let the consistency metric be <span class="math inline">\mathcal{C}(y, y&#39;) = 1 - \|y - y&#39;\| / \Delta_{\max}</span> where <span class="math inline">\Delta_{\max}</span> is the scale of the output space. Then:</p>
+<p><span class="math display">r_j = 1 - \frac{\|C_{\cdot j}\|}{\Delta_{\max}}</span></p>
+<p>That is, the <span class="math inline">j</span>-th MRI component is the complement of the normalized column norm of the corruption tensor along perturbation direction <span class="math inline">j</span>.</p>
+</section>
+<section id="a10.2-sensitivity-profiling-formal-definition" class="level3">
+<h3>A10.2 Sensitivity Profiling: Formal Definition</h3>
+<p><strong>Definition A10.2</strong> (Sensitivity Profile). For perturbation type <span class="math inline">\tau</span> and model <span class="math inline">f_\theta</span> with <span class="math inline">d</span>-dimensional output, the <em>sensitivity profile</em> is the vector <span class="math inline">\mathbf{s}_\tau \in \mathbb{R}^d_{\geq 0}</span> with components:</p>
+<p><span class="math display">s_{\tau, i} = \mathbb{E}_{x \sim \mathcal{D}}\bigl[\,|f_{\theta, i}(x) - f_{\theta, i}(\tau(x))|\,\bigr]</span></p>
+<p><strong>Definition A10.3</strong> (Sensitivity Matrix). The <em>sensitivity matrix</em> <span class="math inline">S \in \mathbb{R}^{d \times k}_{\geq 0}</span> has entries <span class="math inline">S_{ij} = s_{\tau_j, i}</span>, the sensitivity of output dimension <span class="math inline">i</span> under perturbation type <span class="math inline">\tau_j</span>. The matrix decomposes as:</p>
+<p><span class="math display">S = S_{\text{universal}} + S_{\text{model}}</span></p>
+<p>where <span class="math inline">S_{\text{universal}}</span> captures shared fragilities across models (rows with uniformly high entries) and <span class="math inline">S_{\text{model}}</span> captures model-specific variation (rows with high variance across models).</p>
+</section>
+<section id="a10.3-scalar-irrecoverability-theorem-formal-statement-and-proof-sketch" class="level3">
+<h3>A10.3 Scalar Irrecoverability Theorem: Formal Statement and Proof Sketch</h3>
+<p><strong>Theorem A10.1</strong> (Scalar Irrecoverability). Let <span class="math inline">\{f_1, \ldots, f_n\}</span> be a set of <span class="math inline">n \geq 2</span> models with MRI profiles <span class="math inline">\mathbf{r}^{(1)}, \ldots, \mathbf{r}^{(n)} \in [0,1]^k</span> for <span class="math inline">k \geq 2</span>. Suppose the profiles are <em>Pareto-incomparable</em>: for every pair <span class="math inline">(i, j)</span>, there exist perturbation indices <span class="math inline">a, b</span> such that <span class="math inline">r^{(i)}_a &gt; r^{(j)}_a</span> and <span class="math inline">r^{(i)}_b &lt; r^{(j)}_b</span>. Then no function <span class="math inline">\pi: [0,1]^k \to \mathbb{R}</span> that is strictly monotone in each argument can preserve all pairwise orderings. Formally, for any such <span class="math inline">\pi</span>, there exist models <span class="math inline">i, j</span> and a perturbation index <span class="math inline">c</span> such that:</p>
+<p><span class="math display">\pi(\mathbf{r}^{(i)}) &gt; \pi(\mathbf{r}^{(j)}) \quad \text{but} \quad r^{(i)}_c &lt; r^{(j)}_c.</span></p>
+<p><em>Proof sketch.</em> Suppose for contradiction that <span class="math inline">\pi</span> is a strictly monotone function <span class="math inline">[0,1]^k \to \mathbb{R}</span> that preserves all pairwise orderings along every perturbation axis simultaneously. Consider two Pareto-incomparable profiles <span class="math inline">\mathbf{r}^{(i)}</span> and <span class="math inline">\mathbf{r}^{(j)}</span> with <span class="math inline">r^{(i)}_a &gt; r^{(j)}_a</span> and <span class="math inline">r^{(i)}_b &lt; r^{(j)}_b</span>. Since <span class="math inline">\pi</span> must respect the ordering along axis <span class="math inline">a</span>, we need <span class="math inline">\pi(\mathbf{r}^{(i)}) &gt; \pi(\mathbf{r}^{(j)})</span> (model <span class="math inline">i</span> is better on axis <span class="math inline">a</span>). Since <span class="math inline">\pi</span> must respect the ordering along axis <span class="math inline">b</span>, we need <span class="math inline">\pi(\mathbf{r}^{(i)}) &lt; \pi(\mathbf{r}^{(j)})</span> (model <span class="math inline">j</span> is better on axis <span class="math inline">b</span>). These two requirements contradict the totality of the ordering on <span class="math inline">\mathbb{R}</span>. Therefore no such <span class="math inline">\pi</span> exists. <span class="math inline">\square</span></p>
+<p><strong>Corollary A10.1.</strong> Any scalar “robustness score” computed from the MRI profile of Pareto-incomparable models necessarily reverses at least one pairwise ordering on at least one perturbation axis. The reversal is not a defect of the particular scoring function chosen; it is a topological impossibility inherent in projecting a partially ordered set onto a totally ordered set.</p>
+<p><strong>Corollary A10.2.</strong> The minimum dimensionality of a summary statistic that preserves all pairwise orderings across Pareto-incomparable models is <span class="math inline">k</span> — the full dimensionality of the MRI profile. No dimensionality reduction below <span class="math inline">k</span> is lossless with respect to pairwise orderings.</p>
+<hr />
+</section>
+</section>
+<section id="references" class="level2">
+<h2>References</h2>
+<p>Bond, A. H. (2026a). <em>Geometric Methods in Computational Modeling.</em> San Jose State University.</p>
+<p>Bond, A. H. (2026b). <em>Geometric Ethics: Moral Reasoning on the Judgment Manifold.</em> San Jose State University.</p>
+<p>Bond, A. H. (2026c). Measuring AGI: Five convergent measurements of cognitive capability in large language models. <em>Kaggle Competition Report.</em></p>
+<p>Goodfellow, I. J., Shlens, J., &amp; Szegedy, C. (2015). Explaining and harnessing adversarial examples. <em>ICLR.</em></p>
+<p>Hendrycks, D. &amp; Dietterich, T. (2019). Benchmarking neural network robustness to common corruptions and perturbations. <em>ICLR.</em></p>
+<p>Madry, A., Makelov, A., Schmidt, L., Tsipras, D., &amp; Vladu, A. (2018). Towards deep learning models resistant to adversarial attacks. <em>ICLR.</em></p>
+<p>Szegedy, C., Zaremba, W., Sutskever, I., Bruna, J., Erhan, D., Goodfellow, I., &amp; Fergus, R. (2014). Intriguing properties of neural networks. <em>ICLR.</em></p>
+</section>
+</section>
       </div>
 
       <div class="chapter-nav-bottom">
@@ -647,8 +769,8 @@
   </article>
 
   <footer class="book-footer">
-    <p>&copy; 2026 Andrew H. Bond. Geometric Reasoning: From Search to Manifolds.</p>
-    <p class="footer-note">Reasoning is informed search through a structured space.</p>
+    <p>&copy; 2026 Andrew H. Bond. <em>Geometric Reasoning: From Search to Manifolds.</em></p>
+    <p class="footer-note">The geometry was always real. The scalars were always insufficient.</p>
   </footer>
 
   <script>
@@ -659,35 +781,22 @@
       document.querySelector('.nav-links').classList.toggle('open');
     });
   </script>
-<script>
-window.addEventListener("load", function() {
-  if (typeof katex === 'undefined') return;
-  // Render all <em class="math"> elements with</em> KaTeX
-  document.querySelectorAll('em.math').forEach(function(el) {
-    try {
-      katex.render(el.textContent, el, {throwOnError: false, displayMode: false});
-    } catch(e) {}
-  });
-  // Render all <p class="display-math"> elements
-  document.querySelectorAll('p.display-math').forEach(function(el) {
-    var mathEl = el.querySelector('em.math');
-    if (mathEl) {
-      try {
-        katex.render(mathEl.textContent, el, {throwOnError: false, displayMode: true});
-      } catch(e) {}
-    }
-  });
-  // Also try auto-render for any $...$ delimited math
-  if (typeof renderMathInElement !== 'undefined') {
-    renderMathInElement(document.body, {
-      delimiters: [
-        {left: "$$", right: "$$", display: true},
-        {left: "$", right: "$", display: false}
-      ],
-      throwOnError: false
+  <script>
+    // Pandoc --katex outputs <span class="math inline"> and <span class="math display">.
+    // This script renders them with KaTeX once the library loads.
+    document.addEventListener("DOMContentLoaded", function() {
+      if (typeof katex === 'undefined') return;
+      var mathElements = document.getElementsByClassName("math");
+      for (var i = 0; i < mathElements.length; i++) {
+        var texText = mathElements[i].firstChild;
+        if (mathElements[i].tagName === "SPAN" && texText) {
+          katex.render(texText.data, mathElements[i], {
+            displayMode: mathElements[i].classList.contains('display'),
+            throwOnError: false
+          });
+        }
+      }
     });
-  }
-});
-</script>
+  </script>
 </body>
 </html>

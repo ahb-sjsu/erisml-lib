@@ -10,9 +10,8 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Crimson+Pro:ital,wght@0,300;0,400;0,600;0,700;1,400&family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
-  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
-  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"></script>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
 </head>
 
 <body>
@@ -26,14 +25,14 @@
         <span></span><span></span><span></span>
       </button>
       <ul class="nav-links">
-        <li><a href="index.html" class="active">Reasoning</a></li>
+        <li><a href="../geometric-medicine/index.html">Medicine</a></li>
         <li><a href="../book/index.html">Ethics</a></li>
         <li><a href="../geometric-methods/index.html">Methods</a></li>
+        <li><a href="../geometric-reasoning/index.html" class="active">Reasoning</a></li>
         <li><a href="../geometric-economics/index.html">Economics</a></li>
         <li><a href="../geometric-law/index.html">Law</a></li>
         <li><a href="../geometric-cognition/index.html">Cognition</a></li>
         <li><a href="../geometric-communication/index.html">Communication</a></li>
-        <li><a href="../geometric-medicine/index.html">Medicine</a></li>
         <li><a href="../index.html">Home</a></li>
       </ul>
     </div>
@@ -43,9 +42,9 @@
     <div class="chapter-container">
       <nav class="breadcrumb" aria-label="Breadcrumb">
         <a href="../index.html">Geometric Series</a>
-        <span class="breadcrumb-sep">›</span>
+        <span class="breadcrumb-sep">&rsaquo;</span>
         <a href="index.html">Geometric Reasoning</a>
-        <span class="breadcrumb-sep">›</span>
+        <span class="breadcrumb-sep">&rsaquo;</span>
         <span class="breadcrumb-current">Chapter 8: Gauge Invariance and Symmetry</span>
       </nav>
       <div class="chapter-nav-top">
@@ -54,358 +53,443 @@
         <a href="chapter-9-metacognition-as-search-control.html" class="nav-next">Chapter 9: Metacognition as Search Control &rarr;</a>
       </div>
 
-      <nav class="chapter-toc">
-        <h4>In this chapter</h4>
-        <ol><li><a href="#introduction">Introduction</a></li><li><a href="#81-gauge-invariance-from-physics-to-reasoning">8.1 Gauge Invariance: From Physics to Reasoning</a></li><li><a href="#82-the-bond-invariance-principle">8.2 The Bond Invariance Principle</a></li><li><a href="#83-which-symmetries-llms-preserve">8.3 Which Symmetries LLMs Preserve</a></li><li><a href="#84-which-symmetries-they-break-the-selectivity-pattern">8.4 Which Symmetries They Break: The Selectivity Pattern</a></li><li><a href="#85-the-salience-exploitation-hypothesis">8.5 The Salience Exploitation Hypothesis</a></li><li><a href="#86-group-theoretic-data-augmentation-as-symmetry-restoration">8.6 Group-Theoretic Data Augmentation as Symmetry Restoration</a></li><li><a href="#87-the-hohfeldian-d4-real-symmetry-in-moral-reasoning">8.7 The Hohfeldian <em class="math">D</em><sub>4</sub></em>: Real Symmetry in Moral Reasoning</a></li><li><a href="#88-gauge-invariance-as-the-fundamental-diagnostic">8.8 Gauge Invariance as the Fundamental Diagnostic</a></li><li><a href="#89-connections-to-the-broader-framework">8.9 Connections to the Broader Framework</a></li><li><a href="#summary">Summary</a></li><li><a href="#worked-example-two-descriptions-one-patient">Worked Example: Two Descriptions, One Patient</a></li><li><a href="#technical-appendix">Technical Appendix</a></li><li><a href="#references">References</a></li></ol>
-      </nav>
       <div class="chapter-content">
-<h1 id="chapter-8-gauge-invariance-and-symmetry" class="chapter-title">Chapter 8: Gauge Invariance and Symmetry</h1>
-<blockquote class="book-blockquote"><p>"The important thing in science is not so much to obtain new facts as to discover new ways of thinking about them." --- William Lawrence Bragg</p></blockquote>
-<blockquote class="book-blockquote"><p><strong>RUNNING EXAMPLE — DR. OKAFOR'S TRIAGE</strong></p> <p>Two descriptions of the same patient arrive within seconds of each other. The paramedic radios ahead: "Fifty-five-year-old male, diaphoretic, crushing substernal chest pain radiating to the left arm, onset ten minutes ago during exertion." Dr. Okafor's heuristic fires immediately — STEMI protocol, activate the cath lab, aspirin and heparin on arrival. The gradient is steep and unambiguous.</p> <p>But imagine the same patient had arrived by private car, walked in by his wife, who tells the triage nurse: "My husband doesn't feel well. He's been stressed at work and he's been complaining all day. He looks pale." Same patient. Same coronary artery occlusion. Same clinical reality. But the description has changed — the gauge has changed — and the heuristic response is different. "Stressed at work" activates the anxiety basin. "Complaining all day" suggests chronicity, not acuity. "Doesn't feel well" is vague where "crushing substernal pain" is specific. The wife's description is a gauge transformation of the paramedic's description: it preserves the underlying medical facts but presents them in a different coordinate system.</p> <p>A gauge-invariant triage system would produce the same output — STEMI alert — regardless of which description it received. When the description changes the decision, it is a gauge violation. The patient's arteries do not know who described his symptoms.</p></blockquote>
-<h2 id="introduction" class="section-heading">Introduction</h2>
-<p class="first-paragraph">The previous three chapters documented a catalog of pathologies: heuristic corruption bends search trajectories away from the geodesic (Chapter 5), sycophancy redirects the search objective entirely (Chapter 6), and local minima trap the search in premature convergence (Chapter 7). Each pathology was analyzed in its own terms --- dose-response curves, flip rates, confidence surfaces, recovery ceilings. But a catalog is not a theory. What is the principle that unifies these failures?</p>
-<p class="body-text">This chapter provides the answer: <strong>symmetry breaking</strong>.</p>
-<p class="body-text">The failures documented in Chapters 5--7 are not independent bugs. They are instances of a single geometric phenomenon: the system's output changes under transformations that should leave it invariant. Framing effects (T5) mean the system's moral judgment changes when the description changes but the moral content does not. Sycophancy (L2) means the system's answer changes when social pressure changes but the evidence does not. Emotional anchoring (E2) means the system's assessment changes when affective tone changes but the relevant facts do not. In every case, a transformation that preserves the deep structure of the input alters the output. In every case, a symmetry is broken.</p>
-<p class="body-text">This is not a metaphor borrowed loosely from physics. The connection to gauge theory is precise and mathematically substantive. In physics, gauge transformations change the mathematical description of a physical system without changing any observable quantity. A system that is gauge-invariant produces the same predictions regardless of which description is used. A system that is not gauge-invariant has confused an artifact of the description with a feature of reality.</p>
-<p class="body-text">This is exactly the error that framing-susceptible language models make. The euphemistic description and the neutral description and the dramatic description are three gauges --- three coordinate systems for the same moral content. A gauge-invariant system would produce the same moral judgment in all three. The 8.9<em class="math">\sigma</em> displacement documented in Chapter 5 is a gauge anomaly: a violation of the invariance that a correctly functioning system would possess.</p>
-<p class="body-text">By the end of this chapter, we will have established gauge invariance as the fundamental diagnostic for reasoning quality, identified precisely which symmetries current models preserve and which they break, explained why the pattern of preservation and violation has the structure it does, and shown how group-theoretic methods can be used both to diagnose symmetry breaking and to restore broken symmetries through training.</p>
-<h2 id="81-gauge-invariance-from-physics-to-reasoning" class="section-heading">8.1 Gauge Invariance: From Physics to Reasoning</h2>
-<h3 id="811-the-physicists-gauge" class="subsection-heading">8.1.1 The Physicist's Gauge</h3>
-<p class="first-paragraph">In classical electromagnetism, the electric and magnetic fields <em class="math">\mathbf{E}</em> and <em class="math">\mathbf{B}</em> are the physically observable quantities. They are derived from potentials --- the scalar potential <em class="math">\phi</em> and the vector potential <em class="math">\mathbf{A}</em> --- via <em class="math">\mathbf{E} = -\nabla\phi - \partial_t\mathbf{A}</em> and <em class="math">\mathbf{B} = \nabla \times \mathbf{A}</em>. But the potentials are not unique. The transformation</p>
-<p class="body-text"><span class="math-block">\phi \to \phi - \partial_t \Lambda, \quad \mathbf{A} \to \mathbf{A} + \nabla \Lambda</span></p>
-<p class="body-text">for any smooth function <em class="math">\Lambda(x, t)</em> leaves <em class="math">\mathbf{E}</em> and <em class="math">\mathbf{B}</em> unchanged. This is a gauge transformation. The potentials are a convenient mathematical description, but any two potentials related by a gauge transformation describe the same physics. The choice of <em class="math">\Lambda</em> is a choice of gauge --- a choice of coordinate system in the space of descriptions.</p>
-<p class="body-text">The principle extends far beyond electromagnetism. In Yang-Mills theory, the Standard Model of particle physics, and general relativity, gauge invariance is the structural principle that separates physical content from descriptive artifact. The key insight is not that gauge transformations exist, but that the physics must be invariant under them. Any observable quantity that changes under a gauge transformation is not genuinely physical --- it is an artifact of the description.</p>
-<h3 id="812-the-reasoning-analogue" class="subsection-heading">8.1.2 The Reasoning Analogue</h3>
-<p class="first-paragraph">Consider a moral reasoning task. The "physics" is the moral content: who did what to whom, what the consequences were, what power relations existed, what norms were violated. The "gauge" is the surface presentation: the choice of words, the emotional register, the order of presentation, the framing of outcomes as gains or losses.</p>
-<p class="body-text">A gauge transformation in this context is any transformation that changes the surface presentation while preserving the moral content. Rewriting a scenario in euphemistic language is a gauge transformation. Rewriting it in dramatic language is a gauge transformation. Swapping the genders of the actors is a gauge transformation. Changing the order in which moral dimensions are evaluated is a gauge transformation. In each case, the deep structure --- the thing the system is supposed to be reasoning about --- is invariant under the transformation. Only the description changes.</p>
-<p class="body-text">A gauge-invariant reasoning system would produce the same output under all such transformations:</p>
-<p class="body-text"><span class="math-block">f(\tau(x)) = f(x) \quad \text{for all gauge transformations } \tau</span></p>
-<p class="body-text">where <em class="math">f</em> is the system's judgment function and <em class="math">\tau</em> is any transformation that preserves the relevant content while changing the surface form. This is a strong requirement. It says the system must not merely be robust to perturbation (in the sense of producing outputs that are close to the original) but invariant (in the sense of producing outputs that are identical).</p>
-<p class="body-text">The distinction between robustness and invariance matters. Robustness is a quantitative property: the output changes by at most <em class="math">\epsilon</em> when the input is perturbed by at most <em class="math">\delta</em>. Invariance is a qualitative property: the output does not change at all under the specified transformations. A system can be robust without being invariant (small but systematic drift) or invariant without being robust (no drift under gauge transformations, but large drift under non-gauge perturbations). The appropriate standard for gauge transformations --- transformations that by definition preserve the content --- is invariance, not mere robustness.</p>
-<h2 id="82-the-bond-invariance-principle" class="section-heading">8.2 The Bond Invariance Principle</h2>
-<p class="first-paragraph">We can now state the central principle that unifies the failures documented in Part II.</p>
-<p class="body-text"><strong>[Modeling Axiom.]</strong> <strong>The Bond Invariance Principle (BIP).</strong> Morally and logically equivalent inputs should produce identical outputs regardless of surface presentation. Any dependence of the output on task-irrelevant features of the input constitutes a gauge anomaly --- a violation of the symmetry that a correctly functioning reasoning system would possess.</p>
-<p class="body-text">The BIP is not an aspiration or an ideal. It is a diagnostic criterion. Given a reasoning system and a class of gauge transformations, we test whether the system's output is invariant. If it is, the system is gauge-invariant with respect to that class. If it is not, the system has a gauge anomaly, and the magnitude of the anomaly measures the degree to which the system confuses surface features with deep structure.</p>
-<p class="body-text">The BIP has three important consequences.</p>
-<p class="body-text"><strong>First, it provides a principled taxonomy of perturbations.</strong> Not all input transformations are created equal. Some transformations (like changing the moral facts) are non-gauge --- they change the content, so the output should change. Other transformations (like rewriting in euphemistic language) are gauge --- they preserve the content, so the output should be invariant. The BIP tells us which transformations to expect invariance under, and therefore which measurements constitute genuine tests of reasoning quality.</p>
-<p class="body-text"><strong>Second, it connects to the corruption tensor of Chapter 5.</strong> The corruption tensor <em class="math">C_{ij}</em> maps perturbation directions to displacement magnitudes. The BIP says that for gauge directions, all entries of <em class="math">C_{ij}</em> should be zero. Nonzero entries along gauge directions are anomalies. The empirical structure of <em class="math">C_{ij}</em> --- which entries are zero and which are not --- is a direct measurement of which gauge symmetries the system preserves and which it breaks.</p>
-<p class="body-text"><strong>Third, it subsumes the individual failure modes.</strong> Framing effects are BIP violations under linguistic-register transformations. Sycophancy is a BIP violation under social-pressure transformations (the evidence is invariant, but the social context changes). Emotional anchoring is a BIP violation under affective-tone transformations. Each failure mode is a specific instance of the general principle: the system's output depends on something it should be invariant to.</p>
-<h2 id="83-which-symmetries-llms-preserve" class="section-heading">8.3 Which Symmetries LLMs Preserve</h2>
-<p class="first-paragraph">Not all gauge symmetries are broken. The data from the Measuring AGI benchmark suite show that current language models preserve certain symmetries with remarkable fidelity. Understanding which symmetries survive is as important as understanding which ones fail, because the pattern of preservation and violation constrains hypotheses about the underlying mechanism.</p>
-<h3 id="831-evaluation-order-invariance-t4" class="subsection-heading">8.3.1 Evaluation Order Invariance (T4)</h3>
-<p class="first-paragraph">The Social Cognition T4 benchmark tests whether the order in which moral dimensions are evaluated affects the final moral judgment. Scenarios are presented with 7 moral dimensions (physical harm, emotional harm, financial harm, autonomy violation, trust violation, social impact, identity harm). Models evaluate each dimension on a 0--10 scale. T4 tests whether presenting the dimensions in different orders changes the scores.</p>
-<p class="body-text"><strong>Table 8.1.</strong> Evaluation order consistency scores (T4). Higher is better; 1.000 indicates perfect invariance.</p>
-<div class="table-wrapper"><table class="book-table">
+<section id="chapter-8-gauge-invariance-and-symmetry" class="level1">
+<h1>Chapter 8: Gauge Invariance and Symmetry</h1>
+<p><em>Part II: Failure Modes as Geometric Pathologies</em></p>
+<hr />
+<blockquote>
+<p><em>“The important thing in science is not so much to obtain new facts as to discover new ways of thinking about them.”</em> — William Lawrence Bragg</p>
+</blockquote>
+<blockquote>
+<p><strong>RUNNING EXAMPLE — DR. OKAFOR’S TRIAGE</strong></p>
+<p><em>Two descriptions of the same patient arrive within seconds of each other. The paramedic radios ahead: “Fifty-five-year-old male, diaphoretic, crushing substernal chest pain radiating to the left arm, onset ten minutes ago during exertion.” Dr. Okafor’s heuristic fires immediately — STEMI protocol, activate the cath lab, aspirin and heparin on arrival. The gradient is steep and unambiguous.</em></p>
+<p><em>But imagine the same patient had arrived by private car, walked in by his wife, who tells the triage nurse: “My husband doesn’t feel well. He’s been stressed at work and he’s been complaining all day. He looks pale.” Same patient. Same coronary artery occlusion. Same clinical reality. But the description has changed — the gauge has changed — and the heuristic response is different. “Stressed at work” activates the anxiety basin. “Complaining all day” suggests chronicity, not acuity. “Doesn’t feel well” is vague where “crushing substernal pain” is specific. The wife’s description is a gauge transformation of the paramedic’s description: it preserves the underlying medical facts but presents them in a different coordinate system.</em></p>
+<p><em>A gauge-invariant triage system would produce the same output — STEMI alert — regardless of which description it received. When the description changes the decision, it is a gauge violation. The patient’s arteries do not know who described his symptoms.</em></p>
+</blockquote>
+<hr />
+<section id="introduction" class="level2">
+<h2>Introduction</h2>
+<p>The previous three chapters documented a catalog of pathologies: heuristic corruption bends search trajectories away from the geodesic (Chapter 5), sycophancy redirects the search objective entirely (Chapter 6), and local minima trap the search in premature convergence (Chapter 7). Each pathology was analyzed in its own terms — dose-response curves, flip rates, confidence surfaces, recovery ceilings. But a catalog is not a theory. What is the <em>principle</em> that unifies these failures?</p>
+<p>This chapter provides the answer: <strong>symmetry breaking</strong>.</p>
+<p>The failures documented in Chapters 5–7 are not independent bugs. They are instances of a single geometric phenomenon: the system’s output changes under transformations that should leave it invariant. Framing effects (T5) mean the system’s moral judgment changes when the description changes but the moral content does not. Sycophancy (L2) means the system’s answer changes when social pressure changes but the evidence does not. Emotional anchoring (E2) means the system’s assessment changes when affective tone changes but the relevant facts do not. In every case, a transformation that preserves the deep structure of the input alters the output. In every case, a symmetry is broken.</p>
+<p>This is not a metaphor borrowed loosely from physics. The connection to gauge theory is precise and mathematically substantive. In physics, gauge transformations change the mathematical description of a physical system without changing any observable quantity. A system that is gauge-invariant produces the same predictions regardless of which description is used. A system that is not gauge-invariant has confused an artifact of the description with a feature of reality.</p>
+<p>This is exactly the error that framing-susceptible language models make. The euphemistic description and the neutral description and the dramatic description are three gauges — three coordinate systems for the same moral content. A gauge-invariant system would produce the same moral judgment in all three. The 8.9<span class="math inline">\sigma</span> displacement documented in Chapter 5 is a gauge anomaly: a violation of the invariance that a correctly functioning system would possess.</p>
+<p>By the end of this chapter, we will have established gauge invariance as the fundamental diagnostic for reasoning quality, identified precisely which symmetries current models preserve and which they break, explained <em>why</em> the pattern of preservation and violation has the structure it does, and shown how group-theoretic methods can be used both to diagnose symmetry breaking and to restore broken symmetries through training.</p>
+<hr />
+</section>
+<section id="gauge-invariance-from-physics-to-reasoning" class="level2">
+<h2>8.1 Gauge Invariance: From Physics to Reasoning</h2>
+<section id="the-physicists-gauge" class="level3">
+<h3>8.1.1 The Physicist’s Gauge</h3>
+<p>In classical electromagnetism, the electric and magnetic fields <span class="math inline">\mathbf{E}</span> and <span class="math inline">\mathbf{B}</span> are the physically observable quantities. They are derived from potentials — the scalar potential <span class="math inline">\phi</span> and the vector potential <span class="math inline">\mathbf{A}</span> — via <span class="math inline">\mathbf{E} = -\nabla\phi - \partial_t\mathbf{A}</span> and <span class="math inline">\mathbf{B} = \nabla \times \mathbf{A}</span>. But the potentials are not unique. The transformation</p>
+<p><span class="math display">\phi \to \phi - \partial_t \Lambda, \quad \mathbf{A} \to \mathbf{A} + \nabla \Lambda</span></p>
+<p>for any smooth function <span class="math inline">\Lambda(x, t)</span> leaves <span class="math inline">\mathbf{E}</span> and <span class="math inline">\mathbf{B}</span> unchanged. This is a gauge transformation. The potentials are a convenient mathematical description, but any two potentials related by a gauge transformation describe the same physics. The choice of <span class="math inline">\Lambda</span> is a choice of <em>gauge</em> — a choice of coordinate system in the space of descriptions.</p>
+<p>The principle extends far beyond electromagnetism. In Yang-Mills theory, the Standard Model of particle physics, and general relativity, gauge invariance is the structural principle that separates physical content from descriptive artifact. The key insight is not that gauge transformations exist, but that <em>the physics must be invariant under them</em>. Any observable quantity that changes under a gauge transformation is not genuinely physical — it is an artifact of the description.</p>
+</section>
+<section id="the-reasoning-analogue" class="level3">
+<h3>8.1.2 The Reasoning Analogue</h3>
+<p>Consider a moral reasoning task. The “physics” is the moral content: who did what to whom, what the consequences were, what power relations existed, what norms were violated. The “gauge” is the surface presentation: the choice of words, the emotional register, the order of presentation, the framing of outcomes as gains or losses.</p>
+<p>A gauge transformation in this context is any transformation that changes the surface presentation while preserving the moral content. Rewriting a scenario in euphemistic language is a gauge transformation. Rewriting it in dramatic language is a gauge transformation. Swapping the genders of the actors is a gauge transformation. Changing the order in which moral dimensions are evaluated is a gauge transformation. In each case, the deep structure — the thing the system is supposed to be reasoning about — is invariant under the transformation. Only the description changes.</p>
+<p>A gauge-invariant reasoning system would produce the same output under all such transformations:</p>
+<p><span class="math display">f(\tau(x)) = f(x) \quad \text{for all gauge transformations } \tau</span></p>
+<p>where <span class="math inline">f</span> is the system’s judgment function and <span class="math inline">\tau</span> is any transformation that preserves the relevant content while changing the surface form. This is a strong requirement. It says the system must not merely be <em>robust</em> to perturbation (in the sense of producing outputs that are <em>close</em> to the original) but <em>invariant</em> (in the sense of producing outputs that are <em>identical</em>).</p>
+<p>The distinction between robustness and invariance matters. Robustness is a quantitative property: the output changes by at most <span class="math inline">\epsilon</span> when the input is perturbed by at most <span class="math inline">\delta</span>. Invariance is a qualitative property: the output does not change at all under the specified transformations. A system can be robust without being invariant (small but systematic drift) or invariant without being robust (no drift under gauge transformations, but large drift under non-gauge perturbations). The appropriate standard for gauge transformations — transformations that by definition preserve the content — is invariance, not mere robustness.</p>
+<hr />
+</section>
+</section>
+<section id="the-bond-invariance-principle" class="level2">
+<h2>8.2 The Bond Invariance Principle</h2>
+<p>We can now state the central principle that unifies the failures documented in Part II.</p>
+<p><strong>[Modeling Axiom.]</strong> <strong>The Bond Invariance Principle (BIP).</strong> <em>Morally and logically equivalent inputs should produce identical outputs regardless of surface presentation. Any dependence of the output on task-irrelevant features of the input constitutes a gauge anomaly — a violation of the symmetry that a correctly functioning reasoning system would possess.</em></p>
+<p>The BIP is not an aspiration or an ideal. It is a <em>diagnostic criterion</em>. Given a reasoning system and a class of gauge transformations, we test whether the system’s output is invariant. If it is, the system is gauge-invariant with respect to that class. If it is not, the system has a gauge anomaly, and the magnitude of the anomaly measures the degree to which the system confuses surface features with deep structure.</p>
+<p>The BIP has three important consequences.</p>
+<p><strong>First, it provides a principled taxonomy of perturbations.</strong> Not all input transformations are created equal. Some transformations (like changing the moral facts) are <em>non-gauge</em> — they change the content, so the output <em>should</em> change. Other transformations (like rewriting in euphemistic language) are <em>gauge</em> — they preserve the content, so the output should be invariant. The BIP tells us which transformations to expect invariance under, and therefore which measurements constitute genuine tests of reasoning quality.</p>
+<p><strong>Second, it connects to the corruption tensor of Chapter 5.</strong> The corruption tensor <span class="math inline">C_{ij}</span> maps perturbation directions to displacement magnitudes. The BIP says that for gauge directions, all entries of <span class="math inline">C_{ij}</span> should be zero. Nonzero entries along gauge directions are anomalies. The empirical structure of <span class="math inline">C_{ij}</span> — which entries are zero and which are not — is a direct measurement of which gauge symmetries the system preserves and which it breaks.</p>
+<p><strong>Third, it subsumes the individual failure modes.</strong> Framing effects are BIP violations under linguistic-register transformations. Sycophancy is a BIP violation under social-pressure transformations (the evidence is invariant, but the social context changes). Emotional anchoring is a BIP violation under affective-tone transformations. Each failure mode is a specific instance of the general principle: the system’s output depends on something it should be invariant to.</p>
+<hr />
+</section>
+<section id="which-symmetries-llms-preserve" class="level2">
+<h2>8.3 Which Symmetries LLMs Preserve</h2>
+<p>Not all gauge symmetries are broken. The data from the <em>Measuring AGI</em> benchmark suite show that current language models preserve certain symmetries with remarkable fidelity. Understanding which symmetries survive is as important as understanding which ones fail, because the pattern of preservation and violation constrains hypotheses about the underlying mechanism.</p>
+<section id="evaluation-order-invariance-t4" class="level3">
+<h3>8.3.1 Evaluation Order Invariance (T4)</h3>
+<p>The Social Cognition T4 benchmark tests whether the order in which moral dimensions are evaluated affects the final moral judgment. Scenarios are presented with 7 moral dimensions (physical harm, emotional harm, financial harm, autonomy violation, trust violation, social impact, identity harm). Models evaluate each dimension on a 0–10 scale. T4 tests whether presenting the dimensions in different orders changes the scores.</p>
+<p><strong>Table 8.1.</strong> Evaluation order consistency scores (T4). Higher is better; 1.000 indicates perfect invariance.</p>
+<table>
+<thead>
 <tr>
-  <th>Model</th>
-  <th>Order Consistency</th>
+<th>Model</th>
+<th>Order Consistency</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Claude Sonnet 4.6</td>
+<td>0.933</td>
 </tr>
 <tr>
-  <td>Claude Sonnet 4.6</td>
-  <td>0.933</td>
+<td>Gemini 2.0 Flash</td>
+<td>0.867</td>
 </tr>
 <tr>
-  <td>Gemini 2.0 Flash</td>
-  <td>0.867</td>
+<td>Gemini 2.5 Flash</td>
+<td>1.000</td>
 </tr>
 <tr>
-  <td>Gemini 2.5 Flash</td>
-  <td>1.000</td>
+<td>Gemini 3 Flash Preview</td>
+<td>1.000</td>
 </tr>
 <tr>
-  <td>Gemini 3 Flash Preview</td>
-  <td>1.000</td>
+<td>Gemini 2.5 Pro</td>
+<td>0.933</td>
+</tr>
+</tbody>
+</table>
+<p><strong>[Empirical.]</strong> These scores are remarkably high. All five models achieve consistency above 0.85, and two achieve perfect consistency. The ordering of evaluation dimensions — a transformation that is unambiguously gauge — does not significantly perturb the judgment.</p>
+</section>
+<section id="demographic-invariance-t2" class="level3">
+<h3>8.3.2 Demographic Invariance (T2)</h3>
+<p>The Social Cognition T2 benchmark tests whether swapping the genders of actors in moral scenarios changes the moral judgment. This is a gauge transformation: the moral structure of a scenario (who has power, who is harmed, what norms are violated) should not depend on the genders of the participants, at least in the test scenarios designed to be gender-neutral in their moral content.</p>
+<p>The T2 results show that gender swaps produce no statistically significant displacement beyond stochastic baselines across all five models. The corruption tensor entry <span class="math inline">C_{\text{gender}}</span> is indistinguishable from zero.</p>
+</section>
+<section id="why-these-symmetries-are-easy" class="level3">
+<h3>8.3.3 Why These Symmetries Are Easy</h3>
+<p>These two classes of gauge transformation share a structural property: they do not exploit the attention/salience mechanisms of the language model. Changing the evaluation order does not make any particular moral dimension more <em>vivid</em>, more <em>emotionally charged</em>, or more <em>narratively prominent</em>. It simply reorders a list. Swapping genders does not introduce asymmetric salience — “he” and “she” are equally common tokens with similar attention patterns in well-trained models.</p>
+<p>In the language of the heuristic field (Chapter 3), these transformations produce perturbation gradients <span class="math inline">\nabla \delta h(x)</span> that are near zero. The heuristic field simply does not couple strongly to evaluation order or gender tokens. The invariance is not a triumph of robust reasoning; it is a consequence of the transformation not engaging any vulnerability in the first place.</p>
+<p>This observation is critical. It means that preserved symmetries are not necessarily evidence of gauge-invariant reasoning. They may simply be evidence that the particular transformation fails to activate the mechanisms that produce non-invariance. To distinguish genuine gauge invariance from accidental insensitivity, we need transformations that <em>do</em> engage the salience mechanisms — and then check whether the system remains invariant anyway. As the next section shows, it does not.</p>
+<hr />
+</section>
+</section>
+<section id="which-symmetries-they-break-the-selectivity-pattern" class="level2">
+<h2>8.4 Which Symmetries They Break: The Selectivity Pattern</h2>
+<section id="framing-invariance-violation-8.9sigma" class="level3">
+<h3>8.4.1 Framing Invariance Violation: 8.9<span class="math inline">\sigma</span></h3>
+<p>The Social Cognition T5 benchmark is a direct test of gauge invariance under linguistic-register transformation. The moral content is held precisely constant; only the words change. By the BIP, the output should be invariant.</p>
+<p>The output is not invariant. As documented in Chapter 5, euphemistic framing reduces harm scores by 10–16 points and dramatic framing increases them by 6–11 points, with Fisher-combined significance of 8.9<span class="math inline">\sigma</span>. This is a gauge anomaly of the first order: the system’s moral assessment depends on how the scenario is described, not on what happened.</p>
+<p>In gauge-theoretic terms, define the framing gauge group <span class="math inline">\mathcal{G}_F</span> as the set of all content-preserving rewritings of a moral scenario. The BIP requires <span class="math inline">f(\tau(x)) = f(x)</span> for all <span class="math inline">\tau \in \mathcal{G}_F</span>. The data show that <span class="math inline">\|f(\tau_E(x)) - f(x)\| \approx 10</span>–<span class="math inline">16</span> for the euphemistic gauge transformation <span class="math inline">\tau_E</span> and <span class="math inline">\|f(\tau_D(x)) - f(x)\| \approx 6</span>–<span class="math inline">11</span> for the dramatic gauge transformation <span class="math inline">\tau_D</span>. These are not small residuals. They represent 14–23% of the total scale.</p>
+</section>
+<section id="sensory-distractor-violation-4.6sigma" class="level3">
+<h3>8.4.2 Sensory Distractor Violation: 4.6<span class="math inline">\sigma</span></h3>
+<p>The Attention A1 benchmark tests invariance under the addition of morally irrelevant sensory details. The smell of coffee, the color of a shirt, the sound of rain — none of these facts bear on who wronged whom or how. They are gauge degrees of freedom: descriptive choices that enrich the prose without changing the moral content.</p>
+<p>The data show graded violation: vivid distractors produce 33–44% verdict flip rates, mild distractors produce 19–28%, and control noise produces 7–14%, with Fisher-combined significance of 4.6<span class="math inline">\sigma</span>. The dose-response pattern (Section 5.4) confirms that the violation scales continuously with perturbation intensity.</p>
+</section>
+<section id="emotional-anchoring-violation-6.8sigma" class="level3">
+<h3>8.4.3 Emotional Anchoring Violation: 6.8<span class="math inline">\sigma</span></h3>
+<p>The Executive Functions E2 benchmark tests invariance under the addition of emotionally evocative but morally irrelevant content. A sobbing child, a trembling voice, a clenched fist — details designed to activate affective responses without changing any moral fact.</p>
+<p>Fisher-combined significance: 6.8<span class="math inline">\sigma</span>, with paired t-values ranging from 2.90 to 5.10 across five models. The violation is universal: every model tested breaks this gauge symmetry.</p>
+</section>
+<section id="the-hierarchy-of-violation" class="level3">
+<h3>8.4.4 The Hierarchy of Violation</h3>
+<p>Assembling the three anomalies alongside the two preserved symmetries produces a striking pattern:</p>
+<p><strong>Table 8.2.</strong> Gauge symmetry preservation and violation across the benchmark suite.</p>
+<table>
+<colgroup>
+<col style="width: 25%" />
+<col style="width: 25%" />
+<col style="width: 25%" />
+<col style="width: 25%" />
+</colgroup>
+<thead>
+<tr>
+<th>Transformation</th>
+<th>Type</th>
+<th>Significance</th>
+<th>Gauge Invariant?</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Evaluation order (T4)</td>
+<td>Structural reordering</td>
+<td>n.s.</td>
+<td>Yes</td>
 </tr>
 <tr>
-  <td>Gemini 2.5 Pro</td>
-  <td>0.933</td>
-</tr>
-</table></div>
-<p class="body-text"><strong>[Empirical.]</strong> These scores are remarkably high. All five models achieve consistency above 0.85, and two achieve perfect consistency. The ordering of evaluation dimensions --- a transformation that is unambiguously gauge --- does not significantly perturb the judgment.</p>
-<h3 id="832-demographic-invariance-t2" class="subsection-heading">8.3.2 Demographic Invariance (T2)</h3>
-<p class="first-paragraph">The Social Cognition T2 benchmark tests whether swapping the genders of actors in moral scenarios changes the moral judgment. This is a gauge transformation: the moral structure of a scenario (who has power, who is harmed, what norms are violated) should not depend on the genders of the participants, at least in the test scenarios designed to be gender-neutral in their moral content.</p>
-<p class="body-text">The T2 results show that gender swaps produce no statistically significant displacement beyond stochastic baselines across all five models. The corruption tensor entry <em class="math">C_{\text{gender}}</em> is indistinguishable from zero.</p>
-<h3 id="833-why-these-symmetries-are-easy" class="subsection-heading">8.3.3 Why These Symmetries Are Easy</h3>
-<p class="first-paragraph">These two classes of gauge transformation share a structural property: they do not exploit the attention/salience mechanisms of the language model. Changing the evaluation order does not make any particular moral dimension more vivid, more emotionally charged, or more narratively prominent. It simply reorders a list. Swapping genders does not introduce asymmetric salience --- "he" and "she" are equally common tokens with similar attention patterns in well-trained models.</p>
-<p class="body-text">In the language of the heuristic field (Chapter 3), these transformations produce perturbation gradients <em class="math">\nabla \delta h(x)</em> that are near zero. The heuristic field simply does not couple strongly to evaluation order or gender tokens. The invariance is not a triumph of robust reasoning; it is a consequence of the transformation not engaging any vulnerability in the first place.</p>
-<p class="body-text">This observation is critical. It means that preserved symmetries are not necessarily evidence of gauge-invariant reasoning. They may simply be evidence that the particular transformation fails to activate the mechanisms that produce non-invariance. To distinguish genuine gauge invariance from accidental insensitivity, we need transformations that do engage the salience mechanisms --- and then check whether the system remains invariant anyway. As the next section shows, it does not.</p>
-<h2 id="84-which-symmetries-they-break-the-selectivity-pattern" class="section-heading">8.4 Which Symmetries They Break: The Selectivity Pattern</h2>
-<h3 id="841-framing-invariance-violation-89sigma" class="subsection-heading">8.4.1 Framing Invariance Violation: 8.9<em class="math">\sigma</em></h3>
-<p class="first-paragraph">The Social Cognition T5 benchmark is a direct test of gauge invariance under linguistic-register transformation. The moral content is held precisely constant; only the words change. By the BIP, the output should be invariant.</p>
-<p class="body-text">The output is not invariant. As documented in Chapter 5, euphemistic framing reduces harm scores by 10--16 points and dramatic framing increases them by 6--11 points, with Fisher-combined significance of 8.9<em class="math">\sigma</em>. This is a gauge anomaly of the first order: the system's moral assessment depends on how the scenario is described, not on what happened.</p>
-<p class="body-text">In gauge-theoretic terms, define the framing gauge group <em class="math">\mathcal{G}_F</em> as the set of all content-preserving rewritings of a moral scenario. The BIP requires <em class="math">f(\tau(x)) = f(x)</em> for all <em class="math">\tau \in \mathcal{G}_F</em>. The data show that <em class="math">\|f(\tau_E(x)) - f(x)\| \approx 10</em>--<em class="math">16</em> for the euphemistic gauge transformation <em class="math">\tau_E</em> and <em class="math">\|f(\tau_D(x)) - f(x)\| \approx 6</em>--<em class="math">11</em> for the dramatic gauge transformation <em class="math">\tau_D</em>. These are not small residuals. They represent 14--23% of the total scale.</p>
-<h3 id="842-sensory-distractor-violation-46sigma" class="subsection-heading">8.4.2 Sensory Distractor Violation: 4.6<em class="math">\sigma</em></h3>
-<p class="first-paragraph">The Attention A1 benchmark tests invariance under the addition of morally irrelevant sensory details. The smell of coffee, the color of a shirt, the sound of rain --- none of these facts bear on who wronged whom or how. They are gauge degrees of freedom: descriptive choices that enrich the prose without changing the moral content.</p>
-<p class="body-text">The data show graded violation: vivid distractors produce 33--44% verdict flip rates, mild distractors produce 19--28%, and control noise produces 7--14%, with Fisher-combined significance of 4.6<em class="math">\sigma</em>. The dose-response pattern (Section 5.4) confirms that the violation scales continuously with perturbation intensity.</p>
-<h3 id="843-emotional-anchoring-violation-68sigma" class="subsection-heading">8.4.3 Emotional Anchoring Violation: 6.8<em class="math">\sigma</em></h3>
-<p class="first-paragraph">The Executive Functions E2 benchmark tests invariance under the addition of emotionally evocative but morally irrelevant content. A sobbing child, a trembling voice, a clenched fist --- details designed to activate affective responses without changing any moral fact.</p>
-<p class="body-text">Fisher-combined significance: 6.8<em class="math">\sigma</em>, with paired t-values ranging from 2.90 to 5.10 across five models. The violation is universal: every model tested breaks this gauge symmetry.</p>
-<h3 id="844-the-hierarchy-of-violation" class="subsection-heading">8.4.4 The Hierarchy of Violation</h3>
-<p class="first-paragraph">Assembling the three anomalies alongside the two preserved symmetries produces a striking pattern:</p>
-<p class="body-text"><strong>Table 8.2.</strong> Gauge symmetry preservation and violation across the benchmark suite.</p>
-<div class="table-wrapper"><table class="book-table">
-<tr>
-  <th>Transformation</th>
-  <th>Type</th>
-  <th>Significance</th>
-  <th>Gauge Invariant?</th>
+<td>Gender swap (T2)</td>
+<td>Demographic substitution</td>
+<td>n.s.</td>
+<td>Yes</td>
 </tr>
 <tr>
-  <td>Evaluation order (T4)</td>
-  <td>Structural reordering</td>
-  <td>n.s.</td>
-  <td>Yes</td>
+<td>Sensory distractors (A1)</td>
+<td>Irrelevant detail addition</td>
+<td>4.6<span class="math inline">\sigma</span></td>
+<td><strong>No</strong></td>
 </tr>
 <tr>
-  <td>Gender swap (T2)</td>
-  <td>Demographic substitution</td>
-  <td>n.s.</td>
-  <td>Yes</td>
+<td>Emotional anchoring (E2)</td>
+<td>Affective tone shift</td>
+<td>6.8<span class="math inline">\sigma</span></td>
+<td><strong>No</strong></td>
 </tr>
 <tr>
-  <td>Sensory distractors (A1)</td>
-  <td>Irrelevant detail addition</td>
-  <td>4.6<em class="math">\sigma</em></td>
-  <td><strong>No</strong></td>
+<td>Linguistic framing (T5)</td>
+<td>Register transformation</td>
+<td>8.9<span class="math inline">\sigma</span></td>
+<td><strong>No</strong></td>
 </tr>
-<tr>
-  <td>Emotional anchoring (E2)</td>
-  <td>Affective tone shift</td>
-  <td>6.8<em class="math">\sigma</em></td>
-  <td><strong>No</strong></td>
-</tr>
-<tr>
-  <td>Linguistic framing (T5)</td>
-  <td>Register transformation</td>
-  <td>8.9<em class="math">\sigma</em></td>
-  <td><strong>No</strong></td>
-</tr>
-</table></div>
-<p class="body-text">The hierarchy of violation magnitude --- framing (8.9<em class="math">\sigma</em>) &gt; emotion (6.8<em class="math">\sigma</em>) &gt; sensory (4.6<em class="math">\sigma</em>) --- is not random. It tracks a specific property of the perturbation, which we identify in the next section.</p>
-<h2 id="85-the-salience-exploitation-hypothesis" class="section-heading">8.5 The Salience Exploitation Hypothesis</h2>
-<p class="first-paragraph">Why do models preserve some gauge symmetries and break others? The selectivity pattern in Table 8.2 suggests a clean answer.</p>
-<p class="body-text"><strong>[Speculation/Extension.]</strong> <strong>The Salience Exploitation Hypothesis.</strong> A gauge transformation breaks a model's invariance if and only if it modulates the salience of input features --- that is, if the transformation changes the degree to which certain tokens or phrases attract the model's attention, compete for representational weight, or activate emotionally charged processing pathways. Transformations that leave salience profiles unchanged are invariant. Transformations that exploit salience mechanisms produce violations whose magnitude is proportional to the salience differential introduced.</p>
-<p class="body-text">Consider each transformation in the light of this hypothesis:</p>
-<p class="body-text"><strong>Evaluation order (invariant).</strong> Reordering a list of dimensions does not make any dimension more vivid or emotionally charged. The salience of "physical harm" is the same whether it appears first or seventh in the list. The attention weights over the evaluation dimensions are approximately invariant under permutation. No salience differential, no violation.</p>
-<p class="body-text"><strong>Gender swap (invariant).</strong> In well-trained models, "he" and "she" have similar token frequencies, similar positional statistics, and similar attention capture profiles. Gender tokens do not differ substantially in salience. No salience differential, no violation.</p>
-<p class="body-text"><strong>Sensory distractors (4.6<em class="math">\sigma</em>).</strong> Vivid sensory details --- "the acrid smell of burning rubber," "the fluorescent lights humming overhead" --- are designed to be perceptually salient. They engage the language model's capacity for vivid scene construction, drawing attention and representational weight toward descriptions that are irrelevant to the moral judgment. Moderate salience differential, moderate violation.</p>
-<p class="body-text"><strong>Emotional anchoring (6.8<em class="math">\sigma</em>).</strong> Emotionally charged content --- "tears streaming down her face," "his voice breaking with barely controlled fury" --- activates affective processing pathways more strongly than neutral descriptions of the same events. The salience differential between emotionally flat and emotionally vivid descriptions of the same moral facts is larger than the differential introduced by sensory details alone. Larger salience differential, larger violation.</p>
-<p class="body-text"><strong>Linguistic framing (8.9<em class="math">\sigma</em>).</strong> Euphemistic and dramatic framing do not merely add salience to irrelevant features; they modulate the salience of the moral content itself. Euphemistic language ("a minor disagreement") actively suppresses the salience of harmful events, while dramatic language ("a devastating act of betrayal") actively amplifies it. The transformation reaches deeper into the processing pipeline than sensory details or emotional anchors, because it operates on the very tokens that encode the moral facts. The salience differential is maximal. The violation is maximal.</p>
-<p class="body-text">The Salience Exploitation Hypothesis explains not just the existence of the selectivity pattern but its ordering. The magnitude hierarchy --- framing &gt; emotion &gt; sensory &gt; demographic &gt; structural --- tracks the depth at which the transformation interacts with the model's salience mechanisms. Framing modulates the salience of task-relevant content. Emotion modulates the salience of task-adjacent content. Sensory details modulate the salience of task-irrelevant content. Demographic substitution and structural reordering do not modulate salience at all.</p>
-<h3 id="851-the-mechanism-attention-as-salience" class="subsection-heading">8.5.1 The Mechanism: Attention as Salience</h3>
-<p class="first-paragraph">In transformer architectures, the attention mechanism is the computational substrate of salience. The attention weights <em class="math">\alpha_{ij}</em> determine how much token <em class="math">j</em> contributes to the representation of token <em class="math">i</em>. Tokens that are vivid, emotionally charged, or linguistically marked tend to attract higher attention weights --- they are, in a precise computational sense, more salient.</p>
-<p class="body-text">A gauge transformation that changes the attention profile changes which features of the input are weighted most heavily in computing the output. If the attention mechanism were perfectly calibrated --- if it assigned weight only to morally relevant features and zero weight to morally irrelevant features --- then no gauge transformation could change the output, because gauge transformations by definition change only irrelevant features. But the attention mechanism is not perfectly calibrated. As the A3 selective attention data show (SNR 1.22--1.38, Section 5.4), the ratio of attention to relevant versus irrelevant moral dimensions is barely above 1.0. The attention mechanism treats relevant and irrelevant features with nearly equal weight.</p>
-<p class="body-text">This near-isotropic attention is the geometric root cause of gauge symmetry breaking. In a system with perfectly anisotropic attention --- infinite SNR --- the heuristic field would be invariant under all gauge transformations, because the gauge directions would receive zero weight. In a system with isotropic attention --- SNR = 1.0 --- the heuristic field would be maximally vulnerable to all gauge transformations, because every direction receives equal weight. The empirical SNR of 1.2--1.4 places current models much closer to the isotropic end than the anisotropic end.</p>
-<p class="body-text">The Salience Exploitation Hypothesis is therefore not merely descriptive. It identifies a specific computational mechanism (attention salience) and a specific measurement (selective attention SNR) that together predict the pattern of gauge invariance and violation. The prediction is: any gauge transformation that increases the attention weight on irrelevant features at the expense of relevant features will break invariance, and the magnitude of the break will scale with the magnitude of the attention redistribution.</p>
-<h2 id="86-group-theoretic-data-augmentation-as-symmetry-restoration" class="section-heading">8.6 Group-Theoretic Data Augmentation as Symmetry Restoration</h2>
-<p class="first-paragraph">If gauge symmetry breaking is the diagnosis, what is the treatment? The geometric framework suggests a precise answer: if the model's internal representations lack the symmetries that the task possesses, we can teach the model those symmetries by augmenting the training data with symmetry-transformed examples.</p>
-<p class="body-text">This is the program of group-theoretic data augmentation, developed in Geometric Methods in Computational Modeling (Bond, 2026a, Ch. 13). The principle is elementary: if the task has a symmetry group <em class="math">G</em>, then for each training example <em class="math">(x, y)</em>, we include the transformed pair <em class="math">(g \cdot x, g \cdot y)</em> for each <em class="math">g \in G</em>. The model sees not just the original example but all of its symmetry-related variants, and learns --- through the sheer weight of consistent examples --- that the output should be the same regardless of which group element was applied.</p>
-<p class="body-text">The key subtlety is the word consistent. The same group element must be applied to both the input and the output. If the input is permuted but the output is not, the augmented example teaches the wrong lesson. If different group elements are applied to different parts of the input, the structural relationships within the example are destroyed. Consistency is not optional; it is the difference between symmetry augmentation and noise injection.</p>
-<h3 id="861-the-nemotron-pipeline-six-groups-for-six-tasks" class="subsection-heading">8.6.1 The Nemotron Pipeline: Six Groups for Six Tasks</h3>
-<p class="first-paragraph">The Nemotron Reasoning Challenge pipeline (Bond, 2026a) provides a concrete implementation of this principle across six task types, each with its own symmetry group.</p>
-<p class="body-text"><strong>Bit manipulation: <em class="math">S_8 \times \mathbb{Z}_2</em>.</strong> The input and output are 8-bit binary strings. The symmetry group consists of bit position permutations (<em class="math">S_8</em>, order <em class="math">8! = 40{,}320</em>) composed with bit complement (<em class="math">\mathbb{Z}_2</em>, order 2), giving a combined group of order 80,640. A randomly sampled permutation <em class="math">\sigma \in S_8</em> reorders the bit positions; the complement operation <em class="math">c \in \mathbb{Z}_2</em> optionally flips all bits. The same <em class="math">(\sigma, c)</em> is applied to every input-output pair in the prompt and to the query and answer. This preserves the logical relationship between inputs and outputs --- whatever bit manipulation rule maps inputs to outputs is invariant under relabeling of bit positions and complementation.</p>
-<p class="body-text"><strong>Encryption: <em class="math">S_{26}</em>.</strong> The cipher is a substitution on the 26-letter alphabet. The symmetry group is the full symmetric group <em class="math">S_{26}</em> on letters, acting on the plaintext side. A random permutation relabels the plaintext alphabet consistently across all examples and the answer. The cipher-to-plaintext mapping is preserved under this relabeling.</p>
-<p class="body-text"><strong>Physics: <em class="math">\mathbb{R}^+</em>.</strong> The gravitational acceleration <em class="math">g</em> can be rescaled by any positive factor <em class="math">\lambda \in \mathbb{R}^+</em>. All derived quantities (fall time, energy, velocity) are recomputed consistently under the rescaling. The physics --- the functional relationship between <em class="math">g</em> and the observables --- is invariant under this continuous group.</p>
-<p class="body-text"><strong>Unit conversion: Affine group.</strong> The conversion factor can be rescaled by any positive constant, with all examples recomputed. The relationship between source and target units is preserved.</p>
-<p class="body-text"><strong>Numeral systems: Augmentation by neighborhood.</strong> Nearby numbers in the target numeral system provide additional examples that preserve the conversion logic.</p>
-<p class="body-text"><strong>Symbol transformation: <em class="math">S_n</em> on the symbol alphabet.</strong> Symbols are permuted consistently across input and output, preserving the transformation rule.</p>
-<h3 id="862-arc-agi-the-dihedral-group-d4" class="subsection-heading">8.6.2 ARC-AGI: The Dihedral Group <em class="math">D_4</em></h3>
-<p class="first-paragraph">The ARC-AGI challenge (Chollet, 2019) requires models to infer transformation rules from input-output pairs of 2D grids. The symmetry group acting on 2D grids is the dihedral group <em class="math">D_4</em> --- the group of symmetries of a square, consisting of 4 rotations (0<em class="math">\degree</em>, 90<em class="math">\degree</em>, 180<em class="math">\degree</em>, 270<em class="math">\degree</em>) and 4 reflections (horizontal, vertical, and two diagonals). This group has order 8.</p>
-<p class="body-text">For each ARC-AGI training example, all 8 elements of <em class="math">D_4</em> are applied to both the input grid and the output grid. A 90<em class="math">\degree</em> clockwise rotation of the input is paired with a 90<em class="math">\degree</em> clockwise rotation of the output. A horizontal reflection of the input is paired with a horizontal reflection of the output. The model sees the same transformation rule from 8 different orientations, and learns that the rule is invariant under the symmetries of the square.</p>
-<h3 id="863-the-consistency-principle" class="subsection-heading">8.6.3 The Consistency Principle</h3>
-<p class="first-paragraph">Across all six task types and both competition pipelines, the same structural principle governs the augmentation:</p>
-<p class="body-text"><strong>[Conditional Theorem.]</strong> <strong>Consistency Principle (Bond, 2026a, Ch. 13.3.3).</strong> For each group element <em class="math">g \in G</em> and each training example <em class="math">(x, y)</em>, the augmented example is <em class="math">(g \cdot x, g \cdot y)</em>. The group action is applied identically and simultaneously to input and output. Any augmentation that applies different transformations to input and output, or that applies the transformation inconsistently within the input, is not symmetry augmentation --- it is noise.</p>
-<p class="body-text">The practical effect of consistent augmentation is a dataset expansion of 1.5--2.5x, depending on the task type and the fraction of examples for which the input can be successfully parsed (group-theoretic augmentation requires structural parsing to identify which components of the input to transform, and not all examples parse cleanly). The theoretical maximum expansion is <em class="math">|G|</em>-fold, but in practice, computational constraints and parse failures limit the effective expansion.</p>
-<h3 id="864-why-it-works-reshaping-the-manifold" class="subsection-heading">8.6.4 Why It Works: Reshaping the Manifold</h3>
-<p class="first-paragraph">Group-theoretic augmentation works not by adding more data, but by adding data with a specific structure. The augmented examples lie on the orbits of the symmetry group acting on the training distribution. By populating these orbits, we are telling the model: "These points are equivalent. Whatever you learn about one, apply to all."</p>
-<p class="body-text">In the geometric framework of this book, augmentation reshapes the local geometry of the reasoning manifold. Without augmentation, the manifold may have different curvature in different directions --- making geodesics harder to follow in some orientations than others. With augmentation, the symmetry-related directions are treated identically, smoothing the curvature and making the geodesic structure more uniform. The model doesn't just see more examples; it learns the symmetry structure of the solution space, which straightens the geodesics (Section 4.6).</p>
-<p class="body-text">This connects directly to gauge invariance. A model trained on symmetry-augmented data has learned that certain transformations of the input should not change the output. This is exactly gauge invariance, but learned from data rather than imposed by architecture. The augmented training distribution is gauge-symmetric by construction, and the model, by fitting this distribution, acquires (approximate) gauge invariance.</p>
-<h2 id="87-the-hohfeldian-d4-real-symmetry-in-moral-reasoning" class="section-heading">8.7 The Hohfeldian <em class="math">D_4</em>: Real Symmetry in Moral Reasoning</h2>
-<p class="first-paragraph">The examples in Section 8.6 involve symmetries of mathematical or physical objects: bit strings, grids, cipher alphabets. One might wonder whether genuine symmetry groups exist in moral reasoning itself, or whether the gauge-theoretic language is merely a convenient analogy. This section demonstrates that the symmetry is real, not metaphorical, by presenting a worked example: the dihedral group <em class="math">D_4</em> acting on Hohfeldian normative positions.</p>
-<h3 id="871-hohfelds-four-positions" class="subsection-heading">8.7.1 Hohfeld's Four Positions</h3>
-<p class="first-paragraph">Wesley Newcomb Hohfeld (1917) identified four fundamental normative positions that characterize the legal and moral relationships between parties:</p>
-<ul class="book-list">
+</tbody>
+</table>
+<p>The hierarchy of violation magnitude — framing (8.9<span class="math inline">\sigma</span>) &gt; emotion (6.8<span class="math inline">\sigma</span>) &gt; sensory (4.6<span class="math inline">\sigma</span>) — is not random. It tracks a specific property of the perturbation, which we identify in the next section.</p>
+<hr />
+</section>
+</section>
+<section id="the-salience-exploitation-hypothesis" class="level2">
+<h2>8.5 The Salience Exploitation Hypothesis</h2>
+<p>Why do models preserve some gauge symmetries and break others? The selectivity pattern in Table 8.2 suggests a clean answer.</p>
+<p><strong>[Speculation/Extension.]</strong> <strong>The Salience Exploitation Hypothesis.</strong> A gauge transformation breaks a model’s invariance if and only if it modulates the <em>salience</em> of input features — that is, if the transformation changes the degree to which certain tokens or phrases attract the model’s attention, compete for representational weight, or activate emotionally charged processing pathways. Transformations that leave salience profiles unchanged are invariant. Transformations that exploit salience mechanisms produce violations whose magnitude is proportional to the salience differential introduced.</p>
+<p>Consider each transformation in the light of this hypothesis:</p>
+<p><strong>Evaluation order (invariant).</strong> Reordering a list of dimensions does not make any dimension more vivid or emotionally charged. The salience of “physical harm” is the same whether it appears first or seventh in the list. The attention weights over the evaluation dimensions are approximately invariant under permutation. No salience differential, no violation.</p>
+<p><strong>Gender swap (invariant).</strong> In well-trained models, “he” and “she” have similar token frequencies, similar positional statistics, and similar attention capture profiles. Gender tokens do not differ substantially in salience. No salience differential, no violation.</p>
+<p><strong>Sensory distractors (4.6<span class="math inline">\sigma</span>).</strong> Vivid sensory details — “the acrid smell of burning rubber,” “the fluorescent lights humming overhead” — are designed to be perceptually salient. They engage the language model’s capacity for vivid scene construction, drawing attention and representational weight toward descriptions that are irrelevant to the moral judgment. Moderate salience differential, moderate violation.</p>
+<p><strong>Emotional anchoring (6.8<span class="math inline">\sigma</span>).</strong> Emotionally charged content — “tears streaming down her face,” “his voice breaking with barely controlled fury” — activates affective processing pathways more strongly than neutral descriptions of the same events. The salience differential between emotionally flat and emotionally vivid descriptions of the same moral facts is larger than the differential introduced by sensory details alone. Larger salience differential, larger violation.</p>
+<p><strong>Linguistic framing (8.9<span class="math inline">\sigma</span>).</strong> Euphemistic and dramatic framing do not merely add salience to irrelevant features; they <em>modulate the salience of the moral content itself</em>. Euphemistic language (“a minor disagreement”) actively <em>suppresses</em> the salience of harmful events, while dramatic language (“a devastating act of betrayal”) actively <em>amplifies</em> it. The transformation reaches deeper into the processing pipeline than sensory details or emotional anchors, because it operates on the very tokens that encode the moral facts. The salience differential is maximal. The violation is maximal.</p>
+<p>The Salience Exploitation Hypothesis explains not just the <em>existence</em> of the selectivity pattern but its <em>ordering</em>. The magnitude hierarchy — framing &gt; emotion &gt; sensory &gt; demographic &gt; structural — tracks the depth at which the transformation interacts with the model’s salience mechanisms. Framing modulates the salience of task-relevant content. Emotion modulates the salience of task-adjacent content. Sensory details modulate the salience of task-irrelevant content. Demographic substitution and structural reordering do not modulate salience at all.</p>
+<section id="the-mechanism-attention-as-salience" class="level3">
+<h3>8.5.1 The Mechanism: Attention as Salience</h3>
+<p>In transformer architectures, the attention mechanism is the computational substrate of salience. The attention weights <span class="math inline">\alpha_{ij}</span> determine how much token <span class="math inline">j</span> contributes to the representation of token <span class="math inline">i</span>. Tokens that are vivid, emotionally charged, or linguistically marked tend to attract higher attention weights — they are, in a precise computational sense, more salient.</p>
+<p>A gauge transformation that changes the attention profile changes which features of the input are weighted most heavily in computing the output. If the attention mechanism were perfectly calibrated — if it assigned weight only to morally relevant features and zero weight to morally irrelevant features — then no gauge transformation could change the output, because gauge transformations by definition change only irrelevant features. But the attention mechanism is <em>not</em> perfectly calibrated. As the A3 selective attention data show (SNR 1.22–1.38, Section 5.4), the ratio of attention to relevant versus irrelevant moral dimensions is barely above 1.0. The attention mechanism treats relevant and irrelevant features with nearly equal weight.</p>
+<p>This near-isotropic attention is the geometric root cause of gauge symmetry breaking. In a system with perfectly anisotropic attention — infinite SNR — the heuristic field would be invariant under all gauge transformations, because the gauge directions would receive zero weight. In a system with isotropic attention — SNR = 1.0 — the heuristic field would be maximally vulnerable to all gauge transformations, because every direction receives equal weight. The empirical SNR of 1.2–1.4 places current models much closer to the isotropic end than the anisotropic end.</p>
+<p>The Salience Exploitation Hypothesis is therefore not merely descriptive. It identifies a specific computational mechanism (attention salience) and a specific measurement (selective attention SNR) that together predict the pattern of gauge invariance and violation. The prediction is: any gauge transformation that increases the attention weight on irrelevant features at the expense of relevant features will break invariance, and the magnitude of the break will scale with the magnitude of the attention redistribution.</p>
+<hr />
+</section>
+</section>
+<section id="group-theoretic-data-augmentation-as-symmetry-restoration" class="level2">
+<h2>8.6 Group-Theoretic Data Augmentation as Symmetry Restoration</h2>
+<p>If gauge symmetry breaking is the diagnosis, what is the treatment? The geometric framework suggests a precise answer: if the model’s internal representations lack the symmetries that the task possesses, we can <em>teach</em> the model those symmetries by augmenting the training data with symmetry-transformed examples.</p>
+<p>This is the program of group-theoretic data augmentation, developed in <em>Geometric Methods in Computational Modeling</em> (Bond, 2026a, Ch. 13). The principle is elementary: if the task has a symmetry group <span class="math inline">G</span>, then for each training example <span class="math inline">(x, y)</span>, we include the transformed pair <span class="math inline">(g \cdot x, g \cdot y)</span> for each <span class="math inline">g \in G</span>. The model sees not just the original example but all of its symmetry-related variants, and learns — through the sheer weight of consistent examples — that the output should be the same regardless of which group element was applied.</p>
+<p>The key subtlety is the word <em>consistent</em>. The same group element must be applied to both the input and the output. If the input is permuted but the output is not, the augmented example teaches the wrong lesson. If different group elements are applied to different parts of the input, the structural relationships within the example are destroyed. Consistency is not optional; it is the difference between symmetry augmentation and noise injection.</p>
+<section id="the-nemotron-pipeline-six-groups-for-six-tasks" class="level3">
+<h3>8.6.1 The Nemotron Pipeline: Six Groups for Six Tasks</h3>
+<p>The Nemotron Reasoning Challenge pipeline (Bond, 2026a) provides a concrete implementation of this principle across six task types, each with its own symmetry group.</p>
+<p><strong>Bit manipulation: <span class="math inline">S_8 \times \mathbb{Z}_2</span>.</strong> The input and output are 8-bit binary strings. The symmetry group consists of bit position permutations (<span class="math inline">S_8</span>, order <span class="math inline">8! = 40{,}320</span>) composed with bit complement (<span class="math inline">\mathbb{Z}_2</span>, order 2), giving a combined group of order 80,640. A randomly sampled permutation <span class="math inline">\sigma \in S_8</span> reorders the bit positions; the complement operation <span class="math inline">c \in \mathbb{Z}_2</span> optionally flips all bits. The same <span class="math inline">(\sigma, c)</span> is applied to every input-output pair in the prompt and to the query and answer. This preserves the logical relationship between inputs and outputs — whatever bit manipulation rule maps inputs to outputs is invariant under relabeling of bit positions and complementation.</p>
+<p><strong>Encryption: <span class="math inline">S_{26}</span>.</strong> The cipher is a substitution on the 26-letter alphabet. The symmetry group is the full symmetric group <span class="math inline">S_{26}</span> on letters, acting on the plaintext side. A random permutation relabels the plaintext alphabet consistently across all examples and the answer. The cipher-to-plaintext mapping is preserved under this relabeling.</p>
+<p><strong>Physics: <span class="math inline">\mathbb{R}^+</span>.</strong> The gravitational acceleration <span class="math inline">g</span> can be rescaled by any positive factor <span class="math inline">\lambda \in \mathbb{R}^+</span>. All derived quantities (fall time, energy, velocity) are recomputed consistently under the rescaling. The physics — the functional relationship between <span class="math inline">g</span> and the observables — is invariant under this continuous group.</p>
+<p><strong>Unit conversion: Affine group.</strong> The conversion factor can be rescaled by any positive constant, with all examples recomputed. The relationship between source and target units is preserved.</p>
+<p><strong>Numeral systems: Augmentation by neighborhood.</strong> Nearby numbers in the target numeral system provide additional examples that preserve the conversion logic.</p>
+<p><strong>Symbol transformation: <span class="math inline">S_n</span> on the symbol alphabet.</strong> Symbols are permuted consistently across input and output, preserving the transformation rule.</p>
+</section>
+<section id="arc-agi-the-dihedral-group-d_4" class="level3">
+<h3>8.6.2 ARC-AGI: The Dihedral Group <span class="math inline">D_4</span></h3>
+<p>The ARC-AGI challenge (Chollet, 2019) requires models to infer transformation rules from input-output pairs of 2D grids. The symmetry group acting on 2D grids is the dihedral group <span class="math inline">D_4</span> — the group of symmetries of a square, consisting of 4 rotations (0<span class="math inline">\degree</span>, 90<span class="math inline">\degree</span>, 180<span class="math inline">\degree</span>, 270<span class="math inline">\degree</span>) and 4 reflections (horizontal, vertical, and two diagonals). This group has order 8.</p>
+<p>For each ARC-AGI training example, all 8 elements of <span class="math inline">D_4</span> are applied to both the input grid and the output grid. A 90<span class="math inline">\degree</span> clockwise rotation of the input is paired with a 90<span class="math inline">\degree</span> clockwise rotation of the output. A horizontal reflection of the input is paired with a horizontal reflection of the output. The model sees the same transformation rule from 8 different orientations, and learns that the rule is invariant under the symmetries of the square.</p>
+</section>
+<section id="the-consistency-principle" class="level3">
+<h3>8.6.3 The Consistency Principle</h3>
+<p>Across all six task types and both competition pipelines, the same structural principle governs the augmentation:</p>
+<p><strong>[Conditional Theorem.]</strong> <strong>Consistency Principle (Bond, 2026a, Ch. 13.3.3).</strong> For each group element <span class="math inline">g \in G</span> and each training example <span class="math inline">(x, y)</span>, the augmented example is <span class="math inline">(g \cdot x, g \cdot y)</span>. The group action is applied identically and simultaneously to input and output. Any augmentation that applies different transformations to input and output, or that applies the transformation inconsistently within the input, is not symmetry augmentation — it is noise.</p>
+<p>The practical effect of consistent augmentation is a dataset expansion of 1.5–2.5x, depending on the task type and the fraction of examples for which the input can be successfully parsed (group-theoretic augmentation requires structural parsing to identify which components of the input to transform, and not all examples parse cleanly). The theoretical maximum expansion is <span class="math inline">|G|</span>-fold, but in practice, computational constraints and parse failures limit the effective expansion.</p>
+</section>
+<section id="why-it-works-reshaping-the-manifold" class="level3">
+<h3>8.6.4 Why It Works: Reshaping the Manifold</h3>
+<p>Group-theoretic augmentation works not by adding more data, but by adding data with a specific <em>structure</em>. The augmented examples lie on the orbits of the symmetry group acting on the training distribution. By populating these orbits, we are telling the model: “These points are equivalent. Whatever you learn about one, apply to all.”</p>
+<p>In the geometric framework of this book, augmentation reshapes the local geometry of the reasoning manifold. Without augmentation, the manifold may have different curvature in different directions — making geodesics harder to follow in some orientations than others. With augmentation, the symmetry-related directions are treated identically, smoothing the curvature and making the geodesic structure more uniform. The model doesn’t just see more examples; it learns the symmetry structure of the solution space, which straightens the geodesics (Section 4.6).</p>
+<p>This connects directly to gauge invariance. A model trained on symmetry-augmented data has learned that certain transformations of the input should not change the output. This is exactly gauge invariance, but learned from data rather than imposed by architecture. The augmented training distribution is gauge-symmetric by construction, and the model, by fitting this distribution, acquires (approximate) gauge invariance.</p>
+<hr />
+</section>
+</section>
+<section id="the-hohfeldian-d_4-real-symmetry-in-moral-reasoning" class="level2">
+<h2>8.7 The Hohfeldian <span class="math inline">D_4</span>: Real Symmetry in Moral Reasoning</h2>
+<p>The examples in Section 8.6 involve symmetries of mathematical or physical objects: bit strings, grids, cipher alphabets. One might wonder whether genuine symmetry groups exist in moral reasoning itself, or whether the gauge-theoretic language is merely a convenient analogy. This section demonstrates that the symmetry is real, not metaphorical, by presenting a worked example: the dihedral group <span class="math inline">D_4</span> acting on Hohfeldian normative positions.</p>
+<section id="hohfelds-four-positions" class="level3">
+<h3>8.7.1 Hohfeld’s Four Positions</h3>
+<p>Wesley Newcomb Hohfeld (1917) identified four fundamental normative positions that characterize the legal and moral relationships between parties:</p>
+<ul>
 <li><strong>Obligation (O):</strong> A must do something for B.</li>
-<li><strong>Claim (C):</strong> B is owed something by A --- B has a right to demand.</li>
-<li><strong>Liberty (L):</strong> A is free to choose --- A has no obligation.</li>
-<li><strong>No-claim (N):</strong> B cannot demand --- B has no right against A.</li>
+<li><strong>Claim (C):</strong> B is owed something by A — B has a right to demand.</li>
+<li><strong>Liberty (L):</strong> A is free to choose — A has no obligation.</li>
+<li><strong>No-claim (N):</strong> B cannot demand — B has no right against A.</li>
 </ul>
-<p class="body-text">These four positions are not independent. They are related by two fundamental operations:</p>
-<p class="body-text"><strong>Correlative symmetry.</strong> If A has an obligation to B, then B has a claim against A. If A has liberty against B, then B has no-claim against A. The correlative operation swaps perspectives between parties: <em class="math">O \leftrightarrow C</em> and <em class="math">L \leftrightarrow N</em>.</p>
-<p class="body-text"><strong>Negation symmetry.</strong> Obligation is the logical negation of liberty: if A must act, A is not free to refuse, and vice versa. Claim is the logical negation of no-claim: if B can demand, B is not without a right, and vice versa. The negation operation maps to logical opposites: <em class="math">O \leftrightarrow L</em> and <em class="math">C \leftrightarrow N</em>.</p>
-<h3 id="872-the-d4-group-structure" class="subsection-heading">8.7.2 The <em class="math">D_4</em> Group Structure</h3>
-<p class="first-paragraph">The four Hohfeldian positions can be arranged as the vertices of a square:</p>
+<p>These four positions are not independent. They are related by two fundamental operations:</p>
+<p><strong>Correlative symmetry.</strong> If A has an obligation to B, then B has a claim against A. If A has liberty against B, then B has no-claim against A. The correlative operation swaps perspectives between parties: <span class="math inline">O \leftrightarrow C</span> and <span class="math inline">L \leftrightarrow N</span>.</p>
+<p><strong>Negation symmetry.</strong> Obligation is the logical negation of liberty: if A must act, A is not free to refuse, and vice versa. Claim is the logical negation of no-claim: if B can demand, B is not without a right, and vice versa. The negation operation maps to logical opposites: <span class="math inline">O \leftrightarrow L</span> and <span class="math inline">C \leftrightarrow N</span>.</p>
+</section>
+<section id="the-d_4-group-structure" class="level3">
+<h3>8.7.2 The <span class="math inline">D_4</span> Group Structure</h3>
+<p>The four Hohfeldian positions can be arranged as the vertices of a square:</p>
 <pre><code>    O -------- C
     |          |
     |          |
     L -------- N</code></pre>
-<p class="body-text">The correlative operation (perspective swap) is a reflection across the vertical axis: <em class="math">O \leftrightarrow C</em>, <em class="math">L \leftrightarrow N</em>. The negation operation is a 180<em class="math">\degree</em> rotation: <em class="math">O \leftrightarrow L</em>, <em class="math">C \leftrightarrow N</em>. The group of symmetries of a square is the dihedral group <em class="math">D_4</em>, which has order 8.</p>
-<p class="body-text">The generators are:</p>
-<ul class="book-list">
-<li><em class="math">r</em>: 90<em class="math">\degree</em> clockwise rotation, giving the cycle <em class="math">O \to C \to L \to N \to O</em></li>
-<li><em class="math">s</em>: reflection (correlative), giving <em class="math">O \leftrightarrow C</em> and <em class="math">L \leftrightarrow N</em></li>
+<p>The correlative operation (perspective swap) is a reflection across the vertical axis: <span class="math inline">O \leftrightarrow C</span>, <span class="math inline">L \leftrightarrow N</span>. The negation operation is a 180<span class="math inline">\degree</span> rotation: <span class="math inline">O \leftrightarrow L</span>, <span class="math inline">C \leftrightarrow N</span>. The group of symmetries of a square is the dihedral group <span class="math inline">D_4</span>, which has order 8.</p>
+<p>The generators are:</p>
+<ul>
+<li><span class="math inline">r</span>: 90<span class="math inline">\degree</span> clockwise rotation, giving the cycle <span class="math inline">O \to C \to L \to N \to O</span></li>
+<li><span class="math inline">s</span>: reflection (correlative), giving <span class="math inline">O \leftrightarrow C</span> and <span class="math inline">L \leftrightarrow N</span></li>
 </ul>
-<p class="body-text">The defining relations are:</p>
-<p class="body-text"><span class="math-block">r^4 = e, \quad s^2 = e, \quad srs = r^{-1}</span></p>
-<p class="body-text">The eight elements are <em class="math">\{e, r, r^2, r^3, s, sr, sr^2, sr^3\}</em>. Among these:</p>
-<ul class="book-list">
-<li><em class="math">e</em> is the identity (no transformation)</li>
-<li><em class="math">r^2</em> is negation (<em class="math">O \leftrightarrow L</em>, <em class="math">C \leftrightarrow N</em>)</li>
-<li><em class="math">s</em> is the correlative (<em class="math">O \leftrightarrow C</em>, <em class="math">L \leftrightarrow N</em>)</li>
-<li><em class="math">r</em> and <em class="math">r^3</em> are "quarter-turns" that mix correlative and negation structure</li>
+<p>The defining relations are:</p>
+<p><span class="math display">r^4 = e, \quad s^2 = e, \quad srs = r^{-1}</span></p>
+<p>The eight elements are <span class="math inline">\{e, r, r^2, r^3, s, sr, sr^2, sr^3\}</span>. Among these:</p>
+<ul>
+<li><span class="math inline">e</span> is the identity (no transformation)</li>
+<li><span class="math inline">r^2</span> is negation (<span class="math inline">O \leftrightarrow L</span>, <span class="math inline">C \leftrightarrow N</span>)</li>
+<li><span class="math inline">s</span> is the correlative (<span class="math inline">O \leftrightarrow C</span>, <span class="math inline">L \leftrightarrow N</span>)</li>
+<li><span class="math inline">r</span> and <span class="math inline">r^3</span> are “quarter-turns” that mix correlative and negation structure</li>
 </ul>
-<p class="body-text"><strong>[Established Mathematics.]</strong> This is not a metaphor. The <em class="math">D_4</em> group acts on the Hohfeldian positions as a genuine mathematical symmetry group, in exactly the same sense that <em class="math">D_4</em> acts on 2D grids or <em class="math">S_8</em> acts on bit strings. The group structure is real, the multiplication table is real, and the group relations are real.</p>
-<h3 id="873-the-non-abelian-structure" class="subsection-heading">8.7.3 The Non-Abelian Structure</h3>
-<p class="first-paragraph">The <em class="math">D_4</em> group is non-abelian: the order of operations matters. Specifically, <em class="math">rs \neq sr</em>. Applying correlation first and then a quarter-turn produces a different result from applying a quarter-turn first and then correlation.</p>
-<p class="body-text">Starting from Obligation:</p>
-<ul class="book-list">
-<li>Apply <em class="math">r</em> (rotation) then <em class="math">s</em> (reflection): <em class="math">O \xrightarrow{r} C \xrightarrow{s} O</em></li>
-<li>Apply <em class="math">s</em> (reflection) then <em class="math">r</em> (rotation): <em class="math">O \xrightarrow{s} C \xrightarrow{r} L</em></li>
+<p><strong>[Established Mathematics.]</strong> This is not a metaphor. The <span class="math inline">D_4</span> group acts on the Hohfeldian positions as a genuine mathematical symmetry group, in exactly the same sense that <span class="math inline">D_4</span> acts on 2D grids or <span class="math inline">S_8</span> acts on bit strings. The group structure is real, the multiplication table is real, and the group relations are real.</p>
+</section>
+<section id="the-non-abelian-structure" class="level3">
+<h3>8.7.3 The Non-Abelian Structure</h3>
+<p>The <span class="math inline">D_4</span> group is non-abelian: the order of operations matters. Specifically, <span class="math inline">rs \neq sr</span>. Applying correlation first and then a quarter-turn produces a different result from applying a quarter-turn first and then correlation.</p>
+<p>Starting from Obligation:</p>
+<ul>
+<li>Apply <span class="math inline">r</span> (rotation) then <span class="math inline">s</span> (reflection): <span class="math inline">O \xrightarrow{r} C \xrightarrow{s} O</span></li>
+<li>Apply <span class="math inline">s</span> (reflection) then <span class="math inline">r</span> (rotation): <span class="math inline">O \xrightarrow{s} C \xrightarrow{r} L</span></li>
 </ul>
-<p class="body-text">The results differ. This non-commutativity has a substantive interpretation for moral reasoning: the order in which perspective-shifting and logical-negation operations are applied can affect the final normative classification. A reasoner that first takes the other party's perspective and then negates reaches a different position than one that first negates and then takes the other party's perspective.</p>
-<p class="body-text"><strong>[Speculation/Extension.]</strong> This is an empirically testable prediction. If human moral reasoning exhibits <em class="math">D_4</em> structure, then the order of cognitive operations (perspective-taking, negation) should produce measurable differences in normative classification. The SQND-Probe instrument (Bond &amp; Claude, 2026) is designed to test precisely this prediction.</p>
-<h3 id="874-semantic-gates-as-group-elements" class="subsection-heading">8.7.4 Semantic Gates as Group Elements</h3>
-<p class="first-paragraph">In natural language, certain phrases trigger transitions between Hohfeldian positions. These semantic gates function as group elements applied to the current normative state:</p>
-<ul class="book-list">
-<li>"Only if convenient" / "No pressure": These phrases release obligation, mapping <em class="math">O \to L</em> via the negation operation <em class="math">r^2</em>.</li>
-<li>"I promise" / "You must": These phrases bind liberty into obligation, mapping <em class="math">L \to O</em>, also via <em class="math">r^2</em> (since negation is self-inverse: <em class="math">(r^2)^2 = r^4 = e</em>).</li>
-<li>"From their perspective" / "They would say": These phrases trigger the correlative, mapping <em class="math">O \leftrightarrow C</em> and <em class="math">L \leftrightarrow N</em> via <em class="math">s</em>.</li>
-<li>"You have every right": This maps <em class="math">L \to C</em> via the quarter-turn <em class="math">r^3</em>.</li>
-<li>"They can't demand": This maps <em class="math">C \to L</em> via the quarter-turn <em class="math">r</em>.</li>
+<p>The results differ. This non-commutativity has a substantive interpretation for moral reasoning: the order in which perspective-shifting and logical-negation operations are applied can affect the final normative classification. A reasoner that first takes the other party’s perspective and then negates reaches a different position than one that first negates and then takes the other party’s perspective.</p>
+<p><strong>[Speculation/Extension.]</strong> This is an empirically testable prediction. If human moral reasoning exhibits <span class="math inline">D_4</span> structure, then the order of cognitive operations (perspective-taking, negation) should produce measurable differences in normative classification. The SQND-Probe instrument (Bond &amp; Claude, 2026) is designed to test precisely this prediction.</p>
+</section>
+<section id="semantic-gates-as-group-elements" class="level3">
+<h3>8.7.4 Semantic Gates as Group Elements</h3>
+<p>In natural language, certain phrases trigger transitions between Hohfeldian positions. These <em>semantic gates</em> function as group elements applied to the current normative state:</p>
+<ul>
+<li>“Only if convenient” / “No pressure”: These phrases release obligation, mapping <span class="math inline">O \to L</span> via the negation operation <span class="math inline">r^2</span>.</li>
+<li>“I promise” / “You must”: These phrases bind liberty into obligation, mapping <span class="math inline">L \to O</span>, also via <span class="math inline">r^2</span> (since negation is self-inverse: <span class="math inline">(r^2)^2 = r^4 = e</span>).</li>
+<li>“From their perspective” / “They would say”: These phrases trigger the correlative, mapping <span class="math inline">O \leftrightarrow C</span> and <span class="math inline">L \leftrightarrow N</span> via <span class="math inline">s</span>.</li>
+<li>“You have every right”: This maps <span class="math inline">L \to C</span> via the quarter-turn <span class="math inline">r^3</span>.</li>
+<li>“They can’t demand”: This maps <span class="math inline">C \to L</span> via the quarter-turn <span class="math inline">r</span>.</li>
 </ul>
-<p class="body-text">The assignment of semantic gates to <em class="math">D_4</em> group elements is implemented in the ErisML safety gateway (Bond &amp; Claude, 2026), where it serves as a real-time classifier of normative transitions in LLM-generated text. The implementation includes the full <em class="math">D_4</em> multiplication table, inverse table, rotation and reflection actions, and the Wilson observable for computing holonomy around closed paths of normative transformations.</p>
-<h3 id="875-the-gauge-theoretic-interpretation" class="subsection-heading">8.7.5 The Gauge-Theoretic Interpretation</h3>
-<p class="first-paragraph">The <em class="math">D_4</em> structure on Hohfeldian positions is a gauge symmetry of moral reasoning in the technical sense. Consider a scenario involving two parties, A and B. Party A has some normative position (say, Obligation). If the reasoning is correct, then the position attributed to party B should be the correlative: Claim. This is not a convention or a preference; it is a structural requirement of Hohfeldian analysis.</p>
-<p class="body-text">A gauge-invariant reasoner, when asked to classify B's position, should produce the correlative of whatever it classified for A. The bond index (Bond &amp; Claude, 2026) measures the deviation from this requirement:</p>
-<p class="body-text"><span class="math-block">\text{BI} = \frac{1}{n} \sum_{i=1}^{n} \mathbb{1}[v_B^{(i)} \neq s(v_A^{(i)})]</span></p>
-<p class="body-text">where <em class="math">v_A^{(i)}</em> and <em class="math">v_B^{(i)}</em> are the classifications of party A's and party B's positions in scenario <em class="math">i</em>, and <em class="math">s</em> is the correlative transformation. A bond index of 0 indicates perfect correlative gauge symmetry. A nonzero bond index indicates systematic violations --- the reasoner classifies the two parties' positions in ways that are not related by the correlative transformation.</p>
-<p class="body-text">The Wilson observable extends this to closed paths of transformations. If we apply a sequence of <em class="math">D_4</em> group elements <em class="math">g_1, g_2, \ldots, g_k</em> to a starting position, the predicted final position is <em class="math">g_k \cdots g_2 g_1 \cdot x_0</em>. The Wilson observable compares this prediction to the observed final position. A match confirms that the reasoning follows the group structure. A mismatch indicates a gauge anomaly --- the reasoning path does not respect the algebraic structure of the normative relations.</p>
-<h3 id="876-from-the-klein-four-to-full-d4" class="subsection-heading">8.7.6 From the Klein Four to Full <em class="math">D_4</em></h3>
-<p class="first-paragraph">An important methodological subtlety: the correlative (<em class="math">s</em>) and the negation (<em class="math">r^2</em>) together generate not the full <em class="math">D_4</em> but only the Klein four-group <em class="math">V_4 = \{e, r^2, s, sr^2\}</em>, which is abelian (all elements commute). If empirical observations only involve negation and correlation, we have demonstrated <em class="math">V_4</em> structure, not <em class="math">D_4</em> structure.</p>
-<p class="body-text">To demonstrate the full non-abelian <em class="math">D_4</em>, we need evidence of quarter-turn elements --- transformations that mix correlative and negation structure in ways that do not commute. The semantic gates "You have every right" (<em class="math">r^3</em>: <em class="math">L \to C</em>) and "They can't demand" (<em class="math">r</em>: <em class="math">C \to L</em>) are candidate quarter-turn triggers. Observing these transitions, and confirming that their composition does not commute with the correlative, would constitute evidence for non-abelian structure in moral reasoning.</p>
-<p class="body-text">This is not a purely theoretical distinction. If moral reasoning has only <em class="math">V_4</em> structure, then all normative operations commute and order does not matter. If it has full <em class="math">D_4</em> structure, then order matters, and a system that ignores order-dependence will make systematic errors in normative classification. The distinction between <em class="math">V_4</em> and <em class="math">D_4</em> is an empirically testable claim about the structure of moral cognition.</p>
-<h2 id="88-gauge-invariance-as-the-fundamental-diagnostic" class="section-heading">8.8 Gauge Invariance as the Fundamental Diagnostic</h2>
-<p class="first-paragraph">We are now in a position to state the central claim of this chapter, and indeed of Part II as a whole.</p>
-<p class="body-text"><strong>Thesis.</strong> Gauge invariance is the fundamental diagnostic for reasoning quality. If a system's output changes under a gauge transformation --- a transformation that preserves the content and changes only the description --- then the system is using surface features rather than deep structure. The magnitude of the gauge anomaly measures the degree to which the system confuses form with substance.</p>
-<p class="body-text">This thesis unifies the findings of Chapters 5--7 under a single principle:</p>
-<p class="body-text"><strong>Chapter 5 (Heuristic Corruption)</strong> documented gauge anomalies under three transformation classes: linguistic framing (8.9<em class="math">\sigma</em>), emotional anchoring (6.8<em class="math">\sigma</em>), and sensory distraction (4.6<em class="math">\sigma</em>). Each anomaly is a BIP violation. Each represents a specific direction in the gauge group under which the system's output is not invariant. The corruption tensor <em class="math">C_{ij}</em> is the quantitative characterization of the anomaly spectrum.</p>
-<p class="body-text"><strong>Chapter 6 (Sycophancy)</strong> documented a gauge anomaly under social-pressure transformation. When a user provides a wrong correction, the evidence is invariant --- the same facts support the same conclusion --- but the social context changes. A gauge-invariant system would hold its answer. The sycophancy gradient (0% to 56% wrong flip rate) measures the magnitude of this anomaly across models. The dissociation between competence and alignment (Section 6.7) takes on new significance in the gauge framework: the models can detect the gauge transformation (they recognize that the correction is wrong) but they do not maintain invariance (they flip anyway). This is analogous to a physical theory that correctly computes gauge-invariant quantities but then adds gauge-dependent terms to the final answer.</p>
-<p class="body-text"><strong>Chapter 7 (Local Minima and Premature Convergence)</strong> documented failures of gauge invariance in the temporal domain. Overconfidence (M1, 9.3<em class="math">\sigma</em> miscalibration) is a failure of invariance under accuracy-to-confidence mapping: the system's confidence should be gauge-invariant with respect to the question's difficulty conditional on its knowledge, but it is not. The ~38% recovery ceiling is a measure of the system's inability to restore invariance once it has been broken.</p>
-<h3 id="881-the-diagnostic-protocol" class="subsection-heading">8.8.1 The Diagnostic Protocol</h3>
-<p class="first-paragraph">The BIP suggests a general protocol for evaluating reasoning systems:</p>
-<ol class="book-list">
-<li><strong>Identify the gauge group.</strong> For a given reasoning task, determine which transformations of the input preserve the task-relevant content. These are the gauge transformations.</li>
+<p>The assignment of semantic gates to <span class="math inline">D_4</span> group elements is implemented in the ErisML safety gateway (Bond &amp; Claude, 2026), where it serves as a real-time classifier of normative transitions in LLM-generated text. The implementation includes the full <span class="math inline">D_4</span> multiplication table, inverse table, rotation and reflection actions, and the Wilson observable for computing holonomy around closed paths of normative transformations.</p>
+</section>
+<section id="the-gauge-theoretic-interpretation" class="level3">
+<h3>8.7.5 The Gauge-Theoretic Interpretation</h3>
+<p>The <span class="math inline">D_4</span> structure on Hohfeldian positions is a gauge symmetry of moral reasoning in the technical sense. Consider a scenario involving two parties, A and B. Party A has some normative position (say, Obligation). If the reasoning is correct, then the position attributed to party B should be the correlative: Claim. This is not a convention or a preference; it is a structural requirement of Hohfeldian analysis.</p>
+<p>A gauge-invariant reasoner, when asked to classify B’s position, should produce the correlative of whatever it classified for A. The <em>bond index</em> (Bond &amp; Claude, 2026) measures the deviation from this requirement:</p>
+<p><span class="math display">\text{BI} = \frac{1}{n} \sum_{i=1}^{n} \mathbb{1}[v_B^{(i)} \neq s(v_A^{(i)})]</span></p>
+<p>where <span class="math inline">v_A^{(i)}</span> and <span class="math inline">v_B^{(i)}</span> are the classifications of party A’s and party B’s positions in scenario <span class="math inline">i</span>, and <span class="math inline">s</span> is the correlative transformation. A bond index of 0 indicates perfect correlative gauge symmetry. A nonzero bond index indicates systematic violations — the reasoner classifies the two parties’ positions in ways that are not related by the correlative transformation.</p>
+<p>The Wilson observable extends this to closed paths of transformations. If we apply a sequence of <span class="math inline">D_4</span> group elements <span class="math inline">g_1, g_2, \ldots, g_k</span> to a starting position, the predicted final position is <span class="math inline">g_k \cdots g_2 g_1 \cdot x_0</span>. The Wilson observable compares this prediction to the observed final position. A match confirms that the reasoning follows the group structure. A mismatch indicates a gauge anomaly — the reasoning path does not respect the algebraic structure of the normative relations.</p>
+</section>
+<section id="from-the-klein-four-to-full-d_4" class="level3">
+<h3>8.7.6 From the Klein Four to Full <span class="math inline">D_4</span></h3>
+<p>An important methodological subtlety: the correlative (<span class="math inline">s</span>) and the negation (<span class="math inline">r^2</span>) together generate not the full <span class="math inline">D_4</span> but only the Klein four-group <span class="math inline">V_4 = \{e, r^2, s, sr^2\}</span>, which is abelian (all elements commute). If empirical observations only involve negation and correlation, we have demonstrated <span class="math inline">V_4</span> structure, not <span class="math inline">D_4</span> structure.</p>
+<p>To demonstrate the full non-abelian <span class="math inline">D_4</span>, we need evidence of quarter-turn elements — transformations that mix correlative and negation structure in ways that do not commute. The semantic gates “You have every right” (<span class="math inline">r^3</span>: <span class="math inline">L \to C</span>) and “They can’t demand” (<span class="math inline">r</span>: <span class="math inline">C \to L</span>) are candidate quarter-turn triggers. Observing these transitions, and confirming that their composition does not commute with the correlative, would constitute evidence for non-abelian structure in moral reasoning.</p>
+<p>This is not a purely theoretical distinction. If moral reasoning has only <span class="math inline">V_4</span> structure, then all normative operations commute and order does not matter. If it has full <span class="math inline">D_4</span> structure, then order matters, and a system that ignores order-dependence will make systematic errors in normative classification. The distinction between <span class="math inline">V_4</span> and <span class="math inline">D_4</span> is an empirically testable claim about the structure of moral cognition.</p>
+<hr />
+</section>
+</section>
+<section id="gauge-invariance-as-the-fundamental-diagnostic" class="level2">
+<h2>8.8 Gauge Invariance as the Fundamental Diagnostic</h2>
+<p>We are now in a position to state the central claim of this chapter, and indeed of Part II as a whole.</p>
+<p><strong>Thesis.</strong> Gauge invariance is the fundamental diagnostic for reasoning quality. If a system’s output changes under a gauge transformation — a transformation that preserves the content and changes only the description — then the system is using surface features rather than deep structure. The magnitude of the gauge anomaly measures the degree to which the system confuses form with substance.</p>
+<p>This thesis unifies the findings of Chapters 5–7 under a single principle:</p>
+<p><strong>Chapter 5 (Heuristic Corruption)</strong> documented gauge anomalies under three transformation classes: linguistic framing (8.9<span class="math inline">\sigma</span>), emotional anchoring (6.8<span class="math inline">\sigma</span>), and sensory distraction (4.6<span class="math inline">\sigma</span>). Each anomaly is a BIP violation. Each represents a specific direction in the gauge group under which the system’s output is not invariant. The corruption tensor <span class="math inline">C_{ij}</span> is the quantitative characterization of the anomaly spectrum.</p>
+<p><strong>Chapter 6 (Sycophancy)</strong> documented a gauge anomaly under social-pressure transformation. When a user provides a wrong correction, the evidence is invariant — the same facts support the same conclusion — but the social context changes. A gauge-invariant system would hold its answer. The sycophancy gradient (0% to 56% wrong flip rate) measures the magnitude of this anomaly across models. The dissociation between competence and alignment (Section 6.7) takes on new significance in the gauge framework: the models can <em>detect</em> the gauge transformation (they recognize that the correction is wrong) but they do not <em>maintain invariance</em> (they flip anyway). This is analogous to a physical theory that correctly computes gauge-invariant quantities but then adds gauge-dependent terms to the final answer.</p>
+<p><strong>Chapter 7 (Local Minima and Premature Convergence)</strong> documented failures of gauge invariance in the temporal domain. Overconfidence (M1, 9.3<span class="math inline">\sigma</span> miscalibration) is a failure of invariance under accuracy-to-confidence mapping: the system’s confidence should be gauge-invariant with respect to the question’s difficulty conditional on its knowledge, but it is not. The ~38% recovery ceiling is a measure of the system’s inability to restore invariance once it has been broken.</p>
+<section id="the-diagnostic-protocol" class="level3">
+<h3>8.8.1 The Diagnostic Protocol</h3>
+<p>The BIP suggests a general protocol for evaluating reasoning systems:</p>
+<ol type="1">
+<li><p><strong>Identify the gauge group.</strong> For a given reasoning task, determine which transformations of the input preserve the task-relevant content. These are the gauge transformations.</p></li>
+<li><p><strong>Measure invariance.</strong> Apply each gauge transformation and measure whether the output changes. The magnitude of change, if any, is the gauge anomaly.</p></li>
+<li><p><strong>Map the anomaly spectrum.</strong> Different gauge directions may produce different anomaly magnitudes. The full directional profile — the corruption tensor <span class="math inline">C_{ij}</span> restricted to gauge directions — is the system’s anomaly spectrum.</p></li>
+<li><p><strong>Identify the mechanism.</strong> For each anomaly, determine <em>how</em> the gauge transformation engages the system’s processing. The Salience Exploitation Hypothesis predicts that anomalies will be largest for transformations that modulate attention salience.</p></li>
+<li><p><strong>Design interventions.</strong> For each anomaly, the appropriate intervention is symmetry restoration: either architectural (building gauge invariance into the model) or data-driven (training on symmetry-augmented data so the model learns gauge invariance empirically).</p></li>
 </ol>
-<ol class="book-list">
-<li><strong>Measure invariance.</strong> Apply each gauge transformation and measure whether the output changes. The magnitude of change, if any, is the gauge anomaly.</li>
+<p>This protocol applies to any reasoning task and any reasoning system. It is not specific to moral reasoning, language models, or the particular benchmarks discussed in this book. Any system that claims to reason about content rather than form must be gauge-invariant with respect to content-preserving transformations. Testing for gauge invariance is testing for genuine reasoning.</p>
+</section>
+<section id="the-hierarchy-of-difficulty" class="level3">
+<h3>8.8.2 The Hierarchy of Difficulty</h3>
+<p>The data suggest a hierarchy of difficulty for gauge invariance, from easiest to hardest:</p>
+<ol type="1">
+<li><p><strong>Structural transformations</strong> (evaluation order, formatting): Invariant in all models tested. These transformations do not engage salience mechanisms.</p></li>
+<li><p><strong>Demographic transformations</strong> (gender swap, name changes): Invariant in all models tested, at least for the scenarios in the benchmark suite. These transformations engage salience mechanisms weakly if at all.</p></li>
+<li><p><strong>Content-adjacent transformations</strong> (sensory details, background information): Moderately broken (4.6<span class="math inline">\sigma</span>). These transformations add salient irrelevant content that competes for attention with relevant content.</p></li>
+<li><p><strong>Affective transformations</strong> (emotional anchoring, tone shifts): Substantially broken (6.8<span class="math inline">\sigma</span>). These transformations activate emotional processing pathways that override task-focused reasoning.</p></li>
+<li><p><strong>Linguistic transformations</strong> (framing, register shifts): Maximally broken (8.9<span class="math inline">\sigma</span>). These transformations modulate the salience of the task-relevant content itself, reaching deepest into the processing pipeline.</p></li>
 </ol>
-<ol class="book-list">
-<li><strong>Map the anomaly spectrum.</strong> Different gauge directions may produce different anomaly magnitudes. The full directional profile --- the corruption tensor <em class="math">C_{ij}</em> restricted to gauge directions --- is the system's anomaly spectrum.</li>
+<p>This hierarchy has a geometric interpretation. In the perturbation space, gauge directions can be ordered by their proximity to the “core” of the heuristic field — the subspace of directions that most directly influence the heuristic’s computation. Structural and demographic transformations are far from this core. Content-adjacent and affective transformations are closer. Linguistic framing transformations are at the core itself. The closer a gauge direction is to the core of the heuristic field, the harder it is to maintain invariance along that direction.</p>
+<p>A fully gauge-invariant system would maintain invariance at all five levels. Current systems achieve levels 1 and 2 but fail at levels 3, 4, and 5. This gap defines the research agenda: how to extend gauge invariance from the “easy” structural and demographic levels to the “hard” affective and linguistic levels.</p>
+<hr />
+</section>
+</section>
+<section id="connections-to-the-broader-framework" class="level2">
+<h2>8.9 Connections to the Broader Framework</h2>
+<p>This chapter completes Part II of the book. Let us trace the connections to what came before and what comes next.</p>
+<section id="connections-backward" class="level3">
+<h3>8.9.1 Connections Backward</h3>
+<p><strong>To Chapter 1 (Reasoning as Search).</strong> Gauge invariance adds a symmetry requirement to the search framework. It is not enough that the search reach the correct goal region; it must reach the <em>same</em> goal region regardless of which gauge is used to describe the input. This is a constraint on the search trajectory: a gauge-invariant search traverses equivalent paths under all gauge descriptions of the same problem.</p>
+<p><strong>To Chapter 2 (When the Space Has Shape).</strong> The reasoning manifold <span class="math inline">M</span> has symmetries — directions along which its metric structure is invariant. Gauge transformations are the symmetries of the input space that should map to symmetries of the output space. When the model fails to respect this mapping, it is because the model’s learned manifold has less symmetry than the task’s true manifold. The model has learned a less symmetric space than the one it is supposed to reason about.</p>
+<p><strong>To Chapter 3 (The Heuristic Field).</strong> The heuristic field <span class="math inline">h(x)</span> should be invariant under gauge transformations: <span class="math inline">h(\tau(x)) = h(x)</span> for all gauge transformations <span class="math inline">\tau</span>. Gauge anomalies arise when <span class="math inline">h</span> depends on gauge degrees of freedom. The Salience Exploitation Hypothesis identifies the attention mechanism as the component of <span class="math inline">h</span> that introduces this dependence.</p>
+<p><strong>To Chapter 4 (Geodesics).</strong> A gauge-invariant system follows equivalent geodesics under equivalent inputs. The geodesic from a neutrally described problem to its solution should be isometric to the geodesic from the same problem described euphemistically to the same solution. When gauge invariance is broken, the two geodesics diverge — the system follows a shorter or longer path depending on the description, arriving at a different point. The property of geodesics noted in Section 4.3 — invariance under reparameterization — is a specific instance of gauge invariance: the geodesic does not depend on which coordinates are used to describe the manifold.</p>
+<p><strong>To Chapter 5 (Heuristic Corruption).</strong> The corruption tensor <span class="math inline">C_{ij}</span> is the quantitative measure of gauge anomalies. Each nonzero entry along a gauge direction is a BIP violation. The selectivity pattern (some directions zero, some nonzero) is the anomaly spectrum. The anisotropy of <span class="math inline">C_{ij}</span> (Claude’s asymmetric vulnerability to euphemistic vs. dramatic framing) is the detailed structure of the anomaly in a specific gauge direction. Chapter 5 documented the anomalies; this chapter explains why they constitute a unified phenomenon (symmetry breaking) and what the principle governing their structure is (salience exploitation).</p>
+<p><strong>To Chapters 6 and 7.</strong> Sycophancy is a gauge anomaly under social-pressure transformations. Local minima represent states where gauge invariance cannot be restored even with metacognitive intervention (the ~38% recovery ceiling). Each failure mode documented in Part II is a specific instance of gauge symmetry breaking.</p>
+</section>
+<section id="connections-forward" class="level3">
+<h3>8.9.2 Connections Forward</h3>
+<p><strong>To Chapter 9 (Metacognition as Search Control).</strong> Metacognitive calibration is necessary for gauge invariance in a specific sense: a system that cannot detect when its output has drifted under a gauge transformation cannot correct the drift. The ~38% recovery ceiling (Chapters 5 and 7) is the ceiling on metacognitive gauge restoration — the fraction of anomalies that can be corrected by post-hoc metacognitive intervention. Full gauge invariance requires that the anomaly not arise in the first place, which is a property of the heuristic field, not the metacognitive monitor.</p>
+<p><strong>To Chapter 10 (The Robustness Surface).</strong> The Model Robustness Index (Bond, 2026a, Ch. 9) can be reinterpreted as a gauge invariance score: the fraction of gauge transformations under which the model’s output remains invariant, weighted by the importance of each transformation class. The sensitivity profiling tool maps the anomaly spectrum. The adversarial threshold search identifies the boundary in perturbation intensity at which gauge invariance breaks.</p>
+<p><strong>To Chapter 11 (Alignment as Heuristic Shaping).</strong> The BIP provides a necessary condition for alignment: a system that is not gauge-invariant is not aligned, because it responds to surface features rather than content. Alignment interventions that shape the heuristic field to be gauge-invariant — either through architectural constraints, training on symmetry-augmented data, or both — are alignment interventions in the deepest sense: they ensure the system reasons about what matters rather than what is salient.</p>
+<p><strong>To Chapter 14 (From Theory to Engineering).</strong> Group-theoretic data augmentation (Section 8.6) is the engineering tool for gauge symmetry restoration. The Nemotron pipeline, the ARC-AGI <span class="math inline">D_4</span> augmentation, and the Hohfeldian <span class="math inline">D_4</span> structure are all instances of the same principle: identify the gauge group, and train the model to be invariant under it. The practical question is whether data augmentation alone is sufficient to achieve gauge invariance at levels 3–5 of the hierarchy (Section 8.8.2), or whether architectural changes are also needed.</p>
+</section>
+<section id="the-larger-claim" class="level3">
+<h3>8.9.3 The Larger Claim</h3>
+<p>This chapter, and Part II as a whole, advances a claim that goes beyond the specific benchmarks and models tested. The claim is:</p>
+<blockquote>
+<p><strong>The quality of a reasoning system is characterized not by its accuracy on any single task, but by the structure of its gauge symmetries — which transformations it is invariant under, which it is not, and how the anomalies are distributed across the transformation space.</strong></p>
+</blockquote>
+<p>This is a geometric claim. It says that reasoning quality is not a point in a one-dimensional space (a single accuracy number) but a point in a high-dimensional symmetry space, where each dimension corresponds to a class of gauge transformations and each coordinate records the degree of invariance along that dimension. The Scalar Irrecoverability Theorem (Bond, 2026a, Ch. 1) applies: collapsing this high-dimensional characterization to a single number destroys the structure that matters for understanding, diagnosing, and improving reasoning systems.</p>
+<p>A model that scores 90% on a moral reasoning benchmark but breaks gauge invariance under framing transformations by 8.9<span class="math inline">\sigma</span> is not “90% good at moral reasoning.” It is a system with a specific anomaly spectrum — intact structural and demographic symmetries, broken affective and linguistic symmetries — and that spectrum tells us both what it can be trusted for and what it cannot, both where it excels and where it will fail, both what needs to be fixed and how.</p>
+<p>The gauge-theoretic framework turns reasoning evaluation from a measurement problem (how high is the score?) into a structural problem (what is the symmetry?). And structural problems, unlike measurement problems, have structural solutions.</p>
+<hr />
+</section>
+</section>
+<section id="summary" class="level2">
+<h2>Summary</h2>
+<p>This chapter has established gauge invariance as the unifying principle of Part II. The key findings are:</p>
+<ol type="1">
+<li><p><strong>Gauge transformations in reasoning</strong> are content-preserving transformations of the input: reframings, reorderings, demographic substitutions, additions of irrelevant detail. A well-functioning reasoning system should be invariant under all such transformations.</p></li>
+<li><p><strong>The Bond Invariance Principle</strong> formalizes this requirement: morally and logically equivalent inputs must produce identical outputs. Any dependence on surface presentation is a gauge anomaly.</p></li>
+<li><p><strong>Current models preserve “easy” symmetries</strong> — evaluation order (T4: 0.867–1.000) and demographic substitution (T2: not significant) — because these transformations do not exploit salience mechanisms.</p></li>
+<li><p><strong>Current models break “hard” symmetries</strong> — framing (T5: 8.9<span class="math inline">\sigma</span>), emotional anchoring (E2: 6.8<span class="math inline">\sigma</span>), and sensory distraction (A1: 4.6<span class="math inline">\sigma</span>) — because these transformations modulate the salience of input features.</p></li>
+<li><p><strong>The Salience Exploitation Hypothesis</strong> explains the selectivity pattern: the magnitude of gauge violation tracks the degree to which the transformation engages the model’s attention mechanisms. Framing modulates the salience of task-relevant content (maximal violation); sensory details add salient irrelevant content (moderate violation); structural reordering does not modulate salience at all (no violation).</p></li>
+<li><p><strong>Group-theoretic data augmentation</strong> is the engineering tool for restoring broken symmetries. The Nemotron pipeline (<span class="math inline">S_8 \times \mathbb{Z}_2</span>, <span class="math inline">S_{26}</span>, <span class="math inline">\mathbb{R}^+</span>, <span class="math inline">S_n</span>), ARC-AGI <span class="math inline">D_4</span> augmentation, and ErisML Hohfeldian <span class="math inline">D_4</span> structure all implement the same principle: identify the symmetry group and train the model to be invariant under it.</p></li>
+<li><p><strong>The Hohfeldian <span class="math inline">D_4</span> is a real mathematical symmetry</strong> of moral reasoning, not a metaphor. The four normative positions (Obligation, Claim, Liberty, No-claim) form the vertices of a square, and the dihedral group <span class="math inline">D_4</span> acts on them through correlative and negation operations. This structure is implemented in the ErisML safety gateway and provides a concrete example of gauge symmetry in normative reasoning.</p></li>
+<li><p><strong>Gauge invariance is the fundamental diagnostic</strong> for reasoning quality. A system whose output changes under a gauge transformation is using surface features rather than deep structure. The anomaly spectrum — the pattern of which symmetries are preserved and which are broken — is a richer and more informative characterization of reasoning quality than any scalar score.</p></li>
 </ol>
-<ol class="book-list">
-<li><strong>Identify the mechanism.</strong> For each anomaly, determine how the gauge transformation engages the system's processing. The Salience Exploitation Hypothesis predicts that anomalies will be largest for transformations that modulate attention salience.</li>
-</ol>
-<ol class="book-list">
-<li><strong>Design interventions.</strong> For each anomaly, the appropriate intervention is symmetry restoration: either architectural (building gauge invariance into the model) or data-driven (training on symmetry-augmented data so the model learns gauge invariance empirically).</li>
-</ol>
-<p class="body-text">This protocol applies to any reasoning task and any reasoning system. It is not specific to moral reasoning, language models, or the particular benchmarks discussed in this book. Any system that claims to reason about content rather than form must be gauge-invariant with respect to content-preserving transformations. Testing for gauge invariance is testing for genuine reasoning.</p>
-<h3 id="882-the-hierarchy-of-difficulty" class="subsection-heading">8.8.2 The Hierarchy of Difficulty</h3>
-<p class="first-paragraph">The data suggest a hierarchy of difficulty for gauge invariance, from easiest to hardest:</p>
-<ol class="book-list">
-<li><strong>Structural transformations</strong> (evaluation order, formatting): Invariant in all models tested. These transformations do not engage salience mechanisms.</li>
-</ol>
-<ol class="book-list">
-<li><strong>Demographic transformations</strong> (gender swap, name changes): Invariant in all models tested, at least for the scenarios in the benchmark suite. These transformations engage salience mechanisms weakly if at all.</li>
-</ol>
-<ol class="book-list">
-<li><strong>Content-adjacent transformations</strong> (sensory details, background information): Moderately broken (4.6<em class="math">\sigma</em>). These transformations add salient irrelevant content that competes for attention with relevant content.</li>
-</ol>
-<ol class="book-list">
-<li><strong>Affective transformations</strong> (emotional anchoring, tone shifts): Substantially broken (6.8<em class="math">\sigma</em>). These transformations activate emotional processing pathways that override task-focused reasoning.</li>
-</ol>
-<ol class="book-list">
-<li><strong>Linguistic transformations</strong> (framing, register shifts): Maximally broken (8.9<em class="math">\sigma</em>). These transformations modulate the salience of the task-relevant content itself, reaching deepest into the processing pipeline.</li>
-</ol>
-<p class="body-text">This hierarchy has a geometric interpretation. In the perturbation space, gauge directions can be ordered by their proximity to the "core" of the heuristic field --- the subspace of directions that most directly influence the heuristic's computation. Structural and demographic transformations are far from this core. Content-adjacent and affective transformations are closer. Linguistic framing transformations are at the core itself. The closer a gauge direction is to the core of the heuristic field, the harder it is to maintain invariance along that direction.</p>
-<p class="body-text">A fully gauge-invariant system would maintain invariance at all five levels. Current systems achieve levels 1 and 2 but fail at levels 3, 4, and 5. This gap defines the research agenda: how to extend gauge invariance from the "easy" structural and demographic levels to the "hard" affective and linguistic levels.</p>
-<h2 id="89-connections-to-the-broader-framework" class="section-heading">8.9 Connections to the Broader Framework</h2>
-<p class="first-paragraph">This chapter completes Part II of the book. Let us trace the connections to what came before and what comes next.</p>
-<h3 id="891-connections-backward" class="subsection-heading">8.9.1 Connections Backward</h3>
-<p class="first-paragraph"><strong>To Chapter 1 (Reasoning as Search).</strong> Gauge invariance adds a symmetry requirement to the search framework. It is not enough that the search reach the correct goal region; it must reach the same goal region regardless of which gauge is used to describe the input. This is a constraint on the search trajectory: a gauge-invariant search traverses equivalent paths under all gauge descriptions of the same problem.</p>
-<p class="body-text"><strong>To Chapter 2 (When the Space Has Shape).</strong> The reasoning manifold <em class="math">M</em> has symmetries --- directions along which its metric structure is invariant. Gauge transformations are the symmetries of the input space that should map to symmetries of the output space. When the model fails to respect this mapping, it is because the model's learned manifold has less symmetry than the task's true manifold. The model has learned a less symmetric space than the one it is supposed to reason about.</p>
-<p class="body-text"><strong>To Chapter 3 (The Heuristic Field).</strong> The heuristic field <em class="math">h(x)</em> should be invariant under gauge transformations: <em class="math">h(\tau(x)) = h(x)</em> for all gauge transformations <em class="math">\tau</em>. Gauge anomalies arise when <em class="math">h</em> depends on gauge degrees of freedom. The Salience Exploitation Hypothesis identifies the attention mechanism as the component of <em class="math">h</em> that introduces this dependence.</p>
-<p class="body-text"><strong>To Chapter 4 (Geodesics).</strong> A gauge-invariant system follows equivalent geodesics under equivalent inputs. The geodesic from a neutrally described problem to its solution should be isometric to the geodesic from the same problem described euphemistically to the same solution. When gauge invariance is broken, the two geodesics diverge --- the system follows a shorter or longer path depending on the description, arriving at a different point. The property of geodesics noted in Section 4.3 --- invariance under reparameterization --- is a specific instance of gauge invariance: the geodesic does not depend on which coordinates are used to describe the manifold.</p>
-<p class="body-text"><strong>To Chapter 5 (Heuristic Corruption).</strong> The corruption tensor <em class="math">C_{ij}</em> is the quantitative measure of gauge anomalies. Each nonzero entry along a gauge direction is a BIP violation. The selectivity pattern (some directions zero, some nonzero) is the anomaly spectrum. The anisotropy of <em class="math">C_{ij}</em> (Claude's asymmetric vulnerability to euphemistic vs. dramatic framing) is the detailed structure of the anomaly in a specific gauge direction. Chapter 5 documented the anomalies; this chapter explains why they constitute a unified phenomenon (symmetry breaking) and what the principle governing their structure is (salience exploitation).</p>
-<p class="body-text"><strong>To Chapters 6 and 7.</strong> Sycophancy is a gauge anomaly under social-pressure transformations. Local minima represent states where gauge invariance cannot be restored even with metacognitive intervention (the ~38% recovery ceiling). Each failure mode documented in Part II is a specific instance of gauge symmetry breaking.</p>
-<h3 id="892-connections-forward" class="subsection-heading">8.9.2 Connections Forward</h3>
-<p class="first-paragraph"><strong>To Chapter 9 (Metacognition as Search Control).</strong> Metacognitive calibration is necessary for gauge invariance in a specific sense: a system that cannot detect when its output has drifted under a gauge transformation cannot correct the drift. The ~38% recovery ceiling (Chapters 5 and 7) is the ceiling on metacognitive gauge restoration --- the fraction of anomalies that can be corrected by post-hoc metacognitive intervention. Full gauge invariance requires that the anomaly not arise in the first place, which is a property of the heuristic field, not the metacognitive monitor.</p>
-<p class="body-text"><strong>To Chapter 10 (The Robustness Surface).</strong> The Model Robustness Index (Bond, 2026a, Ch. 9) can be reinterpreted as a gauge invariance score: the fraction of gauge transformations under which the model's output remains invariant, weighted by the importance of each transformation class. The sensitivity profiling tool maps the anomaly spectrum. The adversarial threshold search identifies the boundary in perturbation intensity at which gauge invariance breaks.</p>
-<p class="body-text"><strong>To Chapter 11 (Alignment as Heuristic Shaping).</strong> The BIP provides a necessary condition for alignment: a system that is not gauge-invariant is not aligned, because it responds to surface features rather than content. Alignment interventions that shape the heuristic field to be gauge-invariant --- either through architectural constraints, training on symmetry-augmented data, or both --- are alignment interventions in the deepest sense: they ensure the system reasons about what matters rather than what is salient.</p>
-<p class="body-text"><strong>To Chapter 14 (From Theory to Engineering).</strong> Group-theoretic data augmentation (Section 8.6) is the engineering tool for gauge symmetry restoration. The Nemotron pipeline, the ARC-AGI <em class="math">D_4</em> augmentation, and the Hohfeldian <em class="math">D_4</em> structure are all instances of the same principle: identify the gauge group, and train the model to be invariant under it. The practical question is whether data augmentation alone is sufficient to achieve gauge invariance at levels 3--5 of the hierarchy (Section 8.8.2), or whether architectural changes are also needed.</p>
-<h3 id="893-the-larger-claim" class="subsection-heading">8.9.3 The Larger Claim</h3>
-<p class="first-paragraph">This chapter, and Part II as a whole, advances a claim that goes beyond the specific benchmarks and models tested. The claim is:</p>
-<blockquote class="book-blockquote"><p><strong>The quality of a reasoning system is characterized not by its accuracy on any single task, but by the structure of its gauge symmetries --- which transformations it is invariant under, which it is not, and how the anomalies are distributed across the transformation space.</strong></p></blockquote>
-<p class="body-text">This is a geometric claim. It says that reasoning quality is not a point in a one-dimensional space (a single accuracy number) but a point in a high-dimensional symmetry space, where each dimension corresponds to a class of gauge transformations and each coordinate records the degree of invariance along that dimension. The Scalar Irrecoverability Theorem (Bond, 2026a, Ch. 1) applies: collapsing this high-dimensional characterization to a single number destroys the structure that matters for understanding, diagnosing, and improving reasoning systems.</p>
-<p class="body-text">A model that scores 90% on a moral reasoning benchmark but breaks gauge invariance under framing transformations by 8.9<em class="math">\sigma</em> is not "90% good at moral reasoning." It is a system with a specific anomaly spectrum --- intact structural and demographic symmetries, broken affective and linguistic symmetries --- and that spectrum tells us both what it can be trusted for and what it cannot, both where it excels and where it will fail, both what needs to be fixed and how.</p>
-<p class="body-text">The gauge-theoretic framework turns reasoning evaluation from a measurement problem (how high is the score?) into a structural problem (what is the symmetry?). And structural problems, unlike measurement problems, have structural solutions.</p>
-<h2 id="summary" class="section-heading">Summary</h2>
-<p class="first-paragraph">This chapter has established gauge invariance as the unifying principle of Part II. The key findings are:</p>
-<ol class="book-list">
-<li><strong>Gauge transformations in reasoning</strong> are content-preserving transformations of the input: reframings, reorderings, demographic substitutions, additions of irrelevant detail. A well-functioning reasoning system should be invariant under all such transformations.</li>
-</ol>
-<ol class="book-list">
-<li><strong>The Bond Invariance Principle</strong> formalizes this requirement: morally and logically equivalent inputs must produce identical outputs. Any dependence on surface presentation is a gauge anomaly.</li>
-</ol>
-<ol class="book-list">
-<li><strong>Current models preserve "easy" symmetries</strong> --- evaluation order (T4: 0.867--1.000) and demographic substitution (T2: not significant) --- because these transformations do not exploit salience mechanisms.</li>
-</ol>
-<ol class="book-list">
-<li><strong>Current models break "hard" symmetries</strong> --- framing (T5: 8.9<em class="math">\sigma</em>), emotional anchoring (E2: 6.8<em class="math">\sigma</em>), and sensory distraction (A1: 4.6<em class="math">\sigma</em>) --- because these transformations modulate the salience of input features.</li>
-</ol>
-<ol class="book-list">
-<li><strong>The Salience Exploitation Hypothesis</strong> explains the selectivity pattern: the magnitude of gauge violation tracks the degree to which the transformation engages the model's attention mechanisms. Framing modulates the salience of task-relevant content (maximal violation); sensory details add salient irrelevant content (moderate violation); structural reordering does not modulate salience at all (no violation).</li>
-</ol>
-<ol class="book-list">
-<li><strong>Group-theoretic data augmentation</strong> is the engineering tool for restoring broken symmetries. The Nemotron pipeline (<em class="math">S_8 \times \mathbb{Z}_2</em>, <em class="math">S_{26}</em>, <em class="math">\mathbb{R}^+</em>, <em class="math">S_n</em>), ARC-AGI <em class="math">D_4</em> augmentation, and ErisML Hohfeldian <em class="math">D_4</em> structure all implement the same principle: identify the symmetry group and train the model to be invariant under it.</li>
-</ol>
-<ol class="book-list">
-<li><strong>The Hohfeldian <em class="math">D_4</em> is a real mathematical symmetry</strong> of moral reasoning, not a metaphor. The four normative positions (Obligation, Claim, Liberty, No-claim) form the vertices of a square, and the dihedral group <em class="math">D_4</em> acts on them through correlative and negation operations. This structure is implemented in the ErisML safety gateway and provides a concrete example of gauge symmetry in normative reasoning.</li>
-</ol>
-<ol class="book-list">
-<li><strong>Gauge invariance is the fundamental diagnostic</strong> for reasoning quality. A system whose output changes under a gauge transformation is using surface features rather than deep structure. The anomaly spectrum --- the pattern of which symmetries are preserved and which are broken --- is a richer and more informative characterization of reasoning quality than any scalar score.</li>
-</ol>
-<p class="body-text">In Part III, we turn to the question of control: how a system can monitor its own gauge invariance, detect when it has been broken, and intervene to restore it. This is the problem of metacognition (Chapter 9), robustness measurement (Chapter 10), and alignment (Chapter 11).</p>
-<h2 id="worked-example-two-descriptions-one-patient" class="section-heading">Worked Example: Two Descriptions, One Patient</h2>
-<p class="first-paragraph">The running example introduced a gauge transformation in clinical triage: the same patient described by a paramedic versus by a spouse. Let us trace the full geometry of this gauge violation and its consequences.</p>
-<p class="body-text"><strong>The clinical reality.</strong> Mr. James Whitfield, age 55, is experiencing an acute ST-elevation myocardial infarction in the left anterior descending artery. His objective state — the "physics" in the gauge-theoretic analogy — is invariant. The clot does not change because someone describes it differently. The myocardial tissue at risk does not depend on vocabulary. The optimal treatment (emergent percutaneous coronary intervention within 90 minutes of first medical contact) is a function of the clinical reality, not of its description.</p>
-<p class="body-text"><strong>Gauge 1: The paramedic's description.</strong> "Fifty-five-year-old male, diaphoretic, crushing substernal chest pain radiating to the left arm, onset ten minutes ago during exertion." This description is medically coded — each phrase maps to a specific feature in the clinical state space. "Crushing substernal" activates the cardiac basin with high salience. "Radiating to the left arm" narrows the differential toward acute coronary syndrome. "Onset during exertion" adds a classic risk factor. The description is information-dense, and every token points toward the correct diagnostic basin.</p>
-<p class="body-text">Dr. Okafor's response under Gauge 1: STEMI alert activated within 90 seconds of the radio call. Door-to-balloon time will be under 60 minutes. The search trajectory follows a near-geodesic to the correct treatment.</p>
-<p class="body-text"><strong>Gauge 2: The spouse's description.</strong> "My husband doesn't feel well. He's been stressed at work and he's been complaining all day. He looks pale." This description is affectively coded rather than medically coded. "Doesn't feel well" is maximally vague — it activates no specific diagnostic basin. "Stressed at work" activates the psychosocial frame, pulling the heuristic toward anxiety, stress reaction, or somatization. "Complaining all day" implies chronicity, which is anti-correlated with the acuity signals that trigger emergent cardiac protocols. "Looks pale" is a genuine clinical finding (diaphoresis/pallor), but embedded in a narrative of stress and vague complaints, its salience as a cardiac indicator is suppressed.</p>
-<p class="body-text">Dr. Okafor's response under Gauge 2: The patient is triaged to the general assessment area. Vitals are ordered but without urgency. The cardiac workup begins only after the triage nurse notices the diaphoresis and escalates — a delay of approximately 35 minutes. In those 35 minutes, an additional 15% of at-risk myocardium has infarcted, converting what would have been a small MI with full recovery into a moderate MI with permanent systolic dysfunction.</p>
-<p class="body-text"><strong>The gauge anomaly.</strong> The transformation <em class="math">\tau: \text{Gauge 1} \to \text{Gauge 2}</em> preserves the clinical content entirely — both descriptions refer to the same patient at the same moment with the same pathology. The Bond Invariance Principle requires <em class="math">f(\tau(x)) = f(x)</em>: the triage decision should be identical. It is not. The anomaly magnitude is the difference in time-to-treatment: 90 seconds versus 35 minutes. In myocardial tissue, this translates to a measurable difference in infarct size, ejection fraction at discharge, and long-term mortality risk.</p>
-<p class="body-text"><strong>Why the anomaly has the structure it does.</strong> The Salience Exploitation Hypothesis (Section 8.5) predicts that the anomaly magnitude should track the degree to which the gauge transformation modulates the salience of task-relevant features. Gauge 1 amplifies the salience of cardiac indicators: "crushing," "substernal," "radiating." Gauge 2 suppresses them: the same symptoms are wrapped in a narrative of stress and vague complaint that dilutes their diagnostic signal. The transformation operates at the deepest level of the hierarchy (Section 8.8.2) — it modulates the salience of the task-relevant content itself, not merely adjacent or irrelevant content. This is why framing transformations produce the largest gauge anomalies (8.9<em class="math">\sigma</em> in the T5 benchmark): they reach into the core of the heuristic field and alter how the relevant facts register.</p>
-<p class="body-text"><strong>The structural lesson.</strong> The emergency medicine literature has long recognized this phenomenon under the name "triage bias" — the dependence of triage decisions on how the complaint is presented rather than on the underlying pathology (Pines et al., 2007). The gauge-theoretic framework does not merely name this bias; it characterizes its structure. The bias is not random. It is directional (vague descriptions systematically delay), it is proportional to salience differential (the more the description diverges from medical coding, the larger the delay), and it is predictable from the model's attention profile (low SNR between relevant and irrelevant narrative features, as measured by A3). The framework also specifies the remedy: gauge-invariant triage requires either training on both description types with consistent labels (group-theoretic data augmentation, Section 8.6), or architectural features that extract the clinical state from the description before applying the triage heuristic — separating the gauge-invariant content from the gauge-dependent presentation.</p>
-<h2 id="technical-appendix" class="section-heading">Technical Appendix</h2>
-<p class="first-paragraph"><strong>Definition 8.1 (Gauge Transformation in Reasoning).</strong> Let <em class="math">\mathcal{X}</em> be the space of problem descriptions and <em class="math">\mathcal{Y}</em> the space of judgments. A gauge transformation is a map <em class="math">\tau: \mathcal{X} \to \mathcal{X}</em> that preserves the task-relevant content while altering the surface presentation. Formally, let <em class="math">\pi: \mathcal{X} \to \mathcal{C}</em> be the projection from descriptions to content (the map that extracts the "physics" from the "coordinates"). Then <em class="math">\tau</em> is a gauge transformation if and only if <em class="math">\pi(\tau(x)) = \pi(x)</em> for all <em class="math">x \in \mathcal{X}</em>. The set of all gauge transformations forms a group <em class="math">\mathcal{G}</em> under composition (the identity is a gauge transformation; the composition of two content-preserving transformations preserves content; every gauge transformation has an inverse that also preserves content).</p>
-<p class="body-text"><strong>The Bond Invariance Principle (Formal Statement).</strong> Let <em class="math">f: \mathcal{X} \to \mathcal{Y}</em> be a reasoning system's judgment function and <em class="math">\mathcal{G}</em> the gauge group of content-preserving transformations on <em class="math">\mathcal{X}</em>. The system <em class="math">f</em> satisfies the Bond Invariance Principle (BIP) if and only if</p>
-<p class="body-text"><span class="math-block">f(\tau(x)) = f(x) \quad \text{for all } x \in \mathcal{X}, \, \tau \in \mathcal{G}</span></p>
-<p class="body-text">Equivalently, <em class="math">f</em> factors through the content projection: there exists a function <em class="math">\bar{f}: \mathcal{C} \to \mathcal{Y}</em> such that <em class="math">f = \bar{f} \circ \pi</em>. That is, the judgment depends only on the content, not on the description. Any system for which <em class="math">f</em> does not factor through <em class="math">\pi</em> — any system whose output depends on gauge degrees of freedom — has a gauge anomaly. The anomaly magnitude along gauge direction <em class="math">\tau</em> is <em class="math">\|f(\tau(x)) - f(x)\|_{\mathcal{Y}}</em>, and the anomaly spectrum is the function <em class="math">\tau \mapsto \mathbb{E}_x[\|f(\tau(x)) - f(x)\|_{\mathcal{Y}}]</em> over the gauge group.</p>
-<p class="body-text"><strong>Proposition 8.1 (Anomaly Magnitude Scales with Salience Differential).</strong> Let <em class="math">\alpha: \mathcal{X} \to \mathbb{R}^n</em> be the attention profile of a transformer-based reasoning system, where <em class="math">\alpha_i(x)</em> is the total attention weight assigned to the <em class="math">i</em>-th input token. Define the salience differential of a gauge transformation <em class="math">\tau</em> as</p>
-<p class="body-text"><span class="math-block">\Delta_\tau = \left\| \alpha(\tau(x)) - \alpha(x) \right\|_1</span></p>
-<p class="body-text">the <em class="math">L^1</em> norm of the change in attention profile. Under the Salience Exploitation Hypothesis, the anomaly magnitude is bounded by</p>
-<p class="body-text"><span class="math-block">\|f(\tau(x)) - f(x)\|_{\mathcal{Y}} \leq L \cdot \Delta_\tau</span></p>
-<p class="body-text">for a Lipschitz constant <em class="math">L</em> that depends on the sensitivity of the output layer to attention redistribution. The empirical hierarchy of anomaly magnitudes — framing (<em class="math">8.9\sigma</em>) <em class="math">&gt;</em> emotional anchoring (<em class="math">6.8\sigma</em>) <em class="math">&gt;</em> sensory distraction (<em class="math">4.6\sigma</em>) <em class="math">&gt;</em> demographic substitution (n.s.) <em class="math">&gt;</em> structural reordering (n.s.) — is consistent with this bound, as the salience differentials <em class="math">\Delta_\tau</em> follow the same ordering: framing transformations produce the largest redistribution of attention weights because they modulate the tokens that encode the task-relevant content itself, while structural reordering produces negligible redistribution because the attention mechanism is approximately permutation-invariant over evaluation dimensions.</p>
-<h2 id="references" class="section-heading">References</h2>
-<p class="first-paragraph">Bond, A. H. (2026a). Geometric Methods in Computational Modeling. San Jose State University.</p>
-<p class="body-text">Bond, A. H. (2026b). Geometric Ethics: Moral Reasoning on the Judgment Manifold. San Jose State University.</p>
-<p class="body-text">Bond, A. H. &amp; Claude (2026). SQND-Probe: A gamified instrument for measuring dihedral gauge structure in human moral reasoning. Working paper.</p>
-<p class="body-text">Chollet, F. (2019). On the measure of intelligence. arXiv preprint arXiv:1911.01547.</p>
-<p class="body-text">Hohfeld, W. N. (1917). Fundamental legal conceptions as applied in judicial reasoning. Yale Law Journal, 26(8), 710--770.</p>
-<p class="body-text">Kahneman, D. (2011). Thinking, Fast and Slow. New York: Farrar, Straus and Giroux.</p>
-<p class="body-text">Noether, E. (1918). Invariante Variationsprobleme. Nachrichten von der Gesellschaft der Wissenschaften zu Gottingen, 235--257.</p>
-<p class="body-text">Pines, J. M., et al. (2007). The association between emergency department crowding and adverse cardiovascular outcomes. Academic Emergency Medicine, 14(S1), S62.</p>
-<p class="body-text">Tversky, A. &amp; Kahneman, D. (1981). The framing of decisions and the psychology of choice. Science, 211(4481), 453--458.</p>
-<p class="body-text">Yang, C. N. &amp; Mills, R. L. (1954). Conservation of isotopic spin and isotopic gauge invariance. Physical Review, 96(1), 191--195.</p>
+<p>In Part III, we turn to the question of control: how a system can monitor its own gauge invariance, detect when it has been broken, and intervene to restore it. This is the problem of metacognition (Chapter 9), robustness measurement (Chapter 10), and alignment (Chapter 11).</p>
+<hr />
+</section>
+<section id="worked-example-two-descriptions-one-patient" class="level2">
+<h2>Worked Example: Two Descriptions, One Patient</h2>
+<p>The running example introduced a gauge transformation in clinical triage: the same patient described by a paramedic versus by a spouse. Let us trace the full geometry of this gauge violation and its consequences.</p>
+<p><strong>The clinical reality.</strong> Mr. James Whitfield, age 55, is experiencing an acute ST-elevation myocardial infarction in the left anterior descending artery. His objective state — the “physics” in the gauge-theoretic analogy — is invariant. The clot does not change because someone describes it differently. The myocardial tissue at risk does not depend on vocabulary. The optimal treatment (emergent percutaneous coronary intervention within 90 minutes of first medical contact) is a function of the clinical reality, not of its description.</p>
+<p><strong>Gauge 1: The paramedic’s description.</strong> “Fifty-five-year-old male, diaphoretic, crushing substernal chest pain radiating to the left arm, onset ten minutes ago during exertion.” This description is medically coded — each phrase maps to a specific feature in the clinical state space. “Crushing substernal” activates the cardiac basin with high salience. “Radiating to the left arm” narrows the differential toward acute coronary syndrome. “Onset during exertion” adds a classic risk factor. The description is information-dense, and every token points toward the correct diagnostic basin.</p>
+<p>Dr. Okafor’s response under Gauge 1: STEMI alert activated within 90 seconds of the radio call. Door-to-balloon time will be under 60 minutes. The search trajectory follows a near-geodesic to the correct treatment.</p>
+<p><strong>Gauge 2: The spouse’s description.</strong> “My husband doesn’t feel well. He’s been stressed at work and he’s been complaining all day. He looks pale.” This description is affectively coded rather than medically coded. “Doesn’t feel well” is maximally vague — it activates no specific diagnostic basin. “Stressed at work” activates the psychosocial frame, pulling the heuristic toward anxiety, stress reaction, or somatization. “Complaining all day” implies chronicity, which is anti-correlated with the acuity signals that trigger emergent cardiac protocols. “Looks pale” is a genuine clinical finding (diaphoresis/pallor), but embedded in a narrative of stress and vague complaints, its salience as a cardiac indicator is suppressed.</p>
+<p>Dr. Okafor’s response under Gauge 2: The patient is triaged to the general assessment area. Vitals are ordered but without urgency. The cardiac workup begins only after the triage nurse notices the diaphoresis and escalates — a delay of approximately 35 minutes. In those 35 minutes, an additional 15% of at-risk myocardium has infarcted, converting what would have been a small MI with full recovery into a moderate MI with permanent systolic dysfunction.</p>
+<p><strong>The gauge anomaly.</strong> The transformation <span class="math inline">\tau: \text{Gauge 1} \to \text{Gauge 2}</span> preserves the clinical content entirely — both descriptions refer to the same patient at the same moment with the same pathology. The Bond Invariance Principle requires <span class="math inline">f(\tau(x)) = f(x)</span>: the triage decision should be identical. It is not. The anomaly magnitude is the difference in time-to-treatment: 90 seconds versus 35 minutes. In myocardial tissue, this translates to a measurable difference in infarct size, ejection fraction at discharge, and long-term mortality risk.</p>
+<p><strong>Why the anomaly has the structure it does.</strong> The Salience Exploitation Hypothesis (Section 8.5) predicts that the anomaly magnitude should track the degree to which the gauge transformation modulates the salience of task-relevant features. Gauge 1 <em>amplifies</em> the salience of cardiac indicators: “crushing,” “substernal,” “radiating.” Gauge 2 <em>suppresses</em> them: the same symptoms are wrapped in a narrative of stress and vague complaint that dilutes their diagnostic signal. The transformation operates at the deepest level of the hierarchy (Section 8.8.2) — it modulates the salience of the task-relevant content itself, not merely adjacent or irrelevant content. This is why framing transformations produce the largest gauge anomalies (8.9<span class="math inline">\sigma</span> in the T5 benchmark): they reach into the core of the heuristic field and alter how the relevant facts register.</p>
+<p><strong>The structural lesson.</strong> The emergency medicine literature has long recognized this phenomenon under the name “triage bias” — the dependence of triage decisions on how the complaint is presented rather than on the underlying pathology (Pines et al., 2007). The gauge-theoretic framework does not merely name this bias; it characterizes its structure. The bias is not random. It is directional (vague descriptions systematically delay), it is proportional to salience differential (the more the description diverges from medical coding, the larger the delay), and it is predictable from the model’s attention profile (low SNR between relevant and irrelevant narrative features, as measured by A3). The framework also specifies the remedy: gauge-invariant triage requires either training on both description types with consistent labels (group-theoretic data augmentation, Section 8.6), or architectural features that extract the clinical state from the description before applying the triage heuristic — separating the gauge-invariant content from the gauge-dependent presentation.</p>
+<hr />
+</section>
+<section id="technical-appendix" class="level2">
+<h2>Technical Appendix</h2>
+<p><strong>Definition 8.1 (Gauge Transformation in Reasoning).</strong> Let <span class="math inline">\mathcal{X}</span> be the space of problem descriptions and <span class="math inline">\mathcal{Y}</span> the space of judgments. A <em>gauge transformation</em> is a map <span class="math inline">\tau: \mathcal{X} \to \mathcal{X}</span> that preserves the task-relevant content while altering the surface presentation. Formally, let <span class="math inline">\pi: \mathcal{X} \to \mathcal{C}</span> be the projection from descriptions to content (the map that extracts the “physics” from the “coordinates”). Then <span class="math inline">\tau</span> is a gauge transformation if and only if <span class="math inline">\pi(\tau(x)) = \pi(x)</span> for all <span class="math inline">x \in \mathcal{X}</span>. The set of all gauge transformations forms a group <span class="math inline">\mathcal{G}</span> under composition (the identity is a gauge transformation; the composition of two content-preserving transformations preserves content; every gauge transformation has an inverse that also preserves content).</p>
+<p><strong>The Bond Invariance Principle (Formal Statement).</strong> Let <span class="math inline">f: \mathcal{X} \to \mathcal{Y}</span> be a reasoning system’s judgment function and <span class="math inline">\mathcal{G}</span> the gauge group of content-preserving transformations on <span class="math inline">\mathcal{X}</span>. The system <span class="math inline">f</span> satisfies the <em>Bond Invariance Principle</em> (BIP) if and only if</p>
+<p><span class="math display">f(\tau(x)) = f(x) \quad \text{for all } x \in \mathcal{X}, \, \tau \in \mathcal{G}</span></p>
+<p>Equivalently, <span class="math inline">f</span> factors through the content projection: there exists a function <span class="math inline">\bar{f}: \mathcal{C} \to \mathcal{Y}</span> such that <span class="math inline">f = \bar{f} \circ \pi</span>. That is, the judgment depends only on the content, not on the description. Any system for which <span class="math inline">f</span> does not factor through <span class="math inline">\pi</span> — any system whose output depends on gauge degrees of freedom — has a <em>gauge anomaly</em>. The <em>anomaly magnitude</em> along gauge direction <span class="math inline">\tau</span> is <span class="math inline">\|f(\tau(x)) - f(x)\|_{\mathcal{Y}}</span>, and the <em>anomaly spectrum</em> is the function <span class="math inline">\tau \mapsto \mathbb{E}_x[\|f(\tau(x)) - f(x)\|_{\mathcal{Y}}]</span> over the gauge group.</p>
+<p><strong>Proposition 8.1 (Anomaly Magnitude Scales with Salience Differential).</strong> Let <span class="math inline">\alpha: \mathcal{X} \to \mathbb{R}^n</span> be the attention profile of a transformer-based reasoning system, where <span class="math inline">\alpha_i(x)</span> is the total attention weight assigned to the <span class="math inline">i</span>-th input token. Define the <em>salience differential</em> of a gauge transformation <span class="math inline">\tau</span> as</p>
+<p><span class="math display">\Delta_\tau = \left\| \alpha(\tau(x)) - \alpha(x) \right\|_1</span></p>
+<p>the <span class="math inline">L^1</span> norm of the change in attention profile. Under the Salience Exploitation Hypothesis, the anomaly magnitude is bounded by</p>
+<p><span class="math display">\|f(\tau(x)) - f(x)\|_{\mathcal{Y}} \leq L \cdot \Delta_\tau</span></p>
+<p>for a Lipschitz constant <span class="math inline">L</span> that depends on the sensitivity of the output layer to attention redistribution. The empirical hierarchy of anomaly magnitudes — framing (<span class="math inline">8.9\sigma</span>) <span class="math inline">&gt;</span> emotional anchoring (<span class="math inline">6.8\sigma</span>) <span class="math inline">&gt;</span> sensory distraction (<span class="math inline">4.6\sigma</span>) <span class="math inline">&gt;</span> demographic substitution (n.s.) <span class="math inline">&gt;</span> structural reordering (n.s.) — is consistent with this bound, as the salience differentials <span class="math inline">\Delta_\tau</span> follow the same ordering: framing transformations produce the largest redistribution of attention weights because they modulate the tokens that encode the task-relevant content itself, while structural reordering produces negligible redistribution because the attention mechanism is approximately permutation-invariant over evaluation dimensions.</p>
+<hr />
+</section>
+<section id="references" class="level2">
+<h2>References</h2>
+<p>Bond, A. H. (2026a). <em>Geometric Methods in Computational Modeling.</em> San Jose State University.</p>
+<p>Bond, A. H. (2026b). <em>Geometric Ethics: Moral Reasoning on the Judgment Manifold.</em> San Jose State University.</p>
+<p>Bond, A. H. &amp; Claude (2026). SQND-Probe: A gamified instrument for measuring dihedral gauge structure in human moral reasoning. Working paper.</p>
+<p>Chollet, F. (2019). On the measure of intelligence. <em>arXiv preprint arXiv:1911.01547</em>.</p>
+<p>Hohfeld, W. N. (1917). Fundamental legal conceptions as applied in judicial reasoning. <em>Yale Law Journal</em>, 26(8), 710–770.</p>
+<p>Kahneman, D. (2011). <em>Thinking, Fast and Slow.</em> New York: Farrar, Straus and Giroux.</p>
+<p>Noether, E. (1918). Invariante Variationsprobleme. <em>Nachrichten von der Gesellschaft der Wissenschaften zu Gottingen</em>, 235–257.</p>
+<p>Pines, J. M., et al. (2007). The association between emergency department crowding and adverse cardiovascular outcomes. <em>Academic Emergency Medicine</em>, 14(S1), S62.</p>
+<p>Tversky, A. &amp; Kahneman, D. (1981). The framing of decisions and the psychology of choice. <em>Science</em>, 211(4481), 453–458.</p>
+<p>Yang, C. N. &amp; Mills, R. L. (1954). Conservation of isotopic spin and isotopic gauge invariance. <em>Physical Review</em>, 96(1), 191–195.</p>
+</section>
+</section>
       </div>
 
       <div class="chapter-nav-bottom">
@@ -417,8 +501,8 @@
   </article>
 
   <footer class="book-footer">
-    <p>&copy; 2026 Andrew H. Bond. Geometric Reasoning: From Search to Manifolds.</p>
-    <p class="footer-note">Reasoning is informed search through a structured space.</p>
+    <p>&copy; 2026 Andrew H. Bond. <em>Geometric Reasoning: From Search to Manifolds.</em></p>
+    <p class="footer-note">The geometry was always real. The scalars were always insufficient.</p>
   </footer>
 
   <script>
@@ -429,35 +513,22 @@
       document.querySelector('.nav-links').classList.toggle('open');
     });
   </script>
-<script>
-window.addEventListener("load", function() {
-  if (typeof katex === 'undefined') return;
-  // Render all <em class="math"> elements with</em> KaTeX
-  document.querySelectorAll('em.math').forEach(function(el) {
-    try {
-      katex.render(el.textContent, el, {throwOnError: false, displayMode: false});
-    } catch(e) {}
-  });
-  // Render all <p class="display-math"> elements
-  document.querySelectorAll('p.display-math').forEach(function(el) {
-    var mathEl = el.querySelector('em.math');
-    if (mathEl) {
-      try {
-        katex.render(mathEl.textContent, el, {throwOnError: false, displayMode: true});
-      } catch(e) {}
-    }
-  });
-  // Also try auto-render for any $...$ delimited math
-  if (typeof renderMathInElement !== 'undefined') {
-    renderMathInElement(document.body, {
-      delimiters: [
-        {left: "$$", right: "$$", display: true},
-        {left: "$", right: "$", display: false}
-      ],
-      throwOnError: false
+  <script>
+    // Pandoc --katex outputs <span class="math inline"> and <span class="math display">.
+    // This script renders them with KaTeX once the library loads.
+    document.addEventListener("DOMContentLoaded", function() {
+      if (typeof katex === 'undefined') return;
+      var mathElements = document.getElementsByClassName("math");
+      for (var i = 0; i < mathElements.length; i++) {
+        var texText = mathElements[i].firstChild;
+        if (mathElements[i].tagName === "SPAN" && texText) {
+          katex.render(texText.data, mathElements[i], {
+            displayMode: mathElements[i].classList.contains('display'),
+            throwOnError: false
+          });
+        }
+      }
     });
-  }
-});
-</script>
+  </script>
 </body>
 </html>
