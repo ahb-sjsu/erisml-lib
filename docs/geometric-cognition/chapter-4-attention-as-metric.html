@@ -81,7 +81,7 @@
 <h2 id="43-selective-attention-narrows-the-metric" class="section-heading">4.3 Selective Attention Narrows the Metric</h2>
 <p class="first-paragraph">Selective attention is the allocation of cognitive resources to a subset of the available dimensions, at the expense of the remaining dimensions. In the geometric framework, selective attention <em>narrows</em> the metric: it increases the metric components along the attended dimensions and decreases them along the unattended dimensions.</p>
 <p class="body-text"><strong>Definition 4.2</strong> (Selective Attention Operator). *Let <em class="math">g_{\mu\nu}</em> be the baseline metric and let <em class="math">\mathcal{S} \subseteq \{1, \ldots, n\}</em> be the set of attended dimensions. The selectively attended metric is:*</p>
-<p class="display-math"><em class="math">\tilde{g}_{\mu\nu} = \begin{cases} \alpha \cdot g_{\mu\nu} & \text{if } \mu, \nu \in \mathcal{S} \\ \beta \cdot g_{\mu\nu} & \text{if } \mu, \nu \notin \mathcal{S} \\ \sqrt{\alpha\beta} \cdot g_{\mu\nu} & \text{otherwise} \end{cases}</em></p>
+<p class="display-math"><em class="math">\tilde{g}_{\mu\nu} = \begin{cases} \alpha \cdot g_{\mu\nu} & \text{if } \mu, \nu \in \mathcal{S} \ \beta \cdot g_{\mu\nu} & \text{if } \mu, \nu \notin \mathcal{S} \ \sqrt{\alpha\beta} \cdot g_{\mu\nu} & \text{otherwise} \end{cases}</em></p>
 <div class="table-wrapper"><table class="book-table"><tr><th>*where <em class="math">\alpha > 1</em> is the attention amplification factor and <em class="math">0 < \beta < 1</em> is the inattention suppression factor, subject to a total resource constraint <em class="math"></th><th>𝒮</th><th>· α + (n -</th><th>𝒮</th><th>) · β = n</em> (total attentional resources are conserved).*</th></tr></table></div>
 <p class="first-paragraph">The resource constraint is the key feature. Attention is finite. Amplifying some dimensions requires suppressing others. This is not a limitation of the mathematical model; it is an empirical fact about cognition. Humans cannot attend to everything simultaneously with full resolution. Transformer attention mechanisms have a finite number of heads, each attending to a subset of the representation. The resource constraint is real, and it shapes the metric.</p>
 <p class="body-text">The consequences of selective attention for the metric are profound:</p>
@@ -177,7 +177,7 @@
 <p class="body-text"><strong>Setup.</strong> We have two models, Claude and Flash 3, evaluated on two subtasks: A1 (distractor resistance, measuring metric stability) and A4 (divided attention, measuring metric width). The data:</p>
 <div class="table-wrapper"><table class="book-table"><tr><th></th><th>A1 (Distractor Resistance)</th><th>A4 (Divided Attention)</th></tr><tr><td>Claude</td><td>0.72</td><td>0.571</td></tr><tr><td>Flash 3</td><td>0.68</td><td>1.000</td></tr></table></div>
 <p class="body-text"><strong>Step 1: Parameterize the metric.</strong> We model the attention metric as a diagonal matrix in two-dimensional cognitive space (the two task dimensions):</p>
-<p class="display-math"><em class="math">g_{\mu\nu} = \begin{pmatrix} a_1 & 0 \\ 0 & a_2 \end{pmatrix}</em></p>
+<p class="display-math"><em class="math">g_{\mu\nu} = \begin{pmatrix} a_1 & 0 \ 0 & a_2 \end{pmatrix}</em></p>
 <p class="first-paragraph">where <em class="math">a_1</em> is the attention weight on the primary task dimension and <em class="math">a_2</em> is the attention weight on the secondary task dimension. The total attention budget is fixed: <em class="math">a_1 + a_2 = A* for some constant <em class="math">A</em>.</p>
 <p class="body-text"><strong>Step 2: Relate A1 to metric stability.</strong> The A1 score measures how much the metric is perturbed by distractors. A high A1 score means the metric is stable: distractors do not significantly change <em class="math">a_1</em> or <em class="math">a_2</em>. A low A1 score means the metric is unstable: distractors shift attention weight from the task dimension to the distractor dimension. Both models have similar A1 scores (0.72 vs. 0.68), indicating similar metric stability.</p>
 <p class="body-text"><strong>Step 3: Relate A4 to metric distribution.</strong> The A4 score measures how well the model performs when it must attend to two dimensions simultaneously. This constrains the ratio <em class="math">a_1 / a_2</em>:</p>
@@ -205,7 +205,7 @@
 <p class="first-paragraph">*where the infimum is taken over all smooth curves <em class="math">\gamma: [0,1] \to \mathcal{M}</em> with <em class="math">\gamma(0) = p</em> and <em class="math">\gamma(1) = q</em>.*</p>
 <h2 id="technical-appendix-4b-selective-and-divided-attention-as-metric-transformations" class="section-heading">Technical Appendix 4B: Selective and Divided Attention as Metric Transformations</h2>
 <p class="first-paragraph"><strong>Proposition 4.1</strong> (Selective Attention Reduces Effective Dimensionality). *Let <em class="math">g_{\mu\nu}</em> be the baseline metric on an <em class="math">n</em>-dimensional manifold <em class="math">\mathcal{M}</em>, and let <em class="math">\tilde{g}_{\mu\nu}(\epsilon)</em> be the selectively attended metric with attention parameter <em class="math">\epsilon</em> on <em class="math">k</em> attended dimensions:*</p>
-<p class="display-math"><em class="math">\tilde{g}_{\mu\nu}(\epsilon) = \begin{cases} g_{\mu\nu} & \text{if } \mu, \nu \leq k \\ \epsilon \cdot g_{\mu\nu} & \text{if } \mu, \nu > k \\ \sqrt{\epsilon} \cdot g_{\mu\nu} & \text{otherwise} \end{cases}</em></p>
+<p class="display-math"><em class="math">\tilde{g}_{\mu\nu}(\epsilon) = \begin{cases} g_{\mu\nu} & \text{if } \mu, \nu \leq k \ \epsilon \cdot g_{\mu\nu} & \text{if } \mu, \nu > k \ \sqrt{\epsilon} \cdot g_{\mu\nu} & \text{otherwise} \end{cases}</em></p>
 <p class="first-paragraph">*Then as <em class="math">\epsilon \to 0</em>, the geodesics of <em class="math">\tilde{g}</em> converge to the geodesics of the <em class="math">k</em>-dimensional submanifold defined by the first <em class="math">k</em> coordinates. That is, selective attention in the limit reduces the manifold to its attended submanifold.*</p>
 <p class="body-text"><strong>Proposition 4.2</strong> (Divided Attention Lowers Per-Target Resolution). *Under the equal-allocation divided attention metric with budget <em class="math">W</em> split across <em class="math">k</em> targets, the per-target SNR is:*</p>
 <p class="display-math"><em class="math">\text{SNR}_{\text{divided}} = \frac{W/k + g_n}{g_n} = 1 + \frac{W}{k \cdot g_n}</em></p>
@@ -237,7 +237,8 @@
     });
   </script>
 <script>
-document.addEventListener("DOMContentLoaded", function() {
+window.addEventListener("load", function() {
+  if (typeof katex === 'undefined') return;
   // Render all <em class="math"> elements with KaTeX
   document.querySelectorAll('em.math').forEach(function(el) {
     try {
