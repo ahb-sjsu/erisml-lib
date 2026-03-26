@@ -272,13 +272,31 @@
   </script>
 <script>
 document.addEventListener("DOMContentLoaded", function() {
-  renderMathInElement(document.body, {
-    delimiters: [
-      {left: "$$", right: "$$", display: true},
-      {left: "$", right: "$", display: false}
-    ],
-    throwOnError: false
+  // Render all <em class="math"> elements with KaTeX
+  document.querySelectorAll('em.math').forEach(function(el) {
+    try {
+      katex.render(el.textContent, el, {throwOnError: false, displayMode: false});
+    } catch(e) {}
   });
+  // Render all <p class="display-math"> elements
+  document.querySelectorAll('p.display-math').forEach(function(el) {
+    var mathEl = el.querySelector('em.math');
+    if (mathEl) {
+      try {
+        katex.render(mathEl.textContent, el, {throwOnError: false, displayMode: true});
+      } catch(e) {}
+    }
+  });
+  // Also try auto-render for any $...$ delimited math
+  if (typeof renderMathInElement !== 'undefined') {
+    renderMathInElement(document.body, {
+      delimiters: [
+        {left: "$$", right: "$$", display: true},
+        {left: "$", right: "$", display: false}
+      ],
+      throwOnError: false
+    });
+  }
 });
 </script>
 </body>
