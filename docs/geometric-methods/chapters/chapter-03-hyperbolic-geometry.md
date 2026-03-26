@@ -1,6 +1,6 @@
 # Chapter 3: Hyperbolic Geometry for Hierarchical Data
 
-*Geometric Methods in Computational Modeling — Andrew H. Bond*
+*Structural Fuzzing: Geometric Methods for Adversarial Model Validation — Andrew H. Bond*
 
 ---
 

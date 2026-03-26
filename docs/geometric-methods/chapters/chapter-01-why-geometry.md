@@ -50,7 +50,7 @@ The irrecoverability problem is not academic. It produces three concrete failure
 
 2. **Fragile optima.** Two configurations achieve the same loss. One is robust to perturbation; the other sits on a knife edge. Scalar loss cannot distinguish between a broad valley and a narrow ridge in parameter space.
 
-3. **Misleading comparisons.** Model A outperforms Model B on a scalar benchmark. But Model B is superior on three of five dimensions and inferior only on the two that the scalar over-weights. A Pareto analysis (Chapter 5) reveals that neither dominates the other---the comparison is fundamentally multi-dimensional.
+3. **Misleading comparisons.** Model A outperforms Model B on a scalar benchmark. But Model B is superior on three of five dimensions and inferior only on the two that the scalar over-weights. A Pareto analysis (Chapter 8) reveals that neither dominates the other---the comparison is fundamentally multi-dimensional.
 
 These failure modes are not edge cases. They are the *default* outcome whenever a multi-dimensional evaluation is collapsed to a scalar and the null space happens to contain the information that matters.
 
@@ -72,7 +72,7 @@ A *state* is a vector $\mathbf{s} = (s_1, s_2, \ldots, s_n) \in \mathbb{R}^n$ wh
 | $s_4$ | Object-orientation | Coupling, cohesion, inheritance depth |
 | $s_5$ | Process | Revisions, distinct authors, code churn |
 
-Each dimension is not a single feature but a *group* of related features that collectively describe one aspect of the system. The grouping itself is a modeling decision, and it matters: the geometry of the resulting space depends on which features share a dimension and which are separated. Chapter 3 develops systematic methods for constructing these dimension groupings.
+Each dimension is not a single feature but a *group* of related features that collectively describe one aspect of the system. The grouping itself is a modeling decision, and it matters: the geometry of the resulting space depends on which features share a dimension and which are separated. Chapter 1 develops systematic methods for constructing these dimension groupings.
 
 ### 1.2.2 Design Patterns for State Vectors
 
@@ -80,9 +80,9 @@ Working with multi-dimensional state vectors requires disciplined engineering. T
 
 **Immutable state vectors.** A state vector, once constructed, should not be modified in place. Operations that transform states---perturbation, projection, interpolation---produce new vectors. Immutability prevents an entire class of bugs where shared references to a state vector produce unexpected aliasing, and it makes state trajectories trivially reproducible.
 
-**Dimension enumerations.** Each dimension of the state space is named, not numbered. Rather than referring to "dimension 3," the framework refers to "Halstead" or "vocabulary complexity." Named dimensions make code self-documenting, prevent off-by-one errors in dimension indexing, and enable operations like "activate all dimensions except OO" to be expressed declaratively. Chapter 3 introduces the dimension enumeration pattern used throughout the structural fuzzing framework.
+**Dimension enumerations.** Each dimension of the state space is named, not numbered. Rather than referring to "dimension 3," the framework refers to "Halstead" or "vocabulary complexity." Named dimensions make code self-documenting, prevent off-by-one errors in dimension indexing, and enable operations like "activate all dimensions except OO" to be expressed declaratively. Chapter 1 introduces the dimension enumeration pattern used throughout the structural fuzzing framework.
 
-**Attribute encoding conventions.** Each component $s_i$ requires a consistent encoding. For real-valued attributes, the convention is log-space encoding: parameter values are drawn from $[\epsilon, M]$ on a logarithmic scale, with a sentinel value (typically $10^6$) indicating that a dimension is *inactive*. This encoding provides uniform resolution across orders of magnitude and naturally handles the "off/on" semantics needed for subset enumeration (Chapter 4). For categorical or ordinal attributes, one-hot or thermometer encoding maps discrete values into the continuous space while preserving ordering relationships.
+**Attribute encoding conventions.** Each component $s_i$ requires a consistent encoding. For real-valued attributes, the convention is log-space encoding: parameter values are drawn from $[\epsilon, M]$ on a logarithmic scale, with a sentinel value (typically $10^6$) indicating that a dimension is *inactive*. This encoding provides uniform resolution across orders of magnitude and naturally handles the "off/on" semantics needed for subset enumeration (Chapter 11). For categorical or ordinal attributes, one-hot or thermometer encoding maps discrete values into the continuous space while preserving ordering relationships.
 
 ### 1.2.3 What Geometry Buys You
 
@@ -91,7 +91,7 @@ With states as points in $\mathbb{R}^n$, standard geometric operations become im
 - **Distance** between configurations quantifies how different they are, across all dimensions simultaneously, rather than reducing to a scalar difference.
 - **Direction** from one configuration to another reveals *which* dimensions change and by how much---information that scalar comparison discards entirely.
 - **Neighborhoods** around a configuration define the set of "nearby" states, enabling robustness analysis: how far can you move from the current state before behavior changes qualitatively?
-- **Subspaces** correspond to subsets of dimensions, enabling systematic exploration of which combinations of attributes matter (Chapter 4) and which are redundant.
+- **Subspaces** correspond to subsets of dimensions, enabling systematic exploration of which combinations of attributes matter (Chapter 11) and which are redundant.
 - **Curvature** of the loss surface at a point reveals whether the configuration is stable (broad valley) or fragile (narrow ridge), directly addressing the fragile-optima failure mode of scalar metrics.
 
 These are not metaphors. They are literal geometric computations, implemented in the structural fuzzing framework and exercised throughout the examples in this book.
@@ -114,9 +114,9 @@ As points approach the boundary of the ball ($\|x\| \to 1$), distances grow with
 
 Two concrete applications motivate the development in later chapters:
 
-**ARC-AGI rule hierarchies.** The ARC-AGI benchmark requires discovering transformation rules that map input grids to output grids. These rules form hierarchies: a high-level rule like "reflect and recolor" decomposes into sub-rules ("reflect horizontally," "map color A to color B"), which further decompose into pixel-level operations. Embedding these hierarchies into hyperbolic space allows geometric operations---nearest-neighbor search, interpolation, centroid computation---to respect the hierarchical structure. A rule and its parent are "close" in hyperbolic distance even though they may differ substantially in Euclidean terms. Chapter 8 develops this application in detail.
+**ARC-AGI rule hierarchies.** The ARC-AGI benchmark requires discovering transformation rules that map input grids to output grids. These rules form hierarchies: a high-level rule like "reflect and recolor" decomposes into sub-rules ("reflect horizontally," "map color A to color B"), which further decompose into pixel-level operations. Embedding these hierarchies into hyperbolic space allows geometric operations---nearest-neighbor search, interpolation, centroid computation---to respect the hierarchical structure. A rule and its parent are "close" in hyperbolic distance even though they may differ substantially in Euclidean terms. Chapter 3 develops this application in detail.
 
-**Cetacean coda taxonomies.** Sperm whale communication is organized into coda types---rhythmic patterns of clicks---that form a taxonomy: broad categories subdivide into regional variants, which further subdivide into individual-level signatures. The branching structure of this taxonomy maps naturally onto hyperbolic space, enabling similarity computations that respect the taxonomic hierarchy rather than treating all codas as points in a flat space. This application appears in Chapter 12 as a case study in biological signal analysis.
+**Cetacean coda taxonomies.** Sperm whale communication is organized into coda types---rhythmic patterns of clicks---that form a taxonomy: broad categories subdivide into regional variants, which further subdivide into individual-level signatures. The branching structure of this taxonomy maps naturally onto hyperbolic space, enabling similarity computations that respect the taxonomic hierarchy rather than treating all codas as points in a flat space. This application appears in Chapter 20 as a case study in biological signal analysis.
 
 ### 1.3.2 Covariance and Spectral Data on SPD Manifolds
 
@@ -130,7 +130,7 @@ $$d_{LE}(\Sigma_1, \Sigma_2) = \|\log(\Sigma_1) - \log(\Sigma_2)\|_F$$
 
 where $\log$ is the matrix logarithm. This metric respects the multiplicative structure: geodesics (shortest paths) on the SPD manifold correspond to paths along which eigenvalues change by constant multiplicative factors, which is the physically and statistically natural notion of "smooth interpolation" between covariance structures.
 
-For the structural fuzzing framework, SPD manifolds arise when the evaluation involves covariance-dependent quantities. The Mahalanobis distance $d_M(\mathbf{x}, \mathbf{y}) = \sqrt{(\mathbf{x} - \mathbf{y})^\top \Sigma^{-1} (\mathbf{x} - \mathbf{y})}$ uses the inverse covariance matrix $\Sigma^{-1}$ as a metric tensor, stretching distances along directions of low variance and compressing them along directions of high variance. This is the *right* distance metric when features have different scales and are correlated---which is to say, almost always. Chapter 6 develops the Mahalanobis distance in detail, and Chapter 9 extends the framework to operate on SPD manifolds directly.
+For the structural fuzzing framework, SPD manifolds arise when the evaluation involves covariance-dependent quantities. The Mahalanobis distance $d_M(\mathbf{x}, \mathbf{y}) = \sqrt{(\mathbf{x} - \mathbf{y})^\top \Sigma^{-1} (\mathbf{x} - \mathbf{y})}$ uses the inverse covariance matrix $\Sigma^{-1}$ as a metric tensor, stretching distances along directions of low variance and compressing them along directions of high variance. This is the *right* distance metric when features have different scales and are correlated---which is to say, almost always. Chapter 2 develops the Mahalanobis distance in detail, and Chapter 4 extends the framework to operate on SPD manifolds directly.
 
 ### 1.3.3 Topological Features and Persistent Homology
 
@@ -148,7 +148,7 @@ For computational modeling, persistent homology reveals structural properties th
 - A parameter space may contain voids---regions where no valid configuration exists---that exhaustive search must navigate around.
 - The loss landscape may have topological complexity (multiple basins, saddle connections) that curvature analysis alone cannot detect.
 
-Chapter 10 introduces persistent homology for practitioners and Chapter 11 applies it to structural fuzzing, using topological features of the perturbation response surface to detect fragility patterns that the Model Robustness Index (Chapter 7) would miss.
+Chapter 5 introduces persistent homology for practitioners and applies it to structural fuzzing, using topological features of the perturbation response surface to detect fragility patterns that the Model Robustness Index (Chapter 9) would miss.
 
 ---
 
@@ -158,20 +158,19 @@ This book develops a coherent toolchain in which each geometric method addresses
 
 | Tool | Chapter | Problem Addressed |
 |------|---------|-------------------|
-| Multi-dimensional state vectors | 3 | Representing model configurations without information loss |
-| Subset enumeration | 4 | Which dimension combinations matter? |
-| Pareto frontier analysis | 5 | Which configurations are non-dominated tradeoffs? |
-| Mahalanobis distance | 6 | Scale- and correlation-aware distance in feature space |
-| Model Robustness Index (MRI) | 7 | How stable is a configuration under perturbation? |
-| Poincare embeddings | 8 | Faithful representation of hierarchical structures |
-| SPD manifold operations | 9 | Correct arithmetic on covariance and spectral data |
-| Persistent homology | 10--11 | Shape features (loops, voids) invisible to distance metrics |
-| A\* on manifolds | 12 | Optimal pathfinding in non-Euclidean configuration spaces |
-| Pareto optimization | 13 | Multi-objective search without scalarization |
-| Adversarial robustness testing | 14 | Finding tipping points and worst-case perturbations |
-| Group-theoretic augmentation | 15 | Exploiting symmetries for efficient exploration |
+| Multi-dimensional state vectors | 1 | Representing model configurations without information loss |
+| Mahalanobis distance | 2 | Scale- and correlation-aware distance in feature space |
+| Poincare embeddings | 3 | Faithful representation of hierarchical structures |
+| SPD manifold operations | 4 | Correct arithmetic on covariance and spectral data |
+| Persistent homology | 5 | Shape features (loops, voids) invisible to distance metrics |
+| A\* on manifolds | 6 | Optimal pathfinding in non-Euclidean configuration spaces |
+| Pareto optimization | 8 | Multi-objective search without scalarization |
+| Model Robustness Index (MRI) | 9 | How stable is a configuration under perturbation? |
+| Adversarial robustness testing | 9 | Finding tipping points and worst-case perturbations |
+| Subset enumeration | 11 | Which dimension combinations matter? |
+| Group-theoretic augmentation | 13 | Exploiting symmetries for efficient exploration |
 
-The tools are designed to compose. A typical analysis pipeline might: construct a state space (Chapter 3), enumerate subsets to identify important dimensions (Chapter 4), compute the Pareto frontier to find non-dominated configurations (Chapter 5), apply the MRI to quantify robustness of each Pareto-optimal point (Chapter 7), and then run adversarial search to locate exact tipping points for the most promising configurations (Chapter 14). Each step uses geometry to extract information that the previous step's scalar summary would discard.
+The tools are designed to compose. A typical analysis pipeline might: construct a state space (Chapter 1), enumerate subsets to identify important dimensions (Chapter 11), compute the Pareto frontier to find non-dominated configurations (Chapter 8), apply the MRI to quantify robustness of each Pareto-optimal point (Chapter 9), and then run adversarial search to locate exact tipping points for the most promising configurations (Chapter 9). Each step uses geometry to extract information that the previous step's scalar summary would discard.
 
 The toolchain is not tied to any particular domain. It applies wherever a model takes parameters and produces multi-dimensional outputs---which is to say, it applies almost everywhere. The examples in this book span software defect prediction, behavioral economics, abstract reasoning (ARC-AGI), biological signal analysis, and simulation validation, but the methods are domain-agnostic.
 
@@ -203,9 +202,9 @@ The geometric approach begins by organizing the 16 features into five groups, ea
 
 The model's configuration is now a point in $\mathbb{R}^5$. Each dimension corresponds to a feature group, and the parameter value for that dimension controls the group's influence on predictions. Setting a dimension to the sentinel value ($10^6$) deactivates the corresponding feature group entirely, allowing the framework to test *structural* questions: what happens when the model has no access to complexity features? To OO metrics? To process information?
 
-**Step 1: Subset enumeration (Chapter 4).** The framework tests all $\binom{5}{1} + \binom{5}{2} + \binom{5}{3} = 25$ subsets of dimensions up to size 3. Each subset is optimized independently. The results reveal that {Complexity, Process} achieves MAE 2.1, while {Size, Halstead} achieves MAE 2.3. These two configurations are close in scalar terms but occupy entirely different regions of the feature space.
+**Step 1: Subset enumeration (Chapter 11).** The framework tests all $\binom{5}{1} + \binom{5}{2} + \binom{5}{3} = 25$ subsets of dimensions up to size 3. Each subset is optimized independently. The results reveal that {Complexity, Process} achieves MAE 2.1, while {Size, Halstead} achieves MAE 2.3. These two configurations are close in scalar terms but occupy entirely different regions of the feature space.
 
-**Step 2: Pareto frontier (Chapter 5).** Plotting all 25 configurations in the (number-of-dimensions, MAE) plane, the Pareto frontier identifies four non-dominated points:
+**Step 2: Pareto frontier (Chapter 8).** Plotting all 25 configurations in the (number-of-dimensions, MAE) plane, the Pareto frontier identifies four non-dominated points:
 
 | Dimensions $k$ | Best MAE | Configuration |
 |:-:|:-:|---|
@@ -216,9 +215,9 @@ The model's configuration is now a point in $\mathbb{R}^5$. Each dimension corre
 
 Adding OO and Halstead to the three-group configuration reduces MAE from 1.7 to 1.5---a marginal improvement that comes at the cost of doubling the feature count. The Pareto analysis makes this tradeoff explicit without requiring the practitioner to choose a weighting between accuracy and simplicity.
 
-**Step 3: Sensitivity profiling (Chapter 7).** Ablation reveals that removing Complexity increases MAE by 1.9 (the most important dimension), removing Process increases it by 1.2, removing Size increases it by 0.6, while removing OO or Halstead increases it by less than 0.2 each. The scalar metric "84% accuracy" hid the fact that the model is overwhelmingly dependent on two of its five feature groups.
+**Step 3: Sensitivity profiling (Chapter 9).** Ablation reveals that removing Complexity increases MAE by 1.9 (the most important dimension), removing Process increases it by 1.2, removing Size increases it by 0.6, while removing OO or Halstead increases it by less than 0.2 each. The scalar metric "84% accuracy" hid the fact that the model is overwhelmingly dependent on two of its five feature groups.
 
-**Step 4: Model Robustness Index (Chapter 7).** The MRI perturbs the baseline configuration 300 times, measuring the distribution of MAE deviations:
+**Step 4: Model Robustness Index (Chapter 9).** The MRI perturbs the baseline configuration 300 times, measuring the distribution of MAE deviations:
 
 | Statistic | Value |
 |:-:|:-:|
@@ -229,7 +228,7 @@ Adding OO and Halstead to the three-group configuration reduces MAE from 1.7 to 
 
 The 95th percentile deviation of 3.1 means that in the worst 5% of perturbations, the model's error nearly doubles. This tail behavior is invisible to mean-based metrics. The MRI's weighted combination of mean, P75, and P95 provides a single robustness score *that explicitly accounts for tail risk*, unlike standard deviation which treats all deviations symmetrically.
 
-**Step 5: Adversarial threshold search (Chapter 14).** Binary search along each dimension reveals that the Complexity parameter has a tipping point at 0.3x its baseline value: reducing it below this threshold causes recall on high-complexity modules to collapse from 0.71 to 0.29. The model is not just dependent on Complexity---it is *brittle* with respect to it. A small shift in the complexity distribution of incoming code (as might occur during a refactoring initiative) could silently degrade the model's real-world performance.
+**Step 5: Adversarial threshold search (Chapter 9).** Binary search along each dimension reveals that the Complexity parameter has a tipping point at 0.3x its baseline value: reducing it below this threshold causes recall on high-complexity modules to collapse from 0.71 to 0.29. The model is not just dependent on Complexity---it is *brittle* with respect to it. A small shift in the complexity distribution of incoming code (as might occur during a refactoring initiative) could silently degrade the model's real-world performance.
 
 ### 1.5.3 What Geometry Revealed
 
@@ -246,13 +245,13 @@ None of these findings were available from accuracy, precision, recall, or F1. T
 
 ## 1.6 What Comes Next
 
-The remainder of Part I (Chapters 2--3) builds the mathematical and software foundations: Chapter 2 develops the core concepts of metric spaces, manifolds, and curvature that underpin the geometric methods, while Chapter 3 introduces the dimension model and state vector patterns used throughout the framework.
+The remainder of Part I (Chapters 2--5) builds the mathematical and software foundations: Chapter 2 develops the Mahalanobis distance and weighted metric spaces, Chapter 3 introduces hyperbolic geometry for hierarchical data, Chapter 4 develops SPD manifolds and spectral geometry, and Chapter 5 introduces topological data analysis.
 
-Part II (Chapters 4--11) develops the geometric algorithms themselves, from subset enumeration through persistent homology. Each chapter introduces a mathematical tool, motivates it with a concrete problem, and provides a complete implementation.
+Part II (Chapters 6--10) develops the geometric algorithms themselves, from pathfinding on manifolds through adversarial probing. Each chapter introduces a mathematical tool, motivates it with a concrete problem, and provides a complete implementation.
 
-Part III (Chapters 12--15) applies the toolchain to systems-level problems: pathfinding on manifolds, multi-objective optimization, adversarial testing, and symmetry exploitation.
+Part III (Chapters 11--15) presents design patterns: the subset enumeration pattern, compositional testing, group-theoretic data augmentation, gradient reversal and invariance training, and Cholesky parameterization for positive-definiteness.
 
-Part IV (Chapters 16--18) addresses integration concerns: scaling to high-dimensional spaces, composing geometric analyses into pipelines, and deploying geometric validation in production systems.
+Part IV (Chapters 16--20) addresses systems-level concerns: building geometric pipelines, scaling to high-dimensional spaces, deploying geometric validation in production, and two complete case studies in software defect prediction and cetacean bioacoustics.
 
 The thread that connects all of this is the conviction that *geometry is not a metaphor*. When we say that two model configurations are "far apart" or that a configuration is "near a boundary," we mean this literally, with precise distances computed in well-defined spaces. The power of the geometric approach comes from this precision: it transforms vague intuitions about model behavior into exact, computable quantities that can be tested, compared, optimized, and monitored.
 

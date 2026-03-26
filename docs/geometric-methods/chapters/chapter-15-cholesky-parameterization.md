@@ -1,6 +1,6 @@
 # Chapter 15: Cholesky Parameterization for Positive-Definiteness
 
-*Geometric Methods in Computational Modeling* --- Andrew H. Bond
+*Structural Fuzzing: Geometric Methods for Adversarial Model Validation* --- Andrew H. Bond
 
 ---
 
