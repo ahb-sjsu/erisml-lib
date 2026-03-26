@@ -216,7 +216,7 @@ This three-stage workflow is exactly how `run_campaign` in the pipeline module o
 
 ### 9.3.4 Limitations of One-at-a-Time Ablation
 
-One-at-a-time ablation captures *marginal* importance: how much does each dimension contribute when all others are present? It does not capture *interaction effects*: the case where dimensions $i$ and $j$ are individually unimportant but jointly critical (their information is redundant, and either one alone suffices). The subset enumeration of Chapter 4 and the compositional testing of Section 9.5 address this limitation by exploring multi-dimensional combinations. Sensitivity profiling is a fast screening step, not a complete analysis.
+One-at-a-time ablation captures *marginal* importance: how much does each dimension contribute when all others are present? It does not capture *interaction effects*: the case where dimensions $i$ and $j$ are individually unimportant but jointly critical (their information is redundant, and either one alone suffices). The subset enumeration of Chapter 11 and the compositional testing of Section 9.5 address this limitation by exploring multi-dimensional combinations. Sensitivity profiling is a fast screening step, not a complete analysis.
 
 ---
 
@@ -344,7 +344,7 @@ def run_campaign(
 
 The stages are:
 
-1. **Subset enumeration** (Chapter 4): Test all dimension combinations up to a maximum size.
+1. **Subset enumeration** (Chapter 11): Test all dimension combinations up to a maximum size.
 2. **Pareto frontier** (Chapter 8): Extract the non-dominated configurations from the enumeration results.
 3. **Sensitivity profiling** (this chapter): Ablate each dimension from the best configuration to rank importance.
 4. **MRI computation** (this chapter): Perturb the best configuration to quantify global robustness.
@@ -578,7 +578,7 @@ The adversarial threshold search shares its philosophy with adversarial example 
 
 ## 9.10 What Comes Next
 
-This chapter has developed tools for characterizing the robustness of a model at a single operating point---the best configuration found by optimization. Chapter 10 extends this analysis in two directions. First, it introduces *adversarial probing*: systematic exploration of the full parameter space to find not just tipping points along individual dimensions but adversarial *regions*---connected subsets of parameter space where the model fails. This requires the topological tools (persistent homology) that Chapter 10 develops, because the shape of an adversarial region---whether it is a thin sliver or a broad basin, whether it is simply connected or has holes---determines the practical risk it poses. Second, Chapter 10 develops methods for *hardening* a model against the vulnerabilities that the MRI and adversarial threshold search reveal, closing the loop from diagnosis to treatment.
+This chapter has developed tools for characterizing the robustness of a model at a single operating point---the best configuration found by optimization. Chapter 10 extends this analysis in two directions. First, it introduces *adversarial probing*: systematic exploration of the full parameter space to find not just tipping points along individual dimensions but adversarial *regions*---connected subsets of parameter space where the model fails. This requires the topological tools (persistent homology) from Chapter 5, because the shape of an adversarial region---whether it is a thin sliver or a broad basin, whether it is simply connected or has holes---determines the practical risk it poses. Second, Chapter 10 develops methods for *hardening* a model against the vulnerabilities that the MRI and adversarial threshold search reveal, closing the loop from diagnosis to treatment.
 
 The progression from Chapter 8 to Chapter 10 mirrors the progression from a static to a dynamic understanding of the model. Chapter 8 asks: "Which configurations are optimal?" This chapter asks: "How fragile are those optima?" Chapter 10 will ask: "What does the failure landscape look like, and can we reshape it?"
 

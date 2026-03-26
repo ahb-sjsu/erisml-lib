@@ -1,6 +1,6 @@
 # Appendix C: Selected Proofs and Derivations
 
-*Geometric Methods in Computational Modeling* --- Andrew H. Bond
+*Structural Fuzzing: Geometric Methods for Adversarial Model Validation* --- Andrew H. Bond
 
 ---
 
@@ -193,7 +193,7 @@ Since $\Phi$ is a diffeomorphism, $D_S\Phi$ is an isomorphism at each $S$, so th
 
 ---
 
-## C.5 Cholesky Parameterization Surjects onto SPD(n) (Chapter 2)
+## C.5 Cholesky Parameterization Surjects onto SPD(n) (Chapter 15)
 
 **Theorem C.5.** *Let $\mathcal{L}_n^+$ denote the set of $n \times n$ lower-triangular matrices with strictly positive diagonal entries. The map $\Psi : \mathcal{L}_n^+ \to \text{SPD}(n)$ defined by $\Psi(L) = LL^\top$ is a surjection. Moreover, it is a bijection: each $S \in \text{SPD}(n)$ has a unique Cholesky factor $L \in \mathcal{L}_n^+$.*
 
@@ -231,7 +231,7 @@ $$\hat{\Psi}(\theta_1, \ldots, \theta_n, \theta_{n+1}, \ldots, \theta_{n(n+1)/2}
 
 **Proof.** The exponential function $\theta_i \mapsto e^{\theta_i}$ maps $\mathbb{R}$ onto $(0, \infty)$, ensuring that the diagonal entries of $L$ are strictly positive. The off-diagonal entries are unconstrained. By Theorem C.5, $\Psi(L) = LL^\top$ surjects onto $\text{SPD}(n)$, and the composition $\hat{\Psi} = \Psi \circ (\text{exp-diag construction})$ is smooth as a composition of smooth maps. $\square$
 
-**Remark C.5.** This corollary is the mathematical justification for the Cholesky parameterization used in Chapter 2: optimizing over unconstrained $\theta \in \mathbb{R}^{n(n+1)/2}$ is equivalent to optimizing over $\text{SPD}(n)$, but without any constraints. The log-diagonal trick $L_{ii} = e^{\theta_i}$ eliminates the positivity constraint on the diagonal of $L$, making the entire optimization unconstrained.
+**Remark C.5.** This corollary is the mathematical justification for the Cholesky parameterization used in Chapter 15: optimizing over unconstrained $\theta \in \mathbb{R}^{n(n+1)/2}$ is equivalent to optimizing over $\text{SPD}(n)$, but without any constraints. The log-diagonal trick $L_{ii} = e^{\theta_i}$ eliminates the positivity constraint on the diagonal of $L$, making the entire optimization unconstrained.
 
 ---
 

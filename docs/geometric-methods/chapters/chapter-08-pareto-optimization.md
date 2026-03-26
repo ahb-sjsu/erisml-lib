@@ -3,7 +3,7 @@
 > *"The optimum is not a point but a surface, and the task of the engineer is to understand that surface before choosing where to stand on it."*
 > --- Vilfredo Pareto, *Manual of Political Economy* (1906), adapted
 
-The preceding chapters have developed a geometric vocabulary for multi-dimensional model analysis: state vectors (Chapter 3), subset enumeration (Chapter 4), distance metrics, and sensitivity profiling. Each of these tools produces results in multiple dimensions. Yet at some point the practitioner must *decide*---which configuration to deploy, which feature set to adopt, how much complexity to tolerate. The temptation is to collapse the multi-dimensional result into a single number and optimize that number. This chapter explains why that temptation must be resisted, what to do instead, and how the structural fuzzing framework implements the alternative.
+The preceding chapters have developed a geometric vocabulary for multi-dimensional model analysis: state vectors (Chapter 1), subset enumeration (Chapter 11), distance metrics, and sensitivity profiling. Each of these tools produces results in multiple dimensions. Yet at some point the practitioner must *decide*---which configuration to deploy, which feature set to adopt, how much complexity to tolerate. The temptation is to collapse the multi-dimensional result into a single number and optimize that number. This chapter explains why that temptation must be resisted, what to do instead, and how the structural fuzzing framework implements the alternative.
 
 The alternative is Pareto optimization: identifying the set of configurations that cannot be improved on one objective without sacrificing another, and then reasoning about the structure of that set directly. No weights are chosen. No objectives are combined. The geometry of the tradeoff surface speaks for itself.
 
@@ -74,7 +74,7 @@ In the structural fuzzing framework, the most natural pair of objectives is:
 - **Objective 1: Minimize dimensionality** $k$ (number of active feature groups). Fewer groups mean simpler models, faster training, easier interpretation.
 - **Objective 2: Minimize prediction error** (MAE). Lower error means better predictive accuracy.
 
-The `enumerate_subsets` function from Chapter 4 produces a list of `SubsetResult` objects, each recording the best MAE achievable with a particular subset of dimensions. The `pareto_frontier` function extracts the non-dominated configurations from this list.
+The `enumerate_subsets` function from Chapter 11 produces a list of `SubsetResult` objects, each recording the best MAE achievable with a particular subset of dimensions. The `pareto_frontier` function extracts the non-dominated configurations from this list.
 
 ### 8.3.1 The SubsetResult Data Structure
 
@@ -96,7 +96,7 @@ The `errors` dictionary provides a per-component breakdown---not just the aggreg
 
 ### 8.3.2 From Enumeration to Frontier
 
-The connection between subset enumeration (Chapter 4) and Pareto analysis is direct. Subset enumeration explores the space of possible feature-group combinations:
+The connection between subset enumeration (Chapter 11) and Pareto analysis is direct. Subset enumeration explores the space of possible feature-group combinations:
 
 ```python
 def enumerate_subsets(
@@ -519,7 +519,7 @@ The Pareto frontier identifies *which* configurations represent optimal tradeoff
 
 Chapter 9 addresses this question directly through adversarial robustness testing. Where this chapter asks "what are the best tradeoffs?", Chapter 9 asks "how far can we push each tradeoff before it breaks?" The two analyses compose naturally: first identify the Pareto-optimal configurations (this chapter), then stress-test each one to find its breaking points (Chapter 9). Together, they provide a complete picture of the tradeoff landscape---not just its surface, but its depth and stability.
 
-The progression from enumeration (Chapter 4) through Pareto analysis (this chapter) to adversarial probing (Chapter 9) reflects a general principle of the geometric approach: understanding a space requires examining it at multiple scales. Enumeration maps the space coarsely. Pareto analysis identifies the interesting regions. Adversarial testing probes the fine structure of those regions. Each step narrows the focus while increasing the resolution, building toward the complete geometric characterization that is the goal of the structural fuzzing framework.
+The progression from enumeration (Chapter 11) through Pareto analysis (this chapter) to adversarial probing (Chapter 9) reflects a general principle of the geometric approach: understanding a space requires examining it at multiple scales. Enumeration maps the space coarsely. Pareto analysis identifies the interesting regions. Adversarial testing probes the fine structure of those regions. Each step narrows the focus while increasing the resolution, building toward the complete geometric characterization that is the goal of the structural fuzzing framework.
 
 ---
 

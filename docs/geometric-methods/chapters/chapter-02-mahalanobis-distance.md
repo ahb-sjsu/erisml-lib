@@ -126,7 +126,7 @@ weights = np.where(params < 1e5, 1.0 / np.maximum(params, 1e-6), 0.0)
 sigma_inv = np.diag(weights)
 ```
 
-When `params[i]` is set to $10^6$ (the `inactive_value`), the corresponding weight drops to zero, effectively removing that dimension from the metric entirely. This is how the subset enumeration in Chapter 1 works: for each subset of "active" dimensions, the inactive dimensions receive zero attention. The structural fuzzing framework then asks: which *attention pattern* -- which assignment of precision across dimensions -- best explains the empirical data?
+When `params[i]` is set to $10^6$ (the `inactive_value`), the corresponding weight drops to zero, effectively removing that dimension from the metric entirely. This is how the subset enumeration in Chapter 11 works: for each subset of "active" dimensions, the inactive dimensions receive zero attention. The structural fuzzing framework then asks: which *attention pattern* -- which assignment of precision across dimensions -- best explains the empirical data?
 
 There is a deeper connection worth noting. In Gaussian graphical models, the sparsity pattern of $\Sigma^{-1}$ encodes *conditional independence*: if $(\Sigma^{-1})_{ij} = 0$, then dimensions $i$ and $j$ are conditionally independent given all other dimensions. A sparse precision matrix is one where most dimensions interact only indirectly, through chains of conditionally dependent neighbors. When the structural fuzzing framework sets most diagonal entries to zero (by assigning `inactive_value` to those dimensions), it is effectively imposing an extreme form of sparsity on $\Sigma^{-1}$ -- asserting that only a small subset of dimensions participates in the conditional dependency structure at all.
 
@@ -318,7 +318,7 @@ Here `params[i]` plays the role of $\sigma_i^2$, and `weights[i]` $= 1/\sigma_i^
 
 **Bootstrap confidence intervals.** To assess the reliability of the learned metric, draw $B$ bootstrap samples from the targets (sampling with replacement), fit $\Sigma^{-1}$ to each bootstrap sample, and examine the distribution of the resulting parameters. Dimensions whose precision estimates have tight bootstrap intervals are reliably important. Dimensions with wide intervals are uncertain -- the data does not strongly constrain their contribution to the metric.
 
-For the `eris-econ` model, bootstrap analysis reveals that dimensions 0 (Consequences), 2 (Fairness), and 4 (Trust) consistently receive high precision across bootstrap samples, while dimensions 3 (Autonomy) and 7 (Legitimacy) are unstable. This aligns with the structural fuzzing results from Chapter 1: the Pareto frontier is dominated by subsets containing Consequences and Fairness.
+For the `eris-econ` model, bootstrap analysis reveals that dimensions 0 (Consequences), 2 (Fairness), and 4 (Trust) consistently receive high precision across bootstrap samples, while dimensions 3 (Autonomy) and 7 (Legitimacy) are unstable. This aligns with the structural fuzzing results from Chapter 11: the Pareto frontier is dominated by subsets containing Consequences and Fairness.
 
 
 ## 2.7 Putting It Together: From Distance to Decision
@@ -354,4 +354,4 @@ This chapter developed the Mahalanobis distance as the natural generalization of
 
 5. **Diagonal simplification** reduces the parameter count to $n$ when the full covariance is overparameterized, with cross-validation and bootstrap analysis for regularization and uncertainty quantification.
 
-In Chapter 3, we turn to the *search* problem: given a space equipped with a Mahalanobis metric, how do we systematically explore the subsets of dimensions that contribute to it? This is the core algorithmic problem of structural fuzzing, and it connects the geometric foundations of this chapter to the combinatorial enumeration machinery that makes the framework practical.
+In Chapter 3, we turn to hyperbolic geometry for hierarchical data, extending the geometric toolkit to spaces with negative curvature where trees and taxonomies live naturally.

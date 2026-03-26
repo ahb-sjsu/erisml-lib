@@ -1,6 +1,6 @@
 # Appendix A: Mathematical Notation and Conventions
 
-*Geometric Methods in Computational Modeling* --- Andrew H. Bond
+*Structural Fuzzing: Geometric Methods for Adversarial Model Validation* --- Andrew H. Bond
 
 ---
 
@@ -249,7 +249,7 @@ where $L_\text{path} = \sum_{t=1}^{T-1} d_{LE}(\mathbf{C}_t, \mathbf{C}_{t+1})$ 
 
 ### A.7.1 MRI Weights
 
-The Model Robustness Index combines mean deviation, 75th percentile, and 95th percentile of perturbation response into a single robustness score. The composite explicitly accounts for tail risk, unlike standard deviation which treats all deviations symmetrically. Chapter 1 (introduced), Chapter 7 (developed).
+The Model Robustness Index combines mean deviation, 75th percentile, and 95th percentile of perturbation response into a single robustness score. The composite explicitly accounts for tail risk, unlike standard deviation which treats all deviations symmetrically. Chapter 1 (introduced), Chapter 9 (developed).
 
 ### A.7.2 Softmax Choice Rule
 
