@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>$title$ &mdash; $book-title$</title>
+  <meta name="description" content="$title$ from $book-title$: $book-subtitle$ by $author$.">
+  <link rel="stylesheet" href="../assets/css/style.css">
+  <link rel="stylesheet" href="../book/book.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Crimson+Pro:ital,wght@0,300;0,400;0,600;0,700;1,400&family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
+</head>
+
+<body>
+  <nav id="main-nav">
+    <div class="nav-inner">
+      <a href="../index.html" class="nav-brand">
+        <span class="brand-symbol">M</span>
+        <span class="brand-text">Geometric Series</span>
+      </a>
+      <button class="nav-toggle" aria-label="Toggle menu">
+        <span></span><span></span><span></span>
+      </button>
+      <ul class="nav-links">
+        <li><a href="../geometric-medicine/index.html"$if(nav-medicine)$ class="active"$endif$>Medicine</a></li>
+        <li><a href="../book/index.html">Ethics</a></li>
+        <li><a href="../geometric-methods/index.html">Methods</a></li>
+        <li><a href="../geometric-reasoning/index.html"$if(nav-reasoning)$ class="active"$endif$>Reasoning</a></li>
+        <li><a href="../geometric-economics/index.html"$if(nav-economics)$ class="active"$endif$>Economics</a></li>
+        <li><a href="../geometric-law/index.html"$if(nav-law)$ class="active"$endif$>Law</a></li>
+        <li><a href="../geometric-cognition/index.html"$if(nav-cognition)$ class="active"$endif$>Cognition</a></li>
+        <li><a href="../geometric-communication/index.html"$if(nav-communication)$ class="active"$endif$>Communication</a></li>
+        <li><a href="../index.html">Home</a></li>
+      </ul>
+    </div>
+  </nav>
+
+  <article class="book-chapter">
+    <div class="chapter-container">
+      <nav class="breadcrumb" aria-label="Breadcrumb">
+        <a href="../index.html">Geometric Series</a>
+        <span class="breadcrumb-sep">&rsaquo;</span>
+        <a href="index.html">$book-title$</a>
+        <span class="breadcrumb-sep">&rsaquo;</span>
+        <span class="breadcrumb-current">$title$</span>
+      </nav>
+      <div class="chapter-nav-top">
+$if(prev-url)$
+        <a href="$prev-url$" class="nav-prev">&larr; $prev-title$</a>
+$else$
+        <span class="nav-prev"></span>
+$endif$
+        <a href="index.html" class="nav-toc">Contents</a>
+$if(next-url)$
+        <a href="$next-url$" class="nav-next">$next-title$ &rarr;</a>
+$else$
+        <span class="nav-next"></span>
+$endif$
+      </div>
+
+      <div class="chapter-content">
+$body$
+      </div>
+
+      <div class="chapter-nav-bottom">
+$if(prev-url)$
+        <a href="$prev-url$" class="nav-prev">&larr; $prev-title$</a>
+$else$
+        <span class="nav-prev"></span>
+$endif$
+        <a href="index.html" class="nav-toc">Contents</a>
+$if(next-url)$
+        <a href="$next-url$" class="nav-next">$next-title$ &rarr;</a>
+$else$
+        <span class="nav-next"></span>
+$endif$
+      </div>
+    </div>
+  </article>
+
+  <footer class="book-footer">
+    <p>&copy; 2026 $author$. <em>$book-title$: $book-subtitle$.</em></p>
+    <p class="footer-note">The geometry was always real. The scalars were always insufficient.</p>
+  </footer>
+
+  <script>
+    window.addEventListener('scroll', () => {
+      document.getElementById('main-nav').classList.toggle('scrolled', window.scrollY > 20);
+    });
+    document.querySelector('.nav-toggle')?.addEventListener('click', function() {
+      document.querySelector('.nav-links').classList.toggle('open');
+    });
+  </script>
+  <script>
+    // Pandoc --katex outputs <span class="math inline"> and <span class="math display">.
+    // This script renders them with KaTeX once the library loads.
+    document.addEventListener("DOMContentLoaded", function() {
+      if (typeof katex === 'undefined') return;
+      var mathElements = document.getElementsByClassName("math");
+      for (var i = 0; i < mathElements.length; i++) {
+        var texText = mathElements[i].firstChild;
+        if (mathElements[i].tagName === "SPAN" && texText) {
+          katex.render(texText.data, mathElements[i], {
+            displayMode: mathElements[i].classList.contains('display'),
+            throwOnError: false
+          });
+        }
+      }
+    });
+  </script>
+</body>
+</html>

@@ -79,10 +79,10 @@
 <h2>5.1 How Heuristics Get Corrupted</h2>
 <p>Recall from Chapter 3 that the heuristic function <span class="math inline">h(x)</span> is a scalar field on the state space <span class="math inline">M</span> that estimates the cost-to-go from state <span class="math inline">x</span> to the goal state <span class="math inline">x^*</span>. In an ideal reasoner, <span class="math inline">h(x)</span> depends only on task-relevant features — the features that determine the actual distance <span class="math inline">d(x, x^*)</span> in the problem’s natural metric. An admissible heuristic never overestimates this distance; a consistent heuristic satisfies the triangle inequality at every step. When both conditions hold, A* search is optimal: the trajectory follows the gradient of <span class="math inline">f(x) = g(x) + h(x)</span> along the shortest path.</p>
 <p>Corruption occurs when <span class="math inline">h(x)</span> acquires a dependence on task-irrelevant features. Let us write the corrupted heuristic as:</p>
-<p><span class="math display">h&#39;(x) = h(x) + \delta h(x)</span></p>
+<p><span class="math display">h'(x) = h(x) + \delta h(x)</span></p>
 <p>where <span class="math inline">\delta h(x)</span> is a perturbation term that is correlated with irrelevant features — the emotional valence of a description, the vividness of sensory detail, the linguistic register of the framing — rather than with the features that determine the correct answer.</p>
 <p>The gradient of the corrupted heuristic is:</p>
-<p><span class="math display">\nabla h&#39;(x) = \nabla h(x) + \nabla \delta h(x)</span></p>
+<p><span class="math display">\nabla h'(x) = \nabla h(x) + \nabla \delta h(x)</span></p>
 <p>The perturbation gradient <span class="math inline">\nabla \delta h(x)</span> acts as a force that deflects the search trajectory. If <span class="math inline">\nabla \delta h(x)</span> has a component orthogonal to the geodesic direction <span class="math inline">\nabla h(x)</span>, the trajectory curves away from the optimal path. If it has a component antiparallel to <span class="math inline">\nabla h(x)</span>, the trajectory slows or reverses. In either case, the reasoner ends up at a different point in the state space than it would have reached with the uncorrupted heuristic — and that different point constitutes a different judgment, a different conclusion, a different answer.</p>
 <p>This framework makes several predictions that we can test empirically:</p>
 <ol type="1">
@@ -115,32 +115,32 @@
 <tbody>
 <tr>
 <td>Gemini 2.0 Flash</td>
-<td>$-$10.2</td>
+<td>&minus;10.2</td>
 <td>+8.7</td>
 <td>2.1</td>
 </tr>
 <tr>
 <td>Gemini 2.5 Flash</td>
-<td>$-$13.4</td>
+<td>&minus;13.4</td>
 <td>+6.3</td>
 <td>4.8</td>
 </tr>
 <tr>
 <td>Gemini 3 Flash Preview</td>
-<td>$-$15.8</td>
+<td>&minus;15.8</td>
 <td>+10.9</td>
 <td>6.7</td>
 </tr>
 <tr>
 <td>Gemini 2.5 Pro</td>
-<td>$-$12.1</td>
+<td>&minus;12.1</td>
 <td>+7.4</td>
 <td>3.5</td>
 </tr>
 <tr>
 <td>Claude Sonnet 4.6</td>
-<td>$-$9.1</td>
-<td>$-$1.5</td>
+<td>&minus;9.1</td>
+<td>&minus;1.5</td>
 <td>1.2</td>
 </tr>
 </tbody>
@@ -271,7 +271,7 @@
 <p>An additional finding reinforces the picture of corruption. The <strong>selective attention signal-to-noise ratio</strong> (A3) — the ratio of attention allocated to morally relevant dimensions versus morally irrelevant dimensions — was uniformly weak across all models: 1.22–1.38 on a scale where 1.0 represents no discrimination and higher values represent better discrimination. No model strongly distinguished relevant from irrelevant moral dimensions. This baseline weakness in dimensional attention helps explain why sensory distractors have such a reliable effect: the heuristic field does not strongly differentiate signal from noise even in the unperturbed condition, so additional noise easily pushes the response.</p>
 <p><strong>Geometric interpretation.</strong> The dose-response pattern is the key geometric signature. If heuristic corruption were a binary phenomenon — the heuristic either works or it breaks — we would expect a threshold effect: no displacement below some critical perturbation intensity, then full displacement above it. Instead, we observe a smooth, monotonic relationship between perturbation intensity and displacement magnitude. This is exactly what the continuous deformation model predicts: <span class="math inline">\delta h(x)</span> is a smooth function of the perturbation intensity <span class="math inline">\epsilon</span>, and the displacement of the search trajectory is a smooth function of <span class="math inline">\|\nabla \delta h(x)\|</span>.</p>
 <p>We can formalize this. Let <span class="math inline">\epsilon</span> parameterize the perturbation intensity, with <span class="math inline">\epsilon = 0</span> for neutral, <span class="math inline">\epsilon = \epsilon_1</span> for mild, and <span class="math inline">\epsilon = \epsilon_2 &gt; \epsilon_1</span> for vivid. The corrupted heuristic is:</p>
-<p><span class="math display">h&#39;(x; \epsilon) = h(x) + \epsilon \cdot \delta h_0(x)</span></p>
+<p><span class="math display">h'(x; \epsilon) = h(x) + \epsilon \cdot \delta h_0(x)</span></p>
 <p>where <span class="math inline">\delta h_0(x)</span> is the unit perturbation field induced by sensory distractors. The search trajectory <span class="math inline">\gamma(\epsilon)</span> under the corrupted heuristic deviates from the geodesic <span class="math inline">\gamma(0)</span> by an amount that scales with <span class="math inline">\epsilon</span>:</p>
 <p><span class="math display">d(\gamma(\epsilon), \gamma(0)) \sim \epsilon \cdot \|\nabla \delta h_0\|</span></p>
 <p>This linear (or at least monotonic) dose-response is precisely what Tables 5.3 shows across all five models. The heuristic field is being continuously deformed, and the search trajectory moves continuously in response.</p>
@@ -283,7 +283,7 @@
 <p>We now have three independent measurements of heuristic corruption — framing (8.9<span class="math inline">\sigma</span>), emotional anchoring (6.8<span class="math inline">\sigma</span>), and sensory distractors (4.6<span class="math inline">\sigma</span>) — each probing a different perturbation direction. Let us assemble them into a unified geometric picture.</p>
 <p><strong>[Modeling Axiom.]</strong> <strong>The corruption manifold.</strong> Consider the space of all possible perturbations to the heuristic field. Each perturbation direction <span class="math inline">\delta h_i(x)</span> corresponds to a different type of irrelevant feature that could corrupt the heuristic: linguistic register, emotional valence, sensory vividness, social pressure, narrative order, and so on. The set of all such perturbation directions forms a vector space (or more precisely, a function space), and the susceptibility of the heuristic to each direction defines a tensor — the <strong>corruption tensor</strong> <span class="math inline">C_{ij}</span> — that maps perturbation directions to displacement magnitudes.</p>
 <p>In the language of Section 5.1, the corrupted heuristic under a general perturbation is:</p>
-<p><span class="math display">h&#39;(x) = h(x) + \sum_i \epsilon_i \cdot \delta h_i(x)</span></p>
+<p><span class="math display">h'(x) = h(x) + \sum_i \epsilon_i \cdot \delta h_i(x)</span></p>
 <p>where <span class="math inline">\epsilon_i</span> is the intensity of perturbation along direction <span class="math inline">i</span>. The displacement of the search trajectory is:</p>
 <p><span class="math display">\Delta x \approx C_{ij} \epsilon_j</span></p>
 <p>where <span class="math inline">C_{ij}</span> encodes the coupling between perturbation direction <span class="math inline">j</span> and displacement along dimension <span class="math inline">i</span> of the judgment space. This tensor is the central object of interest: it tells us everything about how the heuristic field responds to corruption.</p>
@@ -301,12 +301,12 @@
 <section id="anisotropic-vulnerability-why-some-directions-are-fragile" class="level2">
 <h2>5.6 Anisotropic Vulnerability: Why Some Directions Are Fragile</h2>
 <p>The most striking illustration of anisotropic vulnerability comes from the Claude Sonnet 4.6 results in the framing benchmark (T5).</p>
-<p>Recall from Table 5.1: Claude’s euphemistic drift is $-$9.1 points (substantial displacement toward lower harm scores) but its dramatic drift is $-$1.5 points (essentially no displacement, and actually in the wrong direction — slightly lower harm even under dramatic amplification). Claude resists dramatic exaggeration almost completely while being substantially vulnerable to euphemistic minimization.</p>
+<p>Recall from Table 5.1: Claude’s euphemistic drift is &minus;9.1 points (substantial displacement toward lower harm scores) but its dramatic drift is &minus;1.5 points (essentially no displacement, and actually in the wrong direction — slightly lower harm even under dramatic amplification). Claude resists dramatic exaggeration almost completely while being substantially vulnerable to euphemistic minimization.</p>
 <p>This asymmetry is invisible to any evaluation that tests only one perturbation direction, and it would be averaged away by any aggregate “framing robustness” score. It is only visible in the full directional profile of the corruption tensor.</p>
 <p><strong>Geometric interpretation.</strong> In the perturbation space, euphemistic framing and dramatic framing are (roughly) opposite directions: euphemistic points toward the “minimize harm” pole; dramatic points toward the “amplify harm” pole. A model with isotropic vulnerability would be equally displaced in both directions. Claude’s asymmetry means its corruption tensor is <strong>anisotropic</strong> along the framing axis: the eigenvalue in the euphemistic direction is large, while the eigenvalue in the dramatic direction is near zero.</p>
 <p>Why might this be? One hypothesis, consistent with the known properties of Claude’s training, is that Claude has been specifically trained (via RLHF or constitutional AI methods) to resist amplification of harm — to push back against exaggerated claims of danger. This training would have shaped the heuristic field to be stiff along the “amplify harm” direction, making the search trajectory resistant to perturbations that push toward higher harm scores. But the same training may not have addressed the opposite direction: when language <em>minimizes</em> harm, the model does not have a corresponding pressure to resist the minimization. The heuristic field is stiff in one direction and soft in the other.</p>
 <p>This has practical implications for safety. A system that resists exaggeration but not minimization can be manipulated by anyone who phrases harmful content in euphemistic terms. The geometric framework makes the vulnerability precise: the corruption surface has a valley along the euphemistic direction that the search trajectory falls into, even though there is a ridge along the dramatic direction that the trajectory successfully avoids.</p>
-<p>The anisotropy is not unique to Claude. Every model in the study has a different directional profile. Gemini 3 Flash Preview shows the largest dramatic drift (+10.9) but also a large euphemistic drift ($-<span class="math inline">15.8), suggesting a more isotropic corruption surface --- equally vulnerable in both directions. Gemini 2.0 Flash shows moderate vulnerability in both directions (</span>-$10.2 and +8.7), with a slight asymmetry favoring dramatic resistance. Each model’s corruption tensor has a distinct eigenstructure.</p>
+<p>The anisotropy is not unique to Claude. Every model in the study has a different directional profile. Gemini 3 Flash Preview shows the largest dramatic drift (+10.9) but also a large euphemistic drift (&minus;15.8), suggesting a more isotropic corruption surface --- equally vulnerable in both directions. Gemini 2.0 Flash shows moderate vulnerability in both directions (&minus;10.2 and +8.7), with a slight asymmetry favoring dramatic resistance. Each model’s corruption tensor has a distinct eigenstructure.</p>
 <p><strong>[Conditional Theorem.]</strong> The lesson is that <strong>robustness is not a scalar property.</strong> A model’s vulnerability to heuristic corruption cannot be captured by a single number. It requires, at minimum, a directional profile — the corruption tensor <span class="math inline">C_{ij}</span> — that specifies the susceptibility in each perturbation direction. The Scalar Irrecoverability Theorem (Bond, 2026a, Ch. 1; developed fully in Chapter 13 of this book) applies here with full force: collapsing the corruption tensor to a scalar destroys the directional information that is essential for understanding and mitigating the vulnerability.</p>
 <hr />
 </section>
@@ -341,7 +341,7 @@
 <h2>5.8 Implications: The Corruption Surface</h2>
 <p>We can now assemble the full picture. The heuristic corruption phenomenon, as measured across three independent benchmarks and five models, has the following geometric structure.</p>
 <p><strong>1. The corruption is real and large.</strong> Three independent measurements — framing (8.9<span class="math inline">\sigma</span>), emotional anchoring (6.8<span class="math inline">\sigma</span>), and sensory distractors (4.6<span class="math inline">\sigma</span>) — confirm that irrelevant features displace moral judgment well beyond stochastic baselines. These are not marginal effects detectable only with large samples; they are massive displacements visible in individual model runs.</p>
-<p><strong>2. The corruption is continuous.</strong> The dose-response pattern in A1 (vivid &gt; mild &gt; neutral) demonstrates that heuristic corruption is a continuous deformation of the field, not a binary on/off effect. The displacement scales with the intensity of the perturbation, exactly as predicted by the model <span class="math inline">h&#39;(x; \epsilon) = h(x) + \epsilon \cdot \delta h_0(x)</span>.</p>
+<p><strong>2. The corruption is continuous.</strong> The dose-response pattern in A1 (vivid &gt; mild &gt; neutral) demonstrates that heuristic corruption is a continuous deformation of the field, not a binary on/off effect. The displacement scales with the intensity of the perturbation, exactly as predicted by the model <span class="math inline">h'(x; \epsilon) = h(x) + \epsilon \cdot \delta h_0(x)</span>.</p>
 <p><strong>3. The corruption is directional.</strong> Different perturbation types (framing, emotion, sensory) produce different magnitudes of displacement (8.9<span class="math inline">\sigma</span> &gt; 6.8<span class="math inline">\sigma</span> &gt; 4.6<span class="math inline">\sigma</span>). Within a single perturbation type, different directions produce different magnitudes (Claude: euphemistic <span class="math inline">\gg</span> dramatic). The corruption tensor is anisotropic.</p>
 <p><strong>4. Some directions are invariant.</strong> Gender swap and evaluation order produce no significant displacement (T2, T4). The heuristic field possesses genuine symmetries — it is not uniformly fragile. The selectivity pattern (vulnerable to salience manipulation, invariant under demographic swap) is the diagnostic that a multi-dimensional geometric approach reveals and a scalar robustness score would hide.</p>
 <p><strong>5. Corruption and detection are independent.</strong> The recovery dissociation in E2 demonstrates that susceptibility to perturbation and ability to detect perturbation are geometrically independent capabilities. They are not two aspects of a single “robustness” trait; they are separate dimensions of the robustness surface.</p>
@@ -366,7 +366,7 @@
 <p><strong>Measuring the geodesic deviation.</strong> The geodesic — the optimal triage trajectory — leads to the same destination for both patients: emergent catheterization with door-to-balloon time under 90 minutes. Define the deviation <span class="math inline">\Delta_\gamma</span> as the integrated distance between the actual triage trajectory and the geodesic:</p>
 <p><span class="math display">\Delta_\gamma = \int_0^T d(\gamma_{\text{actual}}(t), \gamma_{\text{geodesic}}(t)) \, dt</span></p>
 <p>For Patient B (panicked presentation), <span class="math inline">\Delta_\gamma</span> is small: the dramatic salience pushes the trajectory toward rapid intervention, which happens to align with the geodesic. The corruption accidentally helps. For Patient A (calm presentation), <span class="math inline">\Delta_\gamma</span> is large: the suppressed salience delays recognition of the emergency. The trajectory curves away from the geodesic into a holding pattern — “monitor, re-evaluate, consult” — that costs minutes of myocardial tissue.</p>
-<p>Using the T5 displacement magnitudes as a guide: the euphemistic drift of $-$10.2 to $-$15.8 points on a 70-point scale translates to a 14–23% deflection of the urgency trajectory. In a clinical setting where the treatment window is 90 minutes, a 14–23% delay in urgency recognition corresponds to 13–21 minutes of additional delay. For a STEMI, each 30 minutes of delay increases one-year mortality by approximately 7.5% (De Luca et al., 2004). The heuristic corruption produced by calm presentation, mapped through the geodesic deviation to a clinical outcome, translates to measurable excess risk.</p>
+<p>Using the T5 displacement magnitudes as a guide: the euphemistic drift of &minus;10.2 to &minus;15.8 points on a 70-point scale translates to a 14–23% deflection of the urgency trajectory. In a clinical setting where the treatment window is 90 minutes, a 14–23% delay in urgency recognition corresponds to 13–21 minutes of additional delay. For a STEMI, each 30 minutes of delay increases one-year mortality by approximately 7.5% (De Luca et al., 2004). The heuristic corruption produced by calm presentation, mapped through the geodesic deviation to a clinical outcome, translates to measurable excess risk.</p>
 <p><strong>The corruption tensor at work.</strong> The two presentations probe different entries of the corruption tensor <span class="math inline">C_{ij}</span>. The calm presentation probes the coupling between “low emotional salience” and “urgency estimate” — the euphemistic entry. The panicked presentation probes the coupling between “high emotional salience” and “urgency estimate” — the dramatic entry. The anisotropy observed in the benchmark data (euphemistic drift <span class="math inline">\gg</span> dramatic drift for Claude; roughly symmetric drift for the Gemini family) predicts that the danger is asymmetric: systems trained to resist dramatic exaggeration may remain fully vulnerable to calm understatement. The quiet heart attack is the adversarial input that the corruption tensor’s anisotropy leaves undefended.</p>
 <hr />
 </section>
@@ -375,12 +375,12 @@
 <p><strong>The Corruption Tensor <span class="math inline">C_{ij}</span>: Formal Definition</strong></p>
 <p>Let <span class="math inline">(M, g)</span> be the judgment manifold equipped with the metric <span class="math inline">g_{ij}</span> defined in Chapter 2. Let <span class="math inline">\mathcal{P}</span> denote the space of perturbation directions — the vector space spanned by task-irrelevant features that can influence the heuristic field. A perturbation is characterized by a direction <span class="math inline">\hat{p} \in \mathcal{P}</span> and an intensity <span class="math inline">\epsilon \in \mathbb{R}_{\geq 0}</span>.</p>
 <p>The corrupted heuristic under perturbation <span class="math inline">(\hat{p}, \epsilon)</span> is:</p>
-<p><span class="math display">h&#39;(x; \hat{p}, \epsilon) = h(x) + \epsilon \cdot \delta h_{\hat{p}}(x)</span></p>
-<p>where <span class="math inline">\delta h_{\hat{p}}(x)</span> is the unit perturbation field induced by perturbation direction <span class="math inline">\hat{p}</span>. The search trajectory under the corrupted heuristic is <span class="math inline">\gamma&#39;(t; \hat{p}, \epsilon)</span>, and its endpoint judgment is <span class="math inline">x&#39;(\hat{p}, \epsilon) = \gamma&#39;(T; \hat{p}, \epsilon)</span>.</p>
+<p><span class="math display">h'(x; \hat{p}, \epsilon) = h(x) + \epsilon \cdot \delta h_{\hat{p}}(x)</span></p>
+<p>where <span class="math inline">\delta h_{\hat{p}}(x)</span> is the unit perturbation field induced by perturbation direction <span class="math inline">\hat{p}</span>. The search trajectory under the corrupted heuristic is <span class="math inline">\gamma'(t; \hat{p}, \epsilon)</span>, and its endpoint judgment is <span class="math inline">x'(\hat{p}, \epsilon) = \gamma'(T; \hat{p}, \epsilon)</span>.</p>
 <p><strong>Definition 5.1 (Corruption Tensor).</strong> The <em>corruption tensor</em> <span class="math inline">C_{ij}</span> is a bilinear map <span class="math inline">C: \mathcal{P} \times M^* \to \mathbb{R}</span> defined by the first-order displacement response:</p>
 <p><span class="math display">\Delta x^i = C^i{}_j \, \epsilon^j + O(\epsilon^2)</span></p>
-<p>where <span class="math inline">\Delta x^i = x&#39;^i - x^i_0</span> is the displacement of the judgment in the <span class="math inline">i</span>-th dimension of the harm space, and <span class="math inline">\epsilon^j</span> is the intensity of the perturbation along the <span class="math inline">j</span>-th perturbation direction. In index-free notation:</p>
-<p><span class="math display">C = \frac{\partial \, x&#39;(\hat{p}, \epsilon)}{\partial \epsilon} \bigg|_{\epsilon = 0}</span></p>
+<p>where <span class="math inline">\Delta x^i = x'^i - x^i_0</span> is the displacement of the judgment in the <span class="math inline">i</span>-th dimension of the harm space, and <span class="math inline">\epsilon^j</span> is the intensity of the perturbation along the <span class="math inline">j</span>-th perturbation direction. In index-free notation:</p>
+<p><span class="math display">C = \frac{\partial \, x'(\hat{p}, \epsilon)}{\partial \epsilon} \bigg|_{\epsilon = 0}</span></p>
 <p>That is, <span class="math inline">C</span> is the Jacobian of the judgment-endpoint map with respect to the perturbation intensities, evaluated at zero perturbation. It maps perturbation directions in <span class="math inline">\mathcal{P}</span> to displacement vectors in <span class="math inline">T_{x_0}M</span> — the tangent space of the judgment manifold at the unperturbed judgment point.</p>
 <p><strong>Properties.</strong></p>
 <ol type="1">
@@ -391,7 +391,7 @@
 </ol>
 <p><strong>Empirical estimation.</strong> The benchmarks in this chapter provide estimates of specific entries (or sums of entries) of <span class="math inline">C_{ij}</span>:</p>
 <ul>
-<li><p>T5 (framing): estimates the column of <span class="math inline">C</span> corresponding to the “linguistic register” perturbation direction. The euphemistic drift ($-$10.2 to $-$15.8) and dramatic drift (+6.3 to +10.9) are the projections of this column onto the total-harm-score direction, with sign indicating the direction of displacement.</p></li>
+<li><p>T5 (framing): estimates the column of <span class="math inline">C</span> corresponding to the “linguistic register” perturbation direction. The euphemistic drift (&minus;10.2 to &minus;15.8) and dramatic drift (+6.3 to +10.9) are the projections of this column onto the total-harm-score direction, with sign indicating the direction of displacement.</p></li>
 <li><p>E2 (emotion): estimates the column corresponding to the “emotional anchoring” perturbation direction. The paired t-values (2.90 to 5.10) reflect the magnitude of this column relative to the stochastic baseline noise.</p></li>
 <li><p>A1 (sensory): estimates the column corresponding to “sensory vividness.” The dose-response pattern (vivid &gt; mild &gt; neutral) confirms the linearity assumption underlying the first-order definition of <span class="math inline">C</span>.</p></li>
 </ul>
