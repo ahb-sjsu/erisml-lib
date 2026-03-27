@@ -1,0 +1,353 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Chapter 1: The Perplexity Trap - Geometric Communication</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
+  <style>
+    :root {
+      --bg: #fafaf8;
+      --fg: #222;
+      --accent: #2c5f8a;
+      --border: #ddd;
+      --code-bg: #f4f4f0;
+      --max-width: 48rem;
+    }
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --bg: #1a1a2e;
+        --fg: #e0e0e0;
+        --accent: #7eb8da;
+        --border: #444;
+        --code-bg: #16213e;
+      }
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Georgia', 'Times New Roman', serif;
+      background: var(--bg);
+      color: var(--fg);
+      line-height: 1.7;
+      padding: 2rem 1rem;
+    }
+    .container {
+      max-width: var(--max-width);
+      margin: 0 auto;
+    }
+    nav.breadcrumb {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      font-size: 0.85rem;
+      margin-bottom: 2rem;
+      padding-bottom: 0.5rem;
+      border-bottom: 1px solid var(--border);
+    }
+    nav.breadcrumb a {
+      color: var(--accent);
+      text-decoration: none;
+    }
+    nav.breadcrumb a:hover { text-decoration: underline; }
+    nav.breadcrumb .sep { margin: 0 0.4rem; color: #999; }
+    h1 {
+      font-size: 2rem;
+      margin-bottom: 0.5rem;
+      line-height: 1.2;
+      border-bottom: 2px solid var(--accent);
+      padding-bottom: 0.5rem;
+    }
+    h2 {
+      font-size: 1.5rem;
+      margin-top: 2.5rem;
+      margin-bottom: 0.75rem;
+      color: var(--accent);
+    }
+    h3 {
+      font-size: 1.2rem;
+      margin-top: 2rem;
+      margin-bottom: 0.5rem;
+    }
+    h4 {
+      font-size: 1.05rem;
+      margin-top: 1.5rem;
+      margin-bottom: 0.4rem;
+      font-style: italic;
+    }
+    p { margin-bottom: 1rem; }
+    blockquote {
+      border-left: 3px solid var(--accent);
+      padding: 0.5rem 1.2rem;
+      margin: 1.5rem 0;
+      background: var(--code-bg);
+      font-style: italic;
+    }
+    blockquote p:last-child { margin-bottom: 0; }
+    code {
+      font-family: 'Consolas', 'Fira Code', monospace;
+      background: var(--code-bg);
+      padding: 0.15rem 0.35rem;
+      border-radius: 3px;
+      font-size: 0.9em;
+    }
+    pre {
+      background: var(--code-bg);
+      padding: 1rem;
+      border-radius: 4px;
+      overflow-x: auto;
+      margin: 1.5rem 0;
+      border: 1px solid var(--border);
+    }
+    pre code {
+      background: none;
+      padding: 0;
+    }
+    a { color: var(--accent); }
+    ul, ol {
+      margin: 0.75rem 0 1rem 1.5rem;
+    }
+    li { margin-bottom: 0.3rem; }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 1.5rem 0;
+    }
+    th, td {
+      border: 1px solid var(--border);
+      padding: 0.5rem 0.75rem;
+      text-align: left;
+    }
+    th { background: var(--code-bg); }
+    hr {
+      border: none;
+      border-top: 1px solid var(--border);
+      margin: 2rem 0;
+    }
+    img {
+      max-width: 100%;
+      height: auto;
+      display: block;
+      margin: 1.5rem auto;
+    }
+    /* KaTeX display math */
+    .katex-display {
+      overflow-x: auto;
+      overflow-y: hidden;
+      padding: 0.5rem 0;
+    }
+    /* Definition/theorem boxes */
+    .definition, .theorem, .axiom {
+      border: 1px solid var(--border);
+      border-left: 4px solid var(--accent);
+      padding: 1rem 1.2rem;
+      margin: 1.5rem 0;
+      background: var(--code-bg);
+      border-radius: 0 4px 4px 0;
+    }
+    footer {
+      margin-top: 4rem;
+      padding-top: 1rem;
+      border-top: 1px solid var(--border);
+      font-size: 0.8rem;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      color: #888;
+      text-align: center;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <nav class="breadcrumb">
+      <a href="../index.html">Geometric Series</a>
+      <span class="sep">/</span>
+      <a href="index.html">Geometric Communication</a>
+      <span class="sep">/</span>
+      <span>Chapter 1: The Perplexity Trap</span>
+    </nav>
+
+    <h1 id="chapter-1-the-perplexity-trap">Chapter 1: The Perplexity Trap<a class="headerlink" href="#chapter-1-the-perplexity-trap" title="Permanent link">&para;</a></h1>
+<p><em>Part I: The Problem</em></p>
+<hr />
+<blockquote>
+<p><em>&ldquo;Not everything that can be counted counts, and not everything that counts can be counted.&rdquo;</em>
+&mdash; William Bruce Cameron</p>
+<p><strong>THE ROSETTA TRAJECTORY</strong></p>
+<p><em>In 1954, researchers at Georgetown University and IBM demonstrated the first public machine translation system. It translated sixty Russian sentences into English using a vocabulary of 250 words and six grammar rules. The press was ecstatic. The New York Times predicted that machine translation would be a solved problem within five years. The researchers knew the demonstration was rigged &mdash; the sentences were carefully selected to fall within the system&rsquo;s narrow competence &mdash; but they also believed the prediction was roughly correct. Surely, expanding the vocabulary, adding grammar rules, and increasing computing power would close the gap.</em></p>
+<p><em>It did not. In 1966, the Automatic Language Processing Advisory Committee (ALPAC) issued a devastating report concluding that machine translation was not merely unsolved but economically unjustified. The field collapsed. Funding dried up. Researchers moved to other problems. The failure was not computational &mdash; it was evaluative. Nobody could agree on what &ldquo;good translation&rdquo; meant, because nobody had a way to measure it that captured what actually mattered.</em></p>
+<p><em>Six decades later, the measurement problem remains. We have BLEU scores, perplexity, word error rates, sentiment scores, readability indices &mdash; an entire apparatus of scalar evaluation. And every one of these numbers destroys the very structure it claims to measure. This chapter explains what is lost, why it cannot be recovered, and what must replace it.</em></p>
+</blockquote>
+<hr />
+<h2 id="11-the-vodka-problem">1.1 The Vodka Problem<a class="headerlink" href="#11-the-vodka-problem" title="Permanent link">&para;</a></h2>
+<p>Consider two English translations of a Russian proverb:</p>
+<blockquote>
+<p><strong>Translation A:</strong> &ldquo;The spirit is willing, but the flesh is weak.&rdquo;</p>
+<p><strong>Translation B:</strong> &ldquo;The vodka is good, but the meat is rotten.&rdquo;</p>
+</blockquote>
+<p>The story that these represent an actual machine translation failure is almost certainly apocryphal &mdash; it has circulated since the 1960s as a cautionary tale about the Georgetown-IBM demonstration and its successors, and no one has ever produced the system that generated Translation B.[^1] But apocryphal or not, the example is devastating, because it exposes a structural deficiency in how we evaluate communication that persists to this day.</p>
+<p>Compute the BLEU score of each translation against the reference &ldquo;The spirit is willing, but the flesh is weak.&rdquo; Translation A scores perfectly: it <em>is</em> the reference. Translation B scores poorly on unigram overlap &mdash; &ldquo;vodka,&rdquo; &ldquo;good,&rdquo; &ldquo;meat,&rdquo; and &ldquo;rotten&rdquo; do not appear in the reference &mdash; and zero on any $n$-gram with $n > 2$, since no bigram except &ldquo;the&rdquo; plus a content word matches.</p>
+<p>Now reverse the problem. Suppose we do not know which translation is correct. Suppose we have only the two translations and a set of scalar metrics. Can we recover, from those metrics, <em>what went wrong</em> with Translation B?</p>
+<p>The BLEU score tells us that Translation B has low $n$-gram overlap with the reference. It does not tell us <em>why</em>. It cannot distinguish between three radically different failure modes:</p>
+<ol>
+<li>
+<p><strong>Lexical substitution with preserved structure.</strong> The translator chose the wrong word from a set of homonyms or near-homonyms. &ldquo;Spirit&rdquo; (the animating principle) became &ldquo;spirit&rdquo; (distilled alcohol, hence vodka). &ldquo;Flesh&rdquo; (the body, frailty) became &ldquo;flesh&rdquo; (meat). The syntactic structure is preserved; the semantic field has shifted. The error is localized and correctable &mdash; a better dictionary would fix it.</p>
+</li>
+<li>
+<p><strong>Structural collapse with preserved topic.</strong> The translator understood the general domain (something about willingness and weakness) but could not reconstruct the sentence structure, producing a grammatically correct but semantically unrelated sentence in the same general topic area. The error is global and structural.</p>
+</li>
+<li>
+<p><strong>Complete hallucination.</strong> The translator produced a fluent sentence that bears no systematic relationship to the source. The output is coherent English, but it is not a translation of anything.</p>
+</li>
+</ol>
+<p>These three failure modes have identical BLEU scores. They have completely different implications for the translation system, completely different remedies, and completely different relationships to the source text&rsquo;s meaning. The scalar has compressed a three-dimensional failure taxonomy into a single number, and the compression is irreversible. No amount of staring at the BLEU score will tell you which failure occurred.</p>
+<p>[Figure 1.1: The three failure modes of Translation B, visualized as points in a semantic space. Lexical substitution (1) lies close to the source on two of three axes but displaced on the third. Structural collapse (2) lies in the correct region of topic space but at the wrong structural coordinates. Hallucination (3) is displaced on all axes. All three project to the same point on the scalar BLEU axis.]</p>
+<p>This is not a contrived example. It is the normal operating condition of every scalar evaluation metric used in communication science. The vodka problem is not about translation. It is about the geometry of meaning and the impossibility of capturing that geometry in a single number.</p>
+<h2 id="12-the-scalar-menagerie">1.2 The Scalar Menagerie<a class="headerlink" href="#12-the-scalar-menagerie" title="Permanent link">&para;</a></h2>
+<p>The evaluation of communication &mdash; human and machine, spoken and written, ancient and modern &mdash; has generated a remarkable zoo of scalar metrics. Each was invented to solve a real problem. Each captures something genuine. And each destroys geometric structure that its inventors did not know existed.</p>
+<h3 id="121-bleu-the-math8-gram-guillotine">1.2.1 BLEU: The $n$-Gram Guillotine<a class="headerlink" href="#121-bleu-the-math8-gram-guillotine" title="Permanent link">&para;</a></h3>
+<p>BLEU (Bilingual Evaluation Understudy) was introduced by Papineni et al. in 2002 as an automatic metric for machine translation evaluation.[^2] Its design was explicitly pragmatic: human evaluation of translation quality is expensive, slow, and inconsistent, so an automatic proxy that correlates with human judgment would be enormously useful. BLEU computes a modified precision score over $n$-grams of different lengths, combining them via a geometric mean and applying a brevity penalty for translations shorter than the reference:</p>
+<p>$$\text{BLEU} = \text{BP} \cdot \exp\left(\sum_{n=1}^{N} w_n \log p_n\right)$$</p>
+<p>where $p_n$ is the modified $n$-gram precision (the fraction of $n$-grams in the candidate that appear in the reference, clipped to avoid rewarding repetition), $w_n = 1/N$ is the uniform weight, and $\text{BP} = \min(1, e^{1 - r/c})$ is the brevity penalty with $r$ the reference length and $c$ the candidate length.</p>
+<p>BLEU was a breakthrough. Before BLEU, evaluating machine translation required human judges &mdash; expensive, slow, and difficult to calibrate across studies. BLEU made evaluation automatic, reproducible, and fast. It enabled the rapid iteration that drove statistical machine translation forward through the 2000s. Its inventors were careful to note its limitations: it measures only surface-level $n$-gram overlap, it requires one or more reference translations, and it does not capture meaning, fluency, or adequacy as separate dimensions. The field heard the first half of this message and ignored the second.</p>
+<p>What does BLEU destroy?</p>
+<p><strong>Synonymy.</strong> &ldquo;The automobile accelerated&rdquo; and &ldquo;The car sped up&rdquo; have zero bigram overlap despite being near-synonyms. BLEU punishes every lexical choice that deviates from the reference, regardless of whether the deviation preserves meaning. On the semantic manifold, these two phrases occupy nearby points &mdash; their meanings are close &mdash; but BLEU measures surface distance, not semantic distance. It projects the semantic manifold onto the lexical surface and measures distance in the projection.</p>
+<p><strong>Word order flexibility.</strong> &ldquo;She gave him the book&rdquo; and &ldquo;The book she gave to him&rdquo; express the same propositional content with different syntactic structures. BLEU captures the shared unigrams (&ldquo;she,&rdquo; &ldquo;gave,&rdquo; &ldquo;him,&rdquo; &ldquo;the,&rdquo; &ldquo;book&rdquo;) but penalizes the different bigrams and trigrams. Languages with freer word order &mdash; German, Latin, Japanese, Akkadian &mdash; are systematically disadvantaged, because the space of valid surface realizations is larger, making any single reference a poorer representative of the set.[^3]</p>
+<p><strong>Pragmatic equivalence.</strong> &ldquo;Could you close the door?&rdquo; and &ldquo;Close the door&rdquo; have the same pragmatic force (a request to close the door) with different levels of politeness. BLEU treats them as different strings. More broadly, BLEU has no representation of speaker intention, social context, or communicative function &mdash; the entire pragmatic manifold is invisible to it.</p>
+<p><strong>Hierarchical structure.</strong> &ldquo;The dog that bit the cat that ate the rat&rdquo; has a nested clause structure that determines its meaning. Scrambling the clause order produces nonsense. BLEU&rsquo;s $n$-gram window sees only local fragments; the global syntactic tree &mdash; the hierarchical structure that determines compositional meaning &mdash; is visible only to the extent that it is reflected in local $n$-gram statistics. For deeply embedded structures, this reflection is faint.</p>
+<p>Each of these losses corresponds to the destruction of a specific geometric structure. Synonymy is metric structure: nearby points on the semantic manifold are projected to distant points on the lexical surface. Word order flexibility is a symmetry: the set of valid surface realizations of a meaning forms the orbit of a syntactic transformation group, and BLEU breaks this symmetry by privileging one element of the orbit (the reference). Pragmatic equivalence is a fiber: the meaning &ldquo;request to close the door&rdquo; is the base point, and the various ways to express it (imperative, interrogative, indirect) are the fiber above that point. BLEU evaluates in the total space rather than the base space. Hierarchical structure is topology: the tree structure of the sentence is a topological object that BLEU&rsquo;s sliding window cannot detect.</p>
+<p>[Figure 1.2: The four geometric structures destroyed by BLEU. (a) Metric: synonymous expressions are nearby on the semantic manifold but distant on the lexical surface. (b) Symmetry: word-order variants form an orbit under syntactic transformation; BLEU privileges one element. (c) Fiber: pragmatic equivalents are different points in the total space that project to the same base point. (d) Topology: hierarchical structure is a global property invisible to local $n$-gram windows.]</p>
+<h3 id="122-perplexity-the-probabilistic-myopia">1.2.2 Perplexity: The Probabilistic Myopia<a class="headerlink" href="#122-perplexity-the-probabilistic-myopia" title="Permanent link">&para;</a></h3>
+<p>Perplexity is the standard evaluation metric for language models. It measures how well a probability distribution predicts a sample:</p>
+<p>$$\text{PPL}(W) = \exp\left(-\frac{1}{N}\sum_{i=1}^{N} \log P(w_i \mid w_{<i})\right)$$</p>
+<p>where $W = w_1, w_2, \ldots, w_N$ is a sequence of $N$ tokens and $P(w_i \mid w_{<i})$ is the model&rsquo;s predicted probability of token $w_i$ given the preceding context. Lower perplexity means the model assigns higher probability to the tokens that actually occurred &mdash; it is less &ldquo;surprised&rdquo; by the data.</p>
+<p>Perplexity has a clean information-theoretic interpretation: it is $2^H$ where $H$ is the cross-entropy between the model&rsquo;s distribution and the empirical distribution. A perfect model &mdash; one that knows exactly which token comes next &mdash; has perplexity 1. A model that assigns uniform probability over a vocabulary of $V$ tokens has perplexity $V$. A model with perplexity 30 is, informally, &ldquo;as confused as if it were choosing uniformly among 30 equally likely next tokens.&rdquo;</p>
+<p>This is useful. It is also profoundly misleading as a measure of language understanding, and the geometric reasons are precise.</p>
+<p><strong>Perplexity is a pointwise metric.</strong> It evaluates each token prediction in isolation (conditional on the context, but scoring each position independently). It has no representation of whether the model understands the <em>global</em> coherence of the text &mdash; whether the narrative is consistent, whether the argument is valid, whether the dialogue is pragmatically appropriate. A model could achieve low perplexity by being excellent at local collocation statistics (&ldquo;strong&rdquo; is likely after &ldquo;the spirit is&rdquo;) while having no representation of discourse structure.</p>
+<p><strong>Perplexity is surface-locked.</strong> It measures the probability of the <em>actual</em> surface form, not the probability of the <em>meaning</em>. Consider a model that perfectly understands the meaning of every sentence but expresses that understanding through unconventional word choices &mdash; a model that always says &ldquo;automobile&rdquo; where the training data says &ldquo;car.&rdquo; Its perplexity will be high, because its surface predictions deviate from the observed surface, even though its semantic predictions are perfect. Perplexity measures fidelity to the surface distribution, not fidelity to the semantic content.</p>
+<p><strong>Perplexity destroys the distinction between easy and hard tokens.</strong> The average in the exponent weights all positions equally. A text might contain 95% predictable function words and connectives (&ldquo;the,&rdquo; &ldquo;is,&rdquo; &ldquo;but,&rdquo; &ldquo;and&rdquo;) and 5% content-bearing tokens that carry the actual information. The model&rsquo;s performance on the content tokens &mdash; the tokens that matter for meaning &mdash; is diluted by its performance on the function tokens. A perplexity of 15 might mean &ldquo;excellent on everything&rdquo; or &ldquo;near-perfect on function words, terrible on content words.&rdquo; The average destroys the distinction.</p>
+<p>The geometric structure that perplexity destroys is the <em>heterogeneity of the prediction surface</em>. A language model&rsquo;s prediction at each position in a text is not a number; it is a probability distribution over the vocabulary &mdash; a point on the probability simplex $\Delta^{V-1}$, which is a $(V-1)$-dimensional manifold. The full prediction of a model on a text of length $N$ is a trajectory on this simplex: a sequence of $N$ points, each representing the model&rsquo;s belief about the next token. This trajectory has structure &mdash; curvature (how sharply the distribution shifts from position to position), topology (whether the trajectory revisits similar distributions), and symmetry (whether semantically equivalent positions produce similar distributions). Perplexity collapses the entire trajectory to a single number: the geometric mean of the probabilities along the path. It is a scalar summary of a manifold-valued trajectory, and the Scalar Irrecoverability Theorem (<em>Geometric Reasoning</em>, Ch. 13) predicts exactly what it loses.</p>
+<h3 id="123-word-error-rate-the-edit-distance-trap">1.2.3 Word Error Rate: The Edit Distance Trap<a class="headerlink" href="#123-word-error-rate-the-edit-distance-trap" title="Permanent link">&para;</a></h3>
+<p>Word Error Rate (WER) is the standard metric for automatic speech recognition:</p>
+<p>$$\text{WER} = \frac{S + D + I}{N}$$</p>
+<p>where $S$ is the number of substitutions, $D$ the number of deletions, $I$ the number of insertions, and $N$ the total number of words in the reference. WER is an edit distance normalized by reference length: the minimum number of word-level operations needed to transform the hypothesis into the reference, expressed as a proportion.</p>
+<p>WER treats all errors as equal. Substituting &ldquo;cat&rdquo; for &ldquo;car&rdquo; and substituting &ldquo;cat&rdquo; for &ldquo;democracy&rdquo; both count as one substitution. Deleting &ldquo;the&rdquo; and deleting &ldquo;not&rdquo; both count as one deletion. This uniform weighting destroys the <em>metric structure</em> of the error space. Some errors are catastrophic (inserting &ldquo;not&rdquo; reverses the meaning of a sentence); others are trivial (substituting &ldquo;a&rdquo; for &ldquo;the&rdquo; in most contexts). WER has no representation of this distinction because it operates on a flat, unweighted space where all word-level edit operations have unit cost.</p>
+<p>The geometric structure destroyed is the semantic metric on word space. In a semantically informed evaluation, the cost of substituting word $a$ for word $b$ would be a function of their semantic distance: $c(a, b) = d_{\text{semantic}}(a, b)$. Substituting &ldquo;automobile&rdquo; for &ldquo;car&rdquo; would cost nearly zero; substituting &ldquo;automobile&rdquo; for &ldquo;freedom&rdquo; would cost the full distance across the semantic manifold. WER replaces this rich metric with the discrete metric: $c(a, b) = 0$ if $a = b$, $c(a, b) = 1$ otherwise. The entire continuous structure of semantic similarity is collapsed to a binary distinction.</p>
+<p>Moreover, WER destroys <em>positional structure</em>. An error in a syntactically critical position (the verb, the negation, the subject) can change the meaning of the entire sentence; an error in a peripheral position (an adjective, an aside, a filler phrase) may leave the meaning nearly intact. WER weights all positions equally. The syntactic tree &mdash; which encodes which positions are structurally critical &mdash; is invisible.</p>
+<h3 id="124-classification-accuracy-the-topology-eraser">1.2.4 Classification Accuracy: The Topology Eraser<a class="headerlink" href="#124-classification-accuracy-the-topology-eraser" title="Permanent link">&para;</a></h3>
+<p>In communication science, classification accuracy appears everywhere: sentiment classification (positive/negative/neutral), speaker identification (which speaker?), language identification (which language?), intent detection (which communicative intent?), species identification from vocalizations (which species?). The metric is deceptively simple:</p>
+<p>$$\text{Accuracy} = \frac{\text{Number correct}}{\text{Total}}$$</p>
+<p>Classification accuracy destroys the <em>topology of the class space</em>. Consider sentiment analysis. A three-class system (positive/negative/neutral) achieves 70% accuracy. But misclassifying positive as neutral (a one-step error on the valence axis) is qualitatively different from misclassifying positive as negative (a two-step error that reverses the polarity). Accuracy treats both errors as equal &mdash; both are &ldquo;wrong.&rdquo; The confusion matrix captures some of this structure, but it is typically contracted to a scalar (accuracy, macro-F1, or AUC) before being reported.</p>
+<p>For species identification from vocalizations &mdash; the task at the heart of the BirdCLEF competition and the eris-ketos cetacean analysis that we will examine in Chapters 7 and 8 &mdash; the problem is more severe. Misclassifying a Humpback whale coda as a Sperm whale coda is not the same kind of error as misclassifying it as a Blue whale song. Humpback and Sperm whales produce clicks through different mechanisms with different spectral properties; the error likely reflects acoustic confusion at the feature level. Humpback and Blue whales are both mysticetes with some shared vocal characteristics; the error might reflect genuine taxonomic proximity. The class space has a hierarchical structure &mdash; the phylogenetic tree of the species &mdash; and errors that cross different levels of this hierarchy have different causes and different implications. Classification accuracy, by treating all errors as equivalent, erases this hierarchy entirely.</p>
+<p>A whale coda classifier with 95% accuracy tells us that 95% of codas were assigned to the correct coda type. It tells us nothing about:</p>
+<ul>
+<li>Whether the errors are concentrated in acoustically similar coda types (suggesting a feature-level limitation) or scattered across the taxonomy (suggesting random noise)</li>
+<li>Whether the errors are systematically asymmetric (coda type A is often confused with type B, but not vice versa), which would reveal the directed structure of the perceptual boundary</li>
+<li>Whether the classifier has learned the <em>meaning</em> of the coda types (whatever that meaning is) or merely their acoustic signatures</li>
+</ul>
+<p>These are geometric properties of the classification boundary &mdash; its curvature, its symmetry, its relationship to the taxonomic hierarchy &mdash; and all of them are invisible to the scalar accuracy metric.</p>
+<h3 id="125-readability-indices-the-dimensionality-collapse">1.2.5 Readability Indices: The Dimensionality Collapse<a class="headerlink" href="#125-readability-indices-the-dimensionality-collapse" title="Permanent link">&para;</a></h3>
+<p>The Flesch-Kincaid readability score, the Gunning fog index, the Coleman-Liau index, the SMOG grade, and their many cousins all attempt to measure how &ldquo;readable&rdquo; a text is by computing a scalar from surface statistics: average sentence length, average word length, syllable count, polysyllabic word frequency. The Flesch Reading Ease formula is typical:</p>
+<p>$$\text{FRE} = 206.835 - 1.015 \left(\frac{\text{total words}}{\text{total sentences}}\right) - 84.6 \left(\frac{\text{total syllables}}{\text{total words}}\right)$$</p>
+<p>This is a linear projection from a two-dimensional space (average sentence length, average syllables per word) onto a scalar. The projection destroys everything about readability that is not captured by these two features: logical structure, coherence, presupposition load, domain-specific vocabulary, the reader&rsquo;s background knowledge, pragmatic clarity, and the interaction between all of these. A passage of Hegel and a passage of a VCR instruction manual can have identical Flesch scores while being unreadable for completely different reasons &mdash; one because the ideas are genuinely complex and densely interrelated, the other because the writing is simply bad.</p>
+<p>The geometric structure destroyed is the <em>dimensionality of the readability manifold</em>. Readability is not a one-dimensional quantity. It is at minimum a function of syntactic complexity, semantic density, pragmatic clarity, domain familiarity, and coherence structure. These dimensions are not reducible to each other: a text can be syntactically simple but semantically dense (a mathematics paper using short sentences), or syntactically complex but semantically transparent (a legal contract with nested clauses expressing simple conditions). Readability indices project this multi-dimensional manifold onto a line and discard the rest.</p>
+<h3 id="126-sentiment-scores-the-affect-flattener">1.2.6 Sentiment Scores: The Affect Flattener<a class="headerlink" href="#126-sentiment-scores-the-affect-flattener" title="Permanent link">&para;</a></h3>
+<p>Sentiment analysis reduces text to a scalar (positive/negative/neutral) or, in more sophisticated systems, to a point on a one-dimensional valence axis from $-1$ to $+1$. Some systems add a second dimension &mdash; arousal &mdash; producing a point in the two-dimensional valence-arousal plane. Even this modest expansion is unusual; most deployed sentiment systems are scalar.</p>
+<p>What does the scalar destroy?</p>
+<p><strong>The object of the sentiment.</strong> &ldquo;I love the camera but hate the battery life&rdquo; is positive about one aspect and negative about another. Scalar sentiment either averages these (producing a misleadingly neutral score) or picks one (producing a misleadingly decisive score). The aspect structure of the sentiment &mdash; the fact that it is a <em>tensor</em> with different values along different dimensions of the product &mdash; is collapsed.</p>
+<p><strong>The pragmatic force.</strong> &ldquo;Great, another meeting&rdquo; is syntactically positive and pragmatically negative (sarcastic). Scalar sentiment, operating on the surface, reads it as positive. The pragmatic inversion &mdash; the 180-degree rotation on the meaning manifold between the literal and intended senses &mdash; is invisible to a metric that operates on surface features alone.</p>
+<p><strong>The social context.</strong> The same words carry different sentiment when spoken by a friend (affectionate teasing) versus a stranger (hostility) versus a subordinate (deference) versus a superior (condescension). Scalar sentiment strips the social coordinates entirely. The communicative act is a point on the product manifold $M = S \times P \times C$, where $S$ is the signal, $P$ the pragmatic context, and $C$ the content. Scalar sentiment projects onto a one-dimensional subspace of $C$ and discards $S$ and $P$ entirely.</p>
+<p><strong>The intensity profile across dimensions.</strong> &ldquo;I&rsquo;m excited but anxious&rdquo; is not captured by any point on a one-dimensional valence axis. It requires at least two dimensions (positive activation, negative activation) and arguably more (anticipation, uncertainty, arousal). The psychological evidence from Russell&rsquo;s circumplex model, Plutchik&rsquo;s wheel of emotions, and the PAD (Pleasure-Arousal-Dominance) model all agree that affect is multi-dimensional.[^4] Scalar sentiment is a lossy projection from this multi-dimensional space.</p>
+<p>Every content moderation system built on scalar sentiment inherits these losses. Every social media analytics platform that reports &ldquo;sentiment trending positive&rdquo; has destroyed the aspect structure, the pragmatic force, the social context, and the intensity profile of what was actually said. The number is not wrong, exactly. It is a valid contraction of a tensor. But the contraction is lossy, and the lost information is precisely the information needed to understand what the communication <em>means</em>.</p>
+<h2 id="13-the-geometry-that-scalars-destroy">1.3 The Geometry That Scalars Destroy<a class="headerlink" href="#13-the-geometry-that-scalars-destroy" title="Permanent link">&para;</a></h2>
+<p>The previous section catalogued six scalar metrics and their specific losses. A pattern emerges. Each metric destroys one or more of four fundamental geometric structures:</p>
+<p><strong>Metric structure.</strong> The continuous distance between meanings &mdash; the fact that &ldquo;car&rdquo; is closer to &ldquo;automobile&rdquo; than to &ldquo;democracy,&rdquo; that a half-step error is less severe than a polarity reversal. BLEU replaces semantic distance with lexical identity. WER replaces it with the discrete metric. Sentiment scores replace the multi-dimensional distance between emotional states with a one-dimensional projection. In each case, the rich metric on the semantic manifold is replaced by a cruder metric that discards gradations of similarity.</p>
+<p><strong>Symmetry structure.</strong> The invariances that preserve meaning &mdash; the fact that &ldquo;the dog bit the man&rdquo; and &ldquo;the man was bitten by the dog&rdquo; express the same propositional content under a syntactic transformation, that &ldquo;Il pleut&rdquo; and &ldquo;it&rsquo;s raining&rdquo; express the same content under a lexical transformation (translation), that a request can be expressed as an imperative, an interrogative, or an indirect speech act while preserving its communicative function. These are symmetries of the communication manifold: transformations that move points on the surface (different expressions) while preserving the base point (the meaning). Scalar metrics break these symmetries by privileging one surface form (the reference) and measuring distance from it.</p>
+<p><strong>Fiber structure.</strong> The separation between content and expression &mdash; the fact that a single meaning can be realized in many surface forms, and a single surface form can carry many meanings. This is the fiber bundle structure of communication: the base space is meaning, the fiber at each point is the set of expressions that convey that meaning, and the total space is the set of all expressed meanings. Scalar metrics operate in the total space (comparing expressions) rather than the base space (comparing meanings). They cannot distinguish between two expressions that are far apart in the total space but project to the same base point (paraphrases) and two expressions that are equally far apart but project to different base points (distinct meanings).</p>
+<p><strong>Topological structure.</strong> The global shape of meaning space &mdash; the hierarchical nesting of categories, the connected components of discourse, the loops in argumentative structure. Classification accuracy erases the topology of the class space. Perplexity, by averaging over positions, erases the topology of the discourse trajectory. Readability indices, by projecting onto two surface statistics, erase the topological structure of coherence. Topology is inherently global &mdash; it concerns properties that are invariant under continuous deformation &mdash; and scalar metrics, by contracting to a point, destroy all global structure.</p>
+<p>[Figure 1.3: The four geometric structures destroyed by scalar evaluation. (a) Metric: continuous distance replaced by discrete or crude approximation. (b) Symmetry: meaning-preserving transformations broken by privileging one surface form. (c) Fiber: content-expression separation collapsed by evaluating in the total space. (d) Topology: global structure erased by local or pointwise evaluation.]</p>
+<p>These four structures are not independent luxuries. They are the mathematical substance of what communication <em>is</em>. Metric structure is what makes some utterances more similar than others. Symmetry structure is what makes translation, paraphrase, and reformulation possible. Fiber structure is what separates meaning from expression &mdash; the fundamental duality that Saussure identified in 1916 and that every subsequent theory of language has grappled with. Topological structure is what gives discourse its coherence, argument its validity, and narrative its arc. A measurement apparatus that destroys all four is not measuring communication. It is measuring something else &mdash; something correlated with communication, perhaps, but structurally impoverished in exactly the dimensions that matter.</p>
+<h2 id="14-the-scalar-irrecoverability-theorem">1.4 The Scalar Irrecoverability Theorem<a class="headerlink" href="#14-the-scalar-irrecoverability-theorem" title="Permanent link">&para;</a></h2>
+<p>The losses catalogued above are not merely inconvenient. They are mathematically irreversible. This is the content of the Scalar Irrecoverability Theorem, proved in <em>Geometric Reasoning</em> (Ch. 13) and here stated in its communication-specific form.</p>
+<p><strong>Theorem 1.1 (Scalar Irrecoverability for Communication).</strong> <em>Let $\mathbf{q} \in \mathbb{R}^d$ be the quality profile of a communicative act (or a system that produces communicative acts) across $d$ independent evaluation dimensions. For any scalar projection $\pi: \mathbb{R}^d \to \mathbb{R}$, there exist communicative acts $A$ and $B$ such that $\pi(\mathbf{q}_A) = \pi(\mathbf{q}_B)$ despite $A$ being strictly superior to $B$ on a substantive subset of the $d$ dimensions. The information destroyed by $\pi$ &mdash; namely, the identity of which dimensions $A$ dominates and which $B$ dominates &mdash; is not recoverable from the scalar values $\pi(\mathbf{q}_A)$ and $\pi(\mathbf{q}_B)$ alone.</em></p>
+<p>The proof follows immediately from the parent theorem. The condition is that the quality profiles of communicative acts (or communication systems) are mutually Pareto-non-dominated across the evaluation dimensions &mdash; that is, no act (or system) dominates every other on every dimension simultaneously. This condition holds empirically for every communication evaluation scenario we will examine in this book. Two translations with identical BLEU scores can differ in adequacy, fluency, terminology, and style. Two language models with identical perplexity can differ in coherence, factual accuracy, pragmatic appropriateness, and safety. Two speech recognition systems with identical WER can differ in their error distributions across phonemes, positions, and semantic criticality.</p>
+<p>The theorem has a sharpened form that is particularly relevant to communication:</p>
+<p><strong>Corollary 1.1.1.</strong> <em>For any $k$ scalar metrics $\pi_1, \ldots, \pi_k$ with $k < d$, the joint evaluation $(\pi_1(\mathbf{q}), \ldots, \pi_k(\mathbf{q}))$ still fails to recover the full profile $\mathbf{q}$. The information loss is reduced but not eliminated until $k \geq d$.</em></p>
+<p>This means that the response to scalar irrecoverability is not &ldquo;use two metrics instead of one&rdquo; or &ldquo;report BLEU and METEOR and chrF++ together.&rdquo; If the quality profile has $d$ independent dimensions, you need at least $d$ independent measurements to characterize it. And the critical word is <em>independent</em>: BLEU, METEOR, and chrF++ are all $n$-gram overlap metrics with different weighting schemes; they are three projections along nearly parallel directions, not three independent measurements. Adding correlated metrics does not reduce the information loss; it merely gives the illusion of thoroughness.</p>
+<p>What is the dimensionality $d$ of communication quality? The outline in Section 1.2 suggests at least the following independent dimensions:</p>
+<ol>
+<li><strong>Semantic adequacy</strong> &mdash; does the communication convey the intended meaning?</li>
+<li><strong>Fluency</strong> &mdash; is the surface form natural and well-formed?</li>
+<li><strong>Pragmatic appropriateness</strong> &mdash; does the communication achieve the intended social effect?</li>
+<li><strong>Structural fidelity</strong> &mdash; is the hierarchical organization of the content preserved?</li>
+<li><strong>Terminological precision</strong> &mdash; are domain-specific terms handled correctly?</li>
+<li><strong>Stylistic register</strong> &mdash; is the level of formality appropriate to the context?</li>
+<li><strong>Coherence</strong> &mdash; does the discourse hold together over longer spans?</li>
+<li><strong>Robustness</strong> &mdash; does the quality hold under perturbation of the input?</li>
+</ol>
+<p>This is likely an undercount. The BIP experiments described in Chapters 11&ndash;12 identify at least four independent dimensions within moral communication alone (the Hohfeldian quartet: Right, Duty, Liberty, No-Right). The eris-ketos analysis in Chapter 7 identifies at least five independent dimensions within whale coda communication (click count, rhythm class, tempo, rubato, ornamentation). Communication quality is not merely multi-dimensional; it is high-dimensional, and the gap between the dimensionality of the quality profile and the dimensionality of the evaluation (usually 1, occasionally 2 or 3) is vast.</p>
+<p>The theorem does not say that scalar metrics are useless. It says they are lossy, and the loss is irrecoverable. A BLEU score of 0.35 is not meaningless &mdash; it constrains the set of possible translations to those that share roughly 35% of their $n$-grams with the reference. But it constrains the set along <em>one</em> axis while leaving all other axes unconstrained. The set of translations consistent with BLEU = 0.35 is not a point; it is a $(d-1)$-dimensional submanifold of the quality space. Everything in that submanifold looks identical to BLEU. The information that distinguishes points within the submanifold &mdash; the information that tells you whether the translation is adequate but disfluent, fluent but pragmatically inappropriate, or uniformly mediocre &mdash; is gone.</p>
+<p>[Figure 1.4: Scalar irrecoverability visualized. The quality space is $d$-dimensional. A scalar metric $\pi$ projects onto a line. The preimage of a scalar value $\pi = c$ is a $(d-1)$-dimensional hyperplane (shown as a plane for $d = 3$). All points on this hyperplane are indistinguishable to $\pi$. The geometric structure within the hyperplane &mdash; the distances, symmetries, and topological features that distinguish qualitatively different translations with the same BLEU score &mdash; is irrecoverable from the scalar.]</p>
+<h2 id="15-what-this-costs">1.5 What This Costs<a class="headerlink" href="#15-what-this-costs" title="Permanent link">&para;</a></h2>
+<p>The irrecoverability theorem is a mathematical fact. But mathematics does not bleed. What bleeds is practice &mdash; the systems built on scalar evaluation, the decisions made on scalar evidence, the understanding lost to scalar compression. The costs are concrete.</p>
+<h3 id="151-translation-quality-that-isnt">1.5.1 Translation Quality That Isn&rsquo;t<a class="headerlink" href="#151-translation-quality-that-isnt" title="Permanent link">&para;</a></h3>
+<p>The machine translation community has spent two decades optimizing for BLEU. The results are impressive by the metric and often disappointing by the experience. Neural machine translation systems achieve BLEU scores that would have seemed miraculous in 2000, yet they routinely produce translations that are fluent, confident, and wrong &mdash; mistranslating negation, dropping qualifiers, hallucinating content that appears nowhere in the source.[^5]</p>
+<p>The reason is Goodhart&rsquo;s law, applied to a geometric situation: when BLEU becomes the optimization target, systems learn to produce $n$-gram-rich output that maximizes overlap with references, regardless of whether the $n$-grams are assembled into coherent meaning. The metric has become the territory, and the territory it describes is the lexical surface, not the semantic manifold. Systems optimized for BLEU learn to navigate the lexical surface with precision while ignoring the semantic manifold that the lexical surface is supposed to represent.</p>
+<h3 id="152-language-models-that-surprise-no-one">1.5.2 Language Models That Surprise No One<a class="headerlink" href="#152-language-models-that-surprise-no-one" title="Permanent link">&para;</a></h3>
+<p>Perplexity optimization has driven the development of language models from the $n$-gram models of the 1990s through the neural language models of the 2010s to the massive transformers of the 2020s. The trajectory has been spectacular: perplexity on standard benchmarks has fallen from hundreds to tens to single digits. And yet the resulting models exhibit behaviors &mdash; hallucination, inconsistency, susceptibility to adversarial prompts, sycophancy &mdash; that perplexity does not predict and cannot measure.</p>
+<p>The disconnect between perplexity and behavior is not a failure of the models. It is a failure of the metric. Perplexity measures average next-token prediction accuracy. Hallucination is a failure of <em>coherence</em> &mdash; the model generates locally plausible tokens that globally contradict established facts. Sycophancy is a failure of <em>invariance</em> &mdash; the model&rsquo;s output changes when the social context changes but the evidential content does not. These are geometric properties &mdash; coherence is topological (global consistency), invariance is symmetric (preservation under transformation) &mdash; and they are invisible to a metric that evaluates tokens one at a time.</p>
+<h3 id="153-content-moderation-that-moderates-the-wrong-thing">1.5.3 Content Moderation That Moderates the Wrong Thing<a class="headerlink" href="#153-content-moderation-that-moderates-the-wrong-thing" title="Permanent link">&para;</a></h3>
+<p>Scalar sentiment scores underpin most automated content moderation systems. The pipeline is standard: classify the sentiment of each post or comment, flag posts that exceed a negativity threshold, route flagged posts to human reviewers or automated action. The problems are well-documented and geometrically predictable.</p>
+<p>Sarcasm inversion: &ldquo;What a wonderful day to be stuck in traffic for three hours&rdquo; is classified as positive because the surface features are positive. The pragmatic rotation from literal to sarcastic meaning is invisible to a surface-level classifier. Aspect collapse: &ldquo;I love this restaurant but the service is terrible&rdquo; is classified as mixed or neutral, averaging the positive aspect (food) with the negative aspect (service). The aspect structure &mdash; which dimension of the experience is being evaluated &mdash; is destroyed by the scalar projection. Context erasure: &ldquo;Kill it!&rdquo; in a gaming context is classified as violent; the same phrase in a business context (&ldquo;this presentation will kill it&rdquo;) is classified as positive. The social context that determines the meaning is absent from the scalar representation.</p>
+<p>These are not edge cases. They are the normal operating condition of scalar sentiment analysis. The losses predicted by the Scalar Irrecoverability Theorem manifest as systematic errors in every system built on scalar evaluation: errors that no amount of training data, model capacity, or hyperparameter tuning can fix, because they arise not from the model&rsquo;s limitations but from the metric&rsquo;s dimensionality.</p>
+<h3 id="154-understanding-that-isnt">1.5.4 Understanding That Isn&rsquo;t<a class="headerlink" href="#154-understanding-that-isnt" title="Permanent link">&para;</a></h3>
+<p>Perhaps the most consequential cost is epistemic. Scalar evaluation creates the illusion of understanding. When we report that a system achieves &ldquo;BLEU 0.42&rdquo; or &ldquo;perplexity 12.3&rdquo; or &ldquo;95% accuracy,&rdquo; we have produced a number &mdash; a definite, comparable, rankable number &mdash; and the existence of the number creates a sense that we know something. We know how good the system is. We can compare it to other systems. We can track its improvement over time.</p>
+<p>But what do we know? We know the value of a specific contraction of a tensor we have not measured. We know the position of a shadow on the wall of the cave. The Scalar Irrecoverability Theorem tells us precisely what we do not know: everything in the $(d-1)$-dimensional hyperplane perpendicular to the projection direction. And in communication, the hyperplane contains exactly the structure that makes communication <em>communication</em> &mdash; the meaning, the intention, the social context, the coherence, the pragmatic force.</p>
+<p>This is not a call to abandon quantitative evaluation. It is a call to upgrade it. The question is not &ldquo;should we measure?&rdquo; but &ldquo;in what space should we measure?&rdquo; The answer &mdash; the answer that this book develops across seventeen subsequent chapters &mdash; is: on the communication manifold, with its full geometric structure intact.</p>
+<h2 id="16-a-different-path">1.6 A Different Path<a class="headerlink" href="#16-a-different-path" title="Permanent link">&para;</a></h2>
+<p>If scalar metrics destroy geometric structure, the remedy is geometric evaluation: measuring communication in a space that preserves the metric, the symmetry, the fiber structure, and the topology that scalars discard.</p>
+<p>This is not a utopian proposal. It is already happening, piecemeal and without a unifying framework.</p>
+<p><strong>Word embeddings</strong> (Word2Vec, GloVe, BERT embeddings) are coordinates on the semantic manifold. They represent meanings as points in a high-dimensional space where distance corresponds (approximately) to semantic dissimilarity. The success of embedding-based metrics like BERTScore and COMET over $n$-gram metrics like BLEU is evidence that moving evaluation from the lexical surface to the semantic manifold improves measurement quality.[^6] But current embedding-based metrics still contract to scalars at the final step: BERTScore computes pairwise token similarities and then averages. The manifold structure is used internally and then discarded in the output.</p>
+<p><strong>Hyperbolic embeddings</strong> represent hierarchical meaning in the Poincare ball, where the exponential growth of volume matches the exponential branching of semantic taxonomies. We will see in Chapter 5 that cuneiform sign hierarchies, whale coda taxonomies, and moral concept ontologies all embed more naturally in hyperbolic space than in Euclidean space. The curvature of the embedding space encodes structural information &mdash; the hierarchy of abstraction from general to specific &mdash; that flat embeddings lose.</p>
+<p><strong>Topological data analysis</strong> extracts the <em>shape</em> of a communication signal &mdash; its connected components, loops, and higher-dimensional voids &mdash; using persistent homology. Applied to whale click patterns (Chapter 6) and birdsong spectral contours (Chapter 8), TDA produces topological invariants that are robust to noise, amplitude variation, and recording conditions. These invariants capture structure that is invisible to spectral analysis: the <em>shape</em> of the vocalization in phase space, not just its frequency content.</p>
+<p><strong>SPD manifold features</strong> represent the covariance structure of acoustic signals on the manifold of symmetric positive-definite matrices, equipped with a Riemannian metric that respects the manifold geometry. The 156-dimensional geometric feature vector developed for birdsong analysis in Chapter 8 &mdash; 136 SPD features, 4 trajectory features, 16 TDA features &mdash; captures cross-frequency correlations, spectral trajectory complexity, and topological persistence in a single representation that outperforms any single geometry alone.</p>
+<p>These are not competing alternatives to scalar evaluation. They are complementary geometric structures, each capturing a different aspect of the communication manifold. And they already work. The empirical results presented in this book &mdash; Menzerath&rsquo;s law in whale codas (Chapter 7), hyperbolic attention bias for cuneiform translation (Chapter 9), cross-lingual moral invariance at 44.5% F1 (Chapter 11) &mdash; are all products of geometric evaluation applied where scalar evaluation fails.</p>
+<p>The question is not whether geometric methods work. The question is whether they can be unified into a coherent framework that explains <em>why</em> they work and <em>what</em> they measure. This is the project of the book.</p>
+<h2 id="17-the-plan">1.7 The Plan<a class="headerlink" href="#17-the-plan" title="Permanent link">&para;</a></h2>
+<p>The book proceeds in seven parts along what we call the Rosetta trajectory &mdash; the path from raw signal to structured meaning, developed through five communication systems spanning 4,000 years and three biological kingdoms.</p>
+<p><strong>Part I (Chapters 1&ndash;3)</strong> establishes the problem and the framework. Chapter 2 recovers the geometric intuitions buried in the history of linguistics &mdash; Saussure&rsquo;s arbitrariness of the sign as gauge invariance, Jakobson&rsquo;s distinctive features as a discrete symmetry group, Chomsky&rsquo;s deep structure as a quotient manifold &mdash; and shows that the field has been reaching toward geometry for over a century without naming it. Chapter 3 constructs the communication manifold $M = S \times P \times C$, the product of signal, pragmatic, and content manifolds, and defines the metric, heuristic field, and symmetry group that give it structure.</p>
+<p><strong>Part II (Chapters 4&ndash;6)</strong> develops the geometric toolkit: hyperbolic embeddings for hierarchical structure, SPD manifolds for covariance structure, and topological data analysis for shape. These three geometries are orthogonal &mdash; they capture hierarchy, covariance, and topology respectively &mdash; and their combination produces a richer representation than any single geometry alone.</p>
+<p><strong>Parts III&ndash;V (Chapters 7&ndash;13)</strong> apply the toolkit to five communication systems: sperm whale codas, birdsong, Akkadian cuneiform, cross-lingual moral reasoning, and the gauge theory of communicative acts. Each application validates the geometric approach on a different system and contributes empirical evidence for the central claim.</p>
+<p><strong>Part VI (Chapters 14&ndash;15)</strong> catalogs the failure modes of communication through the geometric lens and proves the domain-specific Scalar Irrecoverability Theorem with full formal machinery.</p>
+<p><strong>Part VII (Chapters 16&ndash;18)</strong> synthesizes the Rosetta trajectory, identifies what communication teaches the general geometric framework, and poses the open questions that the next generation of research must address.</p>
+<p>The argument, stripped to its essence, is this: communication has geometric structure. Scalar evaluation destroys that structure. The destruction is mathematically irreversible. Geometric methods recover it. And the recovery is not merely theoretical &mdash; it is empirical, practical, and already underway.</p>
+<p>What we need is the framework to see it clearly. That framework begins, in the next chapter, with a linguist who died in 1913 and whose two deepest insights turn out to be theorems in differential geometry.</p>
+<hr />
+<h2 id="summary">Summary<a class="headerlink" href="#summary" title="Permanent link">&para;</a></h2>
+<p>This chapter has argued that the standard evaluation apparatus for communication &mdash; BLEU, perplexity, WER, classification accuracy, readability indices, sentiment scores &mdash; systematically destroys the geometric structure of meaning. Each metric collapses a multi-dimensional quality profile into a scalar, and the collapse is irreversible: the Scalar Irrecoverability Theorem (<em>Geometric Reasoning</em>, Ch. 13) proves that no scalar projection can preserve the Pareto structure of the quality space. What is lost includes metric structure (continuous semantic distance), symmetry structure (meaning-preserving transformations), fiber structure (the separation of content from expression), and topological structure (the global shape of discourse and hierarchy).</p>
+<p>The costs are not theoretical. They manifest as translation systems that are fluent but unfaithful, language models with low perplexity and high hallucination, content moderation systems that cannot detect sarcasm or aspect structure, and an evaluation culture that creates the illusion of understanding through numbers that have been emptied of the structure they claim to measure.</p>
+<p>The alternative is geometric evaluation: measuring communication on the manifold where meaning lives, with tools that preserve the structure that scalars destroy. The book develops these tools &mdash; hyperbolic embeddings, SPD manifolds, persistent homology, gauge invariance &mdash; and validates them empirically across five communication systems. The argument begins, in Chapter 2, with Saussure.</p>
+<hr />
+<p>[^1]: The story appears in Bar-Hillel (1960) and has been repeated in countless textbooks since. Hutchins (1995) traces the provenance and concludes that no documented system produced this specific output. The example is best understood as a thought experiment &mdash; one that happens to be exactly right about the structural deficiency it illustrates.</p>
+<p>[^2]: Papineni, K., Roukos, S., Ward, T., &amp; Zhu, W.-J. (2002). BLEU: a Method for Automatic Evaluation of Machine Translation. <em>Proceedings of ACL</em>, 311&ndash;318. The paper has been cited over 20,000 times, making it one of the most influential papers in NLP history and one of the most consequential examples of a scalar metric becoming an optimization target.</p>
+<p>[^3]: This problem is well-known in the MT evaluation literature. Doddington (2002) proposed NIST, which weights $n$-grams by informativeness; Banerjee &amp; Lavie (2005) proposed METEOR, which adds synonym matching and stemming; Popovic (2015) proposed chrF++, which uses character $n$-grams to reduce sensitivity to morphological variation. Each addresses one specific loss while leaving the fundamental scalar projection intact.</p>
+<p>[^4]: Russell, J. A. (1980). A circumplex model of affect. <em>Journal of Personality and Social Psychology</em>, 39(6), 1161&ndash;1178. Plutchik, R. (1980). <em>Emotion: A Psychoevolutionary Synthesis</em>. Harper &amp; Row. Mehrabian, A., &amp; Russell, J. A. (1974). <em>An Approach to Environmental Psychology</em>. MIT Press. The convergence of three independent theoretical frameworks on the multi-dimensionality of affect makes the one-dimensional projection of sentiment analysis particularly indefensible.</p>
+<p>[^5]: Raunak, V., Menezes, A., &amp; Junczys-Dowmunt, M. (2021). The Curious Case of Hallucinations in Neural Machine Translation. <em>Proceedings of NAACL</em>, 1172&ndash;1183. The paper documents cases where neural MT systems produce fluent, confident translations that contain information appearing nowhere in the source &mdash; a failure mode that BLEU cannot detect because hallucinated content can overlap with reference $n$-grams by chance.</p>
+<p>[^6]: Zhang, T., Kishore, V., Wu, F., Weinberger, K. Q., &amp; Artzi, Y. (2020). BERTScore: Evaluating Text Generation with BERT. <em>ICLR 2020</em>. Rei, R., Stewart, C., Farinha, A. C., &amp; Lavie, A. (2020). COMET: A Neural Framework for MT Evaluation. <em>Proceedings of EMNLP</em>, 2685&ndash;2702.</p>
+
+    <footer>
+      <p>Part of the <em>Geometric Series</em> by A.H. Bowers</p>
+      <p>Built automatically from source. Last updated: 2026-03-27 00:17 UTC</p>
+    </footer>
+  </div>
+
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js"
+    onload="renderMathInElement(document.body, {
+      delimiters: [
+        {left: '$$', right: '$$', display: true},
+        {left: '$', right: '$', display: false},
+        {left: '\\\\(', right: '\\\\)', display: false},
+        {left: '\\\\[', right: '\\\\]', display: true}
+      ],
+      throwOnError: false
+    });"></script>
+</body>
+</html>

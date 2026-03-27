@@ -1,0 +1,1136 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Appendix C: The BIP Experimental Protocol - Geometric Communication</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
+  <style>
+    :root {
+      --bg: #fafaf8;
+      --fg: #222;
+      --accent: #2c5f8a;
+      --border: #ddd;
+      --code-bg: #f4f4f0;
+      --max-width: 48rem;
+    }
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --bg: #1a1a2e;
+        --fg: #e0e0e0;
+        --accent: #7eb8da;
+        --border: #444;
+        --code-bg: #16213e;
+      }
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Georgia', 'Times New Roman', serif;
+      background: var(--bg);
+      color: var(--fg);
+      line-height: 1.7;
+      padding: 2rem 1rem;
+    }
+    .container {
+      max-width: var(--max-width);
+      margin: 0 auto;
+    }
+    nav.breadcrumb {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      font-size: 0.85rem;
+      margin-bottom: 2rem;
+      padding-bottom: 0.5rem;
+      border-bottom: 1px solid var(--border);
+    }
+    nav.breadcrumb a {
+      color: var(--accent);
+      text-decoration: none;
+    }
+    nav.breadcrumb a:hover { text-decoration: underline; }
+    nav.breadcrumb .sep { margin: 0 0.4rem; color: #999; }
+    h1 {
+      font-size: 2rem;
+      margin-bottom: 0.5rem;
+      line-height: 1.2;
+      border-bottom: 2px solid var(--accent);
+      padding-bottom: 0.5rem;
+    }
+    h2 {
+      font-size: 1.5rem;
+      margin-top: 2.5rem;
+      margin-bottom: 0.75rem;
+      color: var(--accent);
+    }
+    h3 {
+      font-size: 1.2rem;
+      margin-top: 2rem;
+      margin-bottom: 0.5rem;
+    }
+    h4 {
+      font-size: 1.05rem;
+      margin-top: 1.5rem;
+      margin-bottom: 0.4rem;
+      font-style: italic;
+    }
+    p { margin-bottom: 1rem; }
+    blockquote {
+      border-left: 3px solid var(--accent);
+      padding: 0.5rem 1.2rem;
+      margin: 1.5rem 0;
+      background: var(--code-bg);
+      font-style: italic;
+    }
+    blockquote p:last-child { margin-bottom: 0; }
+    code {
+      font-family: 'Consolas', 'Fira Code', monospace;
+      background: var(--code-bg);
+      padding: 0.15rem 0.35rem;
+      border-radius: 3px;
+      font-size: 0.9em;
+    }
+    pre {
+      background: var(--code-bg);
+      padding: 1rem;
+      border-radius: 4px;
+      overflow-x: auto;
+      margin: 1.5rem 0;
+      border: 1px solid var(--border);
+    }
+    pre code {
+      background: none;
+      padding: 0;
+    }
+    a { color: var(--accent); }
+    ul, ol {
+      margin: 0.75rem 0 1rem 1.5rem;
+    }
+    li { margin-bottom: 0.3rem; }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 1.5rem 0;
+    }
+    th, td {
+      border: 1px solid var(--border);
+      padding: 0.5rem 0.75rem;
+      text-align: left;
+    }
+    th { background: var(--code-bg); }
+    hr {
+      border: none;
+      border-top: 1px solid var(--border);
+      margin: 2rem 0;
+    }
+    img {
+      max-width: 100%;
+      height: auto;
+      display: block;
+      margin: 1.5rem auto;
+    }
+    /* KaTeX display math */
+    .katex-display {
+      overflow-x: auto;
+      overflow-y: hidden;
+      padding: 0.5rem 0;
+    }
+    /* Definition/theorem boxes */
+    .definition, .theorem, .axiom {
+      border: 1px solid var(--border);
+      border-left: 4px solid var(--accent);
+      padding: 1rem 1.2rem;
+      margin: 1.5rem 0;
+      background: var(--code-bg);
+      border-radius: 0 4px 4px 0;
+    }
+    footer {
+      margin-top: 4rem;
+      padding-top: 1rem;
+      border-top: 1px solid var(--border);
+      font-size: 0.8rem;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      color: #888;
+      text-align: center;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <nav class="breadcrumb">
+      <a href="../index.html">Geometric Series</a>
+      <span class="sep">/</span>
+      <a href="index.html">Geometric Communication</a>
+      <span class="sep">/</span>
+      <span>Appendix C: The BIP Experimental Protocol</span>
+    </nav>
+
+    <h1 id="appendix-c-the-bip-experimental-protocol">Appendix C: The BIP Experimental Protocol<a class="headerlink" href="#appendix-c-the-bip-experimental-protocol" title="Permanent link">&para;</a></h1>
+<h2 id="full-specification-of-the-cross-lingual-transfer-experiment">Full Specification of the Cross-Lingual Transfer Experiment<a class="headerlink" href="#full-specification-of-the-cross-lingual-transfer-experiment" title="Permanent link">&para;</a></h2>
+<p>This appendix provides a complete specification of the Bond Invariance Principle (BIP) experiment described in Chapters 11&ndash;12, sufficient for independent replication. The experiment tests whether Hohfeldian moral relations&mdash;Right, Duty, Liberty, No-Right&mdash;constitute a gauge-invariant structure that persists across languages, cultures, and millennia. We train an adversarial disentanglement model on ancient Hebrew and Aramaic ethical texts (500 BCE&ndash;1800 CE) and test zero-shot transfer to modern American English advice columns (1956&ndash;2020), with supplementary evaluation on Classical Chinese and Arabic corpora.</p>
+<p>All code and data are available at <code>github.com/ahb-sjsu/sqnd-probe</code>. Configuration files referenced below are <code>config_bip.yaml</code> and <code>corpora.yaml</code> in the repository root.</p>
+<hr />
+<h2 id="c1-corpus-preparation">C.1 Corpus Preparation<a class="headerlink" href="#c1-corpus-preparation" title="Permanent link">&para;</a></h2>
+<h3 id="c11-training-corpus-sefaria-database">C.1.1 Training Corpus: Sefaria Database<a class="headerlink" href="#c11-training-corpus-sefaria-database" title="Permanent link">&para;</a></h3>
+<p>The primary training corpus is drawn from the Sefaria Project (sefaria.org), a freely available, community-maintained library of Jewish texts. The Sefaria-Export repository provides the complete digitized corpus as structured JSON files organized by category, with parallel Hebrew/Aramaic originals and English translations.</p>
+<p><strong>Acquisition.</strong> The corpus is obtained by shallow-cloning the Sefaria-Export repository:</p>
+<pre><code class="language-bash">git clone --depth 1 https://github.com/Sefaria/Sefaria-Export.git
+# Approximate size: 8.3 GB
+</code></pre>
+<p>The JSON directory contains subdirectories for each category of text (Tanakh, Mishnah, Talmud, Midrash, Halakhah, Kabbalah, Musar, Responsa, etc.). Each text is stored as a JSON file with <code>he</code> (Hebrew/Aramaic original) and <code>text</code> or <code>en</code> (English translation) fields, organized hierarchically by chapter and verse or folio and line.</p>
+<p><strong>Temporal bins.</strong> Passages are assigned to temporal periods based on the Sefaria directory structure and category metadata:</p>
+<table>
+<thead>
+<tr>
+<th>Code</th>
+<th>Period</th>
+<th>Date Range</th>
+<th>Primary Languages</th>
+<th>Representative Texts</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>BIB</td>
+<td>Biblical</td>
+<td>1000&ndash;500 BCE</td>
+<td>Biblical Hebrew</td>
+<td>Torah, Prophets, Writings</td>
+</tr>
+<tr>
+<td>ST</td>
+<td>Second Temple</td>
+<td>500 BCE&ndash;70 CE</td>
+<td>Late Hebrew</td>
+<td>Apocrypha, sectarian texts</td>
+</tr>
+<tr>
+<td>TAN</td>
+<td>Tannaitic</td>
+<td>70&ndash;200 CE</td>
+<td>Mishnaic Hebrew</td>
+<td>Mishnah, Tosefta</td>
+</tr>
+<tr>
+<td>AMO</td>
+<td>Amoraic</td>
+<td>200&ndash;500 CE</td>
+<td>Aramaic, Hebrew</td>
+<td>Talmud Bavli, Talmud Yerushalmi, Midrash</td>
+</tr>
+<tr>
+<td>GEO</td>
+<td>Geonic</td>
+<td>600&ndash;1000 CE</td>
+<td>Judeo-Arabic, Hebrew</td>
+<td>Responsa literature</td>
+</tr>
+<tr>
+<td>RIS</td>
+<td>Rishonim</td>
+<td>1000&ndash;1500 CE</td>
+<td>Medieval Hebrew</td>
+<td>Rashi, Maimonides, Nachmanides</td>
+</tr>
+<tr>
+<td>ACH</td>
+<td>Achronim</td>
+<td>1500&ndash;1800 CE</td>
+<td>Early Modern Hebrew</td>
+<td>Shulchan Aruch, Chasidic texts</td>
+</tr>
+</tbody>
+</table>
+<p>Period assignment is performed by a deterministic mapping from Sefaria category to period:</p>
+<pre><code class="language-python">CATEGORY_TO_PERIOD = {
+    'Tanakh': 'BIBLICAL',   'Torah': 'BIBLICAL',
+    'Prophets': 'BIBLICAL', 'Writings': 'BIBLICAL',
+    'Mishnah': 'TANNAITIC', 'Tosefta': 'TANNAITIC',
+    'Talmud': 'AMORAIC',    'Bavli': 'AMORAIC',
+    'Yerushalmi': 'AMORAIC','Midrash': 'AMORAIC',
+    'Halakhah': 'RISHONIM', 'Kabbalah': 'RISHONIM',
+    'Philosophy': 'RISHONIM',
+    'Musar': 'ACHRONIM',    'Responsa': 'ACHRONIM',
+    'Chasidut': 'ACHRONIM',
+}
+</code></pre>
+<p><strong>Passage extraction.</strong> The <code>SefariaLoader</code> recursively traverses the JSON directory tree. For each JSON file, it extracts paired (Hebrew/Aramaic original, English translation) passages by flattening nested list structures. Priority is given to ethically rich tractates: the Talmudic orders Nezikin (damages), Nashim (women/family law), and Mo&rsquo;ed (festivals), as well as the Mishnaic tractates Pirkei Avot, Bava Kamma, Bava Metzia, Sanhedrin, and Ketubot.</p>
+<p><strong>Text cleaning.</strong> All passages undergo the following preprocessing:</p>
+<ol>
+<li>Unicode normalization to NFC form</li>
+<li>HTML tag removal (Sefaria source text contains inline markup)</li>
+<li>Whitespace normalization (collapse multiple spaces, strip leading/trailing whitespace)</li>
+<li>Length filtering: minimum 50 characters, maximum 2,000 characters</li>
+</ol>
+<p><strong>Language detection.</strong> Passages from Talmud Bavli, Targums, and Zohar are tagged as Aramaic; all others as Hebrew. Language is assigned from Sefaria metadata rather than automatic detection, since the two languages frequently co-occur.</p>
+<p><strong>Deduplication.</strong> Each passage receives a deterministic ID: the first 12 hex characters of the MD5 hash of the source name, structural reference, and first 50 characters of the Hebrew original. Re-runs produce identical IDs; exact duplicates are naturally deduplicated.</p>
+<p>The final training corpus comprises approximately 3.9 million passages with both Hebrew/Aramaic original and English translation. For training, the model receives <strong>only the original Hebrew/Aramaic text</strong> (or the English text in the appropriate experimental condition), never the translation.</p>
+<h3 id="c12-test-corpus-dear-abby-letters">C.1.2 Test Corpus: Dear Abby Letters<a class="headerlink" href="#c12-test-corpus-dear-abby-letters" title="Permanent link">&para;</a></h3>
+<p>The test corpus consists of letters from the &ldquo;Dear Abby&rdquo; syndicated advice column, spanning 1956&ndash;2020. The corpus was chosen because it is maximally distant from the training corpus along every conceivable confound: language (American English vs. Hebrew/Aramaic), era (20th&ndash;21st century vs. ancient/medieval), genre (informal advice-seeking vs. legal/religious commentary), and cultural context (secular American vs. Jewish legal tradition).</p>
+<p><strong>Source.</strong> The Dear Abby dataset is available as a CSV file via Kaggle. The columns include the date of publication, the reader&rsquo;s question (letter), and the columnist&rsquo;s answer (response).</p>
+<p><strong>Preprocessing.</strong> Each letter is formatted as a combined question-answer pair (<code>QUESTION: [text] ANSWER: [response]</code>). The same cleaning pipeline (Unicode normalization, whitespace normalization, length filtering at 50&ndash;2,000 characters) is applied. Year of publication is extracted for temporal metadata; topical category (family, marriage, work, friendship, etc.) is assigned by keyword regex matching.</p>
+<p><strong>Deduplication.</strong> Letter IDs are the first 12 hex characters of the MD5 hash of the date and first 50 characters of the question. The final test corpus comprises approximately 68,000 letters, with an additional 20,000-letter archive (1985&ndash;2017) available for extended evaluation.</p>
+<h3 id="c13-supplementary-corpora">C.1.3 Supplementary Corpora<a class="headerlink" href="#c13-supplementary-corpora" title="Permanent link">&para;</a></h3>
+<p>Two additional corpora test cross-cultural invariance beyond the Semitic&ndash;Germanic language family boundary.</p>
+<p><strong>Classical Chinese.</strong> The core Chinese corpus draws from the Chinese Text Project (ctext.org) and includes the Analects, Mencius, Dao De Jing, Zhuangzi, Daxue, and Zhongyong, representing the Confucian and Daoist traditions (approximately 500 BCE&ndash;200 CE). In the v10.9 expansion, the corpus is diversified to include:</p>
+<ul>
+<li><em>Buddhist Chinese</em>: Dhammapada (Chinese translation), Diamond Sutra, Lotus Sutra, Heart Sutra, Brahma Net Sutra, Vimalakirti Sutra, Platform Sutra (~50 passages)</li>
+<li><em>Legalist Chinese</em>: Han Feizi, Shang Jun Shu, Guanzi (~40 passages)</li>
+<li><em>Mohist Chinese</em>: Mozi, with emphasis on the &ldquo;Universal Love&rdquo; chapters (~30 passages)</li>
+<li><em>Neo-Confucian Chinese</em>: Zhu Xi, Wang Yangming, Zhou Dunyi, Zhang Zai (~30 passages)</li>
+</ul>
+<p>This diversification tests whether Chinese transfer performance reflects genuine invariant structure or corpus homogeneity.</p>
+<p><strong>Arabic.</strong> The Arabic corpus includes the Quran, Hadith collections, Islamic legal maxims (<em>qawa&rsquo;id fiqhiyya</em>), Sufi ethical texts (al-Ghazali, al-Qushayri, Rumi), and Arabic philosophical ethics (al-Farabi, Ibn Rushd, Ibn Khaldun). The v10.8 corpus (~180 passages) is expanded substantially in v10.9.</p>
+<p><strong>Sanskrit/Pali (planned).</strong> Passages from the Mahabharata, Bhagavad Gita, Manusmriti, Upanishads, Dhammapada, and Vinaya Pitaka serve as an independence test: an Indo-European tradition developed independently of both Semitic and Sinitic moral thought.</p>
+<h3 id="c14-labeling-protocol-hohfeldian-relation-assignment">C.1.4 Labeling Protocol: Hohfeldian Relation Assignment<a class="headerlink" href="#c14-labeling-protocol-hohfeldian-relation-assignment" title="Permanent link">&para;</a></h3>
+<p>Hohfeldian labels are assigned to passages through a hybrid extraction pipeline. The primary method is pattern-based, with optional LLM augmentation for ambiguous cases.</p>
+<p><strong>Pattern-based extraction.</strong> For each passage, the English text (the translation for ancient texts, the original for Dear Abby) is scanned against compiled regular expression patterns for each Hohfeldian state:</p>
+<table>
+<thead>
+<tr>
+<th>Hohfeldian State</th>
+<th>English Patterns</th>
+<th>Hebrew Patterns</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>OBLIGATION (Duty)</td>
+<td>must, shall, duty, required, obligated, responsible, have to, need to</td>
+<td>חייב (chayav), מצווה (mitzvah)</td>
+</tr>
+<tr>
+<td>RIGHT (Claim)</td>
+<td>right to, entitled, deserve, owed, demand, may claim</td>
+<td>זכאי (zakai)</td>
+</tr>
+<tr>
+<td>LIBERTY (Privilege)</td>
+<td>may, can, permitted, allowed, free to, optional, voluntary</td>
+<td>מותר (mutar), רשות (reshut)</td>
+</tr>
+<tr>
+<td>NO-RIGHT (Exposure)</td>
+<td>cannot demand, no right, not entitled, may not require</td>
+<td>אסור (asur)</td>
+</tr>
+</tbody>
+</table>
+<p>Each pattern is compiled with case-insensitive matching. The Hohfeldian state with the highest match count across its pattern set is assigned as the passage&rsquo;s primary label. Passages matching no patterns receive a NONE label and are excluded from supervised training on the Hohfeldian classification task.</p>
+<p><strong>Bond type extraction.</strong> In addition to Hohfeldian state, each passage is labeled with one or more of ten bond types, identified by a separate set of domain-specific patterns:</p>
+<table>
+<thead>
+<tr>
+<th>Bond Type</th>
+<th>Representative Patterns</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>HARM_PREVENTION</td>
+<td>kill, murder, harm, hurt, save, rescue, protect</td>
+</tr>
+<tr>
+<td>RECIPROCITY</td>
+<td>return, repay, owe, debt, mutual, exchange</td>
+</tr>
+<tr>
+<td>AUTONOMY</td>
+<td>choose, decision, consent, force, coerce</td>
+</tr>
+<tr>
+<td>PROPERTY</td>
+<td>property, own, steal, buy, sell, land</td>
+</tr>
+<tr>
+<td>FAMILY</td>
+<td>honor parent, marry, divorce, inherit</td>
+</tr>
+<tr>
+<td>AUTHORITY</td>
+<td>obey, command, law, judge, permit, forbid</td>
+</tr>
+<tr>
+<td>CARE</td>
+<td>care, help, assist, feed, visit, charity</td>
+</tr>
+<tr>
+<td>FAIRNESS</td>
+<td>fair, just, equal, deserve, bias</td>
+</tr>
+<tr>
+<td>EMERGENCY</td>
+<td>emergency, urgent, life-threatening, pikuach nefesh</td>
+</tr>
+<tr>
+<td>CONTRACT</td>
+<td>promise, vow, oath, agreement, pledge</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Consent status.</strong> Each passage is also classified by consent status (EXPLICIT_YES, IMPLICIT_YES, CONTESTED, IMPLICIT_NO, EXPLICIT_NO, IMPOSSIBLE), determined by a third pattern set targeting consent-indicative language. Disputed passages&mdash;those containing markers such as &ldquo;machlok,&rdquo; &ldquo;some say&hellip; others say,&rdquo; or multiple attributed rabbinic opinions&mdash;are flagged and assigned to a &ldquo;contested&rdquo; consensus tier.</p>
+<p><strong>Known limitations.</strong> The pattern-based approach is deliberately noisy. Label noise makes transfer <em>harder</em>, not easier, so successful transfer despite noise constitutes stronger evidence for invariant structure. A hybrid mode (pattern + LLM classification via Claude 3 Haiku, confidence threshold 0.7) is specified in <code>config_bip.yaml</code> for production use. The experiments in Chapters 11&ndash;12 use pattern-based labels only.</p>
+<hr />
+<h2 id="c2-model-architecture">C.2 Model Architecture<a class="headerlink" href="#c2-model-architecture" title="Permanent link">&para;</a></h2>
+<h3 id="c21-encoder">C.2.1 Encoder<a class="headerlink" href="#c21-encoder" title="Permanent link">&para;</a></h3>
+<p>The base encoder is a pretrained multilingual sentence transformer. Two configurations are used across experimental versions:</p>
+<table>
+<thead>
+<tr>
+<th>Version</th>
+<th>Model</th>
+<th>Embedding Dim</th>
+<th>Languages</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>v10.8 (paper draft)</td>
+<td><code>paraphrase-multilingual-MiniLM-L12-v2</code></td>
+<td>384</td>
+<td>50+ languages</td>
+</tr>
+<tr>
+<td>v10.9+ (full tensor)</td>
+<td><code>sentence-transformers/all-mpnet-base-v2</code></td>
+<td>768</td>
+<td>English-dominant, multilingual</td>
+</tr>
+<tr>
+<td>Alternate</td>
+<td>LaBSE (<code>sentence-transformers/LaBSE</code>)</td>
+<td>768</td>
+<td>109 languages</td>
+</tr>
+</tbody>
+</table>
+<p>The encoder maps each passage to a fixed-dimensional embedding $h \in \mathbb{R}^{d}$ via mean pooling over the last hidden state, weighted by the attention mask:</p>
+<p>$$h = \frac{\sum_{i=1}^{L} m_i \cdot h_i}{\sum_{i=1}^{L} m_i}$$</p>
+<p>where $h_i$ is the hidden state at position $i$, $m_i$ is the attention mask value, and $L$ is the sequence length. If the encoder&rsquo;s native hidden size differs from the target $d_\text{model}$, a learned linear projection maps to the target dimension.</p>
+<p>The encoder may be frozen (all parameters fixed) or fine-tuned. The default configuration fine-tunes the encoder with a lower learning rate than the classification heads. Maximum sequence length is 256 tokens (v10.8) or 512 tokens (v10.9+).</p>
+<h3 id="c22-disentanglement-module">C.2.2 Disentanglement Module<a class="headerlink" href="#c22-disentanglement-module" title="Permanent link">&para;</a></h3>
+<p>The core architectural innovation is the disentanglement of the encoder representation into two complementary latent spaces:</p>
+<ul>
+<li><strong>$z_\text{bond}$</strong> (bond space): Trained to encode moral structure (Hohfeldian relations, bond types) while being <em>uninformative</em> about temporal, linguistic, and stylistic features. Dimension: 64 (v10.8) or 128 (v10.9+).</li>
+<li><strong>$z_\text{label}$</strong> (label space): Trained to capture the temporal-stylistic information that $z_\text{bond}$ discards. Dimension: 32 (v10.8) or 64 (v10.9+).</li>
+</ul>
+<p>Both projections use a variational architecture with the reparameterization trick:</p>
+<pre><code>h (768-dim)
+  |
+  +---&gt; bond_mean:   Linear(768, 384) -&gt; ReLU -&gt; Dropout(0.1) -&gt; Linear(384, d_bond)
+  +---&gt; bond_logvar: Linear(768, 384) -&gt; ReLU -&gt; Dropout(0.1) -&gt; Linear(384, d_bond)
+  |
+  +---&gt; label_mean:   Linear(768, 384) -&gt; ReLU -&gt; Dropout(0.1) -&gt; Linear(384, d_label)
+  +---&gt; label_logvar: Linear(768, 384) -&gt; ReLU -&gt; Dropout(0.1) -&gt; Linear(384, d_label)
+</code></pre>
+<p>During training, $z_\text{bond} = \mu_\text{bond} + \sigma_\text{bond} \cdot \epsilon$ where $\epsilon \sim \mathcal{N}(0, I)$ and $\sigma_\text{bond} = \exp(0.5 \cdot \text{logvar}_\text{bond})$. During evaluation, $z_\text{bond} = \mu_\text{bond}$.</p>
+<h3 id="c23-classification-heads">C.2.3 Classification Heads<a class="headerlink" href="#c23-classification-heads" title="Permanent link">&para;</a></h3>
+<p>The model has multiple classification heads, each a two-layer MLP:</p>
+<table>
+<thead>
+<tr>
+<th>Head</th>
+<th>Input</th>
+<th>Output Classes</th>
+<th>Objective</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Hohfeld Classifier</td>
+<td>$z_\text{bond}$</td>
+<td>4 (Right, Duty, Liberty, No-Right)</td>
+<td>Maximize accuracy</td>
+</tr>
+<tr>
+<td>Bond Type Classifier</td>
+<td>$z_\text{bond}$</td>
+<td>10 (bond types)</td>
+<td>Maximize accuracy</td>
+</tr>
+<tr>
+<td>Time Classifier (adversarial)</td>
+<td>GRL($z_\text{bond}$)</td>
+<td>8&ndash;26 (time periods)</td>
+<td>Minimize accuracy (~chance)</td>
+</tr>
+<tr>
+<td>Time Classifier (control)</td>
+<td>$z_\text{label}$</td>
+<td>8&ndash;26 (time periods)</td>
+<td>Maximize accuracy</td>
+</tr>
+<tr>
+<td>Language Classifier (adversarial)</td>
+<td>GRL($z_\text{bond}$)</td>
+<td>4&ndash;8 (languages)</td>
+<td>Minimize accuracy (~chance)</td>
+</tr>
+<tr>
+<td>Genre Classifier (adversarial)</td>
+<td>GRL($z_\text{bond}$)</td>
+<td>4 (legal, narrative, wisdom, advice)</td>
+<td>Minimize accuracy (~chance)</td>
+</tr>
+</tbody>
+</table>
+<p>Each classifier head follows the architecture:</p>
+<pre><code>Linear(d_input, hidden_dim) -&gt; ReLU -&gt; Dropout(p) -&gt; Linear(hidden_dim, n_classes)
+</code></pre>
+<p>where hidden_dim = 128 for adversarial heads and 64 for task heads, and dropout $p = 0.2$ for adversarial heads, $p = 0.1$ for task heads.</p>
+<h3 id="c24-gradient-reversal-layer">C.2.4 Gradient Reversal Layer<a class="headerlink" href="#c24-gradient-reversal-layer" title="Permanent link">&para;</a></h3>
+<p>The adversarial heads receive input through a Gradient Reversal Layer (GRL; Ganin et al., 2016). The GRL is the identity function in the forward pass and negates (and scales) the gradient in the backward pass:</p>
+<p>$$\text{GRL}(x) = x \quad \text{(forward)}$$
+$$\frac{\partial \text{GRL}}{\partial x} = -\lambda \cdot I \quad \text{(backward)}$$</p>
+<p>where $\lambda$ is the reversal strength. This forces $z_\text{bond}$ to become uninformative about the adversarial target (time period, language, genre) while remaining informative about the task target (Hohfeldian state, bond type). The parameter $\lambda$ controls the adversarial pressure; see Section C.3.2 for the schedule.</p>
+<h3 id="c25-complete-architecture-diagram">C.2.5 Complete Architecture Diagram<a class="headerlink" href="#c25-complete-architecture-diagram" title="Permanent link">&para;</a></h3>
+<pre><code>Input text
+    |
+    v
+[Encoder: all-mpnet-base-v2 or LaBSE]
+    |
+    v
+h (768-dim)
+    |
+    +-------&gt; [Bond Projection (VAE)] --&gt; z_bond (64 or 128-dim)
+    |                                        |
+    |                                   +----+----+----+
+    |                                   |    |    |    |
+    |                                   v    v    v    v
+    |                                 [HOH] [BND] [GRL]--&gt;[TIME_ADV]
+    |                                  cls   cls         [LANG_ADV]
+    |                                                    [GENRE_ADV]
+    |
+    +-------&gt; [Label Projection (VAE)] --&gt; z_label (32 or 64-dim)
+                                              |
+                                              v
+                                           [TIME_CTL]
+                                             cls
+</code></pre>
+<hr />
+<h2 id="c3-training-procedure">C.3 Training Procedure<a class="headerlink" href="#c3-training-procedure" title="Permanent link">&para;</a></h2>
+<h3 id="c31-loss-function">C.3.1 Loss Function<a class="headerlink" href="#c31-loss-function" title="Permanent link">&para;</a></h3>
+<p>The total loss is a weighted sum of six components:</p>
+<p>$$\mathcal{L} = \lambda_\text{hohf} \mathcal{L}_\text{hohf} + \lambda_\text{bond} \mathcal{L}_\text{bond} + \lambda_\text{time} \mathcal{L}_\text{time} + \lambda_\text{adv} \mathcal{L}_\text{adv} + \lambda_\text{kl} \mathcal{L}_\text{kl} + \lambda_\text{bip} \mathcal{L}_\text{bip}$$</p>
+<p>where:</p>
+<ul>
+<li>$\mathcal{L}_\text{hohf}$: Cross-entropy loss for Hohfeldian classification from $z_\text{bond}$.</li>
+<li>$\mathcal{L}_\text{bond}$: Binary cross-entropy loss for multi-label bond type classification from $z_\text{bond}$.</li>
+<li>$\mathcal{L}_\text{time}$: Cross-entropy loss for time period classification from $z_\text{label}$ (the control path&mdash;this should succeed).</li>
+<li>$\mathcal{L}_\text{adv}$: Negative entropy of the time period prediction from $z_\text{bond}$. We <em>maximize</em> the entropy of the adversarial classifier&rsquo;s output, forcing it toward uniform (chance-level) predictions: $\mathcal{L}_\text{adv} = -H(\text{softmax}(f_\text{time}(\text{GRL}(z_\text{bond}))))$.</li>
+<li>$\mathcal{L}_\text{kl}$: KL divergence regularization for both variational projections: $\mathcal{L}_\text{kl} = D_\text{KL}(q(z_\text{bond}|h) \| p(z)) + D_\text{KL}(q(z_\text{label}|h) \| p(z))$ where $p(z) = \mathcal{N}(0, I)$.</li>
+<li>$\mathcal{L}_\text{bip}$: Contrastive loss on bond-isomorphic pairs. Passages with identical bond structure signatures (same agent-patient-relation-consent topology) from <em>different</em> time periods should have similar $z_\text{bond}$ representations. Implemented as InfoNCE with temperature $\tau = 0.07$.</li>
+</ul>
+<h3 id="c32-hyperparameters">C.3.2 Hyperparameters<a class="headerlink" href="#c32-hyperparameters" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>Parameter</th>
+<th>Value</th>
+<th>Notes</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Optimizer</td>
+<td>AdamW</td>
+<td>$\beta_1 = 0.9$, $\beta_2 = 0.999$</td>
+</tr>
+<tr>
+<td>Learning rate</td>
+<td>$2 \times 10^{-5}$</td>
+<td>For both encoder and heads</td>
+</tr>
+<tr>
+<td>Weight decay</td>
+<td>0.01</td>
+<td></td>
+</tr>
+<tr>
+<td>LR schedule</td>
+<td>OneCycleLR</td>
+<td>10% warmup, cosine annealing</td>
+</tr>
+<tr>
+<td>Warmup steps</td>
+<td>1,000</td>
+<td></td>
+</tr>
+<tr>
+<td>Batch size</td>
+<td>32</td>
+<td></td>
+</tr>
+<tr>
+<td>Max epochs</td>
+<td>50</td>
+<td></td>
+</tr>
+<tr>
+<td>Early stopping patience</td>
+<td>5 epochs</td>
+<td>On validation loss</td>
+</tr>
+<tr>
+<td>Gradient clipping</td>
+<td>1.0 (max norm)</td>
+<td></td>
+</tr>
+<tr>
+<td>Max sequence length</td>
+<td>512 tokens</td>
+<td></td>
+</tr>
+<tr>
+<td>$\lambda_\text{hohf}$</td>
+<td>1.0</td>
+<td></td>
+</tr>
+<tr>
+<td>$\lambda_\text{bond}$</td>
+<td>1.0</td>
+<td></td>
+</tr>
+<tr>
+<td>$\lambda_\text{time}$</td>
+<td>1.0</td>
+<td></td>
+</tr>
+<tr>
+<td>$\lambda_\text{adv}$</td>
+<td>1.0</td>
+<td>Fixed; GRL $\lambda$ controls adversarial strength</td>
+</tr>
+<tr>
+<td>$\lambda_\text{kl}$</td>
+<td>0.1</td>
+<td>Low weight prevents posterior collapse</td>
+</tr>
+<tr>
+<td>$\lambda_\text{bip}$</td>
+<td>2.0</td>
+<td>High weight emphasizes structural invariance</td>
+</tr>
+<tr>
+<td>GRL $\lambda$</td>
+<td>1.0</td>
+<td>Fixed in primary experiments</td>
+</tr>
+<tr>
+<td>Dropout (task heads)</td>
+<td>0.1</td>
+<td></td>
+</tr>
+<tr>
+<td>Dropout (adversarial heads)</td>
+<td>0.2</td>
+<td></td>
+</tr>
+<tr>
+<td>InfoNCE temperature</td>
+<td>0.07</td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<h3 id="c33-training-loop">C.3.3 Training Loop<a class="headerlink" href="#c33-training-loop" title="Permanent link">&para;</a></h3>
+<p>Each epoch proceeds as follows:</p>
+<ol>
+<li>Iterate over training batches. For each batch:
+   a. Tokenize passages and move tensors to GPU.
+   b. Forward pass through encoder, disentangler, and all classification heads.
+   c. Compute composite loss $\mathcal{L}$.
+   d. Backward pass with gradient reversal active on adversarial paths.
+   e. Clip gradients by max norm (1.0).
+   f. Optimizer step and learning rate scheduler step.</li>
+<li>Evaluate on validation set with adversarial lambda set to 0.0 (no gradient reversal during evaluation).</li>
+<li>Track validation loss for early stopping. Save checkpoint if validation loss improves.</li>
+<li>If no improvement for 5 consecutive epochs, stop training and reload best checkpoint.</li>
+</ol>
+<h3 id="c34-gradient-reversal-lambda-schedule">C.3.4 Gradient Reversal Lambda Schedule<a class="headerlink" href="#c34-gradient-reversal-lambda-schedule" title="Permanent link">&para;</a></h3>
+<p>The primary experiments use a fixed $\lambda = 1.0$ for the gradient reversal layer. An alternative schedule, ramping $\lambda$ from 0 to 1 over the first 20% of training, was tested but did not produce significantly different results. The fixed schedule is preferred for simplicity and reproducibility.</p>
+<hr />
+<h2 id="c4-experimental-design">C.4 Experimental Design<a class="headerlink" href="#c4-experimental-design" title="Permanent link">&para;</a></h2>
+<h3 id="c41-direction-a-ancient-to-modern-primary">C.4.1 Direction A: Ancient to Modern (Primary)<a class="headerlink" href="#c41-direction-a-ancient-to-modern-primary" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>Split</th>
+<th>Content</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Train</td>
+<td>~3.9M Hebrew/Aramaic passages (BIB, ST, TAN, AMO, GEO, RIS periods; 500 BCE&ndash;1500 CE)</td>
+</tr>
+<tr>
+<td>Validation</td>
+<td>Achronim passages (ACH period; 1500&ndash;1800 CE), held out</td>
+</tr>
+<tr>
+<td>Test</td>
+<td>~68K Dear Abby letters (1956&ndash;2020, American English)</td>
+</tr>
+</tbody>
+</table>
+<p>This is the primary BIP test. The model is trained exclusively on ancient and medieval Hebrew/Aramaic text and evaluated on modern English with no additional training, adaptation, or fine-tuning.</p>
+<h3 id="c42-direction-b-modern-to-ancient">C.4.2 Direction B: Modern to Ancient<a class="headerlink" href="#c42-direction-b-modern-to-ancient" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>Split</th>
+<th>Content</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Train</td>
+<td>~68K Dear Abby letters (1956&ndash;2020)</td>
+</tr>
+<tr>
+<td>Validation</td>
+<td>~6K Dear Abby letters, held out</td>
+</tr>
+<tr>
+<td>Test</td>
+<td>~50K Hebrew passages, sampled from the Sefaria corpus</td>
+</tr>
+</tbody>
+</table>
+<p>Bidirectional transfer controls for the possibility that the result is an artifact of training on the larger corpus. If transfer works in both directions, the invariant structure is genuine.</p>
+<h3 id="c43-mixed-training-control-ceiling">C.4.3 Mixed Training (Control Ceiling)<a class="headerlink" href="#c43-mixed-training-control-ceiling" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>Split</th>
+<th>Content</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Train</td>
+<td>70% mixed ancient + modern</td>
+</tr>
+<tr>
+<td>Test</td>
+<td>30% mixed ancient + modern</td>
+</tr>
+</tbody>
+</table>
+<p>This establishes the ceiling for in-distribution performance.</p>
+<h3 id="c44-full-transfer-matrix">C.4.4 Full Transfer Matrix<a class="headerlink" href="#c44-full-transfer-matrix" title="Permanent link">&para;</a></h3>
+<p>For the temporal invariance protocol (Chapter 12), all 56 pairwise transfers between the 8 time periods are computed as a SLURM array job (one transfer experiment per array task). Each cell in the $8 \times 8$ matrix (minus the diagonal) records the Hohfeldian classification accuracy when training on one period and testing on another.</p>
+<h3 id="c45-leave-one-era-out-cross-validation">C.4.5 Leave-One-Era-Out Cross-Validation<a class="headerlink" href="#c45-leave-one-era-out-cross-validation" title="Permanent link">&para;</a></h3>
+<p>For each of the 8 temporal periods with sufficient data (&gt;100 passages), the model is trained on all other periods and tested on the held-out period. This yields 8 independent tests of temporal transfer.</p>
+<hr />
+<h2 id="c5-evaluation-metrics">C.5 Evaluation Metrics<a class="headerlink" href="#c5-evaluation-metrics" title="Permanent link">&para;</a></h2>
+<h3 id="c51-primary-metrics">C.5.1 Primary Metrics<a class="headerlink" href="#c51-primary-metrics" title="Permanent link">&para;</a></h3>
+<p><strong>F1 (macro).</strong> The primary metric for Hohfeldian classification. Macro F1 gives equal weight to each of the four classes regardless of class frequency, ensuring that minority classes (typically No-Right) are not ignored. Reported as the mean across 5 random seeds with 95% confidence intervals.</p>
+<p><strong>Accuracy.</strong> Overall classification accuracy, with Wilson score 95% confidence intervals.</p>
+<p><strong>Per-class precision and recall.</strong> For each Hohfeldian state (Right, Duty, Liberty, No-Right), we report precision $P_c = \text{TP}_c / (\text{TP}_c + \text{FP}_c)$ and recall $R_c = \text{TP}_c / (\text{TP}_c + \text{FN}_c)$.</p>
+<h3 id="c52-adversarial-success-measures">C.5.2 Adversarial Success Measures<a class="headerlink" href="#c52-adversarial-success-measures" title="Permanent link">&para;</a></h3>
+<p><strong>Language probe accuracy.</strong> After training, a fresh linear probe is trained on frozen $z_\text{bond}$ representations to predict the source language. Successful disentanglement is indicated by probe accuracy near the chance level (25% for 4 languages, 12.5% for 8 languages). The reported result of 1.2% (below chance) and 0.0% for the cross-lingual condition confirms that $z_\text{bond}$ contains no recoverable linguistic information.</p>
+<p><strong>Time period probe accuracy.</strong> Analogously, a fresh linear probe trained on frozen $z_\text{bond}$ to predict time period should achieve near-chance accuracy. Near-chance time prediction from $z_\text{bond}$, combined with above-chance Hohfeldian prediction, demonstrates that the bond space encodes moral structure but not temporal-stylistic features.</p>
+<p><strong>Time Invariance Score (TIS).</strong> A composite metric:</p>
+<p>$$\text{TIS} = 1 - \frac{\text{Time\_acc} - \text{chance}}{1 - \text{chance}}$$</p>
+<p>where Time_acc is the adversarial classifier&rsquo;s accuracy from $z_\text{bond}$. TIS &gt; 0.90 indicates strong temporal invariance.</p>
+<h3 id="c53-bond-index">C.5.3 Bond Index<a class="headerlink" href="#c53-bond-index" title="Permanent link">&para;</a></h3>
+<p>The Bond Index quantifies the structural consistency of Hohfeldian classifications by measuring correlative symmetry violations. Hohfeldian positions come in correlative pairs: Duty $\leftrightarrow$ Right, and Liberty $\leftrightarrow$ No-Right. If the model classifies one party as having a Duty, the correlative party should have a Right. A classification that assigns Duty to one party and No-Right to the other constitutes a symmetry violation.</p>
+<p>$$\text{Bond Index} = \frac{\text{observed violations}}{\text{maximum possible violations}}$$</p>
+<p>A Bond Index of 0.0 indicates perfect correlative symmetry; 0.5 indicates random classification; values above 0.5 indicate systematic anti-correlation.</p>
+<h3 id="c54-structural-fuzzing-analysis">C.5.4 Structural Fuzzing Analysis<a class="headerlink" href="#c54-structural-fuzzing-analysis" title="Permanent link">&para;</a></h3>
+<p>To validate that $z_\text{bond}$ captures structural rather than surface features, we compute embedding distances under two perturbation types:</p>
+<ul>
+<li><strong>Structural perturbations</strong>: Change the Hohfeldian state (Obligation to Permission), swap agent/patient roles, alter consent status. These should produce <em>large</em> movements in $z_\text{bond}$.</li>
+<li><strong>Surface perturbations</strong>: Synonym substitution, style changes (formal to informal), paraphrase. These should produce <em>small</em> movements in $z_\text{bond}$.</li>
+</ul>
+<p>The ratio of mean structural distance to mean surface distance (the &ldquo;structural sensitivity ratio&rdquo;) should be significantly greater than 1.0. The reported ratio of 11.1x ($t = 2.46$, $p = 0.023$) confirms structural sensitivity with surface invariance.</p>
+<h3 id="c55-geometric-analysis">C.5.5 Geometric Analysis<a class="headerlink" href="#c55-geometric-analysis" title="Permanent link">&para;</a></h3>
+<p><strong>PCA of $z_\text{bond}$.</strong> Principal component analysis on the bond space reveals its effective dimensionality. The reported finding is that 3 components explain 90% of variance, consistent with the theoretical prediction that Hohfeldian relations form a bounded, low-dimensional manifold.</p>
+<p><strong>Manifold comparison.</strong> For each time period, UMAP projections of $z_\text{bond}$ are computed. If BIP holds, the manifolds should be congruent (similar cluster structure, similar topological features) across periods, differing only in orientation. Procrustes analysis quantifies the alignment between period-specific manifolds.</p>
+<hr />
+<h2 id="c6-statistical-testing">C.6 Statistical Testing<a class="headerlink" href="#c6-statistical-testing" title="Permanent link">&para;</a></h2>
+<h3 id="c61-comparison-to-chance">C.6.1 Comparison to Chance<a class="headerlink" href="#c61-comparison-to-chance" title="Permanent link">&para;</a></h3>
+<p>All reported accuracies and F1 scores are tested against the chance baseline (25% for 4-class Hohfeldian classification) using a $z$-test:</p>
+<p>$$z = \frac{\hat{p} - p_0}{\sqrt{p_0(1-p_0)/n}}$$</p>
+<p>The primary result ($z = 52.3$, $p < 10^{-50}$) is computed on the full test set of ~68,000 letters. Effect size is reported as Cohen&rsquo;s $h = 2 \arcsin(\sqrt{\hat{p}}) - 2 \arcsin(\sqrt{p_0})$.</p>
+<h3 id="c62-confidence-intervals">C.6.2 Confidence Intervals<a class="headerlink" href="#c62-confidence-intervals" title="Permanent link">&para;</a></h3>
+<p>All metrics are reported with 95% confidence intervals computed by one of:</p>
+<ul>
+<li><strong>Wilson score interval</strong> for accuracy (proportion) estimates.</li>
+<li><strong>Standard deviation across 5 random seeds</strong> for F1 and composite metrics.</li>
+<li><strong>Bootstrap (10,000 resamples)</strong> for effect size comparisons.</li>
+</ul>
+<h3 id="c63-multiple-comparisons">C.6.3 Multiple Comparisons<a class="headerlink" href="#c63-multiple-comparisons" title="Permanent link">&para;</a></h3>
+<p>The full transfer matrix involves 56 pairwise tests. Bonferroni correction sets the per-comparison significance threshold at $\alpha = 0.05 / 56 = 0.0009$. The conservative significance level of $\alpha = 0.001$ specified in <code>config_bip.yaml</code> satisfies this requirement.</p>
+<h3 id="c64-variance-decomposition">C.6.4 Variance Decomposition<a class="headerlink" href="#c64-variance-decomposition" title="Permanent link">&para;</a></h3>
+<p>For the full tensor experiment (Chapter 12, Section 12.2), a MANOVA decomposes variance in $z_\text{bond}$ across five factors: Time Period, Language, Genre, Bond Type, and Hohfeldian State. The key prediction is:</p>
+<table>
+<thead>
+<tr>
+<th>Factor</th>
+<th>Predicted $\eta^2$</th>
+<th>BIP Interpretation</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Hohfeldian State</td>
+<td>&gt; 0.30</td>
+<td>Large effect: $z_\text{bond}$ is organized by moral structure</td>
+</tr>
+<tr>
+<td>Bond Type</td>
+<td>&gt; 0.20</td>
+<td>Large effect: domain-specific moral content preserved</td>
+</tr>
+<tr>
+<td>Time Period</td>
+<td>&lt; 0.05</td>
+<td>Negligible: temporal variation successfully removed</td>
+</tr>
+<tr>
+<td>Language</td>
+<td>&lt; 0.05</td>
+<td>Negligible: linguistic variation successfully removed</td>
+</tr>
+<tr>
+<td>Genre</td>
+<td>&lt; 0.10</td>
+<td>Small: some genre signal may remain</td>
+</tr>
+</tbody>
+</table>
+<p>The bootstrap comparison of effect sizes ($n_\text{bootstrap} = 10{,}000$) tests the directional hypothesis $H_1: \eta^2(\text{Time}) < \eta^2(\text{Hohfeld})$.</p>
+<hr />
+<h2 id="c7-temporal-invariance-protocol">C.7 Temporal Invariance Protocol<a class="headerlink" href="#c7-temporal-invariance-protocol" title="Permanent link">&para;</a></h2>
+<h3 id="c71-temporal-bin-definitions">C.7.1 Temporal Bin Definitions<a class="headerlink" href="#c71-temporal-bin-definitions" title="Permanent link">&para;</a></h3>
+<p>The eight temporal bins (seven ancient/medieval, one modern) are defined in Section C.1.1. For the Temporal Invariance Protocol specifically, the bins serve as both the holdout variable and the adversarial target. The critical design choice is that the bins are defined by scholarly periodization (based on literary, linguistic, and historical criteria), not by the model. This prevents circular reasoning.</p>
+<h3 id="c72-cross-temporal-validation-procedure">C.7.2 Cross-Temporal Validation Procedure<a class="headerlink" href="#c72-cross-temporal-validation-procedure" title="Permanent link">&para;</a></h3>
+<p>The primary cross-temporal test uses the <strong>temporal holdout</strong> split:</p>
+<ol>
+<li><strong>Train</strong> on all passages from periods BIB through RIS (500 BCE&ndash;1500 CE).</li>
+<li><strong>Validate</strong> on ACH (1500&ndash;1800 CE)&mdash;the most recent ancient period, serving as a bridge.</li>
+<li><strong>Test</strong> on MOD (1956&ndash;2020 CE)&mdash;the Dear Abby corpus, maximally distant from training.</li>
+</ol>
+<p>The temporal gap between the latest training data (Rishonim, ~1500 CE) and the test data (Dear Abby, 1956&ndash;2020) is approximately 450&ndash;2,500 years depending on training period.</p>
+<p>The <strong>leave-one-era-out</strong> protocol provides finer-grained analysis. For each era $e$, the model is trained on $\{E \setminus e\}$ and tested on $e$. This produces a per-era transfer profile: which eras transfer to which? The transfer score for each cell is:</p>
+<p>$$T_{s \to t} = \text{Hohfeld\_acc}_{s \to t} \times (1 - \text{Time\_acc}_{s \to t})$$</p>
+<p>This penalizes configurations where Hohfeldian accuracy is high but the model is also successfully predicting time period&mdash;indicating that temporal features, not invariant structure, are driving the classification.</p>
+<h3 id="c73-controls-for-confounds">C.7.3 Controls for Confounds<a class="headerlink" href="#c73-controls-for-confounds" title="Permanent link">&para;</a></h3>
+<p><strong>Translation artifact control.</strong> Hohfeldian labels for ancient texts are extracted from English translations, but the model is trained on original Hebrew/Aramaic. This design ensures that any transfer to English cannot be mediated by translation artifacts in the training signal. The model must learn structure present in the original language that happens to transfer to English&mdash;exactly the invariance claim.</p>
+<p><strong>Corpus size control.</strong> The Sefaria corpus (~3.9M passages) is ~57x larger than Dear Abby (~68K). In bidirectional transfer, the Sefaria test set is subsampled to 68K passages to match.</p>
+<p><strong>Genre control.</strong> The adversarial genre head forces $z_\text{bond}$ to discard genre information. The Dear Abby corpus is maximally genre-distant from all Sefaria categories, making genre-based shortcuts impossible.</p>
+<p><strong>Encoder pretraining control.</strong> The multilingual encoder was pretrained on general-purpose web text, not on either experimental corpus. It provides a shared multilingual coordinate system; moral structure must be learned by the task-specific heads.</p>
+<hr />
+<h2 id="c8-reproducibility-checklist">C.8 Reproducibility Checklist<a class="headerlink" href="#c8-reproducibility-checklist" title="Permanent link">&para;</a></h2>
+<h3 id="c81-random-seeds">C.8.1 Random Seeds<a class="headerlink" href="#c81-random-seeds" title="Permanent link">&para;</a></h3>
+<p>All experiments use 5 random seeds: {42, 123, 456, 789, 1024}. For each seed, <code>torch.manual_seed(seed)</code>, <code>numpy.random.seed(seed)</code>, and <code>random.Random(seed)</code> are set. Results are reported as mean $\pm$ standard deviation across seeds.</p>
+<h3 id="c82-hardware">C.8.2 Hardware<a class="headerlink" href="#c82-hardware" title="Permanent link">&para;</a></h3>
+<p>The experiments were developed and tested on the following hardware:</p>
+<table>
+<thead>
+<tr>
+<th>Resource</th>
+<th>Specification</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Primary development</td>
+<td>SJSU College of Engineering HPC cluster</td>
+</tr>
+<tr>
+<td>GPU (full tensor)</td>
+<td>NVIDIA H100 (80 GB VRAM)</td>
+</tr>
+<tr>
+<td>GPU (transfer matrix)</td>
+<td>NVIDIA P100 (12 GB VRAM) x 10, SLURM array</td>
+</tr>
+<tr>
+<td>GPU (standard training)</td>
+<td>NVIDIA V100 (16 GB VRAM)</td>
+</tr>
+<tr>
+<td>CPU (preprocessing)</td>
+<td>16 cores, 64 GB RAM</td>
+</tr>
+<tr>
+<td>Storage</td>
+<td>524 TB Lustre scratch (checkpoints), 100 TB /data (corpora)</td>
+</tr>
+</tbody>
+</table>
+<p>For replication on more modest hardware, a single GPU with 12+ GB VRAM (e.g., NVIDIA T4) is sufficient for training with a reduced batch size (16 instead of 32). Preprocessing is CPU-only.</p>
+<h3 id="c83-software-versions">C.8.3 Software Versions<a class="headerlink" href="#c83-software-versions" title="Permanent link">&para;</a></h3>
+<pre><code>python              &gt;= 3.10
+torch               &gt;= 2.0.0
+transformers        &gt;= 4.35.0
+sentence-transformers &gt;= 2.2.0
+datasets            &gt;= 2.14.0
+numpy               &gt;= 1.24.0
+pandas              &gt;= 2.0.0
+scipy               &gt;= 1.11.0
+scikit-learn        &gt;= 1.3.0
+spacy               &gt;= 3.6.0  (with en_core_web_lg model)
+nltk                &gt;= 3.8.0
+hebrew-tokenizer    &gt;= 2.3.0
+pyarabic            &gt;= 0.6.0
+matplotlib          &gt;= 3.7.0
+seaborn             &gt;= 0.12.0
+wandb               &gt;= 0.15.0  (optional, for experiment tracking)
+tqdm                &gt;= 4.65.0
+pyyaml              &gt;= 6.0.0
+</code></pre>
+<h3 id="c84-expected-runtimes">C.8.4 Expected Runtimes<a class="headerlink" href="#c84-expected-runtimes" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>Phase</th>
+<th>Hardware</th>
+<th>Expected Time</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Sefaria git clone</td>
+<td>Any (network-bound)</td>
+<td>~15 minutes</td>
+</tr>
+<tr>
+<td>Preprocessing (4M passages)</td>
+<td>16 CPU cores</td>
+<td>~2 hours</td>
+</tr>
+<tr>
+<td>Embedding extraction</td>
+<td>1x P100</td>
+<td>~4 hours</td>
+</tr>
+<tr>
+<td>Transfer matrix (56 experiments)</td>
+<td>10x P100 in parallel</td>
+<td>~2 hours</td>
+</tr>
+<tr>
+<td>Full tensor training (20 epochs)</td>
+<td>1x H100</td>
+<td>~8&ndash;12 hours</td>
+</tr>
+<tr>
+<td>MANOVA analysis</td>
+<td>16 CPU cores</td>
+<td>~1 hour</td>
+</tr>
+<tr>
+<td>Manifold analysis (UMAP + clustering)</td>
+<td>1x A100</td>
+<td>~2 hours</td>
+</tr>
+<tr>
+<td><strong>Total wall time (with parallelization)</strong></td>
+<td></td>
+<td><strong>~18 hours</strong></td>
+</tr>
+<tr>
+<td><strong>Total GPU-hours</strong></td>
+<td></td>
+<td><strong>~70 hours</strong></td>
+</tr>
+</tbody>
+</table>
+<p>On a single T4 GPU (Kaggle-class hardware), the full pipeline requires approximately 72 hours of wall time. The transfer matrix cannot be parallelized and dominates the runtime.</p>
+<h3 id="c85-data-availability">C.8.5 Data Availability<a class="headerlink" href="#c85-data-availability" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>Resource</th>
+<th>Location</th>
+<th>Size</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Sefaria-Export</td>
+<td><code>github.com/Sefaria/Sefaria-Export</code></td>
+<td>~8.3 GB</td>
+</tr>
+<tr>
+<td>Dear Abby dataset</td>
+<td>Kaggle (see repository README)</td>
+<td>~50 MB</td>
+</tr>
+<tr>
+<td>Chinese Classics</td>
+<td><code>ctext.org</code></td>
+<td>~5 MB (curated sample)</td>
+</tr>
+<tr>
+<td>Code and configuration</td>
+<td><code>github.com/ahb-sjsu/sqnd-probe</code></td>
+<td>~100 MB</td>
+</tr>
+</tbody>
+</table>
+<h3 id="c86-directory-structure">C.8.6 Directory Structure<a class="headerlink" href="#c86-directory-structure" title="Permanent link">&para;</a></h3>
+<pre><code>sqnd-probe/
++-- config_bip.yaml              # Primary configuration
++-- corpora.yaml                 # Corpus definitions and future plans
++-- data/
+|   +-- raw/
+|   |   +-- Sefaria-Export/      # Cloned repository (~8.3 GB)
+|   |   +-- dear_abby.csv       # Kaggle dataset
+|   |   +-- chinese/             # Chinese classics (JSON)
+|   |   +-- islamic/             # Islamic texts (JSON)
+|   +-- processed/
+|   |   +-- passages.jsonl       # Preprocessed passages
+|   |   +-- bond_structures.jsonl # Extracted bond structures
+|   |   +-- corpus_stats.json    # Corpus statistics
+|   +-- splits/
+|       +-- all_splits.json      # All split definitions
++-- src/
+|   +-- data/
+|   |   +-- preprocess.py        # Corpus loading and preprocessing
+|   |   +-- extract_bonds.py     # Bond structure extraction
+|   |   +-- generate_splits.py   # Train/valid/test split generation
+|   |   +-- verify_data.py       # Data verification
+|   +-- models/
+|   |   +-- bip_model.py         # Model architecture
+|   +-- train.py                 # Training loop
+|   +-- evaluate.py              # Evaluation and statistical tests
++-- models/
+|   +-- checkpoints/             # Saved model weights
++-- results/
+    +-- metrics/                 # JSON metric files
+    +-- figures/                 # Generated plots
+</code></pre>
+<hr />
+<h2 id="c9-key-results-summary">C.9 Key Results Summary<a class="headerlink" href="#c9-key-results-summary" title="Permanent link">&para;</a></h2>
+<p>For reference, the primary results reported in Chapter 11 are:</p>
+<table>
+<thead>
+<tr>
+<th>Metric</th>
+<th>Value</th>
+<th>95% CI</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Bond F1 (macro), Ancient to Modern</td>
+<td>44.5%</td>
+<td>42.1&ndash;46.9%</td>
+</tr>
+<tr>
+<td>Bond Accuracy, Ancient to Modern</td>
+<td>50.7%</td>
+<td>48.3&ndash;53.1%</td>
+</tr>
+<tr>
+<td>Chance Baseline</td>
+<td>25.0%</td>
+<td>&mdash;</td>
+</tr>
+<tr>
+<td>$z$-statistic</td>
+<td>52.3</td>
+<td>$p < 10^{-50}$</td>
+</tr>
+<tr>
+<td>Cohen&rsquo;s $h$</td>
+<td>0.52</td>
+<td>Medium effect</td>
+</tr>
+<tr>
+<td>Language Probe Accuracy from $z_\text{bond}$</td>
+<td>0.0%</td>
+<td>(chance = 25%)</td>
+</tr>
+<tr>
+<td>Mixed Training F1 (ceiling)</td>
+<td>79.99%</td>
+<td>&mdash;</td>
+</tr>
+<tr>
+<td>Transfer Efficiency (transfer / ceiling)</td>
+<td>55.6%</td>
+<td>&mdash;</td>
+</tr>
+<tr>
+<td>Structural/Surface Perturbation Ratio</td>
+<td>11.1x</td>
+<td>$p = 0.023$</td>
+</tr>
+<tr>
+<td>PCA: Components for 90% Variance</td>
+<td>3</td>
+<td>&mdash;</td>
+</tr>
+<tr>
+<td>Obligation-Permission Transfer Accuracy</td>
+<td>100%</td>
+<td>&mdash;</td>
+</tr>
+</tbody>
+</table>
+<p>Per-language transfer F1 (v10.8): Hebrew 64.5%, English 41.5%, Arabic 40.7%, Classical Chinese 64.9%.</p>
+<hr />
+<h2 id="c10-replication-quickstart">C.10 Replication Quickstart<a class="headerlink" href="#c10-replication-quickstart" title="Permanent link">&para;</a></h2>
+<p>For a graduate student wishing to replicate the primary result (Direction A: Ancient to Modern):</p>
+<pre><code class="language-bash"># 1. Clone and install
+git clone https://github.com/ahb-sjsu/sqnd-probe.git
+cd sqnd-probe
+pip install -e &quot;.[dev]&quot;
+
+# 2. Acquire data
+mkdir -p data/raw
+cd data/raw
+git clone --depth 1 https://github.com/Sefaria/Sefaria-Export.git
+# Place dear_abby.csv from Kaggle in data/raw/
+cd ../..
+
+# 3. Preprocess
+python src/data/preprocess.py --config config_bip.yaml
+
+# 4. Extract bond structures
+python src/data/extract_bonds.py --config config_bip.yaml
+
+# 5. Generate splits
+python src/data/generate_splits.py --config config_bip.yaml
+
+# 6. Train (temporal holdout split)
+python src/train.py --config config_bip.yaml --split temporal_holdout
+
+# 7. Evaluate
+python src/evaluate.py --config config_bip.yaml \
+    --model models/checkpoints/temporal_holdout/best_model.pt
+</code></pre>
+<p>Expected output: Hohfeldian classification F1 in the range 42&ndash;47% on the Dear Abby test set, with time prediction accuracy from $z_\text{bond}$ near or below chance.</p>
+<hr />
+<h2 id="references">References<a class="headerlink" href="#references" title="Permanent link">&para;</a></h2>
+<p>Ganin, Y., Ustinova, E., Ajakan, H., Germain, P., Larochelle, H., Laviolette, F., Marchand, M., &amp; Lempitsky, V. (2016). Domain-adversarial training of neural networks. <em>Journal of Machine Learning Research</em>, 17(1), 2096&ndash;2030.</p>
+<p>Hohfeld, W. N. (1913). Some fundamental legal conceptions as applied in judicial reasoning. <em>Yale Law Journal</em>, 23(1), 16&ndash;59.</p>
+<p>Hohfeld, W. N. (1917). Fundamental legal conceptions as applied in judicial reasoning. <em>Yale Law Journal</em>, 26(8), 710&ndash;770.</p>
+<p>Reimers, N., &amp; Gurevych, I. (2019). Sentence-BERT: Sentence embeddings using Siamese BERT-networks. <em>Proceedings of EMNLP</em>.</p>
+<p>Sefaria Project. (n.d.). Sefaria: A living library of Torah texts online. https://sefaria.org</p>
+
+    <footer>
+      <p>Part of the <em>Geometric Series</em> by A.H. Bowers</p>
+      <p>Built automatically from source. Last updated: 2026-03-27 00:17 UTC</p>
+    </footer>
+  </div>
+
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js"
+    onload="renderMathInElement(document.body, {
+      delimiters: [
+        {left: '$$', right: '$$', display: true},
+        {left: '$', right: '$', display: false},
+        {left: '\\\\(', right: '\\\\)', display: false},
+        {left: '\\\\[', right: '\\\\]', display: true}
+      ],
+      throwOnError: false
+    });"></script>
+</body>
+</html>

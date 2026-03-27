@@ -1,0 +1,1184 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Define the coda type taxonomy - Geometric Communication</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
+  <style>
+    :root {
+      --bg: #fafaf8;
+      --fg: #222;
+      --accent: #2c5f8a;
+      --border: #ddd;
+      --code-bg: #f4f4f0;
+      --max-width: 48rem;
+    }
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --bg: #1a1a2e;
+        --fg: #e0e0e0;
+        --accent: #7eb8da;
+        --border: #444;
+        --code-bg: #16213e;
+      }
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Georgia', 'Times New Roman', serif;
+      background: var(--bg);
+      color: var(--fg);
+      line-height: 1.7;
+      padding: 2rem 1rem;
+    }
+    .container {
+      max-width: var(--max-width);
+      margin: 0 auto;
+    }
+    nav.breadcrumb {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      font-size: 0.85rem;
+      margin-bottom: 2rem;
+      padding-bottom: 0.5rem;
+      border-bottom: 1px solid var(--border);
+    }
+    nav.breadcrumb a {
+      color: var(--accent);
+      text-decoration: none;
+    }
+    nav.breadcrumb a:hover { text-decoration: underline; }
+    nav.breadcrumb .sep { margin: 0 0.4rem; color: #999; }
+    h1 {
+      font-size: 2rem;
+      margin-bottom: 0.5rem;
+      line-height: 1.2;
+      border-bottom: 2px solid var(--accent);
+      padding-bottom: 0.5rem;
+    }
+    h2 {
+      font-size: 1.5rem;
+      margin-top: 2.5rem;
+      margin-bottom: 0.75rem;
+      color: var(--accent);
+    }
+    h3 {
+      font-size: 1.2rem;
+      margin-top: 2rem;
+      margin-bottom: 0.5rem;
+    }
+    h4 {
+      font-size: 1.05rem;
+      margin-top: 1.5rem;
+      margin-bottom: 0.4rem;
+      font-style: italic;
+    }
+    p { margin-bottom: 1rem; }
+    blockquote {
+      border-left: 3px solid var(--accent);
+      padding: 0.5rem 1.2rem;
+      margin: 1.5rem 0;
+      background: var(--code-bg);
+      font-style: italic;
+    }
+    blockquote p:last-child { margin-bottom: 0; }
+    code {
+      font-family: 'Consolas', 'Fira Code', monospace;
+      background: var(--code-bg);
+      padding: 0.15rem 0.35rem;
+      border-radius: 3px;
+      font-size: 0.9em;
+    }
+    pre {
+      background: var(--code-bg);
+      padding: 1rem;
+      border-radius: 4px;
+      overflow-x: auto;
+      margin: 1.5rem 0;
+      border: 1px solid var(--border);
+    }
+    pre code {
+      background: none;
+      padding: 0;
+    }
+    a { color: var(--accent); }
+    ul, ol {
+      margin: 0.75rem 0 1rem 1.5rem;
+    }
+    li { margin-bottom: 0.3rem; }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 1.5rem 0;
+    }
+    th, td {
+      border: 1px solid var(--border);
+      padding: 0.5rem 0.75rem;
+      text-align: left;
+    }
+    th { background: var(--code-bg); }
+    hr {
+      border: none;
+      border-top: 1px solid var(--border);
+      margin: 2rem 0;
+    }
+    img {
+      max-width: 100%;
+      height: auto;
+      display: block;
+      margin: 1.5rem auto;
+    }
+    /* KaTeX display math */
+    .katex-display {
+      overflow-x: auto;
+      overflow-y: hidden;
+      padding: 0.5rem 0;
+    }
+    /* Definition/theorem boxes */
+    .definition, .theorem, .axiom {
+      border: 1px solid var(--border);
+      border-left: 4px solid var(--accent);
+      padding: 1rem 1.2rem;
+      margin: 1.5rem 0;
+      background: var(--code-bg);
+      border-radius: 0 4px 4px 0;
+    }
+    footer {
+      margin-top: 4rem;
+      padding-top: 1rem;
+      border-top: 1px solid var(--border);
+      font-size: 0.8rem;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      color: #888;
+      text-align: center;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <nav class="breadcrumb">
+      <a href="../index.html">Geometric Series</a>
+      <span class="sep">/</span>
+      <a href="index.html">Geometric Communication</a>
+      <span class="sep">/</span>
+      <span>Define the coda type taxonomy</span>
+    </nav>
+
+    <h2 id="appendix-b-the-eris-ketos-toolkit">Appendix B: The eris-ketos Toolkit<a class="headerlink" href="#appendix-b-the-eris-ketos-toolkit" title="Permanent link">&para;</a></h2>
+<p>This appendix provides a practical reference for the <strong>eris-ketos</strong> Python package (v0.2.0), which implements the geometric analysis pipeline described in Chapters 5&ndash;7 and applied to 8,719 annotated sperm whale codas from the Dominica Sperm Whale Project. The package is open-source (MIT licence) and available on PyPI and GitHub. Everything reported in the cetacean chapters of this book can be reproduced using the code documented here.</p>
+<p>The name <em>ketos</em> (Greek: <em>ketos</em>, from which &ldquo;cetacean&rdquo; derives) reflects the package&rsquo;s focus on whale communication; <em>eris</em> situates it within the broader ErisML geometric analysis family. The toolkit provides four analysis modules &mdash; hyperbolic embeddings, topological data analysis, SPD manifold metrics, and adversarial robustness testing &mdash; each capturing a different geometric aspect of cetacean vocalisation structure.</p>
+<hr />
+<h3 id="b1-installation">B.1 Installation<a class="headerlink" href="#b1-installation" title="Permanent link">&para;</a></h3>
+<p>The core package requires Python 3.10 or later and depends on NumPy, SciPy, PyTorch, and librosa:</p>
+<pre><code class="language-bash">pip install eris-ketos
+</code></pre>
+<p>Optional dependency groups are available for topological data analysis, machine learning utilities, and data loading:</p>
+<pre><code class="language-bash">pip install eris-ketos[tda]       # adds ripser, persim
+pip install eris-ketos[ml]        # adds timm, torchaudio, scikit-learn
+pip install eris-ketos[data]      # adds datasets (HuggingFace), pandas
+pip install eris-ketos[all]       # everything including dev tools
+</code></pre>
+<p>The <code>[tda]</code> extra is required for persistent homology computation (<code>compute_persistence</code>, <code>tda_feature_vector</code>). The <code>[data]</code> extra is required for the <code>load_dswp()</code> convenience function that downloads the DSWP dataset from HuggingFace. All other modules work with the core installation.</p>
+<p>For development and testing:</p>
+<pre><code class="language-bash">git clone https://github.com/ahb-sjsu/eris-ketos.git
+cd eris-ketos
+pip install -e &quot;.[all]&quot;
+pytest
+</code></pre>
+<p>The package is built with Hatch and uses ruff for linting and mypy for type checking. All public functions carry full type annotations.</p>
+<hr />
+<h3 id="b2-module-overview">B.2 Module Overview<a class="headerlink" href="#b2-module-overview" title="Permanent link">&para;</a></h3>
+<p>The package is organised into five modules, each corresponding to a distinct geometric analysis method:</p>
+<table>
+<thead>
+<tr>
+<th>Module</th>
+<th>Purpose</th>
+<th>Key exports</th>
+<th>Dependencies</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>poincare_coda</code></td>
+<td>Hyperbolic embeddings of hierarchical coda structure</td>
+<td><code>PoincareBall</code>, <code>HyperbolicMLR</code>, <code>embed_taxonomy_hyperbolic</code></td>
+<td>torch</td>
+</tr>
+<tr>
+<td><code>tda_clicks</code></td>
+<td>Topological data analysis of click timing patterns</td>
+<td><code>compute_persistence</code>, <code>tda_feature_vector</code>, <code>time_delay_embedding</code></td>
+<td>ripser (optional)</td>
+</tr>
+<tr>
+<td><code>spd_spectral</code></td>
+<td>SPD manifold analysis of spectral covariance</td>
+<td><code>SPDManifold</code>, <code>spd_features_from_spectrogram</code>, <code>compute_spectral_trajectory</code></td>
+<td>torch</td>
+</tr>
+<tr>
+<td><code>acoustic_transforms</code></td>
+<td>Parametric acoustic perturbations</td>
+<td><code>AcousticTransform</code>, <code>make_acoustic_transform_suite</code>, <code>TransformChain</code></td>
+<td>numpy</td>
+</tr>
+<tr>
+<td><code>decoder_robustness</code></td>
+<td>Adversarial robustness benchmarking</td>
+<td><code>DecoderRobustnessIndex</code>, <code>CodaSemanticDistance</code>, <code>DRIResult</code></td>
+<td>numpy</td>
+</tr>
+</tbody>
+</table>
+<p>All public symbols are re-exported from the package root, so both <code>from eris_ketos import PoincareBall</code> and <code>from eris_ketos.poincare_coda import PoincareBall</code> work identically.</p>
+<p>The modules are designed to be composed: <code>acoustic_transforms</code> feeds into <code>decoder_robustness</code>; <code>poincare_coda</code> provides the embedding space for classification; <code>tda_clicks</code> and <code>spd_spectral</code> extract complementary feature vectors that can be concatenated for downstream tasks. The overall pipeline, as applied in Chapter 7, runs: raw signal (or ICI annotations) through three parallel geometric analyses (hyperbolic embedding, TDA, SPD), then through adversarial robustness evaluation.</p>
+<hr />
+<h3 id="b3-api-reference">B.3 API Reference<a class="headerlink" href="#b3-api-reference" title="Permanent link">&para;</a></h3>
+<h4 id="b31-poincare_coda-hyperbolic-embeddings">B.3.1 poincare_coda &mdash; Hyperbolic Embeddings<a class="headerlink" href="#b31-poincare_coda-hyperbolic-embeddings" title="Permanent link">&para;</a></h4>
+<p><strong><code>PoincareBall(c: float = 1.0)</code></strong></p>
+<p>The core class implementing Mobius gyrovector operations on the Poincare ball model of hyperbolic space, $\mathbb{B}^d_c = \{x \in \mathbb{R}^d : c\|x\|^2 < 1\}$. The curvature parameter <code>c</code> controls how aggressively distances grow toward the boundary; higher <code>c</code> increases hyperbolic spread.</p>
+<p>Methods:</p>
+<ul>
+<li>
+<p><strong><code>expmap0(v: Tensor) -&gt; Tensor</code></strong> &mdash; Exponential map from the origin. Maps a tangent vector $v$ at the origin to a point on the ball via $\exp_0(v) = \tanh(\sqrt{c}\|v\|) \cdot v / (\sqrt{c}\|v\|)$. This is the primary mechanism for placing features onto the ball.</p>
+</li>
+<li>
+<p><strong><code>logmap0(y: Tensor) -&gt; Tensor</code></strong> &mdash; Logarithmic map to the origin. The inverse of <code>expmap0</code>: maps a ball point back to the tangent space at the origin via $\log_0(y) = \text{arctanh}(\sqrt{c}\|y\|) \cdot y / (\sqrt{c}\|y\|)$.</p>
+</li>
+<li>
+<p><strong><code>mobius_add(x: Tensor, y: Tensor) -&gt; Tensor</code></strong> &mdash; Mobius addition, the hyperbolic analogue of vector addition. Defined as:</p>
+</li>
+</ul>
+<p>$$x \oplus y = \frac{(1 + 2c\langle x,y\rangle + c\|y\|^2)x + (1 - c\|x\|^2)y}{1 + 2c\langle x,y\rangle + c^2\|x\|^2\|y\|^2}$$</p>
+<ul>
+<li>
+<p><strong><code>dist(x: Tensor, y: Tensor) -&gt; Tensor</code></strong> &mdash; Geodesic distance on the ball: $d(x, y) = (2/\sqrt{c}) \cdot \text{arctanh}(\sqrt{c}\|(-x) \oplus y\|)$. This grows exponentially as points approach the boundary, which is why trees embed naturally: exponential volume growth in hyperbolic space matches exponential branching in trees.</p>
+</li>
+<li>
+<p><strong><code>dist_to_origin(x: Tensor) -&gt; Tensor</code></strong> &mdash; Cheaper special case of <code>dist</code> when one point is the origin.</p>
+</li>
+<li>
+<p><strong><code>midpoint(x: Tensor, y: Tensor) -&gt; Tensor</code></strong> &mdash; Einstein midpoint of two points, computed via conformal factors.</p>
+</li>
+<li>
+<p><strong><code>project(x: Tensor, eps: float = 1e-5) -&gt; Tensor</code></strong> &mdash; Projects points onto the open ball by clamping norms to $1/\sqrt{c} - \epsilon$. Called internally by other methods to maintain numerical stability.</p>
+</li>
+</ul>
+<p>All methods operate on batched tensors (arbitrary leading dimensions) and are differentiable through PyTorch autograd.</p>
+<p><strong><code>HyperbolicMLR(embed_dim: int, num_classes: int, c: float = 1.0)</code></strong></p>
+<p>Hyperbolic Multinomial Logistic Regression. An <code>nn.Module</code> that classifies points on the Poincare ball by computing negative scaled geodesic distances to learned prototypes. Each class has a prototype (stored as a tangent vector at the origin, mapped to the ball via <code>expmap0</code>) and a learnable temperature parameter.</p>
+<ul>
+<li>
+<p><strong><code>forward(x: Tensor) -&gt; Tensor</code></strong> &mdash; Computes logits as $-d(x, p_k) \cdot \exp(s_k)$ for each class $k$, where $p_k$ is the prototype and $s_k$ is the log-scale.</p>
+</li>
+<li>
+<p><strong><code>init_from_taxonomy(embeddings: Tensor) -&gt; None</code></strong> &mdash; Initialises prototypes from pre-computed taxonomic embeddings (e.g., from <code>embed_taxonomy_hyperbolic</code>). This is the key mechanism for encoding prior structural knowledge: classes that are taxonomically close start with nearby prototypes.</p>
+</li>
+<li>
+<p><strong><code>prototypes</code></strong> (property) &mdash; Returns the current prototype positions on the ball.</p>
+</li>
+</ul>
+<p><strong><code>embed_taxonomy_hyperbolic(dist_matrix: ndarray, embed_dim: int, c: float = 1.0, scale: float = 0.7) -&gt; Tensor</code></strong></p>
+<p>Embeds a taxonomic distance matrix into the Poincare ball via spectral decomposition of a Gaussian kernel. The <code>scale</code> parameter controls the maximum norm relative to the ball radius (must be in $(0, 1)$). Returns a tensor of shape <code>[n, embed_dim]</code>.</p>
+<p><strong><code>build_distance_matrix(species_info: dict, levels: tuple) -&gt; ndarray</code></strong></p>
+<p>Constructs an integer-valued taxonomic distance matrix from a dictionary of species (or coda type) metadata. Distance is the shallowest taxonomic level at which two entries first differ. For the coda system, typical levels are <code>('variant', 'click_count', 'rhythm_class')</code>, finest to coarsest.</p>
+<h4 id="b32-tda_clicks-topological-data-analysis">B.3.2 tda_clicks &mdash; Topological Data Analysis<a class="headerlink" href="#b32-tda_clicks-topological-data-analysis" title="Permanent link">&para;</a></h4>
+<p><strong><code>time_delay_embedding(signal: ndarray, delay: int = 10, dim: int = 3) -&gt; ndarray</code></strong></p>
+<p>Takens&rsquo; time-delay embedding. Given a 1D signal $x(t)$, constructs vectors $v(t) = [x(t), x(t+\tau), \ldots, x(t+(d-1)\tau)]$. By Takens&rsquo; theorem, for generic delay $\tau$ and embedding dimension $d \geq 2m+1$ (where $m$ is the attractor dimension), this reconstructs the topology of the underlying dynamical system. Returns a point cloud of shape <code>[n_points, dim]</code>.</p>
+<p>The <code>signal</code> argument accepts either raw audio samples or inter-click interval sequences. For ICI-based analysis (as in Chapter 7), the &ldquo;signal&rdquo; is the vector of measured intervals.</p>
+<p><strong><code>compute_persistence(signal: ndarray, delay: int = 10, dim: int = 3, max_points: int = 1000, max_homology_dim: int = 1, thresh: float = 2.0, seed: int | None = None) -&gt; PersistenceResult</code></strong></p>
+<p>The primary TDA pipeline function. Executes four steps:</p>
+<ol>
+<li>Time-delay embeds the signal into $\mathbb{R}^{\text{dim}}$.</li>
+<li>Subsamples the point cloud to at most <code>max_points</code> for computational tractability.</li>
+<li>Normalises to zero mean and unit variance.</li>
+<li>Computes Vietoris-Rips persistent homology via ripser up to dimension <code>max_homology_dim</code>.</li>
+</ol>
+<p>Returns a <code>PersistenceResult</code> dataclass containing:
+- <code>diagrams</code>: list of persistence diagrams (one per homology dimension), each an array of shape <code>[n_features, 2]</code> with columns <code>(birth, death)</code>.
+- <code>cloud</code>: the normalised point cloud used for computation.
+- <code>max_dim</code>: the maximum homology dimension computed.</p>
+<p>Raises <code>ImportError</code> if ripser is not installed (requires the <code>[tda]</code> extra).</p>
+<p><strong><code>tda_feature_vector(result: PersistenceResult) -&gt; ndarray</code></strong></p>
+<p>Extracts a fixed-length summary vector from persistence diagrams: 8 statistics per homology dimension, yielding $8 \times (d_{\max} + 1)$ features total. With the default <code>max_homology_dim=1</code>, this produces 16 features.</p>
+<p>The 8 per-dimension statistics are:</p>
+<table>
+<thead>
+<tr>
+<th>Index</th>
+<th>Feature</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>0</td>
+<td>count</td>
+<td>Number of finite-lifetime features</td>
+</tr>
+<tr>
+<td>1</td>
+<td>mean_lifetime</td>
+<td>Average persistence</td>
+</tr>
+<tr>
+<td>2</td>
+<td>std_lifetime</td>
+<td>Spread of persistence values</td>
+</tr>
+<tr>
+<td>3</td>
+<td>max_lifetime</td>
+<td>Most persistent feature</td>
+</tr>
+<tr>
+<td>4</td>
+<td>p75_lifetime</td>
+<td>75th percentile of lifetimes</td>
+</tr>
+<tr>
+<td>5</td>
+<td>mean_birth</td>
+<td>Average birth time</td>
+</tr>
+<tr>
+<td>6</td>
+<td>total_persistence</td>
+<td>Sum of squared lifetimes ($L^2$ norm)</td>
+</tr>
+<tr>
+<td>7</td>
+<td>normalized_persistence</td>
+<td>$\sqrt{\text{total}} / \text{count}$</td>
+</tr>
+</tbody>
+</table>
+<p>The H0 features (connected components) capture cluster structure: regular codas with uniform ICI patterns produce tight clusters (low H0 persistence), while compound codas with multi-component timing produce elevated H0 persistence. The H1 features (loops) capture cyclic patterns: irregular codas with variable timing produce topological loops (high H1 persistence), while regular codas do not.</p>
+<h4 id="b33-spd_spectral-spd-manifold-analysis">B.3.3 spd_spectral &mdash; SPD Manifold Analysis<a class="headerlink" href="#b33-spd_spectral-spd-manifold-analysis" title="Permanent link">&para;</a></h4>
+<p><strong><code>SPDManifold</code></strong></p>
+<p>Static methods implementing the log-Euclidean Riemannian metric on the manifold of symmetric positive definite matrices $\text{SPD}(n) = \{S \in \mathbb{R}^{n \times n} : S = S^\top, S \succ 0\}$.</p>
+<ul>
+<li>
+<p><strong><code>log_map(S: Tensor) -&gt; Tensor</code></strong> &mdash; Matrix logarithm via eigendecomposition: $\log(S) = U \cdot \text{diag}(\log \lambda) \cdot U^\top$. Maps from the SPD manifold to the tangent space (symmetric matrices).</p>
+</li>
+<li>
+<p><strong><code>exp_map(X: Tensor) -&gt; Tensor</code></strong> &mdash; Matrix exponential: the inverse of <code>log_map</code>. Maps symmetric matrices back to the SPD manifold.</p>
+</li>
+<li>
+<p><strong><code>distance(S1: Tensor, S2: Tensor) -&gt; Tensor</code></strong> &mdash; Log-Euclidean distance: $d_{LE}(S_1, S_2) = \|\log(S_1) - \log(S_2)\|_F$. This is a proper metric on SPD(n) that is more discriminative than the Frobenius norm $\|S_1 - S_2\|_F$ because it respects the curved geometry of the positive-definite cone. In particular, it correctly captures the fact that two covariance matrices can be far apart in spectral structure while being close in Frobenius norm (if they differ primarily in the orientation of their eigenvectors).</p>
+</li>
+<li>
+<p><strong><code>frechet_mean(matrices: Tensor, weights: Tensor | None = None) -&gt; Tensor</code></strong> &mdash; Log-Euclidean Frechet mean: $\bar{S} = \exp(\sum_i w_i \log(S_i))$. The Riemannian-aware &ldquo;average&rdquo; covariance matrix, used to compute per-type centroids in the SPD feature space.</p>
+</li>
+</ul>
+<p>All methods support batched inputs with arbitrary leading dimensions.</p>
+<p><strong><code>compute_covariance(spectrogram: ndarray, n_bands: int = 16, regularize: float = 1e-4) -&gt; ndarray</code></strong></p>
+<p>Computes a frequency-band covariance matrix from a mel spectrogram. Groups mel frequency bins into <code>n_bands</code> equal-sized bands, averages within each band across frequencies, then computes the time-domain covariance across bands. Adds <code>regularize * I</code> to guarantee positive definiteness. Returns a matrix of shape <code>[n_bands, n_bands]</code>.</p>
+<p><strong><code>spd_features_from_spectrogram(spectrogram: ndarray, n_bands: int = 16, regularize: float = 1e-4) -&gt; ndarray</code></strong></p>
+<p>The end-to-end SPD feature extraction function. Computes the covariance matrix, applies the log-Euclidean map, and extracts the upper triangle of $\log(\text{Cov})$ as a feature vector. Returns a vector of length $n_{\text{bands}} \times (n_{\text{bands}} + 1) / 2$. With the default <code>n_bands=16</code>, this yields 136 features; with <code>n_bands=8</code>, it yields 36.</p>
+<p><strong><code>compute_spectral_trajectory(spectrogram: ndarray, n_bands: int = 16, window_frames: int = 32, hop_frames: int = 16, sr: int = 32000, hop_length: int = 512, regularize: float = 1e-4) -&gt; SpectralTrajectory</code></strong></p>
+<p>Computes a time-varying trajectory on the SPD manifold by sliding a window across the spectrogram and computing a covariance matrix at each position. Returns a <code>SpectralTrajectory</code> dataclass with:</p>
+<ul>
+<li><code>matrices</code>: the sequence of SPD matrices, shape <code>[n_windows, n_bands, n_bands]</code>.</li>
+<li><code>timestamps</code>: centre time (in seconds) of each window.</li>
+<li><code>geodesic_deviation</code>: the ratio $(L_{\text{path}} - d_{\text{geodesic}}) / d_{\text{geodesic}}$, where $L_{\text{path}}$ is the summed log-Euclidean distance along consecutive windows and $d_{\text{geodesic}}$ is the direct distance between the first and last matrices. A deviation of 0 means the spectral structure evolved along a perfect geodesic (a smooth, &ldquo;straight&rdquo; transition between two vowel states); higher values indicate a more complex, wandering trajectory.</li>
+</ul>
+<p>This function is the computational implementation of the diphthong analysis described in Chapter 7, Section 7.3.</p>
+<h4 id="b34-acoustic_transforms-parametric-perturbations">B.3.4 acoustic_transforms &mdash; Parametric Perturbations<a class="headerlink" href="#b34-acoustic_transforms-parametric-perturbations" title="Permanent link">&para;</a></h4>
+<p><strong><code>AcousticTransform</code></strong></p>
+<p>A dataclass wrapping a parametric acoustic perturbation function. Each transform has:</p>
+<ul>
+<li><code>name: str</code> &mdash; Identifier (e.g., <code>"additive_noise"</code>, <code>"doppler_shift"</code>).</li>
+<li><code>fn: Callable[[ndarray, int, float], ndarray]</code> &mdash; The transform function, taking <code>(signal, sample_rate, intensity)</code> and returning a perturbed signal.</li>
+<li><code>intensity_range: tuple[float, float]</code> &mdash; Valid intensity range (default: <code>(0.0, 1.0)</code>).</li>
+<li><code>is_invariant: bool</code> &mdash; Whether a correct decoder should be invariant to this transform.</li>
+</ul>
+<p>Calling <code>transform(signal, sr, intensity)</code> applies the perturbation. At intensity 0.0, the signal is always unchanged.</p>
+<p><strong><code>make_acoustic_transform_suite() -&gt; list[AcousticTransform]</code></strong></p>
+<p>Returns the full suite of nine acoustic transforms used in the DRI analysis:</p>
+<table>
+<thead>
+<tr>
+<th>Transform</th>
+<th>Type</th>
+<th>Behaviour at intensity=1.0</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>amplitude_scale</code></td>
+<td>Invariant</td>
+<td>Scale by 0.1x to 10x (log-uniform)</td>
+</tr>
+<tr>
+<td><code>time_shift</code></td>
+<td>Invariant</td>
+<td>Circular shift up to 25% of signal</td>
+</tr>
+<tr>
+<td><code>additive_noise</code></td>
+<td>Invariant</td>
+<td>Gaussian white noise at ~0 dB SNR</td>
+</tr>
+<tr>
+<td><code>pink_noise</code></td>
+<td>Invariant</td>
+<td>1/f noise at ~0 dB SNR</td>
+</tr>
+<tr>
+<td><code>doppler_shift</code></td>
+<td>Stress</td>
+<td>~5% frequency shift</td>
+</tr>
+<tr>
+<td><code>multipath_echo</code></td>
+<td>Stress</td>
+<td>Echo at ~50ms delay, 30% attenuation</td>
+</tr>
+<tr>
+<td><code>time_stretch</code></td>
+<td>Stress</td>
+<td>Up to +/-20% speed change</td>
+</tr>
+<tr>
+<td><code>spectral_mask</code></td>
+<td>Stress</td>
+<td>Zero out up to 40% of spectrum</td>
+</tr>
+<tr>
+<td><code>click_dropout</code></td>
+<td>Stress</td>
+<td>Zero out up to 30% of signal in random segments</td>
+</tr>
+</tbody>
+</table>
+<p>The invariant/stress distinction matters for DRI interpretation: high omega on invariant transforms indicates a decoder bug; high omega on stress transforms may be legitimate.</p>
+<p><strong><code>TransformChain</code></strong></p>
+<p>Composes multiple transforms into a chain for compound distortion testing. Created from a list of <code>(transform, intensity)</code> pairs and called on a signal to apply each transform sequentially. The class method <code>TransformChain.generate_chains()</code> produces random chains for systematic testing.</p>
+<h4 id="b35-decoder_robustness-decoder-robustness-index">B.3.5 decoder_robustness &mdash; Decoder Robustness Index<a class="headerlink" href="#b35-decoder_robustness-decoder-robustness-index" title="Permanent link">&para;</a></h4>
+<p><strong><code>CodaDecoder</code> (Protocol)</strong></p>
+<p>Any object with a <code>classify(signal: ndarray, sr: int) -&gt; str</code> method. The DRI framework is decoder-agnostic: implement this interface to plug in any classifier, from a nearest-centroid baseline to a deep learning model like WhAM.</p>
+<p><strong><code>CodaSemanticDistance(feature_weights: dict | None = None, coda_features: dict | None = None)</code></strong></p>
+<p>Computes graduated semantic distance between coda type predictions. When both predictions have known feature decompositions (rhythm, tempo, rubato, ornamentation), the distance is weighted by feature importance:</p>
+<p>$$\omega(y, \hat{y}) = \max\left(0.5, \; 0.5 + 0.5 \cdot \frac{\sum_f w_f \cdot \mathbf{1}[y_f \neq \hat{y}_f]}{\sum_f w_f}\right)$$</p>
+<p>Default weights: rhythm = 1.0, tempo = 0.7, rubato = 0.4, ornamentation = 0.2. The minimum 0.5 penalty ensures any classification flip is registered. When feature decompositions are unavailable, falls back to a binary mismatch penalty of 0.75.</p>
+<p><strong><code>DecoderRobustnessIndex(transforms: list[AcousticTransform], semantic_distance: CodaSemanticDistance | None = None)</code></strong></p>
+<p>The main adversarial fuzzing engine. Key methods:</p>
+<ul>
+<li><strong><code>measure(decoder, signals, sr=32000, intensities=None, n_chains=30, chain_max_length=3) -&gt; DRIResult</code></strong> &mdash; Full DRI measurement. Applies all transforms at each intensity level, generates and tests compositional chains, and runs adversarial threshold search. Returns a <code>DRIResult</code> containing:</li>
+<li><code>dri</code>: the scalar index ($0.5 \bar{\omega} + 0.3 \omega_{75} + 0.2 \omega_{95}$).</li>
+<li><code>dri_invariant</code>: DRI computed only on invariant transforms.</li>
+<li><code>dri_stress</code>: DRI computed only on stress transforms.</li>
+<li><code>per_transform</code>: dict mapping each transform name to its mean omega.</li>
+<li><code>adversarial_thresholds</code>: dict mapping each transform to its minimal flip intensity.</li>
+<li>
+<p><code>chain_results</code>: list of (chain description, mean omega) for compositional tests.</p>
+</li>
+<li>
+<p><strong><code>sensitivity_profile(decoder, signals, sr) -&gt; dict[str, float]</code></strong> &mdash; Quick profile mapping each transform to its mean omega at full intensity.</p>
+</li>
+<li>
+<p><strong><code>intensity_sweep(decoder, signals, sr, transform, n_points=10) -&gt; list[tuple[float, float]]</code></strong> &mdash; Sweeps a single transform from intensity 0 to 1, returning the (intensity, mean_omega) curve. Reveals the activation threshold where the decoder starts failing.</p>
+</li>
+<li>
+<p><strong><code>find_adversarial_threshold(decoder, signal, sr, transform, tolerance=0.01) -&gt; float</code></strong> &mdash; Binary search for the minimal intensity that flips the decoder output on a single signal. Returns 1.0 if no flip is found at any intensity.</p>
+</li>
+</ul>
+<hr />
+<h3 id="b4-worked-examples">B.4 Worked Examples<a class="headerlink" href="#b4-worked-examples" title="Permanent link">&para;</a></h3>
+<p>The examples below demonstrate the four core analysis pipelines. All code is self-contained and runnable with the appropriate <code>[tda]</code> or <code>[data]</code> extras installed.</p>
+<h4 id="b41-embedding-coda-features-on-the-poincare-ball">B.4.1 Embedding Coda Features on the Poincare Ball<a class="headerlink" href="#b41-embedding-coda-features-on-the-poincare-ball" title="Permanent link">&para;</a></h4>
+<p>This example constructs the coda type taxonomy described in Chapter 5, embeds it into the Poincare ball, and trains a hyperbolic classifier.</p>
+<pre><code class="language-python">import torch
+import numpy as np
+from eris_ketos.poincare_coda import (
+    PoincareBall,
+    HyperbolicMLR,
+    build_distance_matrix,
+    embed_taxonomy_hyperbolic,
+)
+
+# Define the coda type taxonomy
+# Each entry maps a coda type to its feature decomposition
+coda_taxonomy = {
+    &quot;5R1&quot;: {&quot;rhythm_class&quot;: &quot;regular&quot;, &quot;click_count&quot;: &quot;5&quot;, &quot;variant&quot;: &quot;1&quot;},
+    &quot;5R2&quot;: {&quot;rhythm_class&quot;: &quot;regular&quot;, &quot;click_count&quot;: &quot;5&quot;, &quot;variant&quot;: &quot;2&quot;},
+    &quot;5R3&quot;: {&quot;rhythm_class&quot;: &quot;regular&quot;, &quot;click_count&quot;: &quot;5&quot;, &quot;variant&quot;: &quot;3&quot;},
+    &quot;4R1&quot;: {&quot;rhythm_class&quot;: &quot;regular&quot;, &quot;click_count&quot;: &quot;4&quot;, &quot;variant&quot;: &quot;1&quot;},
+    &quot;4R2&quot;: {&quot;rhythm_class&quot;: &quot;regular&quot;, &quot;click_count&quot;: &quot;4&quot;, &quot;variant&quot;: &quot;2&quot;},
+    &quot;3R1&quot;: {&quot;rhythm_class&quot;: &quot;regular&quot;, &quot;click_count&quot;: &quot;3&quot;, &quot;variant&quot;: &quot;1&quot;},
+    &quot;5D1&quot;: {&quot;rhythm_class&quot;: &quot;deceleration&quot;, &quot;click_count&quot;: &quot;5&quot;, &quot;variant&quot;: &quot;1&quot;},
+    &quot;5D2&quot;: {&quot;rhythm_class&quot;: &quot;deceleration&quot;, &quot;click_count&quot;: &quot;5&quot;, &quot;variant&quot;: &quot;2&quot;},
+    &quot;4D1&quot;: {&quot;rhythm_class&quot;: &quot;deceleration&quot;, &quot;click_count&quot;: &quot;4&quot;, &quot;variant&quot;: &quot;1&quot;},
+    &quot;4i&quot;:  {&quot;rhythm_class&quot;: &quot;irregular&quot;, &quot;click_count&quot;: &quot;4&quot;, &quot;variant&quot;: &quot;0&quot;},
+    &quot;5i&quot;:  {&quot;rhythm_class&quot;: &quot;irregular&quot;, &quot;click_count&quot;: &quot;5&quot;, &quot;variant&quot;: &quot;0&quot;},
+    &quot;1+1+3&quot;: {&quot;rhythm_class&quot;: &quot;compound&quot;, &quot;click_count&quot;: &quot;1+1+3&quot;, &quot;variant&quot;: &quot;0&quot;},
+    &quot;2+3&quot;:   {&quot;rhythm_class&quot;: &quot;compound&quot;, &quot;click_count&quot;: &quot;2+3&quot;, &quot;variant&quot;: &quot;0&quot;},
+}
+
+# Build taxonomic distance matrix
+# Levels from finest to coarsest: variant -&gt; click_count -&gt; rhythm_class
+dist_matrix = build_distance_matrix(
+    coda_taxonomy,
+    levels=(&quot;variant&quot;, &quot;click_count&quot;, &quot;rhythm_class&quot;),
+)
+print(f&quot;Distance matrix: {dist_matrix.shape}&quot;)
+print(f&quot;Unique distances: {sorted(set(dist_matrix.flatten()))}&quot;)
+# -&gt; [0.0, 1.0, 2.0, 3.0, 4.0]
+
+# Embed into Poincare ball
+embed_dim = 16
+embeddings = embed_taxonomy_hyperbolic(dist_matrix, embed_dim=embed_dim, c=1.0)
+print(f&quot;Embeddings: {embeddings.shape}&quot;)
+print(f&quot;Max norm: {embeddings.norm(dim=-1).max():.4f}&quot;)  # must be &lt; 1.0
+
+# Verify: taxonomically close types should have small hyperbolic distances
+ball = PoincareBall(c=1.0)
+d_5R1_5R2 = ball.dist(embeddings[0:1], embeddings[1:2]).item()
+d_5R1_4i  = ball.dist(embeddings[0:1], embeddings[9:10]).item()
+print(f&quot;d(5R1, 5R2) = {d_5R1_5R2:.3f}&quot;)   # small: same rhythm, same clicks
+print(f&quot;d(5R1, 4i)  = {d_5R1_4i:.3f}&quot;)     # large: different rhythm class
+
+# Train a classifier with taxonomy-initialised prototypes
+n_classes = len(coda_taxonomy)
+classifier = HyperbolicMLR(embed_dim=embed_dim, num_classes=n_classes, c=1.0)
+classifier.init_from_taxonomy(embeddings)
+
+# Map feature vectors onto the ball and classify
+features = torch.randn(100, embed_dim) * 0.1  # synthetic features
+on_ball = ball.expmap0(features * 0.3)         # scale to stay inside ball
+logits = classifier(on_ball)                   # [100, n_classes]
+predictions = logits.argmax(dim=1)             # predicted class indices
+</code></pre>
+<p>The Poincare ball embedding places taxonomically related types (e.g., 5R1, 5R2, 5R3) near each other and taxonomically distant types (e.g., 5R1, 1+1+3) far apart, with the exponential growth of hyperbolic distance providing natural separation between hierarchy levels.</p>
+<h4 id="b42-computing-persistence-diagrams-from-click-patterns">B.4.2 Computing Persistence Diagrams from Click Patterns<a class="headerlink" href="#b42-computing-persistence-diagrams-from-click-patterns" title="Permanent link">&para;</a></h4>
+<p>This example computes persistent homology on inter-click interval point clouds and extracts topological feature vectors.</p>
+<pre><code class="language-python">import numpy as np
+from eris_ketos.tda_clicks import (
+    time_delay_embedding,
+    compute_persistence,
+    tda_feature_vector,
+)
+
+# Simulate inter-click intervals for different coda types
+# Regular coda: uniform timing
+regular_icis = np.array([0.35, 0.35, 0.36, 0.34, 0.35, 0.36, 0.35, 0.34, 0.35])
+
+# Irregular coda: variable timing
+irregular_icis = np.array([0.20, 0.50, 0.15, 0.45, 0.25, 0.55, 0.18, 0.42, 0.30])
+
+# Compound coda: grouped timing (1+1+3 pattern)
+compound_icis = np.array([0.80, 0.75, 0.20, 0.21, 0.19, 0.00, 0.00, 0.00, 0.00])
+
+# Approach 1: Direct ICI point cloud (as used in Chapter 7)
+# Build a point cloud from multiple codas of the same type
+n_codas = 100
+regular_cloud = np.array([
+    regular_icis + np.random.normal(0, 0.02, 9) for _ in range(n_codas)
+])
+print(f&quot;ICI point cloud shape: {regular_cloud.shape}&quot;)  # [100, 9]
+
+# Approach 2: Time-delay embedding of audio signal
+# Reconstruct the vocal attractor from a 1D signal
+audio_signal = np.random.randn(32000).astype(np.float32)  # placeholder
+cloud = time_delay_embedding(audio_signal, delay=10, dim=3)
+print(f&quot;Delay-embedded cloud: {cloud.shape}&quot;)  # [n_points, 3]
+
+# Compute persistent homology
+result = compute_persistence(
+    audio_signal,
+    delay=10,        # time delay tau (samples)
+    dim=3,           # embedding dimension
+    max_points=1000, # subsample for tractability
+    max_homology_dim=1,  # compute H0 and H1
+    thresh=2.0,      # maximum filtration value
+    seed=42,         # for reproducible subsampling
+)
+print(f&quot;H0 diagram: {result.diagrams[0].shape}&quot;)  # [n_components, 2]
+print(f&quot;H1 diagram: {result.diagrams[1].shape}&quot;)  # [n_loops, 2]
+
+# Extract fixed-length feature vector
+features = tda_feature_vector(result)
+print(f&quot;TDA feature vector: {features.shape}&quot;)  # [16] = 8 features x 2 dimensions
+print(f&quot;H0 features: {features[:8]}&quot;)
+print(f&quot;H1 features: {features[8:]}&quot;)
+
+# Compare topological signatures across coda types
+for name, icis in [(&quot;Regular&quot;, regular_icis), (&quot;Irregular&quot;, irregular_icis)]:
+    # Tile into a point cloud (simulating multiple codas with noise)
+    cloud = np.array([icis + np.random.normal(0, 0.03, len(icis))
+                      for _ in range(200)])
+    # Use ripser directly on the ICI point cloud
+    res = compute_persistence(cloud.flatten(), delay=1, dim=len(icis),
+                              max_points=200)
+    feat = tda_feature_vector(res)
+    print(f&quot;{name}: H0_count={feat[0]:.0f}, H1_count={feat[8]:.0f}, &quot;
+          f&quot;H1_max_life={feat[11]:.4f}&quot;)
+</code></pre>
+<p>The key insight is that regular codas produce tight clusters with low H1 persistence (no topological loops), while irregular codas produce spread distributions with detectable loops &mdash; the topological fingerprint of timing variability. These signatures are invariant to monotone transformations of the distance metric, making them robust to amplitude scaling and recording conditions.</p>
+<h4 id="b43-extracting-spd-features-from-spectrograms">B.4.3 Extracting SPD Features from Spectrograms<a class="headerlink" href="#b43-extracting-spd-features-from-spectrograms" title="Permanent link">&para;</a></h4>
+<p>This example demonstrates the SPD manifold analysis pipeline: from raw audio to frequency-band covariance matrices to Riemannian feature vectors.</p>
+<pre><code class="language-python">import numpy as np
+import torch
+import librosa
+from eris_ketos.spd_spectral import (
+    SPDManifold,
+    compute_covariance,
+    spd_features_from_spectrogram,
+    compute_spectral_trajectory,
+)
+
+# Load or synthesise a coda signal
+sr = 32000
+duration = 1.0
+t = np.linspace(0, duration, int(sr * duration))
+# Synthetic click train: 5 clicks at ~0.2s intervals
+signal = np.zeros_like(t, dtype=np.float32)
+for click_time in [0.1, 0.3, 0.5, 0.7, 0.9]:
+    click_idx = int(click_time * sr)
+    click_len = int(0.003 * sr)
+    for k in range(click_len):
+        if click_idx + k &lt; len(signal):
+            env = np.exp(-0.5 * ((k - click_len/2) / (click_len/5))**2)
+            signal[click_idx + k] = env * np.sin(2 * np.pi * 5000 * k / sr)
+
+# Compute mel spectrogram
+mel_spec = librosa.feature.melspectrogram(
+    y=signal, sr=sr, n_mels=64, n_fft=1024, hop_length=256
+)
+mel_db = librosa.power_to_db(mel_spec + 1e-10)
+print(f&quot;Spectrogram shape: {mel_db.shape}&quot;)  # [64, n_frames]
+
+# Extract SPD covariance features (one-shot)
+features = spd_features_from_spectrogram(mel_db, n_bands=16)
+print(f&quot;SPD feature vector: {features.shape}&quot;)  # [136] = 16*17/2
+
+# With n_bands=8 (as used in Chapter 7 for cetacean analysis)
+features_8 = spd_features_from_spectrogram(mel_db, n_bands=8)
+print(f&quot;SPD feature vector (8 bands): {features_8.shape}&quot;)  # [36] = 8*9/2
+
+# Compute the raw covariance matrix for inspection
+cov = compute_covariance(mel_db, n_bands=8, regularize=1e-4)
+print(f&quot;Covariance matrix: {cov.shape}&quot;)  # [8, 8]
+print(f&quot;Eigenvalues: {np.linalg.eigvalsh(cov)}&quot;)  # all positive (SPD)
+
+# SPD manifold distances between two codas
+cov1 = torch.tensor(cov, dtype=torch.float32)
+cov2 = torch.tensor(
+    compute_covariance(mel_db + np.random.randn(*mel_db.shape) * 0.1,
+                       n_bands=8),
+    dtype=torch.float32,
+)
+d_le = SPDManifold.distance(cov1, cov2)
+print(f&quot;Log-Euclidean distance: {d_le.item():.4f}&quot;)
+
+# Frechet mean of multiple covariance matrices
+matrices = torch.stack([cov1, cov2])
+mean_cov = SPDManifold.frechet_mean(matrices)
+print(f&quot;Frechet mean eigenvalues: {torch.linalg.eigvalsh(mean_cov).numpy()}&quot;)
+
+# Compute spectral trajectory (diphthong analysis)
+trajectory = compute_spectral_trajectory(
+    mel_db,
+    n_bands=8,
+    window_frames=16,   # window size in spectrogram frames
+    hop_frames=8,       # hop size
+    sr=sr,
+    hop_length=256,
+)
+print(f&quot;Trajectory: {len(trajectory.timestamps)} windows&quot;)
+print(f&quot;Geodesic deviation: {trajectory.geodesic_deviation:.4f}&quot;)
+# Low deviation = smooth vowel transition (geodesic on SPD manifold)
+# High deviation = complex spectral evolution
+</code></pre>
+<p>The geodesic deviation metric is the key output for diphthong analysis (Chapter 7, Section 7.3): a coda whose spectral covariance evolves along a geodesic on the SPD manifold is undergoing a smooth, vowel-like transition between two spectral states. Higher deviations indicate more complex spectral dynamics &mdash; potentially encoding additional information beyond the basic coda type.</p>
+<h4 id="b44-running-adversarial-robustness-dri-analysis">B.4.4 Running Adversarial Robustness (DRI) Analysis<a class="headerlink" href="#b44-running-adversarial-robustness-dri-analysis" title="Permanent link">&para;</a></h4>
+<p>This example demonstrates the full Decoder Robustness Index pipeline, from building a decoder to interpreting the diagnostic output.</p>
+<pre><code class="language-python">import numpy as np
+from eris_ketos.acoustic_transforms import (
+    make_acoustic_transform_suite,
+    TransformChain,
+)
+from eris_ketos.decoder_robustness import (
+    DecoderRobustnessIndex,
+    CodaSemanticDistance,
+    DRIResult,
+)
+
+# Step 1: Define a decoder (any object with classify(signal, sr) -&gt; str)
+class SimpleICIDecoder:
+    &quot;&quot;&quot;Nearest-centroid decoder based on inter-click intervals.&quot;&quot;&quot;
+
+    def __init__(self, centroids: dict[str, np.ndarray]):
+        self.centroids = centroids
+
+    def _extract_icis(self, signal: np.ndarray, sr: int) -&gt; np.ndarray:
+        &quot;&quot;&quot;Detect clicks via energy peaks and measure intervals.&quot;&quot;&quot;
+        frame_len = int(0.005 * sr)
+        hop = frame_len // 2
+        energy = np.array([
+            np.sum(signal[i:i+frame_len]**2)
+            for i in range(0, len(signal) - frame_len, hop)
+        ])
+        threshold = np.mean(energy) + 2 * np.std(energy)
+        peaks = []
+        in_peak = False
+        for i, e in enumerate(energy):
+            if e &gt; threshold and not in_peak:
+                peaks.append(i * hop / sr)
+                in_peak = True
+            elif e &lt;= threshold:
+                in_peak = False
+        icis = np.zeros(9, dtype=np.float32)
+        for i in range(min(len(peaks) - 1, 9)):
+            icis[i] = peaks[i + 1] - peaks[i]
+        return icis
+
+    def classify(self, signal: np.ndarray, sr: int) -&gt; str:
+        icis = self._extract_icis(signal, sr)
+        best_type, best_dist = &quot;&quot;, float(&quot;inf&quot;)
+        for coda_type, centroid in self.centroids.items():
+            d = np.linalg.norm(centroid - icis)
+            if d &lt; best_dist:
+                best_type, best_dist = coda_type, d
+        return best_type
+
+# Step 2: Build centroids from annotated ICI data
+centroids = {
+    &quot;5R1&quot;: np.array([0.35, 0.35, 0.35, 0.35, 0, 0, 0, 0, 0], dtype=np.float32),
+    &quot;5R3&quot;: np.array([0.30, 0.30, 0.30, 0.30, 0, 0, 0, 0, 0], dtype=np.float32),
+    &quot;1+1+3&quot;: np.array([0.80, 0.75, 0.20, 0.20, 0, 0, 0, 0, 0], dtype=np.float32),
+}
+decoder = SimpleICIDecoder(centroids)
+
+# Step 3: Prepare test signals (synthetic click trains)
+def make_click_train(icis, sr=32000):
+    total = sum(icis) + 0.05
+    signal = np.zeros(int(total * sr), dtype=np.float32)
+    t = 0.01
+    click_n = int(0.003 * sr)
+    for ici in [0.0] + list(icis):
+        t += ici
+        idx = int(t * sr)
+        for k in range(click_n):
+            if idx + k &lt; len(signal):
+                env = np.exp(-0.5 * ((k - click_n/2) / (click_n/5))**2)
+                signal[idx + k] = env * np.sin(2 * np.pi * 5000 * k / sr)
+    return signal
+
+test_signals = [
+    make_click_train([0.35, 0.35, 0.35, 0.35]),  # 5R1
+    make_click_train([0.30, 0.30, 0.30, 0.30]),  # 5R3
+    make_click_train([0.80, 0.75, 0.20, 0.20]),  # 1+1+3
+]
+
+# Step 4: Run full DRI measurement
+transforms = make_acoustic_transform_suite()
+semantic_distance = CodaSemanticDistance()
+dri = DecoderRobustnessIndex(transforms, semantic_distance)
+
+result = dri.measure(
+    decoder,
+    test_signals,
+    sr=32000,
+    intensities=[0.3, 0.6, 1.0],  # three intensity levels
+    n_chains=15,                    # compositional chains to test
+    chain_max_length=2,             # max transforms per chain
+)
+
+# Step 5: Interpret results
+print(f&quot;Overall DRI: {result.dri:.4f}&quot;)
+print(f&quot;  Invariant transforms: {result.dri_invariant:.4f}&quot;)
+print(f&quot;  Stress transforms:    {result.dri_stress:.4f}&quot;)
+
+# Sensitivity profile: which transforms cause the most damage?
+print(&quot;\nPer-transform sensitivity:&quot;)
+for name, omega in sorted(result.per_transform.items(), key=lambda x: -x[1]):
+    print(f&quot;  {name:&gt;20s}: omega = {omega:.4f}&quot;)
+
+# Adversarial thresholds: how little perturbation flips the decoder?
+print(&quot;\nAdversarial thresholds (lower = more vulnerable):&quot;)
+for name, thresh in sorted(result.adversarial_thresholds.items(),
+                            key=lambda x: x[1]):
+    print(f&quot;  {name:&gt;20s}: threshold = {thresh:.3f}&quot;)
+
+# Step 6: Detailed intensity sweep for the most disruptive transform
+worst_transform = max(result.per_transform, key=result.per_transform.get)
+for t in transforms:
+    if t.name == worst_transform:
+        curve = dri.intensity_sweep(decoder, test_signals, 32000, t, n_points=11)
+        print(f&quot;\nIntensity sweep for '{worst_transform}':&quot;)
+        for intensity, omega in curve:
+            bar = &quot;#&quot; * int(omega * 40)
+            print(f&quot;  intensity={intensity:.1f}: omega={omega:.4f} |{bar}&quot;)
+        break
+</code></pre>
+<p>The DRI output tells you three things: (1) the overall robustness of the decoder on a 0&ndash;1 scale; (2) which specific acoustic conditions cause the most degradation (the sensitivity profile); and (3) how little perturbation is needed to flip the decoder&rsquo;s output (adversarial thresholds). A robust decoder should have low DRI on invariant transforms (amplitude scaling, time shift, mild noise) and may legitimately show higher DRI on stress transforms (Doppler shift, click dropout).</p>
+<hr />
+<h3 id="b5-reproducing-the-chapter-7-results">B.5 Reproducing the Chapter 7 Results<a class="headerlink" href="#b5-reproducing-the-chapter-7-results" title="Permanent link">&para;</a></h3>
+<p>This section provides step-by-step instructions for reproducing all cetacean analysis results reported in Chapter 7 of this book.</p>
+<h4 id="b51-environment-setup">B.5.1 Environment Setup<a class="headerlink" href="#b51-environment-setup" title="Permanent link">&para;</a></h4>
+<pre><code class="language-bash"># Create a clean environment
+python -m venv eris-env
+source eris-env/bin/activate        # Linux/macOS
+# eris-env\Scripts\activate         # Windows
+
+# Install all dependencies
+pip install eris-ketos[all]
+pip install matplotlib seaborn adjustText jupytext
+
+# Verify installation
+python -c &quot;from eris_ketos import PoincareBall; print('OK')&quot;
+</code></pre>
+<h4 id="b52-data-acquisition">B.5.2 Data Acquisition<a class="headerlink" href="#b52-data-acquisition" title="Permanent link">&para;</a></h4>
+<p>The analysis uses two data sources:</p>
+<ol>
+<li><strong>DSWP coda annotations</strong> (Sharma et al., 2024): 8,719 annotated codas with inter-click intervals, coda type labels, social unit and individual whale identifiers.</li>
+</ol>
+<pre><code class="language-python">import pandas as pd
+
+# Download from the Sharma et al. GitHub repository
+url = (&quot;https://raw.githubusercontent.com/pratyushasharma/&quot;
+       &quot;sw-combinatoriality/main/data/DominicaCodas.csv&quot;)
+df = pd.read_csv(url)
+print(f&quot;Loaded {len(df)} codas, {df['CodaType'].nunique()} types&quot;)
+</code></pre>
+<ol>
+<li><strong>DSWP raw audio</strong> (HuggingFace): 1,501 coda recordings with waveforms.</li>
+</ol>
+<pre><code class="language-python">from datasets import load_dataset
+
+ds = load_dataset(&quot;orrp/DSWP&quot;, split=&quot;train&quot;, streaming=True)
+</code></pre>
+<p>The annotation dataset is approximately 2 MB and downloads in seconds. The audio dataset is larger and is best accessed via HuggingFace streaming mode.</p>
+<h4 id="b53-running-the-full-analysis">B.5.3 Running the Full Analysis<a class="headerlink" href="#b53-running-the-full-analysis" title="Permanent link">&para;</a></h4>
+<p>The complete analysis notebook is provided in the repository as <code>notebooks/cetacean_geometric_analysis.py</code> in Jupytext percent format. It can be executed as a Jupyter notebook or as a Python script:</p>
+<pre><code class="language-bash"># As a Jupyter notebook
+jupytext --to notebook notebooks/cetacean_geometric_analysis.py
+jupyter lab notebooks/cetacean_geometric_analysis.ipynb
+
+# As a Python script
+python notebooks/cetacean_geometric_analysis.py
+</code></pre>
+<p>The notebook produces all figures reported in the paper and in Chapter 7 of this book:</p>
+<table>
+<thead>
+<tr>
+<th>Figure</th>
+<th>Content</th>
+<th>Notebook Section</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>fig1</td>
+<td>Coda type distribution</td>
+<td>Section 1: Data Loading</td>
+</tr>
+<tr>
+<td>fig2</td>
+<td>Poincare ball vs. Euclidean embeddings</td>
+<td>Section 2: Poincare Embedding</td>
+</tr>
+<tr>
+<td>fig3</td>
+<td>Distortion analysis</td>
+<td>Section 2: Poincare Embedding</td>
+</tr>
+<tr>
+<td>fig4</td>
+<td>Classification comparison</td>
+<td>Section 3: HyperbolicMLR</td>
+</tr>
+<tr>
+<td>fig5</td>
+<td>Persistence diagrams by coda type</td>
+<td>Section 4: TDA</td>
+</tr>
+<tr>
+<td>fig6</td>
+<td>Topological feature summary</td>
+<td>Section 4: TDA</td>
+</tr>
+<tr>
+<td>fig7</td>
+<td>SPD manifold analysis</td>
+<td>Section 5: SPD</td>
+</tr>
+<tr>
+<td>fig8</td>
+<td>DRI results</td>
+<td>Section 6: DRI</td>
+</tr>
+<tr>
+<td>fig9</td>
+<td>Spectral trajectories (raw audio)</td>
+<td>Section 7: Raw Audio</td>
+</tr>
+<tr>
+<td>fig10</td>
+<td>Social unit dialect structure</td>
+<td>Section 8: Dialects</td>
+</tr>
+<tr>
+<td>fig11</td>
+<td>Adversarial boundary discovery</td>
+<td>Section 9: Fuzzing</td>
+</tr>
+<tr>
+<td>fig12</td>
+<td>Linguistic universals</td>
+<td>Section 10: Linguistics</td>
+</tr>
+</tbody>
+</table>
+<h4 id="b54-reproducing-specific-results">B.5.4 Reproducing Specific Results<a class="headerlink" href="#b54-reproducing-specific-results" title="Permanent link">&para;</a></h4>
+<p><strong>Menzerath&rsquo;s law</strong> ($r = -0.269$, $p < 10^{-144}$):</p>
+<pre><code class="language-python">from scipy.stats import spearmanr
+
+ici_cols = [c for c in df.columns if c.startswith(&quot;ICI&quot;)]
+mean_ici = df[ici_cols].mean(axis=1)
+r, p = spearmanr(df[&quot;nClicks&quot;], mean_ici)
+print(f&quot;Menzerath's law: r = {r:.3f}, p = {p:.2e}&quot;)
+</code></pre>
+<p><strong>Poincare embedding classification</strong> (74.3% accuracy):</p>
+<p>The notebook&rsquo;s Section 3 trains a <code>HyperbolicMLR</code> classifier on 11-dimensional features (9 duration-normalised ICIs, log-duration, normalised click count) with taxonomy-initialised prototypes and cosine-annealed Adam optimisation. The exact accuracy depends on the random split seed; the reported result uses <code>random_state=42</code> and an 80/20 stratified split. Note that this split does not account for within-individual correlations; leave-one-whale-out cross-validation would yield a more conservative estimate.</p>
+<p><strong>DRI measurement</strong>:</p>
+<p>The notebook&rsquo;s Section 6 constructs a nearest-centroid ICI decoder from the DSWP annotations, synthesises test signals, and runs the full DRI measurement with 9 transforms at 3 intensity levels plus 15 compositional chains. Runtime is approximately 2&ndash;5 minutes on a modern CPU.</p>
+<p><strong>Boundary asymmetry</strong> (mean = 0.87):</p>
+<p>The notebook&rsquo;s Section 9 applies all 9 transforms at 11 intensity levels to synthesised codas from the 8 most frequent types and records all classification boundary crossings. The transition matrix reveals the strong directionality reported in the paper.</p>
+<h4 id="b55-expected-runtime">B.5.5 Expected Runtime<a class="headerlink" href="#b55-expected-runtime" title="Permanent link">&para;</a></h4>
+<p>On a standard workstation (no GPU required for any analysis):</p>
+<table>
+<thead>
+<tr>
+<th>Analysis</th>
+<th>Approximate time</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Data loading and preprocessing</td>
+<td>10 seconds</td>
+</tr>
+<tr>
+<td>Poincare embedding + classification</td>
+<td>30 seconds</td>
+</tr>
+<tr>
+<td>TDA (10 coda types, ripser)</td>
+<td>1&ndash;2 minutes</td>
+</tr>
+<tr>
+<td>SPD features (6 types, 50 codas each)</td>
+<td>30 seconds</td>
+</tr>
+<tr>
+<td>DRI measurement (20 signals, 9 transforms)</td>
+<td>2&ndash;5 minutes</td>
+</tr>
+<tr>
+<td>Full notebook end-to-end</td>
+<td>10&ndash;15 minutes</td>
+</tr>
+</tbody>
+</table>
+<p>The TDA computation is the bottleneck and scales with point cloud size. The <code>max_points</code> parameter in <code>compute_persistence</code> controls this trade-off; 1,000 points is sufficient for the DSWP analysis.</p>
+<hr />
+<h3 id="b6-data-requirements-and-formats">B.6 Data Requirements and Formats<a class="headerlink" href="#b6-data-requirements-and-formats" title="Permanent link">&para;</a></h3>
+<h4 id="b61-dswp-coda-annotations">B.6.1 DSWP Coda Annotations<a class="headerlink" href="#b61-dswp-coda-annotations" title="Permanent link">&para;</a></h4>
+<p>The primary data source is the <code>DominicaCodas.csv</code> file from the Sharma et al. (2024) repository. Required columns:</p>
+<table>
+<thead>
+<tr>
+<th>Column</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>CodaType</code></td>
+<td>string</td>
+<td>Coda type label (e.g., <code>"5R1"</code>, <code>"1+1+3"</code>)</td>
+</tr>
+<tr>
+<td><code>nClicks</code></td>
+<td>int</td>
+<td>Number of clicks in the coda</td>
+</tr>
+<tr>
+<td><code>Duration</code></td>
+<td>float</td>
+<td>Total coda duration in seconds</td>
+</tr>
+<tr>
+<td><code>ICI1</code> &hellip; <code>ICI9</code></td>
+<td>float</td>
+<td>Inter-click intervals in seconds (NaN-padded)</td>
+</tr>
+<tr>
+<td><code>Unit</code></td>
+<td>string</td>
+<td>Social unit identifier (optional)</td>
+</tr>
+<tr>
+<td><code>IDN</code></td>
+<td>string</td>
+<td>Individual whale identifier (optional)</td>
+</tr>
+</tbody>
+</table>
+<p>For the exchange-level analyses (Markov structure, turn-taking), the dialogues dataset provides additional columns:</p>
+<table>
+<thead>
+<tr>
+<th>Column</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>RhythmType</code></td>
+<td>string</td>
+<td>Rhythm class label</td>
+</tr>
+<tr>
+<td><code>WhaleID</code></td>
+<td>string</td>
+<td>Individual whale in the exchange</td>
+</tr>
+<tr>
+<td><code>Timestamp</code></td>
+<td>float</td>
+<td>Time within the recording session</td>
+</tr>
+</tbody>
+</table>
+<h4 id="b62-audio-format">B.6.2 Audio Format<a class="headerlink" href="#b62-audio-format" title="Permanent link">&para;</a></h4>
+<p>Raw audio for the DRI and SPD trajectory analyses should be:</p>
+<ul>
+<li><strong>Sample rate</strong>: 32,000 Hz (the DSWP recording rate; can be resampled)</li>
+<li><strong>Format</strong>: 1D NumPy array of <code>float32</code> values</li>
+<li><strong>Duration</strong>: typically 0.5&ndash;3 seconds per coda</li>
+</ul>
+<p>The DSWP HuggingFace dataset provides audio in this format. For custom recordings, any format loadable by librosa or soundfile is acceptable:</p>
+<pre><code class="language-python">import librosa
+signal, sr = librosa.load(&quot;recording.wav&quot;, sr=32000)
+</code></pre>
+<h4 id="b63-custom-data">B.6.3 Custom Data<a class="headerlink" href="#b63-custom-data" title="Permanent link">&para;</a></h4>
+<p>The eris-ketos modules are not restricted to sperm whale data. To apply the toolkit to another species or acoustic communication system:</p>
+<ol>
+<li>
+<p><strong>Poincare embedding</strong>: Provide a taxonomic distance matrix (integer-valued, symmetric) and a taxonomy dictionary mapping each type to its hierarchical features. The <code>build_distance_matrix</code> function handles arbitrary levels.</p>
+</li>
+<li>
+<p><strong>TDA</strong>: Provide either raw audio signals (for time-delay embedding) or precomputed feature vectors (for direct point cloud persistence). Any 1D time series or set of feature vectors is valid input.</p>
+</li>
+<li>
+<p><strong>SPD features</strong>: Provide mel spectrograms as NumPy arrays of shape <code>[n_mels, n_frames]</code>. The <code>n_bands</code> parameter should be chosen to match the frequency resolution relevant to the species: 16 bands for broadband signals, 8 bands for narrowband.</p>
+</li>
+<li>
+<p><strong>DRI</strong>: Implement the <code>CodaDecoder</code> protocol (a single <code>classify(signal, sr) -&gt; str</code> method) for your decoder. The <code>CodaSemanticDistance</code> class can be initialised with custom feature weights and decompositions for your type system.</p>
+</li>
+</ol>
+<p>The 156-dimensional geometric feature vector described in Chapter 8 (birdsong) combines 136 SPD features (<code>n_bands=16</code>, yielding <code>16 * 17 / 2 = 136</code>), 4 spectral trajectory features (geodesic deviation and related statistics), and 16 TDA features (8 per homology dimension). This same decomposition can be applied to any acoustic signal by calling <code>spd_features_from_spectrogram</code>, <code>compute_spectral_trajectory</code>, and <code>tda_feature_vector</code> on the appropriate inputs.</p>
+<h4 id="b64-coda-type-naming-convention">B.6.4 Coda Type Naming Convention<a class="headerlink" href="#b64-coda-type-naming-convention" title="Permanent link">&para;</a></h4>
+<p>The DSWP coda type labels follow a systematic convention:</p>
+<ul>
+<li><strong><code>nR</code><em>v</em></strong>: Regular rhythm with <em>n</em> clicks, variant <em>v</em>. Example: <code>5R1</code>, <code>5R3</code>.</li>
+<li><strong><code>nD</code><em>v</em></strong>: Decelerating rhythm with <em>n</em> clicks, variant <em>v</em>. Example: <code>5D1</code>, <code>4D1</code>.</li>
+<li><strong><code>ni</code></strong>: Irregular rhythm with <em>n</em> clicks. Example: <code>4i</code>, <code>5i</code>.</li>
+<li><strong><code>a+b+c</code></strong>: Compound rhythm with click groups of sizes <em>a</em>, <em>b</em>, <em>c</em>. Example: <code>1+1+3</code>, <code>2+3</code>.</li>
+</ul>
+<p>The <code>parse_coda_type</code> function in the analysis notebook converts these labels to structured dictionaries with <code>rhythm_class</code>, <code>click_count</code>, and <code>variant</code> fields. For the DRI&rsquo;s graduated semantic distance calculation, the four combinatorial features (rhythm, tempo, rubato, ornamentation) identified by Sharma et al. must be provided via the <code>coda_features</code> parameter of <code>CodaSemanticDistance</code>.</p>
+<hr />
+<h3 id="b7-relationship-to-the-erisml-framework">B.7 Relationship to the ErisML Framework<a class="headerlink" href="#b7-relationship-to-the-erisml-framework" title="Permanent link">&para;</a></h3>
+<p>The eris-ketos toolkit adapts two core components from the ErisML geometric ethics framework:</p>
+<ol>
+<li>
+<p><strong>Adversarial fuzzing architecture</strong>: The DRI is a direct adaptation of the Bond Index. The mathematical structure is identical &mdash; graduated semantic distance, adversarial threshold search via binary search, sensitivity profiling, and compositional chain testing &mdash; with domain-specific substitutions (acoustic transforms for scenario transforms, coda semantic distance for option semantic distance). The weighting formula $\text{DRI} = 0.5\bar{\omega} + 0.3\omega_{75} + 0.2\omega_{95}$ is the Bond Index convention, emphasising tail behaviour.</p>
+</li>
+<li>
+<p><strong>Parametric transform design</strong>: The <code>AcousticTransform</code> and <code>TransformChain</code> classes mirror ErisML&rsquo;s <code>ParametricTransform</code> and <code>TransformChain</code>. The identity property (intensity 0.0 = no change) and the invariant/stress classification are inherited from the ethics framework, where they distinguish between perturbations that a well-calibrated evaluator should tolerate and perturbations that may legitimately change the evaluation.</p>
+</li>
+</ol>
+<p>This structural homology is not accidental. It reflects the central claim of this book: the same geometric tools apply across communication domains. The adversarial robustness framework developed for ethical reasoning (do moral judgments change under surface-level reframing?) transfers directly to bioacoustics (do coda classifications change under acoustic perturbation?) because both are instances of the same problem &mdash; testing gauge invariance of a decoder on a communication manifold.</p>
+<hr />
+<h3 id="b8-version-history-and-compatibility">B.8 Version History and Compatibility<a class="headerlink" href="#b8-version-history-and-compatibility" title="Permanent link">&para;</a></h3>
+<p>The results in this book were produced with eris-ketos v0.2.0. The package requires Python 3.10+ and has been tested on Python 3.10, 3.11, and 3.12.</p>
+<p>Core dependencies and their minimum versions:</p>
+<table>
+<thead>
+<tr>
+<th>Package</th>
+<th>Minimum version</th>
+<th>Purpose</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>numpy</td>
+<td>1.24.0</td>
+<td>Array operations</td>
+</tr>
+<tr>
+<td>scipy</td>
+<td>1.10.0</td>
+<td>Statistical tests, eigendecomposition</td>
+</tr>
+<tr>
+<td>torch</td>
+<td>2.0.0</td>
+<td>Poincare ball operations, SPD manifold, HyperbolicMLR</td>
+</tr>
+<tr>
+<td>librosa</td>
+<td>0.10.0</td>
+<td>Audio loading, mel spectrograms</td>
+</tr>
+<tr>
+<td>ripser</td>
+<td>0.6.0</td>
+<td>Vietoris-Rips persistence (optional, <code>[tda]</code>)</td>
+</tr>
+<tr>
+<td>persim</td>
+<td>0.3.0</td>
+<td>Persistence diagram utilities (optional, <code>[tda]</code>)</td>
+</tr>
+<tr>
+<td>scikit-learn</td>
+<td>1.3.0</td>
+<td>Euclidean baselines (optional, <code>[ml]</code>)</td>
+</tr>
+<tr>
+<td>datasets</td>
+<td>2.14.0</td>
+<td>HuggingFace data loading (optional, <code>[data]</code>)</td>
+</tr>
+</tbody>
+</table>
+<p>The package has no GPU requirement. All computations, including PyTorch operations in the Poincare ball and SPD modules, run on CPU. The full analysis notebook completes in under 15 minutes on a standard workstation. For Kaggle deployment or constrained environments, the <code>[tda]</code> extra (ripser) is the only non-trivial dependency; all other modules rely on standard scientific Python packages.</p>
+
+    <footer>
+      <p>Part of the <em>Geometric Series</em> by A.H. Bowers</p>
+      <p>Built automatically from source. Last updated: 2026-03-27 00:17 UTC</p>
+    </footer>
+  </div>
+
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js"
+    onload="renderMathInElement(document.body, {
+      delimiters: [
+        {left: '$$', right: '$$', display: true},
+        {left: '$', right: '$', display: false},
+        {left: '\\\\(', right: '\\\\)', display: false},
+        {left: '\\\\[', right: '\\\\]', display: true}
+      ],
+      throwOnError: false
+    });"></script>
+</body>
+</html>

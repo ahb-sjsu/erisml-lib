@@ -1,0 +1,570 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Chapter 6: Topological Data Analysis of Signal - Geometric Communication</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
+  <style>
+    :root {
+      --bg: #fafaf8;
+      --fg: #222;
+      --accent: #2c5f8a;
+      --border: #ddd;
+      --code-bg: #f4f4f0;
+      --max-width: 48rem;
+    }
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --bg: #1a1a2e;
+        --fg: #e0e0e0;
+        --accent: #7eb8da;
+        --border: #444;
+        --code-bg: #16213e;
+      }
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Georgia', 'Times New Roman', serif;
+      background: var(--bg);
+      color: var(--fg);
+      line-height: 1.7;
+      padding: 2rem 1rem;
+    }
+    .container {
+      max-width: var(--max-width);
+      margin: 0 auto;
+    }
+    nav.breadcrumb {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      font-size: 0.85rem;
+      margin-bottom: 2rem;
+      padding-bottom: 0.5rem;
+      border-bottom: 1px solid var(--border);
+    }
+    nav.breadcrumb a {
+      color: var(--accent);
+      text-decoration: none;
+    }
+    nav.breadcrumb a:hover { text-decoration: underline; }
+    nav.breadcrumb .sep { margin: 0 0.4rem; color: #999; }
+    h1 {
+      font-size: 2rem;
+      margin-bottom: 0.5rem;
+      line-height: 1.2;
+      border-bottom: 2px solid var(--accent);
+      padding-bottom: 0.5rem;
+    }
+    h2 {
+      font-size: 1.5rem;
+      margin-top: 2.5rem;
+      margin-bottom: 0.75rem;
+      color: var(--accent);
+    }
+    h3 {
+      font-size: 1.2rem;
+      margin-top: 2rem;
+      margin-bottom: 0.5rem;
+    }
+    h4 {
+      font-size: 1.05rem;
+      margin-top: 1.5rem;
+      margin-bottom: 0.4rem;
+      font-style: italic;
+    }
+    p { margin-bottom: 1rem; }
+    blockquote {
+      border-left: 3px solid var(--accent);
+      padding: 0.5rem 1.2rem;
+      margin: 1.5rem 0;
+      background: var(--code-bg);
+      font-style: italic;
+    }
+    blockquote p:last-child { margin-bottom: 0; }
+    code {
+      font-family: 'Consolas', 'Fira Code', monospace;
+      background: var(--code-bg);
+      padding: 0.15rem 0.35rem;
+      border-radius: 3px;
+      font-size: 0.9em;
+    }
+    pre {
+      background: var(--code-bg);
+      padding: 1rem;
+      border-radius: 4px;
+      overflow-x: auto;
+      margin: 1.5rem 0;
+      border: 1px solid var(--border);
+    }
+    pre code {
+      background: none;
+      padding: 0;
+    }
+    a { color: var(--accent); }
+    ul, ol {
+      margin: 0.75rem 0 1rem 1.5rem;
+    }
+    li { margin-bottom: 0.3rem; }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 1.5rem 0;
+    }
+    th, td {
+      border: 1px solid var(--border);
+      padding: 0.5rem 0.75rem;
+      text-align: left;
+    }
+    th { background: var(--code-bg); }
+    hr {
+      border: none;
+      border-top: 1px solid var(--border);
+      margin: 2rem 0;
+    }
+    img {
+      max-width: 100%;
+      height: auto;
+      display: block;
+      margin: 1.5rem auto;
+    }
+    /* KaTeX display math */
+    .katex-display {
+      overflow-x: auto;
+      overflow-y: hidden;
+      padding: 0.5rem 0;
+    }
+    /* Definition/theorem boxes */
+    .definition, .theorem, .axiom {
+      border: 1px solid var(--border);
+      border-left: 4px solid var(--accent);
+      padding: 1rem 1.2rem;
+      margin: 1.5rem 0;
+      background: var(--code-bg);
+      border-radius: 0 4px 4px 0;
+    }
+    footer {
+      margin-top: 4rem;
+      padding-top: 1rem;
+      border-top: 1px solid var(--border);
+      font-size: 0.8rem;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      color: #888;
+      text-align: center;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <nav class="breadcrumb">
+      <a href="../index.html">Geometric Series</a>
+      <span class="sep">/</span>
+      <a href="index.html">Geometric Communication</a>
+      <span class="sep">/</span>
+      <span>Chapter 6: Topological Data Analysis of Signal</span>
+    </nav>
+
+    <h1 id="chapter-6-topological-data-analysis-of-signal">Chapter 6: Topological Data Analysis of Signal<a class="headerlink" href="#chapter-6-topological-data-analysis-of-signal" title="Permanent link">&para;</a></h1>
+<blockquote>
+<p><em>&ldquo;The purpose of computing is insight, not numbers.&rdquo;</em>
+&mdash; Richard Hamming, <em>Numerical Methods for Scientists and Engineers</em> (1962)</p>
+<p><strong>RUNNING EXAMPLE &mdash; THE WHALE AND THE WREN</strong></p>
+<p><em>Consider two acoustic signals, each recorded in the field under adverse conditions.</em></p>
+<p><em>Signal A: a sperm whale coda &mdash; five broadband clicks separated by inter-click intervals of roughly 0.35, 0.35, 0.22, and 0.22 seconds. The recording is saturated with shipping noise, reverberant multipath echoes, and the clicks of at least three other whales at varying distances. The hydrophone is a towed array moving at six knots; the whale is diving at depth. Amplitude is meaningless. Absolute timing is approximate.</em></p>
+<p><em>Signal B: a Pacific wren&rsquo;s song &mdash; a cascade of rapid notes spanning 4&ndash;8 kHz, recorded from a distance of 30 meters with wind buffeting the microphone, a nearby stream masking frequencies below 1 kHz, and a second wren counter-singing in partial temporal overlap. The gain was set for a closer bird and has clipped the loudest notes.</em></p>
+<p><em>In both cases, the standard approach &mdash; compute a spectrogram, extract Mel-frequency features, train a neural classifier &mdash; works, but poorly. The noise, the gain mismatch, the reverb, the overlapping conspecifics all corrupt the representation. What we need are features that do not care about amplitude, that tolerate noise, that are robust to recording distance. We need features that capture the shape of the signal &mdash; its topology &mdash; rather than its magnitude.</em></p>
+<p><em>This chapter develops those features.</em></p>
+</blockquote>
+<hr />
+<p>In Chapter 4, we introduced the three-geometry toolkit for communication: hyperbolic embeddings for hierarchy, SPD manifold features for spectral covariance, and persistent homology for shape. Chapter 5 developed the first of these &mdash; the Poincare ball model applied to the hierarchical structure of communication systems, from coda taxonomies to cuneiform sign hierarchies. This chapter develops the third: topological data analysis (TDA) of communication signals.</p>
+<p>The central idea is deceptively simple. A one-dimensional signal &mdash; a time series of inter-click intervals, a waveform amplitude trace, an energy contour from a spectrogram &mdash; is the observable output of a higher-dimensional dynamical system. The whale&rsquo;s vocal production apparatus has internal state: muscle tensions, air pressure in the phonic lips, neural firing patterns. The bird&rsquo;s syrinx has its own state space. The signal we record is a one-dimensional projection of this multi-dimensional dynamics. Takens&rsquo; embedding theorem tells us that, under generic conditions, we can reconstruct the <em>topology</em> of the original dynamical system from this one-dimensional projection, by the simple device of stacking time-delayed copies of the signal into vectors.</p>
+<p>Once we have reconstructed a point cloud in a higher-dimensional space, persistent homology extracts its topological features &mdash; connected components, loops, voids &mdash; in a way that is provably stable under small perturbations. These features are invariant to amplitude scaling, robust to additive noise, and insensitive to recording distance. They capture the <em>shape</em> of the vocal attractor, not its magnitude. For field recordings of non-human communication, this is not a theoretical nicety. It is a practical necessity.</p>
+<p>The code is real, the data is real, and the results are reproducible.</p>
+<hr />
+<h2 id="61-from-signal-to-point-cloud-takens-embedding-theorem">6.1 From Signal to Point Cloud: Takens&rsquo; Embedding Theorem<a class="headerlink" href="#61-from-signal-to-point-cloud-takens-embedding-theorem" title="Permanent link">&para;</a></h2>
+<h3 id="611-the-problem-of-dimensional-poverty">6.1.1 The Problem of Dimensional Poverty<a class="headerlink" href="#611-the-problem-of-dimensional-poverty" title="Permanent link">&para;</a></h3>
+<p>Every recording device produces a one-dimensional signal: a scalar value that varies over time. This is a lossy projection. The dynamical system that produced the signal &mdash; a whale&rsquo;s vocal apparatus, a bird&rsquo;s syrinx, a human larynx &mdash; operates in a state space of many dimensions, and the recording collapses all of that structure onto a single axis.</p>
+<p>Takens&rsquo; embedding theorem tells us that we can undo this collapse &mdash; at least topologically. Under generic conditions, the topology of the original dynamical system can be recovered from a single time series by constructing vectors from time-delayed copies of the observed signal. The reconstruction is not exact in a metric sense &mdash; distances in the embedding space do not generally match distances in the original state space &mdash; but it is exact in a topological sense. The embedding preserves the qualitative shape: connected components, loops, voids, and all higher-order topological features.</p>
+<h3 id="612-the-construction">6.1.2 The Construction<a class="headerlink" href="#612-the-construction" title="Permanent link">&para;</a></h3>
+<p>Let $x(t)$ be a scalar-valued time series &mdash; for concreteness, the amplitude of a whale click recording sampled at discrete times $t = 0, 1, 2, \ldots, N-1$. Choose two parameters:</p>
+<ul>
+<li>$\tau$ &mdash; the <strong>time delay</strong>, measured in samples, and</li>
+<li>$d$ &mdash; the <strong>embedding dimension</strong>, a positive integer.</li>
+</ul>
+<p>Construct the <strong>time-delay embedding</strong> by forming the $d$-dimensional vectors</p>
+<p>$$\mathbf{v}(t) = \bigl[x(t),\; x(t + \tau),\; x(t + 2\tau),\; \ldots,\; x(t + (d-1)\tau)\bigr]$$</p>
+<p>for $t = 0, 1, \ldots, N - (d-1)\tau - 1$. This produces a set of $n = N - (d-1)\tau$ points in $\mathbb{R}^d$ &mdash; a <strong>point cloud</strong> that lives in the reconstructed phase space.</p>
+<p>[Figure 6.1: Schematic of the time-delay embedding. Left: a 1D signal $x(t)$ with marked sample points at times $t$, $t + \tau$, and $t + 2\tau$. Right: the corresponding 3D point $\mathbf{v}(t) = [x(t), x(t+\tau), x(t+2\tau)]$ in the reconstructed phase space. Multiple time steps trace out a curve (the reconstructed attractor).]</p>
+<p>The implementation is direct. From the <code>geometric_features.py</code> pipeline:</p>
+<pre><code class="language-python">def time_delay_embedding(signal: np.ndarray, delay: int = 10,
+                          dim: int = 3) -&gt; np.ndarray:
+    &quot;&quot;&quot;Takens' time-delay embedding: reconstruct attractor from 1D series.
+
+    Given a signal x(t), constructs vectors:
+        v(t) = [x(t), x(t+τ), x(t+2τ), ..., x(t+(d-1)τ)]
+
+    By Takens' theorem, for generic τ and d ≥ 2m+1 (m = attractor
+    dimension), this reconstructs the topology of the original
+    dynamical system.
+    &quot;&quot;&quot;
+    n = len(signal) - (dim - 1) * delay
+    if n &lt;= 0:
+        return np.zeros((1, dim))
+    embedded = np.empty((n, dim))
+    for d in range(dim):
+        embedded[:, d] = signal[d * delay: d * delay + n]
+    return embedded
+</code></pre>
+<p>The code is deliberately minimal. No windowing, no smoothing, no normalization at the embedding stage. The theorem works on the raw signal; preprocessing is a choice, not a requirement.</p>
+<h3 id="613-takens-theorem-the-formal-statement">6.1.3 Takens&rsquo; Theorem: The Formal Statement<a class="headerlink" href="#613-takens-theorem-the-formal-statement" title="Permanent link">&para;</a></h3>
+<p>The result that justifies this construction is due to Floris Takens (1981), with important refinements by Sauer, Yorke, and Casdagli (1991).</p>
+<p><strong>Theorem 6.1</strong> (Takens&rsquo; Embedding Theorem). <em>Let $\mathcal{M}$ be a compact manifold of dimension $m$, and let $\Phi: \mathcal{M} \to \mathcal{M}$ be a smooth diffeomorphism (the dynamics). Let $h: \mathcal{M} \to \mathbb{R}$ be a smooth observation function. For generic[^1] $(\Phi, h)$, the delay map</em></p>
+<p>$$F_{\Phi, h}: \mathcal{M} \to \mathbb{R}^{2m+1}$$</p>
+<p><em>defined by $F_{\Phi, h}(\mathbf{x}) = \bigl(h(\mathbf{x}),\; h(\Phi(\mathbf{x})),\; \ldots,\; h(\Phi^{2m}(\mathbf{x}))\bigr)$ is an embedding &mdash; that is, an injective immersion.</em></p>
+<p>[^1]: &ldquo;Generic&rdquo; here means &ldquo;for all $(\Phi, h)$ except a set of measure zero in the appropriate function space.&rdquo; This is an open and dense condition, which means that almost every choice of dynamics and observation function works. It does not mean <em>every</em> choice works &mdash; pathological cases exist, but they require precise tuning and do not arise in practice.</p>
+<p>The theorem has three critical implications for our purposes:</p>
+<ol>
+<li>
+<p><strong>Topological faithfulness.</strong> Because $F_{\Phi,h}$ is an embedding (not merely a continuous map), it preserves the topology of $\mathcal{M}$. Connected components, loops, and voids in the original state space appear as connected components, loops, and voids in the reconstructed point cloud. This is why persistent homology on the embedded point cloud recovers genuine dynamical structure.</p>
+</li>
+<li>
+<p><strong>The dimension bound $d \geq 2m + 1$.</strong> The embedding dimension must be at least $2m + 1$, where $m$ is the dimension of the attractor. For a periodic orbit ($m = 1$), $d = 3$ suffices. For a strange attractor on a surface ($m = 2$), $d = 5$ suffices. In practice, the attractor dimension is rarely known <em>a priori</em>, but low-dimensional embeddings ($d = 3$ or $d = 5$) work well for acoustic signals because the dominant dynamics are low-dimensional &mdash; the vocal production apparatus has far fewer degrees of freedom than the sampling rate would suggest.</p>
+</li>
+<li>
+<p><strong>Genericity of $\tau$.</strong> The theorem holds for <em>generic</em> delay $\tau$ &mdash; almost every value works. But &ldquo;almost every&rdquo; is a topological statement, not a practical one. Some values of $\tau$ work much better than others in finite, noisy data. If $\tau$ is too small, consecutive coordinates are nearly identical and the point cloud collapses to the diagonal. If $\tau$ is too large, consecutive coordinates are nearly independent and the embedding captures noise rather than dynamics. The choice of $\tau$ matters in practice, even though it does not matter in principle.</p>
+</li>
+</ol>
+<h3 id="614-choosing-math45-and-math46-in-practice">6.1.4 Choosing $\tau$ and $d$ in Practice<a class="headerlink" href="#614-choosing-math45-and-math46-in-practice" title="Permanent link">&para;</a></h3>
+<p>Two parameters must be set: the delay $\tau$ and the embedding dimension $d$. The theoretical guarantee requires only $d \geq 2m + 1$ and generic $\tau$, but finite noisy data demands more care.</p>
+<p><strong>Delay $\tau$.</strong> The standard heuristic for $\tau$ is the <strong>first minimum of the mutual information</strong> between $x(t)$ and $x(t + \tau)$ (Fraser and Swinney, 1986). At this delay, consecutive coordinates are maximally informative about each other in a nonlinear sense &mdash; they are neither redundant (too small $\tau$) nor independent (too large $\tau$). An alternative is the <strong>first zero-crossing of the autocorrelation function</strong>, which is faster to compute but assumes linear dependence.</p>
+<p>For the BirdCLEF pipeline, we use $\tau = 10$ samples, which corresponds to roughly 0.5 ms at a typical audio sample rate of 22,050 Hz. For sperm whale codas, the relevant signal is the inter-click interval sequence (not the raw audio), and the appropriate delay depends on the number of clicks per coda. The eris-ketos pipeline operates on ICI vectors directly, constructing point clouds in $\mathbb{R}^9$ from zero-padded ICI sequences &mdash; effectively using the raw ICI vector as the embedding, which is equivalent to a Takens embedding with $\tau = 1$ on the ICI time series.[^2]</p>
+<p>[^2]: This is a common pattern when the signal is already a summary sequence (like ICIs) rather than a raw waveform. The &ldquo;time delay&rdquo; is then one step along the sequence, and the &ldquo;embedding dimension&rdquo; is the length of the ICI vector. Takens&rsquo; theorem still applies: the ICI sequence is an observation function on the dynamical system (the whale&rsquo;s vocal production), and the delay map reconstructs the attractor topology.</p>
+<p><strong>Dimension $d$.</strong> The standard method for choosing $d$ is the <strong>false nearest neighbors</strong> algorithm (Kennel, Brown, and Abarbanel, 1992). The idea: in too low a dimension, points that are far apart in the true state space are forced close together by the projection (false neighbors). As $d$ increases, false neighbors are eliminated. The embedding dimension is the smallest $d$ at which the fraction of false neighbors drops to zero (or below a threshold).</p>
+<p>In practice, for acoustic signals, $d = 3$ is often sufficient. The vocal attractors of interest are typically one- or two-dimensional (periodic orbits for sustained tones, limit cycles for trills, low-dimensional chaos for complex calls), and $d = 3$ satisfies the $2m + 1$ bound for $m = 1$. The BirdCLEF and eris-ketos pipelines both default to $d = 3$, with the eris-ketos whale analysis using the full ICI vector dimension ($d = 9$) as an upper bound.</p>
+<p>[Figure 6.2: Effect of delay and dimension on the reconstructed point cloud. A synthetic periodic signal $x(t) = \sin(2\pi t / T)$ embedded with (a) $\tau$ too small: the cloud collapses to the diagonal; (b) $\tau$ optimal: the cloud forms a clean ellipse; (c) $\tau$ too large: the cloud fills a rectangle. Below: (d) $d = 2$: a circle (correct topology); (e) $d = 3$: a torus knot (correct topology, higher resolution); (f) $d = 10$: same topology, unnecessary dimensions.]</p>
+<hr />
+<h2 id="62-persistent-homology-extracting-topology-from-point-clouds">6.2 Persistent Homology: Extracting Topology from Point Clouds<a class="headerlink" href="#62-persistent-homology-extracting-topology-from-point-clouds" title="Permanent link">&para;</a></h2>
+<h3 id="621-the-challenge-of-noisy-point-clouds">6.2.1 The Challenge of Noisy Point Clouds<a class="headerlink" href="#621-the-challenge-of-noisy-point-clouds" title="Permanent link">&para;</a></h3>
+<p>The time-delay embedding produces a point cloud &mdash; a finite set of points in $\mathbb{R}^d$. The cloud is not a manifold; it is a discrete approximation to a manifold, corrupted by noise and finite sampling. We need a method that extracts topological features from finite, noisy point data.</p>
+<p>This is the domain of <strong>persistent homology</strong>, the central construction of topological data analysis. The key insight is to analyze the point cloud not at a single scale, but across <em>all</em> scales simultaneously, and to identify topological features that <em>persist</em> across a range of scales as the genuine structure of the underlying space. Short-lived features are noise; long-lived features are signal.</p>
+<h3 id="622-the-vietorisrips-complex">6.2.2 The Vietoris&ndash;Rips Complex<a class="headerlink" href="#622-the-vietorisrips-complex" title="Permanent link">&para;</a></h3>
+<p>The first step is to build a combinatorial object &mdash; a simplicial complex &mdash; from the point cloud. The standard construction for TDA is the <strong>Vietoris&ndash;Rips complex</strong>.</p>
+<p><strong>Definition 6.2</strong> (Vietoris&ndash;Rips Complex). <em>Let $X = \{x_1, \ldots, x_n\} \subset \mathbb{R}^d$ be a finite point cloud and let $\varepsilon \geq 0$ be a scale parameter. The Vietoris&ndash;Rips complex $\mathrm{VR}(X, \varepsilon)$ is the abstract simplicial complex whose $k$-simplices are subsets $\{x_{i_0}, x_{i_1}, \ldots, x_{i_k}\} \subseteq X$ such that</em></p>
+<p>$$d(x_{i_j}, x_{i_l}) \leq \varepsilon \quad \text{for all } 0 \leq j, l \leq k.$$</p>
+<p>In words: a set of points forms a simplex if and only if <em>every pair</em> of points in the set is within distance $\varepsilon$ of each other. At $\varepsilon = 0$, the complex consists of isolated vertices (each point is its own 0-simplex). As $\varepsilon$ increases, edges appear between nearby points (1-simplices), then triangles fill in between triples of mutually close points (2-simplices), and so on.</p>
+<p>The Rips complex is a computationally tractable proxy for the Cech complex (which uses balls of radius $\varepsilon/2$ and takes $k$-simplices when $k+1$ balls have a common intersection). The Rips complex requires only pairwise distance comparisons, while the Cech complex requires $k$-fold intersection tests. For TDA applications, the Rips complex is standard.[^3]</p>
+<p>[^3]: The Rips and Cech complexes are not identical, but they are interleaved: $\mathrm{Cech}(X, \varepsilon) \subseteq \mathrm{VR}(X, \varepsilon) \subseteq \mathrm{Cech}(X, \sqrt{2}\,\varepsilon)$ in Euclidean space. This means the persistence diagrams from the two complexes are at most a factor of $\sqrt{2}$ apart in the bottleneck distance, which is negligible for our purposes.</p>
+<h3 id="623-filtration-and-persistence">6.2.3 Filtration and Persistence<a class="headerlink" href="#623-filtration-and-persistence" title="Permanent link">&para;</a></h3>
+<p>The key idea of persistent homology is to study the Rips complex not at a single $\varepsilon$, but across the entire filtration &mdash; the nested family of complexes obtained by increasing $\varepsilon$ from 0 to $\infty$:</p>
+<p>$$\mathrm{VR}(X, 0) \subseteq \mathrm{VR}(X, \varepsilon_1) \subseteq \mathrm{VR}(X, \varepsilon_2) \subseteq \cdots$$</p>
+<p>As $\varepsilon$ increases, topological features appear (<strong>birth</strong>) and disappear (<strong>death</strong>). A connected component is born when a vertex is added and dies when an edge merges it with another component. A loop (1-cycle) is born when a cycle of edges forms and dies when a 2-simplex fills it in. Each feature has a birth time $b$ and a death time $d$, and its <strong>lifetime</strong> (or <strong>persistence</strong>) is $\ell = d - b$.</p>
+<p><strong>Definition 6.3</strong> (Persistence Diagram). <em>The persistence diagram $\mathrm{Dgm}_k(X)$ for homology dimension $k$ is the multiset of birth-death pairs $\{(b_i, d_i)\}$ for all $H_k$ features in the filtration, together with the diagonal $\{(x, x) : x \in \mathbb{R}\}$ counted with infinite multiplicity.</em></p>
+<p>Each persistence diagram is a scatter plot in the upper half of the plane (since $d > b$ for every genuine feature). Points far from the diagonal have high persistence &mdash; they represent robust topological features that persist over a wide range of scales. Points near the diagonal are short-lived and typically represent noise.</p>
+<p>[Figure 6.3: The Vietoris&ndash;Rips filtration. Top row: a point cloud at four increasing values of $\varepsilon$, with the Rips complex drawn. Bottom row: the corresponding persistence diagram, accumulating birth-death pairs as $\varepsilon$ increases. A long-lived $H_1$ loop (the central ring) appears far from the diagonal; short-lived components near the diagonal are noise.]</p>
+<h3 id="624-homology-dimensions-and-their-interpretation">6.2.4 Homology Dimensions and Their Interpretation<a class="headerlink" href="#624-homology-dimensions-and-their-interpretation" title="Permanent link">&para;</a></h3>
+<p>For communication signals, two homology dimensions carry the primary information:</p>
+<p><strong>$H_0$: Connected components.</strong> The zeroth homology group counts the connected components of the simplicial complex. In the filtration, every point is born as its own component at $\varepsilon = 0$, and components merge as $\varepsilon$ increases. The persistence diagram for $H_0$ records the death times of the components that merge &mdash; the longer a component survives before merging, the more isolated it was from the rest of the cloud.</p>
+<p>For acoustic signals, $H_0$ persistence reflects the <strong>cluster structure</strong> of the reconstructed attractor. A signal with distinct harmonic components (e.g., a chord with well-separated frequencies) produces a point cloud with well-separated clusters, yielding high $H_0$ persistence. A signal with a single dominant frequency produces a single tight cluster with low $H_0$ persistence.</p>
+<p><strong>$H_1$: Loops.</strong> The first homology group counts the independent loops (1-cycles) in the complex. In the filtration, a loop is born when a cycle of edges forms and dies when a 2-simplex fills it in. Persistent $H_1$ features indicate robust cyclic structure in the point cloud.</p>
+<p>For acoustic signals, $H_1$ persistence reflects <strong>periodic structure</strong> in the reconstructed attractor. A purely periodic signal (a sine wave) produces a point cloud that is a closed loop in the embedding space &mdash; a single persistent $H_1$ feature. A signal with multiple periodicities produces multiple loops. An aperiodic signal produces no persistent loops. This is the topological encoding of periodicity: loops in the point cloud correspond to recurrent patterns in the signal.</p>
+<p>Higher homology dimensions ($H_2$: voids, $H_3$: cavities, etc.) capture progressively more complex topological structure. For the acoustic signals considered here, $H_0$ and $H_1$ suffice &mdash; the vocal attractors are low-dimensional, and higher homology is typically empty or dominated by noise. The eris-ketos and BirdCLEF pipelines both compute homology up to dimension 1.</p>
+<h3 id="625-the-stability-theorem">6.2.5 The Stability Theorem<a class="headerlink" href="#625-the-stability-theorem" title="Permanent link">&para;</a></h3>
+<p>The most important theoretical property of persistent homology for applications is <strong>stability</strong>: small perturbations of the input produce small perturbations of the output.</p>
+<p><strong>Theorem 6.4</strong> (Stability of Persistence Diagrams; Cohen-Steiner, Edelsbrunner, and Harer, 2007). <em>Let $f, g: X \to \mathbb{R}$ be two functions on a topological space $X$, and let $\mathrm{Dgm}(f)$ and $\mathrm{Dgm}(g)$ be their persistence diagrams. Then</em></p>
+<p>$$d_B\bigl(\mathrm{Dgm}(f),\, \mathrm{Dgm}(g)\bigr) \leq \|f - g\|_\infty$$</p>
+<p><em>where $d_B$ is the bottleneck distance between persistence diagrams.</em></p>
+<p>The bottleneck distance measures the worst-case displacement of any single point in the diagram. The theorem says: if two functions differ by at most $\delta$ in the supremum norm, their persistence diagrams differ by at most $\delta$ in the bottleneck distance. Birth-death pairs can shift by at most $\delta$; features with persistence less than $\delta$ can appear or disappear; but features with persistence much greater than $\delta$ are guaranteed to survive.</p>
+<p>For our purposes, this means: additive noise of magnitude $\delta$ can shift birth-death pairs by at most $\delta$ but cannot destroy topological features with persistence much greater than $\delta$. The long-lived features in the persistence diagram &mdash; the ones far from the diagonal &mdash; are the stable ones. The short-lived features near the diagonal are the ones that noise can create or destroy. This is why persistence provides a natural signal/noise separation: the diagonal is the noise floor, and distance from the diagonal is the signal-to-noise ratio.[^4]</p>
+<p>[^4]: The stability theorem has been strengthened in several directions. Chazal, de Silva, Glisse, and Oudot (2016) proved stability for the Wasserstein distance (which averages over all points in the diagram, rather than taking the worst case). Lesnick (2015) extended stability to multi-parameter persistence. For our single-parameter Rips filtrations, the original bottleneck stability is sufficient.</p>
+<hr />
+<h2 id="63-feature-extraction-from-persistence-diagrams">6.3 Feature Extraction from Persistence Diagrams<a class="headerlink" href="#63-feature-extraction-from-persistence-diagrams" title="Permanent link">&para;</a></h2>
+<h3 id="631-the-vectorization-problem">6.3.1 The Vectorization Problem<a class="headerlink" href="#631-the-vectorization-problem" title="Permanent link">&para;</a></h3>
+<p>Persistence diagrams are multisets of points in the plane. Machine learning algorithms require fixed-length vectors. The <strong>vectorization problem</strong> is: how do we extract a fixed-length feature vector from a persistence diagram that preserves the information we care about?</p>
+<p>There are several approaches in the literature &mdash; persistence landscapes (Bubenik, 2015), persistence images (Adams et al., 2017), kernel methods (Reininghaus et al., 2015) &mdash; each with different theoretical guarantees. For the BirdCLEF and eris-ketos pipelines, we use a simpler approach: <strong>summary statistics</strong> of the birth-death pairs. This sacrifices some information (the spatial arrangement of points in the diagram is lost) but produces a compact, interpretable feature vector that is fast to compute and works well in practice.</p>
+<h3 id="632-the-eight-summary-statistics">6.3.2 The Eight Summary Statistics<a class="headerlink" href="#632-the-eight-summary-statistics" title="Permanent link">&para;</a></h3>
+<p>For each homology dimension $k$, the pipeline extracts eight summary statistics from the persistence diagram $\mathrm{Dgm}_k(X)$. Let $\{(b_i, d_i)\}_{i=1}^n$ be the finite birth-death pairs (excluding infinite-persistence features), and let $\ell_i = d_i - b_i$ be the lifetime of the $i$-th feature.</p>
+<p>The eight statistics are:</p>
+<ol>
+<li>
+<p><strong>Count</strong> ($n$): The number of finite-lifetime features in dimension $k$. This measures the topological complexity at the given scale &mdash; how many independent components ($k=0$) or loops ($k=1$) were detected.</p>
+</li>
+<li>
+<p><strong>Mean lifetime</strong> ($\bar{\ell} = \frac{1}{n}\sum_{i} \ell_i$): The average persistence of features. High mean lifetime indicates that topological features are robust; low mean lifetime indicates that they are ephemeral and likely noise.</p>
+</li>
+<li>
+<p><strong>Standard deviation of lifetime</strong> ($\sigma_\ell$): The dispersion of persistence values. High standard deviation indicates a mixture of persistent and ephemeral features &mdash; some genuine structure and some noise. Low standard deviation indicates homogeneous features (either all robust or all noisy).</p>
+</li>
+<li>
+<p><strong>Maximum lifetime</strong> ($\max_i \ell_i$): The persistence of the single most prominent feature. This is the most stable statistic under noise (by the stability theorem, the longest-lived feature is the last to be destroyed by perturbation).</p>
+</li>
+<li>
+<p><strong>75th percentile of lifetime</strong> ($\ell_{75}$): A robust alternative to the maximum, less sensitive to outliers. Captures the persistence of the &ldquo;typical prominent feature.&rdquo;</p>
+</li>
+<li>
+<p><strong>Mean birth time</strong> ($\bar{b} = \frac{1}{n}\sum_i b_i$): The average scale at which features appear. For $H_0$, all features are born at $\varepsilon = 0$ (every point is its own component at zero scale), so the mean birth is identically zero &mdash; but for $H_1$, the mean birth time indicates the scale at which cyclic structure begins to appear. Early birth means cycles at small scales (fine-grained periodicity); late birth means cycles at large scales (coarse periodicity).</p>
+</li>
+<li>
+<p><strong>Total persistence</strong> ($L^2 = \sum_i \ell_i^2$): The sum of squared lifetimes. This is the $L^2$ norm of the persistence, which weights long-lived features more heavily than short-lived ones. It provides a single scalar measure of the total topological complexity, with the quadratic weighting serving as a natural importance filter.</p>
+</li>
+<li>
+<p><strong>Normalized persistence</strong> ($\hat{L} = \sqrt{L^2} / (n + \epsilon)$): The root-mean-square lifetime, or equivalently the $L^2$ norm divided by the count. This compensates for the number of features: a diagram with one very persistent loop has higher normalized persistence than a diagram with many short-lived loops, even if their total persistence is similar.</p>
+</li>
+</ol>
+<p>The implementation from <code>geometric_features.py</code>:</p>
+<pre><code class="language-python">def _diagram_features(dgm: np.ndarray) -&gt; np.ndarray:
+    &quot;&quot;&quot;Extract 8 summary statistics from a persistence diagram.&quot;&quot;&quot;
+    if len(dgm) == 0:
+        return np.zeros(8, dtype=np.float32)
+
+    finite_mask = np.isfinite(dgm[:, 1])
+    finite = dgm[finite_mask]
+
+    if len(finite) == 0:
+        return np.zeros(8, dtype=np.float32)
+
+    lifetimes = finite[:, 1] - finite[:, 0]
+    n = len(lifetimes)
+    total = float(np.sum(lifetimes ** 2))
+
+    return np.array([
+        n,
+        lifetimes.mean(),
+        lifetimes.std() if n &gt; 1 else 0.0,
+        lifetimes.max(),
+        np.percentile(lifetimes, 75),
+        finite[:, 0].mean(),
+        total,
+        np.sqrt(total) / (n + 1e-10),
+    ], dtype=np.float32)
+</code></pre>
+<p>Computing these eight statistics for each of $H_0$ and $H_1$ produces a <strong>16-dimensional TDA feature vector</strong> &mdash; the topological component of the full 156-dimensional geometric feature vector (136 SPD + 4 trajectory + 16 TDA) used in the BirdCLEF pipeline.</p>
+<h3 id="633-why-these-eight">6.3.3 Why These Eight?<a class="headerlink" href="#633-why-these-eight" title="Permanent link">&para;</a></h3>
+<p>The choice is motivated by the stability theorem and the practical requirements of acoustic classification. The <strong>count</strong> captures complexity. The <strong>lifetime statistics</strong> (mean, std, max, p75) capture the persistence distribution &mdash; by the stability theorem, only features with lifetime greater than the noise magnitude are reliable, and the maximum lifetime is the most noise-robust single number. The <strong>mean birth time</strong> captures scale: for $H_1$ features, it indicates the characteristic scale of periodic structure. The <strong>total and normalized persistence</strong> provide aggregate measures that weight long-lived features more heavily; the normalization by count distinguishes &ldquo;one strong feature&rdquo; (clean periodic signal) from &ldquo;many weak features&rdquo; (broadband noise).</p>
+<p>These eight statistics are not the only possible summary &mdash; persistence landscapes and persistence images retain more spatial information about the diagram. But for the 206-species birdsong and 21-type whale coda classification problems, the summary statistics capture sufficient structure. The tradeoff &mdash; information loss in exchange for interpretability, speed, and a compact 16-dimensional representation &mdash; is favorable.</p>
+<p>[Figure 6.4: The eight summary statistics, illustrated on two persistence diagrams. Left: a diagram with few, persistent $H_1$ features (a clean periodic signal). Right: a diagram with many, short-lived $H_1$ features (a noisy aperiodic signal). The statistics distinguish the two: the left diagram has low count, high max lifetime, high normalized persistence; the right has high count, low max lifetime, low normalized persistence.]</p>
+<hr />
+<h2 id="64-empirical-case-whale-click-patterns">6.4 Empirical Case: Whale Click Patterns<a class="headerlink" href="#64-empirical-case-whale-click-patterns" title="Permanent link">&para;</a></h2>
+<h3 id="641-codas-and-inter-click-intervals">6.4.1 Codas and Inter-Click Intervals<a class="headerlink" href="#641-codas-and-inter-click-intervals" title="Permanent link">&para;</a></h3>
+<p>Sperm whale codas are stereotyped sequences of 3&ndash;12 broadband clicks, with inter-click intervals (ICIs) ranging from roughly 0.1 to 0.8 seconds. The ICI pattern defines the coda type: regular codas have approximately equal intervals, accelerating codas have decreasing intervals, compound codas have distinct groups of clicks with different internal timing (Sharma et al., 2024). The Dominica Sperm Whale Project (DSWP) dataset contains 8,719 annotated codas spanning 28 coda types.</p>
+<p>For each coda, the relevant signal is the ICI vector &mdash; a sequence of $k-1$ intervals for a $k$-click coda. This is already a one-dimensional time series (interval as a function of position within the coda), and it can be analyzed directly as a point cloud or embedded via the Takens delay map.</p>
+<h3 id="642-point-cloud-construction">6.4.2 Point Cloud Construction<a class="headerlink" href="#642-point-cloud-construction" title="Permanent link">&para;</a></h3>
+<p>The eris-ketos pipeline constructs ICI point clouds in $\mathbb{R}^9$. For each coda type with at least 40 samples, the ICI vectors of all codas of that type are collected. Shorter vectors are zero-padded to a common dimensionality of 9 (accommodating codas with up to 10 clicks). Each ICI vector becomes a point in $\mathbb{R}^9$; the collection of all codas of a given type forms the point cloud for that type.[^5]</p>
+<p>[^5]: Strictly, this is not a Takens embedding of a single time series but rather a collection of ICI vectors &mdash; each coda contributes one point, and the point cloud represents the <em>distribution</em> of timing patterns within a coda type. The topological analysis then characterizes the shape of this distribution. This is complementary to the Takens approach (which would embed a single long ICI sequence and characterize the dynamics of production) and is the natural construction when each coda is a short, discrete event.</p>
+<p>Point clouds exceeding 300 points are randomly subsampled (seed = 42) for computational tractability. This subsampling is justified by the stability of persistent homology: removing a finite number of points can only remove topological features or shorten their lifetimes by an amount bounded by the minimum distance to the removed points. For uniformly sampled clouds, the effect is negligible.</p>
+<h3 id="643-topological-signatures-by-rhythm-class">6.4.3 Topological Signatures by Rhythm Class<a class="headerlink" href="#643-topological-signatures-by-rhythm-class" title="Permanent link">&para;</a></h3>
+<p>Vietoris&ndash;Rips persistent homology computed to dimension 1 using Ripser (Bauer, 2021; Tralie et al., 2018) reveals systematic topological differences across rhythm classes:</p>
+<p><strong>Regular codas (xR).</strong> Codas with approximately equal inter-click intervals &mdash; the most common type in many social units &mdash; produce tight, roughly spherical point clouds in ICI space. The ICI vectors cluster tightly because the timing is consistent both within and across productions. The persistence diagrams show:</p>
+<ul>
+<li><strong>Low $H_0$ persistence</strong>: components merge quickly, indicating a single tight cluster with no well-separated sub-groups.</li>
+<li><strong>Low $H_1$ persistence</strong>: no persistent loops, indicating no cyclic structure in the timing distribution.</li>
+</ul>
+<p>This is the topological signature of temporal regularity: a point mass in ICI space, or more precisely, a noisy ball centered on the prototypical ICI vector. The topology is trivial &mdash; one connected component, no loops, no voids &mdash; and this triviality is itself informative.</p>
+<p><strong>Irregular codas (xi).</strong> Codas with variable inter-click intervals produce more dispersed point clouds. The timing variability means that ICI vectors spread across a larger region of $\mathbb{R}^9$, and the resulting cloud has non-trivial topology:</p>
+<ul>
+<li><strong>Moderate $H_0$ persistence</strong>: some sub-clusters persist before merging, indicating that the timing variability has structure (not just uniform noise).</li>
+<li><strong>Higher $H_1$ persistence</strong>: persistent loops appear, indicating cyclic patterns in the timing distribution. This is consistent with a production mechanism that cycles through a repertoire of timing variants.</li>
+</ul>
+<p><strong>Compound codas (x+y).</strong> Codas with distinct groups of clicks (e.g., three fast clicks followed by two slow clicks) produce point clouds with <strong>elevated $H_0$ persistence</strong> &mdash; the two click groups correspond to two sub-clusters in ICI space that merge only at large scale. This is the most intuitively clear topological signature: the internal structure of the coda (two distinct groups) manifests directly as two components in the point cloud.</p>
+<p>[Figure 6.5: Persistence diagrams for three coda types, reproduced from the eris-ketos analysis (Bond, 2026). Left: regular coda (5R) &mdash; tight cluster, low persistence. Center: irregular coda (5i) &mdash; dispersed cloud, elevated $H_1$. Right: compound coda (3+1+1) &mdash; multi-component structure, elevated $H_0$. $H_0$ features in blue, $H_1$ features in orange. Points far from the diagonal indicate persistent topological features.]</p>
+<p>[Figure 6.6: Topological feature summary across coda types. Left: $H_1$ loop count versus maximum $H_1$ lifetime for each coda type, colored by rhythm class. Right: total $H_1$ persistence ranked by coda type. Irregular and compound types show systematically higher topological complexity.]</p>
+<h3 id="644-topological-content-vs-metric-identity">6.4.4 Topological Content vs. Metric Identity<a class="headerlink" href="#644-topological-content-vs-metric-identity" title="Permanent link">&para;</a></h3>
+<p>A striking feature of the cetacean analysis (detailed in Chapter 7) is the clean separation between <strong>topological content</strong> and <strong>metric identity</strong>. The topology of the ICI point cloud encodes <em>coda type</em>: different rhythm classes have different topological signatures, invariant to the precise inter-click intervals. But individual whales produce the same coda type with statistically distinguishable ICI patterns (Kolmogorov&ndash;Smirnov $p < 0.001$ for all tested pairs). Identity is encoded in the <em>metric</em> &mdash; the precise distances between points &mdash; not the topology.</p>
+<p>This is a geometric decomposition of communicative content: topology carries the message (what coda type), and the metric carries the identity (who is producing it). The decomposition is natural &mdash; topology is invariant under continuous deformation; metric is the structure that deformation can change &mdash; and it may reflect a genuine functional property of the communication system.</p>
+<hr />
+<h2 id="65-empirical-case-birdsong-spectral-topology">6.5 Empirical Case: Birdsong Spectral Topology<a class="headerlink" href="#65-empirical-case-birdsong-spectral-topology" title="Permanent link">&para;</a></h2>
+<h3 id="651-from-waveform-to-topological-features">6.5.1 From Waveform to Topological Features<a class="headerlink" href="#651-from-waveform-to-topological-features" title="Permanent link">&para;</a></h3>
+<p>The BirdCLEF geometric feature pipeline applies the same TDA machinery to birdsong, but starting from a different signal: the raw audio waveform rather than a sequence of inter-click intervals.</p>
+<p>The full pipeline, from the <code>tda_features</code> function in <code>geometric_features.py</code>:</p>
+<pre><code class="language-python">def tda_features(signal: np.ndarray, delay: int = 10, dim: int = 3,
+                  max_points: int = 1000, max_homology_dim: int = 1,
+                  thresh: float = 2.0, seed: int = 42) -&gt; np.ndarray:
+    &quot;&quot;&quot;Extract topological features from an audio signal.
+
+    Full pipeline: signal → Takens embedding → subsample →
+    persistent homology → feature vector.
+    &quot;&quot;&quot;
+    # Normalize signal
+    signal = signal.astype(np.float64)
+    signal = (signal - signal.mean()) / (signal.std() + 1e-10)
+
+    # Time-delay embedding
+    cloud = time_delay_embedding(signal, delay=delay, dim=dim)
+
+    # Subsample for tractability
+    cloud = subsample_cloud(cloud, max_points=max_points, seed=seed)
+
+    # Normalize point cloud
+    cloud = (cloud - cloud.mean(axis=0)) / (cloud.std(axis=0) + 1e-10)
+
+    # Persistent homology
+    diagrams = _persistence_diagrams_ripser(cloud, max_dim=max_homology_dim,
+                                             thresh=thresh)
+
+    # Extract features per homology dimension
+    features = []
+    for d in range(max_homology_dim + 1):
+        if d &lt; len(diagrams):
+            features.append(_diagram_features(diagrams[d]))
+        else:
+            features.append(np.zeros(8, dtype=np.float32))
+
+    return np.concatenate(features)
+</code></pre>
+<p>The pipeline operates in five stages:</p>
+<ol>
+<li>
+<p><strong>Normalization.</strong> The signal is zero-centered and scaled to unit variance. This removes absolute amplitude information, which is desirable: we want features that are invariant to recording gain and distance. The normalization also ensures that the Rips complex threshold ($\varepsilon = 2.0$) is calibrated to the signal&rsquo;s intrinsic scale.</p>
+</li>
+<li>
+<p><strong>Time-delay embedding.</strong> The normalized 1D signal is embedded in $\mathbb{R}^3$ with delay $\tau = 10$ samples. For birdsong recorded at 22,050 Hz, this corresponds to a delay of approximately 0.45 ms &mdash; well within the timescale of individual harmonic cycles for birdsong in the 2&ndash;8 kHz range (where one cycle takes 0.125&ndash;0.5 ms).</p>
+</li>
+<li>
+<p><strong>Subsampling.</strong> The point cloud is subsampled to at most 1,000 points (or 500 in the combined feature pipeline). Ripser&rsquo;s computational complexity is approximately $O(n^3)$ in the number of points, and subsampling to 1,000 points keeps the TDA computation under a fraction of a second per recording &mdash; critical for the BirdCLEF submission constraint of 90 minutes for the full test set on CPU.</p>
+</li>
+<li>
+<p><strong>Cloud normalization.</strong> The point cloud is re-centered and rescaled per coordinate. This is a second normalization, applied in the embedding space rather than the signal space, and it ensures that the Rips filtration explores the relevant scale range regardless of the signal&rsquo;s absolute characteristics.</p>
+</li>
+<li>
+<p><strong>Persistent homology.</strong> The Vietoris&ndash;Rips complex is computed to dimension 1 with a filtration threshold of $\varepsilon_{\max} = 2.0$. Features beyond this threshold are unlikely to represent genuine structure (they would correspond to topological features at scales larger than two standard deviations in the normalized cloud).</p>
+</li>
+</ol>
+<h3 id="652-species-specific-topology">6.5.2 Species-Specific Topology<a class="headerlink" href="#652-species-specific-topology" title="Permanent link">&para;</a></h3>
+<p>Different bird species produce vocalizations with different dynamical structure, and this structure manifests as different point cloud topology. Four broad categories illustrate the pattern:</p>
+<ul>
+<li><strong>Sustained tonal songs</strong> (thrushes, warblers): the time-delay embedding of a frequency-modulated tone produces a loop or torus knot. TDA features: high $H_1$ maximum lifetime, low $H_0$ persistence.</li>
+<li><strong>Trills</strong> (wrens, chipping sparrows): rapid repetitions create thickened loops from multiple attractor traversals. TDA features: high $H_1$ count, moderate maximum lifetime.</li>
+<li><strong>Complex broadband songs</strong> (mockingbirds, starlings): variable, aperiodic vocalizations fill the embedding space without loop structure. TDA features: low $H_1$ persistence, high $H_0$ persistence from syllable-type sub-clusters.</li>
+<li><strong>Click-based calls</strong> (woodpeckers, corvids): discrete impulses create separated clusters, qualitatively similar to the whale coda analysis. TDA features: high $H_0$ persistence, low $H_1$ persistence.</li>
+</ul>
+<p>[Figure 6.7: Point clouds and persistence diagrams for four vocalization types. (a) Sustained tone (Swainson&rsquo;s thrush): clean elliptical loop, single persistent $H_1$ feature. (b) Trill (Pacific wren): thickened loop, multiple $H_1$ features. (c) Complex song (Northern mockingbird): filled region, low $H_1$ persistence. (d) Click train (Downy woodpecker): separated clusters, high $H_0$ persistence.]</p>
+<h3 id="653-complementarity-with-spd-features">6.5.3 Complementarity with SPD Features<a class="headerlink" href="#653-complementarity-with-spd-features" title="Permanent link">&para;</a></h3>
+<p>The 16 TDA features capture structure that the 136 SPD features cannot, and vice versa. SPD features encode <strong>spectral covariance</strong> &mdash; which frequencies co-occur. TDA features encode <strong>temporal topology</strong> &mdash; the qualitative dynamics of the signal (periodic, quasiperiodic, chaotic, impulsive). Two species can have nearly identical spectral envelopes but different temporal structure (one sustains a tone, the other trills); TDA distinguishes them. Conversely, two species can have different spectral content but similar dynamics; SPD distinguishes them. The spectral trajectory features (4 dims) bridge the two, tracking how covariance evolves on the SPD manifold. The three components provide complementary geometric views, and the combined pipeline extracts richer structure than any single view.</p>
+<p>[Figure 6.8: Feature importance for species classification (LightGBM on 156-dimensional geometric features). The top 20 features include contributions from all three components. No single component dominates.]</p>
+<hr />
+<h2 id="66-robustness-why-topology-succeeds-where-amplitude-fails">6.6 Robustness: Why Topology Succeeds Where Amplitude Fails<a class="headerlink" href="#66-robustness-why-topology-succeeds-where-amplitude-fails" title="Permanent link">&para;</a></h2>
+<h3 id="661-the-field-recording-problem">6.6.1 The Field Recording Problem<a class="headerlink" href="#661-the-field-recording-problem" title="Permanent link">&para;</a></h3>
+<p>Bioacoustic field recordings are hostile to standard feature extraction. Amplitude varies with distance. Background noise varies unpredictably. Reverberation distorts temporal structure. Equipment introduces frequency-dependent gain. Two recordings of the same vocalization, made 10 meters apart with different equipment, can differ dramatically in amplitude, noise floor, and spectral coloration. Standard spectral features &mdash; MFCCs, spectrograms, fundamental frequency &mdash; are sensitive to all of these distortions, and these sensitivities are the dominant sources of error in deployed bioacoustic classifiers.</p>
+<h3 id="662-topological-invariance-properties">6.6.2 Topological Invariance Properties<a class="headerlink" href="#662-topological-invariance-properties" title="Permanent link">&para;</a></h3>
+<p>Topological features have three specific invariance properties that make them robust to field recording conditions:</p>
+<p><strong>Invariance to amplitude scaling.</strong> Let $x(t)$ be a signal and $y(t) = \alpha \cdot x(t)$ be a scaled version (different gain, different distance). The time-delay embeddings of $x$ and $y$ are related by $\mathbf{v}_y(t) = \alpha \cdot \mathbf{v}_x(t)$ &mdash; the point clouds are identical up to a global scale factor. After the cloud normalization step (centering and scaling to unit variance), the two clouds are <em>identical</em>. Their persistence diagrams are therefore identical. The topological features are exactly invariant to amplitude scaling.</p>
+<p>This is not true of spectral features: a spectrogram of $\alpha \cdot x(t)$ has amplitudes scaled by $\alpha$ (or $\alpha^2$ for power spectrograms), and even after log-scaling, the absolute level differs. Normalization helps, but the normalization must be done carefully to avoid introducing artifacts. For topological features, the invariance is built in.</p>
+<p><strong>Robustness to additive noise.</strong> Let $x(t)$ be a signal and $y(t) = x(t) + \eta(t)$ be a noisy version, where $\|\eta\|_\infty \leq \delta$. By the stability theorem (Theorem 6.4), the persistence diagrams of the embedded point clouds satisfy</p>
+<p>$$d_B\bigl(\mathrm{Dgm}(x),\, \mathrm{Dgm}(y)\bigr) \leq C \cdot \delta$$</p>
+<p>for a constant $C$ that depends on the embedding parameters but not on the signal. Topological features with persistence much greater than $C \cdot \delta$ are unaffected by the noise; only features with persistence comparable to $C \cdot \delta$ can be created or destroyed.</p>
+<p>In practice, this means that persistent topological features &mdash; the ones that dominate the summary statistics &mdash; survive moderate noise. Short-lived features (near the diagonal of the persistence diagram) may be corrupted, but these are precisely the features that the summary statistics downweight (the maximum lifetime, 75th percentile, and normalized persistence all emphasize long-lived features).</p>
+<p><strong>Invariance to monotone distance transformations.</strong> Persistent homology depends only on the <em>ordering</em> of pairwise distances, not on the distances themselves. If we replace the Euclidean distance $d(x, y) = \|x - y\|_2$ with any monotone transformation $\tilde{d}(x, y) = f(d(x, y))$ where $f$ is strictly increasing, the Rips filtration produces the same nested sequence of simplicial complexes (though at different scale parameters). The persistence diagram is reparameterized but has the same topology &mdash; the same birth-death pairs, in the same order.</p>
+<p>This means that any distortion of the signal that preserves the <em>ordering</em> of temporal correlations &mdash; a broad class that includes many forms of nonlinear gain, soft clipping, and moderate reverberation &mdash; leaves the topological features invariant. Spectral features have no such invariance: any nonlinear transformation of the signal changes the spectral content in ways that are difficult to correct.</p>
+<h3 id="663-empirical-evidence-from-cetacean-decoders">6.6.3 Empirical Evidence from Cetacean Decoders<a class="headerlink" href="#663-empirical-evidence-from-cetacean-decoders" title="Permanent link">&para;</a></h3>
+<p>The eris-ketos adversarial robustness framework provides direct evidence. Nine parametric acoustic transforms were applied at 11 intensity levels to synthesized coda waveforms. The topological features showed: <strong>complete invariance to amplitude scaling</strong> (identical TDA vectors across all levels, as predicted); <strong>strong robustness to additive noise</strong> (stable to ~5 dB SNR, with high-persistence statistics surviving longer than spectral baselines); <strong>moderate sensitivity to click dropout</strong> (expected &mdash; dropout changes the signal itself, though TDA degraded more gracefully than Euclidean ICI features); and <strong>near-complete invariance to spectral masking</strong> (the Takens embedding operates in the time domain, making it insensitive to frequency-dependent recording artifacts).</p>
+<h3 id="664-the-invariance-hierarchy">6.6.4 The Invariance Hierarchy<a class="headerlink" href="#664-the-invariance-hierarchy" title="Permanent link">&para;</a></h3>
+<p>The robustness properties of topological features can be organized into a hierarchy, from exact invariances to approximate robustness:</p>
+<table>
+<thead>
+<tr>
+<th>Property</th>
+<th>Invariance type</th>
+<th>Theoretical basis</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Amplitude scaling</td>
+<td>Exact</td>
+<td>Cloud normalization</td>
+</tr>
+<tr>
+<td>Monotone gain</td>
+<td>Exact</td>
+<td>Monotone distance invariance</td>
+</tr>
+<tr>
+<td>Additive noise ($\|\eta\|_\infty \leq \delta$)</td>
+<td>$\delta$-approximate</td>
+<td>Stability theorem</td>
+</tr>
+<tr>
+<td>Recording distance</td>
+<td>Exact (via amplitude)</td>
+<td>Inverse-square → scaling</td>
+</tr>
+<tr>
+<td>Spectral coloration</td>
+<td>Approximate</td>
+<td>Time-domain embedding</td>
+</tr>
+<tr>
+<td>Time stretch (moderate)</td>
+<td>Approximate</td>
+<td>Reparameterization of the attractor</td>
+</tr>
+<tr>
+<td>Signal destruction (dropout, clipping)</td>
+<td>Not invariant</td>
+<td>Signal change, not representation change</td>
+</tr>
+</tbody>
+</table>
+<p>[Figure 6.9: Robustness comparison across feature types under increasing noise. Horizontal axis: signal-to-noise ratio (dB). Vertical axis: classification accuracy for coda type. Lines: TDA features (16-dim), SPD features (136-dim), MFCCs (13-dim). TDA features maintain accuracy longest as SNR decreases, followed by SPD, followed by MFCCs. Below approximately 3 dB, all feature types degrade.]</p>
+<p>This hierarchy is precisely what field recordings demand. Amplitude and distance variation are ubiquitous and uncontrollable &mdash; exact invariance to these is essential. Noise is always present but bounded &mdash; approximate robustness proportional to the noise magnitude is the best one can hope for. Signal destruction (a whale that swims behind a rock, a bird that flies away mid-recording) changes the signal itself and cannot be compensated by any feature extraction method.</p>
+<hr />
+<h2 id="67-the-full-tda-pipeline-from-raw-signal-to-feature-vector">6.7 The Full TDA Pipeline: From Raw Signal to Feature Vector<a class="headerlink" href="#67-the-full-tda-pipeline-from-raw-signal-to-feature-vector" title="Permanent link">&para;</a></h2>
+<h3 id="671-assembling-the-pipeline">6.7.1 Assembling the Pipeline<a class="headerlink" href="#671-assembling-the-pipeline" title="Permanent link">&para;</a></h3>
+<p>The complete TDA pipeline chains the components developed in this chapter:</p>
+<p>$$\text{raw signal} \xrightarrow{\text{normalize}} \text{unit-variance signal} \xrightarrow{\tau, d} \text{point cloud in } \mathbb{R}^d \xrightarrow{\text{subsample}} \text{reduced cloud} \xrightarrow{\text{Rips}} \text{persistence diagrams} \xrightarrow{\text{summarize}} \mathbb{R}^{16}$$</p>
+<p>Each arrow is a well-defined operation with known information-theoretic properties. Normalization removes absolute amplitude while preserving all temporal and frequency structure. Takens embedding introduces no information loss (for generic parameters, by theorem). Subsampling has bounded effect (by the stability theorem). Rips homology extracts complete topological invariants of the filtration. Summary statistics compress the diagrams, losing the spatial arrangement of birth-death pairs but preserving the distribution of lifetimes and births.</p>
+<p>The pipeline is <strong>CPU-only</strong> &mdash; no GPU is required at any stage. With subsampling to 500&ndash;1,000 points, Ripser runs in under 0.5 seconds per recording on a single core. For the BirdCLEF competition (~15,000 test recordings), the full TDA extraction completes in under 15 minutes &mdash; well within the 90-minute CPU submission constraint.[^6]</p>
+<p>[^6]: This computational efficiency is a non-trivial practical advantage. The 156-dimensional geometric feature vector (SPD + trajectory + TDA) can be extracted for the entire test set in under 90 minutes on CPU, enabling deployment of geometric methods in settings where neural network inference would be prohibitively slow.</p>
+<h3 id="672-integration-with-the-full-geometric-vector">6.7.2 Integration with the Full Geometric Vector<a class="headerlink" href="#672-integration-with-the-full-geometric-vector" title="Permanent link">&para;</a></h3>
+<p>The 16 TDA features form one component of the 156-dimensional geometric feature vector:</p>
+<p>$$\mathbf{f} = [\underbrace{f_1, \ldots, f_{136}}_{\text{SPD (log-Euclidean covariance)}},\; \underbrace{f_{137}, \ldots, f_{140}}_{\text{trajectory (geodesic deviation)}},\; \underbrace{f_{141}, \ldots, f_{156}}_{\text{TDA (persistent homology)}}]$$</p>
+<p>The three components probe three different mathematical spaces &mdash; the SPD manifold (what frequencies co-occur), curves on the SPD manifold (how spectral shape evolves), and the topology of Euclidean point clouds (the shape of the signal in phase space). Their orthogonality is what makes the combination powerful. In the BirdCLEF experiments, ablation studies showed that removing any one component reduced classification accuracy, and the full 156-dimensional vector outperformed any subset.</p>
+<hr />
+<h2 id="68-theoretical-foundations-and-limitations">6.8 Theoretical Foundations and Limitations<a class="headerlink" href="#68-theoretical-foundations-and-limitations" title="Permanent link">&para;</a></h2>
+<h3 id="681-when-takens-theorem-fails">6.8.1 When Takens&rsquo; Theorem Fails<a class="headerlink" href="#681-when-takens-theorem-fails" title="Permanent link">&para;</a></h3>
+<p>Takens&rsquo; theorem holds for <em>generic</em> observation functions and dynamics. The non-generic cases where it fails are instructive:</p>
+<p><strong>Symmetric observation functions.</strong> If the observation function $h$ respects a symmetry of the dynamics &mdash; for example, $h(\mathbf{x}) = h(R\mathbf{x})$ for some rotation $R$ &mdash; then the delay map cannot distinguish states related by $R$, and the embedding is not injective. In acoustic signals, this corresponds to an observation that does not break the symmetry of the vocal production: for instance, recording the amplitude (which is symmetric under phase inversion) loses the phase information. In practice, the waveform amplitude is sufficient for our purposes because the dynamics are not phase-symmetric (the vocal tract has asymmetric resonances).</p>
+<p><strong>Insufficient embedding dimension.</strong> If $d < 2m + 1$, the embedding is generically <em>not</em> injective &mdash; there exist points in the state space that map to the same point in the embedding space. In practice, this means that $d = 3$ can fail for attractors with dimension $m \geq 2$. For the acoustic signals considered here, $d = 3$ is adequate because the dominant dynamics are low-dimensional, but for more complex signals (e.g., orchestral music with many simultaneous instruments), a higher embedding dimension would be needed.</p>
+<p><strong>Noise beyond the stability bound.</strong> The stability theorem guarantees robustness up to the noise magnitude. When the noise is comparable to or larger than the signal (SNR $\lesssim 0$ dB), the persistence diagram of the noise dominates, and the topological features of the signal are lost. There is no magic: topology is robust, not invulnerable.</p>
+<h3 id="682-what-topology-does-not-capture">6.8.2 What Topology Does Not Capture<a class="headerlink" href="#682-what-topology-does-not-capture" title="Permanent link">&para;</a></h3>
+<p>Persistent homology captures the <em>shape</em> of the point cloud &mdash; its connected components, loops, and voids. It does not capture:</p>
+<ul>
+<li>
+<p><strong>Metric structure</strong>: Two point clouds can have identical persistence diagrams but different metrics. A circle of radius 1 and a circle of radius 10 have the same topology (one $H_1$ loop) but different metrics. For classification, metric information matters &mdash; it tells us <em>which</em> frequency, <em>how fast</em> the trill, <em>what size</em> the loop. The SPD features capture this metric structure; TDA does not.</p>
+</li>
+<li>
+<p><strong>Orientation</strong>: Persistent homology is not sensitive to orientation. A clockwise spiral and a counterclockwise spiral have the same persistence diagram. For acoustic signals, orientation in the embedding space can carry information (e.g., rising vs. falling frequency sweeps), and this information is lost in the topological summary.</p>
+</li>
+<li>
+<p><strong>Fine-grained distributional structure</strong>: The eight summary statistics compress the full persistence diagram into a coarse summary. The spatial arrangement of birth-death pairs &mdash; which features are born at similar scales, which die together &mdash; is lost. Persistence landscapes and persistence images preserve more of this structure, at the cost of higher dimensionality.</p>
+</li>
+</ul>
+<p>These limitations are precisely why TDA is one component of a three-geometry pipeline, not a standalone solution. The SPD features capture metric structure. The trajectory features capture directional dynamics. TDA captures topology. Together, they cover more of the geometric content of the signal than any single method.</p>
+<h3 id="683-connections-to-the-communication-manifold">6.8.3 Connections to the Communication Manifold<a class="headerlink" href="#683-connections-to-the-communication-manifold" title="Permanent link">&para;</a></h3>
+<p>The TDA pipeline operates on the signal manifold $S$ &mdash; the first factor of the communication manifold $M = S \times P \times C$ introduced in Chapter 3. The topological features characterize the <em>shape of the signal space</em>, not the pragmatic or semantic content. This is a feature, not a limitation. The signal manifold is the most directly accessible factor of $M$, and characterizing its topology is the necessary first step before ascending the Rosetta trajectory (Chapter 16) toward hierarchy and meaning. TDA tells us that whale coda types have distinct topological signatures; it does not tell us what they mean. But by providing a robust, noise-invariant representation, it enables downstream methods to operate on stable inputs. The topology is the foundation on which meaning analysis is built.</p>
+<hr />
+<h2 id="69-summary">6.9 Summary<a class="headerlink" href="#69-summary" title="Permanent link">&para;</a></h2>
+<p>This chapter has developed the full TDA pipeline for communication signals: Takens&rsquo; embedding theorem reconstructs attractor topology from a 1D time series ($\S$6.1); persistent homology extracts topological invariants &mdash; connected components ($H_0$) and loops ($H_1$) &mdash; across the Vietoris&ndash;Rips filtration, with stability guaranteed under perturbation ($\S$6.2); eight summary statistics per homology dimension yield a compact 16-dimensional feature vector ($\S$6.3). Applied to whale codas, the pipeline distinguishes rhythm classes by topological signature while cleanly separating coda-type content from individual identity ($\S$6.4). Applied to birdsong, it captures species-specific dynamical structure that complements SPD spectral features ($\S$6.5). The practical payoff is robustness: exact invariance to amplitude scaling, approximate robustness to noise, and insensitivity to spectral coloration &mdash; precisely the properties that field recordings demand ($\S$6.6).</p>
+<p>The TDA pipeline completes the three-geometry toolkit: hyperbolic embeddings for hierarchy (Chapter 5), persistent homology for topology (this chapter), and SPD manifold features for covariance (Part III). In Part III, we apply the full toolkit to non-human communication &mdash; whale codas in Chapter 7, birdsong in Chapter 8 &mdash; building the evidence that communication, across species and across millions of years of evolutionary divergence, has geometric structure that scalar evaluation destroys.</p>
+<hr />
+<p><strong>Notes on computation.</strong> All TDA computations in this chapter use the Ripser library (Bauer, 2021) for Vietoris&ndash;Rips persistent homology. The <code>geometric_features.py</code> pipeline includes a naive fallback (<code>_persistence_diagrams_naive</code>) that computes $H_0$ via single-linkage clustering when Ripser is unavailable, but $H_1$ computation requires Ripser or an equivalent. The full pipeline (Takens embedding + subsampling + Ripser + feature extraction) runs in under 0.5 seconds per recording on a single CPU core for clouds subsampled to 500&ndash;1,000 points. The eris-ketos toolkit provides an independent implementation (<code>tda_clicks</code> module) optimized for ICI-based point clouds rather than raw waveforms.</p>
+<p><strong>Series cross-references.</strong> The mathematical foundations of persistent homology are developed in <em>Geometric Methods</em> (Bond, 2026a), Ch. 5. The stability theorem and its implications for robust feature extraction are treated in GM Ch. 5.3&ndash;5.4. The SPD manifold features that complement the TDA pipeline are developed in GM Ch. 4.6. The communication manifold $M = S \times P \times C$ on which TDA operates (specifically, on the $S$ factor) is defined in Ch. 3 of this volume. The empirical applications to cetacean communication and birdsong are developed in Ch. 7 and Ch. 8, respectively.</p>
+
+    <footer>
+      <p>Part of the <em>Geometric Series</em> by A.H. Bowers</p>
+      <p>Built automatically from source. Last updated: 2026-03-27 00:17 UTC</p>
+    </footer>
+  </div>
+
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js"
+    onload="renderMathInElement(document.body, {
+      delimiters: [
+        {left: '$$', right: '$$', display: true},
+        {left: '$', right: '$', display: false},
+        {left: '\\\\(', right: '\\\\)', display: false},
+        {left: '\\\\[', right: '\\\\]', display: true}
+      ],
+      throwOnError: false
+    });"></script>
+</body>
+</html>

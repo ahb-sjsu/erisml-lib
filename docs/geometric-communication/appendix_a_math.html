@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Appendix A: Mathematical Prerequisites - Geometric Communication</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
+  <style>
+    :root {
+      --bg: #fafaf8;
+      --fg: #222;
+      --accent: #2c5f8a;
+      --border: #ddd;
+      --code-bg: #f4f4f0;
+      --max-width: 48rem;
+    }
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --bg: #1a1a2e;
+        --fg: #e0e0e0;
+        --accent: #7eb8da;
+        --border: #444;
+        --code-bg: #16213e;
+      }
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Georgia', 'Times New Roman', serif;
+      background: var(--bg);
+      color: var(--fg);
+      line-height: 1.7;
+      padding: 2rem 1rem;
+    }
+    .container {
+      max-width: var(--max-width);
+      margin: 0 auto;
+    }
+    nav.breadcrumb {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      font-size: 0.85rem;
+      margin-bottom: 2rem;
+      padding-bottom: 0.5rem;
+      border-bottom: 1px solid var(--border);
+    }
+    nav.breadcrumb a {
+      color: var(--accent);
+      text-decoration: none;
+    }
+    nav.breadcrumb a:hover { text-decoration: underline; }
+    nav.breadcrumb .sep { margin: 0 0.4rem; color: #999; }
+    h1 {
+      font-size: 2rem;
+      margin-bottom: 0.5rem;
+      line-height: 1.2;
+      border-bottom: 2px solid var(--accent);
+      padding-bottom: 0.5rem;
+    }
+    h2 {
+      font-size: 1.5rem;
+      margin-top: 2.5rem;
+      margin-bottom: 0.75rem;
+      color: var(--accent);
+    }
+    h3 {
+      font-size: 1.2rem;
+      margin-top: 2rem;
+      margin-bottom: 0.5rem;
+    }
+    h4 {
+      font-size: 1.05rem;
+      margin-top: 1.5rem;
+      margin-bottom: 0.4rem;
+      font-style: italic;
+    }
+    p { margin-bottom: 1rem; }
+    blockquote {
+      border-left: 3px solid var(--accent);
+      padding: 0.5rem 1.2rem;
+      margin: 1.5rem 0;
+      background: var(--code-bg);
+      font-style: italic;
+    }
+    blockquote p:last-child { margin-bottom: 0; }
+    code {
+      font-family: 'Consolas', 'Fira Code', monospace;
+      background: var(--code-bg);
+      padding: 0.15rem 0.35rem;
+      border-radius: 3px;
+      font-size: 0.9em;
+    }
+    pre {
+      background: var(--code-bg);
+      padding: 1rem;
+      border-radius: 4px;
+      overflow-x: auto;
+      margin: 1.5rem 0;
+      border: 1px solid var(--border);
+    }
+    pre code {
+      background: none;
+      padding: 0;
+    }
+    a { color: var(--accent); }
+    ul, ol {
+      margin: 0.75rem 0 1rem 1.5rem;
+    }
+    li { margin-bottom: 0.3rem; }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 1.5rem 0;
+    }
+    th, td {
+      border: 1px solid var(--border);
+      padding: 0.5rem 0.75rem;
+      text-align: left;
+    }
+    th { background: var(--code-bg); }
+    hr {
+      border: none;
+      border-top: 1px solid var(--border);
+      margin: 2rem 0;
+    }
+    img {
+      max-width: 100%;
+      height: auto;
+      display: block;
+      margin: 1.5rem auto;
+    }
+    /* KaTeX display math */
+    .katex-display {
+      overflow-x: auto;
+      overflow-y: hidden;
+      padding: 0.5rem 0;
+    }
+    /* Definition/theorem boxes */
+    .definition, .theorem, .axiom {
+      border: 1px solid var(--border);
+      border-left: 4px solid var(--accent);
+      padding: 1rem 1.2rem;
+      margin: 1.5rem 0;
+      background: var(--code-bg);
+      border-radius: 0 4px 4px 0;
+    }
+    footer {
+      margin-top: 4rem;
+      padding-top: 1rem;
+      border-top: 1px solid var(--border);
+      font-size: 0.8rem;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      color: #888;
+      text-align: center;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <nav class="breadcrumb">
+      <a href="../index.html">Geometric Series</a>
+      <span class="sep">/</span>
+      <a href="index.html">Geometric Communication</a>
+      <span class="sep">/</span>
+      <span>Appendix A: Mathematical Prerequisites</span>
+    </nav>
+
+    <h1 id="appendix-a-mathematical-prerequisites">Appendix A: Mathematical Prerequisites<a class="headerlink" href="#appendix-a-mathematical-prerequisites" title="Permanent link">&para;</a></h1>
+<p>This appendix collects the mathematical definitions and results used throughout the book. It is self-contained for readers unfamiliar with differential geometry or algebraic topology; those with background in these areas may skip directly to the chapters. Full proofs and extended treatments can be found in <em>Geometric Methods in Computational Modeling</em> (Bond, 2026a).</p>
+<hr />
+<h2 id="a1-smooth-manifolds">A.1 Smooth Manifolds<a class="headerlink" href="#a1-smooth-manifolds" title="Permanent link">&para;</a></h2>
+<p><strong>Definition A.1 (Topological Manifold).</strong> A <em>topological manifold</em> of dimension $n$ is a Hausdorff, second-countable topological space $M$ such that every point $p \in M$ has a neighborhood homeomorphic to an open subset of $\mathbb{R}^n$.</p>
+<p><strong>Definition A.2 (Chart).</strong> A <em>chart</em> on $M$ is a pair $(U, \varphi)$ where $U \subseteq M$ is open and $\varphi: U \to \mathbb{R}^n$ is a homeomorphism onto its image. The coordinates $x^1, \ldots, x^n$ given by $\varphi$ are <em>local coordinates</em> on $U$.</p>
+<p><strong>Definition A.3 (Atlas and Smooth Structure).</strong> A <em>smooth atlas</em> is a collection of charts $\{(U_\alpha, \varphi_\alpha)\}$ covering $M$ such that all transition maps $\varphi_\beta \circ \varphi_\alpha^{-1}$ are smooth ($C^\infty$). A <em>smooth manifold</em> is a topological manifold equipped with a maximal smooth atlas.</p>
+<p><em>Communication interpretation</em>: A language is a chart on the semantic manifold. Each language provides local coordinates for meaning. The transition map between charts is translation. The smoothness requirement says that translation between nearby meanings should be continuous — a small change in the source meaning produces a small change in the target meaning. (See Chapter 3.)</p>
+<hr />
+<h2 id="a2-riemannian-metrics">A.2 Riemannian Metrics<a class="headerlink" href="#a2-riemannian-metrics" title="Permanent link">&para;</a></h2>
+<p><strong>Definition A.4 (Riemannian Metric).</strong> A <em>Riemannian metric</em> on a smooth manifold $M$ is a smooth assignment of a positive-definite inner product $g_p: T_pM \times T_pM \to \mathbb{R}$ to each tangent space $T_pM$.</p>
+<p>In local coordinates, $g = g_{ij} \, dx^i \otimes dx^j$, where $g_{ij}(p) = g_p(\partial_i, \partial_j)$.</p>
+<p><strong>Definition A.5 (Geodesic).</strong> A curve $\gamma: [0,1] \to M$ is a <em>geodesic</em> if it satisfies</p>
+<p>$$\frac{d^2 \gamma^k}{dt^2} + \Gamma^k_{ij} \frac{d\gamma^i}{dt} \frac{d\gamma^j}{dt} = 0$$</p>
+<p>where $\Gamma^k_{ij}$ are the Christoffel symbols of the Levi-Civita connection.</p>
+<p><strong>Definition A.6 (Geodesic Distance).</strong> The <em>geodesic distance</em> between $p, q \in M$ is</p>
+<p>$$d(p, q) = \inf_\gamma \int_0^1 \sqrt{g_{\gamma(t)}(\dot{\gamma}(t), \dot{\gamma}(t))} \, dt$$</p>
+<p>where the infimum is over all smooth curves from $p$ to $q$.</p>
+<p><em>Communication interpretation</em>: The metric determines which communicative acts are &ldquo;close.&rdquo; Geodesics are the most efficient paths through meaning space. (See Chapter 3, Section 3.2.)</p>
+<hr />
+<h2 id="a3-the-poincare-ball-model">A.3 The Poincare Ball Model<a class="headerlink" href="#a3-the-poincare-ball-model" title="Permanent link">&para;</a></h2>
+<p><strong>Definition A.7 (Poincare Ball).</strong> The <em>Poincare ball</em> of dimension $d$ and curvature $-c$ ($c > 0$) is</p>
+<p>$$\mathbb{B}^d_c = \{x \in \mathbb{R}^d : c\|x\|^2 < 1\}$$</p>
+<p>equipped with the Riemannian metric</p>
+<p>$$g^{\mathbb{B}}_x = \left(\frac{2}{1 - c\|x\|^2}\right)^2 g^E$$</p>
+<p>where $g^E$ is the Euclidean metric.</p>
+<p><strong>Definition A.8 (Mobius Addition).</strong> For $x, y \in \mathbb{B}^d_c$,</p>
+<p>$$x \oplus_c y = \frac{(1 + 2c\langle x, y \rangle + c\|y\|^2)x + (1 - c\|x\|^2)y}{1 + 2c\langle x, y \rangle + c^2 \|x\|^2 \|y\|^2}$$</p>
+<p><strong>Definition A.9 (Hyperbolic Distance).</strong> The geodesic distance in $\mathbb{B}^d_c$ is</p>
+<p>$$d_{\mathbb{B}}(x, y) = \frac{1}{\sqrt{c}} \operatorname{arcosh}\left(1 + \frac{2c\|x - y\|^2}{(1 - c\|x\|^2)(1 - c\|y\|^2)}\right)$$</p>
+<p><strong>Definition A.10 (Exponential Map).</strong> The exponential map at $x \in \mathbb{B}^d_c$ sends a tangent vector $v \in T_x\mathbb{B}^d_c$ to</p>
+<p>$$\exp^c_x(v) = x \oplus_c \left(\tanh\left(\frac{\sqrt{c}\,\lambda^c_x \|v\|}{2}\right) \frac{v}{\sqrt{c}\|v\|}\right)$$</p>
+<p>where $\lambda^c_x = \frac{2}{1 - c\|x\|^2}$ is the conformal factor.</p>
+<p><em>Communication interpretation</em>: Hierarchical structures (taxonomies, ontologies, parse trees) embed naturally in the Poincare ball with exponentially less distortion than in Euclidean space. (See Chapter 5.)</p>
+<hr />
+<h2 id="a4-symmetric-positive-definite-matrices">A.4 Symmetric Positive-Definite Matrices<a class="headerlink" href="#a4-symmetric-positive-definite-matrices" title="Permanent link">&para;</a></h2>
+<p><strong>Definition A.11 (SPD Manifold).</strong> The space of $n \times n$ symmetric positive-definite matrices,</p>
+<p>$$\text{SPD}(n) = \{S \in \mathbb{R}^{n \times n} : S = S^\top, \, v^\top S v > 0 \; \forall v \neq 0\}$$</p>
+<p>is an open cone in the space of symmetric matrices, hence a smooth manifold of dimension $n(n+1)/2$.</p>
+<p><strong>Definition A.12 (Log-Euclidean Metric).</strong> The <em>log-Euclidean distance</em> between $S_1, S_2 \in \text{SPD}(n)$ is</p>
+<p>$$d_{LE}(S_1, S_2) = \|\log(S_1) - \log(S_2)\|_F$$</p>
+<p>where $\log$ is the matrix logarithm and $\|\cdot\|_F$ is the Frobenius norm.</p>
+<p><em>Communication interpretation</em>: Spectral covariance matrices of acoustic signals live on SPD(n). The log-Euclidean metric respects the manifold geometry — it measures the &ldquo;true&rdquo; distance between spectral structures. (See Chapters 4 and 8.)</p>
+<hr />
+<h2 id="a5-persistent-homology">A.5 Persistent Homology<a class="headerlink" href="#a5-persistent-homology" title="Permanent link">&para;</a></h2>
+<p><strong>Definition A.13 (Simplicial Complex).</strong> A <em>simplicial complex</em> $K$ is a collection of simplices (vertices, edges, triangles, tetrahedra, &hellip;) closed under taking faces.</p>
+<p><strong>Definition A.14 (Vietoris-Rips Complex).</strong> Given a point cloud $X \subset \mathbb{R}^d$ and a scale parameter $\varepsilon > 0$, the <em>Vietoris-Rips complex</em> $\text{VR}(X, \varepsilon)$ contains a simplex $\sigma = [x_0, \ldots, x_k]$ whenever $d(x_i, x_j) \leq \varepsilon$ for all $i, j$.</p>
+<p><strong>Definition A.15 (Filtration and Persistence).</strong> A <em>filtration</em> is a nested sequence $K_0 \subseteq K_1 \subseteq \cdots \subseteq K_N$ of simplicial complexes. A <em>persistence diagram</em> records the birth and death of homological features (connected components $H_0$, loops $H_1$, voids $H_2$, &hellip;) as the filtration parameter increases.</p>
+<p><strong>Theorem A.1 (Stability, Cohen-Steiner, Edelsbrunner, and Harer 2007).</strong> Let $f, g: X \to \mathbb{R}$ be tame functions with persistence diagrams $D_f, D_g$. Then</p>
+<p>$$d_B(D_f, D_g) \leq \|f - g\|_\infty$$</p>
+<p>where $d_B$ is the bottleneck distance.</p>
+<p><em>Communication interpretation</em>: Persistent homology extracts the <em>shape</em> of a signal&rsquo;s attractor. Features that persist across many scales are genuine topological structure; features that appear and die quickly are noise. The stability theorem guarantees robustness to perturbation. (See Chapter 6.)</p>
+<hr />
+<h2 id="a6-fiber-bundles-and-gauge-theory">A.6 Fiber Bundles and Gauge Theory<a class="headerlink" href="#a6-fiber-bundles-and-gauge-theory" title="Permanent link">&para;</a></h2>
+<p><strong>Definition A.16 (Fiber Bundle).</strong> A <em>fiber bundle</em> is a tuple $(\mathcal{E}, \pi, \mathcal{B}, F, G)$ where:
+- $\mathcal{E}$ is the total space
+- $\mathcal{B}$ is the base space
+- $\pi: \mathcal{E} \to \mathcal{B}$ is the projection
+- $F$ is the typical fiber ($\pi^{-1}(b) \cong F$ for all $b$)
+- $G$ is the structure group acting on $F$</p>
+<p><strong>Definition A.17 (Connection).</strong> An <em>Ehresmann connection</em> on a fiber bundle is a smooth choice of horizontal subspace $H_e \subset T_e\mathcal{E}$ at each point, complementary to the vertical subspace (tangent to the fiber).</p>
+<p><strong>Definition A.18 (Parallel Transport).</strong> Given a curve $\gamma: [0,1] \to \mathcal{B}$ and an initial point $e_0 \in \pi^{-1}(\gamma(0))$, <em>parallel transport</em> lifts $\gamma$ to a horizontal curve $\tilde{\gamma}$ in $\mathcal{E}$ with $\tilde{\gamma}(0) = e_0$.</p>
+<p><strong>Definition A.19 (Holonomy).</strong> The <em>holonomy</em> of a connection around a closed loop $\gamma$ in $\mathcal{B}$ is the element $g \in G$ such that parallel transport around $\gamma$ maps the fiber at $\gamma(0)$ to itself by the action of $g$.</p>
+<p><em>Communication interpretation</em>: The communication fiber bundle has content as base space and surface forms as fibers. Translation is parallel transport. The gauge group consists of translation, paraphrase, and format change. Holonomy is translation loss — meaning that &ldquo;rotates&rdquo; when transported around a loop of translations. (See Chapter 13.)</p>
+<hr />
+<h2 id="a7-the-dihedral-group-math86">A.7 The Dihedral Group $D_4$<a class="headerlink" href="#a7-the-dihedral-group-math86" title="Permanent link">&para;</a></h2>
+<p><strong>Definition A.20 ($D_4$).</strong> The <em>dihedral group of order 8</em> is</p>
+<p>$$D_4 = \langle r, s \mid r^4 = s^2 = e, \; srs = r^{-1} \rangle$$</p>
+<p>Its eight elements are $\{e, r, r^2, r^3, s, sr, sr^2, sr^3\}$. It is the symmetry group of the square.</p>
+<p><strong>Properties:</strong>
+- $D_4$ is non-abelian: $rs \neq sr$
+- Center: $Z(D_4) = \{e, r^2\}$
+- Conjugacy classes: $\{e\}$, $\{r^2\}$, $\{r, r^3\}$, $\{s, sr^2\}$, $\{sr, sr^3\}$</p>
+<p><em>Communication interpretation</em>: $D_4$ is the symmetry group of the Hohfeldian square of jural relations. The generator $r$ rotates through normative positions (Right → Duty → Liberty → No-Right). The generator $s$ reflects between correlative positions (Right ↔ Duty). (See Chapter 13.)</p>
+
+    <footer>
+      <p>Part of the <em>Geometric Series</em> by A.H. Bowers</p>
+      <p>Built automatically from source. Last updated: 2026-03-27 00:17 UTC</p>
+    </footer>
+  </div>
+
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js"
+    onload="renderMathInElement(document.body, {
+      delimiters: [
+        {left: '$$', right: '$$', display: true},
+        {left: '$', right: '$', display: false},
+        {left: '\\\\(', right: '\\\\)', display: false},
+        {left: '\\\\[', right: '\\\\]', display: true}
+      ],
+      throwOnError: false
+    });"></script>
+</body>
+</html>
