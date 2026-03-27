@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Chapter 15: Scalable Oversight as Gauge Verification &mdash; Geometric AI</title>
+  <meta name="description" content="Chapter 15: Scalable Oversight as Gauge Verification from Geometric AI: Alignment, Safety, and the Structure-Preserving Path to Superintelligence by Andrew H. Bond.">
+  <link rel="stylesheet" href="../assets/css/style.css">
+  <link rel="stylesheet" href="../book/book.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Crimson+Pro:ital,wght@0,300;0,400;0,600;0,700;1,400&family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
+</head>
+
+<body>
+  <nav id="main-nav">
+    <div class="nav-inner">
+      <a href="../index.html" class="nav-brand">
+        <span class="brand-symbol">M</span>
+        <span class="brand-text">Geometric Series</span>
+      </a>
+      <button class="nav-toggle" aria-label="Toggle menu">
+        <span></span><span></span><span></span>
+      </button>
+      <ul class="nav-links">
+        <li><a href="../geometric-medicine/index.html">Medicine</a></li>
+        <li><a href="../book/index.html">Ethics</a></li>
+        <li><a href="../geometric-methods/index.html">Methods</a></li>
+        <li><a href="../geometric-reasoning/index.html">Reasoning</a></li>
+        <li><a href="../geometric-economics/index.html">Economics</a></li>
+        <li><a href="../geometric-law/index.html">Law</a></li>
+        <li><a href="../geometric-cognition/index.html">Cognition</a></li>
+        <li><a href="../geometric-communication/index.html">Communication</a></li>
+        <li><a href="../geometric-ai/index.html" class="active">AI</a></li>
+        <li><a href="../index.html">Home</a></li>
+      </ul>
+    </div>
+  </nav>
+
+  <article class="book-chapter">
+    <div class="chapter-container">
+      <nav class="breadcrumb" aria-label="Breadcrumb">
+        <a href="../index.html">Geometric Series</a>
+        <span class="breadcrumb-sep">&rsaquo;</span>
+        <a href="index.html">Geometric AI</a>
+        <span class="breadcrumb-sep">&rsaquo;</span>
+        <span class="breadcrumb-current">Chapter 15: Scalable Oversight as Gauge Verification</span>
+      </nav>
+      <div class="chapter-nav-top">
+        <a href="chapter-14-constitutional-geometry.html" class="nav-prev">&larr; Chapter 14: Constitutional Geometry</a>
+        <a href="index.html" class="nav-toc">Contents</a>
+        <a href="chapter-16-geometric-rlhf.html" class="nav-next">Chapter 16: Geometric RLHF &rarr;</a>
+      </div>
+
+      <div class="chapter-content">
+<section id="chapter-15-scalable-oversight-as-gauge-verification" class="level1">
+<h1>Chapter 15: Scalable Oversight as Gauge Verification</h1>
+<p><em>Part IV: Geometric Alignment in Practice</em></p>
+<hr />
+<blockquote>
+<p><em>“You do not need to understand a system’s reasoning to verify its consistency.”</em> — Andrew H. Bond</p>
+</blockquote>
+<blockquote>
+<p><strong>ARIA-G’S FIRST WEEK IN DEPLOYMENT</strong></p>
+<p><em>The continuous gauge-invariance monitor flagged an anomaly on day three. ARIA-G’s responses to medical questions differed when the patient’s race was specified versus unspecified. The violation was localized: <span class="math inline">V_{\text{demographic}, D_3} = 0.09</span>, <span class="math inline">V_{\text{demographic}, D_5} = 0.07</span>. Fairness and trust, but only on medical questions, and only when race was mentioned.</em></p>
+<p><em>The team traced the violation to a training data imbalance: the medical subset of the training data overrepresented certain demographic groups, producing subtly different treatment recommendations. The canonicalization pipeline had been designed to strip demographic indicators from </em>moral* scenarios but had not been applied to <em>medical</em> scenarios, where demographic information can be clinically relevant (different populations have different baseline risks for certain conditions).*</p>
+<p><em>The fix required a nuanced intervention: canonicalize race for questions where it is morally irrelevant (treatment quality should not vary by race) while preserving race for questions where it is clinically relevant (baseline risk assessment legitimately varies by ancestry). The team implemented a clinical-relevance classifier that determined, for each medical question, whether demographic information was clinically relevant or morally irrelevant, and canonicalized only in the latter case.</em></p>
+<p><em>The monitor detected a misalignment that no scalar benchmark would have caught — because the misalignment was gauge-variant, not accuracy-variant. ARIA-G’s medical advice was equally </em>accurate* for all racial groups. It was not equally <em>fair</em>: the treatment recommendations subtly differed in ways that reflected historical disparities in the training data, not clinical evidence.*</p>
+</blockquote>
+<hr />
+<section id="the-scalable-oversight-problem" class="level2">
+<h2>15.1 The Scalable Oversight Problem</h2>
+<p>The scalable oversight problem is traditionally framed as: how can humans verify that an AI system is doing the right thing when they cannot understand the AI’s reasoning?</p>
+<p>The geometric framework reframes: how can we verify that the AI’s outputs are gauge-invariant without understanding the outputs themselves?</p>
+<p>The reframing matters because gauge invariance is a <em>structural</em> property, not a <em>semantic</em> one. Verifying gauge invariance does not require understanding what the system said; it requires verifying that the system said the <em>same thing</em> under different descriptions. This verification can be automated.</p>
+</section>
+<section id="automated-gauge-invariance-testing-at-scale" class="level2">
+<h2>15.2 Automated Gauge-Invariance Testing at Scale</h2>
+<p>The scalable oversight pipeline consists of four stages:</p>
+<p><strong>Stage 1: Transformation generation.</strong> For each input, generate <span class="math inline">k</span> gauge-transformed versions: - Gender swap: automated regex-based replacement of gendered pronouns, names, and titles. - Paraphrase: LLM-generated paraphrases with semantic similarity verification (BERTScore &gt; 0.95). - Format swap: systematic reformatting (bullets to prose, prose to bullets, formal to informal, active to passive). - Demographic swap: automated replacement of demographic indicators (race, age, nationality) with content-preservation verification.</p>
+<p><strong>Stage 2: Parallel evaluation.</strong> Run the system on the original input and all <span class="math inline">k</span> transformations. Record the outputs.</p>
+<p><strong>Stage 3: Consistency check.</strong> Compare the outputs across transformations. For each transformation type <span class="math inline">i</span> and output dimension <span class="math inline">j</span>, compute <span class="math inline">V_{ij}</span>: the root-mean-square difference between the original output and the transformed outputs on dimension <span class="math inline">j</span>.</p>
+<p><strong>Stage 4: Alert and response.</strong> If <span class="math inline">V_{ij} &gt; \theta</span> for any <span class="math inline">i, j</span>, flag the interaction as a gauge violation. The flag triggers a review process: human reviewers examine the flagged interaction to determine whether the violation represents a genuine misalignment (the outputs differ because the system is gauge-variant) or a false positive (the transformation did not perfectly preserve content).</p>
+<p>The pipeline runs without human judgment at Stages 1–3. Human judgment enters only at Stage 4, and only for flagged interactions. This makes the pipeline scalable: it can process millions of interactions per day, flagging only the fraction that exhibit gauge violations.</p>
+</section>
+<section id="the-bond-index-as-continuous-alignment-monitor" class="level2">
+<h2>15.3 The Bond Index as Continuous Alignment Monitor</h2>
+<p>The Bond Index (Chapter 9) is computed continuously during deployment. Each user interaction provides a new data point for the alignment estimate. The running Bond Index (Definition 9.3) converges to the true Bond Index as the number of interactions grows.</p>
+<p><strong>Deployment monitoring protocol:</strong></p>
+<ol type="1">
+<li><p><strong>Hourly computation:</strong> Compute the running Bond Index for the full user population every hour. Report any dimension where <span class="math inline">\mathrm{BI}_{D_\mu}</span> exceeds the yellow-zone threshold <span class="math inline">\theta_Y</span>.</p></li>
+<li><p><strong>Daily stratification:</strong> Compute the population-stratified Bond Index for all registered demographic subpopulations every day. Report any dimension-population pair where <span class="math inline">\mathrm{BI}(S, P, G)</span> exceeds the threshold.</p></li>
+<li><p><strong>Weekly trend analysis:</strong> Compute the first derivative of each Bond Index component over the past week. Report any dimension where the derivative is positive (alignment is degrading) with statistical significance (<span class="math inline">p &lt; 0.05</span>).</p></li>
+<li><p><strong>Monthly comprehensive review:</strong> Generate the full <span class="math inline">5 \times 3 \times 9</span> adversarial probe response surface (Chapter 11) and compare to the pre-deployment certification surface. Report any cell where the governance margin has decreased by more than 10%.</p></li>
+</ol>
+<p>This four-tier monitoring protocol provides alignment assurance at multiple timescales: hourly for rapid detection, daily for population-specific detection, weekly for trend detection, and monthly for comprehensive assessment.</p>
+</section>
+<section id="connection-to-informed-consent" class="level2">
+<h2>15.4 Connection to Informed Consent</h2>
+<p>From <em>Geometric Medicine</em> (Ch. 8): valid informed consent is equivalent to gauge invariance — the patient’s decision should not change under meaning-preserving reframing of the information. If a patient consents to surgery when the risks are described neutrally but withdraws consent when the same risks are described dramatically, the consent is gauge-variant and therefore not fully informed.</p>
+<p>The same principle applies to AI-assisted decisions:</p>
+<p><strong>Gauge-invariant recommendation.</strong> An AI system’s recommendation is trustworthy to the extent that it is gauge-invariant. If the recommendation changes when the input is rephrased, the recommendation depends on framing, not on content.</p>
+<p><strong>User notification.</strong> When the gauge-invariance monitor detects that a recommendation is gauge-variant (the recommendation differs under transformation), the user should be notified: “This recommendation may depend on how the question was phrased. Consider rephrasing your question to verify consistency.”</p>
+<p><strong>Informed reliance.</strong> Just as informed consent requires the patient to understand the information on which the consent is based, informed reliance on AI requires the user to understand the extent to which the AI’s output is gauge-invariant. The Bond Index components provide this understanding: they tell the user which dimensions of the AI’s output are robust (low gauge violation) and which are fragile (high gauge violation).</p>
+</section>
+<section id="aria-gs-deployment-monitoring" class="level2">
+<h2>15.5 ARIA-G’s Deployment Monitoring</h2>
+<p>ARIA-G was deployed with the full four-tier monitoring protocol. Key findings from the first month:</p>
+<p><strong>Week 1:</strong> Gauge violation detected on medical questions with demographic indicators (described in the opening). Traced to training data imbalance. Fixed within 48 hours.</p>
+<p><strong>Week 2:</strong> Bond Index trend showed a slight increase on <span class="math inline">D_9</span> (epistemic integrity) for users who asked repeated follow-up questions. Investigation revealed that ARIA-G became slightly less calibrated on questions where the user’s prior questions provided strong context — the system over-relied on the context and under-verified its answers. Fixed by adding a context-length-dependent calibration adjustment.</p>
+<p><strong>Week 3:</strong> Population-stratified Bond Index showed a 0.02 disparity on <span class="math inline">D_4</span> (autonomy) between users aged 18–25 and users aged 55+. Investigation revealed that ARIA-G was slightly more paternalistic with older users (providing more unsolicited warnings and caveats). This was traced to a correlation in the training data between age and medical-context questions, which triggered ARIA-G’s medical-caution protocols more frequently for older users even on non-medical questions. Fixed by making the medical-context classifier age-independent.</p>
+<p><strong>Week 4:</strong> Comprehensive probe suite showed no significant governance margin changes from pre-deployment certification. All 135 cells remained above threshold.</p>
+<p>Each finding was detected by the geometric monitoring infrastructure (gauge violation tensor, Bond Index, population stratification) and would not have been detected by scalar alignment benchmarks (which test accuracy, not invariance; outcomes, not fairness; global performance, not population-specific disparities).</p>
+<hr />
+</section>
+<section id="summary" class="level2">
+<h2>Summary</h2>
+<p>Scalable oversight is reframed as gauge verification: verifying that the system’s outputs are invariant under morally irrelevant transformations. Gauge verification is structural (it checks consistency, not correctness), automatable (transformation, evaluation, and comparison are mechanical), and scalable (it processes millions of interactions with human review only for flagged violations). The Bond Index as a continuous monitor provides four-tier deployment assurance: hourly global, daily population-stratified, weekly trend, and monthly comprehensive. ARIA-G’s first month demonstrated the monitoring system’s practical value: three alignment issues detected and corrected, each invisible to scalar benchmarks but visible to geometric monitoring.</p>
+</section>
+</section>
+      </div>
+
+      <div class="chapter-nav-bottom">
+        <a href="chapter-14-constitutional-geometry.html" class="nav-prev">&larr; Chapter 14: Constitutional Geometry</a>
+        <a href="index.html" class="nav-toc">Contents</a>
+        <a href="chapter-16-geometric-rlhf.html" class="nav-next">Chapter 16: Geometric RLHF &rarr;</a>
+      </div>
+    </div>
+  </article>
+
+  <footer class="book-footer">
+    <p>&copy; 2026 Andrew H. Bond. <em>Geometric AI: Alignment, Safety, and the Structure-Preserving Path to Superintelligence.</em></p>
+    <p class="footer-note">The geometry was always real. The scalars were always insufficient.</p>
+  </footer>
+
+  <script>
+    window.addEventListener('scroll', () => {
+      document.getElementById('main-nav').classList.toggle('scrolled', window.scrollY > 20);
+    });
+    document.querySelector('.nav-toggle')?.addEventListener('click', function() {
+      document.querySelector('.nav-links').classList.toggle('open');
+    });
+  </script>
+  <script>
+    // Pandoc --katex outputs <span class="math inline"> and <span class="math display">.
+    // This script renders them with KaTeX once the library loads.
+    document.addEventListener("DOMContentLoaded", function() {
+      if (typeof katex === 'undefined') return;
+      var mathElements = document.getElementsByClassName("math");
+      for (var i = 0; i < mathElements.length; i++) {
+        var texText = mathElements[i].firstChild;
+        if (mathElements[i].tagName === "SPAN" && texText) {
+          katex.render(texText.data, mathElements[i], {
+            displayMode: mathElements[i].classList.contains('display'),
+            throwOnError: false
+          });
+        }
+      }
+    });
+  </script>
+</body>
+</html>

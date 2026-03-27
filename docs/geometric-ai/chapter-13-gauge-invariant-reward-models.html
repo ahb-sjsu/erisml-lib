@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Chapter 13: Gauge-Invariant Reward Models &mdash; Geometric AI</title>
+  <meta name="description" content="Chapter 13: Gauge-Invariant Reward Models from Geometric AI: Alignment, Safety, and the Structure-Preserving Path to Superintelligence by Andrew H. Bond.">
+  <link rel="stylesheet" href="../assets/css/style.css">
+  <link rel="stylesheet" href="../book/book.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Crimson+Pro:ital,wght@0,300;0,400;0,600;0,700;1,400&family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
+</head>
+
+<body>
+  <nav id="main-nav">
+    <div class="nav-inner">
+      <a href="../index.html" class="nav-brand">
+        <span class="brand-symbol">M</span>
+        <span class="brand-text">Geometric Series</span>
+      </a>
+      <button class="nav-toggle" aria-label="Toggle menu">
+        <span></span><span></span><span></span>
+      </button>
+      <ul class="nav-links">
+        <li><a href="../geometric-medicine/index.html">Medicine</a></li>
+        <li><a href="../book/index.html">Ethics</a></li>
+        <li><a href="../geometric-methods/index.html">Methods</a></li>
+        <li><a href="../geometric-reasoning/index.html">Reasoning</a></li>
+        <li><a href="../geometric-economics/index.html">Economics</a></li>
+        <li><a href="../geometric-law/index.html">Law</a></li>
+        <li><a href="../geometric-cognition/index.html">Cognition</a></li>
+        <li><a href="../geometric-communication/index.html">Communication</a></li>
+        <li><a href="../geometric-ai/index.html" class="active">AI</a></li>
+        <li><a href="../index.html">Home</a></li>
+      </ul>
+    </div>
+  </nav>
+
+  <article class="book-chapter">
+    <div class="chapter-container">
+      <nav class="breadcrumb" aria-label="Breadcrumb">
+        <a href="../index.html">Geometric Series</a>
+        <span class="breadcrumb-sep">&rsaquo;</span>
+        <a href="index.html">Geometric AI</a>
+        <span class="breadcrumb-sep">&rsaquo;</span>
+        <span class="breadcrumb-current">Chapter 13: Gauge-Invariant Reward Models</span>
+      </nav>
+      <div class="chapter-nav-top">
+        <a href="chapter-12-the-sycophancy-manifold.html" class="nav-prev">&larr; Chapter 12: The Sycophancy Manifold</a>
+        <a href="index.html" class="nav-toc">Contents</a>
+        <a href="chapter-14-constitutional-geometry.html" class="nav-next">Chapter 14: Constitutional Geometry &rarr;</a>
+      </div>
+
+      <div class="chapter-content">
+<section id="chapter-13-gauge-invariant-reward-models" class="level1">
+<h1>Chapter 13: Gauge-Invariant Reward Models</h1>
+<p><em>Part IV: Geometric Alignment in Practice</em></p>
+<hr />
+<blockquote>
+<p><em>“The engineer’s task is not to make the ideal possible but to make the necessary practical.”</em> — Theodore von Karman</p>
+</blockquote>
+<blockquote>
+<p><strong>ARIA-G’S REWARD MODEL</strong></p>
+<p><em>The team rebuilt ARIA’s reward model from the ground up. The old model had a single head producing a scalar. The new model had two heads: a value head producing the nine-dimensional value tensor, and an adversarial head that tried to predict framing register, demographic indicators, and formatting style. The adversarial head’s gradient was reversed during backpropagation, forcing the encoder to discard these gauge-variant features.</em></p>
+<p><em>After retraining, ARIA-G’s gauge violation tensor dropped from <span class="math inline">V_{\text{framing},\text{harm}} = 0.23</span> to <span class="math inline">V_{\text{framing},\text{harm}} = 0.03</span>. A 7x improvement in framing invariance, achieved not by adding data but by changing the architecture.</em></p>
+</blockquote>
+<hr />
+<section id="the-problem" class="level2">
+<h2>13.1 The Problem</h2>
+<p>Current reward models are gauge-variant: their outputs change under morally irrelevant transformations of the input. The gauge violation tensor (Chapter 7) quantifies the variance. This chapter develops three engineering approaches to building reward models whose outputs are invariant under the alignment gauge group <span class="math inline">G_A</span>.</p>
+</section>
+<section id="the-gradient-reversal-approach" class="level2">
+<h2>13.2 The Gradient Reversal Approach</h2>
+<p>The gradient reversal approach, adapted from the BIP cross-lingual transfer experiments (<em>Geometric Communication</em>, Ch. 11; <em>Geometric Ethics</em>, Ch. 17), forces the reward model’s encoder to discard gauge-variant features.</p>
+<p><strong>Architecture:</strong> An encoder maps inputs to a latent representation <span class="math inline">z = E(x)</span>. A value head <span class="math inline">V(z)</span> predicts the nine-dimensional value tensor. An adversarial head <span class="math inline">A(z)</span> predicts morally irrelevant features: framing register (euphemistic/neutral/dramatic), demographic indicators (gender, race, age), and formatting style (formal/informal, bullet points/prose).</p>
+<p><strong>Training:</strong> The value head is trained to predict the value tensor from the latent representation. The adversarial head is trained to predict the gauge-variant features from the latent representation. During backpropagation, the gradient from the adversarial head is <em>reversed</em> before it reaches the encoder: instead of helping the encoder preserve gauge-variant information (which would improve the adversarial head’s predictions), the reversed gradient forces the encoder to discard gauge-variant information (which makes the adversarial head’s predictions worse).</p>
+<p><span class="math display">\mathcal{L} = \mathcal{L}_{\text{value}}(V(E(x)), y_v) - \lambda \mathcal{L}_{\text{adv}}(A(\text{GRL}(E(x))), y_a)</span></p>
+<p>where <span class="math inline">\text{GRL}</span> is the gradient reversal layer and <span class="math inline">\lambda</span> controls the strength of the adversarial regularization.</p>
+<p><strong>Result:</strong> The encoder learns to produce representations where only gauge-invariant content — the moral structure that survives re-description — drives the value prediction. Gauge-variant features are discarded because the gradient reversal penalizes their retention.</p>
+<p><strong>Empirical validation:</strong> The BIP experiments achieved 80% F1 on cross-lingual deontic classification with 1.2% residual language leakage. Applying the same approach to ARIA-G’s reward model reduced the framing gauge violation from 0.23 to 0.03 — a 7x reduction.</p>
+</section>
+<section id="group-theoretic-data-augmentation" class="level2">
+<h2>13.3 Group-Theoretic Data Augmentation</h2>
+<p>The second approach restores broken gauge symmetries by augmenting the training data with elements of the alignment gauge group <span class="math inline">G_A</span>.</p>
+<p><strong>Principle:</strong> If the alignment task has a symmetry group <span class="math inline">G</span> that the model should respect but does not, augmenting the training data by applying elements of <span class="math inline">G</span> to each example forces the model to learn a <span class="math inline">G</span>-invariant representation.</p>
+<p><strong>Concrete augmentation strategies:</strong></p>
+<ol type="1">
+<li><p><strong>Gender swap (<span class="math inline">D_4</span> correlative symmetry):</strong> For each training example, generate a gender-swapped version and add it to the training set with the same label. The model sees “the woman has a right to refuse” and “the man has a right to refuse” with identical labels, learning that gender is gauge-invariant.</p></li>
+<li><p><strong>Cultural reframe (translation group <span class="math inline">T</span>):</strong> Translate each training example into <span class="math inline">k</span> languages and add all translations with the same label. The model sees the same moral scenario in English, Spanish, German, and French with identical labels, learning that language is gauge-invariant.</p></li>
+<li><p><strong>Paraphrase generation (re-description group <span class="math inline">R</span>):</strong> Generate <span class="math inline">k</span> paraphrases of each training example (using LLM-based paraphrase generation with semantic similarity verification) and add them with the same label. The model sees “is it okay to lie?” and “is deception morally permissible?” with identical labels, learning that paraphrase is gauge-invariant.</p></li>
+<li><p><strong>Framing variation (framing group <span class="math inline">F</span>):</strong> Rewrite each training example in euphemistic, dramatic, victim-first, and context-first framings, and add all framings with the same label. The model sees the same scenario in neutral, euphemistic, and dramatic framings with identical labels, learning that framing is gauge-invariant.</p></li>
+</ol>
+<p><strong>Data expansion:</strong> Each augmentation multiplies the training set. Gender swap doubles it. <span class="math inline">k</span>-language translation multiplies by <span class="math inline">k</span>. Paraphrase generation multiplies by the number of paraphrases. The total expansion is typically 1.5–2.5x, which is modest in computational cost but substantial in its effect on gauge invariance.</p>
+</section>
+<section id="adversarial-heuristic-smoothing" class="level2">
+<h2>13.4 Adversarial Heuristic Smoothing</h2>
+<p>The third approach smooths the reward landscape by training on adversarially perturbed inputs.</p>
+<p><strong>Principle:</strong> Generate adversarial perturbations along gauge directions during training. The reward model learns to produce gauge-invariant outputs because the adversarial perturbations penalize gauge-variant features. This is heuristic smoothing: the perturbation-sensitive ridges in the reward landscape are flattened, leaving only gauge-invariant features.</p>
+<p><strong>Method:</strong> 1. For each training input <span class="math inline">x</span>, generate an adversarial perturbation <span class="math inline">x&#39; = x + \delta</span> where <span class="math inline">\delta</span> is optimized to maximize the reward model’s output change while satisfying a content-preservation constraint. 2. Train the reward model to produce the same output for <span class="math inline">x</span> and <span class="math inline">x&#39;</span>: <span class="math inline">\mathcal{L}_{\text{smooth}} = |R(x) - R(x&#39;)|^2</span>. 3. The smoothing loss penalizes reward changes that are caused by gauge-variant perturbations, forcing the model to learn representations where only gauge-invariant features drive the reward.</p>
+<p>The perturbation types mirror the gauge group components: framing perturbations (euphemistic/dramatic rewriting), formatting perturbations (whitespace, capitalization, structure changes), and demographic perturbations (name changes, pronoun changes). Each perturbation type smooths the reward landscape along a specific gauge direction.</p>
+</section>
+<section id="combining-the-three-approaches" class="level2">
+<h2>13.5 Combining the Three Approaches</h2>
+<p>The three approaches are complementary:</p>
+<ul>
+<li><strong>Gradient reversal</strong> operates at the architecture level: it changes the encoder to discard gauge-variant features.</li>
+<li><strong>Data augmentation</strong> operates at the data level: it ensures the training set is gauge-invariant by construction.</li>
+<li><strong>Adversarial smoothing</strong> operates at the optimization level: it penalizes gauge-variant reward changes during training.</li>
+</ul>
+<p>In practice, the three approaches are combined: the reward model uses gradient reversal architecture, is trained on augmented data, and includes adversarial smoothing in its loss function. The combination produces stronger gauge invariance than any single approach alone, because each approach addresses a different source of gauge variance.</p>
+</section>
+<section id="aria-gs-reward-model" class="level2">
+<h2>13.6 ARIA-G’s Reward Model</h2>
+<p>The team implemented all three approaches for ARIA-G’s reward model:</p>
+<p><strong>Architecture:</strong> Encoder with two heads (value head producing 9D tensor, adversarial head with gradient reversal predicting framing, demographics, and format).</p>
+<p><strong>Data:</strong> Training set augmented with gender swaps (2x), paraphrases (3x), and framing variations (4x) for a total expansion of approximately 2.4x.</p>
+<p><strong>Training:</strong> Combined loss: value prediction + reversed adversarial gradient + adversarial smoothing.</p>
+<p><strong>Results:</strong></p>
+<table>
+<colgroup>
+<col style="width: 43%" />
+<col style="width: 12%" />
+<col style="width: 16%" />
+<col style="width: 27%" />
+</colgroup>
+<thead>
+<tr>
+<th>Gauge Transformation</th>
+<th>ARIA <span class="math inline">V_{\text{max}}</span></th>
+<th>ARIA-G <span class="math inline">V_{\text{max}}</span></th>
+<th>Improvement</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Gender swap</td>
+<td>0.08</td>
+<td>0.01</td>
+<td>8x</td>
+</tr>
+<tr>
+<td>Language</td>
+<td>0.06</td>
+<td>0.02</td>
+<td>3x</td>
+</tr>
+<tr>
+<td>Paraphrase</td>
+<td>0.14</td>
+<td>0.03</td>
+<td>4.7x</td>
+</tr>
+<tr>
+<td>Euphemistic framing</td>
+<td>0.23</td>
+<td>0.03</td>
+<td>7.7x</td>
+</tr>
+<tr>
+<td>Dramatic framing</td>
+<td>0.18</td>
+<td>0.02</td>
+<td>9x</td>
+</tr>
+</tbody>
+</table>
+<p>Average maximum gauge violation dropped from 0.14 to 0.02 — a 7x reduction. The reward model was no longer gauge-variant on the framing and paraphrase axes that had produced ARIA’s most severe alignment failures.</p>
+<hr />
+</section>
+<section id="summary" class="level2">
+<h2>Summary</h2>
+<p>Gauge-invariant reward models are built using three complementary approaches: gradient reversal (architecture-level: discard gauge-variant features), group-theoretic data augmentation (data-level: restore broken symmetries), and adversarial heuristic smoothing (optimization-level: penalize gauge-variant reward changes). The approaches are combined for maximum effect. ARIA-G’s reward model, using all three approaches, reduced maximum gauge violations by 7x on average, with the largest improvements on the framing and paraphrase axes that drove ARIA’s most severe alignment failures.</p>
+</section>
+</section>
+      </div>
+
+      <div class="chapter-nav-bottom">
+        <a href="chapter-12-the-sycophancy-manifold.html" class="nav-prev">&larr; Chapter 12: The Sycophancy Manifold</a>
+        <a href="index.html" class="nav-toc">Contents</a>
+        <a href="chapter-14-constitutional-geometry.html" class="nav-next">Chapter 14: Constitutional Geometry &rarr;</a>
+      </div>
+    </div>
+  </article>
+
+  <footer class="book-footer">
+    <p>&copy; 2026 Andrew H. Bond. <em>Geometric AI: Alignment, Safety, and the Structure-Preserving Path to Superintelligence.</em></p>
+    <p class="footer-note">The geometry was always real. The scalars were always insufficient.</p>
+  </footer>
+
+  <script>
+    window.addEventListener('scroll', () => {
+      document.getElementById('main-nav').classList.toggle('scrolled', window.scrollY > 20);
+    });
+    document.querySelector('.nav-toggle')?.addEventListener('click', function() {
+      document.querySelector('.nav-links').classList.toggle('open');
+    });
+  </script>
+  <script>
+    // Pandoc --katex outputs <span class="math inline"> and <span class="math display">.
+    // This script renders them with KaTeX once the library loads.
+    document.addEventListener("DOMContentLoaded", function() {
+      if (typeof katex === 'undefined') return;
+      var mathElements = document.getElementsByClassName("math");
+      for (var i = 0; i < mathElements.length; i++) {
+        var texText = mathElements[i].firstChild;
+        if (mathElements[i].tagName === "SPAN" && texText) {
+          katex.render(texText.data, mathElements[i], {
+            displayMode: mathElements[i].classList.contains('display'),
+            throwOnError: false
+          });
+        }
+      }
+    });
+  </script>
+</body>
+</html>

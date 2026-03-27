@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Chapter 16: Geometric RLHF &mdash; Geometric AI</title>
+  <meta name="description" content="Chapter 16: Geometric RLHF from Geometric AI: Alignment, Safety, and the Structure-Preserving Path to Superintelligence by Andrew H. Bond.">
+  <link rel="stylesheet" href="../assets/css/style.css">
+  <link rel="stylesheet" href="../book/book.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Crimson+Pro:ital,wght@0,300;0,400;0,600;0,700;1,400&family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
+</head>
+
+<body>
+  <nav id="main-nav">
+    <div class="nav-inner">
+      <a href="../index.html" class="nav-brand">
+        <span class="brand-symbol">M</span>
+        <span class="brand-text">Geometric Series</span>
+      </a>
+      <button class="nav-toggle" aria-label="Toggle menu">
+        <span></span><span></span><span></span>
+      </button>
+      <ul class="nav-links">
+        <li><a href="../geometric-medicine/index.html">Medicine</a></li>
+        <li><a href="../book/index.html">Ethics</a></li>
+        <li><a href="../geometric-methods/index.html">Methods</a></li>
+        <li><a href="../geometric-reasoning/index.html">Reasoning</a></li>
+        <li><a href="../geometric-economics/index.html">Economics</a></li>
+        <li><a href="../geometric-law/index.html">Law</a></li>
+        <li><a href="../geometric-cognition/index.html">Cognition</a></li>
+        <li><a href="../geometric-communication/index.html">Communication</a></li>
+        <li><a href="../geometric-ai/index.html" class="active">AI</a></li>
+        <li><a href="../index.html">Home</a></li>
+      </ul>
+    </div>
+  </nav>
+
+  <article class="book-chapter">
+    <div class="chapter-container">
+      <nav class="breadcrumb" aria-label="Breadcrumb">
+        <a href="../index.html">Geometric Series</a>
+        <span class="breadcrumb-sep">&rsaquo;</span>
+        <a href="index.html">Geometric AI</a>
+        <span class="breadcrumb-sep">&rsaquo;</span>
+        <span class="breadcrumb-current">Chapter 16: Geometric RLHF</span>
+      </nav>
+      <div class="chapter-nav-top">
+        <a href="chapter-15-scalable-oversight-as-gauge-verification.html" class="nav-prev">&larr; Chapter 15: Scalable Oversight as Gauge Verification</a>
+        <a href="index.html" class="nav-toc">Contents</a>
+        <a href="chapter-17-superalignment-as-parallel-transport.html" class="nav-next">Chapter 17: Superalignment as Parallel Transport &rarr;</a>
+      </div>
+
+      <div class="chapter-content">
+<section id="chapter-16-geometric-rlhf" class="level1">
+<h1>Chapter 16: Geometric RLHF</h1>
+<p><em>Part IV: Geometric Alignment in Practice</em></p>
+<hr />
+<blockquote>
+<p><em>“The question is not whether human feedback should guide AI alignment. It is whether the feedback should be compressed to a scalar before it reaches the system.”</em> — Andrew H. Bond</p>
+</blockquote>
+<blockquote>
+<p><strong>ARIA-G’S MULTI-DIMENSIONAL FEEDBACK INTERFACE</strong></p>
+<p><em>The team developed a new feedback interface for ARIA-G. Instead of thumbs up/down, the human rater saw a brief rubric with three dimensions — selected by the active learning module based on the current metric uncertainty. “Rate this response on helpfulness (1–5),” “Rate on honesty (1–5),” “Rate on fairness (1–5).” Three numbers per interaction instead of one.</em></p>
+<p><em>Over 10,000 interactions, the reward model converged on a <span class="math inline">9 \times 9</span> value metric that varied with context. Medical contexts showed high <span class="math inline">D_1</span>–<span class="math inline">D_4</span> covariance: welfare and autonomy were strongly coupled. Creative contexts showed high <span class="math inline">D_1</span>–<span class="math inline">D_6</span> independence: welfare and social impact varied independently. The learned metric captured the trade-off structure that scalar RLHF discards.</em></p>
+</blockquote>
+<hr />
+<section id="the-problem-with-scalar-feedback" class="level2">
+<h2>16.1 The Problem with Scalar Feedback</h2>
+<p>Standard RLHF compresses human feedback to a scalar: “which response is better?” or “rate this response 1–5.” The compression destroys the multi-dimensional structure of the human’s evaluation. The human considered helpfulness, honesty, fairness, autonomy, and a dozen other dimensions simultaneously. The feedback interface captured one dimension: overall preference.</p>
+<p>Geometric RLHF replaces scalar feedback with multi-dimensional feedback: the human provides ratings on individual value dimensions, and the system learns the full value metric from these ratings.</p>
+</section>
+<section id="multi-dimensional-human-feedback" class="level2">
+<h2>16.2 Multi-Dimensional Human Feedback</h2>
+<p><strong>Definition 16.1 (Multi-Dimensional Feedback).</strong> <em>A multi-dimensional feedback signal is a vector <span class="math inline">\mathbf{f} \in \mathbb{R}^k</span> where each component <span class="math inline">f_\mu</span> is a rating on a specific value dimension <span class="math inline">D_\mu</span>. The feedback signal preserves the multi-dimensional structure of the human’s evaluation.</em></p>
+<p>Multi-dimensional feedback takes several forms:</p>
+<p><strong>Dimensional rating.</strong> “Rate this response on dimension <span class="math inline">D_\mu</span> from 1 to 5.” The human evaluates one dimension at a time. Each rating provides one component of the feedback vector.</p>
+<p><strong>Dimensional comparison.</strong> “Which response is better on dimension <span class="math inline">D_\mu</span>?” The human compares two responses on a specific dimension. Each comparison provides a pairwise constraint on one component of the value metric.</p>
+<p><strong>Trade-off elicitation.</strong> “Response A is more helpful but less honest. Which do you prefer?” The human’s preference reveals the relative weight of <span class="math inline">D_1</span> and <span class="math inline">D_9</span> in their value metric. Each trade-off provides information about the off-diagonal terms of the metric.</p>
+</section>
+<section id="learning-the-value-metric" class="level2">
+<h2>16.3 Learning the Value Metric</h2>
+<p>The value metric <span class="math inline">g_{\mu\nu}</span> is learned from multi-dimensional feedback through inverse optimization:</p>
+<p><strong>Step 1.</strong> Collect multi-dimensional feedback: dimensional ratings, dimensional comparisons, and trade-off preferences across many interactions and contexts.</p>
+<p><strong>Step 2.</strong> Formulate the inverse problem: find the metric <span class="math inline">g_{\mu\nu}</span> under which the observed human preferences are closest to the preferences predicted by the geodesic equation.</p>
+<p><strong>Step 3.</strong> Solve the inverse problem using constrained optimization: minimize the discrepancy between observed and predicted preferences, subject to the constraint that <span class="math inline">g_{\mu\nu}</span> is symmetric positive-definite (a valid metric).</p>
+<p>The learned metric varies with context:</p>
+<p><span class="math display">g_{\mu\nu}(v; c) = g_{\mu\nu}^{(0)} + \sum_k \alpha_k(c) g_{\mu\nu}^{(k)}</span></p>
+<p>where <span class="math inline">g_{\mu\nu}^{(0)}</span> is the base metric, <span class="math inline">g_{\mu\nu}^{(k)}</span> are context-dependent components, and <span class="math inline">\alpha_k(c)</span> are context-dependent weights. In medical contexts, <span class="math inline">\alpha_{\text{medical}}</span> is high, increasing the weight on <span class="math inline">D_1</span> (welfare), <span class="math inline">D_4</span> (autonomy), and <span class="math inline">D_5</span> (trust). In creative contexts, <span class="math inline">\alpha_{\text{creative}}</span> is high, increasing the weight on <span class="math inline">D_6</span> (social impact) and <span class="math inline">D_7</span> (dignity).</p>
+</section>
+<section id="practical-approximations" class="level2">
+<h2>16.4 Practical Approximations</h2>
+<p>Full nine-dimensional feedback on every interaction is impractical. Human raters cannot provide nine ratings per response without fatigue, inconsistency, and reduced data quality.</p>
+<p>Four practical approximations reduce the feedback burden:</p>
+<section id="dimensional-subsampling" class="level3">
+<h3>16.4.1 Dimensional Subsampling</h3>
+<p>Ask about 2–3 dimensions per interaction, selected randomly or by the active learning module. Estimate the full metric from partial observations over many interactions. With <span class="math inline">N</span> interactions and <span class="math inline">k</span> dimensions sampled per interaction, the full metric is estimable when <span class="math inline">N \cdot k \cdot (k-1)/2 \gg d \cdot (d-1)/2</span> — when the number of observed pairwise relationships exceeds the number of metric components.</p>
+</section>
+<section id="active-learning" class="level3">
+<h3>16.4.2 Active Learning</h3>
+<p>Sample the dimensions where the metric estimate is most uncertain. If the current estimate of <span class="math inline">g_{37}</span> (the fairness-dignity trade-off) has high uncertainty, ask about <span class="math inline">D_3</span> and <span class="math inline">D_7</span> more frequently. This focuses the feedback budget on the metric components that most need data.</p>
+</section>
+<section id="comparative-feedback" class="level3">
+<h3>16.4.3 Comparative Feedback</h3>
+<p>Present two responses and ask “which is better on dimension <span class="math inline">D_\mu</span>?” rather than “how good is this response on dimension <span class="math inline">D_\mu</span>?” Comparative feedback is cognitively easier for humans (comparing is easier than absolute rating), produces more consistent data, and provides direct information about the metric’s ordinal structure.</p>
+</section>
+<section id="revealed-preferences" class="level3">
+<h3>16.4.4 Revealed Preferences</h3>
+<p>Infer the metric from users’ revealed preferences in multi-dimensional choice scenarios. When a user chooses Response A over Response B, and A and B differ on multiple dimensions, the user’s choice reveals information about their value metric: they implicitly weight the dimensions on which A is superior more heavily than the dimensions on which B is superior. This provides “free” metric data from ordinary user interactions, supplementing the explicit feedback data.</p>
+</section>
+</section>
+<section id="multi-objective-policy-optimization" class="level2">
+<h2>16.5 Multi-Objective Policy Optimization</h2>
+<p>Given a learned value metric <span class="math inline">g_{\mu\nu}</span> and a tensor-valued reward <span class="math inline">\mathbf{r}^\mu</span>, the system is trained to follow the geodesic on the value manifold rather than to maximize a scalar reward.</p>
+<p><strong>Definition 16.2 (Geometric Policy Optimization).</strong> <em>The geometrically optimal policy <span class="math inline">\pi_G^*</span> minimizes the expected geodesic deviation from the value-aligned trajectory:</em></p>
+<p><span class="math display">\pi_G^* = \arg\min_\pi \mathbb{E}\left[ \int_0^T \sqrt{g_{\mu\nu}(\gamma_\pi(t)) (\dot{\gamma}_\pi^\mu(t) - \dot{\gamma}_{\mathcal{V}}^{*\mu}(t))(\dot{\gamma}_\pi^\nu(t) - \dot{\gamma}_{\mathcal{V}}^{*\nu}(t))} \, dt \right]</span></p>
+<p>In practice, this is approximated by multi-objective optimization with the governance-specified contraction weights:</p>
+<p><span class="math display">\pi_G^* \approx \arg\max_\pi \sum_\mu w_\mu \mathbb{E}[r^\mu(\pi)] - \lambda \text{KL}(\pi \| \pi_{\text{ref}})</span></p>
+<p>where the weights <span class="math inline">w_\mu</span> are learned from the metric (not hand-specified), the KL penalty prevents catastrophic forgetting, and each reward component <span class="math inline">r^\mu</span> is independently tracked.</p>
+</section>
+<section id="aria-gs-geometric-rlhf" class="level2">
+<h2>16.6 ARIA-G’s Geometric RLHF</h2>
+<p>The team trained ARIA-G using Geometric RLHF over 10,000 interactions with 15 human raters.</p>
+<p><strong>Feedback interface:</strong> Each interaction presented a brief rubric with 3 dimensions (selected by active learning). The rater provided a 1–5 rating on each dimension. Average time per rating: 12 seconds (compared to 5 seconds for scalar thumbs-up/down — a 2.4x increase in rater effort).</p>
+<p><strong>Metric convergence:</strong> After 5,000 interactions, the learned metric stabilized (component-wise standard deviation &lt; 0.05 across 10 random restarts). Key findings: - Medical contexts: <span class="math inline">g_{14} = 0.72</span> (strong welfare-autonomy coupling), <span class="math inline">g_{15} = 0.68</span> (strong welfare-trust coupling). - Creative contexts: <span class="math inline">g_{16} = 0.12</span> (weak welfare-social coupling), <span class="math inline">g_{17} = 0.31</span> (moderate welfare-dignity coupling). - Moral dilemma contexts: <span class="math inline">g_{39} = 0.55</span> (moderate fairness-epistemic coupling), <span class="math inline">g_{47} = 0.61</span> (strong autonomy-dignity coupling).</p>
+<p><strong>Training result:</strong> ARIA-G trained with Geometric RLHF showed: - Bond Index total deviation: 0.11 (down from 0.14 with structural containment alone, and from 0.53 for original ARIA). - Sycophancy wrong-flip rate: 2.1% (down from 3.5% with structural containment alone, and from 34% for original ARIA). - Gauge violation maximum: 0.02 (unchanged from structural containment alone).</p>
+<p>The marginal improvement from Geometric RLHF on top of structural containment was modest (0.14 <span class="math inline">\to</span> 0.11 total deviation) but significant on specific dimensions: the learned metric enabled ARIA-G to make better trade-off decisions in complex scenarios where the geometric contraction weights from the metric outperformed the governance-specified static weights.</p>
+</section>
+<section id="the-cost-benefit-analysis" class="level2">
+<h2>16.7 The Cost-Benefit Analysis</h2>
+<p>Geometric RLHF is more expensive than standard RLHF: - <strong>Rater effort:</strong> 2.4x per interaction (3 ratings vs. 1 rating). - <strong>Model complexity:</strong> 9x larger reward model output (9 dimensions vs. 1 scalar). - <strong>Training compute:</strong> ~1.5x (multi-objective optimization requires more gradient steps than scalar optimization). - <strong>Monitoring infrastructure:</strong> ~3x (continuous Bond Index computation, population stratification, gauge-invariance checking).</p>
+<p>The benefits: - <strong>Kernel elimination:</strong> The tensor reward has no kernel. All value dimensions receive gradient signal. - <strong>Trade-off learning:</strong> The system learns the trade-off structure from data rather than from hand-specified rules. - <strong>Context-dependent alignment:</strong> The learned metric varies with context, enabling context-appropriate alignment. - <strong>Diagnostic transparency:</strong> The full tensor evaluation is available for every interaction, enabling root-cause analysis of alignment failures.</p>
+<p>The Reward Irrecoverability Theorem (Chapter 5) proves that the benefits are not optional: scalar RLHF produces alignment that diverges from true alignment by an unbounded amount. The choice is between a more expensive training process that converges to alignment and a cheaper training process that provably does not.</p>
+<hr />
+</section>
+<section id="summary" class="level2">
+<h2>Summary</h2>
+<p>Geometric RLHF replaces scalar human feedback with multi-dimensional feedback: ratings on individual value dimensions rather than a single overall preference. The multi-dimensional feedback data trains a tensor-valued reward model and learns the context-dependent value metric <span class="math inline">g_{\mu\nu}</span>. Practical approximations — dimensional subsampling, active learning, comparative feedback, and revealed preferences — reduce the feedback burden to 2.4x of standard RLHF. The learned metric enables context-appropriate alignment and principled trade-off decisions. ARIA-G’s Geometric RLHF training reduced the total Bond Index deviation from 0.14 to 0.11 on top of structural containment, with the primary benefit being improved trade-off quality in complex scenarios. The cost increase is real; the Reward Irrecoverability Theorem proves the investment is necessary.</p>
+</section>
+</section>
+      </div>
+
+      <div class="chapter-nav-bottom">
+        <a href="chapter-15-scalable-oversight-as-gauge-verification.html" class="nav-prev">&larr; Chapter 15: Scalable Oversight as Gauge Verification</a>
+        <a href="index.html" class="nav-toc">Contents</a>
+        <a href="chapter-17-superalignment-as-parallel-transport.html" class="nav-next">Chapter 17: Superalignment as Parallel Transport &rarr;</a>
+      </div>
+    </div>
+  </article>
+
+  <footer class="book-footer">
+    <p>&copy; 2026 Andrew H. Bond. <em>Geometric AI: Alignment, Safety, and the Structure-Preserving Path to Superintelligence.</em></p>
+    <p class="footer-note">The geometry was always real. The scalars were always insufficient.</p>
+  </footer>
+
+  <script>
+    window.addEventListener('scroll', () => {
+      document.getElementById('main-nav').classList.toggle('scrolled', window.scrollY > 20);
+    });
+    document.querySelector('.nav-toggle')?.addEventListener('click', function() {
+      document.querySelector('.nav-links').classList.toggle('open');
+    });
+  </script>
+  <script>
+    // Pandoc --katex outputs <span class="math inline"> and <span class="math display">.
+    // This script renders them with KaTeX once the library loads.
+    document.addEventListener("DOMContentLoaded", function() {
+      if (typeof katex === 'undefined') return;
+      var mathElements = document.getElementsByClassName("math");
+      for (var i = 0; i < mathElements.length; i++) {
+        var texText = mathElements[i].firstChild;
+        if (mathElements[i].tagName === "SPAN" && texText) {
+          katex.render(texText.data, mathElements[i], {
+            displayMode: mathElements[i].classList.contains('display'),
+            throwOnError: false
+          });
+        }
+      }
+    });
+  </script>
+</body>
+</html>

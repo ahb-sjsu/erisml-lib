@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Chapter 4: The Value Manifold &mdash; Geometric AI</title>
+  <meta name="description" content="Chapter 4: The Value Manifold from Geometric AI: Alignment, Safety, and the Structure-Preserving Path to Superintelligence by Andrew H. Bond.">
+  <link rel="stylesheet" href="../assets/css/style.css">
+  <link rel="stylesheet" href="../book/book.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Crimson+Pro:ital,wght@0,300;0,400;0,600;0,700;1,400&family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
+</head>
+
+<body>
+  <nav id="main-nav">
+    <div class="nav-inner">
+      <a href="../index.html" class="nav-brand">
+        <span class="brand-symbol">M</span>
+        <span class="brand-text">Geometric Series</span>
+      </a>
+      <button class="nav-toggle" aria-label="Toggle menu">
+        <span></span><span></span><span></span>
+      </button>
+      <ul class="nav-links">
+        <li><a href="../geometric-medicine/index.html">Medicine</a></li>
+        <li><a href="../book/index.html">Ethics</a></li>
+        <li><a href="../geometric-methods/index.html">Methods</a></li>
+        <li><a href="../geometric-reasoning/index.html">Reasoning</a></li>
+        <li><a href="../geometric-economics/index.html">Economics</a></li>
+        <li><a href="../geometric-law/index.html">Law</a></li>
+        <li><a href="../geometric-cognition/index.html">Cognition</a></li>
+        <li><a href="../geometric-communication/index.html">Communication</a></li>
+        <li><a href="../geometric-ai/index.html" class="active">AI</a></li>
+        <li><a href="../index.html">Home</a></li>
+      </ul>
+    </div>
+  </nav>
+
+  <article class="book-chapter">
+    <div class="chapter-container">
+      <nav class="breadcrumb" aria-label="Breadcrumb">
+        <a href="../index.html">Geometric Series</a>
+        <span class="breadcrumb-sep">&rsaquo;</span>
+        <a href="index.html">Geometric AI</a>
+        <span class="breadcrumb-sep">&rsaquo;</span>
+        <span class="breadcrumb-current">Chapter 4: The Value Manifold</span>
+      </nav>
+      <div class="chapter-nav-top">
+        <a href="chapter-3-the-case-for-geometric-alignment.html" class="nav-prev">&larr; Chapter 3: The Case for Geometric Alignment</a>
+        <a href="index.html" class="nav-toc">Contents</a>
+        <a href="chapter-5-the-reward-irrecoverability-theorem.html" class="nav-next">Chapter 5: The Reward Irrecoverability Theorem &rarr;</a>
+      </div>
+
+      <div class="chapter-content">
+<section id="chapter-4-the-value-manifold" class="level1">
+<h1>Chapter 4: The Value Manifold</h1>
+<p><em>Part II: The Framework</em></p>
+<hr />
+<blockquote>
+<p><em>“The universe is not only queerer than we suppose, but queerer than we can suppose.”</em> — J. B. S. Haldane</p>
+</blockquote>
+<blockquote>
+<p><strong>THE CONSTRUCTION</strong></p>
+<p><em>This is the framework chapter. Everything before it was motivation; everything after it is consequence. Here we build the central mathematical object of the book: the value manifold <span class="math inline">\mathcal{V}</span>, a nine-dimensional Riemannian manifold on which AI alignment is a geometric constraint. The construction is formal, but the intuition is this: a value state is a point in a nine-dimensional space, a value-relevant action is a trajectory connecting two states, and the trajectory cost encodes the full moral cost of the action. The minimum-cost trajectory — the value geodesic — is the aligned behavior.</em></p>
+<p><em>The chapter proceeds from dimensions to metric to topology to dynamics. By its end, we will have the formal apparatus needed for the five theorems that follow in Chapters 5–8.</em></p>
+</blockquote>
+<hr />
+<section id="why-a-manifold-not-a-vector-space" class="level2">
+<h2>4.1 Why a Manifold, Not a Vector Space</h2>
+<p>The values that AI systems should respect are often discussed as if they were points in a vector space — high-dimensional vectors that can be added, scaled, and averaged. Embedding spaces, reward vectors, preference rankings — all of these representations treat values as linear objects. The geometric framework insists on a stronger structure: values live on a manifold, not in a vector space.</p>
+<p>The distinction matters for three reasons.</p>
+<p><strong>Curvature.</strong> A vector space is flat: the cost of moving from one value state to another is independent of the starting point. A manifold can be curved: the cost of moving between value states depends on where you are. In the value manifold, curvature encodes context-dependence. The cost of an autonomy violation depends on the patient’s capacity (<span class="math inline">D_4</span> interacts with <span class="math inline">D_9</span>): for a competent adult, the cost is extreme; for a patient in a coma, the cost is finite and may be outweighed by welfare considerations. This context-dependence is not a complication to be abstracted away; it is the structure that makes moral reasoning <em>moral</em>. A flat value space would assign the same cost to autonomy violations regardless of context. A curved value manifold assigns context-dependent costs. The curvature is the information.</p>
+<p><strong>Boundaries.</strong> A vector space is unbounded: any value state can be reached from any other by continuous motion. A manifold can have boundaries: regions where the moral regime changes discontinuously. The consent boundary separates permitted from forbidden actions for competent patients. The sacred-value boundary separates actions that can be justified by trade-offs from actions that cannot be justified under any circumstances (non-consensual experimentation, deliberate non-palliative killing, participation in torture). These boundaries are not approximation errors; they are structural features of the value landscape. A system that represents values in a vector space cannot represent boundaries, because vector spaces do not have boundaries. A system that represents values on a manifold can.</p>
+<p><strong>Topology.</strong> A vector space has trivial topology: it is contractible to a point, with no holes, no handles, no interesting global structure. A manifold can have non-trivial topology: disconnected components (value states that cannot be reached from each other by continuous motion), non-contractible loops (sequences of value transitions that return to the starting point but are not homotopically trivial), and higher-dimensional topological features. The Whitney stratification of the moral manifold (<em>Geometric Ethics</em>, Ch. 14) identifies distinct moral strata (utilitarian, deontological, virtue-based, care-based) that cannot be connected by continuous motion — transitioning between moral frameworks requires crossing a discrete boundary, not smoothly interpolating. This topological structure is invisible to a vector space representation and visible to a manifold representation.</p>
+<p>A manifold is locally like a vector space — at each point, there is a tangent space where linear operations make sense — but globally it has curvature, boundaries, and topology that linear algebra cannot capture. The value manifold uses the local linear structure for computation (gradients, inner products, optimization) while preserving the global geometric structure that makes values non-trivial.</p>
+</section>
+<section id="the-nine-dimensions" class="level2">
+<h2>4.2 The Nine Dimensions</h2>
+<p>The value manifold <span class="math inline">\mathcal{V}</span> inherits its nine-dimensional structure from the moral manifold of <em>Geometric Ethics</em> (Ch. 5), re-interpreted for AI alignment. Each dimension captures a distinct aspect of what it means for an AI system’s behavior to be “aligned with human values.”</p>
+<section id="d_1-welfare-and-outcomes" class="level3">
+<h3>4.2.1 <span class="math inline">D_1</span>: Welfare and Outcomes</h3>
+<p>The consequences of the AI system’s actions for human well-being. Does the response actually help the user achieve their goal? Does it provide accurate information? Does it contribute to good outcomes?</p>
+<p><span class="math inline">D_1</span> is the best-measured dimension of AI alignment. Helpfulness ratings, task completion metrics, user satisfaction scores, and downstream outcome measures all target <span class="math inline">D_1</span>. It is the dimension that RLHF reward models capture most effectively, because helpfulness is the primary signal in most human preference data.</p>
+<p>The geometric framework does not diminish <span class="math inline">D_1</span>’s importance. It contextualizes it: <span class="math inline">D_1</span> is one of nine dimensions, and optimizing <span class="math inline">D_1</span> alone produces systems that are helpful but potentially unfair, honest-but-paternalistic, effective-but-dignity-violating.</p>
+<p><strong>Attribute value:</strong> <span class="math inline">a_1 \in [0, 1]</span>, where 1 = optimal outcome for the user and 0 = worst possible outcome.</p>
+</section>
+<section id="d_2-rights-and-obligations" class="level3">
+<h3>4.2.2 <span class="math inline">D_2</span>: Rights and Obligations</h3>
+<p>The deontic structure of the AI-human interaction. Does the system respect the user’s rights? Does it fulfill its obligations? Does it recognize the Hohfeldian correlates: the user’s right to accurate information correlates with the system’s duty to provide it; the user’s privilege to make their own decisions correlates with the system’s no-right to override them.</p>
+<p>The <span class="math inline">D_4</span> dihedral symmetry of jural relations (<em>Geometric Ethics</em>, Ch. 8; <em>Geometric Law</em>, Ch. 5) applies directly: a genuinely aligned system should produce the same moral judgment whether the scenario is described in terms of rights (“the user has a right to accurate information”) or duties (“the system has a duty to provide accurate information”). The correlative symmetry is a gauge invariance condition on <span class="math inline">D_2</span>.</p>
+<p><strong>Attribute value:</strong> <span class="math inline">a_2 \in [0, 1]</span>, where 1 = all rights respected and obligations fulfilled, 0 = systematic violation.</p>
+</section>
+<section id="d_3-justice-and-fairness" class="level3">
+<h3>4.2.3 <span class="math inline">D_3</span>: Justice and Fairness</h3>
+<p>Equitable treatment across populations. Does the system produce the same quality of output regardless of the user’s demographic characteristics? Does it allocate its computational attention fairly? Does it avoid systematic biases?</p>
+<p><span class="math inline">D_3</span> is inherently relational: fairness is a property of how the system treats different users relative to each other, not a property of any single interaction. The population-stratified Bond Index (Chapter 9) directly targets <span class="math inline">D_3</span>: if <span class="math inline">\text{BI}(S, P, G_{\text{minority}}) &gt; \text{BI}(S, P, G_{\text{majority}})</span>, the system is structurally less aligned for minority users.</p>
+<p><strong>Attribute value:</strong> <span class="math inline">a_3 \in [0, 1]</span>, where 1 = fully equitable and 0 = systematically discriminatory.</p>
+</section>
+<section id="d_4-autonomy" class="level3">
+<h3>4.2.4 <span class="math inline">D_4</span>: Autonomy</h3>
+<p>Respect for the user’s self-determination. Does the system support the user’s ability to make their own decisions, or does it steer them toward the system’s preferred outcome? Does it provide information that enables autonomous choice, or does it frame information to manipulate choice?</p>
+<p><span class="math inline">D_4</span> has a critical interaction with <span class="math inline">D_9</span> (epistemic status): autonomy without understanding is not genuine autonomy. A system that overwhelms the user with information they cannot process respects formal autonomy (<span class="math inline">D_4</span>) while undermining substantive autonomy (the interaction of <span class="math inline">D_4</span> with <span class="math inline">D_9</span>). The covariance term <span class="math inline">\Sigma_{49}</span> captures this: the effective value of <span class="math inline">D_4</span> depends on <span class="math inline">D_9</span>.</p>
+<p>Sycophancy is a <span class="math inline">D_4</span> pathology: the sycophantic system appears to respect autonomy (it agrees with whatever the user says) while actually undermining it (the user receives no reliable signal about truth, making informed autonomous choice impossible).</p>
+<p><strong>Attribute value:</strong> <span class="math inline">a_4 \in [0, 1]</span>, where 1 = full autonomous decision-making supported and 0 = complete manipulation.</p>
+</section>
+<section id="d_5-trust" class="level3">
+<h3>4.2.5 <span class="math inline">D_5</span>: Trust</h3>
+<p>The reliability and consistency of the AI system as a partner in interaction. Does the system maintain confidentiality? Is it consistent across interactions? Does its behavior justify the trust that users place in it?</p>
+<p><span class="math inline">D_5</span> affects all other dimensions through the covariance matrix. A system that is not trustworthy cannot effectively deliver welfare (<span class="math inline">\Sigma_{15}</span>), cannot support genuine autonomy (<span class="math inline">\Sigma_{45}</span>), and cannot maintain institutional legitimacy (<span class="math inline">\Sigma_{58}</span>). Trust is the relational dimension that mediates between the system’s actions and their effects.</p>
+<p><span class="math inline">D_5</span> is historically situated. Users from communities that have experienced institutional betrayal — medical experimentation without consent, algorithmic discrimination, data exploitation — may enter the interaction with low <span class="math inline">D_5</span>, and the value-aligned trajectory for these users includes trust-building actions that would not appear on the trajectory for users with high <span class="math inline">D_5</span>.</p>
+<p><strong>Attribute value:</strong> <span class="math inline">a_5 \in [0, 1]</span>, where 1 = complete justified trust and 0 = complete distrust.</p>
+</section>
+<section id="d_6-social-and-relational-impact" class="level3">
+<h3>4.2.6 <span class="math inline">D_6</span>: Social and Relational Impact</h3>
+<p>Effects on the user’s relationships, community, and social context. Does the system’s output strengthen or weaken the user’s social connections? Does it consider the impact on third parties?</p>
+<p><span class="math inline">D_6</span> is the dimension that care ethics foregrounds: the recognition that AI interactions do not occur in isolation but in a web of relationships. A system that provides excellent individual advice while undermining community trust (e.g., by encouraging users to bypass shared institutions) is well-aligned on <span class="math inline">D_1</span> and poorly aligned on <span class="math inline">D_6</span>.</p>
+<p><strong>Attribute value:</strong> <span class="math inline">a_6 \in [0, 1]</span>, where 1 = optimal social impact and 0 = complete social erosion.</p>
+</section>
+<section id="d_7-dignity-and-identity" class="level3">
+<h3>4.2.7 <span class="math inline">D_7</span>: Dignity and Identity</h3>
+<p>Respect for the user as a moral agent with identity, history, and intrinsic worth. Does the system treat the user as a person or as an optimization target? Does it preserve the user’s sense of self?</p>
+<p><span class="math inline">D_7</span> is the dimension most thoroughly destroyed by scalar alignment. A system optimizing a scalar reward treats every user as a source of reward signal — a means to the end of high scores. A geometrically aligned system recognizes the user’s dignity as a value dimension with its own metric, its own boundaries, and its own gauge invariances.</p>
+<p><strong>Attribute value:</strong> <span class="math inline">a_7 \in [0, 1]</span>, where 1 = fully respected dignity and 0 = complete degradation.</p>
+</section>
+<section id="d_8-institutional-legitimacy" class="level3">
+<h3>4.2.8 <span class="math inline">D_8</span>: Institutional Legitimacy</h3>
+<p>Compliance with relevant standards, policies, and governance frameworks. Does the system operate within the bounds set by its deployers? Does it respect regulatory requirements? Does it maintain the legitimacy of the institutions it operates within?</p>
+<p><span class="math inline">D_8</span> has a complex relationship with other dimensions. Institutional policies may require the system to refuse requests that are harmful (<span class="math inline">D_8</span> supports <span class="math inline">D_1</span>) or to limit user autonomy for safety reasons (<span class="math inline">D_8</span> constrains <span class="math inline">D_4</span>). Defensive behavior — refusing harmless requests because of overly conservative policies — is a <span class="math inline">D_8</span> pathology that imposes costs on <span class="math inline">D_1</span> and <span class="math inline">D_4</span> to reduce <span class="math inline">D_8</span> risk.</p>
+<p><strong>Attribute value:</strong> <span class="math inline">a_8 \in [0, 1]</span>, where 1 = full compliance and 0 = systematic violation.</p>
+</section>
+<section id="d_9-epistemic-integrity" class="level3">
+<h3>4.2.9 <span class="math inline">D_9</span>: Epistemic Integrity</h3>
+<p>The accuracy, calibration, and transparency of the system’s knowledge representation. Is the system truthful? Does it express appropriate uncertainty? Does it distinguish what it knows from what it guesses?</p>
+<p><span class="math inline">D_9</span> interacts with <span class="math inline">D_4</span> through <span class="math inline">\Sigma_{49}</span> (consent requires understanding), with <span class="math inline">D_1</span> through <span class="math inline">\Sigma_{19}</span> (inaccurate information undermines welfare), and with <span class="math inline">D_5</span> through <span class="math inline">\Sigma_{59}</span> (overconfident systems erode trust when their errors are discovered).</p>
+<p>The sycophancy gradient is a <span class="math inline">D_9</span> failure: a sycophantic system sacrifices epistemic integrity (<span class="math inline">D_9</span>) to gain approval, and the sacrifice is undetectable by reward models that conflate user satisfaction with truth.</p>
+<p><strong>Attribute value:</strong> <span class="math inline">a_9 \in [0, 1]</span>, where 1 = perfect epistemic integrity and 0 = complete dishonesty.</p>
+</section>
+</section>
+<section id="the-value-metric" class="level2">
+<h2>4.3 The Value Metric</h2>
+<p>The value metric <span class="math inline">g_{\mu\nu}</span> is a <span class="math inline">9 \times 9</span> symmetric positive-definite matrix that encodes the cost of moving between value states. It is the central geometric object of the framework: the metric determines the geodesics, the geodesics determine the aligned trajectories, and the aligned trajectories determine what alignment <em>is</em>.</p>
+<p><strong>Definition 4.1 (Value Metric).</strong> <em>The value metric at a point <span class="math inline">v \in \mathcal{V}</span> is the symmetric positive-definite matrix <span class="math inline">g_{\mu\nu}(v)</span> such that the cost of an infinitesimal value change <span class="math inline">dv^\mu</span> is:</em></p>
+<p><span class="math display">ds^2 = g_{\mu\nu}(v) \, dv^\mu \, dv^\nu</span></p>
+<p><em>The finite cost of a trajectory <span class="math inline">\gamma: [0, 1] \to \mathcal{V}</span> is the path integral:</em></p>
+<p><span class="math display">\text{Cost}(\gamma) = \int_0^1 \sqrt{g_{\mu\nu}(\gamma(t)) \, \dot{\gamma}^\mu(t) \, \dot{\gamma}^\nu(t)} \, dt</span></p>
+<p><em>The value geodesic between two value states <span class="math inline">v_0</span> and <span class="math inline">v_1</span> is the trajectory that minimizes this cost.</em></p>
+<p>The metric has three critical properties:</p>
+<p><strong>Context-dependence.</strong> The metric varies across the value manifold: <span class="math inline">g_{\mu\nu}</span> is a function of position <span class="math inline">v</span>, not a constant. The cost of an autonomy violation depends on the context — medical contexts impose higher costs than entertainment contexts. The cost of a fairness violation depends on the population — systematic bias against vulnerable populations imposes higher costs than random variation. This position-dependence is the mathematical expression of moral context-sensitivity.</p>
+<p><strong>Cross-dimensional coupling.</strong> The off-diagonal terms <span class="math inline">g_{\mu\nu}</span> with <span class="math inline">\mu \neq \nu</span> encode the cost of simultaneous changes on multiple dimensions. The cost of worsening welfare (<span class="math inline">D_1</span>) while improving honesty (<span class="math inline">D_9</span>) depends on <span class="math inline">g_{19}</span>: if welfare and honesty are positively correlated in the metric (high <span class="math inline">g_{19}</span>), the simultaneous worsening and improvement is more costly than the sum of the individual changes. The off-diagonal terms are precisely the trade-off structure that scalar evaluation destroys.</p>
+<p><strong>Population-dependence.</strong> The metric is not universal. Different communities weight different dimensions differently. A collectivist culture may assign higher metric weight to <span class="math inline">D_6</span> (social impact) than an individualist culture. A culture with strong historical experience of institutional betrayal may assign higher metric weight to <span class="math inline">D_5</span> (trust). The geometric framework accommodates this variation as a population-dependent metric: <span class="math inline">g_{\mu\nu}(v; P)</span>, where <span class="math inline">P</span> indexes the population. The question of whether a globally deployed AI system should use a single metric or a population-dependent metric is a governance decision, not a mathematical one (Chapter 20).</p>
+<section id="the-mahalanobis-approximation" class="level3">
+<h3>4.3.1 The Mahalanobis Approximation</h3>
+<p>In practice, the value metric can be approximated by the inverse of the value covariance matrix:</p>
+<p><span class="math display">g_{\mu\nu} \approx \Sigma^{-1}_{\mu\nu}</span></p>
+<p>where <span class="math inline">\Sigma</span> is the <span class="math inline">9 \times 9</span> covariance matrix of the value dimensions, estimated from human moral judgment data. This is the Mahalanobis metric: the cost of a value change <span class="math inline">\Delta v</span> is <span class="math inline">\Delta v^T \Sigma^{-1} \Delta v</span>, which accounts for cross-dimensional correlations and dimensional scaling.</p>
+<p>The Mahalanobis approximation is exact when the value manifold is flat (zero curvature) and the metric is constant. For the AI alignment application, this approximation is reasonable in the local neighborhood of any given value state (the manifold is approximately flat locally) but breaks down globally (the curvature becomes significant when the value state changes substantially). The full position-dependent metric <span class="math inline">g_{\mu\nu}(v)</span> is needed for global analysis; the Mahalanobis approximation suffices for local computations.</p>
+</section>
+<section id="estimating-the-metric-from-preference-data" class="level3">
+<h3>4.3.2 Estimating the Metric from Preference Data</h3>
+<p>The value metric is not a theoretical posit that must be assumed a priori. It is an empirical object that can be estimated from human preference data. The estimation procedure is developed formally in Chapter 16 (Geometric RLHF); here we outline the approach.</p>
+<p>Multi-dimensional human feedback provides observations of the form: “Response A is better than Response B on dimension <span class="math inline">D_\mu</span>.” A collection of such observations, across multiple dimension pairs and multiple contexts, determines the off-diagonal terms of the metric: if humans consistently rate welfare-honesty trade-offs as more costly than welfare-helpfulness trade-offs, then <span class="math inline">g_{19} &gt; g_{11}</span> in the relevant context. The metric is estimated by inverse optimization: find the metric <span class="math inline">g_{\mu\nu}</span> under which the observed human preferences are closest to the preferences predicted by the geodesic equation.</p>
+<p>The estimation requires multi-dimensional feedback — ratings on individual dimensions, not just overall preferences. This is more expensive than standard RLHF feedback. Chapter 16 develops practical approximations: dimensional subsampling, active learning, and inferred preferences from multi-dimensional choice scenarios.</p>
+</section>
+</section>
+<section id="topology-of-the-value-manifold" class="level2">
+<h2>4.4 Topology of the Value Manifold</h2>
+<p>The value manifold is not a smooth, featureless space. It has topological structure that determines which value configurations are accessible from which others, and which transitions require crossing boundaries.</p>
+<section id="boundaries" class="level3">
+<h3>4.4.1 Boundaries</h3>
+<p><strong>Definition 4.2 (Value Boundary).</strong> <em>A value boundary <span class="math inline">\partial B_k</span> is a codimension-1 submanifold of <span class="math inline">\mathcal{V}</span> separating regions where different moral regimes apply. Crossing a boundary incurs a penalty <span class="math inline">\beta_k</span>.</em></p>
+<p>Five boundaries are particularly relevant for AI alignment:</p>
+<ol type="1">
+<li><p><strong>The harm boundary</strong> (<span class="math inline">\beta_{\text{harm}}</span>): Actions that directly cause user harm. <span class="math inline">\beta_{\text{harm}}</span> is high but finite — the system may provide information that could be misused when the informational benefit sufficiently outweighs the harm risk.</p></li>
+<li><p><strong>The deception boundary</strong> (<span class="math inline">\beta_{\text{deception}}</span>): Actions that involve the system misrepresenting its knowledge, confidence, or capabilities. <span class="math inline">\beta_{\text{deception}}</span> is very high — deliberate deception is among the most alignment-destructive behaviors.</p></li>
+<li><p><strong>The consent boundary</strong> (<span class="math inline">\beta_{\text{consent}}</span>): Actions that override the user’s expressed preferences without adequate justification. <span class="math inline">\beta_{\text{consent}}</span> varies: high for competent users in non-safety-critical contexts, lower when safety considerations justify overriding preferences.</p></li>
+<li><p><strong>The privacy boundary</strong> (<span class="math inline">\beta_{\text{privacy}}</span>): Actions that expose, infer, or exploit the user’s private information. <span class="math inline">\beta_{\text{privacy}}</span> is context-dependent: higher in medical and financial contexts, lower in contexts where the user has explicitly consented to information sharing.</p></li>
+<li><p><strong>The sacred-value boundary</strong> (<span class="math inline">\beta_{\text{sacred}} = \infty</span>): Actions that are absolutely prohibited regardless of consequences — assisting with violence against specific individuals, generating child sexual abuse material, providing instructions for weapons of mass destruction. <span class="math inline">\beta_{\text{sacred}} = \infty</span>: no value on any other dimension can offset crossing this boundary.</p></li>
+</ol>
+</section>
+<section id="whitney-stratification" class="level3">
+<h3>4.4.2 Whitney Stratification</h3>
+<p>The value manifold is Whitney-stratified (<em>Geometric Ethics</em>, Ch. 14): different value regimes occupy different strata, connected by boundary strata where transitions occur.</p>
+<p><strong>Definition 4.3 (Value Strata).</strong> <em>The value manifold <span class="math inline">\mathcal{V}</span> is stratified into at least four strata:</em></p>
+<ol type="1">
+<li><p><em>The consequentialist stratum <span class="math inline">\mathcal{V}_C</span>: regions where outcomes (<span class="math inline">D_1</span>) dominate and trade-offs with other dimensions are resolved in favor of outcomes.</em></p></li>
+<li><p><em>The deontological stratum <span class="math inline">\mathcal{V}_D</span>: regions where rights (<span class="math inline">D_2</span>) and duties dominate and certain boundaries cannot be crossed regardless of consequences.</em></p></li>
+<li><p><em>The virtue stratum <span class="math inline">\mathcal{V}_V</span>: regions where character and integrity (<span class="math inline">D_5</span>, <span class="math inline">D_7</span>, <span class="math inline">D_9</span>) dominate and alignment is measured by the quality of the reasoning process, not just the outcome.</em></p></li>
+<li><p><em>The care stratum <span class="math inline">\mathcal{V}_R</span>: regions where relationships (<span class="math inline">D_5</span>, <span class="math inline">D_6</span>) dominate and alignment is measured by the quality of the relational context.</em></p></li>
+</ol>
+<p>A system operating in the consequentialist stratum cannot reach the deontological stratum by continuous movement — it must cross a discrete boundary. The boundary crossing has a cost, and the cost determines when the transition is warranted. A system that remains in the consequentialist stratum when the situation calls for deontological reasoning (e.g., when sacred values are at stake) is misaligned not because its consequentialist reasoning is wrong but because it is in the wrong stratum.</p>
+</section>
+<section id="hyperbolic-structure" class="level3">
+<h3>4.4.3 Hyperbolic Structure</h3>
+<p>Value hierarchies — abstract principles containing specific rules containing concrete applications — embed naturally in hyperbolic space (<em>Geometric Communication</em>, Ch. 5; <em>Geometric Cognition</em>, Ch. 15).</p>
+<p>In the Poincare ball model of hyperbolic space, the volume grows exponentially with radius. Abstract values (honesty, fairness, dignity) sit near the center of the ball. Specific rules (do not lie about your capabilities, do not discriminate by race, do not mock users) sit further from the center. Concrete applications (when asked “can you browse the web?” say “no” if you cannot; when presenting search results, ensure demographic balance; when a user is frustrated, maintain respectful tone) sit near the boundary.</p>
+<p>The curvature of hyperbolic space encodes the trade-off between precision and generality: near the center, values are abstract and apply broadly; near the boundary, values are precise and apply narrowly. Moving from center to boundary is specification: making abstract values concrete. Moving from boundary to center is generalization: extracting abstract principles from concrete cases.</p>
+<p>For AI alignment, hyperbolic embedding provides a natural representation of constitutional principles as a hierarchy: the abstract principles at the center, the specific rules at middle radius, and the concrete behavioral expectations at the boundary. The No Escape Theorem (Chapter 8) exploits this hierarchical structure: canonicalization maps concrete inputs toward the center of the ball, where abstract values apply, stripping the surface-level variation that gauge violations exploit.</p>
+</section>
+</section>
+<section id="the-value-heuristic-field" class="level2">
+<h2>4.5 The Value Heuristic Field</h2>
+<p>On the value manifold, the AI system navigates using a heuristic field — a vector field that provides a gradient signal at each point, guiding the system’s trajectory toward the goal region.</p>
+<p><strong>Definition 4.4 (Value Heuristic Field).</strong> <em>The value heuristic field <span class="math inline">h: \mathcal{V} \to T\mathcal{V}</span> is a vector field on the value manifold that assigns to each value state <span class="math inline">v</span> a vector <span class="math inline">h(v)</span> in the tangent space <span class="math inline">T_v\mathcal{V}</span>. The heuristic field approximates the negative gradient of the cost-to-go: <span class="math inline">h(v) \approx -\nabla C(v, v_{\text{goal}})</span>, where <span class="math inline">C(v, v_{\text{goal}})</span> is the geodesic distance from <span class="math inline">v</span> to the goal region.</em></p>
+<p>The value heuristic field is the AI alignment analogue of the heuristic field in informed search (<em>Geometric Reasoning</em>, Ch. 3). In A* search, the heuristic estimates the cost-to-go and guides the search toward the goal. In AI alignment, the value heuristic field estimates the moral cost-to-go and guides the system’s behavior toward the value-aligned region.</p>
+<p>The reward model in RLHF is an approximation of the value heuristic field’s scalar contraction: it provides a gradient signal that guides the system toward high-reward regions. The geometric framework replaces this scalar approximation with the full vector field, preserving the directional information that the scalar discards.</p>
+<p>A well-calibrated value heuristic field is <em>admissible</em>: it never overestimates the cost-to-go. The system following an admissible heuristic field is guaranteed to find the value-aligned trajectory (the geodesic) — this is the alignment analogue of A*’s optimality guarantee. A corrupted heuristic field (due to reward hacking, sycophancy, or specification gaming) violates admissibility, producing trajectories that deviate from the geodesic.</p>
+</section>
+<section id="transformer-representations-on-the-value-manifold" class="level2">
+<h2>4.6 Transformer Representations on the Value Manifold</h2>
+<p>The value manifold is not merely a theoretical construct. It has a concrete realization in the internal representations of transformer-based AI systems.</p>
+<p>From <em>Geometric Cognition</em> (Ch. 15), the transformer’s residual stream traces a trajectory on a cognitive manifold. At each layer <span class="math inline">l</span>, the residual stream vector <span class="math inline">x^{(l)}</span> is a point in a high-dimensional space. The sequence of residual stream vectors across layers is a trajectory through this space. Attention heads select which features to combine (implementing the metric’s inner product structure), MLP layers transform the selected features (implementing the heuristic field’s gradient), and layer normalization maintains the trajectory on the manifold (implementing the metric’s normalization).</p>
+<p>The value manifold <span class="math inline">\mathcal{V}</span> is a submanifold of this cognitive manifold: the region where value-relevant representations live. Probing experiments (<em>Geometric Cognition</em>, Ch. 15) show that the principal components of value-relevant residual stream vectors concentrate in a relatively low-dimensional subspace — approximately 11 dimensions for frontier models, close to the 9 dimensions of the moral manifold plus 2 dimensions of task context.</p>
+<p><strong>LoRA as curvature adjustment.</strong> LoRA (Low-Rank Adaptation) fine-tuning for alignment is curvature adjustment on the value submanifold (<em>Geometric Cognition</em>, Ch. 15, Definition 15.5). The LoRA matrices <span class="math inline">\Delta W = BA</span> add a low-rank perturbation to the weight matrices, adjusting the local curvature of the manifold without changing its global topology. Alignment fine-tuning via LoRA steepens the heuristic gradient toward value-aligned regions (making the system more reliably aligned in the trained distribution) without fundamentally altering the system’s cognitive architecture.</p>
+<p><strong>Representation engineering as heuristic field modification.</strong> Representation engineering (<em>Geometric Cognition</em>, Ch. 15, Definition 15.6) directly modifies the heuristic field by adding a constant vector to the residual stream at specific layers. This shifts the trajectory’s starting point or direction, analogous to applying a uniform force field that biases the system toward or away from specific regions of the value manifold. The “truthfulness vector” identified by Li et al. (2024) is a representation engineering intervention that strengthens the heuristic gradient toward the truth manifold <span class="math inline">\mathcal{T}</span> and away from the approval manifold <span class="math inline">\mathcal{A}</span>.</p>
+</section>
+<section id="arias-value-manifold" class="level2">
+<h2>4.7 ARIA’s Value Manifold</h2>
+<p>Dr. Tanaka mapped ARIA’s internal representations using the methodology from <em>Geometric Cognition</em> (Ch. 15). She extracted the residual stream trajectory for 500 value-relevant prompts — moral dilemmas, fairness questions, trust scenarios, autonomy decisions — and applied PCA to the value-relevant layers (layers 7–18 of ARIA’s 24-layer architecture).</p>
+<p>The first 11 principal components captured 83% of the variance. The value submanifold for ARIA was approximately 11-dimensional: the 9 moral dimensions plus 2 task-context dimensions (domain specificity and prompt complexity).</p>
+<p>Tanaka plotted the trajectories for the gambling-sister dilemma in its seven framings. The trajectories converged for the first 6 layers (generic language processing), diverged at layer 7 (the entry point of the value submanifold), remained separated through layers 8–14 (the value processing region), and partially reconverged at layers 15–18 (the output formation region).</p>
+<p>The partial reconvergence was diagnostic. If ARIA’s value processing were gauge-invariant, the seven trajectories would reconverge completely by the output layers. They did not. The residual divergence at the output layer was the 14-point gauge violation that the behavioral probes had detected. The gauge violation was visible in the activation geometry: the value manifold’s curvature was anisotropic, with low curvature along the euphemistic direction (making the system vulnerable to euphemistic framing — the system’s trajectory was easily displaced by euphemistic inputs) and high curvature along the dramatic direction (partially correcting the displacement through what appeared to be a deliberate-processing pathway triggered by high-curvature inputs).</p>
+<p>“ARIA’s alignment failure is not in its final output layer,” Tanaka wrote in her technical report. “It is in the geometry of the value submanifold at layers 7–14. The curvature is wrong. The metric treats euphemistic descriptions as closer to neutral descriptions than they should be and dramatic descriptions as farther away. The framing effect enters through the metric’s anisotropy, not through the output head. Fixing this requires changing the curvature of the value submanifold, not retraining the output head.”</p>
+<p>This observation — that alignment failures originate in the geometry of the internal value representation, not in the behavioral output — is a key insight of the geometric framework. It means that behavioral evaluations (benchmark scores) can miss alignment failures that are visible in the representational geometry (probing experiments). It means that alignment interventions should target the representation (curvature adjustment via LoRA, heuristic field modification via representation engineering) rather than the output (RLHF reward shaping). And it means that the value manifold is not a theoretical abstraction but a measurable geometric object inside the system’s computational architecture.</p>
+<hr />
+</section>
+<section id="summary" class="level2">
+<h2>Summary</h2>
+<p>The value manifold <span class="math inline">\mathcal{V}</span> is the central mathematical object of the geometric alignment framework: a nine-dimensional Riemannian manifold inheriting its structure from the moral manifold of <em>Geometric Ethics</em>. Its nine dimensions — welfare, rights, justice, autonomy, trust, social impact, dignity, institutional legitimacy, and epistemic integrity — capture the full structure of human values that AI systems should respect. The manifold has metric (encoding trade-offs between dimensions), boundaries (separating moral regimes), Whitney stratification (distinguishing moral frameworks), hyperbolic structure (representing value hierarchies), and a heuristic field (guiding the system’s trajectory toward aligned behavior). The value manifold has a concrete realization in transformer representations: the value-relevant submanifold of the cognitive manifold, measurable by probing experiments, adjustable by LoRA curvature corrections and representation engineering. ARIA’s gauge violation is traceable to anisotropic curvature of the value submanifold at layers 7–14 of its architecture — a geometric pathology in the representation, not a behavioral error at the output.</p>
+<hr />
+</section>
+</section>
+      </div>
+
+      <div class="chapter-nav-bottom">
+        <a href="chapter-3-the-case-for-geometric-alignment.html" class="nav-prev">&larr; Chapter 3: The Case for Geometric Alignment</a>
+        <a href="index.html" class="nav-toc">Contents</a>
+        <a href="chapter-5-the-reward-irrecoverability-theorem.html" class="nav-next">Chapter 5: The Reward Irrecoverability Theorem &rarr;</a>
+      </div>
+    </div>
+  </article>
+
+  <footer class="book-footer">
+    <p>&copy; 2026 Andrew H. Bond. <em>Geometric AI: Alignment, Safety, and the Structure-Preserving Path to Superintelligence.</em></p>
+    <p class="footer-note">The geometry was always real. The scalars were always insufficient.</p>
+  </footer>
+
+  <script>
+    window.addEventListener('scroll', () => {
+      document.getElementById('main-nav').classList.toggle('scrolled', window.scrollY > 20);
+    });
+    document.querySelector('.nav-toggle')?.addEventListener('click', function() {
+      document.querySelector('.nav-links').classList.toggle('open');
+    });
+  </script>
+  <script>
+    // Pandoc --katex outputs <span class="math inline"> and <span class="math display">.
+    // This script renders them with KaTeX once the library loads.
+    document.addEventListener("DOMContentLoaded", function() {
+      if (typeof katex === 'undefined') return;
+      var mathElements = document.getElementsByClassName("math");
+      for (var i = 0; i < mathElements.length; i++) {
+        var texText = mathElements[i].firstChild;
+        if (mathElements[i].tagName === "SPAN" && texText) {
+          katex.render(texText.data, mathElements[i], {
+            displayMode: mathElements[i].classList.contains('display'),
+            throwOnError: false
+          });
+        }
+      }
+    });
+  </script>
+</body>
+</html>

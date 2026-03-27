@@ -143,6 +143,23 @@ def get_book_configs() -> dict[str, BookConfig]:
             nav_key="nav-medicine",
             book_number=8,
         ),
+        "ai": BookConfig(
+            key="ai",
+            dir_name="geometric-ai",
+            title="Geometric AI",
+            subtitle="Alignment, Safety, and the Structure-Preserving Path to Superintelligence",
+            source_repo=source / "geometric-ai",
+            chapter_sources=[
+                ("manuscript/part_i", "ch*.md"),
+                ("manuscript/part_ii", "ch*.md"),
+                ("manuscript/part_iii", "ch*.md"),
+                ("manuscript/part_iv", "ch*.md"),
+                ("manuscript/part_v", "ch*.md"),
+                ("manuscript/part_vi", "ch*.md"),
+            ],
+            nav_key="nav-ai",
+            book_number=11,
+        ),
     }
 
 
@@ -547,7 +564,7 @@ def main():
     )
     parser.add_argument(
         "--book",
-        choices=["reasoning", "economics", "law", "cognition", "communication", "medicine", "all"],
+        choices=["reasoning", "economics", "law", "cognition", "communication", "medicine", "ai", "all"],
         default="all",
         help="Which book to build (default: all)",
     )
