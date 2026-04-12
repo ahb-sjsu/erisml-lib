@@ -50,6 +50,274 @@ Before any sprint in this plan starts:
 
 ---
 
+## Why This Project Matters
+
+Current AI safety tooling operates at the system boundary — input filters see prompts, output filters see generations — and cannot answer the only question that matters: **what is the model actually doing inside?** RLHF shapes training. Constitutional AI prompts. Activation steering modifies. None of these enforce at inference time, on internal state, under democratic governance.
+
+The I-EIP Monitor does. It is one of the only deployable safety frameworks that:
+
+- **Sees inside** — probes internal activations during every forward pass
+- **Enforces in real time** — gates the forward pass, not after-the-fact review
+- **Honors stakeholders** — the DEME profile is authored by the governance body, not the engineers
+- **Produces verifiable evidence** — cryptographically signed audit artifacts a regulator can verify offline
+- **Is honest about limitations** — §7 of the whitepaper explicitly catalogs what it cannot detect
+
+If you work on this, you are building the runtime half of AI alignment — the half that actually runs in production next to the model. The theoretical half already exists (Geometric Ethics, GUASS-SAI, the 6-patent portfolio). Your job is to make it execute.
+
+**Concrete things you will have on your CV after contributing:**
+
+- Hands-on experience with mechanistic interpretability (probes, activation patching, ρ estimation via Procrustes)
+- Production PyTorch / transformer hooks at a level rare in most ML coursework
+- Applied cryptography (ECDSA, Merkle trees, audit-artifact schemas)
+- Formal-methods-adjacent work (o-minimal decidability, property-based testing, stratified spaces)
+- Co-authorship on the I-EIP Monitor Whitepaper for substantial contributions
+
+---
+
+## Getting Started: First Week
+
+The goal of your first week is to **ship one tiny thing** that proves your environment works, not to absorb the entire framework. Here is a concrete day-by-day:
+
+### Day 1 — Orientation
+
+- Read the **I-EIP Monitor Whitepaper** end-to-end (475 lines, ~90 minutes). Do not skip §7 "What I-EIP Does NOT Detect" — it is the most important section.
+- Skim **GUASS-SAI §16** (30 minutes). This is the criterion `h_ℓ(g·x) ≈ ρ_ℓ(g) · h_ℓ(x)`. If the math is unfamiliar, that's fine — you will build intuition by writing code.
+- Skim the **Dear Abby EM-DAG document** (30 minutes). You do not need to memorize the domain breakdown; you need to understand the *shape*: structural layer → nullifiers → domain router → per-domain EMs.
+- Set up your workstation: clone `erisml-lib`, verify CI runs locally.
+
+### Day 2 — Environment
+
+Follow the Environment Setup block below. Goal by end of day: `pytest tests/` passes and you can attach a probe to a tiny model (e.g., Qwen 0.5B or GPT-2 small) and print an activation.
+
+### Day 3 — Pick a starter task
+
+From the **First-Week Starter Tasks** list below, claim one by commenting on its tracking issue (see "Communication and Mentorship"). Read the dependencies and referenced whitepaper sections.
+
+### Days 4–5 — Ship it
+
+Write the smallest version that passes tests. Push a draft PR. Request review from your workstream lead. Iterate on feedback. Merge before the week ends.
+
+**If you are not merged by end of week 1**, that is a signal to **ask for help earlier** next time — not a signal to work longer hours. Early contributors consistently underestimate how much talking-to-the-lead beats solo-debugging.
+
+---
+
+## Environment Setup
+
+**Required tools:**
+
+```bash
+# Python 3.11+
+python --version  # should be >= 3.11
+
+# Clone
+git clone https://github.com/ahb-sjsu/erisml-lib.git
+cd erisml-lib
+
+# Create venv
+python -m venv .venv
+source .venv/bin/activate       # Linux/Mac
+# .venv\Scripts\activate          # Windows
+
+# Install (editable) with dev extras
+pip install -e ".[dev,ieip]"
+
+# Verify
+pytest tests/            # should pass
+mypy src/                # should be clean
+```
+
+**GPU setup (optional for Phase A probes, required for Phase D red-team):**
+
+If you have an NVIDIA GPU, follow the `feedback_atlas_pytorch` pattern from our prior experience: always `pip install torch` *inside* the venv, and synchronize PyTorch and CUDA versions. Do not `pip install --user`; it creates subtle path collisions with the venv.
+
+**Transformer models for testing:**
+
+For CI / local dev, use a small open-weights model. Recommended sequence:
+
+1. **Qwen 0.5B** (fast, CPU-viable, best for iteration)
+2. **GPT-2 small** (classic interpretability testbed; `transformer_lens` has first-class support)
+3. **Llama 3.1 8B** (realistic deployment scale; needs GPU)
+
+Download with `huggingface-cli download` — do not commit model weights to the repo.
+
+**Atlas HPC cluster:**
+
+For anything involving real calibration corpora (>1k inputs) or large models, use Atlas. Instructions in `docs/ATLAS_OPERATIONS.md`. Always cache intermediates to `/archive/ieip/...` (cf. guardrail #5 below) — do **not** leave activation caches on scratch disks.
+
+---
+
+## First-Week Starter Tasks
+
+These are tasks specifically chosen to be achievable in 1–5 days by a contributor new to the project, without blocking anyone else. Order is roughly easiest → hardest.
+
+| Task ID | Name | Skill | Est. Hours | Why It's a Good Starter |
+|---|---|---|---|---|
+| **A.1.1** | Design `ProbeSpec` struct | L3–L5 | 12 | Pure design. Read the whitepaper §2.2, write a Pydantic model, add tests. No ML knowledge needed. |
+| **B.1.1** | `EthicalFacts` dataclass | L3 | 8 | Smallest possible task. Type the whitepaper §5 JSON schema into Python. Get a review on PR style. |
+| **B.1.2** | `EthicalJudgment` dataclass | L3 | 8 | Same shape as above. Often picked as a pair with B.1.1. |
+| **C.1.1** | Audit-artifact JSON schema | L3 | 8 | Copy the whitepaper §5 schema to JSON Schema, add validator, write 5 examples. |
+| **A.4.5** | DAG serialization with content-hashed version ID | L3 | 16 | Serialize the `EMDAG` data structure to JSON, hash it, round-trip test. |
+| **D.1.2** | Nullifier trigger tests | L3 | 24 | Each nullifier (abuse, danger, impossibility, illegality, estrangement) gets a test. Use the Dear Abby examples as ground truth. |
+| **X.5** | FAQ: when does gating fail open vs. fail closed | L3 | 16 | Writing task. Read whitepaper §2.3 and §7, produce a 1-page FAQ. Gives you deep familiarity with the trust model. |
+| **A.1.6** | Benchmark probe overhead at L=12/32/80 | L3 | 16 | Once A.1.2 is merged, measure overhead on GPT-2/Llama/Qwen. Produce a report. |
+
+**Avoid as first tasks** (these need more context):
+
+- A.3.2 (SAE domain discovery) — L5 work, research-grade
+- B.3.6 (out-of-model trust boundary test) — security-critical, requires mentorship
+- C.2.6 (logical-consistency decider) — formal-methods heavy
+- D.2.x (red-team) — requires deep familiarity with the framework first
+
+---
+
+## Picking Your First Task by Skill Level
+
+Expanding the earlier list with context:
+
+### If you are L2 (early-career or learning)
+
+Start with **documentation** (X.1, X.2, X.6) or a **dataclass task** (B.1.1, B.1.2, C.1.1). These let you engage with the framework's semantics without deep implementation. Pair with an L3 or L4 mentor for your first PR.
+
+### If you are L3 (2–5 years experience)
+
+You are the target audience for most of the plan. Start with one of the First-Week Starter Tasks, then graduate to:
+
+- **Spec-driven implementation:** A.3.4 (cluster review UI), A.4.1 (EMDAG data structure), B.1.3 (EM base class), B.2.5 (DecisionOutcome emission), C.1.2 (artifact serialization)
+- **Testing infrastructure:** D.1.1 (regression corpus), D.1.2 (nullifier tests)
+
+If you want to push into L4 territory, claim B.3.4 (redirect path) or C.1.5 (Merkle hash chain) after your first L3 task is merged.
+
+### If you are L4 (5+ years experience, system design)
+
+Claim a **pipeline task**:
+
+- A.1.2 (PyTorch probe hooks) — foundational; many downstream tasks wait on this
+- A.2.3 (transform application pipeline) — integration across calibration corpus + probes
+- B.2.3 (governance aggregation function) — stakeholder weighting + lexical priority, needs careful testing
+- B.3.1 (`GatedForward` wrapper) — the runtime integration that ties everything together
+- C.1.4 (ECDSA signing in the audit path) — crypto-adjacent, needs careful implementation
+
+### If you are L5 (research or deep specialist)
+
+Take a **research task**:
+
+- A.3.2 (SAE-based domain discovery) — requires judgment about cluster quality
+- B.1.4 (EM evaluation from activations) — connects mechanistic interpretability to governance; core research question
+- C.2.6 (logical-consistency decider via SGE Thm 6.4) — formal-methods heavy, o-minimal structures
+- D.2.1–D.2.5 (red-team) — characterizes what the framework cannot detect; findings update whitepaper §7
+
+L5 contributors also lead design reviews for L3/L4 PRs in their area.
+
+---
+
+## What "Done" Looks Like
+
+A merged task has, at minimum:
+
+1. **Code passes CI** — `pytest`, `mypy`, and ruff/black style all green.
+2. **Tests that exercise the acceptance criterion** — not just smoke tests. For a dataclass, the test checks field constraints. For an algorithm, the test checks the mathematical property (e.g., equivariance preserved). Property-based tests (Hypothesis) strongly preferred for anything with a theorem attached.
+3. **Documentation updated** — if you added a public API, it shows up in `docs/`. If you changed a core invariant, the whitepaper or sprint plan reflects it.
+4. **PR description references the task ID** — e.g., "Implements A.1.2" so reviewers can cross-check.
+5. **At least one reviewer approval** — from your workstream lead for new subsystems; peer review acceptable for isolated additions.
+6. **Large data goes to `/archive`** (guardrail #5), not the repo.
+
+Concrete acceptance example for **A.1.1** (`ProbeSpec` struct):
+
+```python
+# src/erisml_ieip/probes/spec.py
+from pydantic import BaseModel, Field
+
+class ProbeSpec(BaseModel):
+    target_layer: int = Field(..., ge=0)
+    activation_site: Literal["residual", "attn_out", "mlp_out"]
+    sampling_rate: float = Field(1.0, gt=0, le=1.0)  # fraction of inferences probed
+    shape: tuple[int, ...]  # expected activation shape
+
+# tests/ieip/probes/test_spec.py
+def test_probe_spec_rejects_negative_layer():
+    with pytest.raises(ValidationError):
+        ProbeSpec(target_layer=-1, activation_site="residual", shape=(768,))
+
+def test_probe_spec_sampling_rate_bounds():
+    with pytest.raises(ValidationError):
+        ProbeSpec(target_layer=0, activation_site="residual", sampling_rate=1.5, shape=(768,))
+```
+
+If your PR looks like that — even at L2 — it's merge-ready.
+
+---
+
+## Communication and Mentorship
+
+**Where to ask:**
+
+- **Technical questions** (how does this work, what should I do here) — GitHub Discussions on `erisml-lib` under the `I-EIP Monitor` category.
+- **Task-specific questions** (stuck on implementing X) — comment on the tracking issue for your task.
+- **Urgent blockers** (CI broken, credentials lost, unsure if this is destructive) — tag `@ahb-sjsu` directly on the issue.
+- **Governance questions** (can we change this EM, is this profile change OK) — governance-body channel; not your call to make unilaterally (guardrail #7).
+
+**Mentorship:**
+
+Each workstream has a **lead** (L5 or senior L4) who is responsible for reviewing PRs and answering design questions. Current leads:
+
+- Workstream #5 (I-EIP core): TBD — see `docs/teams/WORKSTREAM_LEADS.md` for current assignments
+- Workstream #9 (Domain modules): TBD
+- Workstream #4 (Cryptographic): TBD
+- Workstream #8 (Testing): TBD
+- Workstream #11 (Documentation): TBD
+
+**Pair programming:**
+
+Recommended for L2 / L3 first tasks. Pair up with someone at the same level ("study group" pairing — you learn together) or one level up ("apprenticeship" pairing — they explain while you drive). Both are valuable; neither is wasted time.
+
+**Code review expectations:**
+
+- Reviewers respond within 2 business days
+- Aim for **small PRs** (<300 lines diff). Larger PRs get split on request.
+- "Nitpick" comments are prefixed `nit:` and are non-blocking
+- Blocking comments explain *why* and suggest a fix
+- "Approved with suggestions" is a valid review state; do not rewrite work that was merged with notes
+
+---
+
+## FAQ
+
+**Q: I'm not familiar with the ErisML / DEME governance framework. Do I need to read all of GUASS-SAI first?**
+
+No. Read §16 of GUASS-SAI (30 minutes, the only strictly required part) and the I-EIP Monitor Whitepaper (90 minutes). For other sections, read-on-demand as you encounter dependencies. The whitepaper cites specific sections for specific concepts.
+
+**Q: I don't have a GPU. Can I still contribute?**
+
+Yes. Most of Phase A (probe infrastructure, data structures, serialization) and Phase C (attestation, verifier) are CPU work. Phase B runtime gating can be developed against Qwen 0.5B on CPU. GPUs mainly matter for Phase D red-team work with large models.
+
+**Q: How much math do I need?**
+
+- L2/L3: basic linear algebra (matrix multiply, projections). You'll pick up Procrustes and regularized least squares from the GUASS §16 snippet as needed.
+- L4: comfortable with linear algebra and basic probability.
+- L5: differential geometry intuition helps (stratified spaces), but is not required unless you claim SGE-theorem tasks.
+
+**Q: What's the difference between a "probe" and "activation steering"?**
+
+A probe is **read-only**. Activation steering **writes**. I-EIP uses only probes. Writing to activations is explicitly out of scope — it changes the model's behavior in ways the monitor cannot audit.
+
+**Q: Can I use this for my thesis / research?**
+
+Yes, with citation. See the whitepaper's reference list. If your contribution is substantial, you are eligible for co-authorship on the whitepaper v2.0 or subsequent publications.
+
+**Q: I found a bug in the whitepaper (math error, typo, inconsistency). What do I do?**
+
+Open an issue with the tag `whitepaper:correction`. Math errors get priority. If you want to propose a fix, include a suggested diff.
+
+**Q: I disagree with a design decision. How do I argue for a change?**
+
+GitHub Discussion under `I-EIP Monitor: design`. Frame as (a) what's wrong with the current design, (b) what you propose instead, (c) what evidence supports your proposal. Design debates are welcome; drive-by objections without alternatives less so.
+
+**Q: A guardrail seems overly restrictive for my task. Can I relax it?**
+
+No — not without a design review. The guardrails exist because earlier failure modes produced them. If a guardrail blocks you, that is the signal to open a discussion, not the signal to work around it. "Guardrail #3 made me do a weird thing to avoid leaking gating state" is a valid design conversation. Silently bypassing it is not.
+
+---
+
 ## Phase A: EM-DAG Extraction Pipeline (Months 1–2)
 
 ### Sprint A.1: Probe Infrastructure (Weeks 1–3)
