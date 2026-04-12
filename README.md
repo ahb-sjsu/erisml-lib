@@ -37,6 +37,31 @@ Plus [6 appendices](https://ahb-sjsu.github.io/erisml-lib/book/appendix-a-relate
 **[Explore the interactive companion site](https://ahb-sjsu.github.io/erisml-lib/)** — includes the Dear Ethicist Game, Moral Bell Test, domain demos, and tutorials.
 
 ---
+
+## 🛡️ I-EIP Monitor (New in v3.1)
+
+Runtime probes inside a deployed model's forward pass that apply the **Internal Epistemic Invariance Principle** to gate inference on stakeholder-governed Ethical Modules.
+
+- **Whitepaper:** [I-EIP_Monitor_Whitepaper](https://erisml.org/I-EIP_Monitor_Whitepaper) — the founding document
+- **Sprint plan:** [I-EIP_Monitor_Sprint_Plan](https://erisml.org/development/I-EIP_Monitor_Sprint_Plan) — how to contribute (students welcome)
+- **Code:** `src/erisml/ieip/` with `probes`, `rho` (Procrustes), `equivariance`, `drift`, `nondegeneracy`, `report`
+- **Smoke demo:** `python -m erisml.examples.ieip_smoke` (requires `pip install 'erisml-lib[ieip]'`)
+
+```python
+from erisml.ieip import (
+    ActivationProbe, ProbeSpec, estimate_rho, equivariance_error,
+    DriftDetector, nondegeneracy_report, aggregate_report,
+)
+from erisml.ieip.report import format_text
+
+# Attach a read-only probe, collect activations on paired inputs,
+# estimate ρ, then monitor equivariance + drift + non-degeneracy.
+# See docs/I-EIP_Monitor_Whitepaper.md §4 for the full pipeline.
+```
+
+The monitoring half (Sprint 2.5 of the GUASS-SAI plan) is implemented and CI-green. The governance/gating half (EM-DAG runtime gating, cryptographic attestation) is the ongoing student collaboration — see the sprint plan for open tasks.
+
+---
 # ErisML/DEME Research Repository and Library 🍎
 
 ***Ordo ex Chāōnā; Ethos ex Māchinā***
