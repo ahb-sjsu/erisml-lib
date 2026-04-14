@@ -1,5 +1,17 @@
+<p align="center">
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="docs/brand/erisml_apple.svg">
+    <source media="(prefers-color-scheme: light)" srcset="docs/brand/erisml_apple_light.svg">
+    <img src="docs/brand/erisml_apple.svg" width="180" alt="ErisML — the golden apple of discord">
+  </picture>
+</p>
+
 # ErisML
 **A library for governed, foundation-model-enabled agents with tensorial ethics.**
+
+*Named for Eris, the Greek goddess of discord — whose golden apple forced a judgment.*
+
+> **Brand assets:** [erisml.org/brand/](https://erisml.org/brand/) · local: [`docs/brand/`](docs/brand/)
 
 ## 🚀 Quick Start (v3.0.0)
 You can now install ErisML directly from PyPI:
