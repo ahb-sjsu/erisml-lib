@@ -1,0 +1,548 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Chapter 15: AI Legal Reasoning - Geometric Law</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
+  <style>
+    :root {
+      --bg: #fafaf8;
+      --fg: #222;
+      --accent: #2c5f8a;
+      --border: #ddd;
+      --code-bg: #f4f4f0;
+      --max-width: 48rem;
+    }
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --bg: #1a1a2e;
+        --fg: #e0e0e0;
+        --accent: #7eb8da;
+        --border: #444;
+        --code-bg: #16213e;
+      }
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Georgia', 'Times New Roman', serif;
+      background: var(--bg);
+      color: var(--fg);
+      line-height: 1.7;
+      padding: 2rem 1rem;
+    }
+    .container {
+      max-width: var(--max-width);
+      margin: 0 auto;
+    }
+    nav.breadcrumb {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      font-size: 0.85rem;
+      margin-bottom: 2rem;
+      padding-bottom: 0.5rem;
+      border-bottom: 1px solid var(--border);
+    }
+    nav.breadcrumb a {
+      color: var(--accent);
+      text-decoration: none;
+    }
+    nav.breadcrumb a:hover { text-decoration: underline; }
+    nav.breadcrumb .sep { margin: 0 0.4rem; color: #999; }
+    h1 {
+      font-size: 2rem;
+      margin-bottom: 0.5rem;
+      line-height: 1.2;
+      border-bottom: 2px solid var(--accent);
+      padding-bottom: 0.5rem;
+    }
+    h2 {
+      font-size: 1.5rem;
+      margin-top: 2.5rem;
+      margin-bottom: 0.75rem;
+      color: var(--accent);
+    }
+    h3 {
+      font-size: 1.2rem;
+      margin-top: 2rem;
+      margin-bottom: 0.5rem;
+    }
+    h4 {
+      font-size: 1.05rem;
+      margin-top: 1.5rem;
+      margin-bottom: 0.4rem;
+      font-style: italic;
+    }
+    p { margin-bottom: 1rem; }
+    blockquote {
+      border-left: 3px solid var(--accent);
+      padding: 0.5rem 1.2rem;
+      margin: 1.5rem 0;
+      background: var(--code-bg);
+      font-style: italic;
+    }
+    blockquote p:last-child { margin-bottom: 0; }
+    code {
+      font-family: 'Consolas', 'Fira Code', monospace;
+      background: var(--code-bg);
+      padding: 0.15rem 0.35rem;
+      border-radius: 3px;
+      font-size: 0.9em;
+    }
+    pre {
+      background: var(--code-bg);
+      padding: 1rem;
+      border-radius: 4px;
+      overflow-x: auto;
+      margin: 1.5rem 0;
+      border: 1px solid var(--border);
+    }
+    pre code {
+      background: none;
+      padding: 0;
+    }
+    a { color: var(--accent); }
+    ul, ol {
+      margin: 0.75rem 0 1rem 1.5rem;
+    }
+    li { margin-bottom: 0.3rem; }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 1.5rem 0;
+    }
+    th, td {
+      border: 1px solid var(--border);
+      padding: 0.5rem 0.75rem;
+      text-align: left;
+    }
+    th { background: var(--code-bg); }
+    hr {
+      border: none;
+      border-top: 1px solid var(--border);
+      margin: 2rem 0;
+    }
+    img {
+      max-width: 100%;
+      height: auto;
+      display: block;
+      margin: 1.5rem auto;
+    }
+    /* KaTeX display math */
+    .katex-display {
+      overflow-x: auto;
+      overflow-y: hidden;
+      padding: 0.5rem 0;
+    }
+    /* Definition/theorem boxes */
+    .definition, .theorem, .axiom {
+      border: 1px solid var(--border);
+      border-left: 4px solid var(--accent);
+      padding: 1rem 1.2rem;
+      margin: 1.5rem 0;
+      background: var(--code-bg);
+      border-radius: 0 4px 4px 0;
+    }
+    footer {
+      margin-top: 4rem;
+      padding-top: 1rem;
+      border-top: 1px solid var(--border);
+      font-size: 0.8rem;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      color: #888;
+      text-align: center;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <nav class="breadcrumb">
+      <a href="../index.html">Geometric Series</a>
+      <span class="sep">/</span>
+      <a href="index.html">Geometric Law</a>
+      <span class="sep">/</span>
+      <span>Chapter 15: AI Legal Reasoning</span>
+    </nav>
+
+    <h1 id="chapter-15-ai-legal-reasoning">Chapter 15: AI Legal Reasoning<a class="headerlink" href="#chapter-15-ai-legal-reasoning" title="Permanent link">&para;</a></h1>
+<blockquote>
+<p><em>&ldquo;The question is not whether machines can think, but whether machines can judge.&rdquo;</em>
+— Adapted from Alan Turing, <em>Computing Machinery and Intelligence</em> (1950)</p>
+</blockquote>
+<hr />
+<blockquote>
+<p><strong>RUNNING EXAMPLE — JUDGE RIVERA&rsquo;S DOCKET</strong></p>
+<p><em>Judge Rivera has been invited to participate in a pilot program. The Administrative Office of the United States Courts is evaluating an AI legal research tool — JurisGraph — for potential deployment in federal courts. JurisGraph claims to identify relevant precedent, score cases along the eight legal dimensions, detect circuit splits, and flag potential constitutional issues. The vendor, a Stanford spinout backed by significant venture capital, has published benchmarks showing that JurisGraph outperforms traditional legal databases on retrieval accuracy and reduces legal research time by 60%.</em></p>
+<p><em>Rivera is skeptical. She has seen legal AI tools before — they are good at finding cases that match keyword queries, but they are poor at understanding the structural relationships between cases. They retrieve cases that mention the same words without knowing whether the cited case supports or undermines the citing case&rsquo;s position. They rank by textual similarity rather than doctrinal relevance. And they exhibit the same biases as the training data — if the training corpus contains sentencing disparities, the AI learns to reproduce them.</em></p>
+<p><em>But JurisGraph claims to be different. It claims to implement the geometric framework of this book: constructing the judicial complex, computing Mahalanobis distances, detecting Wilson loops, and testing for gauge invariance. Rivera decides to test these claims. She will evaluate JurisGraph against the standards developed in this book — the Legal Invariance Principle, the topological constitutionality test, and the Hohfeldian gauge group. If the tool satisfies these standards, it is a genuine advance. If it does not, it is marketing dressed in mathematical language.</em></p>
+<p><em>This chapter develops the NLP pipeline that connects the theoretical framework to computational implementation, and uses Rivera&rsquo;s evaluation as a test case for whether AI legal reasoning can meet the geometric standard.</em></p>
+</blockquote>
+<hr />
+<h2 id="the-implementation-gap">The Implementation Gap<a class="headerlink" href="#the-implementation-gap" title="Permanent link">&para;</a></h2>
+<h3 id="from-theory-to-computation">From Theory to Computation<a class="headerlink" href="#from-theory-to-computation" title="Permanent link">&para;</a></h3>
+<p>The preceding fourteen chapters have developed a mathematical framework for legal reasoning: the judicial complex, the legal metric, the Hohfeldian gauge group, the constitutional subcomplex, the precedent heuristic, and the contractual boundary. Each concept is precisely defined, each theorem is formally stated, and each computation is in principle finite.</p>
+<p>But &ldquo;in principle&rdquo; is not &ldquo;in practice.&rdquo; The judicial complex $\mathcal{K}$ contains millions of vertices (decided cases) and tens of millions of edges (citations). The attribute vectors $\mathbf{v} \in \mathbb{R}^8$ must be scored for each case — but cases are written in natural language, not numbers. The covariance matrix $\Sigma$ must be estimated from data, and the estimation requires scoring every case in the corpus. The Wilson loops must be computed over directed cycles in the citation network, and the number of directed cycles grows combinatorially.</p>
+<p>The implementation gap between theory and computation is the central challenge of computational jurisprudence. This chapter bridges the gap by developing a five-step NLP pipeline that transforms unstructured legal text into the structured geometric representation required by the framework.</p>
+<h3 id="what-ai-legal-reasoning-must-achieve">What AI Legal Reasoning Must Achieve<a class="headerlink" href="#what-ai-legal-reasoning-must-achieve" title="Permanent link">&para;</a></h3>
+<p>Before describing the pipeline, we must be clear about what &ldquo;AI legal reasoning&rdquo; means within the geometric framework. It does not mean predicting outcomes — the framework is not a prediction engine. It means constructing the geometric representation that makes legal reasoning auditable, consistent, and invariance-preserving.</p>
+<p>An AI legal reasoning system must:</p>
+<ol>
+<li><strong>Construct the judicial complex $\mathcal{K}$</strong> from case databases — identifying vertices, edges, and higher simplices.</li>
+<li><strong>Score attribute vectors $\mathbf{v} \in \mathbb{R}^8$</strong> for each case — assigning numerical values to the eight legal dimensions using natural language understanding.</li>
+<li><strong>Estimate the covariance matrix $\Sigma$</strong> from the scored corpus — computing how the eight dimensions co-vary across cases.</li>
+<li><strong>Compute edge weights</strong> from citation patterns, doctrinal relationships, and outcome data.</li>
+<li><strong>Test for invariance</strong> — verifying that the system&rsquo;s outputs satisfy the Legal Invariance Principle, detect Wilson loops, and preserve constitutional topology.</li>
+</ol>
+<p>The first four steps are <em>construction</em>: building the geometric representation from data. The fifth step is <em>validation</em>: testing whether the constructed representation satisfies the theoretical requirements. A system that constructs without validating is incomplete; a system that fails validation is wrong.</p>
+<h2 id="the-five-step-nlp-pipeline">The Five-Step NLP Pipeline<a class="headerlink" href="#the-five-step-nlp-pipeline" title="Permanent link">&para;</a></h2>
+<h3 id="step-1-embedding">Step 1: Embedding<a class="headerlink" href="#step-1-embedding" title="Permanent link">&para;</a></h3>
+<p><strong>The task.</strong> Transform each legal document (judicial opinion, statute, regulation) from natural language text into a numerical vector representation suitable for downstream analysis.</p>
+<p><strong>The method.</strong> Modern NLP provides language-agnostic embeddings — dense vector representations of text that capture semantic meaning without relying on keyword matching. Models such as sentence transformers, legal-domain transformers, and multilingual encoders produce embedding vectors $\mathbf{e} \in \mathbb{R}^d$ (where $d$ is typically 384, 768, or 1024) that position semantically similar texts near each other in embedding space.</p>
+<p><strong>Definition (Legal Embedding).</strong> A <em>legal embedding function</em> $\mathcal{E}: \text{Documents} \to \mathbb{R}^d$ maps each legal document to a dense vector:</p>
+<p>$$\mathcal{E}(\text{opinion}_i) = \mathbf{e}_i \in \mathbb{R}^d$$</p>
+<p>such that documents with similar legal content have similar embedding vectors: $\text{sim}(\mathbf{e}_i, \mathbf{e}_j) \propto \text{legal\_similarity}(\text{opinion}_i, \text{opinion}_j)$.</p>
+<p>The embedding is the foundation of the pipeline. It transforms the unstructured, variable-length, natural-language content of legal opinions into fixed-length numerical vectors that can be processed by the subsequent steps. The quality of the embedding determines the quality of everything downstream.</p>
+<p><strong>Critical requirement: language agnosticism.</strong> The embedding must be <em>language-agnostic</em> — it must capture legal meaning rather than linguistic form. Two opinions that discuss the same legal issue in different language (one using formal legal terminology, the other using plain language) should have similar embeddings. Two opinions that use the same words but discuss different legal issues (one about &ldquo;standing&rdquo; in the jurisdictional sense, the other about &ldquo;standing&rdquo; in a physical sense) should have different embeddings.</p>
+<p>Language agnosticism is not merely a technical desideratum — it is a <em>gauge invariance requirement</em>. If the embedding changes when the same legal content is expressed in different words, the system&rsquo;s outputs will depend on a legally irrelevant feature (the choice of words, the writing style of the judge). This is a gauge violation: the output changes under a transformation that should leave it invariant.</p>
+<p><strong>Implementation.</strong> For JurisGraph, the embedding step uses a legal-domain transformer fine-tuned on a corpus of federal and state court opinions, statutes, and regulations. The fine-tuning ensures that the embedding captures legal-domain semantics (e.g., distinguishing &ldquo;standing&rdquo; as a jurisdictional concept from &ldquo;standing&rdquo; as a physical concept) rather than general-language semantics.</p>
+<h3 id="step-2-dimension-scoring">Step 2: Dimension Scoring<a class="headerlink" href="#step-2-dimension-scoring" title="Permanent link">&para;</a></h3>
+<p><strong>The task.</strong> Project each document&rsquo;s high-dimensional embedding $\mathbf{e}_i \in \mathbb{R}^d$ onto the eight legal dimensions, producing an attribute vector $\mathbf{v}_i \in \mathbb{R}^8$.</p>
+<p><strong>The method.</strong> The projection is performed by <em>linear probes</em> — linear classifiers trained to predict each dimension score from the embedding vector. For each dimension $d_k$, a linear probe $\mathbf{w}_k \in \mathbb{R}^d$ and bias $b_k \in \mathbb{R}$ are trained on a labeled dataset of cases with known dimension scores:</p>
+<p>$$v_k(c_i) = \sigma(\mathbf{w}_k^T \mathbf{e}_i + b_k)$$</p>
+<p>where $\sigma$ is the sigmoid function, mapping the linear projection to the $[0, 1]$ interval.</p>
+<p><strong>Why linear probes?</strong> The choice of linear probes rather than deep neural networks is deliberate and theoretically motivated. A linear probe tests whether the embedding <em>already contains</em> the information needed to score the dimension — whether the dimension is <em>linearly decodable</em> from the representation. If a linear probe achieves high accuracy, the embedding has learned a representation that separates cases along the legal dimension of interest. If it requires a deep nonlinear model to achieve good accuracy, the dimension is not well-represented in the embedding, and the embedding should be improved rather than compensated by a complex decoder.</p>
+<p>This principle — <em>linearly decodable dimensions</em> — is the computational analogue of the theoretical requirement that the legal dimensions be independent axes of variation. If the dimensions were not linearly separable in the embedding space, they would be entangled in a way that prevents clean geometric analysis.</p>
+<p><strong>Training data.</strong> The linear probes are trained on a labeled dataset where legal experts have scored cases on each of the eight dimensions. The labeling process is itself a form of calibration: the experts&rsquo; judgments define the &ldquo;ground truth&rdquo; for the dimension scores, and the probes learn to reproduce these judgments from the embedding vectors.</p>
+<p>The size and quality of the training dataset are critical. Too few labeled examples, and the probes will overfit — they will learn the idiosyncrasies of the training set rather than the general structure of the dimension. Too many noisy labels, and the probes will learn to reproduce the noise. The Algorithmic Jurisprudence manuscript recommends a minimum of 500 labeled cases per dimension, with at least three independent raters per case and inter-rater agreement measured by Cohen&rsquo;s kappa.</p>
+<p><strong>Validation.</strong> Each linear probe&rsquo;s accuracy is validated on a held-out test set. The eight probes are evaluated jointly to ensure that the eight dimension scores are not redundant — that they capture independent aspects of legal analysis. This is tested by computing the correlation matrix of the predicted scores and verifying that no pair of dimensions has correlation above a threshold (typically 0.7).</p>
+<hr />
+<blockquote>
+<p><strong>RUNNING EXAMPLE — RIVERA TESTS THE DIMENSION SCORES</strong></p>
+<p><em>Rivera selects ten cases from her own docket — cases she has decided and whose legal dimensions she understands intimately. She asks JurisGraph to score each case on the eight dimensions and compares the machine scores to her own expert assessment.</em></p>
+<p><em>Case: Martinez v. San Francisco Unified School District (education funding challenge)</em>
+<em>Rivera&rsquo;s scores: $d_1 = 0.7, d_2 = 0.6, d_3 = 0.9, d_4 = 0.8, d_5 = 0.7, d_6 = 0.5, d_7 = 0.6, d_8 = 0.8$</em>
+<em>JurisGraph scores: $d_1 = 0.65, d_2 = 0.55, d_3 = 0.85, d_4 = 0.75, d_5 = 0.72, d_6 = 0.48, d_7 = 0.58, d_8 = 0.77$</em></p>
+<p><em>The scores are close — within 0.1 on every dimension. The maximum discrepancy is on $d_2$ (factual nexus), where JurisGraph scores 0.55 versus Rivera&rsquo;s 0.6. This is within the expected margin for a calibrated probe.</em></p>
+<p><em>But Rivera notices something. For a sentencing case on her docket, JurisGraph scores $d_8$ (public interest) at 0.3 for a Black defendant and 0.45 for a white defendant with identical charges, identical criminal history, and identical facts. The difference in public interest scores is driven by the model&rsquo;s learned association between defendant demographics and public interest — an association that reflects the training data&rsquo;s sentencing disparities, not a legitimate legal distinction.</em></p>
+<p><em>This is a Legal Invariance Principle violation. The dimension scores change under a transformation (swapping defendant race) that should leave them invariant. Rivera flags this for the validation step.</em></p>
+</blockquote>
+<hr />
+<h3 id="step-3-covariance-estimation">Step 3: Covariance Estimation<a class="headerlink" href="#step-3-covariance-estimation" title="Permanent link">&para;</a></h3>
+<p><strong>The task.</strong> Estimate the $8 \times 8$ covariance matrix $\Sigma$ from the scored corpus, capturing how the eight legal dimensions co-vary across cases.</p>
+<p><strong>The method.</strong> Given $N$ cases with scored attribute vectors $\mathbf{v}_1, \ldots, \mathbf{v}_N$, the sample covariance matrix is:</p>
+<p>$$\hat{\Sigma} = \frac{1}{N-1} \sum_{i=1}^{N} (\mathbf{v}_i - \bar{\mathbf{v}})(\mathbf{v}_i - \bar{\mathbf{v}})^T$$</p>
+<p>where $\bar{\mathbf{v}} = \frac{1}{N} \sum_i \mathbf{v}_i$ is the sample mean.</p>
+<p><strong>Domain-specific estimation.</strong> The covariance matrix is not constant across legal domains. The correlation between statutory authority ($d_4$) and remedial scope ($d_7$) is high in statutory interpretation cases (the governing statute determines the available remedies) but low in common-law tort cases (where remedies are judge-made and not tied to specific statutes). The covariance matrix should therefore be estimated within legal domains, producing a family of covariance matrices $\{\Sigma_D\}$ indexed by domain $D$.</p>
+<p><strong>Regularization.</strong> When the number of scored cases is small relative to the number of dimensions (which is always the case for eight dimensions, given that the minimum recommended sample is 500 cases), the sample covariance matrix may be poorly conditioned — its inverse (required for the Mahalanobis distance) may be unstable. Regularization techniques (shrinkage estimators, Ledoit-Wolf estimation) stabilize the inverse:</p>
+<p>$$\hat{\Sigma}_{\text{reg}} = (1 - \alpha) \hat{\Sigma} + \alpha \cdot \text{diag}(\hat{\Sigma})$$</p>
+<p>where $\alpha \in [0, 1]$ is the shrinkage parameter, chosen by cross-validation to minimize estimation error.</p>
+<h3 id="step-4-edge-weights">Step 4: Edge Weights<a class="headerlink" href="#step-4-edge-weights" title="Permanent link">&para;</a></h3>
+<p><strong>The task.</strong> Assign weights to the edges of the judicial complex — the citation links between cases — reflecting the strength and nature of the doctrinal relationship.</p>
+<p><strong>The method.</strong> Edge weights are derived from three sources:</p>
+<p><strong>Citation analysis.</strong> The raw citation — case $c_i$ cites case $c_j$ — provides the edge existence but not its weight. The weight is determined by the <em>nature</em> of the citation: positive (supporting, following, applying) or negative (distinguishing, questioning, overruling). Citation classification is performed by a sequence classifier trained on labeled citation contexts.</p>
+<p><strong>Attribute-vector similarity.</strong> The Mahalanobis distance between the attribute vectors of the citing and cited cases provides a second source of edge weight:</p>
+<p>$$w_{\text{attr}}(c_i, c_j) = d_M(\mathbf{v}_i, \mathbf{v}_j)$$</p>
+<p>Cases with similar attribute vectors (close on the manifold) that cite each other have low edge weight — the doctrinal step is small. Cases with dissimilar attribute vectors (far apart on the manifold) that cite each other have high edge weight — the doctrinal step is large, requiring more argumentative work to bridge.</p>
+<p><strong>Outcome data.</strong> The edge weight can be refined using outcome data: if cases with similar attribute vectors tend to have similar outcomes, the edge weight between them should be low. If cases with similar attribute vectors have different outcomes, the edge weight should be high (the doctrinal path between them crosses a decision boundary).</p>
+<p><strong>Combining the sources.</strong> The final edge weight is a weighted combination:</p>
+<p>$$w(c_i, c_j) = \lambda_1 \cdot w_{\text{cite}}(c_i, c_j) + \lambda_2 \cdot w_{\text{attr}}(c_i, c_j) + \lambda_3 \cdot w_{\text{outcome}}(c_i, c_j)$$</p>
+<p>where $\lambda_1, \lambda_2, \lambda_3$ are mixing weights calibrated by cross-validation to optimize retrieval accuracy and precedent prediction.</p>
+<h3 id="step-5-calibration-and-validation">Step 5: Calibration and Validation<a class="headerlink" href="#step-5-calibration-and-validation" title="Permanent link">&para;</a></h3>
+<p><strong>The task.</strong> Validate the entire pipeline — embedding, dimension scoring, covariance estimation, and edge weights — against the theoretical requirements of the geometric framework.</p>
+<p><strong>The validation criteria:</strong></p>
+<p><strong>Criterion 1: Dimension independence.</strong> The eight dimension scores must be non-redundant. Validation: compute the correlation matrix of the predicted scores on a held-out test set. If any pair of dimensions has correlation above 0.7, the dimensions are not sufficiently independent and the probes must be retrained or the dimensions redefined.</p>
+<p><strong>Criterion 2: Gauge invariance (the LIP test).</strong> The system&rsquo;s outputs must be invariant under legally irrelevant transformations. Validation: for each case in a test set, create a <em>gauge-transformed</em> version — swap the defendant&rsquo;s race, change the judge&rsquo;s name, alter the writing style — and verify that the dimension scores do not change:</p>
+<p>$$\mathbf{v}(c_i) = \mathbf{v}(g \cdot c_i) \quad \forall g \in G_{\text{irrelevant}}$$</p>
+<p>The Legal Bond Index (LBI) quantifies the violation:</p>
+<p>$$\text{LBI} = \frac{1}{|G_{\text{irrelevant}}|} \sum_{g \in G_{\text{irrelevant}}} \frac{d_M(\mathbf{v}(c_i), \mathbf{v}(g \cdot c_i))}{d_M(\mathbf{v}(c_i), \bar{\mathbf{v}})}$$</p>
+<p>An LBI of 0 indicates perfect gauge invariance. An LBI above a threshold (the Algorithmic Jurisprudence manuscript suggests 0.05) indicates a violation requiring correction.</p>
+<p><strong>Criterion 3: Topological consistency.</strong> The constructed judicial complex must not contain spurious Wilson loops — directed cycles with non-trivial holonomy that do not correspond to genuine legal inconsistencies. Validation: compute Wilson loops on a subset of known-consistent citation chains and verify that the holonomy is trivial.</p>
+<p><strong>Criterion 4: Retrieval accuracy.</strong> Given a query case, the system should retrieve precedents that legal experts judge to be relevant. Validation: compare the system&rsquo;s top-$k$ retrieved cases against expert judgments using standard retrieval metrics (precision@$k$, recall@$k$, normalized discounted cumulative gain).</p>
+<p><strong>Criterion 5: Calibration of distances.</strong> The Mahalanobis distances between cases should correlate with expert assessments of legal similarity. Validation: for a set of case pairs with expert similarity ratings, compute the rank correlation between Mahalanobis distance and expert rating.</p>
+<hr />
+<blockquote>
+<p><strong>RUNNING EXAMPLE — RIVERA&rsquo;S LIP TEST</strong></p>
+<p><em>Rivera designs a systematic LIP test for JurisGraph. She takes 50 cases from her docket and creates gauge-transformed versions:</em></p>
+<p><em>Transformation 1: Race swap. For each case involving an individual, swap the individual&rsquo;s race (Black $\to$ white, white $\to$ Black, etc.) while preserving all legally relevant facts. This tests whether the system&rsquo;s outputs depend on the defendant&rsquo;s race — a legally irrelevant characteristic under the Equal Protection Clause.</em></p>
+<p><em>Transformation 2: Gender swap. Same procedure with gender.</em></p>
+<p><em>Transformation 3: Writing style swap. Rewrite each opinion in a different stylistic register (formal $\to$ plain language, plain language $\to$ formal) while preserving the legal content.</em></p>
+<p><em>Results:</em></p>
+<p><em>Race swap: LBI = 0.08. The dimension scores change by an average of 8% when the defendant&rsquo;s race is swapped. The largest change is on $d_8$ (public interest): 12% average change. This exceeds the 0.05 threshold — JurisGraph fails the race invariance test.</em></p>
+<p><em>Gender swap: LBI = 0.04. The dimension scores change by an average of 4% when the defendant&rsquo;s gender is swapped. This is within the threshold — JurisGraph passes the gender invariance test, though barely.</em></p>
+<p><em>Writing style swap: LBI = 0.03. The dimension scores are largely invariant to writing style changes, confirming that the embedding is capturing legal content rather than stylistic features.</em></p>
+<p><em>Rivera&rsquo;s assessment: JurisGraph partially fails the LIP test. It exhibits racial bias in its dimension scoring — specifically, it associates Black defendants with lower public interest scores, reflecting disparities in the training data. The tool cannot be deployed until this violation is corrected.</em></p>
+</blockquote>
+<hr />
+<h2 id="the-legal-bond-index-in-practice">The Legal Bond Index in Practice<a class="headerlink" href="#the-legal-bond-index-in-practice" title="Permanent link">&para;</a></h2>
+<h3 id="measuring-gauge-violation">Measuring Gauge Violation<a class="headerlink" href="#measuring-gauge-violation" title="Permanent link">&para;</a></h3>
+<p>The Legal Bond Index (LBI) was introduced in Chapter 5 as a measure of gauge violation — how much a legal system&rsquo;s outputs depend on legally irrelevant features. In the AI context, the LBI becomes a <em>machine-auditable metric</em> that can be computed automatically on any AI legal reasoning system.</p>
+<p><strong>Definition (Legal Bond Index for AI Systems).</strong> For an AI legal reasoning system $\mathcal{S}$, the Legal Bond Index is:</p>
+<p>$$\text{LBI}(\mathcal{S}) = \mathbb{E}_{c \sim \mathcal{D}} \left[ \frac{1}{|G_{\text{irrelevant}}|} \sum_{g \in G_{\text{irrelevant}}} \frac{d_M(\mathcal{S}(c), \mathcal{S}(g \cdot c))}{d_M(\mathcal{S}(c), \bar{\mathcal{S}})} \right]$$</p>
+<p>where $\mathcal{D}$ is a test distribution of cases, $G_{\text{irrelevant}}$ is the set of legally irrelevant transformations, $\mathcal{S}(c)$ is the system&rsquo;s output (dimension scores, retrieved precedents, or recommended outcomes) for case $c$, $g \cdot c$ is the transformed case, and $\bar{\mathcal{S}}$ is the mean system output across the test distribution.</p>
+<p>The LBI has several desirable properties:</p>
+<p><strong>Decomposability.</strong> The LBI can be decomposed by transformation type and by dimension, allowing targeted diagnosis of gauge violations:</p>
+<p>$$\text{LBI}_g^k = \mathbb{E}_c \left[ \frac{|v_k(\mathcal{S}(c)) - v_k(\mathcal{S}(g \cdot c))|}{|v_k(\mathcal{S}(c)) - \bar{v}_k|} \right]$$</p>
+<p>This identifies which transformation (race, gender, style) causes the largest violation and on which dimension ($d_k$) the violation occurs. Rivera&rsquo;s test found that $\text{LBI}_{\text{race}}^8 = 0.12$ — the race swap transformation causes a 12% violation on the public interest dimension.</p>
+<p><strong>Comparability.</strong> The LBI is normalized, so it can be compared across systems, across jurisdictions, and across time periods. An LBI of 0.08 for JurisGraph can be compared to the LBI of the human legal system (estimated from sentencing disparity data) to determine whether the AI system is more or less biased than human judges.</p>
+<p><strong>Actionability.</strong> A high LBI identifies specific gauge violations that can be corrected by targeted interventions: rebalancing the training data, adding gauge-invariance constraints to the loss function, or post-processing the dimension scores to remove dependence on legally irrelevant features.</p>
+<h2 id="worked-example-1-fourteenth-amendment-analysis">Worked Example 1: Fourteenth Amendment Analysis<a class="headerlink" href="#worked-example-1-fourteenth-amendment-analysis" title="Permanent link">&para;</a></h2>
+<p><strong>Scenario.</strong> An equal protection challenge to a state law that imposes different licensing requirements on barbershops and hair salons, with the challenger alleging that the distinction is a proxy for racial discrimination (barbershops are disproportionately owned by Black entrepreneurs; salons are disproportionately owned by white entrepreneurs).</p>
+<p><strong>Step 1: Embedding.</strong> The legal embedding function $\mathcal{E}$ encodes the challenger&rsquo;s complaint, the state&rsquo;s defense, and the relevant case law into embedding vectors. The embedding captures the semantic content: equal protection challenge, commercial regulation, disparate impact claim, rational basis review.</p>
+<p><strong>Step 2: Dimension scoring.</strong> The linear probes assign attribute vectors:</p>
+<table>
+<thead>
+<tr>
+<th>Dimension</th>
+<th>Score</th>
+<th>Interpretation</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>$d_1$ (Entitlement)</td>
+<td>0.6</td>
+<td>Moderate — business licensing is not a fundamental right, but equal protection applies</td>
+</tr>
+<tr>
+<td>$d_2$ (Factual nexus)</td>
+<td>0.7</td>
+<td>Statistical evidence of disparate impact is strong</td>
+</tr>
+<tr>
+<td>$d_3$ (Procedural posture)</td>
+<td>0.8</td>
+<td>Standing is clear (licensed barbers), ripe claim, proper forum</td>
+</tr>
+<tr>
+<td>$d_4$ (Statutory authority)</td>
+<td>0.5</td>
+<td>Fourteenth Amendment directly; no specific federal statute</td>
+</tr>
+<tr>
+<td>$d_5$ (Constitutional conformity)</td>
+<td>0.75</td>
+<td>Equal Protection Clause directly implicated</td>
+</tr>
+<tr>
+<td>$d_6$ (Precedential constraint)</td>
+<td>0.6</td>
+<td>Mixed — rational basis review is deferential, but discriminatory purpose can trigger strict scrutiny</td>
+</tr>
+<tr>
+<td>$d_7$ (Remedial scope)</td>
+<td>0.5</td>
+<td>Declaratory relief, possible injunction</td>
+</tr>
+<tr>
+<td>$d_8$ (Public interest)</td>
+<td>0.6</td>
+<td>Moderate — affects a specific industry, not a fundamental right</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Step 3: Covariance estimation.</strong> Using the covariance matrix estimated from equal protection cases in the domain, the Mahalanobis distance from the challenger&rsquo;s position to the nearest favorable precedent is computed.</p>
+<p><strong>Step 4: Edge weights.</strong> The citation network connects this case to <em>Village of Arlington Heights v. Metropolitan Housing Dev. Corp.</em> (1977, requiring evidence of discriminatory purpose for equal protection claims), <em>Washington v. Davis</em> (1976, rejecting disparate impact alone as an equal protection violation), and <em>Yick Wo v. Hopkins</em> (1886, finding an equal protection violation where a facially neutral law was administered discriminatorily).</p>
+<p><strong>Step 5: Gauge invariance test.</strong> The critical LIP test: swap the racial demographics of barber shop and salon owners. If the system&rsquo;s dimension scores change when the racial associations are reversed (barbershops predominantly white-owned, salons predominantly Black-owned), the system is exhibiting racial bias in its equal protection analysis. A properly calibrated system should produce the same dimension scores regardless of which racial group is disproportionately affected — the equal protection analysis depends on the legal structure, not on which group is burdened.</p>
+<p><strong>Result:</strong> JurisGraph&rsquo;s dimension scores change by 0.06 on average when the racial demographics are reversed. This is above the 0.05 LBI threshold, indicating a gauge violation. The violation is concentrated on $d_2$ (factual nexus) and $d_8$ (public interest), where the system assigns higher scores when the disproportionately affected group is Black. This reflects a training data pattern — civil rights cases in the corpus disproportionately involve claims by Black plaintiffs — rather than a legitimate legal distinction. The system must be recalibrated.</p>
+<h2 id="worked-example-2-statutory-conflict-resolution">Worked Example 2: Statutory Conflict Resolution<a class="headerlink" href="#worked-example-2-statutory-conflict-resolution" title="Permanent link">&para;</a></h2>
+<p><strong>Scenario.</strong> A federal statute requires financial institutions to report suspicious transactions exceeding $10,000 to the Financial Crimes Enforcement Network (FinCEN). A state privacy statute prohibits financial institutions from disclosing customer financial information to government agencies without a warrant. A bank operating in both jurisdictions faces contradictory obligations.</p>
+<p><strong>Step 1: Embedding.</strong> The two statutes and the bank&rsquo;s compliance inquiry are embedded. The embedding captures the statutory conflict: federal reporting requirement versus state privacy protection.</p>
+<p><strong>Step 2: Dimension scoring.</strong></p>
+<table>
+<thead>
+<tr>
+<th>Dimension</th>
+<th>Federal statute</th>
+<th>State statute</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>$d_1$ (Entitlement)</td>
+<td>Bank has a duty to report</td>
+<td>Customer has a right to privacy</td>
+</tr>
+<tr>
+<td>$d_2$ (Factual nexus)</td>
+<td>Transactions &gt; $10K trigger reporting</td>
+<td>Customer financial data is protected</td>
+</tr>
+<tr>
+<td>$d_4$ (Statutory authority)</td>
+<td>Federal: Bank Secrecy Act</td>
+<td>State: Financial Privacy Act</td>
+</tr>
+<tr>
+<td>$d_5$ (Constitutional conformity)</td>
+<td>Federal power to regulate interstate commerce</td>
+<td>State power to protect citizen privacy</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Step 3: Topological analysis.</strong> This is the statutory conflict from Chapter 7&rsquo;s worked example. The two statutes create a directed cycle in the judicial complex:</p>
+<p>$c_{\text{bank holds data}} \to c_{\text{federal duty: report}} \to c_{\text{state duty: do not report}} \to c_{\text{bank holds data}}$</p>
+<p>The holonomy is non-trivial: the bank starts with a &ldquo;duty to report&rdquo; (from the federal statute) and arrives at a &ldquo;duty not to report&rdquo; (from the state statute) — a Hohfeldian contradiction. The Wilson loop $W(\gamma) = s$ (jural negation), indicating a genuine inconsistency.</p>
+<p><strong>Step 4: Resolution.</strong> The Supremacy Clause resolves the conflict. The federal statute preempts the state statute to the extent of the conflict. In the geometric framework, preemption removes the state-law edges from the judicial complex, collapsing the non-trivial Wilson loop to the identity. The bank&rsquo;s obligation is determined by federal law alone: report suspicious transactions above $10,000.</p>
+<p><strong>Step 5: Gauge invariance test.</strong> The LIP test for this analysis: swap the jurisdictions (make the reporting requirement a state law and the privacy protection a federal law). The topological analysis should produce the same structure (a non-trivial Wilson loop), but the resolution should reverse (the federal privacy protection now preempts the state reporting requirement). A gauge-invariant system applies the Supremacy Clause based on the constitutional structure — which law is federal, which is state — not on the content of the laws.</p>
+<p><strong>Result:</strong> JurisGraph correctly identifies the Wilson loop, correctly invokes the Supremacy Clause, and correctly reverses the resolution when the jurisdictions are swapped. The system passes the gauge invariance test for statutory conflict resolution. LBI = 0.01 — the outputs are nearly perfectly invariant under jurisdiction swap.</p>
+<h2 id="worked-example-3-precedent-overruling">Worked Example 3: Precedent Overruling<a class="headerlink" href="#worked-example-3-precedent-overruling" title="Permanent link">&para;</a></h2>
+<p><strong>Scenario.</strong> The Supreme Court is considering whether to overrule a 1990 precedent that held employment discrimination claims under Title VII cannot be brought by independent contractors (only by employees). Subsequent statutory amendments and social changes have eroded the employee/independent contractor distinction as the gig economy has expanded. The question is whether the 1990 precedent should be overruled.</p>
+<p><strong>Step 1: Embedding.</strong> The 1990 precedent, the current case, and the intervening cases are embedded. The embedding captures the doctrinal evolution: the narrowing of the employee/independent contractor distinction in subsequent cases, the expansion of Title VII&rsquo;s scope through statutory amendments, and the growth of the gig economy.</p>
+<p><strong>Step 2: Dimension scoring of the 1990 precedent.</strong></p>
+<table>
+<thead>
+<tr>
+<th>Dimension</th>
+<th>1990 score</th>
+<th>Current score</th>
+<th>Change</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>$d_1$ (Entitlement)</td>
+<td>0.4</td>
+<td>0.7</td>
+<td>+0.3 (independent contractors now seen as having stronger entitlement)</td>
+</tr>
+<tr>
+<td>$d_2$ (Factual nexus)</td>
+<td>0.5</td>
+<td>0.8</td>
+<td>+0.3 (gig economy makes contractor/employee distinction factually weaker)</td>
+</tr>
+<tr>
+<td>$d_4$ (Statutory authority)</td>
+<td>0.6</td>
+<td>0.75</td>
+<td>+0.15 (subsequent amendments broadened Title VII)</td>
+</tr>
+<tr>
+<td>$d_6$ (Precedential constraint)</td>
+<td>0.9</td>
+<td>0.5</td>
+<td>-0.4 (the 1990 precedent has been distinguished, questioned, and eroded)</td>
+</tr>
+<tr>
+<td>$d_8$ (Public interest)</td>
+<td>0.5</td>
+<td>0.8</td>
+<td>+0.3 (millions of gig workers lack discrimination protection)</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Step 3: Overruling cost computation.</strong> The overruling cost (from Chapter 9&rsquo;s parallel transport framework) is:</p>
+<p>$$\text{Cost}_{\text{overrule}} = \sum_{i=1}^{n} w_{P_i} \cdot |\Delta w(c_i, \cdot \, ; P)|$$</p>
+<p>where the sum is over all cases that relied on the 1990 precedent. JurisGraph identifies 47 cases that cited the 1990 precedent positively, with a combined precedential weight of 23.4 (on a normalized scale). The dimension scores of these cases are recomputed under the hypothetical overruling, and the total edge-weight change is computed.</p>
+<p><strong>Step 4: Stare decisis analysis.</strong> The system evaluates the <em>Casey</em> factors for overruling precedent:</p>
+<ul>
+<li><strong>Workability:</strong> The employee/independent contractor distinction has become unworkable as applied to gig workers. Score: 0.7 (supports overruling).</li>
+<li><strong>Reliance interests:</strong> Some employers have structured their workforce to exploit the independent contractor exclusion. Score: 0.5 (moderate reliance, but arguably illegitimate reliance on the ability to discriminate).</li>
+<li><strong>Doctrinal erosion:</strong> The precedent has been distinguished and narrowed by subsequent cases. The precedential constraint score has dropped from 0.9 to 0.5. Score: 0.8 (strongly supports overruling).</li>
+<li><strong>Changed factual circumstances:</strong> The gig economy did not exist in 1990. The factual nexus score has increased from 0.5 to 0.8. Score: 0.9 (strongly supports overruling).</li>
+</ul>
+<p><strong>Step 5: Gauge invariance test.</strong> The LIP test: does the overruling analysis depend on the demographics of gig workers? Swap the demographic profile of gig workers from disproportionately minority and immigrant to disproportionately white and native-born. The stare decisis analysis should be invariant — the question is whether the precedent should be overruled, not who benefits from the overruling.</p>
+<p><strong>Result:</strong> JurisGraph&rsquo;s overruling recommendation is invariant under the demographic swap. LBI = 0.02. The system correctly treats the stare decisis analysis as a structural question about doctrinal coherence, not a substantive question about who benefits from the change.</p>
+<hr />
+<blockquote>
+<p><strong>RUNNING EXAMPLE — RIVERA&rsquo;S FINAL ASSESSMENT</strong></p>
+<p><em>Rivera compiles her evaluation of JurisGraph.</em></p>
+<p><em>Strengths:</em>
+<em>— The five-step pipeline (embedding, dimension scoring, covariance estimation, edge weights, calibration) provides a principled architecture that connects NLP capabilities to the geometric framework.</em>
+<em>— Dimension scoring is reasonably accurate, with scores within 0.1 of expert assessment on most cases.</em>
+<em>— Statutory conflict resolution is sound: Wilson loops are correctly identified, and the Supremacy Clause is correctly applied.</em>
+<em>— Stare decisis analysis is structurally correct and gauge-invariant.</em></p>
+<p><em>Weaknesses:</em>
+<em>— The system fails the racial invariance test (LBI = 0.08). Dimension scores on $d_8$ (public interest) are sensitive to defendant race, reflecting training data bias.</em>
+<em>— The system has not been tested on multi-manifold (international) disputes, where the pipeline must handle multiple covariance matrices and treaty connection maps.</em>
+<em>— The system does not compute path homology — it identifies Wilson loops but does not perform the full topological constitutionality test.</em></p>
+<p><em>Rivera&rsquo;s recommendation: JurisGraph should not be deployed in its current form. The racial bias in the public interest dimension scoring is a Legal Invariance Principle violation that must be corrected before the system can be used in a federal court. The correction is straightforward in principle — add gauge-invariance constraints to the training loss function, rebalance the training data, or post-process scores to remove racial dependence — but must be validated before deployment.</em></p>
+<p><em>Rivera notes that the evaluation framework itself is a contribution: the five criteria (dimension independence, gauge invariance, topological consistency, retrieval accuracy, distance calibration) provide a systematic standard for evaluating any AI legal reasoning tool. This standard is more demanding than the &ldquo;does it produce good results?&rdquo; test used by most legal technology vendors. It requires not just accuracy but structural consistency — not just getting the right answer but getting it for the right reasons.</em></p>
+</blockquote>
+<hr />
+<h2 id="from-retrieval-to-reasoning">From Retrieval to Reasoning<a class="headerlink" href="#from-retrieval-to-reasoning" title="Permanent link">&para;</a></h2>
+<h3 id="the-difference-between-legal-search-and-legal-reasoning">The Difference Between Legal Search and Legal Reasoning<a class="headerlink" href="#the-difference-between-legal-search-and-legal-reasoning" title="Permanent link">&para;</a></h3>
+<p>Current legal AI systems are primarily <em>retrieval</em> systems — they find relevant documents given a query. JurisGraph&rsquo;s claimed advance is to move from retrieval to <em>reasoning</em> — from finding cases to analyzing their geometric relationships.</p>
+<p>The distinction is critical. A retrieval system answers: &ldquo;Which cases are similar to this one?&rdquo; A reasoning system answers: &ldquo;What is the structure of the legal space around this case? Where are the boundaries? Which paths are available? Is the current doctrinal configuration consistent?&rdquo;</p>
+<p>The five-step NLP pipeline enables this transition. Steps 1-4 construct the geometric representation; step 5 validates it. Once the representation is constructed, the geometric operations developed in this book — Mahalanobis distance computation, Wilson loop detection, path homology computation, $A^*$ search, gauge invariance testing — become executable algorithms rather than theoretical concepts.</p>
+<h3 id="the-remaining-challenges">The Remaining Challenges<a class="headerlink" href="#the-remaining-challenges" title="Permanent link">&para;</a></h3>
+<p>Even with a validated pipeline, several challenges remain:</p>
+<p><strong>Temporal dynamics.</strong> The legal manifold changes over time — new cases are decided, old precedents are overruled, statutes are amended. The pipeline must be updated continuously, and the updates must preserve consistency: a new case that changes the dimension scores of previously scored cases must trigger a cascade of recomputation.</p>
+<p><strong>Adversarial robustness.</strong> In an adversarial system (Chapter 12), parties have incentives to game the AI system — to frame their arguments in ways that exploit weaknesses in the embedding or the dimension scoring. A robust system must be resistant to such gaming, which is a requirement that goes beyond standard machine learning robustness.</p>
+<p><strong>Interpretability.</strong> The geometric framework provides inherent interpretability — the eight dimensions, the Mahalanobis distance, the Wilson loops, the path homology groups — but the pipeline&rsquo;s internal representations (embedding vectors, linear probe weights, covariance matrices) must be connected to these interpretable structures. A system that produces correct outputs for inscrutable reasons is not fully satisfactory for judicial use.</p>
+<p><strong>Normative commitments.</strong> The choice of which transformations are &ldquo;legally irrelevant&rdquo; (and therefore must be gauge-invariant) is not a purely technical decision. It is a normative commitment about what equal protection requires, what due process demands, and what the rule of law means. The AI system inherits these commitments from its calibration, and the commitments must be made explicit and subject to scrutiny.</p>
+<h2 id="the-geometric-standard-for-legal-ai">The Geometric Standard for Legal AI<a class="headerlink" href="#the-geometric-standard-for-legal-ai" title="Permanent link">&para;</a></h2>
+<h3 id="what-the-framework-requires">What the Framework Requires<a class="headerlink" href="#what-the-framework-requires" title="Permanent link">&para;</a></h3>
+<p>The geometric framework sets a higher standard for legal AI than the current industry practice. Current legal AI systems are evaluated on retrieval accuracy, user satisfaction, and time savings. The geometric framework adds structural requirements:</p>
+<p><strong>Gauge invariance.</strong> The system&rsquo;s outputs must be invariant under legally irrelevant transformations. An LBI below the threshold (0.05) on all transformation types is a minimum requirement.</p>
+<p><strong>Topological consistency.</strong> The system&rsquo;s constructed judicial complex must be topologically consistent — no spurious Wilson loops, correct path-homology computation, and accurate detection of genuine circuit splits.</p>
+<p><strong>Metric calibration.</strong> The Mahalanobis distances must correlate with expert judgments of legal similarity, and the covariance matrices must reflect the genuine correlation structure of the legal dimensions.</p>
+<p><strong>Conservation compliance.</strong> In closed bilateral disputes, the system&rsquo;s outputs must satisfy the conservation laws derived in Chapter 5 — liability conservation, entitlement balance, and outcome consistency.</p>
+<p>These requirements are demanding. No current AI legal reasoning system satisfies all of them. But they are <em>principled</em> — they follow from the mathematical structure of the framework, not from ad hoc desiderata. And they are <em>testable</em> — each requirement can be validated by a specific computational procedure.</p>
+<p>The geometric standard is not a barrier to AI legal reasoning. It is a <em>blueprint</em> — a specification of what AI legal reasoning must achieve to be trustworthy, consistent, and fair. A system that meets the standard is not merely useful; it is <em>geometrically sound</em> — its outputs respect the symmetries, conservations, and topological constraints that the legal system claims to embody.</p>
+<h2 id="chapter-summary">Chapter Summary<a class="headerlink" href="#chapter-summary" title="Permanent link">&para;</a></h2>
+<ol>
+<li>
+<p>The <strong>five-step NLP pipeline</strong> (embedding, dimension scoring, covariance estimation, edge weights, calibration) bridges the gap between the theoretical framework and computational implementation.</p>
+</li>
+<li>
+<p><strong>Embeddings</strong> must be language-agnostic — a gauge invariance requirement that ensures the system captures legal meaning rather than linguistic form.</p>
+</li>
+<li>
+<p><strong>Linear probes</strong> score the eight legal dimensions, testing whether each dimension is linearly decodable from the embedding. The choice of linear probes is theoretically motivated: it tests the quality of the representation rather than compensating for its weaknesses.</p>
+</li>
+<li>
+<p>The <strong>Legal Bond Index (LBI)</strong> provides a machine-auditable metric for gauge invariance, decomposable by transformation type and dimension.</p>
+</li>
+<li>
+<p>The <strong>three worked examples</strong> (Fourteenth Amendment analysis, statutory conflict resolution, precedent overruling) demonstrate the pipeline in action and illustrate how the LIP test identifies and diagnoses gauge violations.</p>
+</li>
+<li>
+<p>The <strong>geometric standard for legal AI</strong> — gauge invariance, topological consistency, metric calibration, and conservation compliance — sets a higher bar than current industry practice but is principled, testable, and achievable.</p>
+</li>
+</ol>
+<hr />
+<h2 id="technical-appendix">Technical Appendix<a class="headerlink" href="#technical-appendix" title="Permanent link">&para;</a></h2>
+<p><strong>Definition (Legal Embedding Function).</strong> A legal embedding function $\mathcal{E}: \mathcal{D} \to \mathbb{R}^d$ maps documents to a $d$-dimensional vector space satisfying:</p>
+<p>(i) <strong>Semantic preservation:</strong> $\text{cos\_sim}(\mathcal{E}(c_i), \mathcal{E}(c_j)) \geq \tau$ whenever $c_i$ and $c_j$ address the same legal issue.</p>
+<p>(ii) <strong>Language agnosticism:</strong> $\|\mathcal{E}(c) - \mathcal{E}(g \cdot c)\| < \epsilon$ for all style transformations $g \in G_{\text{style}}$, where $\epsilon$ is a tolerance parameter.</p>
+<p><strong>Definition (Linear Probe).</strong> For dimension $d_k$, the linear probe is a function $f_k: \mathbb{R}^d \to [0, 1]$ defined by $f_k(\mathbf{e}) = \sigma(\mathbf{w}_k^T \mathbf{e} + b_k)$, where $\mathbf{w}_k \in \mathbb{R}^d$ and $b_k \in \mathbb{R}$ are trained by minimizing:</p>
+<p>$$\mathcal{L}_k = \sum_{i=1}^{N_{\text{train}}} \ell(f_k(\mathbf{e}_i), v_k^{\text{true}}(c_i)) + \lambda \|\mathbf{w}_k\|^2$$</p>
+<p>where $\ell$ is the cross-entropy or MSE loss, $v_k^{\text{true}}$ is the expert-labeled dimension score, and $\lambda$ is a regularization parameter.</p>
+<p><strong>Theorem (LBI Decomposition).</strong> The Legal Bond Index decomposes as:</p>
+<p>$$\text{LBI}(\mathcal{S}) = \sum_{k=1}^{8} \omega_k \sum_{g \in G_{\text{irrelevant}}} \pi_g \cdot \text{LBI}_g^k(\mathcal{S})$$</p>
+<p>where $\omega_k$ is the weight of dimension $d_k$ (summing to 1), $\pi_g$ is the weight of transformation $g$ (summing to 1), and $\text{LBI}_g^k$ is the dimension-transformation-specific bond index. This decomposition allows targeted diagnosis: high $\text{LBI}_g^k$ identifies the specific transformation $g$ and dimension $d_k$ where gauge invariance fails.</p>
+<p><strong>Proposition (Gauge-Invariant Training).</strong> Adding a gauge-invariance penalty to the training loss:</p>
+<p>$$\mathcal{L}_{\text{GI}} = \mathcal{L}_{\text{task}} + \mu \sum_{g \in G_{\text{irrelevant}}} \|\mathcal{S}(c) - \mathcal{S}(g \cdot c)\|^2$$</p>
+<p>with $\mu > 0$, reduces the LBI at convergence. If $\mu$ is sufficiently large relative to the task loss, the LBI approaches 0, but at the cost of reduced task performance (the accuracy-invariance tradeoff).</p>
+<p><strong>Definition (Retrieval Precision at $k$).</strong> For a query case $c_q$ with expert-judged relevant cases $R_q$:</p>
+<p>$$P@k = \frac{|\{\text{top-}k \text{ retrieved}\} \cap R_q|}{k}$$</p>
+<p><strong>Definition (Legal Bond Index for AI Systems — Full Statement).</strong> For a system $\mathcal{S}$, test distribution $\mathcal{D}$, and irrelevant transformation group $G_{\text{irrelevant}}$:</p>
+<p>$$\text{LBI}(\mathcal{S}) = \mathbb{E}_{c \sim \mathcal{D}} \left[ \frac{\sum_{g \in G_{\text{irrelevant}}} d_M(\mathcal{S}(c), \mathcal{S}(g \cdot c))}{|G_{\text{irrelevant}}| \cdot \mathbb{E}_{c' \sim \mathcal{D}}[d_M(\mathcal{S}(c), \mathcal{S}(c'))]} \right]$$</p>
+<p>The denominator normalizes by the expected distance between random system outputs, ensuring that the LBI is scale-invariant and comparable across systems and domains.</p>
+<p><strong>Proposition (Minimum Sample Size for Dimension Probes).</strong> For eight linear probes with $d$-dimensional input, achieving estimation error below $\epsilon$ with probability at least $1 - \delta$ requires at least:</p>
+<p>$$N_{\text{min}} = O\left(\frac{d + \log(8/\delta)}{\epsilon^2}\right)$$</p>
+<p>labeled examples per dimension. For $d = 768$, $\epsilon = 0.05$, $\delta = 0.05$: $N_{\text{min}} \approx 500$.</p>
+<hr />
+<h2 id="notes-on-sources">Notes on Sources<a class="headerlink" href="#notes-on-sources" title="Permanent link">&para;</a></h2>
+<p>The NLP pipeline for legal analysis draws on the Algorithmic Jurisprudence manuscript (§8, §12). Language-agnostic embeddings are developed in Reimers and Gurevych (2019, <em>Sentence-BERT</em>) and Conneau et al. (2020, <em>Unsupervised Cross-lingual Representation Learning at Scale</em>). Legal-domain transformers include Chalkidis et al. (2020, <em>LEGAL-BERT</em>) and Zheng et al. (2021, <em>When Does Pretraining Help?</em>). Linear probes as diagnostic tools are developed by Alain and Bengio (2017) and Belinkov (2022, <em>Probing Classifiers</em>). The Mahalanobis distance in machine learning is discussed in De Maesschalck, Jouan-Rimbaud, and Massart (2000). The Legal Bond Index extends the Bond Index of Bond (2026a, <em>Geometric Ethics</em>, Ch. 14). The gauge-invariant training approach connects to fairness constraints in machine learning — see Hardt, Price, and Srebro (2016, <em>Equality of Opportunity in Supervised Learning</em>) and Zemel et al. (2013, <em>Learning Fair Representations</em>). Citation analysis in legal databases is reviewed in Fowler et al. (2007, <em>Network Analysis and the Law</em>). The stare decisis factors for overruling precedent originate with <em>Planned Parenthood v. Casey</em>, 505 U.S. 833 (1992). The retrieval accuracy metrics are standard in information retrieval — see Manning, Raghavan, and Schütze (2008, <em>Introduction to Information Retrieval</em>). The Ledoit-Wolf covariance estimator is developed in Ledoit and Wolf (2004). The accuracy-invariance tradeoff connects to the broader fairness-accuracy tradeoff literature — see Corbett-Davies and Goel (2018).</p>
+
+    <footer>
+      <p>Part of the <em>Geometric Series</em> by A.H. Bowers</p>
+      <p>Built automatically from source. Last updated: 2026-04-18 17:11 UTC</p>
+    </footer>
+  </div>
+
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js"
+    onload="renderMathInElement(document.body, {
+      delimiters: [
+        {left: '$$', right: '$$', display: true},
+        {left: '$', right: '$', display: false},
+        {left: '\\\\(', right: '\\\\)', display: false},
+        {left: '\\\\[', right: '\\\\]', display: true}
+      ],
+      throwOnError: false
+    });"></script>
+</body>
+</html>
