@@ -1,0 +1,505 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Appendix B: The District 7 Model — Code Walkthrough - Geometric Politics</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
+  <style>
+    :root {
+      --bg: #fafaf8;
+      --fg: #222;
+      --accent: #2c5f8a;
+      --border: #ddd;
+      --code-bg: #f4f4f0;
+      --max-width: 48rem;
+    }
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --bg: #1a1a2e;
+        --fg: #e0e0e0;
+        --accent: #7eb8da;
+        --border: #444;
+        --code-bg: #16213e;
+      }
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Georgia', 'Times New Roman', serif;
+      background: var(--bg);
+      color: var(--fg);
+      line-height: 1.7;
+      padding: 2rem 1rem;
+    }
+    .container {
+      max-width: var(--max-width);
+      margin: 0 auto;
+    }
+    nav.breadcrumb {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      font-size: 0.85rem;
+      margin-bottom: 2rem;
+      padding-bottom: 0.5rem;
+      border-bottom: 1px solid var(--border);
+    }
+    nav.breadcrumb a {
+      color: var(--accent);
+      text-decoration: none;
+    }
+    nav.breadcrumb a:hover { text-decoration: underline; }
+    nav.breadcrumb .sep { margin: 0 0.4rem; color: #999; }
+    h1 {
+      font-size: 2rem;
+      margin-bottom: 0.5rem;
+      line-height: 1.2;
+      border-bottom: 2px solid var(--accent);
+      padding-bottom: 0.5rem;
+    }
+    h2 {
+      font-size: 1.5rem;
+      margin-top: 2.5rem;
+      margin-bottom: 0.75rem;
+      color: var(--accent);
+    }
+    h3 {
+      font-size: 1.2rem;
+      margin-top: 2rem;
+      margin-bottom: 0.5rem;
+    }
+    h4 {
+      font-size: 1.05rem;
+      margin-top: 1.5rem;
+      margin-bottom: 0.4rem;
+      font-style: italic;
+    }
+    p { margin-bottom: 1rem; }
+    blockquote {
+      border-left: 3px solid var(--accent);
+      padding: 0.5rem 1.2rem;
+      margin: 1.5rem 0;
+      background: var(--code-bg);
+      font-style: italic;
+    }
+    blockquote p:last-child { margin-bottom: 0; }
+    code {
+      font-family: 'Consolas', 'Fira Code', monospace;
+      background: var(--code-bg);
+      padding: 0.15rem 0.35rem;
+      border-radius: 3px;
+      font-size: 0.9em;
+    }
+    pre {
+      background: var(--code-bg);
+      padding: 1rem;
+      border-radius: 4px;
+      overflow-x: auto;
+      margin: 1.5rem 0;
+      border: 1px solid var(--border);
+    }
+    pre code {
+      background: none;
+      padding: 0;
+    }
+    a { color: var(--accent); }
+    ul, ol {
+      margin: 0.75rem 0 1rem 1.5rem;
+    }
+    li { margin-bottom: 0.3rem; }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 1.5rem 0;
+    }
+    th, td {
+      border: 1px solid var(--border);
+      padding: 0.5rem 0.75rem;
+      text-align: left;
+    }
+    th { background: var(--code-bg); }
+    hr {
+      border: none;
+      border-top: 1px solid var(--border);
+      margin: 2rem 0;
+    }
+    img {
+      max-width: 100%;
+      height: auto;
+      display: block;
+      margin: 1.5rem auto;
+    }
+    /* KaTeX display math */
+    .katex-display {
+      overflow-x: auto;
+      overflow-y: hidden;
+      padding: 0.5rem 0;
+    }
+    /* Definition/theorem boxes */
+    .definition, .theorem, .axiom {
+      border: 1px solid var(--border);
+      border-left: 4px solid var(--accent);
+      padding: 1rem 1.2rem;
+      margin: 1.5rem 0;
+      background: var(--code-bg);
+      border-radius: 0 4px 4px 0;
+    }
+    footer {
+      margin-top: 4rem;
+      padding-top: 1rem;
+      border-top: 1px solid var(--border);
+      font-size: 0.8rem;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      color: #888;
+      text-align: center;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <nav class="breadcrumb">
+      <a href="../index.html">Geometric Series</a>
+      <span class="sep">/</span>
+      <a href="index.html">Geometric Politics</a>
+      <span class="sep">/</span>
+      <span>Appendix B: The District 7 Model — Code Walkthrough</span>
+    </nav>
+
+    <h1 id="appendix-b-the-district-7-model-code-walkthrough">Appendix B: The District 7 Model — Code Walkthrough<a class="headerlink" href="#appendix-b-the-district-7-model-code-walkthrough" title="Permanent link">&para;</a></h1>
+<p>This appendix provides a Python implementation of the core computational constructions used throughout the book. The code is designed for reproducibility: all computational results in the main text can be verified using these implementations.</p>
+<hr />
+<h2 id="b1-preference-manifold-construction">B.1 Preference Manifold Construction<a class="headerlink" href="#b1-preference-manifold-construction" title="Permanent link">&para;</a></h2>
+<pre><code class="language-python">import numpy as np
+from scipy.spatial.distance import mahalanobis
+from scipy.linalg import inv
+
+class PoliticalManifold:
+    &quot;&quot;&quot;
+    Six-dimensional political preference manifold.
+
+    Dimensions:
+        d1: Economic policy
+        d2: Social values
+        d3: Environmental priority
+        d4: Foreign policy
+        d5: Institutional trust
+        d6: Identity
+    &quot;&quot;&quot;
+
+    def __init__(self, voters: np.ndarray):
+        &quot;&quot;&quot;
+        Args:
+            voters: (n, 6) array of voter positions on the manifold
+        &quot;&quot;&quot;
+        assert voters.shape[1] == 6, &quot;Manifold requires 6 dimensions&quot;
+        self.voters = voters
+        self.n = voters.shape[0]
+        self.d = 6
+        self.mean = np.mean(voters, axis=0)
+        self.cov = np.cov(voters.T)
+        self.cov_inv = inv(self.cov)
+
+        # Eigendecomposition for dimensionality analysis
+        eigenvalues, eigenvectors = np.linalg.eigh(self.cov)
+        idx = np.argsort(eigenvalues)[::-1]
+        self.eigenvalues = eigenvalues[idx]
+        self.eigenvectors = eigenvectors[:, idx]
+
+    def manifold_distance(self, v1: np.ndarray, v2: np.ndarray) -&gt; float:
+        &quot;&quot;&quot;Mahalanobis distance as manifold distance approximation.&quot;&quot;&quot;
+        diff = v1 - v2
+        return np.sqrt(diff @ self.cov_inv @ diff)
+
+    def frechet_mean(self) -&gt; np.ndarray:
+        &quot;&quot;&quot;
+        Frechet mean of the voter distribution.
+        For Mahalanobis metric, this is the arithmetic mean.
+        &quot;&quot;&quot;
+        return self.mean
+
+    def effective_dimensionality(self, threshold: float = 0.85) -&gt; int:
+        &quot;&quot;&quot;Number of dimensions needed to explain threshold of variance.&quot;&quot;&quot;
+        total = np.sum(self.eigenvalues)
+        cumulative = np.cumsum(self.eigenvalues) / total
+        return int(np.searchsorted(cumulative, threshold)) + 1
+
+    def project_1d(self, axis: np.ndarray) -&gt; np.ndarray:
+        &quot;&quot;&quot;Project all voters onto a 1D axis.&quot;&quot;&quot;
+        axis = axis / np.linalg.norm(axis)
+        return self.voters @ axis
+</code></pre>
+<h2 id="b2-voting-system-contractions">B.2 Voting System Contractions<a class="headerlink" href="#b2-voting-system-contractions" title="Permanent link">&para;</a></h2>
+<pre><code class="language-python">class VotingSystem:
+    &quot;&quot;&quot;Base class for voting system contractions.&quot;&quot;&quot;
+
+    def __init__(self, manifold: PoliticalManifold,
+                 candidates: np.ndarray):
+        &quot;&quot;&quot;
+        Args:
+            manifold: The political preference manifold
+            candidates: (m, 6) array of candidate positions
+        &quot;&quot;&quot;
+        self.manifold = manifold
+        self.candidates = candidates
+        self.m = candidates.shape[0]
+
+    def voter_distances(self) -&gt; np.ndarray:
+        &quot;&quot;&quot;(n, m) matrix of manifold distances voter -&gt; candidate.&quot;&quot;&quot;
+        distances = np.zeros((self.manifold.n, self.m))
+        for i in range(self.manifold.n):
+            for j in range(self.m):
+                distances[i, j] = self.manifold.manifold_distance(
+                    self.manifold.voters[i], self.candidates[j]
+                )
+        return distances
+
+
+class PluralityVoting(VotingSystem):
+    &quot;&quot;&quot;Plurality (first-past-the-post) voting.&quot;&quot;&quot;
+
+    def run(self) -&gt; int:
+        &quot;&quot;&quot;Returns index of winning candidate.&quot;&quot;&quot;
+        distances = self.voter_distances()
+        first_choices = np.argmin(distances, axis=1)
+        vote_counts = np.bincount(first_choices, minlength=self.m)
+        return int(np.argmax(vote_counts))
+
+    def information_preserved(self) -&gt; float:
+        &quot;&quot;&quot;Fraction of manifold information preserved.&quot;&quot;&quot;
+        return 1.0 / self.manifold.d
+
+
+class RankedChoiceVoting(VotingSystem):
+    &quot;&quot;&quot;Ranked-choice voting (instant runoff).&quot;&quot;&quot;
+
+    def run(self) -&gt; int:
+        &quot;&quot;&quot;Returns index of winning candidate via IRV elimination.&quot;&quot;&quot;
+        distances = self.voter_distances()
+        rankings = np.argsort(distances, axis=1)
+        active = np.ones(self.m, dtype=bool)
+
+        while np.sum(active) &gt; 1:
+            # Count first-choice votes among active candidates
+            first_choices = np.zeros(self.m, dtype=int)
+            for voter_ranking in rankings:
+                for cand in voter_ranking:
+                    if active[cand]:
+                        first_choices[cand] += 1
+                        break
+
+            total = np.sum(first_choices[active])
+            # Check for majority
+            if np.max(first_choices) &gt; total / 2:
+                return int(np.argmax(first_choices))
+
+            # Eliminate lowest
+            active_counts = first_choices.copy()
+            active_counts[~active] = total + 1
+            eliminate = np.argmin(active_counts)
+            active[eliminate] = False
+
+        return int(np.where(active)[0][0])
+
+    def information_preserved(self) -&gt; float:
+        &quot;&quot;&quot;Fraction of manifold information preserved.&quot;&quot;&quot;
+        return min(self.manifold.d, self.m - 1) / self.manifold.d
+</code></pre>
+<h2 id="b3-gerrymandering-index">B.3 Gerrymandering Index<a class="headerlink" href="#b3-gerrymandering-index" title="Permanent link">&para;</a></h2>
+<pre><code class="language-python">class GerrymanderingAnalysis:
+    &quot;&quot;&quot;Gerrymandering index computation on the manifold.&quot;&quot;&quot;
+
+    def __init__(self, manifold: PoliticalManifold,
+                 geography: np.ndarray):
+        &quot;&quot;&quot;
+        Args:
+            manifold: Political preference manifold
+            geography: (n, 2) array of voter geographic positions
+        &quot;&quot;&quot;
+        self.manifold = manifold
+        self.geography = geography
+
+    def gerrymandering_index(self,
+                              assignment: np.ndarray) -&gt; float:
+        &quot;&quot;&quot;
+        Compute GI(D) for a district assignment.
+
+        Args:
+            assignment: (n,) array of district labels for each voter
+
+        Returns:
+            Average manifold distance from voter to district mean.
+        &quot;&quot;&quot;
+        districts = np.unique(assignment)
+        total_dist = 0.0
+
+        for d in districts:
+            mask = assignment == d
+            district_voters = self.manifold.voters[mask]
+            district_mean = np.mean(district_voters, axis=0)
+
+            for voter in district_voters:
+                total_dist += self.manifold.manifold_distance(
+                    voter, district_mean
+                )
+
+        return total_dist / self.manifold.n
+
+    def dimension_specific_gi(self, assignment: np.ndarray,
+                               dim: int) -&gt; float:
+        &quot;&quot;&quot;GI computed on a single dimension.&quot;&quot;&quot;
+        districts = np.unique(assignment)
+        total_dist = 0.0
+
+        for d in districts:
+            mask = assignment == d
+            positions = self.manifold.voters[mask, dim]
+            mean_pos = np.mean(positions)
+            total_dist += np.sum(np.abs(positions - mean_pos))
+
+        return total_dist / self.manifold.n
+</code></pre>
+<h2 id="b4-political-bond-index">B.4 Political Bond Index<a class="headerlink" href="#b4-political-bond-index" title="Permanent link">&para;</a></h2>
+<pre><code class="language-python">class PoliticalBondIndex:
+    &quot;&quot;&quot;Compute the Political Bond Index.&quot;&quot;&quot;
+
+    def __init__(self, manifold: PoliticalManifold,
+                 representatives: np.ndarray,
+                 voter_rep_assignment: np.ndarray):
+        &quot;&quot;&quot;
+        Args:
+            manifold: Political preference manifold
+            representatives: (k, 6) representative positions
+            voter_rep_assignment: (n,) which rep represents each voter
+        &quot;&quot;&quot;
+        self.manifold = manifold
+        self.representatives = representatives
+        self.assignment = voter_rep_assignment
+
+    def compute(self) -&gt; float:
+        &quot;&quot;&quot;
+        BI(S, E) = E[d(v, r(v)) - d(v, r*(v))]
+        &quot;&quot;&quot;
+        actual_distances = np.zeros(self.manifold.n)
+        optimal_distances = np.zeros(self.manifold.n)
+
+        for i in range(self.manifold.n):
+            v = self.manifold.voters[i]
+            r = self.representatives[self.assignment[i]]
+            actual_distances[i] = self.manifold.manifold_distance(v, r)
+
+            # Optimal: closest representative
+            min_dist = np.inf
+            for rep in self.representatives:
+                d = self.manifold.manifold_distance(v, rep)
+                min_dist = min(min_dist, d)
+            optimal_distances[i] = min_dist
+
+        return np.mean(actual_distances - optimal_distances)
+
+    def compute_by_dimension(self) -&gt; np.ndarray:
+        &quot;&quot;&quot;Dimension-specific Bond Index.&quot;&quot;&quot;
+        bi_dims = np.zeros(self.manifold.d)
+
+        for dim in range(self.manifold.d):
+            actual = np.zeros(self.manifold.n)
+            optimal = np.zeros(self.manifold.n)
+
+            for i in range(self.manifold.n):
+                v_pos = self.manifold.voters[i, dim]
+                r_pos = self.representatives[
+                    self.assignment[i], dim
+                ]
+                actual[i] = abs(v_pos - r_pos)
+
+                min_dist = min(
+                    abs(v_pos - rep[dim])
+                    for rep in self.representatives
+                )
+                optimal[i] = min_dist
+
+            bi_dims[dim] = np.mean(actual - optimal)
+
+        return bi_dims
+</code></pre>
+<h2 id="b5-campaign-gradient-optimization">B.5 Campaign Gradient Optimization<a class="headerlink" href="#b5-campaign-gradient-optimization" title="Permanent link">&para;</a></h2>
+<pre><code class="language-python">def campaign_gradient(manifold: PoliticalManifold,
+                      candidate_position: np.ndarray) -&gt; np.ndarray:
+    &quot;&quot;&quot;
+    Find the optimal projection axis for a campaign.
+
+    Implements the Campaign Gradient Theorem:
+    e* = argmax_e |&lt;x_C - mu, e&gt;|^2 / (e^T Sigma e)
+
+    Returns the optimal projection axis (unit vector).
+    &quot;&quot;&quot;
+    diff = candidate_position - manifold.mean
+
+    # Solve generalized eigenvalue problem
+    # Maximize (diff^T e)^2 / (e^T Sigma e)
+    # This is equivalent to finding the eigenvector of
+    # Sigma^{-1} (diff diff^T) with largest eigenvalue
+
+    M = manifold.cov_inv @ np.outer(diff, diff)
+    eigenvalues, eigenvectors = np.linalg.eig(M)
+    idx = np.argmax(np.real(eigenvalues))
+
+    optimal_axis = np.real(eigenvectors[:, idx])
+    return optimal_axis / np.linalg.norm(optimal_axis)
+</code></pre>
+<h2 id="b6-usage-example-district-7">B.6 Usage Example: District 7<a class="headerlink" href="#b6-usage-example-district-7" title="Permanent link">&para;</a></h2>
+<pre><code class="language-python"># Generate District 7 synthetic electorate
+np.random.seed(42)
+
+# Five subcommunities
+urban_core = np.random.multivariate_normal(
+    [-1.5, -0.3, 0.8, 0.0, -1.2, 1.5],
+    np.eye(6) * 0.5, size=600
+)
+university = np.random.multivariate_normal(
+    [-1.8, -2.0, 2.0, -1.0, 0.5, -1.5],
+    np.eye(6) * 0.4, size=300
+)
+suburbs = np.random.multivariate_normal(
+    [0.2, 0.0, 0.3, -0.2, 0.3, 0.0],
+    np.eye(6) * 0.6, size=500
+)
+exurban = np.random.multivariate_normal(
+    [1.5, 1.2, -1.0, 1.0, -2.0, 1.0],
+    np.eye(6) * 0.5, size=400
+)
+meadow_pines = np.random.multivariate_normal(
+    [0.8, 1.0, -0.5, -1.5, 0.8, 0.5],
+    np.eye(6) * 0.4, size=200
+)
+
+voters = np.vstack([urban_core, university, suburbs,
+                     exurban, meadow_pines])
+
+# Build manifold
+manifold = PoliticalManifold(voters)
+
+print(f&quot;Effective dimensionality (85%): &quot;
+      f&quot;{manifold.effective_dimensionality()}&quot;)
+print(f&quot;Eigenvalue distribution: &quot;
+      f&quot;{manifold.eigenvalues / manifold.eigenvalues.sum()}&quot;)
+</code></pre>
+<p>All code in this appendix is available at the book&rsquo;s companion repository. The implementations are intentionally simple — production use would require optimization for large electorates and more sophisticated manifold distance estimation.</p>
+
+    <footer>
+      <p>Part of the <em>Geometric Series</em> by A.H. Bowers</p>
+      <p>Built automatically from source. Last updated: 2026-04-18 17:12 UTC</p>
+    </footer>
+  </div>
+
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js"
+    onload="renderMathInElement(document.body, {
+      delimiters: [
+        {left: '$$', right: '$$', display: true},
+        {left: '$', right: '$', display: false},
+        {left: '\\\\(', right: '\\\\)', display: false},
+        {left: '\\\\[', right: '\\\\]', display: true}
+      ],
+      throwOnError: false
+    });"></script>
+</body>
+</html>
