@@ -1,0 +1,458 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Chapter 6: Clinical Reasoning as A* Pathfinding - Geometric Medicine</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
+  <style>
+    :root {
+      --bg: #fafaf8;
+      --fg: #222;
+      --accent: #2c5f8a;
+      --border: #ddd;
+      --code-bg: #f4f4f0;
+      --max-width: 48rem;
+    }
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --bg: #1a1a2e;
+        --fg: #e0e0e0;
+        --accent: #7eb8da;
+        --border: #444;
+        --code-bg: #16213e;
+      }
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Georgia', 'Times New Roman', serif;
+      background: var(--bg);
+      color: var(--fg);
+      line-height: 1.7;
+      padding: 2rem 1rem;
+    }
+    .container {
+      max-width: var(--max-width);
+      margin: 0 auto;
+    }
+    nav.breadcrumb {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      font-size: 0.85rem;
+      margin-bottom: 2rem;
+      padding-bottom: 0.5rem;
+      border-bottom: 1px solid var(--border);
+    }
+    nav.breadcrumb a {
+      color: var(--accent);
+      text-decoration: none;
+    }
+    nav.breadcrumb a:hover { text-decoration: underline; }
+    nav.breadcrumb .sep { margin: 0 0.4rem; color: #999; }
+    h1 {
+      font-size: 2rem;
+      margin-bottom: 0.5rem;
+      line-height: 1.2;
+      border-bottom: 2px solid var(--accent);
+      padding-bottom: 0.5rem;
+    }
+    h2 {
+      font-size: 1.5rem;
+      margin-top: 2.5rem;
+      margin-bottom: 0.75rem;
+      color: var(--accent);
+    }
+    h3 {
+      font-size: 1.2rem;
+      margin-top: 2rem;
+      margin-bottom: 0.5rem;
+    }
+    h4 {
+      font-size: 1.05rem;
+      margin-top: 1.5rem;
+      margin-bottom: 0.4rem;
+      font-style: italic;
+    }
+    p { margin-bottom: 1rem; }
+    blockquote {
+      border-left: 3px solid var(--accent);
+      padding: 0.5rem 1.2rem;
+      margin: 1.5rem 0;
+      background: var(--code-bg);
+      font-style: italic;
+    }
+    blockquote p:last-child { margin-bottom: 0; }
+    code {
+      font-family: 'Consolas', 'Fira Code', monospace;
+      background: var(--code-bg);
+      padding: 0.15rem 0.35rem;
+      border-radius: 3px;
+      font-size: 0.9em;
+    }
+    pre {
+      background: var(--code-bg);
+      padding: 1rem;
+      border-radius: 4px;
+      overflow-x: auto;
+      margin: 1.5rem 0;
+      border: 1px solid var(--border);
+    }
+    pre code {
+      background: none;
+      padding: 0;
+    }
+    a { color: var(--accent); }
+    ul, ol {
+      margin: 0.75rem 0 1rem 1.5rem;
+    }
+    li { margin-bottom: 0.3rem; }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 1.5rem 0;
+    }
+    th, td {
+      border: 1px solid var(--border);
+      padding: 0.5rem 0.75rem;
+      text-align: left;
+    }
+    th { background: var(--code-bg); }
+    hr {
+      border: none;
+      border-top: 1px solid var(--border);
+      margin: 2rem 0;
+    }
+    img {
+      max-width: 100%;
+      height: auto;
+      display: block;
+      margin: 1.5rem auto;
+    }
+    /* KaTeX display math */
+    .katex-display {
+      overflow-x: auto;
+      overflow-y: hidden;
+      padding: 0.5rem 0;
+    }
+    /* Definition/theorem boxes */
+    .definition, .theorem, .axiom {
+      border: 1px solid var(--border);
+      border-left: 4px solid var(--accent);
+      padding: 1rem 1.2rem;
+      margin: 1.5rem 0;
+      background: var(--code-bg);
+      border-radius: 0 4px 4px 0;
+    }
+    footer {
+      margin-top: 4rem;
+      padding-top: 1rem;
+      border-top: 1px solid var(--border);
+      font-size: 0.8rem;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      color: #888;
+      text-align: center;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <nav class="breadcrumb">
+      <a href="../index.html">Geometric Series</a>
+      <span class="sep">/</span>
+      <a href="index.html">Geometric Medicine</a>
+      <span class="sep">/</span>
+      <span>Chapter 6: Clinical Reasoning as A* Pathfinding</span>
+    </nav>
+
+    <h1 id="chapter-6-clinical-reasoning-as-a-pathfinding">Chapter 6: Clinical Reasoning as A* Pathfinding<a class="headerlink" href="#chapter-6-clinical-reasoning-as-a-pathfinding" title="Permanent link">&para;</a></h1>
+<p><em>Part II: The Framework</em></p>
+<hr />
+<blockquote>
+<p><em>&ldquo;Clinical judgment is not a black box. It is a search algorithm with a well-calibrated heuristic &mdash; and the fact that the clinician cannot describe the algorithm does not mean the algorithm does not exist.&rdquo;</em>
+&mdash; After Herbert Simon</p>
+<p><strong>THE ALGORITHM</strong></p>
+<p><em>Every clinical decision is a search. The clinician stands at the patient&rsquo;s current state and seeks a path to an acceptable outcome. The search is guided by two sources of information: what the evidence says (how much has the path cost so far?) and what experience says (how much will the remaining path cost?). This chapter formalizes clinical reasoning as A</em> pathfinding on the clinical decision complex, with the evaluation function $f(n) = g(n) + h(n)$. The construction maps every component of clinical reasoning &mdash; diagnosis, treatment planning, prognosis, clinical intuition &mdash; onto a precise element of the A<em> algorithm. The result is not a replacement for clinical judgment. It is a mathematics of clinical judgment &mdash; a formal description of what good clinicians do when they do it well, and what goes wrong when they do it badly.</em></p>
+</blockquote>
+<hr />
+<h2 id="61-the-pathfinding-model">6.1 The Pathfinding Model<a class="headerlink" href="#61-the-pathfinding-model" title="Permanent link">&para;</a></h2>
+<p><strong>Definition 6.1 (Clinical Decision as Pathfinding).</strong> <em>A clinical decision is a pathfinding problem on the clinical decision complex $\mathcal{C}$:</em></p>
+<ul>
+<li><em>Start node $v_0$: The patient&rsquo;s current clinical-moral state &mdash; diagnosis, prognosis, current treatments, relationships, institutional context.</em></li>
+<li><em>Goal region $G$: The set of acceptable clinical-moral outcomes (not just &ldquo;survival&rdquo; but survival with adequate function, autonomy, dignity, and trust).</em></li>
+<li><em>Path $\gamma$: A sequence of clinical actions $(v_0, v_1, \ldots, v_m)$ where each $(v_i, v_{i+1})$ is an available clinical action (edge on $\mathcal{C}$).</em></li>
+<li><em>Cost function: $f(n) = g(n) + h(n)$, where:</em></li>
+<li><em>$g(n)$: the accumulated clinical cost from $v_0$ to the current state $n$ &mdash; the sum of edge weights along the clinical path so far.</em></li>
+<li><em>$h(n)$: the moral-heuristic estimate of the remaining cost from $n$ to the nearest acceptable outcome in $G$.</em></li>
+</ul>
+<p>This definition maps the A<em> search algorithm &mdash; invented by Hart, Nilsson, and Raphael in 1968 for robot pathfinding &mdash; onto clinical decision-making.[^1] The mapping is not metaphorical; it is structural. Every component of the A</em> algorithm has a precise clinical counterpart.</p>
+<h3 id="611-the-component-mapping">6.1.1 The Component Mapping<a class="headerlink" href="#611-the-component-mapping" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>A* Component</th>
+<th>Clinical Counterpart</th>
+<th>What It Captures</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Start node $v_0$</td>
+<td>Patient&rsquo;s presenting condition</td>
+<td>Where we are</td>
+</tr>
+<tr>
+<td>Goal region $G$</td>
+<td>Acceptable outcome set</td>
+<td>Where we want to go</td>
+</tr>
+<tr>
+<td>Edge cost $w(v_i, v_j)$</td>
+<td>Full 9D cost of clinical action</td>
+<td>What each step costs</td>
+</tr>
+<tr>
+<td>$g(n)$: accumulated cost</td>
+<td>Evidence-based medicine (EBM)</td>
+<td>What we have spent</td>
+</tr>
+<tr>
+<td>$h(n)$: heuristic estimate</td>
+<td>Clinical wisdom / ethical intuition</td>
+<td>What we think remains</td>
+</tr>
+<tr>
+<td>Boundary penalty $\beta_k$</td>
+<td>Professional ethical norm</td>
+<td>Where the fences are</td>
+</tr>
+<tr>
+<td>Open list</td>
+<td>Treatment options under consideration</td>
+<td>What we might try</td>
+</tr>
+<tr>
+<td>Closed list</td>
+<td>Options evaluated and dismissed</td>
+<td>What we have ruled out</td>
+</tr>
+<tr>
+<td>Optimal path $\gamma^*$</td>
+<td>Clinical geodesic</td>
+<td>The recommended plan of care</td>
+</tr>
+<tr>
+<td>Path not found</td>
+<td>Clinical-moral impasse</td>
+<td>Ethics consultation needed</td>
+</tr>
+</tbody>
+</table>
+<p>The table is not a loose analogy. Each row identifies a formal correspondence between a computational element of A<em> and a clinical practice. The correspondence is what makes the framework operational: it tells us what a specific clinical activity (diagnosis, treatment planning, ethics consultation) is </em>doing* in the formal model, and therefore what can go wrong with it and how to fix it.</p>
+<h2 id="62-the-math26-component-evidence-based-medicine">6.2 The $g(n)$ Component: Evidence-Based Medicine<a class="headerlink" href="#62-the-math26-component-evidence-based-medicine" title="Permanent link">&para;</a></h2>
+<p>The accumulated cost $g(n) = \sum_{i=0}^{k-1} w(v_i, v_{i+1})$ is the total clinical-moral cost of the path so far &mdash; the sum of edge weights from the start node to the current state.</p>
+<p>$g(n)$ is the evidence-based medicine component of clinical reasoning. It is:</p>
+<p><strong>Slow.</strong> Computing $g(n)$ requires evaluating each edge weight along the path, which in turn requires assessing the nine-dimensional impact of each clinical action. This is what medical students learn in didactics: the physiology, pharmacology, and epidemiology that determine how treatments affect clinical outcomes ($d_1$), the medical law that determines the rights and obligations ($d_2$), the health policy that determines the resource implications ($d_3$, $d_8$).</p>
+<p><strong>Deliberate.</strong> $g(n)$ computation is System 2 in Kahneman&rsquo;s terminology: conscious, effortful, rule-based. The clinician consults guidelines, reviews evidence, performs Bayesian calculations (pretest probability $\times$ likelihood ratio = posttest probability), and updates the accumulated cost as new information arrives.</p>
+<p><strong>Data-driven.</strong> The evidence for $g(n)$ comes from clinical trials, systematic reviews, meta-analyses, and outcome registries. It is the product of the EBM revolution (Chapter 3): the systematic replacement of opinion-based $g(n)$ with evidence-based $g(n)$.</p>
+<p><strong>Primarily calibrated on $d_1$.</strong> The EBM evidence base is overwhelmingly about clinical outcomes. The cost of a treatment on $d_5$ (trust), $d_7$ (dignity), or $d_9$ (patient understanding) is rarely measured in clinical trials. This means that $g(n)$ is well-calibrated on one dimension and poorly calibrated on the remaining eight &mdash; a dimensional asymmetry that has consequences for the clinical geodesic.</p>
+<h3 id="621-math44-in-diagnostic-reasoning">6.2.1 $g(n)$ in Diagnostic Reasoning<a class="headerlink" href="#621-math44-in-diagnostic-reasoning" title="Permanent link">&para;</a></h3>
+<p>Diagnosis is $g(n)$ computation in its purest form. The clinician starts at $v_0$ (presenting symptoms) and evaluates a sequence of diagnostic tests, each of which changes the patient&rsquo;s position on $d_9$ (epistemic status) at a cost on other dimensions ($d_1$: risk of the test, $d_3$: resource cost, $d_7$: dignity cost of invasive procedures).</p>
+<p>A diagnostic workup is a path through the clinical decision complex, and the accumulated cost $g(n)$ at each step is the total cost of the tests performed so far. A good diagnostic workup minimizes $g(n)$ while reaching a state where $d_9$ is high enough to support treatment decisions. An over-zealous workup &mdash; the &ldquo;shotgun approach&rdquo; of ordering every available test &mdash; has high $g(n)$ (accumulated costs from unnecessary tests) with marginal $d_9$ gain. An under-zealous workup has low $g(n)$ but leaves $d_9$ too low for informed treatment planning.</p>
+<p>The Bayesian framework of diagnostic reasoning &mdash; prior probability $\times$ likelihood ratio $= $ posterior probability --- is a specific computation within the $g(n)$ framework. Each diagnostic test is an edge on the complex, and its effect on $d_9$ is determined by the test&rsquo;s sensitivity, specificity, and the prior probability of disease. The Bayesian update is the change in the attribute vector&rsquo;s $d_9$ component produced by traversing the diagnostic edge.</p>
+<h3 id="622-math62-in-treatment-planning">6.2.2 $g(n)$ in Treatment Planning<a class="headerlink" href="#622-math62-in-treatment-planning" title="Permanent link">&para;</a></h3>
+<p>Treatment planning is $g(n)$ computation for a multi-step path. The clinician evaluates a sequence of treatments &mdash; neoadjuvant chemotherapy, then surgery, then adjuvant radiation &mdash; and computes the accumulated cost of each step, including the cross-dimensional costs (chemotherapy&rsquo;s $d_7$ impact, surgery&rsquo;s $d_1$ risk, radiation&rsquo;s $d_6$ burden on the family) and the boundary crossings (surgery crosses $\beta_{\text{harm}}$, but the clinical geodesic through it has lower total cost than the geodesic around it).</p>
+<p>Treatment planning is where the multi-step nature of clinical reasoning becomes explicit. A single-step analysis might reject surgery because of its immediate $d_1$ risk and $d_7$ cost. But a multi-step analysis that includes the post-surgical recovery, the reduction in disease burden, and the improvement in long-term $d_1$ may show that the geodesic passes <em>through</em> surgery and comes out the other side with lower total friction than any path that avoids it.</p>
+<p>This is the clinical analogue of the A<em> algorithm&rsquo;s core insight: local cost is not global cost. An edge with high weight may be part of the minimum-cost path if the alternative routes have even higher total weight. Clinical judgment that evaluates only the immediate cost of the next action is greedy search, not A</em> search, and greedy search does not find the geodesic.</p>
+<h2 id="63-the-math71-component-clinical-wisdom">6.3 The $h(n)$ Component: Clinical Wisdom<a class="headerlink" href="#63-the-math71-component-clinical-wisdom" title="Permanent link">&para;</a></h2>
+<p>The heuristic estimate $h(n)$ is the clinician&rsquo;s assessment of the remaining cost from the current state $n$ to the nearest acceptable outcome in $G$. It is:</p>
+<p><strong>Fast.</strong> $h(n)$ computation is near-instantaneous &mdash; the experienced clinician walks into the room, looks at the patient, and has a sense of &ldquo;how far we have to go.&rdquo; This is System 1 in Kahneman&rsquo;s terminology: automatic, effortless, pattern-based.</p>
+<p><strong>Experience-based.</strong> $h(n)$ is calibrated not by evidence but by experience &mdash; thousands of patients, thousands of outcomes, thousands of traversals of the clinical decision complex that have tuned the clinician&rsquo;s boundary penalties and distance estimates. An attending with twenty years of experience has a well-calibrated $h(n)$. A medical student has an uncalibrated $h(n)$ that may over- or under-estimate the remaining cost on any dimension.</p>
+<p><strong>Multi-dimensional.</strong> Unlike $g(n)$, which is primarily calibrated on $d_1$, $h(n)$ operates on all nine dimensions simultaneously. The clinician&rsquo;s heuristic estimate includes not just &ldquo;how likely is this patient to survive?&rdquo; ($d_1$) but also &ldquo;how difficult will the consent conversation be?&rdquo; ($d_4 + d_9$), &ldquo;will the family cope?&rdquo; ($d_6$), &ldquo;will the patient&rsquo;s dignity be preserved?&rdquo; ($d_7$), and &ldquo;do I trust the institution to support this decision?&rdquo; ($d_8$). These assessments are intuitive, not computed &mdash; but they are real assessments of real dimensions, and their accuracy is what distinguishes clinical wisdom from clinical naivety.</p>
+<p><strong>Vulnerable to damage.</strong> $h(n)$ can be damaged by moral injury (Chapter 13&ndash;15), by cognitive bias (Chapter 7), and by institutional pressure. A clinician whose $h(n)$ has been inflated by moral injury &mdash; who overestimates the cost of boundary crossings because they have been traumatized by past forced crossings &mdash; will avoid beneficial interventions in borderline cases. A clinician whose $h(n)$ has been deflated by moral numbing &mdash; who underestimates the cost of boundary crossings because they have been desensitized by repeated violations &mdash; will cross boundaries too easily. Both forms of damage degrade the quality of clinical pathfinding.</p>
+<h3 id="631-the-two-component-architecture">6.3.1 The Two-Component Architecture<a class="headerlink" href="#631-the-two-component-architecture" title="Permanent link">&para;</a></h3>
+<p>The $f(n) = g(n) + h(n)$ architecture explains a fundamental feature of clinical reasoning that has puzzled cognitive scientists: the dual-process nature of clinical judgment.</p>
+<p>Experienced clinicians exhibit two modes of reasoning: fast pattern recognition (&ldquo;this patient is sick &mdash; I can feel it&rdquo;) and slow analytical reasoning (&ldquo;the probability of PE given this D-dimer is&hellip;&rdquo;). These modes are not independent systems; they are the $h(n)$ and $g(n)$ components of the same evaluation function, operating at different speeds and on different information.</p>
+<p>When the two components agree &mdash; when $h(n)$ says &ldquo;this patient is going to do badly&rdquo; and $g(n)$ confirms &ldquo;the evidence says the prognosis is poor&rdquo; &mdash; clinical reasoning is fast and confident. When they disagree &mdash; when $h(n)$ says &ldquo;something is wrong&rdquo; but $g(n)$ says &ldquo;the numbers look fine&rdquo; &mdash; clinical reasoning slows down, becomes effortful, and recruits additional information sources (more tests, more opinions, more time). This &ldquo;override&rdquo; phenomenon &mdash; the experienced clinician who orders additional workup because &ldquo;something doesn&rsquo;t feel right&rdquo; despite normal labs &mdash; is the clinical heuristic overriding the accumulated cost when the heuristic detects curvature that the data has not yet revealed.</p>
+<p>The framework provides a precise characterization of when each component should dominate:</p>
+<ul>
+<li>
+<p><strong>$g(n)$ should dominate when the evidence is strong and the heuristic is uncalibrated.</strong> A medical student performing a diagnostic workup should follow the evidence (guidelines, probability calculations, structured decision rules) rather than their intuition, because their $h(n)$ is poorly calibrated and their $g(n)$ is grounded in well-validated evidence.</p>
+</li>
+<li>
+<p><strong>$h(n)$ should dominate when the evidence is sparse and the heuristic is well-calibrated.</strong> An experienced palliative care physician having a goals-of-care conversation should follow their intuition (the multi-dimensional sense of what matters to this patient and this family) rather than the evidence, because the evidence for the non-$d_1$ dimensions is sparse and the physician&rsquo;s $h(n)$ has been calibrated by thousands of such conversations.</p>
+</li>
+<li>
+<p><strong>Both should contribute when the evidence is moderate and the heuristic is moderate.</strong> Most clinical reasoning operates in this regime: the clinician uses the evidence to compute $g(n)$ on $d_1$ and the heuristic to estimate $h(n)$ on the remaining dimensions, and the sum $f(n) = g(n) + h(n)$ guides the pathfinding.</p>
+</li>
+</ul>
+<h2 id="64-the-clinical-geodesic">6.4 The Clinical Geodesic<a class="headerlink" href="#64-the-clinical-geodesic" title="Permanent link">&para;</a></h2>
+<p><strong>Definition 6.2 (Clinical Geodesic).</strong> <em>The clinical geodesic $\gamma^*$ from a patient&rsquo;s initial state $v_0$ to a goal region $G$ on the clinical decision complex $\mathcal{C}$ is the minimum-cost path:</em></p>
+<p>$$\gamma^* = \arg\min_\gamma \sum_{i=0}^{m-1} w(v_i, v_{i+1}) \quad \text{subject to } \gamma(0) = v_0, \; \gamma(\text{end}) \in G$$</p>
+<p><em>where $w$ is the full nine-dimensional clinical edge weight (Definition 4.2).</em></p>
+<p>The clinical geodesic is the recommended plan of care. It is optimal not in the sense of maximizing outcomes ($d_1$) but in the sense of minimizing total clinical-moral friction across all nine dimensions, with boundary penalties that encode the cost of crossing ethical thresholds.</p>
+<h3 id="641-properties-of-the-clinical-geodesic">6.4.1 Properties of the Clinical Geodesic<a class="headerlink" href="#641-properties-of-the-clinical-geodesic" title="Permanent link">&para;</a></h3>
+<p><strong>The geodesic optimizes process, not just outcome.</strong> Two paths may reach the same clinical outcome but differ in their process costs. A path to withdrawal of life support that includes family meetings, values conversations, a time-limited trial, and a gradual transition to comfort care has lower total manifold cost than a path that withdraws support immediately &mdash; even though the endpoint (death of the patient) is the same. The difference is in the process: the first path preserves $d_5$ (trust with the family), $d_6$ (family support), $d_7$ (dignity of the dying process), and $d_9$ (understanding of the situation). The geodesic chooses the process path because the process costs are real costs on the manifold, not luxuries to be discarded when time is short.</p>
+<p><strong>The geodesic may pass through harm.</strong> The harm boundary ($\beta_{\text{harm}}$) is high but finite. A geodesic that passes through surgery &mdash; which crosses the harm boundary (the surgeon cuts into healthy tissue) &mdash; may have lower total cost than a geodesic that avoids surgery but permits the disease to progress. This is why surgery exists: the geodesic through harm has lower total friction than the geodesic around it. The harm boundary does not prohibit harm; it prices it. And the price is worth paying when the alternative is more costly.</p>
+<p><strong>The geodesic may not exist.</strong> When resource constraints remove edges from the complex, the goal region may become unreachable. A patient who needs a ventilator but cannot get one has no geodesic from their current state to the survival goal region. The clinical decision complex represents this honestly: &ldquo;no path found&rdquo; is the formal equivalent of &ldquo;ethics consultation,&rdquo; the point at which the standard pathfinding algorithm fails and the clinician must escalate to a higher-level analysis.</p>
+<h3 id="642-comparison-to-the-qaly-optimal-path">6.4.2 Comparison to the QALY-Optimal Path<a class="headerlink" href="#642-comparison-to-the-qaly-optimal-path" title="Permanent link">&para;</a></h3>
+<p>The QALY-optimal path $\gamma_Q^*$ is the path that maximizes the integral $\int Q(\mathbf{a}(t)) \, dt$ &mdash; the path that produces the highest QALY score. Theorem 5.1 (QALY Irrecoverability) proves that $\gamma_Q^*$ can diverge from $\gamma^*$ by an unbounded amount.</p>
+<p>The divergence occurs whenever the geodesic and the QALY path cross different boundaries or activate different dimensions. Three canonical examples:</p>
+<ol>
+<li>
+<p><strong>The Jehovah&rsquo;s Witness case.</strong> QALY path: transfuse (maximizes $d_1$). Geodesic: respect the refusal, pursue alternatives (because forced transfusion has $w = \infty$ due to $\beta_{\text{consent}}$).</p>
+</li>
+<li>
+<p><strong>The divided-family withdrawal case.</strong> QALY path: withdraw immediately (maximizes $d_1$ by freeing resources). Geodesic: withdraw through a process path (family meetings, time-limited trial) that has higher $d_1$ cost but lower total manifold cost.</p>
+</li>
+<li>
+<p><strong>The pandemic triage case.</strong> QALY path: reallocate the ventilator to the patient with better prognosis (maximizes total $d_1$). Geodesic: context-dependent, because the reallocation crosses $\beta_{\text{abandon}}$ and $\beta_{\text{trust}}$ boundaries whose costs may exceed the $d_1$ benefit.</p>
+</li>
+</ol>
+<p>[Figure 6.1: The clinical geodesic vs. the QALY-optimal path for the Jehovah&rsquo;s Witness case. The QALY path (dashed) heads directly toward high $d_1$ via forced transfusion but hits the consent boundary ($\beta_{\text{consent}} = \infty$). The geodesic (solid) respects the boundary and routes through alternative treatments (erythropoietin, cell salvage), reaching a lower $d_1$ endpoint but with finite total cost. The QALY path has infinite cost on the manifold; the geodesic has the minimum finite cost.]</p>
+<h2 id="65-clinical-reasoning-in-practice">6.5 Clinical Reasoning in Practice<a class="headerlink" href="#65-clinical-reasoning-in-practice" title="Permanent link">&para;</a></h2>
+<h3 id="651-the-differential-diagnosis-as-tree-search">6.5.1 The Differential Diagnosis as Tree Search<a class="headerlink" href="#651-the-differential-diagnosis-as-tree-search" title="Permanent link">&para;</a></h3>
+<p>The differential diagnosis &mdash; the list of possible diagnoses being considered for a patient &mdash; is the open list of A* search. Each candidate diagnosis defines a different subgraph of the clinical decision complex (different treatment options, different prognoses, different boundary structures), and the clinician evaluates each candidate by computing $f(n) = g(n) + h(n)$ for the paths it implies.</p>
+<p>The clinician adds candidates to the differential (expanding the open list) when new information suggests unexplored branches. The clinician removes candidates from the differential (moving them to the closed list) when diagnostic tests rule them out. The differential narrows as the search progresses, until either a single diagnosis remains (the path is clear) or the differential reaches an irreducible uncertainty (the path branches and the clinician must decide which branch to follow under uncertainty).</p>
+<h3 id="652-the-attendings-gestalt">6.5.2 The Attending&rsquo;s &ldquo;Gestalt&rdquo;<a class="headerlink" href="#652-the-attendings-gestalt" title="Permanent link">&para;</a></h3>
+<p>Medical students are often mystified by the attending&rsquo;s &ldquo;clinical gestalt&rdquo; &mdash; the ability to walk into a room, look at a patient, and say &ldquo;this patient is septic&rdquo; before the vital signs are fully assessed. The gestalt is not mystical. It is a well-calibrated $h(n)$: a heuristic that has been trained over thousands of patient encounters to estimate the remaining cost from the current state to various outcomes.</p>
+<p>The gestalt is fast because $h(n)$ is fast &mdash; it is the pattern-recognition, System 1 component of clinical reasoning. It is accurate because the attending&rsquo;s $h(n)$ has been calibrated by feedback: the attending has seen thousands of patients whose initial presentation predicted their trajectory, and the $h(n)$ has been adjusted by each discrepancy between prediction and outcome. The medical student lacks this calibration, which is why the student must rely on $g(n)$ (evidence, guidelines, calculations) while the attending can navigate by $h(n)$ alone.</p>
+<h3 id="653-the-ethics-consultation-as-heuristic-reset">6.5.3 The Ethics Consultation as Heuristic Reset<a class="headerlink" href="#653-the-ethics-consultation-as-heuristic-reset" title="Permanent link">&para;</a></h3>
+<p>When the clinician&rsquo;s pathfinding algorithm fails &mdash; when $h(n)$ says &ldquo;I don&rsquo;t know how to proceed&rdquo; or when $g(n)$ and $h(n)$ disagree irreconcilably &mdash; the clinical algorithm has reached &ldquo;path not found.&rdquo; The standard response is an ethics consultation.</p>
+<p>An ethics consultation is, in the framework, a heuristic reset: the ethics consultant brings a different $h(n)$ &mdash; calibrated by different experiences, different boundary penalties, different dimensional weightings &mdash; and applies it to the same clinical decision complex. The consultation does not change $\mathcal{C}$ (the clinical facts are the same) or $g(n)$ (the evidence is the same). It changes $h(n)$ &mdash; the estimate of remaining cost &mdash; by providing an alternative perspective on the boundaries, the goal region, and the relative weights of the nine dimensions.</p>
+<p>This is why ethics consultations often produce consensus despite starting from disagreement: the disagreement is usually about $h(n)$ (different estimates of which boundaries are relevant, which dimensions are most important, how far we are from an acceptable outcome), and the consultation process recalibrates $h(n)$ by making the dimensional analysis explicit.</p>
+<h2 id="66-the-cost-function-in-detail">6.6 The Cost Function in Detail<a class="headerlink" href="#66-the-cost-function-in-detail" title="Permanent link">&para;</a></h2>
+<p>The total cost function $f(n) = g(n) + h(n)$ has a specific structure that maps onto distinct clinical activities:</p>
+<h3 id="661-the-mahalanobis-component-of-math151">6.6.1 The Mahalanobis Component of $g(n)$<a class="headerlink" href="#661-the-mahalanobis-component-of-math151" title="Permanent link">&para;</a></h3>
+<p>The Mahalanobis distance component of each edge weight in $g(n)$ is:</p>
+<p>$$d_{\text{Mahal}}^2(v_i, v_j) = \Delta \mathbf{a}^T \Sigma^{-1} \Delta \mathbf{a}$$</p>
+<p>This measures the &ldquo;clinical-moral distance&rdquo; traveled by the action &mdash; how much the patient&rsquo;s nine-dimensional state changes, weighted by the covariance structure. A treatment that changes $d_1$ by a large amount but leaves all other dimensions unchanged has a Mahalanobis cost determined by $\Sigma_{11}^{-1}$. A treatment that changes $d_1$ and $d_5$ simultaneously has a Mahalanobis cost that includes the cross-term $\Sigma_{15}^{-1}$, which may be larger or smaller than the sum of the individual terms depending on the correlation between outcomes and trust.</p>
+<h3 id="662-the-boundary-component-of-math158">6.6.2 The Boundary Component of $g(n)$<a class="headerlink" href="#662-the-boundary-component-of-math158" title="Permanent link">&para;</a></h3>
+<p>The boundary penalty component of each edge weight in $g(n)$ is:</p>
+<p>$$\sum_k \beta_k \cdot \mathbf{1}[\text{boundary } k \text{ crossed}]$$</p>
+<p>This is the cost of crossing clinical-moral boundaries &mdash; the discrete, discontinuous component of the edge weight that makes the clinical decision complex a simplicial complex rather than a smooth manifold. The boundary component is where clinical ethics happens in its most dramatic form: the decision to cross or not cross a boundary ($\beta_{\text{harm}}$: do I perform the surgery? $\beta_{\text{consent}}$: do I treat without consent? $\beta_{\text{futile}}$: do I continue treatment that is not helping?) is the discrete clinical-moral judgment that no amount of $d_1$ evidence can resolve.</p>
+<h3 id="663-the-heuristic-math164">6.6.3 The Heuristic $h(n)$<a class="headerlink" href="#663-the-heuristic-math164" title="Permanent link">&para;</a></h3>
+<p>The heuristic estimate has the form:</p>
+<p>$$h_C(n) = \sum_k \beta_k \cdot P(\text{remaining path from } n \text{ crosses boundary } k)$$</p>
+<p>This is the clinician&rsquo;s estimate of the boundary crossings that lie ahead. It is computed not from evidence (there are no clinical trials measuring the probability of future boundary crossings) but from experience: the clinician who has navigated many similar paths has an intuitive sense of which boundaries are likely to be crossed and at what cost.</p>
+<p>The heuristic is admissible if and only if it never overestimates the true remaining cost. Chapter 7 develops the admissibility conditions in full.</p>
+<h2 id="67-sarah-watches-an-attending-navigate">6.7 Sarah Watches an Attending Navigate<a class="headerlink" href="#67-sarah-watches-an-attending-navigate" title="Permanent link">&para;</a></h2>
+<p>In her second year, Sarah was assigned to a month on the hospitalist service with Dr. James Park, an attending with fifteen years of inpatient experience. She noticed that Dr. Park made clinical decisions in a distinctive pattern.</p>
+<p>When he entered a patient&rsquo;s room, he spent the first thirty seconds in silence. He looked at the patient, at the monitors, at the whiteboard, at the family members. Then he asked questions &mdash; but not the questions Sarah expected. He did not start with &ldquo;How are you feeling?&rdquo; ($d_1$). He started with &ldquo;Do you have any questions for me?&rdquo; ($d_9$), or &ldquo;Is there anything about the plan that concerns you?&rdquo; ($d_4$, $d_7$), or &ldquo;How is the family holding up?&rdquo; ($d_6$). He was sampling the non-$d_1$ dimensions before computing the $d_1$ plan.</p>
+<p>When Sarah asked him why, he said something that she would remember for the rest of her career: &ldquo;The lab values tell me the $g(n)$. What I need from the patient is the $h(n)$.&rdquo;</p>
+<p>He did not use those symbols. He did not know the framework. But he was describing, in clinical language, the two-component architecture of clinical decision-making: the evidence component ($g(n)$, from the labs and the chart) and the heuristic component ($h(n)$, from the bedside assessment of the patient&rsquo;s trust, understanding, dignity, and social context).</p>
+<p>Sarah watched Dr. Park navigate a difficult discharge decision. The patient &mdash; a 78-year-old woman with heart failure, living alone, with a daughter who lived two hours away &mdash; was medically ready for discharge ($g(n)$ said: go home, start outpatient management). But Dr. Park hesitated.</p>
+<p>&ldquo;She doesn&rsquo;t understand the medication changes,&rdquo; he said. &ldquo;$d_9$ is too low. And she doesn&rsquo;t trust the home health aide we&rsquo;ve arranged &mdash; she&rsquo;s never had a stranger in her house.&rdquo; He paused. &ldquo;If I discharge her now, she won&rsquo;t take the new medications, she won&rsquo;t let the aide in, she&rsquo;ll be readmitted in a week, and she&rsquo;ll trust us even less.&rdquo; He was computing $h(n)$: the heuristic estimate of the remaining cost if the path from here goes through premature discharge. The heuristic said the remaining cost was high &mdash; not because of $d_1$ (the heart failure was compensated) but because of $d_5$ (trust) and $d_9$ (understanding).</p>
+<p>Dr. Park kept the patient an extra day. He spent thirty minutes with her explaining the medication changes (improving $d_9$). He introduced the home health aide in person, in the hospital, where the patient felt safe (improving $d_5$). He called the daughter and included her in the discharge planning (improving $d_6$).</p>
+<p>The extra day cost the hospital $1,800 in bed charges. The thirty-minute conversation cost $200 in physician time. The Bond Index for the alternative path --- premature discharge, readmission, further trust erosion --- was estimated by Dr. Park's $h(n)$ at something much higher than $2,000.</p>
+<p>Dr. Park did not compute the Bond Index. He computed $f(n) = g(n) + h(n)$ and found that the geodesic included an extra day and two conversations. The evidence ($g(n)$) said discharge. The heuristic ($h(n)$) said wait. The heuristic was right, on the full manifold.</p>
+<h2 id="68-when-pathfinding-fails">6.8 When Pathfinding Fails<a class="headerlink" href="#68-when-pathfinding-fails" title="Permanent link">&para;</a></h2>
+<p>The A* algorithm guarantees finding the optimal path if the heuristic is admissible and the goal region is reachable. Both conditions can fail in clinical medicine.</p>
+<p><strong>The heuristic is inadmissible.</strong> A clinician with damaged $h(n)$ (from moral injury, cognitive bias, or poor training) may overestimate the remaining cost, causing A* to avoid beneficial paths. Or the heuristic may be gauge-variant &mdash; sensitive to framing rather than clinical reality &mdash; causing the pathfinding to depend on how the problem is described rather than what the problem is. Chapter 7 addresses both failure modes.</p>
+<p><strong>The goal region is unreachable.</strong> When resource constraints, disease progression, or institutional barriers remove edges from the complex, the goal region may become unreachable. There is no path from the current state to any acceptable outcome. This is clinical futility &mdash; not in the narrow sense of &ldquo;treatment will not work&rdquo; but in the broader sense of &ldquo;no path to an acceptable outcome exists on the available complex.&rdquo;</p>
+<p>When the goal region is unreachable, the clinical algorithm produces &ldquo;path not found.&rdquo; The standard response is to redefine the goal region: shift from curative goals to palliative goals, from survival goals to comfort goals, from individual goals to family goals. The stratum transition from acute to palliative care (Chapter 4) is precisely this redefinition: the original goal region $G_{\text{acute}}$ (survival with good function) is unreachable, so the goal region is redefined as $G_{\text{palliative}}$ (comfort, dignity, family support), and a new geodesic is computed on the palliative stratum.</p>
+<p>This redefinition is one of the most difficult clinical-moral tasks in medicine. It requires the clinician to acknowledge that the original goal is unreachable, to communicate this to the patient and family, and to construct a new goal that is acceptable to all parties. The geometric framework names what this task is: a goal region renegotiation on the clinical decision complex, triggered by the unreachability of the original goal on the current stratum.</p>
+<h2 id="69-the-computational-architecture-of-clinical-reasoning">6.9 The Computational Architecture of Clinical Reasoning<a class="headerlink" href="#69-the-computational-architecture-of-clinical-reasoning" title="Permanent link">&para;</a></h2>
+<table>
+<thead>
+<tr>
+<th>Clinical Activity</th>
+<th>A* Component</th>
+<th>Primary Component</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Diagnostic workup</td>
+<td>Edge traversal on $d_9$ subgraph</td>
+<td>$g(n)$: evidence-driven</td>
+</tr>
+<tr>
+<td>Treatment planning</td>
+<td>Multi-step path evaluation</td>
+<td>$g(n)$: evidence-driven</td>
+</tr>
+<tr>
+<td>Clinical intuition (&ldquo;this patient is sick&rdquo;)</td>
+<td>Heuristic evaluation of $h(n)$</td>
+<td>$h(n)$: experience-driven</td>
+</tr>
+<tr>
+<td>Goals-of-care conversation</td>
+<td>Goal region specification</td>
+<td>Joint $g(n)$ and $h(n)$</td>
+</tr>
+<tr>
+<td>Ethics consultation</td>
+<td>Heuristic recalibration</td>
+<td>$h(n)$: reset</td>
+</tr>
+<tr>
+<td>Triage</td>
+<td>Forced contraction of $f(n)$</td>
+<td>$h(n)$-dominated (time pressure)</td>
+</tr>
+<tr>
+<td>Informed consent</td>
+<td>Calibration of $\mathcal{C}_{\text{patient}}$</td>
+<td>$d_9$ and $d_4$ alignment</td>
+</tr>
+<tr>
+<td>Palliative transition</td>
+<td>Goal region redefinition</td>
+<td>Stratum change</td>
+</tr>
+<tr>
+<td>M&amp;M conference</td>
+<td>Retrospective path analysis</td>
+<td>$g(n)$ and $h(n)$ audit</td>
+</tr>
+</tbody>
+</table>
+<p>The table maps the full repertoire of clinical reasoning onto the A* framework. The mapping is not perfect &mdash; clinical reasoning is messier, more context-dependent, and more emotionally laden than any algorithm. But the mapping identifies the computational structure beneath the messiness and thereby enables a precise analysis of what goes wrong when clinical reasoning fails: which component ($g(n)$ or $h(n)$) is miscalibrated, on which dimension, and why.</p>
+<h2 id="610-the-clinical-geodesic-is-not-a-treatment-plan">6.10 The Clinical Geodesic Is Not a Treatment Plan<a class="headerlink" href="#610-the-clinical-geodesic-is-not-a-treatment-plan" title="Permanent link">&para;</a></h2>
+<p>A common misunderstanding must be addressed directly. The clinical geodesic is not a treatment plan. It is the <em>mathematical object that the treatment plan approximates</em>.</p>
+<p>A treatment plan is a document: a list of interventions, timelines, milestones, and contingencies. It is written in clinical language, reviewed by the care team, and shared with the patient. It is a practical tool, not a mathematical object.</p>
+<p>The clinical geodesic is the minimum-cost path on the nine-dimensional clinical decision complex. It is a sequence of vertices and edges with computable costs. It may or may not correspond to a standard treatment plan; when it does, the treatment plan is manifold-optimal; when it does not, the treatment plan is suboptimal, and the divergence between the plan and the geodesic is measurable (this is what the Bond Index quantifies).</p>
+<p>The distinction matters because treatment plans are often constrained by institutional protocols, insurance requirements, formulary restrictions, and time pressures that force the plan away from the geodesic. These constraints are real and sometimes unavoidable. But they should be recognized as constraints &mdash; as forces that push the treatment path away from the optimal &mdash; rather than treated as features of the optimal path itself.</p>
+<p>A hospital that mandates a specific discharge protocol is not implementing the clinical geodesic for every patient. It is implementing an institutional path ($\gamma_P^*$) that approximates the geodesic for the average patient and diverges from it for patients whose attribute vectors differ substantially from the average. The Bond Index $\text{BI}(P, S)$ measures the expected divergence for patient population $S$. When $\text{BI}$ is high, the protocol is not serving the population well, and redesign is warranted.</p>
+<h2 id="611-integration-the-full-math213-architecture">6.11 Integration: The Full $f(n) = g(n) + h(n)$ Architecture<a class="headerlink" href="#611-integration-the-full-math213-architecture" title="Permanent link">&para;</a></h2>
+<p>Let us trace the full architecture through a single clinical encounter to show how all the components integrate.</p>
+<p><strong>Patient:</strong> Rosa Martinez, 55 years old, presenting with a newly discovered breast mass. Mammogram shows a suspicious lesion. Biopsy is recommended.</p>
+<p><strong>Start node $v_0$:</strong> $\mathbf{a}(v_0) = (0.7, 0.6, 0.6, 0.7, 0.5, 0.6, 0.7, 0.6, 0.4)$. Rosa is physically well ($d_1 = 0.7$), has moderate trust in the medical system ($d_5 = 0.5$ &mdash; she has had mixed experiences with healthcare), and has limited understanding of the diagnostic process ($d_9 = 0.4$ &mdash; she does not know what a biopsy involves or why it is necessary).</p>
+<p><strong>Goal region $G$:</strong> Determined jointly by Rosa and her clinician. Rosa&rsquo;s primary goal: &ldquo;I want to know what&rsquo;s going on and make a decision I understand&rdquo; ($d_9 \geq 0.7$, $d_4 \geq 0.7$). Clinician&rsquo;s primary goal: &ldquo;Determine whether the mass is malignant and establish a treatment plan&rdquo; ($d_9 \geq 0.8$ for diagnostic certainty, $d_1$ optimization for treatment planning).</p>
+<p><strong>Step 1: Diagnostic edge (biopsy recommendation).</strong></p>
+<p>$g(n)$ computation: The evidence supports biopsy for suspicious mammographic findings. Sensitivity and specificity of core needle biopsy are well-established. The $d_1$ cost is low (minor procedure, minimal complication risk). The $d_3$ cost is low (biopsy is standard of care, no resource allocation dilemma). The $g(n)$ component strongly favors biopsy.</p>
+<p>$h(n)$ computation: The clinician&rsquo;s heuristic assesses the non-$d_1$ costs. Rosa&rsquo;s $d_5$ is moderate &mdash; will the biopsy recommendation erode or build trust? The clinician&rsquo;s experience suggests that a well-explained biopsy builds trust (patients appreciate thoroughness), but a poorly explained biopsy damages trust (patients feel rushed or dismissed). Rosa&rsquo;s $d_9$ is low &mdash; she does not understand why the biopsy is necessary. The clinician&rsquo;s heuristic estimates high remaining cost if $d_9$ is not addressed: Rosa may refuse the biopsy (stalling the geodesic) or consent without understanding (gauge-variant consent).</p>
+<p><strong>Clinical decision:</strong> Before recommending the biopsy, spend 15 minutes explaining the mammographic finding, the purpose of the biopsy, the procedure itself, and the possible outcomes. This is a $d_9$-improvement action &mdash; an edge on the complex that moves Rosa from $d_9 = 0.4$ to $d_9 \approx 0.7$. The cost of the 15 minutes is real ($d_3$: clinician time is a resource) but small relative to the cost of proceeding with uncalibrated $d_9$.</p>
+<p><strong>Step 2: After the conversation, Rosa understands the biopsy and agrees.</strong> Her attribute vector has shifted: $d_9 = 0.7$ (she understands), $d_5 = 0.6$ (trust improved by the conversation), $d_4 = 0.8$ (her consent is informed and autonomous). The clinician applies the gauge-invariance test: &ldquo;I mentioned that the biopsy will tell us whether the mass is concerning. Another way to say the same thing is that there&rsquo;s a chance the mass is not cancer and we&rsquo;re doing the biopsy to find out. Does that change how you feel?&rdquo; Rosa: &ldquo;No, I want to know either way.&rdquo; Consent is gauge-invariant.</p>
+<p><strong>Step 3: Biopsy is performed.</strong> Result: ductal carcinoma in situ (DCIS). The diagnostic edge has been traversed, $d_9$ shifts upward (diagnosis is now known), and the clinical decision complex branches: treatment options include lumpectomy + radiation, mastectomy, or active surveillance.</p>
+<p><strong>Step 4: Treatment decision.</strong> The clinician computes $g(n)$ for each option (evidence from clinical trials on DCIS outcomes). The clinician computes $h(n)$ by assessing Rosa&rsquo;s values: she values physical wholeness ($d_7$) highly, she trusts her surgeon ($d_5 = 0.7$ now, after the biopsy experience), she wants to understand all options ($d_9$ requirement). The clinical geodesic favors lumpectomy + radiation (lowest total manifold cost: good $d_1$, preserved $d_7$, intact $d_5$) over mastectomy (higher $d_7$ cost) and over active surveillance (higher remaining uncertainty, $d_9$ cost of ongoing monitoring).</p>
+<p>The entire trajectory &mdash; from presenting mass through diagnosis through treatment decision &mdash; is a path on the clinical decision complex, guided by $f(n) = g(n) + h(n)$ at each step. The evidence ($g(n)$) determines the clinical options. The heuristic ($h(n)$) determines which options respect the patient&rsquo;s full nine-dimensional reality. The geodesic integrates both, producing a path that is clinically sound and morally adequate.</p>
+<p>This is what clinical reasoning does. The framework makes it visible.</p>
+<hr />
+<h2 id="summary">Summary<a class="headerlink" href="#summary" title="Permanent link">&para;</a></h2>
+<p>This chapter has formalized clinical reasoning as A* pathfinding on the clinical decision complex, with the evaluation function $f(n) = g(n) + h(n)$. The $g(n)$ component is evidence-based medicine: slow, deliberate, data-driven, primarily calibrated on $d_1$ (clinical outcomes). The $h(n)$ component is clinical wisdom: fast, automatic, experience-driven, operating on all nine dimensions. The clinical geodesic is the minimum-cost path from the patient&rsquo;s current state to the goal region on the full nine-dimensional manifold. The geodesic optimizes process (not just outcome), may pass through harm (when the harm boundary has finite cost and the alternative is worse), and may not exist (when the goal region is unreachable under resource constraints).</p>
+<p>The framework maps every component of clinical reasoning &mdash; diagnosis, treatment planning, clinical intuition, ethics consultation, triage, informed consent, palliative transition &mdash; onto a precise element of the A* algorithm. The mapping enables a structural analysis of clinical reasoning failures: which component is miscalibrated, on which dimension, and by how much. A full worked example traced the evaluation function through a breast cancer diagnosis, demonstrating how $g(n)$ and $h(n)$ integrate at each step of the clinical trajectory.</p>
+<p>The next chapter addresses the heuristic component in detail: what makes clinical judgment good, bad, damaged, or biased.</p>
+<hr />
+<p>[^1]: Hart, P. E., Nilsson, N. J., &amp; Raphael, B. (1968). A formal basis for the heuristic determination of minimum cost paths. <em>IEEE Transactions on Systems Science and Cybernetics</em>, 4(2), 100&ndash;107. The A* algorithm has been rediscovered and renamed many times in different fields; its clinical instantiation is original to the Geometric Ethics programme (Bond, 2026).</p>
+
+    <footer>
+      <p>Part of the <em>Geometric Series</em> by A.H. Bowers</p>
+      <p>Built automatically from source. Last updated: 2026-04-20 07:00 UTC</p>
+    </footer>
+  </div>
+
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js"
+    onload="renderMathInElement(document.body, {
+      delimiters: [
+        {left: '$$', right: '$$', display: true},
+        {left: '$', right: '$', display: false},
+        {left: '\\\\(', right: '\\\\)', display: false},
+        {left: '\\\\[', right: '\\\\]', display: true}
+      ],
+      throwOnError: false
+    });"></script>
+</body>
+</html>

@@ -1,0 +1,391 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Chapter 5: The QALY Irrecoverability Theorem - Geometric Medicine</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
+  <style>
+    :root {
+      --bg: #fafaf8;
+      --fg: #222;
+      --accent: #2c5f8a;
+      --border: #ddd;
+      --code-bg: #f4f4f0;
+      --max-width: 48rem;
+    }
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --bg: #1a1a2e;
+        --fg: #e0e0e0;
+        --accent: #7eb8da;
+        --border: #444;
+        --code-bg: #16213e;
+      }
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Georgia', 'Times New Roman', serif;
+      background: var(--bg);
+      color: var(--fg);
+      line-height: 1.7;
+      padding: 2rem 1rem;
+    }
+    .container {
+      max-width: var(--max-width);
+      margin: 0 auto;
+    }
+    nav.breadcrumb {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      font-size: 0.85rem;
+      margin-bottom: 2rem;
+      padding-bottom: 0.5rem;
+      border-bottom: 1px solid var(--border);
+    }
+    nav.breadcrumb a {
+      color: var(--accent);
+      text-decoration: none;
+    }
+    nav.breadcrumb a:hover { text-decoration: underline; }
+    nav.breadcrumb .sep { margin: 0 0.4rem; color: #999; }
+    h1 {
+      font-size: 2rem;
+      margin-bottom: 0.5rem;
+      line-height: 1.2;
+      border-bottom: 2px solid var(--accent);
+      padding-bottom: 0.5rem;
+    }
+    h2 {
+      font-size: 1.5rem;
+      margin-top: 2.5rem;
+      margin-bottom: 0.75rem;
+      color: var(--accent);
+    }
+    h3 {
+      font-size: 1.2rem;
+      margin-top: 2rem;
+      margin-bottom: 0.5rem;
+    }
+    h4 {
+      font-size: 1.05rem;
+      margin-top: 1.5rem;
+      margin-bottom: 0.4rem;
+      font-style: italic;
+    }
+    p { margin-bottom: 1rem; }
+    blockquote {
+      border-left: 3px solid var(--accent);
+      padding: 0.5rem 1.2rem;
+      margin: 1.5rem 0;
+      background: var(--code-bg);
+      font-style: italic;
+    }
+    blockquote p:last-child { margin-bottom: 0; }
+    code {
+      font-family: 'Consolas', 'Fira Code', monospace;
+      background: var(--code-bg);
+      padding: 0.15rem 0.35rem;
+      border-radius: 3px;
+      font-size: 0.9em;
+    }
+    pre {
+      background: var(--code-bg);
+      padding: 1rem;
+      border-radius: 4px;
+      overflow-x: auto;
+      margin: 1.5rem 0;
+      border: 1px solid var(--border);
+    }
+    pre code {
+      background: none;
+      padding: 0;
+    }
+    a { color: var(--accent); }
+    ul, ol {
+      margin: 0.75rem 0 1rem 1.5rem;
+    }
+    li { margin-bottom: 0.3rem; }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 1.5rem 0;
+    }
+    th, td {
+      border: 1px solid var(--border);
+      padding: 0.5rem 0.75rem;
+      text-align: left;
+    }
+    th { background: var(--code-bg); }
+    hr {
+      border: none;
+      border-top: 1px solid var(--border);
+      margin: 2rem 0;
+    }
+    img {
+      max-width: 100%;
+      height: auto;
+      display: block;
+      margin: 1.5rem auto;
+    }
+    /* KaTeX display math */
+    .katex-display {
+      overflow-x: auto;
+      overflow-y: hidden;
+      padding: 0.5rem 0;
+    }
+    /* Definition/theorem boxes */
+    .definition, .theorem, .axiom {
+      border: 1px solid var(--border);
+      border-left: 4px solid var(--accent);
+      padding: 1rem 1.2rem;
+      margin: 1.5rem 0;
+      background: var(--code-bg);
+      border-radius: 0 4px 4px 0;
+    }
+    footer {
+      margin-top: 4rem;
+      padding-top: 1rem;
+      border-top: 1px solid var(--border);
+      font-size: 0.8rem;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      color: #888;
+      text-align: center;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <nav class="breadcrumb">
+      <a href="../index.html">Geometric Series</a>
+      <span class="sep">/</span>
+      <a href="index.html">Geometric Medicine</a>
+      <span class="sep">/</span>
+      <span>Chapter 5: The QALY Irrecoverability Theorem</span>
+    </nav>
+
+    <h1 id="chapter-5-the-qaly-irrecoverability-theorem">Chapter 5: The QALY Irrecoverability Theorem<a class="headerlink" href="#chapter-5-the-qaly-irrecoverability-theorem" title="Permanent link">&para;</a></h1>
+<p><em>Part II: The Framework</em></p>
+<hr />
+<blockquote>
+<p><em>&ldquo;You can&rsquo;t compress nine dimensions into one and expect the one to remember what the other eight were doing.&rdquo;</em>
+&mdash; A topologist, overheard at a bioethics conference</p>
+<p><strong>THE PROOF</strong></p>
+<p><em>This chapter contains the domain-specific Scalar Irrecoverability Theorem for clinical medicine. The theorem is not difficult &mdash; it follows from the rank-nullity theorem in linear algebra, which every mathematics undergraduate encounters in their second year. Its difficulty is not mathematical but conceptual: it says that QALY-based health policy is not merely imprecise but structurally incapable of representing the information that matters most for the populations most vulnerable to healthcare injustice. The discrimination is in the dimensionality, not in the calibration. No recalibration fixes it. The theorem proves this.</em></p>
+</blockquote>
+<hr />
+<h2 id="51-the-setup">5.1 The Setup<a class="headerlink" href="#51-the-setup" title="Permanent link">&para;</a></h2>
+<p>Let $\mathbf{a} \in \mathbb{R}^9$ be the attribute vector of a patient&rsquo;s clinical-moral state on the clinical decision complex $\mathcal{C}$, as defined in Chapter 4. Each component $a_k$ represents the patient&rsquo;s score on one of the nine clinical-moral dimensions: $d_1$ (outcomes), $d_2$ (rights), $d_3$ (justice), $d_4$ (autonomy), $d_5$ (trust), $d_6$ (social), $d_7$ (dignity), $d_8$ (institutional), $d_9$ (epistemic).</p>
+<p>A QALY function is any function that maps this nine-dimensional state to a single scalar:</p>
+<p><strong>Definition 5.1 (QALY Function).</strong> <em>A QALY function is any function $Q: \mathbb{R}^9 \to \mathbb{R}$ that assigns a scalar health value to a clinical-moral state. This includes:</em></p>
+<ul>
+<li><em>The standard QALY: $Q(\mathbf{a}) = q(a_1) \cdot T(a_1)$, where $q$ is a quality weight and $T$ is life expectancy, both functions of the outcomes dimension $a_1$.</em></li>
+<li><em>The disability-adjusted QALY: $Q(\mathbf{a}) = \sum_k w_k \cdot a_k$ for fixed weights $w_k$, which at least attempts to incorporate non-outcome dimensions.</em></li>
+<li><em>Any nonlinear function $Q(\mathbf{a})$ that compresses the nine-dimensional state to a scalar.</em></li>
+</ul>
+<p><em>The standard QALY is the most common instantiation. The theorem applies to all instantiations.</em></p>
+<p>The question the theorem answers is precise: what happens to the clinical information when we apply $Q$? Is the compression lossless (recoverable) or lossy (irrecoverable)? And if lossy, what specifically is lost?</p>
+<h2 id="52-the-theorem">5.2 The Theorem<a class="headerlink" href="#52-the-theorem" title="Permanent link">&para;</a></h2>
+<p><strong>Theorem 5.1 (QALY Irrecoverability).</strong> <em>Let $Q: \mathbb{R}^9 \to \mathbb{R}$ be any function that maps a 9-dimensional clinical-moral attribute vector to a scalar QALY value. Then:</em></p>
+<ol>
+<li>
+<p><em>$Q$ is not injective: there exist clinically and morally distinct states $\mathbf{a}_1 \neq \mathbf{a}_2$ such that $Q(\mathbf{a}_1) = Q(\mathbf{a}_2)$.</em></p>
+</li>
+<li>
+<p><em>The information destroyed by $Q$ is irrecoverable: there exists no function $\psi: \mathbb{R} \to \mathbb{R}^9$ such that $\psi \circ Q = \text{id}_{\mathbb{R}^9}$.</em></p>
+</li>
+<li>
+<p><em>The QALY-maximizing path on $\mathcal{C}$ is in general different from the clinical geodesic (Definition 4.3), and the divergence is not bounded by any function of $Q$ alone.</em></p>
+</li>
+</ol>
+<p><strong>Proof.</strong></p>
+<p><em>(1) Non-injectivity.</em> If $Q$ is differentiable at a point $\mathbf{a}_0$, then $dQ_{\mathbf{a}_0}: \mathbb{R}^9 \to \mathbb{R}$ is a linear map between a 9-dimensional space and a 1-dimensional space. By the rank-nullity theorem:</p>
+<p>$$\dim(\ker(dQ_{\mathbf{a}_0})) + \dim(\text{im}(dQ_{\mathbf{a}_0})) = 9$$</p>
+<p>Since $\dim(\text{im}(dQ_{\mathbf{a}_0})) \leq 1$, we have $\dim(\ker(dQ_{\mathbf{a}_0})) \geq 8$. The kernel has dimension at least 8 at every regular point. By the implicit function theorem, the level set $Q^{-1}(c) = \{\mathbf{a} : Q(\mathbf{a}) = c\}$ is a submanifold of dimension at least 8 in a neighborhood of every regular value. This submanifold contains infinitely many clinically and morally distinct states that map to the same QALY value $c$.</p>
+<p>If $Q$ is not differentiable, the result follows from a topological argument: a continuous surjection from $\mathbb{R}^9$ to $\mathbb{R}$ cannot be injective by dimension counting (the fibers have dimension $\geq 8$).</p>
+<p><em>(2) Irrecoverability.</em> Suppose for contradiction that $\psi: \mathbb{R} \to \mathbb{R}^9$ satisfies $\psi \circ Q = \text{id}_{\mathbb{R}^9}$. Then $\psi$ is a left inverse of $Q$, which means $Q$ must be injective. But (1) shows $Q$ is not injective. Contradiction. $\square$</p>
+<p>Alternatively, by the data processing inequality from information theory: for any Markov chain $\mathbf{a} \to Q(\mathbf{a}) \to \psi(Q(\mathbf{a}))$, we have $I(\mathbf{a}; \psi(Q(\mathbf{a}))) \leq I(\mathbf{a}; Q(\mathbf{a}))$, where $I$ denotes mutual information. Since $Q$ maps $\mathbb{R}^9$ to $\mathbb{R}$ and the attribute vectors have full-rank covariance (all nine dimensions are informationally independent), the mutual information $I(\mathbf{a}; Q(\mathbf{a}))$ is strictly less than the entropy of $\mathbf{a}$. The information lost by $Q$ cannot be recovered by any subsequent processing.</p>
+<p><em>(3) Unbounded divergence.</em> We construct a family of examples parameterized by $\lambda > 0$ in which the divergence between the QALY-maximizing path and the clinical geodesic is at least $\lambda$.</p>
+<p>Fix a clinical decision complex $\mathcal{C}$ with three vertices: $v_0$ (start), $v_1$ (QALY-optimal goal), $v_2$ (manifold-optimal goal). Set the attribute vectors such that $Q(\mathbf{a}(v_1)) > Q(\mathbf{a}(v_2))$ (the QALY prefers $v_1$) but the total clinical friction to $v_2$ is less than to $v_1$ because the path to $v_1$ crosses a boundary with penalty $\beta_{\lambda} = \lambda$:</p>
+<p>$$\text{CF}(\gamma_{v_0 \to v_1}) = d_{\text{Mahal}}(v_0, v_1) + \lambda > d_{\text{Mahal}}(v_0, v_2) = \text{CF}(\gamma_{v_0 \to v_2})$$</p>
+<p>The QALY-maximizing path selects $v_1$; the clinical geodesic selects $v_2$. The divergence (the difference in clinical friction between the two paths) is at least $\lambda$, which can be made arbitrarily large by increasing the boundary penalty. $\square$</p>
+<p>[Figure 5.1: The QALY Irrecoverability Theorem visualized. The nine-dimensional clinical-moral state space is projected onto the one-dimensional QALY axis. The level set $Q^{-1}(c)$ is an 8-dimensional submanifold (shown as a plane for $d = 3$). Distinct clinical-moral states A and B, with radically different profiles on $d_5$&ndash;$d_9$, map to the same QALY value. The information distinguishing them is irrecoverable.]</p>
+<h2 id="53-what-exactly-is-lost">5.3 What Exactly Is Lost?<a class="headerlink" href="#53-what-exactly-is-lost" title="Permanent link">&para;</a></h2>
+<p>The theorem says that the QALY destroys information in the kernel of $dQ$. But which information? The answer depends on the specific QALY function, but for the standard QALY &mdash; which is a function of $d_1$ alone &mdash; the kernel is completely explicit.</p>
+<p><strong>Corollary 5.1 (Kernel of the Standard QALY).</strong> <em>The standard QALY function $Q(\mathbf{a}) = q(a_1) \cdot T(a_1)$ depends only on the first component of the attribute vector. Its kernel contains all variation on $d_2$ through $d_9$:</em></p>
+<p>$$\ker(dQ) = \{(0, \delta a_2, \delta a_3, \delta a_4, \delta a_5, \delta a_6, \delta a_7, \delta a_8, \delta a_9) : \delta a_k \in \mathbb{R}\}$$</p>
+<p><em>The eight dimensions discarded by the standard QALY are precisely the dimensions that encode rights, justice, autonomy, trust, social impact, dignity, institutional legitimacy, and epistemic status. These are the dimensions on which vulnerable populations are most likely to differ from the majority, and therefore the dimensions whose loss produces the most systematic bias in allocation.</em></p>
+<p>This is what makes the QALY Irrecoverability Theorem not just mathematically interesting but morally consequential. The eight discarded dimensions are not randomly chosen. They are the dimensions that matter most for populations that already face healthcare injustice.</p>
+<h2 id="54-qaly-discrimination-is-mathematical">5.4 QALY Discrimination Is Mathematical<a class="headerlink" href="#54-qaly-discrimination-is-mathematical" title="Permanent link">&para;</a></h2>
+<p><strong>Corollary 5.2 (QALY Discrimination Is Mathematical, Not Moral).</strong> <em>The well-documented biases of QALY-based allocation against the elderly, the disabled, and minority populations are not failures of implementation. They are mathematical consequences of dimensional collapse.</em></p>
+<p>The proof is constructive. Consider three populations:</p>
+<p><strong>Disabled patients.</strong> A wheelchair user with intact cognition, full autonomy, rich social connections, and complete trust in their medical team has a high attribute vector on $d_2$&ndash;$d_9$. But the standard quality weight for a wheelchair-using health state is $q \approx 0.5$&ndash;$0.7$, substantially below the $q \approx 0.9$&ndash;$1.0$ assigned to ambulatory health states. The QALY systematically undervalues disabled patients because it projects a nine-dimensional state (in which the patient may be thriving on eight dimensions) onto a one-dimensional health-state utility (which weights physical function heavily). The disabled patient&rsquo;s rich life &mdash; the autonomy, the relationships, the dignity &mdash; lives in the kernel of $dQ$.</p>
+<p><strong>Elderly patients.</strong> A 90-year-old with moderate physical limitations but intact cognition, full autonomy, and deep family connections generates fewer QALYs from any intervention than a 30-year-old with the same condition, because the remaining life expectancy $T$ is shorter. The QALY&rsquo;s time horizon weights young patients more heavily than old patients for any given quality improvement. This is age discrimination: two patients with identical clinical states ($\mathbf{a}_1 = \mathbf{a}_2$ on all nine dimensions) generate different QALYs because of a factor (age) that affects $T$ but not the current clinical-moral state. The elderly patient&rsquo;s dignity, trust, social connections, and autonomy are worth exactly as much as the younger patient&rsquo;s &mdash; but the QALY discounts them by a factor of $T_{\text{young}} / T_{\text{old}}$.</p>
+<p><strong>Minority patients.</strong> Black patients in the United States have systematically lower trust in the healthcare system ($d_5$) due to a documented history of institutional betrayal: the Tuskegee syphilis study, the exploitation of Henrietta Lacks, the experiments of J. Marion Sims.[^1] This lower trust has clinical consequences: lower adherence, lower screening rates, later presentation, worse outcomes. QALY-based allocation, by operating on the outcome dimension alone, treats these worse outcomes as evidence of lower treatability and allocates fewer resources &mdash; a feedback loop in which historically produced distrust ($d_5$) degrades outcomes ($d_1$), and the degraded outcomes ($d_1$) are used to justify further resource deprivation, while the trust deficit ($d_5$) &mdash; the root cause &mdash; lives in the kernel of $dQ$ and is invisible to the allocation algorithm.</p>
+<p><strong>Proposition 5.1 (When QALYs Are Adequate).</strong> <em>QALY-based analysis is an adequate approximation of the clinical geodesic when and only when three conditions hold simultaneously:</em></p>
+<ol>
+<li><em>The clinical decision activates primarily dimension $d_1$ (clinical outcomes), with negligible activation of $d_2$&ndash;$d_9$.</em></li>
+<li><em>The patient population is homogeneous on dimensions $d_2$&ndash;$d_9$ (no systematic variation in autonomy, trust, dignity, or justice concerns).</em></li>
+<li><em>No moral boundaries are crossed by any available action.</em></li>
+</ol>
+<p><em>These conditions are approximately satisfied for routine cost-effectiveness comparisons of pharmacologically similar drugs for a well-defined condition in a homogeneous population. They are violated in every case involving: end-of-life care, mental health, disability, resource rationing, vulnerable populations, or cross-cultural care.</em></p>
+<p>The proposition&rsquo;s power is in its third clause: the conditions under which QALYs are adequate are precisely the conditions under which clinical ethics is easy. The QALY works when the problem is one-dimensional. It fails when the problem is hard. This is not a coincidence; it is a consequence of the kernel structure. Hard clinical ethics problems are hard precisely because they activate multiple dimensions simultaneously, and the QALY is precisely the tool that discards those multiple dimensions.</p>
+<h2 id="55-the-rank-nullity-lesson">5.5 The Rank-Nullity Lesson<a class="headerlink" href="#55-the-rank-nullity-lesson" title="Permanent link">&para;</a></h2>
+<p>The rank-nullity theorem is taught in every linear algebra course, and its application to the QALY is immediate. But its implications for health policy are rarely stated explicitly. Let us state them.</p>
+<p>A QALY function $Q: \mathbb{R}^9 \to \mathbb{R}$ has rank at most 1 and nullity at least 8. This means:</p>
+<ul>
+<li>
+<p><strong>At most one dimension of information is preserved.</strong> The QALY can faithfully represent one degree of freedom of the clinical-moral state. It uses this capacity on $d_1$ (clinical outcomes). Everything else is in the kernel.</p>
+</li>
+<li>
+<p><strong>At least eight dimensions of information are destroyed.</strong> The eight destroyed dimensions include every dimension on which QALY-based allocation is known to discriminate: dignity (against the elderly), autonomy (against the disabled), trust (against minorities), justice (against the poor), and understanding (against the low-literacy).</p>
+</li>
+<li>
+<p><strong>No post-hoc correction recovers the lost information.</strong> Once the projection is performed, the information in the kernel is gone. No &ldquo;equity adjustment,&rdquo; &ldquo;disability weighting,&rdquo; or &ldquo;fairness modifier&rdquo; applied to the QALY score can recover it, because the recovery would require information that the projection has already discarded. You cannot reconstruct the direction of a vector from its length.</p>
+</li>
+<li>
+<p><strong>The information loss is not approximate; it is exact.</strong> The rank-nullity theorem is not an inequality that might be tight in favorable cases. It is an equality: $\dim(\ker) + \dim(\text{im}) = 9$, always, for any linear map from $\mathbb{R}^9$ to $\mathbb{R}$. The loss is structural, not statistical.</p>
+</li>
+</ul>
+<p>This is why the corollary says &ldquo;mathematical, not moral.&rdquo; The discrimination is not a matter of values or priorities; it is a matter of linear algebra. The projection from nine dimensions to one dimension has a kernel of dimension eight. The kernel contains the information that distinguishes equity from inequity, dignity from indignity, trust from distrust. No amount of good intention in the design of the QALY function can change the dimensionality of the kernel.</p>
+<h2 id="56-what-would-help">5.6 What Would Help<a class="headerlink" href="#56-what-would-help" title="Permanent link">&para;</a></h2>
+<p>The theorem is negative: it says what the QALY cannot do. But it also implies what would help.</p>
+<h3 id="561-multi-dimensional-health-technology-assessment">5.6.1 Multi-Dimensional Health Technology Assessment<a class="headerlink" href="#561-multi-dimensional-health-technology-assessment" title="Permanent link">&para;</a></h3>
+<p>If the QALY&rsquo;s problem is one-dimensionality, the solution is multi-dimensionality. Instead of contracting the attribute vector $\mathbf{a} \in \mathbb{R}^9$ to a scalar $Q(\mathbf{a}) \in \mathbb{R}$, report the full vector &mdash; or at least a richer projection.</p>
+<p>This is already beginning to happen. The ISPOR (International Society for Pharmacoeconomics and Outcomes Research) has proposed &ldquo;value frameworks&rdquo; that supplement the QALY with additional dimensions: severity of disease, unmet need, equity, and non-health effects. These proposals are geometrically correct but algebraically unsystematic: they add dimensions without specifying the metric, the covariance structure, or the boundary architecture.</p>
+<p>The clinical decision complex provides the systematic alternative. Health technology assessment on the full nine-dimensional complex would report:</p>
+<ul>
+<li>The treatment&rsquo;s impact on all nine dimensions: $\Delta \mathbf{a}$</li>
+<li>The treatment&rsquo;s Mahalanobis distance cost: $\Delta \mathbf{a}^T \Sigma^{-1} \Delta \mathbf{a}$</li>
+<li>The boundary crossings: which boundaries are crossed and at what cost</li>
+<li>The Bond Index: the expected deviation between the treatment pathway and the clinical geodesic for different patient populations</li>
+</ul>
+<p>This is more information than a scalar. It is also more information than any decision-maker can hold in working memory. The solution is not to contract back to a scalar but to develop decision support tools that navigate the multi-dimensional space, highlighting the trade-offs and boundary crossings rather than hiding them behind a single number.</p>
+<h3 id="562-population-specific-geodesics">5.6.2 Population-Specific Geodesics<a class="headerlink" href="#562-population-specific-geodesics" title="Permanent link">&para;</a></h3>
+<p>The QALY assumes that the optimal path is the same for all patients with the same clinical condition. The clinical decision complex does not. Two patients with the same pneumonia but different trust levels, different cultural backgrounds, different health literacy, and different values may have different clinical geodesics &mdash; different optimal paths through the decision complex.</p>
+<p>Population-specific geodesics are more expensive to compute than population-uniform QALYs. They are also more accurate. The Bond Index (Chapter 12) measures the cost of using a population-uniform path for a population whose geodesic is different. When the Bond Index is high &mdash; when the uniform path imposes substantial additional friction on a specific population &mdash; the population-uniform approach is not just less accurate; it is structurally unjust.</p>
+<h3 id="563-bounded-contraction">5.6.3 Bounded Contraction<a class="headerlink" href="#563-bounded-contraction" title="Permanent link">&para;</a></h3>
+<p>The Scalar Irrecoverability Theorem says that contraction from nine dimensions to one dimension loses irrecoverable information. But contraction from nine dimensions to three or four dimensions loses less. The theorem&rsquo;s corollary (Corollary 1.1.1 from <em>Geometric Communication</em>) states that $k$ scalar metrics with $k < d$ still fail to recover the full profile, but the information loss decreases with $k$.</p>
+<p>This suggests a practical compromise: contract not to a scalar but to a low-dimensional summary that preserves the most clinically consequential dimensions. A three-dimensional summary &mdash; outcomes ($d_1$), autonomy ($d_4$), and trust ($d_5$) &mdash; captures more of the manifold than the QALY while remaining tractable for policy analysis. The choice of which three dimensions to preserve is itself a value judgment &mdash; a statement about which aspects of clinical-moral reality the policy-maker considers most important &mdash; but at least the judgment is explicit and auditable, unlike the QALY&rsquo;s implicit judgment that only $d_1$ matters.</p>
+<h2 id="57-sarah-and-the-health-economist">5.7 Sarah and the Health Economist<a class="headerlink" href="#57-sarah-and-the-health-economist" title="Permanent link">&para;</a></h2>
+<p>During Sarah&rsquo;s third year, she attended a health economics seminar. The instructor, a respected health economist, taught QALY-maximization as the gold standard for resource allocation. Sarah listened through two lectures on cost-effectiveness analysis, cost-utility analysis, and the NICE threshold. In the third lecture, the instructor presented a case study: comparing two treatments for advanced heart failure, one with higher QALYs and one with lower cost.</p>
+<p>Sarah raised her hand.</p>
+<p>&ldquo;What happens to the patient who values dignity over survival?&rdquo;</p>
+<p>&ldquo;That&rsquo;s captured in the quality weight,&rdquo; the instructor replied. &ldquo;The quality weight reflects the patient&rsquo;s valuation of their health state.&rdquo;</p>
+<p>&ldquo;But the quality weight is a scalar,&rdquo; Sarah said. &ldquo;A patient who values dignity over survival and a patient who values survival over dignity can have the same quality weight if their overall health state is the same. The weight can&rsquo;t distinguish them.&rdquo;</p>
+<p>&ldquo;The weight is derived from patient preferences. If the patient values dignity highly, the weight reflects that.&rdquo;</p>
+<p>&ldquo;No,&rdquo; Sarah said, and she was aware that she was contradicting a senior faculty member in a roomful of residents. &ldquo;The quality weight is derived from a preference between the health state and death. It asks: &lsquo;What proportion of your remaining life would you trade to be in perfect health?&rsquo; That question elicits a scalar. The scalar cannot represent the direction of the preference &mdash; which dimension the patient is willing to sacrifice and which dimension they insist on keeping. Two patients can give the same scalar answer (both would trade 40 percent of their remaining life) for completely different reasons (one because their physical function is impaired, the other because their dignity is violated), and the QALY treats them identically.&rdquo;</p>
+<p>She paused, then added: &ldquo;By the rank-nullity theorem, a function from $\mathbb{R}^9$ to $\mathbb{R}$ has a kernel of dimension at least 8. The information in the kernel is irrecoverable. That&rsquo;s not a limitation of the instrument. It&rsquo;s a mathematical fact.&rdquo;</p>
+<p>The room was silent. The instructor looked at Sarah for a long moment.</p>
+<p>&ldquo;That&rsquo;s &hellip; a rigorous way of putting it,&rdquo; he said. &ldquo;And I don&rsquo;t have a rebuttal.&rdquo;</p>
+<p>He did not adopt the geometric framework. But he stopped using the phrase &ldquo;the QALY captures patient preferences.&rdquo; That, Sarah thought, was a start.</p>
+<h2 id="58-the-information-theoretic-perspective">5.8 The Information-Theoretic Perspective<a class="headerlink" href="#58-the-information-theoretic-perspective" title="Permanent link">&para;</a></h2>
+<p>The rank-nullity proof is algebraic. An information-theoretic proof provides additional insight.</p>
+<p><strong>Proposition 5.2 (Information Loss of QALY Projection).</strong> <em>Let $\mathbf{a}$ be a random variable on $\mathbb{R}^9$ with full-rank covariance matrix $\Sigma$ (all nine dimensions are informationally independent). Then for any QALY function $Q: \mathbb{R}^9 \to \mathbb{R}$:</em></p>
+<p>$$I(\mathbf{a}; Q(\mathbf{a})) \leq H(Q(\mathbf{a})) \leq H(a_1)$$</p>
+<p><em>where $I$ is mutual information and $H$ is differential entropy. The information preserved by $Q$ is at most the entropy of a single dimension. The information destroyed is at least:</em></p>
+<p>$$H(\mathbf{a}) - H(a_1) = H(a_2, \ldots, a_9 \mid a_1)$$</p>
+<p><em>which is the conditional entropy of the eight non-outcome dimensions given the outcome dimension &mdash; the information about trust, autonomy, dignity, justice, and understanding that is not predictable from clinical outcomes alone.</em></p>
+<p>When the nine dimensions are independent (the covariance matrix is diagonal), the information loss simplifies to $\sum_{k=2}^{9} H(a_k)$: the total entropy of the eight non-outcome dimensions. This is the maximum possible loss: QALY-based allocation has zero information about the eight non-outcome dimensions and must therefore treat them as noise.</p>
+<p>When the dimensions are correlated (off-diagonal $\Sigma_{ij} \neq 0$), some information about the non-outcome dimensions can be inferred from $d_1$ through the correlation. For example, if trust ($d_5$) and outcomes ($d_1$) are positively correlated ($\Sigma_{15} > 0$), then knowing $d_1$ provides some information about $d_5$. But the correlation is never perfect (the dimensions are distinct clinical-moral constructs), so the information recovery is always partial. The QALY recovers the $d_1$ component and the components of $d_2$&ndash;$d_9$ that correlate with $d_1$; it discards the components of $d_2$&ndash;$d_9$ that are orthogonal to $d_1$. And it is precisely the orthogonal components &mdash; the trust that cannot be predicted from outcomes, the dignity that cannot be inferred from function &mdash; that carry the morally distinctive information.</p>
+<h2 id="59-a-geometric-reading-of-the-harris-critique">5.9 A Geometric Reading of the Harris Critique<a class="headerlink" href="#59-a-geometric-reading-of-the-harris-critique" title="Permanent link">&para;</a></h2>
+<p>John Harris&rsquo;s 1987 paper &ldquo;QALYfying the Value of Life&rdquo; in the <em>Journal of Medical Ethics</em> is the most influential critique of the QALY in the bioethics literature.[^2] Harris argued that the QALY violates the principle of equal concern: by assigning higher value to treatments that produce more QALYs, the framework systematically favors younger patients over older patients, healthier patients over sicker patients, and patients with higher quality-of-life potential over patients with disabilities. Harris&rsquo;s objection is fundamentally about justice ($d_3$): the QALY treats a year of life for a young person as more valuable than a year of life for an old person, violating the intuition that all lives have equal moral worth.</p>
+<p>The geometric framework provides the mathematical foundation for Harris&rsquo;s critique. Harris was right, but his argument was philosophical rather than mathematical, which left it vulnerable to counterarguments from health economists who could demonstrate the QALY&rsquo;s practical utility and challenge Harris to provide a quantitative alternative. The QALY Irrecoverability Theorem provides the alternative: the discrimination Harris identified is not a moral failure that can be corrected by moral argument. It is a mathematical consequence of dimensional collapse that can only be corrected by restoring the collapsed dimensions.</p>
+<p>Harris&rsquo;s specific objection &mdash; that QALYs discriminate against the elderly &mdash; is Corollary 5.2 applied to $d_7$ (dignity). Elderly patients&rsquo; health needs are concentrated on non-outcome dimensions: dignity in aging ($d_7$), social connection and family ($d_6$), institutional trust ($d_5$, particularly for patients with long histories of medical interaction), and the epistemic challenges of polypharmacy and complex care ($d_9$). The QALY discards all of these and evaluates the elderly patient solely on $d_1$ (outcomes) modified by remaining life expectancy. The result is systematic deprioritization: the elderly patient generates fewer QALYs from any intervention, not because the intervention is less valuable to the patient but because the metric has discarded the dimensions on which the value primarily resides.</p>
+<p>Harris also argued that QALYs discriminate against the disabled. This is Corollary 5.2 applied to $d_4$ (autonomy) and $d_7$ (dignity). A disabled patient&rsquo;s quality weight is lower than a non-disabled patient&rsquo;s because the quality weight is calibrated against &ldquo;perfect health,&rdquo; and &ldquo;perfect health&rdquo; is defined as the absence of disability. The disabled patient&rsquo;s rich life &mdash; the autonomy they have achieved, the identity they have constructed, the community they have built &mdash; lives in the kernel of $dQ$. The QALY cannot see it. The Bond Index can measure it.</p>
+<p>Nord et al. (1999) extended Harris&rsquo;s critique empirically, showing that the general public does not share the QALY&rsquo;s implicit trade-offs: when asked to choose between saving one person who will return to full health and saving five people who will return to moderate disability, a substantial proportion of respondents prefer to save the five &mdash; contradicting the QALY&rsquo;s prediction that the single person should be prioritized (more QALYs gained).[^3] This empirical finding is a direct consequence of the theorem: the general public&rsquo;s preferences are computed on a multi-dimensional manifold that includes justice ($d_3$: saving more lives) and dignity ($d_7$: disabled lives have full moral worth), while the QALY is computed on a one-dimensional projection that discards both.</p>
+<h2 id="510-implications-for-health-policy">5.10 Implications for Health Policy<a class="headerlink" href="#510-implications-for-health-policy" title="Permanent link">&para;</a></h2>
+<p>The QALY Irrecoverability Theorem has three direct implications for health policy:</p>
+<p><strong>First, QALY-based allocation is structurally biased, and the bias cannot be fixed by recalibration.</strong> Recalibrating quality weights &mdash; assigning different weights to different health states, adjusting for severity, adding equity multipliers &mdash; changes the specific $Q$ function but does not change the rank of $dQ$. The kernel is still 8-dimensional. The information in the kernel is still irrecoverable. Equity adjustments applied to the QALY score are corrections applied to a number that has already lost the information needed to make the correction meaningful. It is like adjusting the contrast on a photograph that was taken in the wrong direction: the adjustment changes the photograph but does not change what it shows.</p>
+<p><strong>Second, the bias falls disproportionately on populations whose needs are concentrated on non-outcome dimensions.</strong> This is not an accidental feature of current QALY implementations. It is a structural feature of any scalar projection that weights $d_1$ most heavily. Populations with high $d_1$ needs (acute illness, treatable disease) are well-served by QALY-based allocation. Populations with high non-$d_1$ needs (trust repair for historically betrayed communities, dignity preservation for the elderly, autonomy support for the disabled) are systematically underserved &mdash; not because the allocation system has been miscalibrated, but because the scalar it uses cannot see their needs.</p>
+<p><strong>Third, the theorem specifies exactly what must replace the QALY.</strong> The replacement is not a better scalar; it is a richer representation: the nine-dimensional attribute vector, the Mahalanobis metric, and the boundary architecture of the clinical decision complex. The computational cost of this replacement is higher. The informational fidelity is categorically better. And the populations that benefit most from the replacement &mdash; the elderly, the disabled, the historically marginalized &mdash; are precisely the populations that the current system fails most severely.</p>
+<h2 id="511-the-two-patient-test-revisited">5.11 The Two-Patient Test, Revisited<a class="headerlink" href="#511-the-two-patient-test-revisited" title="Permanent link">&para;</a></h2>
+<p>In Chapter 1, we introduced Margaret Okonkwo (68, retired professor, advanced pancreatic cancer, QALY 0.35) and David Kowalski (42, construction worker, chronic pain, QALY 0.35). The QALY Irrecoverability Theorem now explains precisely why the QALY fails for these patients and what the failure costs.</p>
+<p>Margaret&rsquo;s attribute vector: $(0.45, 0.8, 0.7, 0.95, 0.9, 0.8, 0.85, 0.7, 0.95)$. She scores highly on all non-outcome dimensions: she understands her diagnosis, trusts her physician, has made an autonomous and informed decision to forgo further chemotherapy, and has intact dignity and social connections. Her $d_1$ is low (advanced cancer), but the other eight dimensions are high.</p>
+<p>David&rsquo;s attribute vector: $(0.35, 0.5, 0.5, 0.3, 0.25, 0.35, 0.3, 0.5, 0.3)$. He scores poorly on most non-outcome dimensions: he does not understand his options, does not trust his physician, feels coerced by his insurer, has a degraded sense of identity, and has strained social connections. His $d_1$ is low (chronic pain), and the other eight dimensions are also low.</p>
+<p>The Mahalanobis distance between these two patients is:</p>
+<p>$$d_{\text{Mahal}}(\mathbf{a}_{\text{Margaret}}, \mathbf{a}_{\text{David}}) = \sqrt{(\mathbf{a}_M - \mathbf{a}_D)^T \Sigma^{-1} (\mathbf{a}_M - \mathbf{a}_D)}$$</p>
+<p>Without the empirical $\Sigma$, we can compute the Euclidean distance as a lower bound: $\|\mathbf{a}_M - \mathbf{a}_D\| = \sqrt{0.01 + 0.09 + 0.04 + 0.4225 + 0.4225 + 0.2025 + 0.3025 + 0.04 + 0.4225} = \sqrt{1.9525} \approx 1.40$. This is a substantial distance &mdash; the two patients are far apart on the clinical decision complex. Their clinical geodesics diverge immediately from the start node.</p>
+<p>Margaret&rsquo;s geodesic: palliative care focused on cognitive preservation, comfort optimization, and family engagement. The path does not cross any boundaries (Margaret&rsquo;s treatment refusal is autonomous and informed; the clinical team respects it). The geodesic&rsquo;s primary cost is on $d_1$ (she will die sooner than with aggressive treatment), but the total manifold cost is low because all other dimensions are preserved.</p>
+<p>David&rsquo;s geodesic: not surgery (not yet). The geodesic begins with non-$d_1$ interventions &mdash; health literacy support ($d_9$), coercion assessment ($d_4$), trust-building ($d_5$), social work referral ($d_6$), dignity restoration ($d_7$). Only after these dimensions are addressed can the surgical decision be genuinely informed. The geodesic may eventually include surgery, but the path to surgery passes through six stations that the QALY cannot see.</p>
+<p>The QALY says: same number (0.35), same treatment priority. It cannot distinguish Margaret from David because the information that distinguishes them lives in the kernel of $dQ$. The eight-dimensional kernel contains the trust, the understanding, the autonomy, the dignity, and the social context that make Margaret and David not just clinically different but morally different &mdash; requiring different paths, different timelines, different goals, and different institutional responses.</p>
+<p>This is what the theorem means in practice. It is not an abstract mathematical fact. It is a fact about what happens to patients when institutions rely on a number that has lost the information needed to treat them as persons.</p>
+<h2 id="512-comparison-to-other-irrecoverability-results">5.12 Comparison to Other Irrecoverability Results<a class="headerlink" href="#512-comparison-to-other-irrecoverability-results" title="Permanent link">&para;</a></h2>
+<p>The QALY Irrecoverability Theorem is the clinical instantiation of the general Scalar Irrecoverability Theorem proved in <em>Geometric Reasoning</em> (Ch. 13) and applied in <em>Geometric Ethics</em> (Ch. 16), <em>Geometric Economics</em> (Ch. 6), <em>Geometric Communication</em> (Ch. 1), and <em>Geometric Cognition</em> (Ch. 1). In each domain, the theorem has the same algebraic structure (rank-nullity) but different substantive content (different dimensions in the kernel).</p>
+<table>
+<thead>
+<tr>
+<th>Domain</th>
+<th>Scalar</th>
+<th style="text-align: center;">Dimensions</th>
+<th>Kernel Contains</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Ethics</td>
+<td>Moral score</td>
+<td style="text-align: center;">9</td>
+<td>Rights, justice, dignity, trust, social impact</td>
+</tr>
+<tr>
+<td>Economics</td>
+<td>GDP/utility</td>
+<td style="text-align: center;">9</td>
+<td>Distribution, sustainability, capabilities</td>
+</tr>
+<tr>
+<td>Communication</td>
+<td>BLEU/perplexity</td>
+<td style="text-align: center;">8+</td>
+<td>Semantic adequacy, pragmatic force, coherence</td>
+</tr>
+<tr>
+<td>Cognition</td>
+<td>IQ/accuracy</td>
+<td style="text-align: center;">5+</td>
+<td>Cognitive profile, strengths/weaknesses</td>
+</tr>
+<tr>
+<td><strong>Medicine</strong></td>
+<td><strong>QALY</strong></td>
+<td style="text-align: center;"><strong>9</strong></td>
+<td><strong>Trust, autonomy, dignity, justice, understanding</strong></td>
+</tr>
+</tbody>
+</table>
+<p>The clinical instantiation is distinctive in two ways. First, the consequences of information loss are directly measurable in patient outcomes: QALY discrimination against the elderly, disabled, and minority populations is not a theoretical prediction but an empirically documented phenomenon. Second, the information loss is borne by populations that are already among the most vulnerable in society &mdash; populations with the least capacity to advocate for the dimensions that the scalar has discarded.</p>
+<h2 id="513-sarahs-rank-nullity-moment">5.13 Sarah&rsquo;s Rank-Nullity Moment<a class="headerlink" href="#513-sarahs-rank-nullity-moment" title="Permanent link">&para;</a></h2>
+<p>The moment in the health economics seminar (Section 5.7) was a turning point in Sarah&rsquo;s intellectual trajectory. It was the moment she realized that the problem with the QALY was not a problem of calibration but a problem of dimensionality &mdash; and that no amount of recalibration could fix a dimensional deficit.</p>
+<p>She spent the following weekend reading the rank-nullity theorem, the data processing inequality, and the proof of the general Scalar Irrecoverability Theorem in <em>Geometric Reasoning</em>. She understood, for the first time, that her clinical discomfort with scalar metrics &mdash; her feeling that patients were not being seen, that important information was being lost, that the numbers were not capturing what mattered &mdash; was not mere sentiment. It was a mathematically precise observation about the dimensionality of the projection.</p>
+<p>She also understood, for the first time, why recalibration efforts always seemed to fall short. Every attempt to &ldquo;fix&rdquo; the QALY &mdash; adding quality weights for specific conditions, adjusting for severity, incorporating equity multipliers &mdash; was an attempt to add information to a scalar that had already lost it. The adjustments changed the scalar but did not change its dimensionality. The information in the kernel remained in the kernel. The patients in the kernel remained invisible.</p>
+<p>&ldquo;The kernel is where the patients live,&rdquo; she wrote in her notebook. &ldquo;The patients who don&rsquo;t trust us. The patients who don&rsquo;t understand us. The patients whose dignity we haven&rsquo;t considered. They&rsquo;re all in the kernel. And the QALY can&rsquo;t see the kernel because the kernel is the set of things that map to the same number.&rdquo;</p>
+<p>She did not publish this observation. She did not need to. The theorem had been proved. The observation was a consequence. And the consequence would shape every clinical decision she made for the rest of her career &mdash; not by replacing the QALY with a different number, but by supplementing the number with the eight dimensions that the number had thrown away.</p>
+<hr />
+<h2 id="summary">Summary<a class="headerlink" href="#summary" title="Permanent link">&para;</a></h2>
+<p>This chapter has proved the QALY Irrecoverability Theorem: any scalar QALY function $Q: \mathbb{R}^9 \to \mathbb{R}$ is non-injective (multiple distinct states map to the same QALY), its information loss is irrecoverable (no post-hoc processing recovers the lost dimensions), and the QALY-maximizing path diverges from the clinical geodesic by an unbounded amount. The proof follows from the rank-nullity theorem: a map from nine dimensions to one dimension has a kernel of dimension at least eight, and the eight discarded dimensions include every dimension on which vulnerable populations differ most from the majority.</p>
+<p>The corollary &mdash; that QALY discrimination against the elderly, disabled, and minority populations is mathematical, not moral &mdash; establishes that no recalibration of quality weights can fix the structural bias of scalar evaluation. The bias is in the dimensionality, not in the calibration. The remedy is not a better scalar but a richer representation: the clinical decision complex with its nine dimensions, Mahalanobis metric, and boundary architecture.</p>
+<hr />
+<p>[^1]: Washington, H. A. (2006). <em>Medical Apartheid: The Dark History of Medical Experimentation on Black Americans from Colonial Times to the Present</em>. Doubleday. Washington documents a systematic pattern of medical exploitation and experimentation that produced a rational basis for distrust &mdash; a trust deficit that is not a psychological failing of the patient but a historically produced feature of the patient&rsquo;s clinical-moral state.</p>
+<p>[^2]: Harris, J. (1987). QALYfying the value of life. <em>Journal of Medical Ethics</em>, 13(3), 117&ndash;123. Harris&rsquo;s paper remains the most cited philosophical critique of the QALY framework and launched a debate that continues to this day.</p>
+<p>[^3]: Nord, E., Pinto, J. L., Richardson, J., Menzel, P., &amp; Ubel, P. (1999). Incorporating societal concerns for fairness in numerical valuations of health programmes. <em>Health Economics</em>, 8(1), 25&ndash;39.</p>
+
+    <footer>
+      <p>Part of the <em>Geometric Series</em> by A.H. Bowers</p>
+      <p>Built automatically from source. Last updated: 2026-04-20 07:00 UTC</p>
+    </footer>
+  </div>
+
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js"
+    onload="renderMathInElement(document.body, {
+      delimiters: [
+        {left: '$$', right: '$$', display: true},
+        {left: '$', right: '$', display: false},
+        {left: '\\\\(', right: '\\\\)', display: false},
+        {left: '\\\\[', right: '\\\\]', display: true}
+      ],
+      throwOnError: false
+    });"></script>
+</body>
+</html>

@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Appendix A: Mathematical Prerequisites - Geometric Medicine</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
+  <style>
+    :root {
+      --bg: #fafaf8;
+      --fg: #222;
+      --accent: #2c5f8a;
+      --border: #ddd;
+      --code-bg: #f4f4f0;
+      --max-width: 48rem;
+    }
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --bg: #1a1a2e;
+        --fg: #e0e0e0;
+        --accent: #7eb8da;
+        --border: #444;
+        --code-bg: #16213e;
+      }
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Georgia', 'Times New Roman', serif;
+      background: var(--bg);
+      color: var(--fg);
+      line-height: 1.7;
+      padding: 2rem 1rem;
+    }
+    .container {
+      max-width: var(--max-width);
+      margin: 0 auto;
+    }
+    nav.breadcrumb {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      font-size: 0.85rem;
+      margin-bottom: 2rem;
+      padding-bottom: 0.5rem;
+      border-bottom: 1px solid var(--border);
+    }
+    nav.breadcrumb a {
+      color: var(--accent);
+      text-decoration: none;
+    }
+    nav.breadcrumb a:hover { text-decoration: underline; }
+    nav.breadcrumb .sep { margin: 0 0.4rem; color: #999; }
+    h1 {
+      font-size: 2rem;
+      margin-bottom: 0.5rem;
+      line-height: 1.2;
+      border-bottom: 2px solid var(--accent);
+      padding-bottom: 0.5rem;
+    }
+    h2 {
+      font-size: 1.5rem;
+      margin-top: 2.5rem;
+      margin-bottom: 0.75rem;
+      color: var(--accent);
+    }
+    h3 {
+      font-size: 1.2rem;
+      margin-top: 2rem;
+      margin-bottom: 0.5rem;
+    }
+    h4 {
+      font-size: 1.05rem;
+      margin-top: 1.5rem;
+      margin-bottom: 0.4rem;
+      font-style: italic;
+    }
+    p { margin-bottom: 1rem; }
+    blockquote {
+      border-left: 3px solid var(--accent);
+      padding: 0.5rem 1.2rem;
+      margin: 1.5rem 0;
+      background: var(--code-bg);
+      font-style: italic;
+    }
+    blockquote p:last-child { margin-bottom: 0; }
+    code {
+      font-family: 'Consolas', 'Fira Code', monospace;
+      background: var(--code-bg);
+      padding: 0.15rem 0.35rem;
+      border-radius: 3px;
+      font-size: 0.9em;
+    }
+    pre {
+      background: var(--code-bg);
+      padding: 1rem;
+      border-radius: 4px;
+      overflow-x: auto;
+      margin: 1.5rem 0;
+      border: 1px solid var(--border);
+    }
+    pre code {
+      background: none;
+      padding: 0;
+    }
+    a { color: var(--accent); }
+    ul, ol {
+      margin: 0.75rem 0 1rem 1.5rem;
+    }
+    li { margin-bottom: 0.3rem; }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 1.5rem 0;
+    }
+    th, td {
+      border: 1px solid var(--border);
+      padding: 0.5rem 0.75rem;
+      text-align: left;
+    }
+    th { background: var(--code-bg); }
+    hr {
+      border: none;
+      border-top: 1px solid var(--border);
+      margin: 2rem 0;
+    }
+    img {
+      max-width: 100%;
+      height: auto;
+      display: block;
+      margin: 1.5rem auto;
+    }
+    /* KaTeX display math */
+    .katex-display {
+      overflow-x: auto;
+      overflow-y: hidden;
+      padding: 0.5rem 0;
+    }
+    /* Definition/theorem boxes */
+    .definition, .theorem, .axiom {
+      border: 1px solid var(--border);
+      border-left: 4px solid var(--accent);
+      padding: 1rem 1.2rem;
+      margin: 1.5rem 0;
+      background: var(--code-bg);
+      border-radius: 0 4px 4px 0;
+    }
+    footer {
+      margin-top: 4rem;
+      padding-top: 1rem;
+      border-top: 1px solid var(--border);
+      font-size: 0.8rem;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      color: #888;
+      text-align: center;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <nav class="breadcrumb">
+      <a href="../index.html">Geometric Series</a>
+      <span class="sep">/</span>
+      <a href="index.html">Geometric Medicine</a>
+      <span class="sep">/</span>
+      <span>Appendix A: Mathematical Prerequisites</span>
+    </nav>
+
+    <h1 id="appendix-a-mathematical-prerequisites">Appendix A: Mathematical Prerequisites<a class="headerlink" href="#appendix-a-mathematical-prerequisites" title="Permanent link">&para;</a></h1>
+<p>This appendix collects the mathematical definitions and results used throughout the book. It is self-contained for readers unfamiliar with differential geometry, simplicial complexes, or search algorithms; those with background in these areas may skip directly to the chapters. Full proofs and extended treatments can be found in <em>Geometric Methods in Computational Modeling</em> (Bond, 2026a) and <em>Geometric Reasoning</em> (Bond, 2026c).</p>
+<hr />
+<h2 id="a1-smooth-manifolds">A.1 Smooth Manifolds<a class="headerlink" href="#a1-smooth-manifolds" title="Permanent link">&para;</a></h2>
+<p><strong>Definition A.1 (Topological Manifold).</strong> A <em>topological manifold</em> of dimension $n$ is a Hausdorff, second-countable topological space $M$ such that every point $p \in M$ has a neighborhood homeomorphic to an open subset of $\mathbb{R}^n$.</p>
+<p><strong>Definition A.2 (Chart).</strong> A <em>chart</em> on $M$ is a pair $(U, \varphi)$ where $U \subseteq M$ is open and $\varphi: U \to \mathbb{R}^n$ is a homeomorphism onto its image. The coordinates $x^1, \ldots, x^n$ given by $\varphi$ are <em>local coordinates</em> on $U$.</p>
+<p><strong>Definition A.3 (Smooth Structure).</strong> A <em>smooth atlas</em> is a collection of charts $\{(U_\alpha, \varphi_\alpha)\}$ covering $M$ such that all transition maps $\varphi_\beta \circ \varphi_\alpha^{-1}$ are smooth ($C^\infty$). A <em>smooth manifold</em> is a topological manifold equipped with a maximal smooth atlas.</p>
+<p><em>Clinical interpretation</em>: A clinical assessment framework (e.g., a triage protocol, a QALY calculator, an ethics committee rubric) is a chart on the clinical manifold. Each framework provides local coordinates for the patient&rsquo;s clinical-moral state. The transition map between charts is the conversion procedure between frameworks. The smoothness requirement says that small changes in a patient&rsquo;s state should produce small changes in any well-constructed clinical assessment. (See Chapter 4.)</p>
+<hr />
+<h2 id="a2-riemannian-metrics-and-geodesics">A.2 Riemannian Metrics and Geodesics<a class="headerlink" href="#a2-riemannian-metrics-and-geodesics" title="Permanent link">&para;</a></h2>
+<p><strong>Definition A.4 (Riemannian Metric).</strong> A <em>Riemannian metric</em> on a smooth manifold $M$ is a smooth assignment of a positive-definite inner product $g_p: T_pM \times T_pM \to \mathbb{R}$ to each tangent space $T_pM$.</p>
+<p>In local coordinates, $g = g_{ij} \, dx^i \otimes dx^j$, where $g_{ij}(p) = g_p(\partial_i, \partial_j)$.</p>
+<p><strong>Definition A.5 (Geodesic).</strong> A curve $\gamma: [0,1] \to M$ is a <em>geodesic</em> if it satisfies</p>
+<p>$$\frac{d^2 \gamma^k}{dt^2} + \Gamma^k_{ij} \frac{d\gamma^i}{dt} \frac{d\gamma^j}{dt} = 0$$</p>
+<p>where $\Gamma^k_{ij}$ are the Christoffel symbols of the Levi-Civita connection.</p>
+<p><strong>Definition A.6 (Geodesic Distance).</strong> The <em>geodesic distance</em> between $p, q \in M$ is</p>
+<p>$$d(p, q) = \inf_\gamma \int_0^1 \sqrt{g_{\gamma(t)}(\dot{\gamma}(t), \dot{\gamma}(t))} \, dt$$</p>
+<p>where the infimum is over all smooth curves from $p$ to $q$.</p>
+<p><em>Clinical interpretation</em>: The metric determines which clinical states are &ldquo;close&rdquo; &mdash; i.e., which transitions have low cost. The clinical geodesic is the minimum-cost path from the patient&rsquo;s current state to an acceptable outcome. (See Chapters 4 and 6.)</p>
+<hr />
+<h2 id="a3-the-mahalanobis-distance">A.3 The Mahalanobis Distance<a class="headerlink" href="#a3-the-mahalanobis-distance" title="Permanent link">&para;</a></h2>
+<p><strong>Definition A.7 (Mahalanobis Distance).</strong> Given a positive-definite matrix $\Sigma \in \text{SPD}(n)$ and vectors $\mathbf{a}, \mathbf{b} \in \mathbb{R}^n$, the <em>Mahalanobis distance</em> between $\mathbf{a}$ and $\mathbf{b}$ with respect to $\Sigma$ is</p>
+<p>$$d_\Sigma(\mathbf{a}, \mathbf{b}) = \sqrt{(\mathbf{a} - \mathbf{b})^\top \Sigma^{-1} (\mathbf{a} - \mathbf{b})}$$</p>
+<p>When $\Sigma = I$ (the identity matrix), this reduces to Euclidean distance. When $\Sigma$ captures covariance between dimensions, the Mahalanobis distance weights the contribution of each dimension and its cross-dimensional interactions.</p>
+<p><strong>Proposition A.1.</strong> The squared Mahalanobis distance $d_\Sigma^2(\mathbf{a}, \mathbf{b})$ is a positive-definite quadratic form. It defines a Riemannian metric on $\mathbb{R}^n$ with constant metric tensor $g_{ij} = (\Sigma^{-1})_{ij}$.</p>
+<p><em>Clinical interpretation</em>: The clinical edge weight (Definition 4.2 in Chapter 4) uses the Mahalanobis distance with the $9 \times 9$ clinical-moral covariance matrix $\Sigma$. This captures the crucial cross-dimensional dependencies: a treatment with uncertain outcomes ($d_1$) is costlier when the trust relationship is fragile ($d_5$), because $\Sigma_{15}$ is non-zero. Euclidean distance would treat these dimensions as independent; the Mahalanobis distance captures their interaction. (See Chapters 4&ndash;5.)</p>
+<hr />
+<h2 id="a4-simplicial-complexes">A.4 Simplicial Complexes<a class="headerlink" href="#a4-simplicial-complexes" title="Permanent link">&para;</a></h2>
+<p><strong>Definition A.8 (Abstract Simplicial Complex).</strong> An <em>abstract simplicial complex</em> $K$ on a vertex set $V$ is a collection of non-empty subsets of $V$ (called <em>simplices</em>) such that: (a) every singleton $\{v\} \in K$ for $v \in V$; (b) if $\sigma \in K$ and $\tau \subseteq \sigma$ with $\tau \neq \emptyset$, then $\tau \in K$.</p>
+<p>A simplex $\sigma$ with $|\sigma| = k + 1$ is a <em>$k$-simplex</em>. Vertices are 0-simplices, edges are 1-simplices, triangles are 2-simplices, and so on.</p>
+<p><strong>Definition A.9 (Weighted Simplicial Complex).</strong> A <em>weighted simplicial complex</em> is a simplicial complex $K$ together with a weight function $w: K \to \mathbb{R}_{\geq 0}$ that assigns a non-negative cost to each simplex.</p>
+<p><em>Clinical interpretation</em>: The clinical decision complex $\mathcal{C}$ (Definition 4.1) is a weighted simplicial complex. Vertices are clinical states (carrying 9-dimensional attribute vectors). Edges are clinical actions (carrying Mahalanobis + boundary penalty weights). Higher simplices are care bundles &mdash; jointly administered interventions that must be evaluated as a unit. (See Chapter 4.)</p>
+<hr />
+<h2 id="a5-the-math59-search-algorithm">A.5 The $A^*$ Search Algorithm<a class="headerlink" href="#a5-the-math59-search-algorithm" title="Permanent link">&para;</a></h2>
+<p><strong>Definition A.10 ($A^*$ Search).</strong> Given a weighted graph $G = (V, E, w)$ with start vertex $v_0$, goal set $G \subseteq V$, and heuristic function $h: V \to \mathbb{R}_{\geq 0}$, $A^*$ search finds a minimum-cost path from $v_0$ to $G$ by expanding vertices in order of $f(n) = g(n) + h(n)$, where:</p>
+<ul>
+<li>$g(n)$ is the cost of the cheapest known path from $v_0$ to $n$</li>
+<li>$h(n)$ is an estimate of the cost from $n$ to the nearest goal vertex</li>
+</ul>
+<p><strong>Definition A.11 (Admissibility).</strong> A heuristic $h$ is <em>admissible</em> if $h(n) \leq h^*(n)$ for all $n$, where $h^*(n)$ is the true minimum cost from $n$ to the goal.</p>
+<p><strong>Theorem A.1 (Hart, Nilsson, and Raphael 1968).</strong> If $h$ is admissible and consistent (i.e., $h(n) \leq w(n, n') + h(n')$ for every edge $(n, n')$), then $A^*$ returns an optimal path.</p>
+<p><strong>Definition A.12 ($\varepsilon$-Admissibility).</strong> A heuristic $h$ is <em>$\varepsilon$-admissible</em> if $h(n) \leq (1 + \varepsilon) \cdot h^*(n)$ for all $n$. An $\varepsilon$-admissible heuristic guarantees that $A^*$ returns a path costing at most $(1 + \varepsilon)$ times the optimum.</p>
+<p><em>Clinical interpretation</em>: Clinical reasoning is $A^*$ search on the clinical decision complex. The start node is the patient&rsquo;s presenting condition. The goal region is the set of acceptable clinical-moral outcomes. $g(n)$ is evidence-based medicine (accumulated clinical cost). $h(n)$ is clinical wisdom (the moral-heuristic estimate). Admissibility requires that clinical training calibrates boundary penalties as lower bounds on true moral cost. The $\varepsilon$-admissibility spectrum classifies clinical heuristics into four categories: strictly admissible, $\varepsilon$-admissible, inadmissible, and gauge-variant. (See Chapters 6&ndash;7.)</p>
+<hr />
+<h2 id="a6-boundary-penalties-and-edge-weights">A.6 Boundary Penalties and Edge Weights<a class="headerlink" href="#a6-boundary-penalties-and-edge-weights" title="Permanent link">&para;</a></h2>
+<p><strong>Definition A.13 (Clinical Edge Weight).</strong> The weight of a clinical action $(v_i, v_j)$ on the clinical decision complex $\mathcal{C}$ is:</p>
+<p>$$w(v_i, v_j) = \underbrace{\Delta \mathbf{a}^\top \Sigma^{-1} \Delta \mathbf{a}}_{\text{Mahalanobis distance}} + \underbrace{\sum_k \beta_k \cdot \mathbf{1}[\text{boundary } k \text{ crossed}]}_{\text{boundary penalties}}$$</p>
+<p>where $\Delta \mathbf{a} = \mathbf{a}(v_j) - \mathbf{a}(v_i)$ is the change in the 9-dimensional attribute vector, $\Sigma$ is the $9 \times 9$ clinical-moral covariance matrix, and $\beta_k$ is the penalty for crossing clinical-moral boundary $k$.</p>
+<p><strong>Remark.</strong> The edge weight has two components. The Mahalanobis component measures the <em>distance</em> traveled on the manifold &mdash; how much the patient&rsquo;s clinical-moral state changes. The boundary component measures the <em>cost</em> of crossing ethical thresholds &mdash; the discontinuous jumps in moral cost at professional norms (harm, consent, futility, abandonment, sacred values). The total weight is the sum of continuous and discontinuous costs. (See Chapters 4&ndash;5.)</p>
+<hr />
+<h2 id="a7-gauge-invariance">A.7 Gauge Invariance<a class="headerlink" href="#a7-gauge-invariance" title="Permanent link">&para;</a></h2>
+<p><strong>Definition A.14 (Gauge Transformation).</strong> A <em>gauge transformation</em> $\tau$ is a meaning-preserving re-description of the clinical situation &mdash; a change in how information is framed, presented, or described that does not alter the underlying clinical-moral state.</p>
+<p><strong>Definition A.15 (Gauge Invariance).</strong> A clinical evaluation $E$ is <em>gauge-invariant</em> if $E(\tau(x)) = E(x)$ for all meaning-preserving transformations $\tau$.</p>
+<p><strong>Definition A.16 (Bond Invariance Principle).</strong> An ethical evaluation is valid only if it is gauge-invariant: the evaluation must depend on the clinical-moral state, not on its description.</p>
+<p><em>Clinical interpretation</em>: Informed consent is a gauge-invariance condition: the patient&rsquo;s clinical decision must be invariant under meaning-preserving reframing. If &ldquo;90% survival rate&rdquo; and &ldquo;10% mortality rate&rdquo; produce different treatment decisions, the patient&rsquo;s heuristic is gauge-variant, and consent is not genuinely informed regardless of what the form says. Algorithmic bias in medical AI is also a gauge-invariance violation: if a clinical decision support system produces different recommendations for the same clinical state described with different demographic labels, the system violates the medical BIP. (See Chapter 8.)</p>
+<hr />
+<h2 id="a8-the-scalar-irrecoverability-theorem">A.8 The Scalar Irrecoverability Theorem<a class="headerlink" href="#a8-the-scalar-irrecoverability-theorem" title="Permanent link">&para;</a></h2>
+<p><strong>Theorem A.2 (Scalar Irrecoverability; Bond 2026c).</strong> Let $Q: \mathbb{R}^n \to \mathbb{R}$ be any function mapping an $n$-dimensional state to a scalar ($n > 1$). Then:</p>
+<ol>
+<li>$Q$ is not injective: multiple distinct states map to the same scalar value.</li>
+<li>The information destroyed by $Q$ is irrecoverable: there exists no function $\psi: \mathbb{R} \to \mathbb{R}^n$ such that $\psi \circ Q = \text{id}$.</li>
+<li>The optimal path on the full $n$-dimensional manifold is in general different from the scalar-optimal path, and the divergence is not bounded by any function of $Q$ alone.</li>
+</ol>
+<p><strong>Proof sketch.</strong> By the rank-nullity theorem, the kernel of $dQ$ has dimension $\geq n - 1$ at every regular point. Information in the kernel is irrecoverable by the data processing inequality. Part (3) follows by constructing specific examples where the scalar-optimal and manifold-optimal paths diverge arbitrarily.</p>
+<p><em>Clinical interpretation</em>: This is the QALY Irrecoverability Theorem (Theorem 5.1). With $n = 9$, any QALY function destroys at least 8 dimensions of clinical-moral information. The destruction is mathematical, not a failure of implementation. (See Chapter 5.)</p>
+
+    <footer>
+      <p>Part of the <em>Geometric Series</em> by A.H. Bowers</p>
+      <p>Built automatically from source. Last updated: 2026-04-20 07:00 UTC</p>
+    </footer>
+  </div>
+
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js"
+    onload="renderMathInElement(document.body, {
+      delimiters: [
+        {left: '$$', right: '$$', display: true},
+        {left: '$', right: '$', display: false},
+        {left: '\\\\(', right: '\\\\)', display: false},
+        {left: '\\\\[', right: '\\\\]', display: true}
+      ],
+      throwOnError: false
+    });"></script>
+</body>
+</html>

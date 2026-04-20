@@ -1,0 +1,576 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Appendix B: Code Walkthrough - Geometric Medicine</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
+  <style>
+    :root {
+      --bg: #fafaf8;
+      --fg: #222;
+      --accent: #2c5f8a;
+      --border: #ddd;
+      --code-bg: #f4f4f0;
+      --max-width: 48rem;
+    }
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --bg: #1a1a2e;
+        --fg: #e0e0e0;
+        --accent: #7eb8da;
+        --border: #444;
+        --code-bg: #16213e;
+      }
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Georgia', 'Times New Roman', serif;
+      background: var(--bg);
+      color: var(--fg);
+      line-height: 1.7;
+      padding: 2rem 1rem;
+    }
+    .container {
+      max-width: var(--max-width);
+      margin: 0 auto;
+    }
+    nav.breadcrumb {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      font-size: 0.85rem;
+      margin-bottom: 2rem;
+      padding-bottom: 0.5rem;
+      border-bottom: 1px solid var(--border);
+    }
+    nav.breadcrumb a {
+      color: var(--accent);
+      text-decoration: none;
+    }
+    nav.breadcrumb a:hover { text-decoration: underline; }
+    nav.breadcrumb .sep { margin: 0 0.4rem; color: #999; }
+    h1 {
+      font-size: 2rem;
+      margin-bottom: 0.5rem;
+      line-height: 1.2;
+      border-bottom: 2px solid var(--accent);
+      padding-bottom: 0.5rem;
+    }
+    h2 {
+      font-size: 1.5rem;
+      margin-top: 2.5rem;
+      margin-bottom: 0.75rem;
+      color: var(--accent);
+    }
+    h3 {
+      font-size: 1.2rem;
+      margin-top: 2rem;
+      margin-bottom: 0.5rem;
+    }
+    h4 {
+      font-size: 1.05rem;
+      margin-top: 1.5rem;
+      margin-bottom: 0.4rem;
+      font-style: italic;
+    }
+    p { margin-bottom: 1rem; }
+    blockquote {
+      border-left: 3px solid var(--accent);
+      padding: 0.5rem 1.2rem;
+      margin: 1.5rem 0;
+      background: var(--code-bg);
+      font-style: italic;
+    }
+    blockquote p:last-child { margin-bottom: 0; }
+    code {
+      font-family: 'Consolas', 'Fira Code', monospace;
+      background: var(--code-bg);
+      padding: 0.15rem 0.35rem;
+      border-radius: 3px;
+      font-size: 0.9em;
+    }
+    pre {
+      background: var(--code-bg);
+      padding: 1rem;
+      border-radius: 4px;
+      overflow-x: auto;
+      margin: 1.5rem 0;
+      border: 1px solid var(--border);
+    }
+    pre code {
+      background: none;
+      padding: 0;
+    }
+    a { color: var(--accent); }
+    ul, ol {
+      margin: 0.75rem 0 1rem 1.5rem;
+    }
+    li { margin-bottom: 0.3rem; }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 1.5rem 0;
+    }
+    th, td {
+      border: 1px solid var(--border);
+      padding: 0.5rem 0.75rem;
+      text-align: left;
+    }
+    th { background: var(--code-bg); }
+    hr {
+      border: none;
+      border-top: 1px solid var(--border);
+      margin: 2rem 0;
+    }
+    img {
+      max-width: 100%;
+      height: auto;
+      display: block;
+      margin: 1.5rem auto;
+    }
+    /* KaTeX display math */
+    .katex-display {
+      overflow-x: auto;
+      overflow-y: hidden;
+      padding: 0.5rem 0;
+    }
+    /* Definition/theorem boxes */
+    .definition, .theorem, .axiom {
+      border: 1px solid var(--border);
+      border-left: 4px solid var(--accent);
+      padding: 1rem 1.2rem;
+      margin: 1.5rem 0;
+      background: var(--code-bg);
+      border-radius: 0 4px 4px 0;
+    }
+    footer {
+      margin-top: 4rem;
+      padding-top: 1rem;
+      border-top: 1px solid var(--border);
+      font-size: 0.8rem;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      color: #888;
+      text-align: center;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <nav class="breadcrumb">
+      <a href="../index.html">Geometric Series</a>
+      <span class="sep">/</span>
+      <a href="index.html">Geometric Medicine</a>
+      <span class="sep">/</span>
+      <span>Appendix B: Code Walkthrough</span>
+    </nav>
+
+    <h1 id="appendix-b-code-walkthrough">Appendix B: Code Walkthrough<a class="headerlink" href="#appendix-b-code-walkthrough" title="Permanent link">&para;</a></h1>
+<p>This appendix provides a guided walkthrough of the Python implementations that produce the computational results in this book. The code is organized in two modules: <code>ch21_clinical.py</code> (individual clinical decision-making, pathfinding, and moral injury) and <code>ch27_bioethics.py</code> (population-level allocation, the bioethical decision complex, and the clinical Bond Index). Both modules are self-contained and depend only on NumPy and SciPy.</p>
+<p>All code examples are presented in the order they appear in the text. Line references are to the versions archived with this volume.</p>
+<hr />
+<h2 id="b1-the-clinical-decision-complex">B.1 The Clinical Decision Complex<a class="headerlink" href="#b1-the-clinical-decision-complex" title="Permanent link">&para;</a></h2>
+<p>The clinical decision complex is implemented as a weighted graph with 9-dimensional attribute vectors on vertices and Mahalanobis-plus-boundary-penalty weights on edges.</p>
+<h3 id="b11-attribute-vectors">B.1.1 Attribute Vectors<a class="headerlink" href="#b11-attribute-vectors" title="Permanent link">&para;</a></h3>
+<p>Each clinical state is represented by a 9-dimensional NumPy array:</p>
+<pre><code class="language-python">import numpy as np
+
+# A clinical state: 9-dimensional attribute vector
+# [d1: outcomes, d2: rights, d3: justice, d4: autonomy,
+#  d5: trust, d6: social, d7: dignity, d8: institutional,
+#  d9: epistemic]
+state_a = np.array([0.7, 0.9, 0.8, 0.95, 0.6, 0.7, 0.85, 0.9, 0.5])
+state_b = np.array([0.9, 0.9, 0.8, 0.95, 0.4, 0.7, 0.85, 0.9, 0.5])
+</code></pre>
+<p>The attribute vector captures the patient&rsquo;s clinical-moral state across all nine dimensions. Values are normalized to $[0, 1]$, where 1 represents the best achievable state on that dimension and 0 represents the worst.</p>
+<h3 id="b12-the-covariance-matrix">B.1.2 The Covariance Matrix<a class="headerlink" href="#b12-the-covariance-matrix" title="Permanent link">&para;</a></h3>
+<p>The $9 \times 9$ clinical-moral covariance matrix $\Sigma$ encodes cross-dimensional dependencies:</p>
+<pre><code class="language-python">def build_covariance_matrix(
+    diagonal_weights: np.ndarray,
+    cross_terms: dict[tuple[int, int], float]
+) -&gt; np.ndarray:
+    &quot;&quot;&quot;
+    Construct the clinical-moral covariance matrix.
+
+    Parameters
+    ----------
+    diagonal_weights : array of shape (9,)
+        Variance of each clinical-moral dimension.
+    cross_terms : dict mapping (i, j) pairs to covariance values
+        Cross-dimensional dependencies (e.g., outcomes x trust).
+
+    Returns
+    -------
+    Sigma : array of shape (9, 9)
+        Symmetric positive-definite covariance matrix.
+    &quot;&quot;&quot;
+    Sigma = np.diag(diagonal_weights)
+    for (i, j), value in cross_terms.items():
+        Sigma[i, j] = value
+        Sigma[j, i] = value  # Symmetry
+    # Verify positive definiteness
+    eigenvalues = np.linalg.eigvalsh(Sigma)
+    assert np.all(eigenvalues &gt; 0), &quot;Covariance matrix is not positive definite&quot;
+    return Sigma
+
+# Example: critical cross-terms from the GCE paper
+Sigma = build_covariance_matrix(
+    diagonal_weights=np.ones(9),
+    cross_terms={
+        (0, 4): 0.3,   # Sigma_15: outcomes x trust
+        (3, 8): 0.25,  # Sigma_49: autonomy x epistemic
+        (2, 6): 0.2,   # Sigma_37: justice x dignity
+    }
+)
+</code></pre>
+<p>The cross-terms are the mathematically critical components. $\Sigma_{15}$ (outcomes $\times$ trust) encodes the fact that uncertain clinical outcomes are costlier when the therapeutic relationship is fragile. $\Sigma_{49}$ (autonomy $\times$ epistemic) encodes the fact that respecting autonomy requires adequate patient understanding. These are not philosophical assertions &mdash; they are estimable from clinical decision data (see Chapter 17 for the experimental design).</p>
+<h3 id="b13-edge-weights-mahalanobis-distance-plus-boundary-penalties">B.1.3 Edge Weights: Mahalanobis Distance Plus Boundary Penalties<a class="headerlink" href="#b13-edge-weights-mahalanobis-distance-plus-boundary-penalties" title="Permanent link">&para;</a></h3>
+<pre><code class="language-python">def clinical_edge_weight(
+    state_from: np.ndarray,
+    state_to: np.ndarray,
+    Sigma_inv: np.ndarray,
+    boundaries: list[dict],
+) -&gt; float:
+    &quot;&quot;&quot;
+    Compute the clinical edge weight (Equation 4.2).
+
+    Parameters
+    ----------
+    state_from, state_to : arrays of shape (9,)
+    Sigma_inv : array of shape (9, 9), inverse covariance matrix
+    boundaries : list of boundary definitions, each with:
+        'check': callable returning True if boundary is crossed
+        'penalty': float, the boundary penalty beta_k
+
+    Returns
+    -------
+    weight : float, total clinical-moral cost of this action
+    &quot;&quot;&quot;
+    delta = state_to - state_from
+    mahalanobis = float(delta @ Sigma_inv @ delta)
+
+    boundary_cost = sum(
+        b['penalty'] for b in boundaries
+        if b['check'](state_from, state_to)
+    )
+
+    return mahalanobis + boundary_cost
+</code></pre>
+<p>The boundary penalties represent clinical-moral thresholds. Each boundary has a detection function (does this action cross the boundary?) and a penalty value ($\beta_k$). Sacred-value boundaries have $\beta_k = \infty$ (represented computationally as <code>float('inf')</code>), which makes paths through them unreachable by $A^*$ search.</p>
+<h3 id="b14-defining-boundaries">B.1.4 Defining Boundaries<a class="headerlink" href="#b14-defining-boundaries" title="Permanent link">&para;</a></h3>
+<pre><code class="language-python"># Example boundary definitions
+def harm_boundary(state_from, state_to):
+    &quot;&quot;&quot;The Hippocratic boundary: does this action directly cause harm?&quot;&quot;&quot;
+    return state_to[0] &lt; state_from[0] - 0.2  # Significant outcome decline
+
+def consent_boundary(state_from, state_to):
+    &quot;&quot;&quot;Does this action proceed without adequate informed consent?&quot;&quot;&quot;
+    return state_to[3] &lt; 0.3  # Autonomy drops below consent threshold
+
+def futility_boundary(state_from, state_to):
+    &quot;&quot;&quot;Does this action continue treatment beyond clinical benefit?&quot;&quot;&quot;
+    return state_from[0] &lt; 0.1 and state_to[0] &lt; 0.15  # Negligible outcome gain
+
+def abandonment_boundary(state_from, state_to):
+    &quot;&quot;&quot;Does this action withdraw care from a dependent patient?&quot;&quot;&quot;
+    return state_from[4] &gt; 0.5 and state_to[4] &lt; 0.2  # Trust collapse
+
+boundaries = [
+    {'check': harm_boundary, 'penalty': 5.0},
+    {'check': consent_boundary, 'penalty': float('inf')},  # Sacred value
+    {'check': futility_boundary, 'penalty': 3.0},
+    {'check': abandonment_boundary, 'penalty': 8.0},
+]
+</code></pre>
+<hr />
+<h2 id="b2-clinical-math10-pathfinding">B.2 Clinical $A^*$ Pathfinding<a class="headerlink" href="#b2-clinical-math10-pathfinding" title="Permanent link">&para;</a></h2>
+<p>The clinical geodesic is computed by $A^*$ search on the clinical decision complex.</p>
+<pre><code class="language-python">import heapq
+
+def clinical_astar(
+    graph: dict,           # adjacency list: {node: [(neighbor, action), ...]}
+    start: str,
+    goals: set[str],
+    states: dict,          # {node: np.ndarray} attribute vectors
+    Sigma_inv: np.ndarray,
+    boundaries: list[dict],
+    heuristic_fn: callable,
+) -&gt; tuple[list[str], float]:
+    &quot;&quot;&quot;
+    A* pathfinding on the clinical decision complex.
+
+    Returns the clinical geodesic (minimum-cost path)
+    and its total clinical friction.
+    &quot;&quot;&quot;
+    open_list = [(0.0, start, [start])]
+    g_costs = {start: 0.0}
+
+    while open_list:
+        f_cost, current, path = heapq.heappop(open_list)
+
+        if current in goals:
+            return path, g_costs[current]
+
+        for neighbor, action in graph[current]:
+            edge_w = clinical_edge_weight(
+                states[current], states[neighbor],
+                Sigma_inv, boundaries
+            )
+
+            if edge_w == float('inf'):
+                continue  # Sacred-value boundary: path blocked
+
+            tentative_g = g_costs[current] + edge_w
+
+            if tentative_g &lt; g_costs.get(neighbor, float('inf')):
+                g_costs[neighbor] = tentative_g
+                h = heuristic_fn(states[neighbor], goals, states)
+                f = tentative_g + h
+                heapq.heappush(open_list, (f, neighbor, path + [neighbor]))
+
+    return None, float('inf')  # No path found: ethics consultation needed
+</code></pre>
+<p>The return value <code>None</code> corresponds to the clinical situation &ldquo;path not found&rdquo; &mdash; a genuine ethical impasse where no available clinical action reaches an acceptable outcome without crossing a sacred-value boundary. This is the formal trigger for ethics consultation (Chapter 6, Table 6.1).</p>
+<hr />
+<h2 id="b3-moral-injury-computation">B.3 Moral Injury Computation<a class="headerlink" href="#b3-moral-injury-computation" title="Permanent link">&para;</a></h2>
+<p>The Moral Injury Index is computed from a sequence of clinical decisions and their boundary-crossing events.</p>
+<pre><code class="language-python">def compute_moral_injury(
+    decisions: list[dict],
+    clinician_betas: dict[str, float],
+    threshold_tau: float,
+) -&gt; dict:
+    &quot;&quot;&quot;
+    Compute cumulative moral injury (Equation 13.2).
+
+    Parameters
+    ----------
+    decisions : list of dicts, each with:
+        'boundaries_crossed': list of boundary names
+        'time': int, time step
+    clinician_betas : dict mapping boundary names to clinician's
+        personal boundary penalty values
+    threshold_tau : float, clinician's tolerance threshold
+
+    Returns
+    -------
+    result : dict with 'cumulative_mi', 'trajectory', 'above_critical'
+    &quot;&quot;&quot;
+    cumulative = 0.0
+    trajectory = []
+    MI_CRITICAL = 15.0  # Threshold for irreversible damage
+
+    for decision in decisions:
+        delta_mi = sum(
+            max(0.0, clinician_betas.get(b, 0.0) - threshold_tau)
+            for b in decision['boundaries_crossed']
+        )
+        cumulative += delta_mi
+        trajectory.append({
+            'time': decision['time'],
+            'delta_mi': delta_mi,
+            'cumulative_mi': cumulative,
+        })
+
+    return {
+        'cumulative_mi': cumulative,
+        'trajectory': trajectory,
+        'above_critical': cumulative &gt; MI_CRITICAL,
+    }
+</code></pre>
+<p>The Moral Injury Accumulation Theorem (Theorem 13.1) is visible in the code: <code>cumulative</code> is monotonically non-decreasing (each <code>delta_mi &gt;= 0</code>), the <code>above_critical</code> flag marks irreversible heuristic damage, and the computation is independent of burnout metrics.</p>
+<h3 id="b31-the-moral-injury-index-for-policy-evaluation">B.3.1 The Moral Injury Index for Policy Evaluation<a class="headerlink" href="#b31-the-moral-injury-index-for-policy-evaluation" title="Permanent link">&para;</a></h3>
+<pre><code class="language-python">def moral_injury_index(
+    policy: callable,
+    case_distribution: list[dict],
+    clinician_population: list[dict],
+) -&gt; float:
+    &quot;&quot;&quot;
+    Compute the Moral Injury Index MI(P) (Definition 13.3).
+
+    Estimates expected cumulative MI imposed by policy P
+    on the clinician population over the case distribution.
+    &quot;&quot;&quot;
+    total_mi = 0.0
+    n_simulations = len(case_distribution) * len(clinician_population)
+
+    for case in case_distribution:
+        for clinician in clinician_population:
+            decisions = policy(case)  # Policy determines actions
+            result = compute_moral_injury(
+                decisions,
+                clinician['betas'],
+                clinician['tau'],
+            )
+            total_mi += result['cumulative_mi']
+
+    return total_mi / n_simulations
+</code></pre>
+<p>This function enables <em>prospective</em> policy evaluation: before implementing a triage protocol or resource allocation rule, estimate its expected moral injury on the clinician workforce. Policies with high MI(P) should be redesigned before deployment (Chapter 15).</p>
+<hr />
+<h2 id="b4-the-clinical-bond-index">B.4 The Clinical Bond Index<a class="headerlink" href="#b4-the-clinical-bond-index" title="Permanent link">&para;</a></h2>
+<p>The clinical Bond Index measures structural healthcare injustice.</p>
+<pre><code class="language-python">def clinical_bond_index(
+    policy_paths: dict[str, list[float]],
+    geodesic_paths: dict[str, list[float]],
+    population: list[str],
+) -&gt; float:
+    &quot;&quot;&quot;
+    Compute BI(P, S) = E[CF(gamma_P*) - CF(gamma_C*)] (Definition 12.1).
+
+    Parameters
+    ----------
+    policy_paths : dict mapping patient ID to list of edge weights
+        on the policy-mandated path
+    geodesic_paths : dict mapping patient ID to list of edge weights
+        on the clinical geodesic
+    population : list of patient IDs in population S
+
+    Returns
+    -------
+    bond_index : float, the expected manifold cost deviation
+    &quot;&quot;&quot;
+    deviations = []
+    for patient_id in population:
+        policy_cost = sum(policy_paths[patient_id])
+        geodesic_cost = sum(geodesic_paths[patient_id])
+        deviations.append(policy_cost - geodesic_cost)
+
+    return np.mean(deviations)
+</code></pre>
+<h3 id="b41-detecting-structural-injustice">B.4.1 Detecting Structural Injustice<a class="headerlink" href="#b41-detecting-structural-injustice" title="Permanent link">&para;</a></h3>
+<pre><code class="language-python">def detect_structural_injustice(
+    policy_paths: dict,
+    geodesic_paths: dict,
+    populations: dict[str, list[str]],
+) -&gt; dict[str, float]:
+    &quot;&quot;&quot;
+    Compute Bond Index for each population subgroup.
+
+    If BI(P, S1) &gt;&gt; BI(P, S2), policy P imposes systematically
+    higher moral cost on population S1 --- structural injustice.
+    &quot;&quot;&quot;
+    results = {}
+    for group_name, members in populations.items():
+        results[group_name] = clinical_bond_index(
+            policy_paths, geodesic_paths, members
+        )
+    return results
+
+# Example usage (Chapter 12):
+# bi_results = detect_structural_injustice(
+#     policy_paths, geodesic_paths,
+#     populations={
+#         'Black patients': black_patient_ids,
+#         'White patients': white_patient_ids,
+#         'Disabled patients': disabled_patient_ids,
+#         'Non-disabled patients': nondisabled_patient_ids,
+#     }
+# )
+# If bi_results['Black patients'] &gt;&gt; bi_results['White patients'],
+# the policy is structurally unjust toward Black patients.
+</code></pre>
+<p>The Bond Index converts &ldquo;structural injustice&rdquo; from a philosophical claim to an empirical measurement. It is computable from clinical data using existing instruments (Chapter 17, Section 17.3).</p>
+<hr />
+<h2 id="b5-the-bioethical-decision-complex-population-scale">B.5 The Bioethical Decision Complex (Population Scale)<a class="headerlink" href="#b5-the-bioethical-decision-complex-population-scale" title="Permanent link">&para;</a></h2>
+<p>The population-level extension from <code>ch27_bioethics.py</code> handles multi-agent allocation problems: triage, vaccine distribution, and organ transplant.</p>
+<pre><code class="language-python">def triage_allocation(
+    patients: list[dict],
+    resource_budget: int,
+    Sigma_inv: np.ndarray,
+    boundaries: list[dict],
+) -&gt; list[dict]:
+    &quot;&quot;&quot;
+    Constrained multi-agent pathfinding (Definition 10.1).
+
+    Minimize total clinical friction subject to resource constraints.
+    This is the manifold-optimal triage, distinct from utilitarian
+    triage which minimizes total d1 cost alone.
+    &quot;&quot;&quot;
+    # Compute clinical friction for each patient's geodesic
+    for patient in patients:
+        patient['geodesic_cost'] = compute_geodesic_cost(
+            patient['state'], patient['goal'],
+            Sigma_inv, boundaries
+        )
+
+    # Greedy allocation by manifold cost (not by d1 alone)
+    # Sort by ratio of clinical friction reduction per resource unit
+    patients_sorted = sorted(
+        patients,
+        key=lambda p: p['geodesic_cost'] / p.get('resource_need', 1),
+        reverse=True
+    )
+
+    allocated = []
+    remaining_budget = resource_budget
+    for patient in patients_sorted:
+        need = patient.get('resource_need', 1)
+        if need &lt;= remaining_budget:
+            allocated.append(patient)
+            remaining_budget -= need
+
+    return allocated
+</code></pre>
+<h3 id="b51-comparing-utilitarian-and-manifold-optimal-triage">B.5.1 Comparing Utilitarian and Manifold-Optimal Triage<a class="headerlink" href="#b51-comparing-utilitarian-and-manifold-optimal-triage" title="Permanent link">&para;</a></h3>
+<pre><code class="language-python">def triage_divergence_analysis(
+    patients: list[dict],
+    resource_budget: int,
+    Sigma_inv: np.ndarray,
+    boundaries: list[dict],
+) -&gt; dict:
+    &quot;&quot;&quot;
+    Compute the divergence between utilitarian and manifold-optimal
+    triage (Theorem 10.1).
+    &quot;&quot;&quot;
+    # Utilitarian: maximize d1 (outcomes) only
+    utilitarian = sorted(
+        patients, key=lambda p: p['state'][0], reverse=True
+    )[:resource_budget]
+
+    # Manifold-optimal: minimize total clinical friction
+    manifold = triage_allocation(
+        patients, resource_budget, Sigma_inv, boundaries
+    )
+
+    util_ids = {p['id'] for p in utilitarian}
+    manifold_ids = {p['id'] for p in manifold}
+
+    return {
+        'utilitarian_allocation': util_ids,
+        'manifold_allocation': manifold_ids,
+        'divergent_patients': util_ids.symmetric_difference(manifold_ids),
+        'divergence_fraction': len(
+            util_ids.symmetric_difference(manifold_ids)
+        ) / len(patients),
+    }
+</code></pre>
+<p>The divergence analysis (Chapter 10) demonstrates the Divergence Theorem: utilitarian and manifold-optimal triage coincide only when decisions activate only $d_1$ and no boundaries are crossed. In every pandemic scenario tested, the divergence fraction is non-zero.</p>
+<hr />
+<h2 id="b6-reproducibility">B.6 Reproducibility<a class="headerlink" href="#b6-reproducibility" title="Permanent link">&para;</a></h2>
+<p>All computational results in this book can be reproduced by:</p>
+<ol>
+<li>Installing dependencies: <code>pip install numpy scipy</code></li>
+<li>Running <code>ch21_clinical.py</code> for individual clinical decision results (Chapters 4&ndash;9, 13&ndash;15)</li>
+<li>Running <code>ch27_bioethics.py</code> for population-level allocation results (Chapters 10&ndash;12)</li>
+<li>Comparing output against the tables and figures in the relevant chapters</li>
+</ol>
+<p>Random seeds are fixed where stochastic elements appear. The code requires Python 3.10 or later. No GPU is required &mdash; all computations run on CPU in under one minute on commodity hardware.</p>
+
+    <footer>
+      <p>Part of the <em>Geometric Series</em> by A.H. Bowers</p>
+      <p>Built automatically from source. Last updated: 2026-04-20 07:00 UTC</p>
+    </footer>
+  </div>
+
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js"
+    onload="renderMathInElement(document.body, {
+      delimiters: [
+        {left: '$$', right: '$$', display: true},
+        {left: '$', right: '$', display: false},
+        {left: '\\\\(', right: '\\\\)', display: false},
+        {left: '\\\\[', right: '\\\\]', display: true}
+      ],
+      throwOnError: false
+    });"></script>
+</body>
+</html>

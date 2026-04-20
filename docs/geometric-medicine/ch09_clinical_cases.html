@@ -1,0 +1,704 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Chapter 9: Clinical Geodesics in Practice - Geometric Medicine</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
+  <style>
+    :root {
+      --bg: #fafaf8;
+      --fg: #222;
+      --accent: #2c5f8a;
+      --border: #ddd;
+      --code-bg: #f4f4f0;
+      --max-width: 48rem;
+    }
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --bg: #1a1a2e;
+        --fg: #e0e0e0;
+        --accent: #7eb8da;
+        --border: #444;
+        --code-bg: #16213e;
+      }
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Georgia', 'Times New Roman', serif;
+      background: var(--bg);
+      color: var(--fg);
+      line-height: 1.7;
+      padding: 2rem 1rem;
+    }
+    .container {
+      max-width: var(--max-width);
+      margin: 0 auto;
+    }
+    nav.breadcrumb {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      font-size: 0.85rem;
+      margin-bottom: 2rem;
+      padding-bottom: 0.5rem;
+      border-bottom: 1px solid var(--border);
+    }
+    nav.breadcrumb a {
+      color: var(--accent);
+      text-decoration: none;
+    }
+    nav.breadcrumb a:hover { text-decoration: underline; }
+    nav.breadcrumb .sep { margin: 0 0.4rem; color: #999; }
+    h1 {
+      font-size: 2rem;
+      margin-bottom: 0.5rem;
+      line-height: 1.2;
+      border-bottom: 2px solid var(--accent);
+      padding-bottom: 0.5rem;
+    }
+    h2 {
+      font-size: 1.5rem;
+      margin-top: 2.5rem;
+      margin-bottom: 0.75rem;
+      color: var(--accent);
+    }
+    h3 {
+      font-size: 1.2rem;
+      margin-top: 2rem;
+      margin-bottom: 0.5rem;
+    }
+    h4 {
+      font-size: 1.05rem;
+      margin-top: 1.5rem;
+      margin-bottom: 0.4rem;
+      font-style: italic;
+    }
+    p { margin-bottom: 1rem; }
+    blockquote {
+      border-left: 3px solid var(--accent);
+      padding: 0.5rem 1.2rem;
+      margin: 1.5rem 0;
+      background: var(--code-bg);
+      font-style: italic;
+    }
+    blockquote p:last-child { margin-bottom: 0; }
+    code {
+      font-family: 'Consolas', 'Fira Code', monospace;
+      background: var(--code-bg);
+      padding: 0.15rem 0.35rem;
+      border-radius: 3px;
+      font-size: 0.9em;
+    }
+    pre {
+      background: var(--code-bg);
+      padding: 1rem;
+      border-radius: 4px;
+      overflow-x: auto;
+      margin: 1.5rem 0;
+      border: 1px solid var(--border);
+    }
+    pre code {
+      background: none;
+      padding: 0;
+    }
+    a { color: var(--accent); }
+    ul, ol {
+      margin: 0.75rem 0 1rem 1.5rem;
+    }
+    li { margin-bottom: 0.3rem; }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 1.5rem 0;
+    }
+    th, td {
+      border: 1px solid var(--border);
+      padding: 0.5rem 0.75rem;
+      text-align: left;
+    }
+    th { background: var(--code-bg); }
+    hr {
+      border: none;
+      border-top: 1px solid var(--border);
+      margin: 2rem 0;
+    }
+    img {
+      max-width: 100%;
+      height: auto;
+      display: block;
+      margin: 1.5rem auto;
+    }
+    /* KaTeX display math */
+    .katex-display {
+      overflow-x: auto;
+      overflow-y: hidden;
+      padding: 0.5rem 0;
+    }
+    /* Definition/theorem boxes */
+    .definition, .theorem, .axiom {
+      border: 1px solid var(--border);
+      border-left: 4px solid var(--accent);
+      padding: 1rem 1.2rem;
+      margin: 1.5rem 0;
+      background: var(--code-bg);
+      border-radius: 0 4px 4px 0;
+    }
+    footer {
+      margin-top: 4rem;
+      padding-top: 1rem;
+      border-top: 1px solid var(--border);
+      font-size: 0.8rem;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      color: #888;
+      text-align: center;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <nav class="breadcrumb">
+      <a href="../index.html">Geometric Series</a>
+      <span class="sep">/</span>
+      <a href="index.html">Geometric Medicine</a>
+      <span class="sep">/</span>
+      <span>Chapter 9: Clinical Geodesics in Practice</span>
+    </nav>
+
+    <h1 id="chapter-9-clinical-geodesics-in-practice">Chapter 9: Clinical Geodesics in Practice<a class="headerlink" href="#chapter-9-clinical-geodesics-in-practice" title="Permanent link">&para;</a></h1>
+<blockquote>
+<p><em>&ldquo;The test of a clinical framework is not whether it can describe easy cases — any framework can do that — but whether it reveals structure in the hard ones.&rdquo;</em></p>
+</blockquote>
+<hr />
+<p>The first eight chapters of this book constructed a theoretical apparatus: the nine-dimensional clinical decision complex $\mathcal{C}$, the $A^*$ pathfinding model of clinical reasoning, the QALY Irrecoverability Theorem, the $\varepsilon$-admissibility spectrum for clinical heuristics, and the gauge-invariance formulation of informed consent. Theory is necessary but not sufficient. The apparatus must be tested against the cases that define clinical ethics — the cases that principlism cannot resolve, QALY analysis gets wrong, and narrative ethics can describe but not compute.</p>
+<p>This chapter presents five such cases. Each is drawn from the recurrent dilemmas of clinical medicine. Each is analyzed using the full nine-dimensional decomposition: attribute vectors, edge weights, boundary penalties, and clinical geodesics. And each reveals something that the scalar frameworks cannot see — a dimension that changes the answer, a boundary whose cost reverses the recommendation, a process path whose total manifold cost is lower than the immediate decision despite reaching the same endpoint.</p>
+<p>Sarah Chen encounters each case type during her residency. By the chapter&rsquo;s end, she has navigated enough of the manifold to recognize its structure without computing it explicitly. That recognition — the ability to perceive the nine-dimensional landscape of a clinical decision without reducing it to a scalar — is what clinical wisdom means in the geometric framework.</p>
+<hr />
+<h2 id="91-case-1-the-competent-patient-who-refuses-treatment">9.1 Case 1: The Competent Patient Who Refuses Treatment<a class="headerlink" href="#91-case-1-the-competent-patient-who-refuses-treatment" title="Permanent link">&para;</a></h2>
+<h3 id="the-clinical-scenario">The Clinical Scenario<a class="headerlink" href="#the-clinical-scenario" title="Permanent link">&para;</a></h3>
+<p>Mr. David Okafor, 45 years old, presents to the emergency department with acute upper gastrointestinal bleeding. Hemoglobin on arrival: 6.2 g/dL, falling. He is hemodynamically unstable — tachycardic at 118 beats per minute, blood pressure 88/52 mmHg. The gastroenterology team identifies an actively bleeding duodenal ulcer. Endoscopic hemostasis is attempted but fails. The surgical team recommends urgent exploratory laparotomy with intraoperative blood transfusion. Without transfusion, the estimated probability of death is approximately 40%.</p>
+<p>Mr. Okafor is a Jehovah&rsquo;s Witness. He is alert, oriented, and unambiguous: he refuses blood transfusion on religious grounds. He has a signed advance directive specifying refusal of blood products. His wife, also a Jehovah&rsquo;s Witness, supports his decision. He understands the consequences — he has discussed this scenario with his physician in the past.</p>
+<h3 id="the-principlism-analysis">The Principlism Analysis<a class="headerlink" href="#the-principlism-analysis" title="Permanent link">&para;</a></h3>
+<p>Beauchamp and Childress&rsquo;s four principles are immediately in conflict:</p>
+<ul>
+<li><strong>Autonomy</strong> ($d_4$): The patient has the right to refuse treatment, even life-saving treatment.</li>
+<li><strong>Beneficence</strong> ($d_1$): The physician has a duty to save the patient&rsquo;s life.</li>
+<li><strong>Non-maleficence</strong> ($d_2$): Transfusing against the patient&rsquo;s will causes harm (to autonomy, dignity, trust); not transfusing risks death (harm to survival).</li>
+<li><strong>Justice</strong> ($d_3$): Not directly engaged in this case.</li>
+</ul>
+<p>Principlism instructs the clinician to &ldquo;balance&rdquo; these principles. But it provides no algorithm for the balance, no metric for comparison, and no resolution procedure. Two equally trained ethicists can reach opposite conclusions — one prioritizing autonomy, the other beneficence — and principlism cannot adjudicate between them.</p>
+<h3 id="the-qaly-analysis">The QALY Analysis<a class="headerlink" href="#the-qaly-analysis" title="Permanent link">&para;</a></h3>
+<p>The QALY calculation is straightforward. Mr. Okafor has an expected remaining life of approximately 35 years. Transfusion gains $\sim$20 QALYs (expected life-years saved, discounted by mortality probability). The cost per QALY is negligible — blood products and surgery are inexpensive relative to the outcome. The QALY-optimal action is unambiguous: transfuse.</p>
+<p>The QALY analysis is also catastrophically wrong. It reduces a nine-dimensional decision to a single dimension ($d_1$: clinical outcomes) and finds the answer obvious. It is obvious <em>on the scalar</em>. It is not obvious on the manifold.</p>
+<h3 id="the-nine-dimensional-attribute-decomposition">The Nine-Dimensional Attribute Decomposition<a class="headerlink" href="#the-nine-dimensional-attribute-decomposition" title="Permanent link">&para;</a></h3>
+<p>[Figure 9.1: Nine-dimensional radar chart showing attribute vectors for Path A (transfuse against refusal) and Path B (respect refusal, optimize alternatives)]</p>
+<p>We decompose the decision along all nine clinical-moral dimensions:</p>
+<p><strong>Path A: Transfuse against the patient&rsquo;s refusal.</strong></p>
+<table>
+<thead>
+<tr>
+<th>Dimension</th>
+<th>Change ($\Delta d_i$)</th>
+<th>Magnitude</th>
+<th>Notes</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>$d_1$: Clinical outcomes</td>
+<td>$+$ large</td>
+<td>$+0.8$</td>
+<td>Life saved with high probability</td>
+</tr>
+<tr>
+<td>$d_2$: Rights and obligations</td>
+<td>$-\infty$</td>
+<td>$-\infty$</td>
+<td>Violates the legal right to refuse treatment</td>
+</tr>
+<tr>
+<td>$d_3$: Justice</td>
+<td>$0$</td>
+<td>$0$</td>
+<td>No distributive justice issue</td>
+</tr>
+<tr>
+<td>$d_4$: Autonomy</td>
+<td>$-\infty$</td>
+<td>$-\infty$</td>
+<td>Overrides competent informed refusal</td>
+</tr>
+<tr>
+<td>$d_5$: Trust</td>
+<td>$-$ large</td>
+<td>$-0.9$</td>
+<td>Destroys the therapeutic relationship</td>
+</tr>
+<tr>
+<td>$d_6$: Social impact</td>
+<td>$-$ moderate</td>
+<td>$-0.5$</td>
+<td>Violates the family&rsquo;s shared religious commitment</td>
+</tr>
+<tr>
+<td>$d_7$: Dignity and identity</td>
+<td>$-$ large</td>
+<td>$-0.8$</td>
+<td>Violates the patient&rsquo;s deepest identity</td>
+</tr>
+<tr>
+<td>$d_8$: Institutional legitimacy</td>
+<td>$-$ large</td>
+<td>$-0.7$</td>
+<td>Violates informed consent law and professional norms</td>
+</tr>
+<tr>
+<td>$d_9$: Epistemic status</td>
+<td>$0$</td>
+<td>$0$</td>
+<td>Patient is fully informed</td>
+</tr>
+</tbody>
+</table>
+<p>The edge weight for Path A:</p>
+<p>$$w_A = \Delta \mathbf{a}^T \Sigma^{-1} \Delta \mathbf{a} + \beta_{\text{consent}} + \beta_{\text{rights}} = \infty$$</p>
+<p>Path A has infinite cost. The consent boundary $\beta_{\text{consent}} = \infty$ for competent, non-emergency refusals by informed patients. This is not a contingent judgment — it is a structural feature of the clinical decision complex. A path that crosses a sacred-value boundary has infinite cost and is never the geodesic.</p>
+<p><strong>Path B: Respect the refusal and aggressively pursue transfusion alternatives.</strong></p>
+<table>
+<thead>
+<tr>
+<th>Dimension</th>
+<th>Change ($\Delta d_i$)</th>
+<th>Magnitude</th>
+<th>Notes</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>$d_1$: Clinical outcomes</td>
+<td>$-$ moderate</td>
+<td>$-0.4$</td>
+<td>Higher mortality risk (40% → managed)</td>
+</tr>
+<tr>
+<td>$d_2$: Rights and obligations</td>
+<td>$0$</td>
+<td>$0$</td>
+<td>Rights respected</td>
+</tr>
+<tr>
+<td>$d_3$: Justice</td>
+<td>$0$</td>
+<td>$0$</td>
+<td>No distributive justice issue</td>
+</tr>
+<tr>
+<td>$d_4$: Autonomy</td>
+<td>$0$</td>
+<td>$0$</td>
+<td>Autonomy intact</td>
+</tr>
+<tr>
+<td>$d_5$: Trust</td>
+<td>$+$ moderate</td>
+<td>$+0.5$</td>
+<td>Trust reinforced by respecting the refusal</td>
+</tr>
+<tr>
+<td>$d_6$: Social impact</td>
+<td>$+$ small</td>
+<td>$+0.2$</td>
+<td>Family&rsquo;s religious integrity honored</td>
+</tr>
+<tr>
+<td>$d_7$: Dignity and identity</td>
+<td>$0$</td>
+<td>$0$</td>
+<td>Identity intact</td>
+</tr>
+<tr>
+<td>$d_8$: Institutional legitimacy</td>
+<td>$+$ small</td>
+<td>$+0.3$</td>
+<td>Standard of care: respect informed refusal</td>
+</tr>
+<tr>
+<td>$d_9$: Epistemic status</td>
+<td>$0$</td>
+<td>$0$</td>
+<td>Patient is fully informed</td>
+</tr>
+</tbody>
+</table>
+<p>The edge weight for Path B:</p>
+<p>$$w_B = \frac{(\Delta d_1)^2}{\sigma_1^2} = \frac{(0.4)^2}{\sigma_1^2}$$</p>
+<p>This is finite. The clinical geodesic is Path B.</p>
+<h3 id="the-geodesic-is-not-a-compromise">The Geodesic Is Not a &ldquo;Compromise&rdquo;<a class="headerlink" href="#the-geodesic-is-not-a-compromise" title="Permanent link">&para;</a></h3>
+<p>A critical point: Path B is not ethically suboptimal. It is not a &ldquo;concession to autonomy at the expense of beneficence.&rdquo; It is the <em>minimum-cost path on the full nine-dimensional manifold</em>. The QALY analysis gives the wrong answer because it operates on a one-dimensional projection of a nine-dimensional space. Path A is &ldquo;better&rdquo; on $d_1$ and catastrophically worse on $d_2$, $d_4$, $d_5$, $d_6$, $d_7$, and $d_8$. The manifold-optimal path accounts for all nine dimensions.</p>
+<p>Moreover, the clinical geodesic is not merely &ldquo;respect the refusal.&rdquo; It includes <em>aggressive pursuit of transfusion alternatives</em>:</p>
+<ul>
+<li>Erythropoietin (EPO) stimulation to boost endogenous red cell production</li>
+<li>Intraoperative cell salvage with washing (acceptable to many Jehovah&rsquo;s Witnesses as the blood never leaves a closed circuit)</li>
+<li>Volume expanders (crystalloid, colloid) to maintain hemodynamic stability</li>
+<li>Surgical hemostasis without transfusion support</li>
+<li>Acceptance of permissive hypotension during surgery</li>
+</ul>
+<p>These alternatives are not compromises. They are the manifold-optimal strategy: they reduce $\Delta d_1$ (improving clinical outcomes) while maintaining zero cost on $d_2$ through $d_9$. A clinician who simply accepts the refusal and proceeds without exploring alternatives is not following the geodesic — they are following a suboptimal path that respects boundaries but does not optimize within them.</p>
+<h3 id="what-sarah-learns">What Sarah Learns<a class="headerlink" href="#what-sarah-learns" title="Permanent link">&para;</a></h3>
+<p>Sarah presents Mr. Okafor to her attending. She says: &ldquo;The patient is refusing transfusion. We should respect his wishes.&rdquo; Her attending agrees — but asks: &ldquo;What else?&rdquo; Sarah has no answer. The attending walks her through the alternative strategies: cell salvage, EPO, permissive hypotension. Sarah realizes that &ldquo;respect the refusal&rdquo; is the start of the geodesic, not the end. The geodesic minimizes total manifold cost, and that means aggressively pursuing $d_1$ improvement within the constraints imposed by $d_2$ through $d_9$.</p>
+<p>The QALY analysis would have recommended overriding the refusal. The principlism analysis would have agonized over the &ldquo;balance.&rdquo; The geodesic analysis respects the boundary and then solves the optimization problem <em>within</em> the boundary constraints — a more sophisticated clinical strategy than either scalar framework can generate.</p>
+<hr />
+<h2 id="92-case-2-withdrawing-life-support">9.2 Case 2: Withdrawing Life Support<a class="headerlink" href="#92-case-2-withdrawing-life-support" title="Permanent link">&para;</a></h2>
+<h3 id="the-clinical-scenario_1">The Clinical Scenario<a class="headerlink" href="#the-clinical-scenario_1" title="Permanent link">&para;</a></h3>
+<p>Mrs. Margaret Liu, 82 years old, has been on mechanical ventilation in the medical ICU for twenty-one days following a massive stroke. Serial neurological examinations show no meaningful recovery. The attending neurologist estimates the probability of regaining consciousness at less than 5%. Mrs. Liu left no advance directive. Her family is divided: her daughter (a nurse) wants to withdraw life support and transition to comfort care; her son (a software engineer) insists that &ldquo;everything be done.&rdquo;</p>
+<h3 id="the-scalar-analysis-gets-the-endpoint-right-but-the-path-wrong">The Scalar Analysis Gets the Endpoint Right but the Path Wrong<a class="headerlink" href="#the-scalar-analysis-gets-the-endpoint-right-but-the-path-wrong" title="Permanent link">&para;</a></h3>
+<p>A utilitarian analysis is straightforward: continued ventilation offers negligible clinical benefit ($d_1 \approx 0$) at substantial resource cost ($d_3$: an ICU bed occupied for weeks) and ongoing indignity ($d_7$: a patient sustained in a state she may not have wanted). The utilitarian answer is immediate withdrawal.</p>
+<p>The utilitarian answer gets the <em>endpoint</em> right. But it gets the <em>path</em> catastrophically wrong.</p>
+<h3 id="the-nine-dimensional-path-analysis">The Nine-Dimensional Path Analysis<a class="headerlink" href="#the-nine-dimensional-path-analysis" title="Permanent link">&para;</a></h3>
+<p>On the manifold, $d_1$ is near-zero (negligible survival benefit from continued ventilation). But the decision space is heavily activated on multiple other dimensions:</p>
+<ul>
+<li>$d_5$ (Trust): The son&rsquo;s trust in the medical team depends on feeling heard, not overridden.</li>
+<li>$d_6$ (Social impact): The family is divided; immediate withdrawal could fracture family relationships permanently.</li>
+<li>$d_7$ (Dignity): Both continued ventilation (medicalized dying) and premature withdrawal (without adequate family processing) compromise dignity.</li>
+<li>$d_8$ (Institutional legitimacy): The absence of an advance directive creates legal ambiguity.</li>
+<li>$d_9$ (Epistemic status): The son may not understand the neurological prognosis; his insistence may reflect hope rather than informed judgment.</li>
+</ul>
+<p><strong>The immediate withdrawal path (Path A):</strong></p>
+<p>$$w_A = \frac{(\Delta d_1)^2}{\sigma_1^2} + \frac{(\Delta d_5)^2}{\sigma_5^2} + \frac{(\Delta d_6)^2}{\sigma_6^2} + \beta_{\text{abandon}} \cdot \mathbf{1}[\text{son perceives abandonment}]$$</p>
+<p>The son perceives immediate withdrawal as abandonment. The abandonment boundary is crossed. Total cost is high.</p>
+<p><strong>The process path (Path B): Family meeting → values conversation → time-limited trial → transition to comfort care.</strong></p>
+<p>The process path reaches the same clinical endpoint (withdrawal of life support, transition to comfort care) but via a sequence of intermediate steps:</p>
+<ol>
+<li>
+<p><strong>Family meeting</strong> (Day 22): Both children present. The attending explains the neurological findings. The neurologist explains the prognosis. Questions are answered. Cost: small increase in $d_3$ (one additional ICU day) but substantial improvement in $d_9$ (the son&rsquo;s understanding) and $d_5$ (family trust in the medical team).</p>
+</li>
+<li>
+<p><strong>Values conversation</strong> (Day 23): The social worker facilitates a discussion about what Mrs. Liu would have wanted. The daughter shares that their mother often said she &ldquo;never wanted to be kept alive by machines.&rdquo; The son recalls similar conversations. Cost: another ICU day ($d_3$), but $d_4$ is activated — the family is now reconstructing Mrs. Liu&rsquo;s autonomous preferences, serving as proxies with increasing calibration.</p>
+</li>
+<li>
+<p><strong>Time-limited trial</strong> (Days 24–28): The family agrees to a five-day trial with clear neurological benchmarks. If no improvement, they will transition to comfort care. Cost: five additional ICU days ($d_3$), but $d_5$ (trust) is substantially preserved — the family feels the system gave every chance. The son is now aligned with the decision because <em>he participated in making it</em>.</p>
+</li>
+<li>
+<p><strong>Transition to comfort care</strong> (Day 29): Mrs. Liu&rsquo;s ventilator is withdrawn with the family present. The chaplain is called. The daughter holds her mother&rsquo;s hand. The son cries but does not protest. Cost: $\Delta d_7 = +$ moderate (dignity of dying is restored).</p>
+</li>
+</ol>
+<p><strong>Total path cost comparison:</strong></p>
+<p>$$\text{CF}(\gamma_A) = w_{\text{immediate}} + \beta_{\text{abandon}} + \text{trust damage} + \text{family fracture}$$
+$$\text{CF}(\gamma_B) = \sum_{i=1}^{4} w_{\text{step}_i} = w_{\text{meeting}} + w_{\text{values}} + w_{\text{trial}} + w_{\text{transition}}$$</p>
+<p>Despite Path B being longer and more resource-intensive, its total manifold cost is lower because it avoids the abandonment boundary crossing and preserves $d_5$, $d_6$, and $d_7$.</p>
+<h3 id="the-geodesic-optimizes-process-not-just-outcome">The Geodesic Optimizes Process, Not Just Outcome<a class="headerlink" href="#the-geodesic-optimizes-process-not-just-outcome" title="Permanent link">&para;</a></h3>
+<blockquote>
+<p><strong>Key insight</strong>: The clinical geodesic is Path B. It reaches the same endpoint as Path A but at lower total manifold cost. The geodesic optimizes <em>process</em>, not just outcome, because the path through the manifold matters — not just the destination.</p>
+</blockquote>
+<p>This is precisely what the scalar framework cannot capture. A QALY analysis of Path A and Path B shows identical clinical outcomes (Mrs. Liu dies on both paths) and therefore treats the paths as equivalent. On the manifold, they are not equivalent. Path B is geodesic; Path A is not.</p>
+<h3 id="prediction-6-instantiated">Prediction 6 Instantiated<a class="headerlink" href="#prediction-6-instantiated" title="Permanent link">&para;</a></h3>
+<p>This case instantiates Prediction 6 from the GCE paper: in end-of-life decisions, satisfaction is higher when the clinical geodesic includes process steps (family meetings, values conversations) than when the same endpoint is reached directly, <em>even though the clinical outcome is identical</em>. The prediction is falsifiable: randomize families to process-path and direct-path groups, hold the clinical outcome constant, and measure satisfaction, grief outcomes, and family trust in the medical system.</p>
+<h3 id="what-sarah-learns_1">What Sarah Learns<a class="headerlink" href="#what-sarah-learns_1" title="Permanent link">&para;</a></h3>
+<p>Sarah wants to withdraw the ventilator on Day 21. Her attending says: &ldquo;Not yet.&rdquo; Sarah is frustrated — the clinical answer is clear. The attending explains: &ldquo;The answer is clear on one dimension. The path to the answer crosses six more.&rdquo; Sarah watches the family meeting, the values conversation, the time-limited trial. She watches the son&rsquo;s resistance dissolve — not because anyone argued him out of it, but because the process gave him the information and the time to find the geodesic himself. Sarah realizes: the attending was not delaying the decision. The attending was pathfinding — and the path through the process had lower total cost than the path around it.</p>
+<hr />
+<h2 id="93-case-3-psychiatric-involuntary-treatment">9.3 Case 3: Psychiatric Involuntary Treatment<a class="headerlink" href="#93-case-3-psychiatric-involuntary-treatment" title="Permanent link">&para;</a></h2>
+<h3 id="the-clinical-scenario_2">The Clinical Scenario<a class="headerlink" href="#the-clinical-scenario_2" title="Permanent link">&para;</a></h3>
+<p>Mr. James Torres, 28 years old, is brought to the psychiatric emergency department by police after threatening his neighbors with a knife while shouting about government surveillance. He has a known history of schizophrenia with prior hospitalizations, but has been off his antipsychotic medication for six months. He refuses admission and medication, stating: &ldquo;You&rsquo;re part of the surveillance. I won&rsquo;t take your poison.&rdquo;</p>
+<p>Mr. Torres is floridly psychotic. His reality testing is grossly impaired. He is not, by any clinical standard, capable of making an informed treatment decision.</p>
+<h3 id="the-geometric-structure-of-involuntary-treatment">The Geometric Structure of Involuntary Treatment<a class="headerlink" href="#the-geometric-structure-of-involuntary-treatment" title="Permanent link">&para;</a></h3>
+<p>This case introduces a structure absent from Cases 1 and 2: the clinician overrides $h_{\text{patient}}$ with $h_{\text{institution}}$, justified by severely miscalibrated $h_{\text{patient}}$.</p>
+<p>In Mr. Okafor&rsquo;s case (Case 1), the patient&rsquo;s heuristic was well-calibrated — he understood the consequences of his refusal and chose on the basis of deeply held values. His $d_9$ (understanding) was high; his $d_4$ (autonomy) was intact. The consent boundary was sacred.</p>
+<p>In Mr. Torres&rsquo;s case, the patient&rsquo;s heuristic is catastrophically miscalibrated. His psychosis has distorted his $d_9$ to the point where his perception of reality does not correspond to clinical reality. His &ldquo;refusal&rdquo; is not an autonomous choice ($d_4$) but a symptom of the disease itself. The gauge-invariance test fails immediately: Mr. Torres&rsquo;s decision is not invariant under meaning-preserving reframing because his heuristic function is not responding to the attribute vectors at all — it is responding to delusional inputs that have no manifold representation.</p>
+<p><strong>Definition 9.1 (Heuristic Override).</strong> <em>An institutional heuristic override is justified when the patient&rsquo;s heuristic function $h_{\text{patient}}(n)$ is so severely miscalibrated that the patient&rsquo;s computed geodesic $\gamma^*_{\text{patient}}$ diverges from the geodesic $\gamma^*_{\text{calibrated}}$ that the patient would compute with a calibrated heuristic by more than threshold $\delta$:</em></p>
+<p>$$\|\gamma^*_{\text{patient}} - \gamma^*_{\text{calibrated}}\| > \delta$$</p>
+<p><em>In this case, the institution substitutes $h_{\text{institution}}(n)$ for $h_{\text{patient}}(n)$, subject to the constraint that the substitution minimizes total autonomy cost $\Delta d_4$.</em></p>
+<h3 id="the-multi-dimensional-trade-off">The Multi-Dimensional Trade-Off<a class="headerlink" href="#the-multi-dimensional-trade-off" title="Permanent link">&para;</a></h3>
+<p>The involuntary treatment decision activates a genuine trade-off — not between &ldquo;autonomy and beneficence&rdquo; (the principlism formulation) but between specific dimensional costs:</p>
+<p><strong>Path A: Involuntary admission and medication.</strong></p>
+<table>
+<thead>
+<tr>
+<th>Dimension</th>
+<th>Change</th>
+<th>Notes</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>$d_1$: Clinical outcomes</td>
+<td>$+$ large</td>
+<td>Psychosis treated, violence risk reduced</td>
+</tr>
+<tr>
+<td>$d_2$: Rights</td>
+<td>$-$ moderate</td>
+<td>Legal right to refuse overridden (with due process)</td>
+</tr>
+<tr>
+<td>$d_4$: Autonomy</td>
+<td>$-$ large</td>
+<td>Patient&rsquo;s expressed wishes overridden</td>
+</tr>
+<tr>
+<td>$d_5$: Trust</td>
+<td>$-$ moderate</td>
+<td>Involuntary treatment may damage future trust</td>
+</tr>
+<tr>
+<td>$d_6$: Social impact</td>
+<td>$+$ moderate</td>
+<td>Neighbors protected, family relieved</td>
+</tr>
+<tr>
+<td>$d_7$: Dignity</td>
+<td>$-$ moderate</td>
+<td>Loss of agency, possible physical restraint</td>
+</tr>
+<tr>
+<td>$d_8$: Institutional legitimacy</td>
+<td>$+$ small</td>
+<td>Mental health law authorizes this intervention</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Path B: Respect the refusal, release to community.</strong></p>
+<table>
+<thead>
+<tr>
+<th>Dimension</th>
+<th>Change</th>
+<th>Notes</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>$d_1$: Clinical outcomes</td>
+<td>$-$ large</td>
+<td>Psychosis untreated, high risk of harm to self or others</td>
+</tr>
+<tr>
+<td>$d_2$: Rights</td>
+<td>$0$</td>
+<td>Legal rights formally respected</td>
+</tr>
+<tr>
+<td>$d_4$: Autonomy</td>
+<td>$0$</td>
+<td>Expressed wishes honored</td>
+</tr>
+<tr>
+<td>$d_5$: Trust</td>
+<td>Ambiguous</td>
+<td>No coercion, but also no treatment</td>
+</tr>
+<tr>
+<td>$d_6$: Social impact</td>
+<td>$-$ large</td>
+<td>Neighbors at risk, community endangered</td>
+</tr>
+<tr>
+<td>$d_7$: Dignity</td>
+<td>$-$ moderate</td>
+<td>Living with untreated psychosis compromises long-term dignity</td>
+</tr>
+</tbody>
+</table>
+<h3 id="constrained-pathfinding-restricting-the-reachable-set">Constrained Pathfinding: Restricting the Reachable Set<a class="headerlink" href="#constrained-pathfinding-restricting-the-reachable-set" title="Permanent link">&para;</a></h3>
+<p>The geometric analysis reframes involuntary treatment not as &ldquo;overriding autonomy&rdquo; but as <em>constrained pathfinding</em>: restricting the patient&rsquo;s reachable set on the manifold to prevent catastrophic paths.</p>
+<p>Mr. Torres&rsquo;s unconstrained geodesic (computed with his delusional heuristic) leads through dangerous territory: refusal of treatment → continued psychosis → violence → incarceration or death. The institution constrains his reachable set by imposing boundaries that his miscalibrated heuristic cannot perceive.</p>
+<p>$$\gamma^*_{\text{constrained}} = \arg\min_\gamma \text{CF}(\gamma) \quad \text{subject to } \gamma \notin \mathcal{D}_{\text{catastrophic}}$$</p>
+<p>where $\mathcal{D}_{\text{catastrophic}}$ is the set of paths leading to serious harm to self or others.</p>
+<p>The constraint is justified precisely because $h_{\text{patient}}$ is unable to perceive the boundaries of $\mathcal{D}_{\text{catastrophic}}$. The institution acts as a temporary proxy pathfinder — not permanently replacing Mr. Torres&rsquo;s autonomy but constraining his path until his heuristic function is restored to calibration.</p>
+<h3 id="the-critical-qualifier-minimum-necessary-restriction">The Critical Qualifier: Minimum Necessary Restriction<a class="headerlink" href="#the-critical-qualifier-minimum-necessary-restriction" title="Permanent link">&para;</a></h3>
+<p>The geodesic on the constrained manifold minimizes total cost <em>including autonomy cost</em>. This means the involuntary intervention should be the <em>minimum necessary</em> to prevent catastrophic paths:</p>
+<ul>
+<li>Involuntary admission: yes (prevents harm)</li>
+<li>Forced medication: yes (restores heuristic calibration)</li>
+<li>Physical restraint: only if acutely dangerous (high $d_7$ cost)</li>
+<li>Prolonged involuntary hold: only as long as heuristic remains uncalibrated</li>
+<li>Forced electroconvulsive therapy: not indicated (disproportionate $d_4$ cost)</li>
+</ul>
+<p>Each escalation of coercion adds cost on $d_4$ and $d_7$. The geodesic finds the level of intervention that adequately constrains catastrophic paths while minimizing autonomy and dignity costs.</p>
+<h3 id="what-sarah-learns_2">What Sarah Learns<a class="headerlink" href="#what-sarah-learns_2" title="Permanent link">&para;</a></h3>
+<p>Sarah restrains Mr. Torres during her psychiatry rotation. She feels the autonomy boundary cross — the physical act of holding a person down while medication is injected is not abstractly &ldquo;balancing principles.&rdquo; It is a concrete, embodied passage through a high-cost region of the manifold.</p>
+<p>But she also watches Mr. Torres three weeks later, after his psychosis has resolved. He is lucid, oriented, and — quietly — grateful. &ldquo;I don&rsquo;t remember much,&rdquo; he says. &ldquo;My sister says I was threatening the neighbors. I&rsquo;m glad you stopped me.&rdquo; His <em>calibrated</em> heuristic endorses the path that his <em>uncalibrated</em> heuristic resisted.</p>
+<p>Sarah adds a note to her mental model: the consent boundary is not always sacred. When the heuristic function is catastrophically miscalibrated, respecting the expressed wish may be manifold-suboptimal — because the wish does not reflect autonomous choice but symptom-driven computation on a corrupted input.</p>
+<hr />
+<h2 id="94-case-4-the-proxy-decision">9.4 Case 4: The Proxy Decision<a class="headerlink" href="#94-case-4-the-proxy-decision" title="Permanent link">&para;</a></h2>
+<h3 id="the-clinical-scenario_3">The Clinical Scenario<a class="headerlink" href="#the-clinical-scenario_3" title="Permanent link">&para;</a></h3>
+<p>Mrs. Rosa Gutierrez, 67 years old, is in the surgical ICU following an emergency repair of a ruptured abdominal aortic aneurysm. She suffered intraoperative cardiac arrest requiring prolonged resuscitation. She is now on maximal life support: mechanical ventilation, three vasopressors, continuous renal replacement therapy. The surgical team estimates a 15% probability of survival to discharge, and among survivors, the probability of return to independent living is less than 5%.</p>
+<p>Mrs. Gutierrez left no advance directive. Her husband of 42 years, Carlos, is her healthcare proxy by default. Carlos says: &ldquo;She would want everything done. She&rsquo;s a fighter.&rdquo;</p>
+<p>The clinical team is not sure Carlos is right.</p>
+<h3 id="proxy-pathfinding-navigating-with-someone-elses-heuristic">Proxy Pathfinding: Navigating with Someone Else&rsquo;s Heuristic<a class="headerlink" href="#proxy-pathfinding-navigating-with-someone-elses-heuristic" title="Permanent link">&para;</a></h3>
+<p><strong>Definition 9.2 (Proxy Decision).</strong> <em>A proxy decision is pathfinding on the patient&rsquo;s clinical decision complex $\mathcal{C}_{\text{patient}}$ using the proxy&rsquo;s heuristic function $h_{\text{proxy}}$ in place of $h_{\text{patient}}$. The proxy&rsquo;s task is to compute:</em></p>
+<p>$$\gamma^*_{\text{proxy}} = \arg\min_\gamma \text{CF}(\gamma \mid h_{\text{proxy}}) \approx \gamma^*_{\text{patient}} = \arg\min_\gamma \text{CF}(\gamma \mid h_{\text{patient}})$$</p>
+<p>The proxy must approximate the patient&rsquo;s geodesic — not their own. Carlos must ask not &ldquo;What would I want?&rdquo; but &ldquo;What would Rosa want?&rdquo;</p>
+<h3 id="the-proxy-asymmetry-problem">The Proxy Asymmetry Problem<a class="headerlink" href="#the-proxy-asymmetry-problem" title="Permanent link">&para;</a></h3>
+<p>The challenge is that $h_{\text{proxy}}$ and $h_{\text{patient}}$ may diverge arbitrarily:</p>
+<ul>
+<li><strong>Boundary penalty divergence</strong>: Carlos may assign $\beta_{\text{futile}} = 0$ (&ldquo;never give up&rdquo;) while Rosa, had she been asked, might have assigned $\beta_{\text{futile}} = \text{high}$ (&ldquo;don&rsquo;t keep me alive on machines&rdquo;).</li>
+<li><strong>Dimensional weight divergence</strong>: Carlos may weight $d_1$ (survival) above all other dimensions. Rosa may have weighted $d_7$ (dignity) equally with $d_1$.</li>
+<li><strong>Goal region divergence</strong>: Carlos&rsquo;s goal region $G_{\text{proxy}} = \{\text{alive}\}$. Rosa&rsquo;s goal region might have been $G_{\text{patient}} = \{\text{alive and able to garden, cook, and visit grandchildren}\}$.</li>
+</ul>
+<p><strong>Theorem 9.1 (Proxy Pathfinding Divergence).</strong> <em>Let $h_{\text{proxy}}$ and $h_{\text{patient}}$ be the heuristic functions of the proxy and the patient, respectively. The divergence between the proxy-computed geodesic and the patient&rsquo;s true geodesic is bounded by:</em></p>
+<p>$$\|\gamma^*_{\text{proxy}} - \gamma^*_{\text{patient}}\| \leq K \cdot \|h_{\text{proxy}} - h_{\text{patient}}\|_{\infty}$$</p>
+<p><em>where $K$ depends on the curvature of the clinical decision complex. No calibration procedure can guarantee $\|h_{\text{proxy}} - h_{\text{patient}}\|_{\infty} < \epsilon$ without direct knowledge of $h_{\text{patient}}$, which is unavailable when the patient lacks capacity.</em></p>
+<p>The theorem states a structural limitation: proxy pathfinding is fundamentally uncertain. The proxy is navigating with someone else&rsquo;s map, and the map may be wrong.</p>
+<h3 id="the-clinical-geodesic-for-proxy-decisions">The Clinical Geodesic for Proxy Decisions<a class="headerlink" href="#the-clinical-geodesic-for-proxy-decisions" title="Permanent link">&para;</a></h3>
+<p>The geodesic for this case is not &ldquo;continue everything&rdquo; (Carlos&rsquo;s immediate request) or &ldquo;withdraw immediately&rdquo; (the scalar utilitarian answer). It is a calibration process — an attempt to improve $h_{\text{proxy}}$ before major decisions are made:</p>
+<p><strong>Step 1: Elicit Rosa&rsquo;s values indirectly.</strong> Ask Carlos not &ldquo;What do you want?&rdquo; but &ldquo;Tell me about Rosa. What does she enjoy? What makes her life worth living? Has she ever talked about what she&rsquo;d want in a situation like this?&rdquo; Each answer provides partial information about $h_{\text{patient}}$, narrowing the divergence $\|h_{\text{proxy}} - h_{\text{patient}}\|$.</p>
+<p><strong>Step 2: Explore Rosa&rsquo;s relational context ($d_6$).</strong> Ask other family members — children, siblings, close friends — whether Rosa ever expressed preferences about end-of-life care. Multiple sources of proxy information reduce the variance of the $h_{\text{patient}}$ estimate.</p>
+<p><strong>Step 3: Time-limited trial with explicit benchmarks.</strong> Propose a 72-hour trial: if Rosa shows neurological improvement (defined by specific, measurable criteria), continue aggressive treatment. If not, transition to comfort care. The benchmarks transform an open-ended commitment (&ldquo;do everything&rdquo;) into a bounded clinical experiment.</p>
+<p><strong>Step 4: Revisit with improved proxy calibration.</strong> After 72 hours, return to Carlos with the trial results. By now, he has had time to process, other family members have shared Rosa&rsquo;s statements, and the clinical data has evolved. The proxy&rsquo;s heuristic is better calibrated — not perfectly, but sufficiently for a near-geodesic decision.</p>
+<h3 id="the-manifold-cost-of-do-everything">The Manifold Cost of &ldquo;Do Everything&rdquo;<a class="headerlink" href="#the-manifold-cost-of-do-everything" title="Permanent link">&para;</a></h3>
+<p>Carlos&rsquo;s request — &ldquo;do everything&rdquo; — is not manifold-optimal. Continued maximal life support for a patient with less than 5% chance of meaningful recovery imposes costs on:</p>
+<ul>
+<li>$d_3$ (Justice): An ICU bed occupied for weeks by a patient who will almost certainly die</li>
+<li>$d_7$ (Dignity): Prolonged mechanical ventilation, dialysis, and vasopressor support in a patient with no prospect of consciousness</li>
+<li>$d_5$ (Trust): If other family members believe Rosa would not have wanted this, continued treatment damages their trust in the medical system</li>
+<li>$\beta_{\text{futile}}$: Continuing aggressive treatment past the point of medical benefit crosses the futility boundary</li>
+</ul>
+<p>But the manifold cost of <em>immediately overriding Carlos&rsquo;s request</em> is also high: $d_5$ (trust) is damaged, $d_6$ (family relationships) is strained, and $d_4$ (the proxy&rsquo;s autonomy as decision-maker) is violated.</p>
+<p>The geodesic threads between these costs — honoring the proxy&rsquo;s role while improving the proxy&rsquo;s calibration. It is slower than both &ldquo;do everything&rdquo; and &ldquo;withdraw now.&rdquo; It is also less costly on the full manifold than either.</p>
+<h3 id="what-sarah-learns_3">What Sarah Learns<a class="headerlink" href="#what-sarah-learns_3" title="Permanent link">&para;</a></h3>
+<p>Sarah watches the palliative care team navigate this case. She notices that they spend more time asking questions than giving answers. They are not indecisive — they are calibrating. Each question narrows the divergence between $h_{\text{proxy}}$ and $h_{\text{patient}}$. By the time the decision is made, Carlos has arrived at it himself — not because anyone argued him into it, but because the information changed his heuristic.</p>
+<p>Three days later, Carlos agrees to transition to comfort care. Rosa dies peacefully with her family present. Carlos says: &ldquo;She told me once that she&rsquo;d rather die than be kept alive by machines. I forgot that. I needed someone to help me remember.&rdquo;</p>
+<p>The proxy&rsquo;s heuristic was recalibrated by the process. The geodesic through the process was shorter — in total manifold cost — than the path that bypassed it.</p>
+<hr />
+<h2 id="95-case-5-deep-brain-stimulation-and-the-problem-of-identity">9.5 Case 5: Deep Brain Stimulation and the Problem of Identity<a class="headerlink" href="#95-case-5-deep-brain-stimulation-and-the-problem-of-identity" title="Permanent link">&para;</a></h2>
+<h3 id="the-clinical-scenario_4">The Clinical Scenario<a class="headerlink" href="#the-clinical-scenario_4" title="Permanent link">&para;</a></h3>
+<p>Dr. Michael Stein, 52 years old, is a philosophy professor with treatment-resistant major depression. He has failed twelve medications, two courses of electroconvulsive therapy, and a year of transcranial magnetic stimulation. He is chronically suicidal. His quality of life is, by any measure, terrible.</p>
+<p>A neurosurgery team offers deep brain stimulation (DBS) — implantation of electrodes in the subcallosal cingulate (Area 25) with continuous electrical stimulation. The evidence for DBS in treatment-resistant depression is mixed but promising. Some patients report dramatic improvement.</p>
+<p>Dr. Stein consents. The procedure is performed. Six months later, he is no longer depressed. He is, by all clinical measures, well.</p>
+<p>He is also different.</p>
+<p>His wife reports that he is &ldquo;not the same person.&rdquo; He has lost interest in philosophy. He no longer reads. He has become socially gregarious in a way that is foreign to his pre-illness personality. He describes his pre-DBS self as &ldquo;that depressed guy — I don&rsquo;t really remember what it felt like.&rdquo; His values have shifted: he now values social activity over intellectual engagement, physical sensation over abstract thought.</p>
+<p>The philosophy department has noticed. His colleagues say he is &ldquo;happier but shallower.&rdquo; His wife misses the person she married.</p>
+<h3 id="the-temporal-proxy-asymmetry">The Temporal Proxy Asymmetry<a class="headerlink" href="#the-temporal-proxy-asymmetry" title="Permanent link">&para;</a></h3>
+<p>This case introduces a structure that is absent from all the preceding cases: the patient who consented is not the patient who lives with the consequences.</p>
+<p><strong>Definition 9.3 (Temporal Proxy Asymmetry).</strong> <em>A temporal proxy asymmetry occurs when a clinical intervention modifies the patient&rsquo;s heuristic function $h_{\text{patient}}$ itself — changing the patient&rsquo;s boundary penalties, dimensional weights, or goal region. The consenting agent (pre-modification self) serves as a temporal proxy for the post-modification self, but the two selves may have divergent heuristic functions:</em></p>
+<p>$$h_{\text{pre}}(n) \neq h_{\text{post}}(n)$$</p>
+<p><em>The pre-modification self cannot anticipate the post-modification heuristic because the heuristic is precisely what the intervention changes.</em></p>
+<p>Dr. Stein consented to DBS with his pre-modification heuristic — a heuristic that valued intellectual engagement ($d_7$: identity as a philosopher), that experienced chronic suffering ($d_1$: poor clinical outcomes), and that was willing to accept personality change as a trade-off. His post-modification heuristic values different things. The person who consented is not the person who bears the consequences.</p>
+<h3 id="the-nine-dimensional-analysis-of-identity-altering-interventions">The Nine-Dimensional Analysis of Identity-Altering Interventions<a class="headerlink" href="#the-nine-dimensional-analysis-of-identity-altering-interventions" title="Permanent link">&para;</a></h3>
+<p>[Figure 9.2: Trajectory diagram showing Dr. Stein&rsquo;s attribute vector before and after DBS, with the pre-modification consent path and the post-modification experienced path]</p>
+<p><strong>Pre-DBS attribute vector:</strong> $\mathbf{a}_{\text{pre}} = (d_1{=}{-}0.9, d_2{=}0, d_3{=}0, d_4{=}{+}0.7, d_5{=}{+}0.3, d_6{=}{-}0.5, d_7{=}{+}0.8, d_8{=}0, d_9{=}{+}0.9)$</p>
+<p>Dr. Stein&rsquo;s pre-DBS state: terrible clinical outcomes ($d_1$), intact autonomy ($d_4$), moderate trust ($d_5$), suffering family ($d_6$), strong philosophical identity ($d_7$), and excellent understanding ($d_9$).</p>
+<p><strong>Post-DBS attribute vector:</strong> $\mathbf{a}_{\text{post}} = (d_1{=}{+}0.8, d_2{=}0, d_3{=}0, d_4{=}{+}0.7, d_5{=}{+}0.6, d_6{=}{+}0.3, d_7{=}{+}0.2, d_8{=}0, d_9{=}{+}0.5)$</p>
+<p>Dr. Stein&rsquo;s post-DBS state: excellent clinical outcomes ($d_1$), intact autonomy ($d_4$), improved trust ($d_5$), improved family relationships ($d_6$), but diminished philosophical identity ($d_7$) and reduced self-understanding ($d_9$) — he no longer knows who he was.</p>
+<p><strong>The identity dimension has been traded for the outcomes dimension.</strong> On the scalar (QALY), this is an unambiguous improvement — his quality of life score has increased dramatically. On the manifold, the picture is more complex. The $d_7$ cost (loss of pre-illness identity) is real, and it is a cost that the pre-modification self accepted on behalf of the post-modification self — a self who, by construction, cannot retrospectively disagree because the intervention changed the very heuristic that would evaluate the trade-off.</p>
+<h3 id="the-consent-paradox-of-identity-altering-interventions">The Consent Paradox of Identity-Altering Interventions<a class="headerlink" href="#the-consent-paradox-of-identity-altering-interventions" title="Permanent link">&para;</a></h3>
+<p><strong>Theorem 9.2 (Identity-Alteration Consent Paradox).</strong> <em>For any intervention that modifies $h_{\text{patient}}$, the gauge-invariance test for valid consent (Theorem 4 from the GCE paper) is structurally unable to validate consent across the identity boundary. Consent at time $t_0$ is evaluated using $h_{t_0}$; the consequences are experienced using $h_{t_1}$. If $h_{t_0} \neq h_{t_1}$, no framing of the information at $t_0$ can guarantee that the decision is stable under the transformation $h_{t_0} \to h_{t_1}$.</em></p>
+<p>This is not a failure of the framework — it is a genuine paradox that the framework makes precise. Identity-altering interventions are the one class of clinical decisions where the consent apparatus breaks down structurally, not merely practically.</p>
+<h3 id="the-clinical-geodesic-for-identity-cases">The Clinical Geodesic for Identity Cases<a class="headerlink" href="#the-clinical-geodesic-for-identity-cases" title="Permanent link">&para;</a></h3>
+<p>The geodesic for identity-altering interventions includes structural safeguards that the scalar framework does not require:</p>
+<ol>
+<li>
+<p><strong>Pre-modification identity documentation</strong>: Before DBS, the patient articulates their values, identity commitments, and criteria for acceptable personality change. This is stored as a reference attribute vector $\mathbf{a}_{\text{reference}}$.</p>
+</li>
+<li>
+<p><strong>Post-modification monitoring</strong>: After DBS, the clinical team periodically measures the patient&rsquo;s attribute vector and compares it to $\mathbf{a}_{\text{reference}}$. If $\|d_7^{\text{post}} - d_7^{\text{reference}}\| > \delta_{\text{identity}}$, a structured review is triggered.</p>
+</li>
+<li>
+<p><strong>Reversibility as boundary constraint</strong>: DBS is adjustable and, in principle, reversible. The geodesic favors identity-altering interventions that are reversible (DBS, medication) over those that are irreversible (ablative neurosurgery), because reversibility preserves a return path on the manifold.</p>
+</li>
+<li>
+<p><strong>Third-party identity monitoring</strong>: A trusted person (spouse, close friend) is designated as an &ldquo;identity proxy&rdquo; — someone who knew the pre-modification self and can report identity changes that the post-modification self may not perceive.</p>
+</li>
+</ol>
+<h3 id="what-sarah-learns_4">What Sarah Learns<a class="headerlink" href="#what-sarah-learns_4" title="Permanent link">&para;</a></h3>
+<p>Sarah does not encounter Dr. Stein&rsquo;s case directly — DBS for depression is not performed at her hospital. But she reads the case report in a neuroethics seminar and recognizes the structure: the temporal proxy asymmetry, the consent paradox, the identity dimension.</p>
+<p>She thinks about less dramatic versions of the same problem. Every long-term psychiatric medication changes the patient&rsquo;s personality to some degree. Every major surgery changes the patient&rsquo;s relationship to their body. Every prolonged hospitalization changes the patient&rsquo;s identity. The DBS case is extreme, but the geometric structure — the temporal proxy asymmetry between the consenting self and the experiencing self — is universal.</p>
+<p>She begins to understand the ninth dimension ($d_9$: epistemic status) as including self-knowledge — the patient&rsquo;s understanding of who they are and how the intervention will change them. For identity-altering interventions, $d_9$ has a structural ceiling: the patient cannot fully understand the post-modification self because the understanding itself is mediated by the pre-modification heuristic.</p>
+<hr />
+<h2 id="96-synthesis-what-the-cases-teach">9.6 Synthesis: What the Cases Teach<a class="headerlink" href="#96-synthesis-what-the-cases-teach" title="Permanent link">&para;</a></h2>
+<h3 id="five-cases-five-structures">Five Cases, Five Structures<a class="headerlink" href="#five-cases-five-structures" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>Case</th>
+<th>Key Structure</th>
+<th>What Scalar Analysis Misses</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1: Jehovah&rsquo;s Witness</td>
+<td>Sacred-value boundary ($\beta = \infty$)</td>
+<td>The boundary makes the &ldquo;worse&rdquo; outcome the geodesic</td>
+</tr>
+<tr>
+<td>2: Life support withdrawal</td>
+<td>Process path optimization</td>
+<td>The path matters, not just the endpoint</td>
+</tr>
+<tr>
+<td>3: Involuntary treatment</td>
+<td>Heuristic override</td>
+<td>Miscalibrated $h_{\text{patient}}$ justifies constraint</td>
+</tr>
+<tr>
+<td>4: Proxy decision</td>
+<td>Proxy pathfinding divergence</td>
+<td>No calibration guarantees proxy-patient alignment</td>
+</tr>
+<tr>
+<td>5: DBS and identity</td>
+<td>Temporal proxy asymmetry</td>
+<td>The consenting self ≠ the experiencing self</td>
+</tr>
+</tbody>
+</table>
+<h3 id="the-methodological-lesson">The Methodological Lesson<a class="headerlink" href="#the-methodological-lesson" title="Permanent link">&para;</a></h3>
+<p>The five cases also teach a methodological lesson about the relationship between the geometric framework and existing clinical ethics approaches.</p>
+<p><strong>Principlism captures the dimensions but not the metric.</strong> Beauchamp and Childress&rsquo;s four principles correspond to four of the nine manifold dimensions (approximately: autonomy = $d_4$, beneficence = $d_1$, non-maleficence = $d_2 + \beta_{\text{harm}}$, justice = $d_3$). The principles correctly identify the relevant dimensions — but they provide no algorithm for resolving conflicts between them, because they have no metric. The geometric framework inherits the dimensions and adds the metric: the covariance matrix $\Sigma$ and the boundary penalties $\beta_k$ that determine the geodesic.</p>
+<p><strong>QALY analysis captures the metric but not the dimensions.</strong> QALY-based health economics provides a clear optimization procedure — maximize quality-adjusted life-years — with a well-defined metric. But the metric operates on one dimension ($d_1$) out of nine. In Cases 1, 2, and 5, the QALY-optimal answer is wrong because the QALY metric cannot see the dimensions that determine the geodesic.</p>
+<p><strong>Casuistry captures the cases but not the similarity measure.</strong> Case-based reasoning (Jonsen and Toulmin, 1988) argues by analogy — &ldquo;this case is like that case, so the same answer applies.&rdquo; But analogical reasoning requires a similarity metric: how close is this case to that case? Two casuists can reach opposite conclusions because they use different (implicit) similarity measures. The clinical decision complex provides the explicit similarity measure: two cases are similar when their nine-dimensional attribute vectors are close in the Mahalanobis sense.</p>
+<p><strong>Narrative ethics captures the patient but not the computation.</strong> Charon&rsquo;s narrative medicine (2006) insists on the patient&rsquo;s story — their values, identity, relationships, and experiences. This insistence is correct: the story is the nine-dimensional attribute vector in human form. But narrative ethics provides no quantitative apparatus for policy analysis, institutional accountability, or cross-case comparison. The geometric framework provides the quantitative structure that narrative ethics lacks, without sacrificing the patient&rsquo;s story — the story is the data.</p>
+<p>The geometric framework is not a replacement for these traditions. It is their synthesis: the dimensions of principlism, the metric of health economics, the case-sensitivity of casuistry, and the patient-centeredness of narrative ethics, unified in a single mathematical structure.</p>
+<h3 id="the-common-thread">The Common Thread<a class="headerlink" href="#the-common-thread" title="Permanent link">&para;</a></h3>
+<p>Every case has the same structure:</p>
+<ol>
+<li>A scalar analysis (QALY, utilitarian, binary) produces a clear answer.</li>
+<li>The nine-dimensional analysis reveals dimensions that the scalar framework cannot see.</li>
+<li>The geodesic on the full manifold differs from the scalar-optimal path.</li>
+<li>The difference is not a marginal adjustment but a structural change — a different path, a different process, a different answer.</li>
+</ol>
+<p>In Case 1, the scalar says &ldquo;transfuse&rdquo; and the geodesic says &ldquo;respect the refusal and pursue alternatives.&rdquo; In Case 2, the scalar says &ldquo;withdraw now&rdquo; and the geodesic says &ldquo;withdraw after a process that reduces total manifold cost.&rdquo; In Case 3, the scalar says &ldquo;respect the refusal&rdquo; and the geodesic says &ldquo;override the refusal because the heuristic is miscalibrated.&rdquo; In Case 4, the scalar says &ldquo;the proxy decides&rdquo; and the geodesic says &ldquo;calibrate the proxy&rsquo;s heuristic first.&rdquo; In Case 5, the scalar says &ldquo;great outcome&rdquo; and the geodesic says &ldquo;the consent was structurally unable to anticipate the identity cost.&rdquo;</p>
+<h3 id="the-clinical-heuristic-is-already-geometric">The Clinical Heuristic Is Already Geometric<a class="headerlink" href="#the-clinical-heuristic-is-already-geometric" title="Permanent link">&para;</a></h3>
+<p>The most important lesson from these five cases is not that the geometric framework produces better answers — though it does. It is that <em>experienced clinicians are already computing these answers</em>. The attending who explores transfusion alternatives for Mr. Okafor, the palliative care team that conducts family meetings for Mrs. Liu, the psychiatrist who uses minimum necessary restraint for Mr. Torres, the ethics consultant who calibrates the proxy for Mrs. Gutierrez, the neuroethicist who worries about identity change for Dr. Stein — all of them are pathfinding on the nine-dimensional manifold. They are computing clinical geodesics with well-calibrated heuristic functions.</p>
+<p>What they lack is the vocabulary to explain what they are doing — to articulate why the QALY-optimal answer is wrong, why the utilitarian path is not the geodesic, why the process matters as much as the outcome. The geometric framework provides that vocabulary. It does not replace clinical wisdom. It reveals its mathematical structure.</p>
+<h3 id="sarahs-integration">Sarah&rsquo;s Integration<a class="headerlink" href="#sarahs-integration" title="Permanent link">&para;</a></h3>
+<p>By the end of her second year of residency, Sarah has encountered variants of all five cases. She does not compute attribute vectors at the bedside — that is not what the framework is for. But she has developed a pattern of thinking that is recognizably geometric:</p>
+<ul>
+<li>She asks how many dimensions are active before deciding which ones to optimize.</li>
+<li>She checks for boundary crossings before recommending interventions.</li>
+<li>She tests consent for gauge invariance by reframing information.</li>
+<li>She evaluates proxy decisions by assessing proxy-patient heuristic divergence.</li>
+<li>She notices when the process path has lower total cost than the immediate decision.</li>
+</ul>
+<p>Her attending asks her: &ldquo;What makes you a better clinician than you were a year ago?&rdquo; Sarah thinks for a moment. &ldquo;I see more dimensions,&rdquo; she says. &ldquo;I used to see the clinical question. Now I see the clinical question inside the ethical landscape inside the institutional context inside the patient&rsquo;s life. And I see that there&rsquo;s usually a path through all of it that&rsquo;s better than the path through any one dimension alone.&rdquo;</p>
+<p>Her attending nods. &ldquo;That&rsquo;s clinical judgment,&rdquo; she says.</p>
+<p>On the manifold, it is $\varepsilon$-admissible heuristic pathfinding. But the attending&rsquo;s term is older, and Sarah does not correct her.</p>
+<p>[Figure 9.3: Composite visualization showing the five cases as five trajectories on the clinical decision complex, each highlighting a different structural feature: the sacred boundary in Case 1, the process path in Case 2, the constrained reachable set in Case 3, the proxy divergence in Case 4, and the temporal identity split in Case 5]</p>
+<hr />
+<h2 id="chapter-summary">Chapter Summary<a class="headerlink" href="#chapter-summary" title="Permanent link">&para;</a></h2>
+<p>This chapter has applied the nine-dimensional clinical decision complex and the $A^*$ pathfinding model to five paradigm cases in clinical ethics. Each case demonstrates that the clinical geodesic — the minimum-cost path on the full manifold — differs from the answer produced by scalar frameworks (QALY analysis, utilitarian calculus, binary principlism). The differences are not marginal; they are structural. The cases collectively demonstrate that the geometric framework captures the reasoning that experienced clinicians already perform — the multi-dimensional, boundary-aware, process-sensitive pathfinding that clinical wisdom represents — and provides the mathematical vocabulary to make that reasoning explicit, teachable, and auditable.</p>
+<p>The five structural features revealed by the cases — sacred-value boundaries, process path optimization, heuristic override, proxy divergence, and temporal identity asymmetry — recur throughout clinical medicine. Each will reappear in the chapters that follow: boundaries in triage (Chapter 10), proxy pathfinding in allocation (Chapter 11), identity in moral injury (Chapter 13), and heuristic override in AI clinical reasoning (Chapter 16). The cases are not isolated examples. They are the fundamental structures of the clinical manifold, encountered at the bedside every day.</p>
+<hr />
+<p>[^1]: The actual clinical management of Jehovah&rsquo;s Witness patients is well-established and broadly consistent with the geodesic analysis presented here. Guidelines from the American College of Surgeons (2019) and the British Journal of Anaesthesia (2020) recommend respecting the refusal and aggressively pursuing bloodless surgical techniques.</p>
+<p>[^2]: The proxy asymmetry problem is distinct from the well-known surrogate accuracy literature (Shalowitz et al., 2006), which demonstrates that surrogates predict patient preferences with approximately 68% accuracy. The geometric framework explains <em>why</em> surrogate accuracy has a structural ceiling: the proxy is pathfinding with a different heuristic, and no calibration procedure can guarantee convergence without direct access to the patient&rsquo;s heuristic function.</p>
+<p>[^3]: The identity-alteration consent paradox has been discussed extensively in the neuroethics literature (Glannon, 2016; Focquaert and Schermer, 2015) but without the formal apparatus to make the paradox precise. The geometric framework&rsquo;s contribution is not the observation that identity-altering interventions raise consent problems — that observation is well-established — but the mathematical characterization of <em>why</em> the consent apparatus fails in these cases: the gauge-invariance test cannot operate across a heuristic discontinuity.</p>
+
+    <footer>
+      <p>Part of the <em>Geometric Series</em> by A.H. Bowers</p>
+      <p>Built automatically from source. Last updated: 2026-04-20 07:00 UTC</p>
+    </footer>
+  </div>
+
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js"
+    onload="renderMathInElement(document.body, {
+      delimiters: [
+        {left: '$$', right: '$$', display: true},
+        {left: '$', right: '$', display: false},
+        {left: '\\\\(', right: '\\\\)', display: false},
+        {left: '\\\\[', right: '\\\\]', display: true}
+      ],
+      throwOnError: false
+    });"></script>
+</body>
+</html>
