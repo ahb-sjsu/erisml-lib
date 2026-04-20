@@ -73,6 +73,29 @@ from erisml.ieip.report import format_text
 
 The monitoring half (Sprint 2.5 of the GUASS-SAI plan) is implemented and CI-green. The governance/gating half (EM-DAG runtime gating, cryptographic attestation) is the ongoing student collaboration — see the sprint plan for open tasks.
 
+### I-EIP Monitor pipeline
+
+```mermaid
+flowchart LR
+    A[Paired inputs<br/>x, T&middot;x]
+    B[ActivationProbe<br/>hooks forward pass]
+    C[estimate_rho<br/>Procrustes alignment]
+    D[equivariance_error<br/>rho-twisted residual]
+    E[DriftDetector<br/>rolling window]
+    F[nondegeneracy_report]
+    G[aggregate_report<br/>gate inference?]
+
+    A --> B --> C --> D --> E --> G
+    D --> F --> G
+
+    classDef probe fill:#e3f2fd,stroke:#1565c0;
+    classDef check fill:#fff3e0,stroke:#e65100;
+    classDef gate fill:#c8e6c9,stroke:#1b5e20;
+    class A,B probe;
+    class C,D,E,F check;
+    class G gate;
+```
+
 ---
 # ErisML/DEME Research Repository and Library 🍎
 
@@ -250,6 +273,42 @@ ErisML has two tightly-related layers:
 
 Together, ErisML + DEME support **norm-governed, ethics-aware agents** that can
 be inspected, audited, and configured by multiple stakeholders.
+
+### DEME 2.0 decision flow
+
+```mermaid
+flowchart TB
+    IN[Candidate Action]
+    subgraph R["Reflex layer (< 100 &micro;s)"]
+        R1[Tier 0: Constitutional vetoes]
+        R2[Hard safety checks]
+    end
+    subgraph T["Tactical layer (10-100 ms)"]
+        T1[MoralVector assessment<br/>8+1 dims]
+        T2[Tier 1-3 Ethical Modules]
+        T3[BIP invariance check]
+    end
+    subgraph S["Strategic layer"]
+        S1[Policy optimization]
+        S2[NVR / ADV metrics]
+        S3[DecisionProof<br/>audit hash chain]
+    end
+    OUT[Action + DecisionProof]
+
+    IN --> R1 --> R2
+    R2 -->|pass| T1
+    R2 -->|veto| OUT
+    T1 --> T2 --> T3
+    T3 -->|pass| S1 --> S2 --> S3 --> OUT
+    T3 -->|violation witness| OUT
+
+    classDef reflex fill:#ffcdd2,stroke:#b71c1c;
+    classDef tactical fill:#fff9c4,stroke:#f57f17;
+    classDef strategic fill:#c8e6c9,stroke:#1b5e20;
+    class R1,R2 reflex;
+    class T1,T2,T3 tactical;
+    class S1,S2,S3 strategic;
+```
 
 ---
 
