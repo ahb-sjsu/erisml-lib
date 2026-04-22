@@ -21,6 +21,8 @@ The monitoring half of the framework exposed here provides:
 * :func:`nondegeneracy_report` -- effective-rank and range checks
 * :class:`IEIPReport` -- aggregated metrics with text/JSON formatters
 * :class:`ActivationProbe` -- PyTorch forward-hook wrapper (requires ``torch``)
+* :func:`~erisml.ieip.adapters.detect_adapter` -- architecture-agnostic
+  probe attachment across HF transformers, API clients, and ensembles
 
 See :doc:`docs/I-EIP_Monitor_Whitepaper` for the full specification
 and :doc:`docs/development/I-EIP_Monitor_Sprint_Plan` for the roadmap.
