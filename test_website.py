@@ -1,9 +1,12 @@
 """Selenium test for Geometric Ethics website interactivity."""
+
 import os
-import time
 import sys
+import time
+
 from selenium import webdriver
 from selenium.webdriver.common.by import By
+
 
 def test_website():
     html_path = os.path.abspath("docs/index.html")
@@ -26,11 +29,15 @@ def test_website():
         print(f"  [{status}] {name}" + (f" - {detail}" if detail else ""))
 
     def click(el):
-        driver.execute_script("arguments[0].scrollIntoView({block:'center'}); arguments[0].click();", el)
+        driver.execute_script(
+            "arguments[0].scrollIntoView({block:'center'}); arguments[0].click();", el
+        )
         time.sleep(0.4)
 
     def css(el, prop):
-        return driver.execute_script(f"return getComputedStyle(arguments[0]).{prop}", el)
+        return driver.execute_script(
+            f"return getComputedStyle(arguments[0]).{prop}", el
+        )
 
     print("\n=== Geometric Ethics Website Interactive Test ===\n")
 
@@ -38,38 +45,57 @@ def test_website():
     print("--- Basic ---")
     check("Page title", "Geometric Ethics" in driver.title)
     check("Nav exists", len(driver.find_elements(By.CSS_SELECTOR, "#main-nav")) > 0)
-    check("Hero particles", len(driver.find_elements(By.CSS_SELECTOR, "#hero canvas")) > 0)
+    check(
+        "Hero particles", len(driver.find_elements(By.CSS_SELECTOR, "#hero canvas")) > 0
+    )
 
     # 2. Parable timeline
     print("\n--- Parable Timeline ---")
     events = driver.find_elements(By.CSS_SELECTOR, ".timeline-event")
     check("4 timeline events", len(events) == 4)
-    check("One is active", len(driver.find_elements(By.CSS_SELECTOR, ".timeline-event.active")) == 1)
+    check(
+        "One is active",
+        len(driver.find_elements(By.CSS_SELECTOR, ".timeline-event.active")) == 1,
+    )
 
     # 3. Object cards
     print("\n--- Object Cards ---")
     cards = driver.find_elements(By.CSS_SELECTOR, ".object-card")
     check("8 object cards", len(cards) == 8)
     click(cards[0])
-    check("Expands on click", len(driver.find_elements(By.CSS_SELECTOR, ".object-card.expanded")) > 0)
+    check(
+        "Expands on click",
+        len(driver.find_elements(By.CSS_SELECTOR, ".object-card.expanded")) > 0,
+    )
     formal = cards[0].find_elements(By.CSS_SELECTOR, ".object-formal")
     if formal:
         check("Formal def visible", css(formal[0], "opacity") == "1")
 
     # 4. Dimension wheel
     print("\n--- Dimension Wheel ---")
-    check("9 dimension dots", len(driver.find_elements(By.CSS_SELECTOR, "#dim-lines circle")) == 9)
-    check("9 labels", len(driver.find_elements(By.CSS_SELECTOR, "#dim-labels text")) == 9)
+    check(
+        "9 dimension dots",
+        len(driver.find_elements(By.CSS_SELECTOR, "#dim-lines circle")) == 9,
+    )
+    check(
+        "9 labels", len(driver.find_elements(By.CSS_SELECTOR, "#dim-labels text")) == 9
+    )
     dim_cards = driver.find_elements(By.CSS_SELECTOR, ".dim-card")
     click(dim_cards[2])
-    check("Dim card activates", len(driver.find_elements(By.CSS_SELECTOR, ".dim-card.active")) == 1)
+    check(
+        "Dim card activates",
+        len(driver.find_elements(By.CSS_SELECTOR, ".dim-card.active")) == 1,
+    )
 
     # 5. Tensor hierarchy
     print("\n--- Tensor Hierarchy ---")
     btns = driver.find_elements(By.CSS_SELECTOR, ".level-btn")
     check("6+ level buttons", len(btns) >= 6)
     click(btns[2])
-    check("Button activates", len(driver.find_elements(By.CSS_SELECTOR, ".level-btn.active")) == 1)
+    check(
+        "Button activates",
+        len(driver.find_elements(By.CSS_SELECTOR, ".level-btn.active")) == 1,
+    )
     lv2 = driver.find_elements(By.CSS_SELECTOR, "#h-level-2")
     if lv2:
         check("Level 2 shown", css(lv2[0], "display") != "none")
@@ -79,19 +105,30 @@ def test_website():
     headers = driver.find_elements(By.CSS_SELECTOR, ".part-header")
     check("7 parts", len(headers) == 7)
     click(headers[0])
-    check("Part opens", len(driver.find_elements(By.CSS_SELECTOR, ".part-item.open")) == 1)
+    check(
+        "Part opens", len(driver.find_elements(By.CSS_SELECTOR, ".part-item.open")) == 1
+    )
 
     # 7. Theorem cards
     print("\n--- Theorem Cards ---")
     thms = driver.find_elements(By.CSS_SELECTOR, ".theorem-card")
     check("7 theorem cards", len(thms) == 7)
     click(thms[0])
-    check("Expands on click", len(driver.find_elements(By.CSS_SELECTOR, ".theorem-card.expanded")) > 0)
+    check(
+        "Expands on click",
+        len(driver.find_elements(By.CSS_SELECTOR, ".theorem-card.expanded")) > 0,
+    )
     detail = thms[0].find_elements(By.CSS_SELECTOR, ".theorem-detail")
     if detail:
         check("Detail visible", css(detail[0], "opacity") == "1")
-        check("Detail has content", len(detail[0].text) > 20, f"{len(detail[0].text)} chars")
-    check("Hint exists", len(thms[0].find_elements(By.CSS_SELECTOR, ".theorem-hint")) > 0)
+        check(
+            "Detail has content",
+            len(detail[0].text) > 20,
+            f"{len(detail[0].text)} chars",
+        )
+    check(
+        "Hint exists", len(thms[0].find_elements(By.CSS_SELECTOR, ".theorem-hint")) > 0
+    )
 
     # 8. Application hex cards *** FOCUS ***
     print("\n--- App Hex Cards (VII) ***FOCUS*** ---")
@@ -103,7 +140,10 @@ def test_website():
         check(f"  '{name}' pointer cursor", css(h, "cursor") == "pointer")
 
     click(hexes[0])
-    check("Hex activates", len(driver.find_elements(By.CSS_SELECTOR, ".app-hex.active")) > 0)
+    check(
+        "Hex activates",
+        len(driver.find_elements(By.CSS_SELECTOR, ".app-hex.active")) > 0,
+    )
     panels = driver.find_elements(By.CSS_SELECTOR, ".app-detail-panel")
     check("Detail panel created", len(panels) > 0)
     if panels:
@@ -112,10 +152,15 @@ def test_website():
 
     click(hexes[3])
     active = driver.find_elements(By.CSS_SELECTOR, ".app-hex.active")
-    check("Switch to finance", len(active) == 1 and active[0].get_attribute("data-app") == "finance")
+    check(
+        "Switch to finance",
+        len(active) == 1 and active[0].get_attribute("data-app") == "finance",
+    )
 
     click(hexes[3])
-    check("Deactivate", len(driver.find_elements(By.CSS_SELECTOR, ".app-hex.active")) == 0)
+    check(
+        "Deactivate", len(driver.find_elements(By.CSS_SELECTOR, ".app-hex.active")) == 0
+    )
 
     # 9. Equation
     print("\n--- Equation ---")
@@ -129,7 +174,10 @@ def test_website():
     check("4 consequences", len(cons) == 4)
     check("Clickable cursor", css(cons[0], "cursor") == "pointer")
     click(cons[0])
-    check("Activates", len(driver.find_elements(By.CSS_SELECTOR, ".consequence.active")) == 1)
+    check(
+        "Activates",
+        len(driver.find_elements(By.CSS_SELECTOR, ".consequence.active")) == 1,
+    )
 
     # 11. Reading paths
     print("\n--- Reading Paths ---")
@@ -139,7 +187,10 @@ def test_website():
 
     # 12. DEME architecture
     print("\n--- DEME Architecture ---")
-    check("Tooltip created", len(driver.find_elements(By.CSS_SELECTOR, ".deme-tooltip")) > 0)
+    check(
+        "Tooltip created",
+        len(driver.find_elements(By.CSS_SELECTOR, ".deme-tooltip")) > 0,
+    )
     rects = driver.find_elements(By.CSS_SELECTOR, ".deme-svg rect")
     check(f"{len(rects)} SVG rects", len(rects) >= 7)
 
@@ -149,7 +200,10 @@ def test_website():
     check("4 epistemic cards", len(eps) == 4)
     click(eps[0])
     time.sleep(0.5)
-    check("Expands", len(driver.find_elements(By.CSS_SELECTOR, ".epistemic-card.expanded")) > 0)
+    check(
+        "Expands",
+        len(driver.find_elements(By.CSS_SELECTOR, ".epistemic-card.expanded")) > 0,
+    )
     ep_d = eps[0].find_elements(By.CSS_SELECTOR, ".epistemic-detail")
     if ep_d:
         check("Detail visible", css(ep_d[0], "opacity") == "1")
@@ -159,12 +213,15 @@ def test_website():
     btns = driver.find_elements(By.CSS_SELECTOR, ".game-choices .choice-btn")
     check("8 choice buttons", len(btns) == 8)
     click(btns[0])  # O for neighbor
-    check("Button activates", len(driver.find_elements(By.CSS_SELECTOR, ".choice-btn.active-choice")) >= 1)
+    check(
+        "Button activates",
+        len(driver.find_elements(By.CSS_SELECTOR, ".choice-btn.active-choice")) >= 1,
+    )
     click(btns[5])  # C for writer
     result = driver.find_elements(By.CSS_SELECTOR, ".game-result")
     if result:
         check("Result appears", css(result[0], "display") != "none")
-        rt = result[0].text.encode('ascii', 'replace').decode()
+        rt = result[0].text.encode("ascii", "replace").decode()
         check("Result has text", len(result[0].text) > 10, rt[:60])
 
     # 15. Bell test slider
@@ -188,11 +245,17 @@ def test_website():
     check(f"{len(tags)} concept tags", len(tags) > 0)
     click(tags[0])
     time.sleep(0.5)
-    modal_overlay = driver.find_elements(By.CSS_SELECTOR, ".concept-modal-overlay.visible")
+    modal_overlay = driver.find_elements(
+        By.CSS_SELECTOR, ".concept-modal-overlay.visible"
+    )
     check("Modal opens", len(modal_overlay) > 0)
     if modal_overlay:
         title = driver.find_elements(By.CSS_SELECTOR, ".concept-modal-title")
-        check("Modal has title", len(title) > 0 and len(title[0].text) > 0, title[0].text if title else "")
+        check(
+            "Modal has title",
+            len(title) > 0 and len(title[0].text) > 0,
+            title[0].text if title else "",
+        )
         formal = driver.find_elements(By.CSS_SELECTOR, ".concept-formal")
         check("Modal has formal def", len(formal) > 0 and len(formal[0].text) > 20)
         desc = driver.find_elements(By.CSS_SELECTOR, ".concept-modal-desc")
@@ -204,7 +267,15 @@ def test_website():
         if close_btn:
             click(close_btn[0])
             time.sleep(0.3)
-            check("Modal closes", len(driver.find_elements(By.CSS_SELECTOR, ".concept-modal-overlay.visible")) == 0)
+            check(
+                "Modal closes",
+                len(
+                    driver.find_elements(
+                        By.CSS_SELECTOR, ".concept-modal-overlay.visible"
+                    )
+                )
+                == 0,
+            )
 
     # 17. Visual demos
     print("\n--- Visual Demos ---")
@@ -231,6 +302,7 @@ def test_website():
 
     driver.quit()
     return failed == 0
+
 
 if __name__ == "__main__":
     success = test_website()
