@@ -14,151 +14,162 @@ Strategy:
 - Insert them into the gaps in the HTML.
 """
 
-import sys, io, re, os, html
-sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding='utf-8')
+import html
+import io
+import os
+import re
+import sys
 
-from docx import Document
-import lxml.etree as ET
+sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding="utf-8")
 
-BOOK_DIR = r'C:\source\erisml-lib\docs\book'
-DOCX_PATH = r'C:\source\erisml-lib\docs\papers\foundations\Geometric Ethics - The Mathematical Structure of Moral Reasoning - Bond - v1.14 - Mar 2026.docx'
+from docx import Document  # noqa: E402
 
-ns = {'m': 'http://schemas.openxmlformats.org/officeDocument/2006/math',
-      'w': 'http://schemas.openxmlformats.org/wordprocessingml/2006/main'}
+BOOK_DIR = r"C:\source\erisml-lib\docs\book"
+DOCX_PATH = r"C:\source\erisml-lib\docs\papers\foundations\Geometric Ethics - The Mathematical Structure of Moral Reasoning - Bond - v1.14 - Mar 2026.docx"
+
+ns = {
+    "m": "http://schemas.openxmlformats.org/officeDocument/2006/math",
+    "w": "http://schemas.openxmlformats.org/wordprocessingml/2006/main",
+}
 
 
 def omath_to_unicode_inner(elem):
     parts = []
+
     def process(el):
-        tag = el.tag.split('}')[-1] if '}' in el.tag else el.tag
-        if tag == 't':
-            parts.append(el.text or '')
-        elif tag in ('r', 'e', 'sub', 'sup', 'num', 'den', 'deg'):
+        tag = el.tag.split("}")[-1] if "}" in el.tag else el.tag
+        if tag == "t":
+            parts.append(el.text or "")
+        elif tag in ("r", "e", "sub", "sup", "num", "den", "deg"):
             for child in el:
                 process(child)
-        elif tag.endswith('Pr'):
+        elif tag.endswith("Pr"):
             pass
         else:
             for child in el:
                 process(child)
+
     process(elem)
-    return ''.join(parts).strip()
+    return "".join(parts).strip()
 
 
 def omath_to_html(elem):
     """Convert Office MathML to inline HTML math notation."""
     parts = []
-    mns = 'http://schemas.openxmlformats.org/officeDocument/2006/math'
+    mns = "http://schemas.openxmlformats.org/officeDocument/2006/math"
 
     def process(el):
-        tag = el.tag.split('}')[-1] if '}' in el.tag else el.tag
-        if tag == 't':
-            t = el.text or ''
+        tag = el.tag.split("}")[-1] if "}" in el.tag else el.tag
+        if tag == "t":
+            t = el.text or ""
             parts.append(html.escape(t))
-        elif tag == 'sSub':
-            base = el.find('m:e', ns)
-            sub = el.find('m:sub', ns)
+        elif tag == "sSub":
+            base = el.find("m:e", ns)
+            sub = el.find("m:sub", ns)
             if base is not None:
                 process(base)
             if sub is not None:
                 sub_t = omath_to_unicode_inner(sub)
-                parts.append(f'<sub>{html.escape(sub_t)}</sub>')
-        elif tag == 'sSup':
-            base = el.find('m:e', ns)
-            sup = el.find('m:sup', ns)
+                parts.append(f"<sub>{html.escape(sub_t)}</sub>")
+        elif tag == "sSup":
+            base = el.find("m:e", ns)
+            sup = el.find("m:sup", ns)
             if base is not None:
                 process(base)
             if sup is not None:
                 sup_t = omath_to_unicode_inner(sup)
-                parts.append(f'<sup>{html.escape(sup_t)}</sup>')
-        elif tag == 'sSubSup':
-            base = el.find('m:e', ns)
-            sub = el.find('m:sub', ns)
-            sup = el.find('m:sup', ns)
+                parts.append(f"<sup>{html.escape(sup_t)}</sup>")
+        elif tag == "sSubSup":
+            base = el.find("m:e", ns)
+            sub = el.find("m:sub", ns)
+            sup = el.find("m:sup", ns)
             if base is not None:
                 process(base)
             if sub is not None:
                 sub_t = omath_to_unicode_inner(sub)
-                parts.append(f'<sub>{html.escape(sub_t)}</sub>')
+                parts.append(f"<sub>{html.escape(sub_t)}</sub>")
             if sup is not None:
                 sup_t = omath_to_unicode_inner(sup)
-                parts.append(f'<sup>{html.escape(sup_t)}</sup>')
-        elif tag == 'f':
-            num = el.find('m:num', ns)
-            den = el.find('m:den', ns)
-            num_t = omath_to_unicode_inner(num) if num is not None else ''
-            den_t = omath_to_unicode_inner(den) if den is not None else ''
-            parts.append(f'({html.escape(num_t)})/({html.escape(den_t)})')
-        elif tag == 'rad':
-            base = el.find('m:e', ns)
-            parts.append('\u221a(')
+                parts.append(f"<sup>{html.escape(sup_t)}</sup>")
+        elif tag == "f":
+            num = el.find("m:num", ns)
+            den = el.find("m:den", ns)
+            num_t = omath_to_unicode_inner(num) if num is not None else ""
+            den_t = omath_to_unicode_inner(den) if den is not None else ""
+            parts.append(f"({html.escape(num_t)})/({html.escape(den_t)})")
+        elif tag == "rad":
+            base = el.find("m:e", ns)
+            parts.append("\u221a(")
             if base is not None:
                 process(base)
-            parts.append(')')
-        elif tag == 'nary':
-            chr_el = el.find('m:naryPr/m:chr', ns)
-            op = chr_el.get(f'{{{mns}}}val', '\u2211') if chr_el is not None else '\u2211'
-            sub = el.find('m:sub', ns)
-            sup = el.find('m:sup', ns)
-            base = el.find('m:e', ns)
+            parts.append(")")
+        elif tag == "nary":
+            chr_el = el.find("m:naryPr/m:chr", ns)
+            op = (
+                chr_el.get(f"{{{mns}}}val", "\u2211")
+                if chr_el is not None
+                else "\u2211"
+            )
+            sub = el.find("m:sub", ns)
+            sup = el.find("m:sup", ns)
+            base = el.find("m:e", ns)
             parts.append(op)
             if sub is not None:
                 st = omath_to_unicode_inner(sub)
                 if st.strip():
-                    parts.append(f'<sub>{html.escape(st)}</sub>')
+                    parts.append(f"<sub>{html.escape(st)}</sub>")
             if sup is not None:
                 st = omath_to_unicode_inner(sup)
                 if st.strip():
-                    parts.append(f'<sup>{html.escape(st)}</sup>')
-            parts.append(' ')
+                    parts.append(f"<sup>{html.escape(st)}</sup>")
+            parts.append(" ")
             if base is not None:
                 process(base)
-        elif tag == 'd':
-            dPr = el.find('m:dPr', ns)
-            beg, end = '(', ')'
+        elif tag == "d":
+            dPr = el.find("m:dPr", ns)
+            beg, end = "(", ")"
             if dPr is not None:
-                b = dPr.find('m:begChr', ns)
-                e = dPr.find('m:endChr', ns)
+                b = dPr.find("m:begChr", ns)
+                e = dPr.find("m:endChr", ns)
                 if b is not None:
-                    beg = b.get(f'{{{mns}}}val', '(')
+                    beg = b.get(f"{{{mns}}}val", "(")
                 if e is not None:
-                    end = e.get(f'{{{mns}}}val', ')')
+                    end = e.get(f"{{{mns}}}val", ")")
             parts.append(html.escape(beg))
-            e_els = el.findall('m:e', ns)
+            e_els = el.findall("m:e", ns)
             for idx, ee in enumerate(e_els):
                 if idx > 0:
-                    parts.append(', ')
+                    parts.append(", ")
                 process(ee)
             parts.append(html.escape(end))
-        elif tag == 'acc':
-            base = el.find('m:e', ns)
+        elif tag == "acc":
+            base = el.find("m:e", ns)
             if base is not None:
                 process(base)
-        elif tag == 'bar':
-            base = el.find('m:e', ns)
+        elif tag == "bar":
+            base = el.find("m:e", ns)
             if base is not None:
                 process(base)
-        elif tag in ('r', 'e', 'sub', 'sup', 'num', 'den', 'deg',
-                     'oMath', 'oMathPara'):
+        elif tag in ("r", "e", "sub", "sup", "num", "den", "deg", "oMath", "oMathPara"):
             for child in el:
                 process(child)
-        elif tag.endswith('Pr'):
+        elif tag.endswith("Pr"):
             pass
         else:
             for child in el:
                 process(child)
 
     process(elem)
-    return ''.join(parts).strip()
+    return "".join(parts).strip()
 
 
 def normalize_text(text):
     """Normalize text for fuzzy matching."""
-    t = re.sub(r'\s+', ' ', text).strip()
-    t = t.replace('\u2013', '-').replace('\u2014', '-')
-    t = t.replace('\u2019', "'").replace('\u2018', "'")
-    t = t.replace('\u201c', '"').replace('\u201d', '"')
-    t = t.replace('\xa0', ' ')
+    t = re.sub(r"\s+", " ", text).strip()
+    t = t.replace("\u2013", "-").replace("\u2014", "-")
+    t = t.replace("\u2019", "'").replace("\u2018", "'")
+    t = t.replace("\u201c", '"').replace("\u201d", '"')
+    t = t.replace("\xa0", " ")
     return t
 
 
@@ -168,7 +179,7 @@ def extract_docx_math():
     result = []  # list of (plain_text, [math_html_strings])
 
     for p in doc.paragraphs:
-        omath_elems = p._element.findall('.//m:oMath', ns)
+        omath_elems = p._element.findall(".//m:oMath", ns)
         if not omath_elems:
             continue
 
@@ -208,7 +219,9 @@ def find_best_match(html_text, docx_paragraphs):
         score = len(common) / max(len(h_words), len(p_words))
 
         # Boost score for matching definition/proposition numbers
-        def_match = re.search(r'(Definition|Proposition|Theorem|Lemma)\s+\d+\.\d+', html_norm)
+        def_match = re.search(
+            r"(Definition|Proposition|Theorem|Lemma)\s+\d+\.\d+", html_norm
+        )
         if def_match and def_match.group() in plain:
             score += 0.5
 
@@ -224,17 +237,17 @@ def find_best_match(html_text, docx_paragraphs):
 def fix_html_line(line, docx_paragraphs):
     """Fix a single HTML line by inserting missing math."""
     # Check if this line has the empty-math pattern
-    if '</em>' not in line or '<em>' not in line:
+    if "</em>" not in line or "<em>" not in line:
         return line, 0
 
     # Count the gaps (</em>  <em> with no content between)
-    gaps = list(re.finditer(r'</em>\s*<em(?:\s[^>]*)?>|</em>\s*<em>', line))
+    gaps = list(re.finditer(r"</em>\s*<em(?:\s[^>]*)?>|</em>\s*<em>", line))
     if not gaps:
         return line, 0
 
     # Extract the text content (strip HTML tags) for matching
-    text_only = re.sub(r'<[^>]+>', '', line)
-    text_only = re.sub(r'\s+', ' ', text_only).strip()
+    text_only = re.sub(r"<[^>]+>", "", line)
+    text_only = re.sub(r"\s+", " ", text_only).strip()
 
     match = find_best_match(text_only, docx_paragraphs)
     if not match:
@@ -253,7 +266,7 @@ def fix_html_line(line, docx_paragraphs):
         if math_idx >= len(math_list):
             break
         # Add everything before this gap
-        new_parts.append(result[pos:gap.start()])
+        new_parts.append(result[pos : gap.start()])
         # Insert the math
         math_html = math_list[math_idx]
         new_parts.append(f'</em> <em class="math">{math_html}</em> <em>')
@@ -262,7 +275,7 @@ def fix_html_line(line, docx_paragraphs):
 
     # Add remaining
     new_parts.append(result[pos:])
-    fixed = ''.join(new_parts)
+    fixed = "".join(new_parts)
 
     fixes = min(len(gaps), len(math_list))
     return fixed, fixes
@@ -270,7 +283,7 @@ def fix_html_line(line, docx_paragraphs):
 
 def process_file(filepath, docx_paragraphs):
     """Process a single HTML file."""
-    with open(filepath, 'r', encoding='utf-8') as f:
+    with open(filepath, "r", encoding="utf-8") as f:
         lines = f.readlines()
 
     total_fixes = 0
@@ -282,7 +295,7 @@ def process_file(filepath, docx_paragraphs):
         total_fixes += fixes
 
     if total_fixes > 0:
-        with open(filepath, 'w', encoding='utf-8') as f:
+        with open(filepath, "w", encoding="utf-8") as f:
             f.writelines(new_lines)
 
     return total_fixes
@@ -294,19 +307,19 @@ def main():
     print(f"  Found {len(docx_paragraphs)} paragraphs with math\n")
 
     # Also add a CSS rule for math styling
-    css_path = os.path.join(BOOK_DIR, 'book.css')
-    with open(css_path, 'r', encoding='utf-8') as f:
+    css_path = os.path.join(BOOK_DIR, "book.css")
+    with open(css_path, "r", encoding="utf-8") as f:
         css = f.read()
-    if '.math' not in css:
+    if ".math" not in css:
         css += '\n\n/* Restored math variables */\nem.math { font-style: italic; font-family: "Cambria Math", "STIX Two Math", serif; }\n'
-        with open(css_path, 'w', encoding='utf-8') as f:
+        with open(css_path, "w", encoding="utf-8") as f:
             f.write(css)
         print("Added .math CSS rule to book.css")
 
     # Process all HTML files
     total_all = 0
     for fname in sorted(os.listdir(BOOK_DIR)):
-        if not fname.endswith('.html'):
+        if not fname.endswith(".html"):
             continue
         filepath = os.path.join(BOOK_DIR, fname)
         fixes = process_file(filepath, docx_paragraphs)
@@ -317,5 +330,5 @@ def main():
     print(f"\nTotal: {total_all} math expressions restored across all files")
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

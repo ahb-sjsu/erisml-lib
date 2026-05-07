@@ -21,15 +21,12 @@ Usage:
 
 import argparse
 import json
-import os
 import re
-import shutil
 import subprocess
 import sys
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 from pathlib import Path
 from typing import Optional
-
 
 # ── Configuration ──────────────────────────────────────────────────────────
 
@@ -43,6 +40,7 @@ AUTHOR = "Andrew H. Bond"
 @dataclass
 class ChapterSource:
     """A single markdown chapter source file."""
+
     md_path: Path
     chapter_num: int  # 0 for front matter
 
@@ -50,14 +48,15 @@ class ChapterSource:
 @dataclass
 class BookConfig:
     """Configuration for one book in the series."""
-    key: str                    # e.g. "medicine"
-    dir_name: str               # e.g. "geometric-medicine" (output dir in docs/)
-    title: str                  # e.g. "Geometric Medicine"
-    subtitle: str               # e.g. "Clinical Reasoning, Triage, and the Ethics of Allocation"
-    source_repo: Path           # root of source repo
-    chapter_sources: list       # list of (part_dir_or_chapters_dir, pattern) tuples
-    nav_key: str                # e.g. "nav-medicine" — for active nav highlighting
-    book_number: int            # e.g. 8
+
+    key: str  # e.g. "medicine"
+    dir_name: str  # e.g. "geometric-medicine" (output dir in docs/)
+    title: str  # e.g. "Geometric Medicine"
+    subtitle: str  # e.g. "Clinical Reasoning, Triage, and the Ethics of Allocation"
+    source_repo: Path  # root of source repo
+    chapter_sources: list  # list of (part_dir_or_chapters_dir, pattern) tuples
+    nav_key: str  # e.g. "nav-medicine" — for active nav highlighting
+    book_number: int  # e.g. 8
 
     def get_output_dir(self) -> Path:
         return DOCS_DIR / self.dir_name
@@ -197,6 +196,7 @@ def get_book_configs() -> dict[str, BookConfig]:
 
 # ── Chapter Discovery ──────────────────────────────────────────────────────
 
+
 def discover_chapters(book: BookConfig) -> list[ChapterSource]:
     """Find all chapter markdown files for a book, sorted by chapter number."""
     chapters = []
@@ -244,12 +244,12 @@ def extract_title_from_md(md_path: Path) -> str:
 def slugify(title: str) -> str:
     """Convert a chapter title to a URL-friendly slug."""
     # Remove LaTeX math
-    slug = re.sub(r'\$[^$]+\$', '', title)
+    slug = re.sub(r"\$[^$]+\$", "", title)
     slug = slug.lower()
-    slug = re.sub(r'[^a-z0-9\s-]', '', slug)
-    slug = re.sub(r'[\s]+', '-', slug.strip())
-    slug = re.sub(r'-+', '-', slug)
-    slug = slug.strip('-')
+    slug = re.sub(r"[^a-z0-9\s-]", "", slug)
+    slug = re.sub(r"[\s]+", "-", slug.strip())
+    slug = re.sub(r"-+", "-", slug)
+    slug = slug.strip("-")
     return slug
 
 
@@ -258,19 +258,19 @@ def make_output_filename(chapter: ChapterSource, title: str) -> str:
     if chapter.chapter_num == 0:
         return "front-matter.html"
     # Strip "Chapter N:" prefix before slugifying to avoid double numbering
-    clean_title = re.sub(r'^Chapter\s+\d+\s*:\s*', '', title)
+    clean_title = re.sub(r"^Chapter\s+\d+\s*:\s*", "", title)
     slug = slugify(clean_title)
     return f"chapter-{chapter.chapter_num}-{slug}.html"
 
 
 # ── Pandoc Conversion ─────────────────────────────────────────────────────
 
+
 def check_pandoc() -> bool:
     """Check if Pandoc is installed and return True if available."""
     try:
         result = subprocess.run(
-            ["pandoc", "--version"],
-            capture_output=True, text=True, timeout=10
+            ["pandoc", "--version"], capture_output=True, text=True, timeout=10
         )
         if result.returncode == 0:
             version = result.stdout.split("\n")[0]
@@ -322,11 +322,15 @@ def convert_chapter_pandoc(
     cmd = [
         "pandoc",
         str(md_path),
-        "--from", "markdown+tex_math_dollars+tex_math_single_backslash",
-        "--to", "html5",
+        "--from",
+        "markdown+tex_math_dollars+tex_math_single_backslash",
+        "--to",
+        "html5",
         "--katex",
-        "--template", str(TEMPLATE),
-        "--output", str(output_path),
+        "--template",
+        str(TEMPLATE),
+        "--output",
+        str(output_path),
         "--wrap=none",
         "--section-divs",
     ]
@@ -358,6 +362,7 @@ def convert_chapter_pandoc(
 
 
 # ── Post-processing ───────────────────────────────────────────────────────
+
 
 def get_existing_output_filename(book: BookConfig, chapter_num: int) -> Optional[str]:
     """Look up the existing HTML filename for a chapter in the current docs.
@@ -414,16 +419,19 @@ def build_chapter_list(
         else:
             filename = make_output_filename(ch, title)
 
-        chapter_list.append({
-            "source": ch,
-            "title": title,
-            "filename": filename,
-        })
+        chapter_list.append(
+            {
+                "source": ch,
+                "title": title,
+                "filename": filename,
+            }
+        )
 
     return chapter_list
 
 
 # ── Main Build Logic ──────────────────────────────────────────────────────
+
 
 def build_book(book: BookConfig, dry_run: bool = False) -> tuple[int, int]:
     """Build all chapters for one book. Returns (success_count, fail_count)."""
@@ -460,7 +468,9 @@ def build_book(book: BookConfig, dry_run: bool = False) -> tuple[int, int]:
         # Determine prev/next
         prev_url = chapter_list[i - 1]["filename"] if i > 0 else None
         prev_title = chapter_list[i - 1]["title"] if i > 0 else None
-        next_url = chapter_list[i + 1]["filename"] if i < len(chapter_list) - 1 else None
+        next_url = (
+            chapter_list[i + 1]["filename"] if i < len(chapter_list) - 1 else None
+        )
         next_title = chapter_list[i + 1]["title"] if i < len(chapter_list) - 1 else None
 
         ok = convert_chapter_pandoc(
@@ -514,8 +524,16 @@ def build_single_chapter(
 
     prev_url = chapter_list[target_idx - 1]["filename"] if target_idx > 0 else None
     prev_title = chapter_list[target_idx - 1]["title"] if target_idx > 0 else None
-    next_url = chapter_list[target_idx + 1]["filename"] if target_idx < len(chapter_list) - 1 else None
-    next_title = chapter_list[target_idx + 1]["title"] if target_idx < len(chapter_list) - 1 else None
+    next_url = (
+        chapter_list[target_idx + 1]["filename"]
+        if target_idx < len(chapter_list) - 1
+        else None
+    )
+    next_title = (
+        chapter_list[target_idx + 1]["title"]
+        if target_idx < len(chapter_list) - 1
+        else None
+    )
 
     output_path = output_dir / target["filename"]
 
@@ -546,8 +564,8 @@ def validate_output(html_path: Path) -> dict:
     issues = []
 
     # Check for unclosed <em> tags (the old bug)
-    em_opens = len(re.findall(r'<em\b', content))
-    em_closes = len(re.findall(r'</em>', content))
+    em_opens = len(re.findall(r"<em\b", content))
+    em_closes = len(re.findall(r"</em>", content))
     if em_opens != em_closes:
         issues.append(f"Unclosed <em> tags: {em_opens} opens vs {em_closes} closes")
 
@@ -562,12 +580,15 @@ def validate_output(html_path: Path) -> dict:
 
     # Check for unrendered dollar signs that suggest math wasn't processed
     # (exclude those inside <span class="math"> elements, and currency like $200,000)
-    stripped = re.sub(r'<span class="math[^"]*">.*?</span>', '', content, flags=re.DOTALL)
+    stripped = re.sub(
+        r'<span class="math[^"]*">.*?</span>', "", content, flags=re.DOTALL
+    )
     # Match $...$ but exclude currency amounts ($123, $4.2B, $200K, etc.)
-    stray_dollar_matches = re.findall(r'(?<![\\])\$[^$]+\$', stripped)
+    stray_dollar_matches = re.findall(r"(?<![\\])\$[^$]+\$", stripped)
     stray_dollars = sum(
-        1 for m in stray_dollar_matches
-        if not re.match(r'^\$[\d,.]+[KMBkmb]?\$?', m)  # not currency
+        1
+        for m in stray_dollar_matches
+        if not re.match(r"^\$[\d,.]+[KMBkmb]?\$?", m)  # not currency
     )
 
     # Check for KaTeX CSS/JS references
@@ -590,13 +611,25 @@ def validate_output(html_path: Path) -> dict:
 
 # ── CLI ────────────────────────────────────────────────────────────────────
 
+
 def main():
     parser = argparse.ArgumentParser(
         description="Build Geometric Series book chapters from Markdown to HTML via Pandoc."
     )
     parser.add_argument(
         "--book",
-        choices=["reasoning", "economics", "law", "cognition", "communication", "medicine", "education", "politics", "ai", "all"],
+        choices=[
+            "reasoning",
+            "economics",
+            "law",
+            "cognition",
+            "communication",
+            "medicine",
+            "education",
+            "politics",
+            "ai",
+            "all",
+        ],
         default="all",
         help="Which book to build (default: all)",
     )
@@ -657,10 +690,13 @@ def main():
             if ch13_file:
                 output_path = output_dir / ch13_file
             else:
-                output_path = output_dir / "chapter-13-the-mathematical-theory-of-moral-injury.html"
+                output_path = (
+                    output_dir
+                    / "chapter-13-the-mathematical-theory-of-moral-injury.html"
+                )
 
             if output_path.exists():
-                print(f"\n--- Validation ---")
+                print("\n--- Validation ---")
                 result = validate_output(output_path)
                 print(f"  File size: {result['file_size']:,} bytes")
                 print(f"  Math inline spans: {result['math_inline_spans']}")
@@ -668,14 +704,16 @@ def main():
                 print(f"  KaTeX CSS: {'yes' if result['has_katex_css'] else 'NO'}")
                 print(f"  KaTeX JS: {'yes' if result['has_katex_js'] else 'NO'}")
                 print(f"  Old <em class='math'> tags: {result['old_math_em_tags']}")
-                print(f"  Unclosed <em> tags: {'YES - BUG!' if result['unclosed_em_tags'] else 'none'}")
+                print(
+                    f"  Unclosed <em> tags: {'YES - BUG!' if result['unclosed_em_tags'] else 'none'}"
+                )
                 print(f"  Stray $ math: {result['stray_dollar_math']}")
                 if result["issues"]:
-                    print(f"\n  ISSUES:")
+                    print("\n  ISSUES:")
                     for issue in result["issues"]:
                         print(f"    - {issue}")
                 else:
-                    print(f"\n  All checks passed.")
+                    print("\n  All checks passed.")
             else:
                 print(f"  Output file not found for validation: {output_path}")
 
