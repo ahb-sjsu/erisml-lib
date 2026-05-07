@@ -266,7 +266,7 @@ Transform registry is versioned and signed in the ErisML norm registry (GUASS-SA
 
 ## 5. Cryptographic Attestation
 
-Every gating decision produces a signed audit artifact in the format inherited from USPTO Provisional Patent 63/941,563 (Patent 5 of the December 2025 filings):
+Every gating decision produces a signed audit artifact:
 
 ```json
 {
@@ -421,7 +421,7 @@ Latency overhead: ~50–100 ms/inference, tolerated because the alternative is m
 2. **DAG extraction under transfer.** When a model is fine-tuned, how much of the base-model DAG is preserved? Theoretical and empirical characterization both needed.
 3. **Stakeholder-weight elicitation.** The DEME profile takes weights as input; where they come from is a governance (not technical) question, but the framework could support tooling for structured elicitation.
 4. **Formal verification of governance aggregation.** The aggregation function is simple enough to be formally verified in Coq or Lean; this is not yet done.
-5. **Hardware acceleration.** The runtime pipeline is a candidate for the FPGA canonicalization / attestation circuits covered by the December 2025 provisional patents. Timing studies pending.
+
 
 ---
 
@@ -432,7 +432,6 @@ The I-EIP Monitor composes four existing pieces into a deployable framework:
 1. The GUASS-SAI §16 internal-equivariance criterion
 2. The empirically-derived EM-DAG structure from NA-SQND
 3. The DEME stakeholder governance stack
-4. Cryptographic attestation from the December 2025 patent portfolio
 
 The contribution is the **composition**, not the components — specifically, runtime gating of the forward pass by a model-specific EM-DAG under a democratically-authored profile, with verifiable audit artifacts. This is one of a small number of deployable safety mechanisms that operate on *internal* model state rather than only on inputs or outputs.
 
@@ -455,14 +454,6 @@ The framework is honest about what it cannot do. It does not solve alignment. It
 [4] Bond, A.H. (2026c). *Geometric Ethics: The Mathematical Structure of Moral Reasoning*, v1.0.2g. Vol 3. Source of EIP and stratified moral spaces.
 
 [5] Bond, A.H. (2026k). *Geometric AI: Alignment, Safety, and the Structure-Preserving Path to Superintelligence.* Vol 11. Source of the Reward Irrecoverability Theorem.
-
-### USPTO Provisional Patents (December 2025)
-
-[6] Bond, A.H. (2025). *Hardware-Accelerated Ethical Decision System for Real-Time DEME Implementation in Autonomous Agents.* USPTO Provisional 63/941,563.
-
-[7] Bond, A.H. (2025). *Stratified Geometric Ethics: Mathematical Framework for Verifiable Moral Reasoning in Autonomous Systems.* USPTO Provisional 63/945,667.
-
-[8] Bond, A.H. (2025). *Cryptographic Attestation System for Unforgeable Verification of AI Invariance Compliance.* USPTO Provisional, December 2025.
 
 ### Operational
 
