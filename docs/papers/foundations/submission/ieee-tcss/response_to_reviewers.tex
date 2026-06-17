@@ -1,0 +1,386 @@
+\documentclass[11pt]{article}
+\usepackage[margin=1in]{geometry}
+\usepackage{amsmath,amssymb}
+\usepackage[T1]{fontenc}
+\usepackage{lmodern}
+\usepackage{enumitem}
+\usepackage{hyperref}
+
+\title{Response to Reviewer \\
+\large TCSS-2026-03-0366 — Geometric Prediction of Economic Behavior:\\
+Cross-Domain Validation Across Game Theory and Prospect Theory}
+\author{Andrew H.\ Bond}
+\date{June 10, 2026}
+
+\newcommand{\rev}[1]{\textbf{#1}}
+\newcommand{\resp}{\medskip\noindent\emph{Response:}\quad}
+\newcommand{\loc}[1]{\nolinebreak[3]\hfill\textsf{[#1]}}
+
+\begin{document}
+\maketitle
+
+We thank the reviewer for an unusually careful and constructive read. The revised manuscript
+(\texttt{revised\_manuscript\_v2.tex}, 16 pp.) addresses every concern raised under
+\emph{Technical flaws}, \emph{Thematic flaws}, and \emph{Room for improvement}, often by
+adding new analyses rather than only by rewriting prose. The single largest change is a
+direct empirical test of the framework's sharpest counter-intuitive prediction
+(stake-scaling invariance) on Andersen et al.'s (2011, \emph{AER}) high-stakes ultimatum
+data ($n=458$, 1000$\times$ stake range). All three pre-specified tests reject invariance
+on this dataset, which lets us replace the manuscript's previously verbal
+``boundary condition'' language with a direct empirical probe. Andersen is one dataset
+in one country, however, and we are careful in the revised text to present the result
+as a first boundary probe of a calibrated metric rather than a complete map of where
+$d_1$ does and does not activate.
+
+The list below maps each reviewer point to the specific section(s) of v2 that respond to it.
+Numbering follows the reviewer's structure.
+
+\section*{Technical flaws}
+
+\rev{T1. Empirical success depends on researcher-specified encodings.}
+\begin{quote}\itshape\small
+The main empirical success depends on researcher-specified encodings. The central object being validated is not only the covariance matrix but also the hand-crafted mapping from each task into nine dimensions. The certainty nonlinearity, the gain/loss encoding flip, and the scenario-specific coefficients are all crucial. As a result, the paper risks validating an encoding design as much as a metric structure.
+\end{quote}
+\resp We agree this is a real concern and have not tried to wave it away. We:
+\begin{itemize}[leftmargin=*]
+  \item Retained the \textsc{Encoding Mechanisms and Audit Status} table
+        (Table~III in v2, in the preamble of Section~IV), which explicitly itemizes
+        the certainty operator, the loss-domain flip, the rejection logistic, the
+        public-goods round decay, and the epistemic encoding values as fixed encoding
+        assumptions.
+  \item Strengthened the encoding-ablation analyses (Section~VI.D):
+        removing the certainty nonlinearity fails P7; removing the loss-domain flip fails
+        P3 and P7; removing both fails P7 catastrophically. Each mechanism has a localized,
+        interpretable causal role rather than being an arbitrary tuning knob.
+  \item Added a \emph{Normative Labels, Descriptive Use} subsection (Section~VII.E)
+        clarifying that the 9-dimensional vocabulary is interpretive scaffolding for a
+        descriptive geometric reduction, not a normative or psychometric claim. The same
+        metric with neutral labels $(x_1,\ldots,x_9)$ would produce identical predictions.
+  \item Explicitly listed independent encoding anchoring (external raters, preregistered
+        coding rules, automated text-to-attribute encoders) as a deferred validation step
+        in the limitations (Section~VII.H, item~1).
+\end{itemize}
+We agree this remains the most important methodological gap, and the revised abstract,
+introduction, and conclusion all flag it.
+
+\rev{T2. Dataset is too small and too aggregated for the strength of the claims.}
+\begin{quote}\itshape\small
+The dataset is too small and too aggregated for the strength of the claims. The validation uses 16 target summaries taken from different studies, designs, and sample sizes. These are not individual-level observations, and they are not generated under one common experimental protocol. This makes the reported precision look stronger than it is.
+\end{quote}
+\resp Three concrete additions:
+\begin{itemize}[leftmargin=*]
+  \item \textbf{Andersen et al.~(2011) individual-level test} (Section~VII.A). $n=458$ raw
+        observations, four stake levels spanning Rs~20 to Rs~20{,}000. This is genuine
+        individual-level data, not aggregate, and it is held out from both calibration and
+        the prospect-theory evaluation. Three pre-specified tests on stake-scaling invariance
+        reject the universal money-zero corollary: $\chi^2(3,458){=}16.18,\,p{=}10^{-3}$;
+        Kruskal--Wallis $H{=}60.7,\,p{<}10^{-12}$; logit LRT $p{<}10^{-4}$. AIC drops 13.4
+        points (584.9 $\to$ 571.5).
+  \item \textbf{Per-subset MAE breakdown} reported alongside the overall figure
+        (Section~V.D, Table~VI): on the Ruggeri prospect-theory subset ($N{=}24{,}588$,
+        the largest individual-level subset in the benchmark) the MAE is 3.95\%, versus
+        2.70\% averaged over the full 16-target benchmark. The Ruggeri MAE is the
+        conservative target metric: it is driven by the systematic errors on P16 and P17
+        rather than averaged out by the smaller-$N$ game targets.
+  \item \textbf{CI coverage on the individual-level subset} (Section~V.D): 2/2 coverage on
+        Fraser--Nettle game targets, 4/6 coverage on Ruggeri prospect-theory items, 58\%
+        coverage across the 114 country$\times$item Ruggeri cells. The gap between
+        ``passes tolerance'' and ``inside the 95\% CI'' is now reported explicitly rather
+        than buried in the limitations.
+\end{itemize}
+We agree the calibration side of the benchmark remains aggregate; this is now explicitly
+acknowledged (Section~VII.H, item~3) and listed as the principal remaining gap.
+
+\rev{T3. Pass/fail metric relies on relatively generous tolerances.}
+\begin{quote}\itshape\small
+The pass/fail metric relies on relatively generous tolerances. A 16/16 pass rate sounds decisive, but the benchmark uses fixed tolerances of $\pm$5\% and $\pm$10\%, which are not the same as formal statistical validation. The manuscript itself later notes that the sample-size-weighted MAE is worse than the unweighted MAE and that one prediction falls outside the 95\% confidence interval.
+\end{quote}
+\resp Section~V.D (``Beyond Pass/Fail'') now adds:
+\begin{itemize}[leftmargin=*]
+  \item Per-subset MAE reported in Table~VI: 3.95\% on the high-$N$ Ruggeri PT subset
+        versus 2.70\% averaged across the full 16-target benchmark, exposing rather
+        than averaging away the systematic errors on P16 and P17.
+  \item Two PT predictions (P16, P17) that pass $\pm10$\,pp but fall outside the Ruggeri
+        95\% CI are reported in the same table footnote, not hidden.
+  \item Formal AIC and likelihood-ratio tests on the Andersen individual-level data
+        (Section~VII.A).
+\end{itemize}
+We retained the tolerance-based pass count because most calibration targets remain
+aggregate published summaries; the right way to read the result is now as a layered
+diagnostic (pass rate, then unweighted MAE, then per-subset (high-$N$ Ruggeri) MAE, then CI coverage, then
+formal LRT/AIC where raw data exist), with each layer reported.
+
+\rev{T4. Degrees-of-freedom argument is optimistic.}
+\begin{quote}\itshape\small
+The degrees-of-freedom argument is optimistic. The paper treats the three active variances as the main free parameters, but in practice the temperature rule, the encoding mechanisms, and the structural restrictions all contribute to model flexibility. Calling the temperature parameters derived rather than tuned does not fully remove them from the complexity of the model.
+\end{quote}
+\resp The conservative parameter-and-flexibility accounting (Table~II, Section~III.E) is
+retained from the previous revision: 3 active variances plus 2 temperature calibration
+quantities plus 1 floor plus 2 rejection-function constants plus 1 round-decay constant
+plus 3 prospect-theory encoding mechanisms $=$ 12 auditable quantities, before the
+9-dimensional basis itself. The narrative around this number now explicitly says: ``the
+parsimony claim should be interpreted as `few fitted covariance variances conditional on
+an explicit encoding architecture,' not as `only three choices were made.''' That language
+was added in direct response to the reviewer's framing of the point.
+
+\rev{T5. Baseline comparisons are suggestive rather than definitive.}
+\begin{quote}\itshape\small
+Baseline comparisons are suggestive rather than definitive. CPT and Fehr-Schmidt are evaluated on domains where they were designed to operate, while the geometric model benefits from custom encodings that are crafted to bridge domains. The comparisons are interesting, but they do not yet establish that the new framework is superior to the best alternative predictive setups under a common estimation protocol.
+\end{quote}
+\resp We retained:
+\begin{itemize}[leftmargin=*]
+  \item The CPT pass-rate ceiling test (Section~VI.E, ``Baseline Comparison''):
+        unconstrained Nelder--Mead over 500 random initializations on CPT's 5 parameters
+        still hits 4/6 on the PT subset; P3 and P11 are structural failures CPT cannot
+        escape regardless of parameter choice.
+  \item The Fehr--Schmidt evaluation on its home turf using its own published parameters.
+  \item The explicit caveat that ``the baselines and the geometric model are not estimated
+        under a common individual-level likelihood protocol'' (Section~VI.E closing
+        paragraph): we say plainly that the comparison is suggestive, not definitive.
+\end{itemize}
+A discrete-choice / random-utility baseline under a common protocol would require
+individual-level data across the full benchmark, which most of the targets do not supply.
+We now flag this as a deferred validation in the limitations (Section~VII.H, item~3) rather
+than overclaiming.
+
+\rev{T6. Diagonal covariance restriction is convenient but severe.}
+\begin{quote}\itshape\small
+The diagonal covariance restriction is convenient but severe. If the framework is genuinely about interactions among social, moral, and epistemic dimensions, then ruling out off-diagonal terms removes a potentially important part of the theory. The current success may partly reflect a simplified representation rather than a validated geometry.
+\end{quote}
+\resp We agree. The revision:
+\begin{itemize}[leftmargin=*]
+  \item Retains the explicit justification in Section~III.B (``The Mahalanobis Cost
+        Metric''): ``A full covariance matrix would add 36 off-diagonal terms beyond
+        the nine variances and is underidentified by the present aggregate benchmark.''
+        Diagonality is a parsimony constraint imposed by data availability, not a
+        theoretical claim that interactions don't exist.
+  \item Lists off-diagonal estimation explicitly in the limitations (Section~VII.H,
+        item~6) and again in the conclusion: ``non-diagonal covariance structures'' is
+        the second-to-last item on the future-work list. This is now framed as a deferred
+        extension that requires individual-level multi-task data, not as a closed
+        question.
+\end{itemize}
+
+\rev{T7. Too much outsourced to companion working papers.}
+\begin{quote}\itshape\small
+Too much of the method is outsourced to companion working papers. Core ingredients such as the broader geometric economics framework and the structural-fuzzing procedure are referenced as unpublished working papers. For a standalone journal article making strong empirical claims, more of that methodological foundation should be contained here.
+\end{quote}
+\resp Addressed directly. The revision:
+\begin{itemize}[leftmargin=*]
+  \item \emph{Inlines the structural-fuzzing algorithm} (Section~V.A) including search
+        space, objective function (Eq.~\ref{eq:fuzz-objective-resp}~below), selection rule,
+        multiplicity exposure, and pseudocode (Table~IV). The previous citation to
+        \texttt{bond2026fuzz} is removed; the paper no longer depends on any unpublished
+        companion.
+  \item Removed citations to all four working-paper references (\texttt{bond2026fuzz},
+        \texttt{bond2026GE}, \texttt{bond2026geometric}, \texttt{thiele2026}) from the
+        body and from the bibliography. The PyPI release
+        (\url{https://pypi.org/project/structural-fuzzing/}) is the only external reference
+        that remains, and it supplies a reference implementation rather than a methodological
+        prerequisite.
+  \item The objective used by the algorithm is now stated in the manuscript itself:
+\begin{equation}\label{eq:fuzz-objective-resp}
+    \text{MAE}(S,\boldsymbol{\sigma}_S^2)
+    = \frac{1}{|\mathcal{T}_{\text{cal}}|}
+      \sum_{t\in\mathcal{T}_{\text{cal}}}
+      \bigl|\hat{y}_t(S,\boldsymbol{\sigma}_S^2) - y_t\bigr|.
+\end{equation}
+\end{itemize}
+A reader can now reproduce the model selection from the manuscript alone.
+
+\rev{T8. The out-of-sample claim is narrower than the rhetoric suggests.}
+\begin{quote}\itshape\small
+The out-of-sample claim is narrower than the rhetoric suggests. The prospect-theory targets are out of sample relative to the selected game targets, but they are still a small, curated set of classic tasks. This is encouraging evidence, not yet a broad demonstration of external validity.
+\end{quote}
+\resp Three changes:
+\begin{itemize}[leftmargin=*]
+  \item The phrase ``unification of game theory and prospect theory'' is removed from the
+        abstract and the conclusion. The discussion subsection previously titled ``Cross-Domain
+        Unification'' is now ``A Cross-Domain Bridge, Not a Unification'' (Section~VII.B).
+  \item The Andersen test extends the out-of-sample set from 7 aggregate targets to
+        7 aggregate targets \emph{plus} a 458-observation individual-level boundary probe
+        on a dataset that played no role in either the calibration or the prospect-theory
+        evaluation.
+  \item Section~VII.B explicitly characterizes the result as ``a shared metric primitive
+        sufficient to organize a small set of canonical aggregate frequencies from both
+        domains, conditional on explicit and auditable domain-specific encodings'' rather
+        than as a derivation of either literature from first principles.
+\end{itemize}
+
+\section*{Thematic flaws}
+
+\rev{Th1. The manuscript overstates what has been shown about rationality.}
+\begin{quote}\itshape\small
+The manuscript overstates what has been shown about rationality. The claim that anomalies are rational navigation on a manifold is philosophically attractive, but the empirical exercise only shows that a particular encoding-and-metric system can mimic observed frequencies on a limited benchmark. That is not yet a demonstration that the underlying behavior is rational in a deeper sense.
+\end{quote}
+\resp Section~VII.D (``What the Result Is, and Is Not, About Rationality'') is new. It
+states directly:
+
+\begin{quote}\small
+``It is tempting to frame the result as showing that behavioral anomalies are `rational navigation on a manifold.' The empirical exercise does not support that philosophical reading. What the exercise shows is much narrower\ldots
+None of that establishes that the underlying behavior is rational in a normative sense,
+that the agents are optimizing the geometric cost, or that the dimensions correspond to
+psychological primitives.''
+\end{quote}
+
+The operative description used throughout the revision is now \emph{descriptive geometric
+reduction}, defined explicitly in Section~VII.D. The word ``rational'' appears only in the
+context of expected-utility benchmarks and the EV-maximizer baseline.
+
+\rev{Th2. The nine dimensions mix normative and descriptive categories without full justification.}
+\begin{quote}\itshape\small
+The nine dimensions mix normative and descriptive categories without full justification. Terms such as Virtue/Identity, Legitimacy, and Epistemic Status are meaningful, but their psychological and behavioral boundaries are not clearly established. The model sometimes reads as a normative vocabulary translated into descriptive coordinates.
+\end{quote}
+\resp Section~VII.E (``Normative Labels, Descriptive Use'') is new and addresses this
+directly:
+
+\begin{quote}\small
+``The dimension names---Fairness, Virtue/Identity, Legitimacy, Epistemic Status---are
+ordinarily normative. They are used here as descriptive coordinate labels chosen for
+interpretability, not as normative endorsements\ldots A model with identical metric
+behavior but neutral coordinate labels $(x_1,\ldots,x_9)$ would make the same
+predictions.''
+\end{quote}
+
+The subsection further commits to comparing the present labels against factor-analytic
+decompositions, automated text-to-attribute encoders, and expert-rated coordinate sets in
+future work to test whether the metric result survives basis change.
+
+\rev{Th3. The claim of unification is somewhat stronger than the evidence.}
+\begin{quote}\itshape\small
+The claim of unification is somewhat stronger than the evidence. The paper successfully links a few bargaining, public-goods, and lottery tasks, but the broader literatures on game theory and prospect theory are much wider than these examples. The current evidence supports a promising bridge, not yet a true unification.
+\end{quote}
+\resp ``Unification'' is removed from the abstract, the introduction, the section heading,
+and the conclusion. The replacement framing is ``a cross-domain bridge tested on two
+domains and probed at one boundary.'' See Section~VII.B and the abstract's last sentence.
+
+\rev{Th4. The computational social systems framing remains more prospective than demonstrated.}
+\begin{quote}\itshape\small
+The computational social systems framing remains more prospective than demonstrated. The discussion of policy simulation, mechanism design, and agent-based modeling is plausible, but the paper itself does not actually implement these downstream applications.
+\end{quote}
+\resp Section~VII.G (the minimal agent-based illustration) is retained but now explicitly
+labeled ``illustrative rather than a new validation experiment'' in its caption, and the
+limitations (Section~VII.H, item~9) state that ``Computational-social-systems applications
+are illustrative\ldots full mechanism-design and policy-simulation applications are not
+implemented in this paper.''
+
+\section*{Room for improvement}
+
+\rev{I1. Move to individual-level estimation and validation.}
+\begin{quote}\itshape\small
+Move to individual-level estimation and validation. The most important next step is to test the framework on raw experimental data rather than published aggregate summaries. This would allow likelihood-based estimation, proper train/validation/test separation, and sharper uncertainty quantification.
+\end{quote}
+\resp Partially done in v2: the Fraser--Nettle game targets and the Andersen high-stakes
+test both use individual-level data. A full joint individual-level likelihood across the
+entire benchmark is not feasible with current data availability (most calibration targets
+remain published summaries) and is listed as the principal future-work item in the
+conclusion.
+
+\rev{I2. Separate encoding validation from metric validation.}
+\begin{quote}\itshape\small
+Separate encoding validation from metric validation. The encodings should be justified more transparently and, where possible, anchored independently -- for example through pre-registered coding rules, external raters, or automated text-to-attribute procedures. At present, too much explanatory power sits in the encoding layer.
+\end{quote}
+\resp The encoding-audit table (Table~III), the encoding-ablation analyses (Section~VI.D),
+and the new Section~VII.E each contribute to this separation. We have not yet anchored
+encodings against external raters or preregistered coding rules, and we say so explicitly
+in the limitations.
+
+\rev{I3. Use stronger statistical evaluation criteria.}
+\begin{quote}\itshape\small
+Use stronger statistical evaluation criteria. The paper should complement tolerance-based pass rates with confidence-interval coverage, weighted loss functions, calibration diagnostics, and formal model-comparison measures. A hierarchical or meta-analytic treatment of the heterogeneous studies would also strengthen the empirical section.
+\end{quote}
+\resp Section~V.D (``Beyond Pass/Fail'') now adds per-subset MAE and the high-$N$ Ruggeri-subset MAE, Wilson 95\% CIs
+on the individual-level subset, and formal AIC and likelihood-ratio tests on Andersen.
+Pass counts are retained as a coarse engineering diagnostic, with the higher-resolution
+metrics layered on top rather than replacing them.
+
+\rev{I4. Broaden the benchmark.}
+\begin{quote}\itshape\small
+Broaden the benchmark. The claims would be much more persuasive if the model were tested on a larger and more diverse set of tasks: additional prospect-theory problems, other bargaining environments, trust games, market settings, and truly money-salient contexts.
+\end{quote}
+\resp v2 adds Andersen ($n=458$) to the held-out set. Further breadth (Ruggeri's full
+19-country / 4{,}098-participant prospect-theory replication; Slonim--Roth and Cameron
+high-stakes cohorts; trust games; market settings) is committed to as the next round of
+work.
+
+\rev{I5. Benchmark against stronger alternatives under a common protocol.}
+\begin{quote}\itshape\small
+Benchmark against stronger alternatives under a common protocol. In addition to CPT and Fehr-Schmidt, the paper should compare against discrete-choice models, random-utility models with richer covariates, or flexible predictive baselines estimated on the same training information.
+\end{quote}
+\resp We do not yet have individual-level data across the full benchmark, which is what a
+common discrete-choice / random-utility estimation protocol would require. The CPT
+optimization ceiling (Section~VI.E, Appendix~A) is the strongest within-tool baseline we
+can run on the existing target set; we now state plainly that the cross-tool comparison
+is ``suggestive rather than definitive.''
+
+\rev{I6. Clarify model complexity.}
+\begin{quote}\itshape\small
+Clarify model complexity. The paper would benefit from a more conservative accounting of complexity that includes the temperature architecture and the domain-specific encoding mechanisms. This would make the parsimony claim more credible.
+\end{quote}
+\resp See response to T4. The 12-quantity conservative count and the
+``few fitted variances conditional on an explicit encoding architecture'' framing are now
+both in the body and in the parameter-accounting table.
+
+\rev{I7. Test the money-zero result more directly.}
+\begin{quote}\itshape\small
+Test the money-zero result more directly. Rather than treating it mainly as an interpretive consequence of the current fit, the paper should confront settings where monetary stakes plausibly dominate and examine whether the monetary dimension activates there.
+\end{quote}
+\resp This is the single largest empirical addition in v2. Section~VII.A
+(``Money-Zero as a Falsifiable Boundary Condition'') contains the full Andersen test.
+Three pre-specified tests reject stake-scaling invariance on this dataset
+($\chi^2$ $p=10^{-3}$; Kruskal--Wallis $p<10^{-12}$; logit LRT $p<10^{-4}$);
+mean offers fall from 24.2\% at Rs~20 to 12.1\% at Rs~20{,}000; rejection rates fall
+from 36.3\% to 4.2\%; the logit log-stake odds ratio is 0.82 per log-unit, holding
+offer share constant.
+
+We are deliberate in the revised text about what this does and does not establish.
+The result is the direction the framework predicts under recalibration: $d_1$
+activates when stakes become consequential, and the universal version of money-zero
+is empirically false on the Andersen data. But Andersen is one dataset in one country.
+A new subsection (``What this does \emph{not} establish,'' Section~VII.A.5) states
+that the test does not by itself map the boundary across cultures, institutional
+settings, or stake ranges, and that whether the same recalibration mechanism explains
+analogous boundaries in dictator and public-goods games remains open. The result is
+the first boundary probe of a calibrated metric, not a closed verdict.
+
+\rev{I8. Make the standalone paper more self-contained.}
+\begin{quote}\itshape\small
+Make the standalone paper more self-contained. Since several key building blocks are currently delegated to companion working papers, the article should either incorporate more methodological detail directly or supply a fuller appendix that allows readers to evaluate the framework without relying on unpublished manuscripts.
+\end{quote}
+\resp See response to T7. The structural-fuzzing algorithm is inlined (Section~V.A,
+pseudocode in Table~IV, objective in Eq.~\ref{eq:fuzz-objective-resp}); all four
+working-paper citations are removed; the paper now depends on no unpublished material.
+
+\section*{Summary of changes}
+
+\begin{itemize}[leftmargin=*]
+  \item \textbf{New}: Section~VII.A (Money-Zero as a Falsifiable Boundary Condition), with
+        the Andersen et al.\ test, the falsification figure (Fig.~4), the AIC and
+        LRT machinery, and an explicit ``what this does \emph{not} establish'' subsection.
+  \item \textbf{New}: Section~VII.D (What the Result Is, and Is Not, About Rationality).
+  \item \textbf{New}: Section~VII.E (Normative Labels, Descriptive Use).
+  \item \textbf{New}: Section~V.D (Beyond Pass/Fail: Statistical Evaluation Where Raw
+        Data Are Recoverable).
+  \item \textbf{Expanded}: Section~V.A inlines the structural-fuzzing algorithm with
+        objective function, selection rule, multiplicity exposure, and pseudocode
+        (Table~IV).
+  \item \textbf{Rewritten}: Section~VII.B (now ``A Cross-Domain Bridge, Not a
+        Unification''). Word ``unification'' removed throughout.
+  \item \textbf{Updated}: Abstract, introduction, contributions, conclusion. Ruggeri-subset MAE row added to Table~VI. CPT appendix retained as Appendix~A.
+  \item \textbf{Removed}: Embedded response-body insertion at the top of the document;
+        the manuscript now begins with the title page. A duplicated ``Complexity,
+        Degrees of Freedom, and Multiplicity'' subsection that had appeared in both
+        Results and Discussion is now consolidated in Discussion (Section~VII.C). Four
+        working-paper bibliography entries removed. The previous \texttt{response\_body.tex}
+        dependency is gone.
+  \item \textbf{Bibliography}: Andersen et al.~(2011) AER, Andersen et al.\ (2019) openICPSR
+        data citation, Slonim and Roth~(1998), and Cameron~(1999) added.
+\end{itemize}
+
+The revised submission file is \texttt{revised\_manuscript\_v2.tex} (compiles via
+\texttt{pdflatex}; produces a 16-page IEEE-format PDF \texttt{revised\_manuscript\_v2.pdf}).
+Supporting analysis code and the Andersen replication are in the Jupyter notebook
+\texttt{tcss\_public\_data\_analysis.ipynb}, with output CSVs and figures under the
+\texttt{tcss\_public\_data\_analysis/outputs/} directory.
+
+\end{document}
