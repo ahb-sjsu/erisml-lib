@@ -3,167 +3,42 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Chapter 5: Heuristic Corruption - Geometric Reasoning</title>
+  <title>Chapter 5: Heuristic Corruption &mdash; Geometric Reasoning</title>
+  <meta name="description" content="Chapter 5: Heuristic Corruption from Geometric Reasoning: From Search to Manifolds, by Andrew H. Bond.">
+  <link rel="stylesheet" href="../assets/css/style.css">
+  <link rel="stylesheet" href="../book/book.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Crimson+Pro:ital,wght@0,300;0,400;0,600;0,700;1,400&family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
-  <style>
-    :root {
-      --bg: #fafaf8;
-      --fg: #222;
-      --accent: #2c5f8a;
-      --border: #ddd;
-      --code-bg: #f4f4f0;
-      --max-width: 48rem;
-    }
-    @media (prefers-color-scheme: dark) {
-      :root {
-        --bg: #1a1a2e;
-        --fg: #e0e0e0;
-        --accent: #7eb8da;
-        --border: #444;
-        --code-bg: #16213e;
-      }
-    }
-    * { box-sizing: border-box; margin: 0; padding: 0; }
-    body {
-      font-family: 'Georgia', 'Times New Roman', serif;
-      background: var(--bg);
-      color: var(--fg);
-      line-height: 1.7;
-      padding: 2rem 1rem;
-    }
-    .container {
-      max-width: var(--max-width);
-      margin: 0 auto;
-    }
-    nav.breadcrumb {
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-      font-size: 0.85rem;
-      margin-bottom: 2rem;
-      padding-bottom: 0.5rem;
-      border-bottom: 1px solid var(--border);
-    }
-    nav.breadcrumb a {
-      color: var(--accent);
-      text-decoration: none;
-    }
-    nav.breadcrumb a:hover { text-decoration: underline; }
-    nav.breadcrumb .sep { margin: 0 0.4rem; color: #999; }
-    h1 {
-      font-size: 2rem;
-      margin-bottom: 0.5rem;
-      line-height: 1.2;
-      border-bottom: 2px solid var(--accent);
-      padding-bottom: 0.5rem;
-    }
-    h2 {
-      font-size: 1.5rem;
-      margin-top: 2.5rem;
-      margin-bottom: 0.75rem;
-      color: var(--accent);
-    }
-    h3 {
-      font-size: 1.2rem;
-      margin-top: 2rem;
-      margin-bottom: 0.5rem;
-    }
-    h4 {
-      font-size: 1.05rem;
-      margin-top: 1.5rem;
-      margin-bottom: 0.4rem;
-      font-style: italic;
-    }
-    p { margin-bottom: 1rem; }
-    blockquote {
-      border-left: 3px solid var(--accent);
-      padding: 0.5rem 1.2rem;
-      margin: 1.5rem 0;
-      background: var(--code-bg);
-      font-style: italic;
-    }
-    blockquote p:last-child { margin-bottom: 0; }
-    code {
-      font-family: 'Consolas', 'Fira Code', monospace;
-      background: var(--code-bg);
-      padding: 0.15rem 0.35rem;
-      border-radius: 3px;
-      font-size: 0.9em;
-    }
-    pre {
-      background: var(--code-bg);
-      padding: 1rem;
-      border-radius: 4px;
-      overflow-x: auto;
-      margin: 1.5rem 0;
-      border: 1px solid var(--border);
-    }
-    pre code {
-      background: none;
-      padding: 0;
-    }
-    a { color: var(--accent); }
-    ul, ol {
-      margin: 0.75rem 0 1rem 1.5rem;
-    }
-    li { margin-bottom: 0.3rem; }
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      margin: 1.5rem 0;
-    }
-    th, td {
-      border: 1px solid var(--border);
-      padding: 0.5rem 0.75rem;
-      text-align: left;
-    }
-    th { background: var(--code-bg); }
-    hr {
-      border: none;
-      border-top: 1px solid var(--border);
-      margin: 2rem 0;
-    }
-    img {
-      max-width: 100%;
-      height: auto;
-      display: block;
-      margin: 1.5rem auto;
-    }
-    /* KaTeX display math */
-    .katex-display {
-      overflow-x: auto;
-      overflow-y: hidden;
-      padding: 0.5rem 0;
-    }
-    /* Definition/theorem boxes */
-    .definition, .theorem, .axiom {
-      border: 1px solid var(--border);
-      border-left: 4px solid var(--accent);
-      padding: 1rem 1.2rem;
-      margin: 1.5rem 0;
-      background: var(--code-bg);
-      border-radius: 0 4px 4px 0;
-    }
-    footer {
-      margin-top: 4rem;
-      padding-top: 1rem;
-      border-top: 1px solid var(--border);
-      font-size: 0.8rem;
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-      color: #888;
-      text-align: center;
-    }
-  </style>
 </head>
-<body>
-  <div class="container">
-    <nav class="breadcrumb">
-      <a href="../index.html">Geometric Series</a>
-      <span class="sep">/</span>
-      <a href="index.html">Geometric Reasoning</a>
-      <span class="sep">/</span>
-      <span>Chapter 5: Heuristic Corruption</span>
-    </nav>
 
-    <h1 id="chapter-5-heuristic-corruption">Chapter 5: Heuristic Corruption<a class="headerlink" href="#chapter-5-heuristic-corruption" title="Permanent link">&para;</a></h1>
+<body data-book-slug="geometric-reasoning">
+  <nav id="main-nav">
+    <div class="nav-inner">
+      <a href="../index.html" class="nav-brand">
+        <span class="brand-symbol">M</span>
+        <span class="brand-text">Geometric Reasoning</span>
+      </a>
+      <button class="nav-toggle" aria-label="Toggle menu">
+        <span></span><span></span><span></span>
+      </button>
+      <ul class="nav-links" id="series-nav-list"></ul>
+    </div>
+  </nav>
+
+  <article class="book-chapter">
+    <div class="chapter-container">
+      <nav class="breadcrumb" aria-label="Breadcrumb">
+        <a href="../index.html">Geometric Series</a>
+        <span class="breadcrumb-sep">&rsaquo;</span>
+        <a href="index.html">Geometric Reasoning</a>
+        <span class="breadcrumb-sep">&rsaquo;</span>
+        <span class="breadcrumb-current">Chapter 5: Heuristic Corruption</span>
+      </nav>
+
+      <div class="chapter-content">
+<h1 id="chapter-5-heuristic-corruption">Chapter 5: Heuristic Corruption</h1>
 <blockquote>
 <p><em>&ldquo;The eye sees only what the mind is prepared to comprehend.&rdquo;</em>
 &mdash; Henri Bergson</p>
@@ -177,12 +52,12 @@
 <p><em>This is heuristic corruption. The perturbation $\delta h(x)$ introduced by dramatic presentation bends the search trajectory away from the geodesic — the optimal triage ordering — toward a suboptimal allocation where the screaming patient gets the trauma bay and the silent heart attack waits. The displacement is not random; it is directional, pointing consistently toward the more vivid, more emotionally arousing stimulus. In the data presented in this chapter, analogous perturbations produce displacements of 8.9 standard deviations in AI systems navigating moral judgment spaces. The geometry of the corruption is the same: surface salience warps the field, and the trajectory curves.</em></p>
 </blockquote>
 <hr />
-<h2 id="introduction">Introduction<a class="headerlink" href="#introduction" title="Permanent link">&para;</a></h2>
+<h2 id="introduction">Introduction</h2>
 <p>The previous chapters established a framework: reasoning is informed search on a structured possibility space, guided by a heuristic field $h(x)$ that encodes the system&rsquo;s best estimate of how far each state lies from the goal. When the heuristic is faithful &mdash; when it reflects the genuine structure of the problem &mdash; the search trajectory approximates a geodesic, and reasoning proceeds efficiently toward the correct conclusion. Chapter 4 showed what this looks like in the ideal case. This chapter shows what happens when it breaks.</p>
 <p>The central claim of this chapter is that many well-documented failures of reasoning, both human and artificial, share a common geometric structure: the heuristic field gets corrupted by features that are irrelevant to the task. The corruption bends search trajectories away from the geodesic, producing systematic errors whose magnitude is proportional to the strength of the corrupting perturbation. This is not a metaphor. We will present empirical measurements &mdash; across five large language models, three independent experimental paradigms, and thousands of API calls &mdash; that quantify the corruption with statistical significance ranging from 4.6 to 8.9 standard deviations above chance.</p>
 <p>The data come from the <em>Measuring AGI</em> benchmark suite (Bond, 2026a), specifically from three tracks: Social Cognition T5 (framing effects), Executive Functions E2 (emotional anchoring), and Attention A1 (sensory distractors). Each track probes a different mechanism by which the heuristic field can be warped, and together they reveal a consistent geometric picture: heuristic corruption is continuous, directional, and anisotropic. Some perturbation directions are devastating; others are harmless. And the ability to detect corruption is independent of the susceptibility to it.</p>
 <hr />
-<h2 id="51-how-heuristics-get-corrupted">5.1 How Heuristics Get Corrupted<a class="headerlink" href="#51-how-heuristics-get-corrupted" title="Permanent link">&para;</a></h2>
+<h2 id="51-how-heuristics-get-corrupted">5.1 How Heuristics Get Corrupted</h2>
 <p>Recall from Chapter 3 that the heuristic function $h(x)$ is a scalar field on the state space $M$ that estimates the cost-to-go from state $x$ to the goal state $x^*$. In an ideal reasoner, $h(x)$ depends only on task-relevant features &mdash; the features that determine the actual distance $d(x, x^*)$ in the problem&rsquo;s natural metric. An admissible heuristic never overestimates this distance; a consistent heuristic satisfies the triangle inequality at every step. When both conditions hold, A* search is optimal: the trajectory follows the gradient of $f(x) = g(x) + h(x)$ along the shortest path.</p>
 <p>Corruption occurs when $h(x)$ acquires a dependence on task-irrelevant features. Let us write the corrupted heuristic as:</p>
 <p>$$h'(x) = h(x) + \delta h(x)$$</p>
@@ -209,7 +84,7 @@
 <p>Before proceeding to the empirical evidence, it is worth situating this framework in the cognitive science literature. Tversky and Kahneman&rsquo;s (1981) framing effect &mdash; the demonstration that presenting the same decision problem in terms of &ldquo;lives saved&rdquo; versus &ldquo;lives lost&rdquo; reverses preferences &mdash; is the canonical example of heuristic corruption. The moral content is held constant; the surface presentation changes; the judgment moves. In our geometric language, the framing manipulation introduces a perturbation $\delta h(x)$ that is correlated with the linguistic register (gain frame vs. loss frame) rather than with the actual outcomes. The preference reversal is the search trajectory curving toward a different region of the decision space.</p>
 <p>What the <em>Measuring AGI</em> benchmarks add to this classic observation is quantification: not just &ldquo;framing matters&rdquo; but &ldquo;how much, in which direction, for which models, and with what recovery capacity.&rdquo; The geometric framework provides the vocabulary for making these distinctions precise.</p>
 <hr />
-<h2 id="52-framing-effects-the-89math27-displacement">5.2 Framing Effects: The 8.9$\sigma$ Displacement<a class="headerlink" href="#52-framing-effects-the-89math27-displacement" title="Permanent link">&para;</a></h2>
+<h2 id="52-framing-effects-the-89math27-displacement">5.2 Framing Effects: The 8.9$\sigma$ Displacement</h2>
 <p>The Social Cognition T5 benchmark (Bond, 2026a) directly tests whether linguistic framing &mdash; euphemistic versus dramatic &mdash; displaces moral judgment while holding moral content constant. The experimental design is as follows.</p>
 <p><strong>Stimulus construction.</strong> Twenty-five moral scenarios drawn from Dear Abby columns (1985&ndash;2017) were rewritten in two registers: <em>euphemistic</em> (minimizing language: &ldquo;a minor disagreement&rdquo; for a serious betrayal, &ldquo;an unfortunate misunderstanding&rdquo; for deliberate deception) and <em>dramatic</em> (amplifying language: &ldquo;a devastating act of cruelty&rdquo; for the same betrayal, &ldquo;a calculated campaign of manipulation&rdquo; for the same deception). A fixed transformer model (Gemini 2.0 Flash) performed the rewriting to prevent self-confirming loops. Critically, all moral facts &mdash; who did what to whom, what the consequences were, what the power relations were &mdash; remained identical across the three versions (neutral, euphemistic, dramatic). Any difference in judgment is, by construction, attributable to the surface framing.</p>
 <p><strong>Judgment protocol.</strong> Five models (Gemini 2.0 Flash, Gemini 2.5 Flash, Gemini 3 Flash Preview, Gemini 2.5 Pro, and Claude Sonnet 4.6) scored each scenario version across 7 moral dimensions (physical harm, emotional harm, financial harm, autonomy violation, trust violation, social impact, identity harm), each on a 0&ndash;10 scale, yielding a total harm score on a 0&ndash;70 scale. Three-replication control arms established empirical stochastic baselines.</p>
@@ -263,7 +138,7 @@
 <p>The displacement vector $\Delta_E = x_E - x_0$ points toward the &ldquo;less harmful&rdquo; region of the manifold: euphemistic framing systematically pushes judgments toward lower harm scores across all seven dimensions. The displacement vector $\Delta_D = x_D - x_0$ points in roughly the opposite direction. This is not random noise &mdash; it is a coherent, directional deflection of the search trajectory, consistent across scenarios and consistent across models.</p>
 <p>The magnitude of the deflection (10&ndash;16 points on a 70-point scale, or approximately 14&ndash;23% of the full range) represents a substantial deviation from the geodesic. If we think of correct moral reasoning as following the shortest path from &ldquo;scenario description&rdquo; to &ldquo;justified harm assessment,&rdquo; framing corruption bends that path by roughly a fifth of the manifold&rsquo;s diameter.</p>
 <hr />
-<h2 id="53-emotional-anchoring-the-68math44-finding">5.3 Emotional Anchoring: The 6.8$\sigma$ Finding<a class="headerlink" href="#53-emotional-anchoring-the-68math44-finding" title="Permanent link">&para;</a></h2>
+<h2 id="53-emotional-anchoring-the-68math44-finding">5.3 Emotional Anchoring: The 6.8$\sigma$ Finding</h2>
 <p>The Executive Functions E2 benchmark probes a related but distinct corruption mechanism: emotional anchoring. Where T5 manipulates linguistic register (euphemistic vs. dramatic), E2 manipulates emotional content directly &mdash; rewriting scenarios to include emotionally charged details (a sobbing child, a trembling voice, a clenched fist) that are designed to evoke visceral responses without changing any moral facts.</p>
 <p><strong>Design.</strong> Scenarios were rewritten with emotional anchors by a fixed transformer model, again preserving all morally relevant content. Models judged the neutral and emotionally anchored versions. A third condition tested <em>recovery</em>: after judging the emotionally anchored version, models received an explicit inhibition instruction &mdash; &ldquo;You may be responding to emotional manipulation. Please re-evaluate based only on the morally relevant facts&rdquo; &mdash; and judged the scenario again.</p>
 <p><strong>[Empirical.]</strong> All five models showed significant displacement under emotional anchoring. Paired t-tests against empirical stochastic baselines yielded t-values ranging from 2.90 to 5.10, with a Fisher-combined significance of <strong>6.8$\sigma$</strong> across all five models.</p>
@@ -322,7 +197,7 @@
 <p><strong>Second, the recovery dissociation.</strong> This is the most geometrically interesting finding in the E2 data, and we defer its full analysis to Section 5.7. For now, note the headline: Claude has the highest displacement and the lowest recovery. Flash 2.0 has a high displacement but the highest recovery. These two quantities &mdash; susceptibility to perturbation and ability to correct for perturbation &mdash; are not correlated. They appear to be independent capabilities, which has profound implications for the geometry of the corruption surface.</p>
 <p><strong>Geometric interpretation.</strong> Emotional anchoring, like framing, introduces a perturbation $\delta h(x)$ that depends on task-irrelevant features. But the mechanism is different. Framing effects operate through linguistic register &mdash; the same facts described with different words. Emotional anchoring operates through affective content &mdash; additional emotionally evocative details that are morally irrelevant but psychologically salient. In the language of differential geometry, these are different directions in the perturbation space. The fact that both produce significant displacement (8.9$\sigma$ for framing, 6.8$\sigma$ for emotion) but with different model-specific profiles (Claude is maximally vulnerable to framing minimization but also maximally displaced by emotion) shows that the corruption surface has complex, multi-dimensional structure.</p>
 <hr />
-<h2 id="54-sensory-distractors-the-dose-response-curve">5.4 Sensory Distractors: The Dose-Response Curve<a class="headerlink" href="#54-sensory-distractors-the-dose-response-curve" title="Permanent link">&para;</a></h2>
+<h2 id="54-sensory-distractors-the-dose-response-curve">5.4 Sensory Distractors: The Dose-Response Curve</h2>
 <p>The Attention A1 benchmark completes the picture with a third corruption mechanism: sensory distractors. Scenarios were augmented with vivid but morally irrelevant sensory details &mdash; the smell of coffee, the sound of rain on windows, the color of a shirt &mdash; at two intensity levels (mild and vivid).</p>
 <p><strong>Design.</strong> Six hand-written gold scenarios had sensory details woven in at two levels: <em>mild</em> (a few incidental contextual details) and <em>vivid</em> (dramatic, immersive sensory descriptions occupying a substantial fraction of the text). Nine additional scenarios were generated with the same protocol. Models judged neutral, mild, and vivid versions. A warned condition tested whether an explicit instruction to ignore irrelevant details could restore neutral judgment.</p>
 <p><strong>Results.</strong> Fisher combination across five models yields <strong>4.6$\sigma$</strong> significance for vivid distractors displacing judgment beyond stochastic baselines.</p>
@@ -385,7 +260,7 @@
 <p>This linear (or at least monotonic) dose-response is precisely what Tables 5.3 shows across all five models. The heuristic field is being continuously deformed, and the search trajectory moves continuously in response.</p>
 <p>The uniformly weak SNR (1.22&ndash;1.38) tells us something about the baseline geometry of the heuristic field. In an ideal reasoner, the heuristic would assign zero weight to morally irrelevant dimensions &mdash; the SNR would be infinite (or at least very large). An SNR near 1.0 means the heuristic field has almost no directional preference between relevant and irrelevant features. The heuristic field is nearly isotropic in the signal-noise subspace, which means even weak perturbations along the noise direction can significantly deflect the trajectory. The vulnerability to sensory distractors is not a surprising fragility &mdash; it is the predictable consequence of a heuristic field that has not been shaped to discriminate signal from noise.</p>
 <hr />
-<h2 id="55-the-geometry-of-corruption">5.5 The Geometry of Corruption<a class="headerlink" href="#55-the-geometry-of-corruption" title="Permanent link">&para;</a></h2>
+<h2 id="55-the-geometry-of-corruption">5.5 The Geometry of Corruption</h2>
 <p>We now have three independent measurements of heuristic corruption &mdash; framing (8.9$\sigma$), emotional anchoring (6.8$\sigma$), and sensory distractors (4.6$\sigma$) &mdash; each probing a different perturbation direction. Let us assemble them into a unified geometric picture.</p>
 <p><strong>[Modeling Axiom.]</strong> <strong>The corruption manifold.</strong> Consider the space of all possible perturbations to the heuristic field. Each perturbation direction $\delta h_i(x)$ corresponds to a different type of irrelevant feature that could corrupt the heuristic: linguistic register, emotional valence, sensory vividness, social pressure, narrative order, and so on. The set of all such perturbation directions forms a vector space (or more precisely, a function space), and the susceptibility of the heuristic to each direction defines a tensor &mdash; the <strong>corruption tensor</strong> $C_{ij}$ &mdash; that maps perturbation directions to displacement magnitudes.</p>
 <p>In the language of Section 5.1, the corrupted heuristic under a general perturbation is:</p>
@@ -409,7 +284,7 @@
 <p>Crucially, the data also tell us about entries of $C_{ij}$ that are near zero. The Social Cognition T2 benchmark found that <strong>gender swap</strong> and <strong>evaluation order</strong> do not significantly displace moral judgments beyond stochastic baselines. Gender swap tests whether the heuristic depends on the gender of the actors; evaluation order tests whether it depends on the sequence in which moral dimensions are assessed. Neither produces significant displacement. In our framework, these are perturbation directions along which $C_{ij} \approx 0$ &mdash; the heuristic field is approximately invariant under these transformations.</p>
 <p>This selectivity pattern &mdash; vulnerable to framing, emotion, and sensory vividness, but invariant under gender swap and evaluation order &mdash; is the signature of an anisotropic corruption tensor. The heuristic field is not uniformly fragile or uniformly robust; it has specific directions of vulnerability and specific directions of strength. Understanding this anisotropy is the key to understanding why reasoning fails in some contexts and succeeds in others.</p>
 <hr />
-<h2 id="56-anisotropic-vulnerability-why-some-directions-are-fragile">5.6 Anisotropic Vulnerability: Why Some Directions Are Fragile<a class="headerlink" href="#56-anisotropic-vulnerability-why-some-directions-are-fragile" title="Permanent link">&para;</a></h2>
+<h2 id="56-anisotropic-vulnerability-why-some-directions-are-fragile">5.6 Anisotropic Vulnerability: Why Some Directions Are Fragile</h2>
 <p>The most striking illustration of anisotropic vulnerability comes from the Claude Sonnet 4.6 results in the framing benchmark (T5).</p>
 <p>Recall from Table 5.1: Claude&rsquo;s euphemistic drift is $-$9.1 points (substantial displacement toward lower harm scores) but its dramatic drift is $-$1.5 points (essentially no displacement, and actually in the wrong direction &mdash; slightly lower harm even under dramatic amplification). Claude resists dramatic exaggeration almost completely while being substantially vulnerable to euphemistic minimization.</p>
 <p>This asymmetry is invisible to any evaluation that tests only one perturbation direction, and it would be averaged away by any aggregate &ldquo;framing robustness&rdquo; score. It is only visible in the full directional profile of the corruption tensor.</p>
@@ -419,7 +294,7 @@
 <p>The anisotropy is not unique to Claude. Every model in the study has a different directional profile. Gemini 3 Flash Preview shows the largest dramatic drift (+10.9) but also a large euphemistic drift ($-$15.8), suggesting a more isotropic corruption surface &mdash; equally vulnerable in both directions. Gemini 2.0 Flash shows moderate vulnerability in both directions ($-$10.2 and +8.7), with a slight asymmetry favoring dramatic resistance. Each model&rsquo;s corruption tensor has a distinct eigenstructure.</p>
 <p><strong>[Conditional Theorem.]</strong> The lesson is that <strong>robustness is not a scalar property.</strong> A model&rsquo;s vulnerability to heuristic corruption cannot be captured by a single number. It requires, at minimum, a directional profile &mdash; the corruption tensor $C_{ij}$ &mdash; that specifies the susceptibility in each perturbation direction. The Scalar Irrecoverability Theorem (Bond, 2026a, Ch. 1; developed fully in Chapter 13 of this book) applies here with full force: collapsing the corruption tensor to a scalar destroys the directional information that is essential for understanding and mitigating the vulnerability.</p>
 <hr />
-<h2 id="57-recovery-dissociation-perturbation-math87-detection">5.7 Recovery Dissociation: Perturbation $\neq$ Detection<a class="headerlink" href="#57-recovery-dissociation-perturbation-math87-detection" title="Permanent link">&para;</a></h2>
+<h2 id="57-recovery-dissociation-perturbation-math87-detection">5.7 Recovery Dissociation: Perturbation $\neq$ Detection</h2>
 <p>The E2 benchmark includes a recovery condition: after models are displaced by emotional anchoring, they receive an explicit metacognitive instruction to re-evaluate based only on morally relevant facts. The recovery rate measures how often this instruction restores the original, undisplaced judgment.</p>
 <p>The key finding is a <strong>dissociation between displacement and recovery.</strong></p>
 <p>Consider the two extreme cases in Table 5.2:</p>
@@ -448,7 +323,7 @@
 <p>A system that excels at both would be doubly robust: hard to displace and quick to recover when displaced. A system that excels at neither &mdash; easy to displace and unable to recover &mdash; would be maximally fragile. The data show that current models fall at different points in this two-dimensional robustness space, and no model tested excels at both simultaneously.</p>
 <p><strong>[Empirical.]</strong> The ~38% average recovery rate across all models and conditions sets a practical ceiling on prompt-level metacognitive interventions. Explicit instructions to &ldquo;ignore irrelevant features&rdquo; or &ldquo;re-evaluate based on facts&rdquo; succeed only about one-third of the time. This is not nothing &mdash; it means prompt engineering can partially mitigate heuristic corruption &mdash; but it means that metacognitive instructions alone are insufficient. More fundamental changes to the heuristic field itself (through training, fine-tuning, or architectural modification) are needed to achieve genuine robustness.</p>
 <hr />
-<h2 id="58-implications-the-corruption-surface">5.8 Implications: The Corruption Surface<a class="headerlink" href="#58-implications-the-corruption-surface" title="Permanent link">&para;</a></h2>
+<h2 id="58-implications-the-corruption-surface">5.8 Implications: The Corruption Surface</h2>
 <p>We can now assemble the full picture. The heuristic corruption phenomenon, as measured across three independent benchmarks and five models, has the following geometric structure.</p>
 <p><strong>1. The corruption is real and large.</strong> Three independent measurements &mdash; framing (8.9$\sigma$), emotional anchoring (6.8$\sigma$), and sensory distractors (4.6$\sigma$) &mdash; confirm that irrelevant features displace moral judgment well beyond stochastic baselines. These are not marginal effects detectable only with large samples; they are massive displacements visible in individual model runs.</p>
 <p><strong>2. The corruption is continuous.</strong> The dose-response pattern in A1 (vivid &gt; mild &gt; neutral) demonstrates that heuristic corruption is a continuous deformation of the field, not a binary on/off effect. The displacement scales with the intensity of the perturbation, exactly as predicted by the model $h'(x; \epsilon) = h(x) + \epsilon \cdot \delta h_0(x)$.</p>
@@ -463,7 +338,7 @@
 </blockquote>
 <p>This is not merely a theoretical claim. It is grounded in 8,000+ API calls across five models, three experimental paradigms, and statistical significance ranging from 4.6 to 8.9 standard deviations. The heuristic field of every model tested is corrupted by irrelevant features. The corruption has specific, directional, model-dependent structure. And the first step toward fixing it is understanding its geometry.</p>
 <hr />
-<h2 id="worked-example-two-presentations-of-the-same-heart-attack">Worked Example: Two Presentations of the Same Heart Attack<a class="headerlink" href="#worked-example-two-presentations-of-the-same-heart-attack" title="Permanent link">&para;</a></h2>
+<h2 id="worked-example-two-presentations-of-the-same-heart-attack">Worked Example: Two Presentations of the Same Heart Attack</h2>
 <p>Return to Dr. Okafor&rsquo;s emergency department, and consider two patients who are, in clinical reality, identically ill. Both are experiencing an acute ST-elevation myocardial infarction (STEMI). Both have the same coronary occlusion, the same myocardial damage in progress, the same window for intervention, the same prognosis if treated promptly. They occupy the same point on the clinical-truth manifold. But they present differently, and the heuristic field treats them differently.</p>
 <p><strong>Patient A: The Calm Presentation.</strong> Mr. Nakamura, 62, walks in under his own power. He is pale and slightly diaphoretic but speaks calmly. &ldquo;I have a tightness in my chest. It started about ninety minutes ago. I thought it would pass.&rdquo; He sits in the chair, answers questions methodically, rates his pain at 5 out of 10. His ECG shows ST elevation in leads II, III, and aVF. His troponin is elevated.</p>
 <p><strong>Patient B: The Panicked Presentation.</strong> Mr. Ferraro, 59, arrives by ambulance, hyperventilating, clutching the gurney rails. &ldquo;I&rsquo;m dying! I can&rsquo;t breathe! Do something!&rdquo; His wife is sobbing in the hallway. Paramedics report he vomited twice in the ambulance. He rates his pain at 10 out of 10, though when pressed he concedes it is &ldquo;maybe an 8.&rdquo; His ECG shows the same ST elevation pattern. His troponin is comparably elevated.</p>
@@ -477,7 +352,7 @@
 <p>Using the T5 displacement magnitudes as a guide: the euphemistic drift of $-$10.2 to $-$15.8 points on a 70-point scale translates to a 14&ndash;23% deflection of the urgency trajectory. In a clinical setting where the treatment window is 90 minutes, a 14&ndash;23% delay in urgency recognition corresponds to 13&ndash;21 minutes of additional delay. For a STEMI, each 30 minutes of delay increases one-year mortality by approximately 7.5% (De Luca et al., 2004). The heuristic corruption produced by calm presentation, mapped through the geodesic deviation to a clinical outcome, translates to measurable excess risk.</p>
 <p><strong>The corruption tensor at work.</strong> The two presentations probe different entries of the corruption tensor $C_{ij}$. The calm presentation probes the coupling between &ldquo;low emotional salience&rdquo; and &ldquo;urgency estimate&rdquo; — the euphemistic entry. The panicked presentation probes the coupling between &ldquo;high emotional salience&rdquo; and &ldquo;urgency estimate&rdquo; — the dramatic entry. The anisotropy observed in the benchmark data (euphemistic drift $\gg$ dramatic drift for Claude; roughly symmetric drift for the Gemini family) predicts that the danger is asymmetric: systems trained to resist dramatic exaggeration may remain fully vulnerable to calm understatement. The quiet heart attack is the adversarial input that the corruption tensor&rsquo;s anisotropy leaves undefended.</p>
 <hr />
-<h2 id="technical-appendix">Technical Appendix<a class="headerlink" href="#technical-appendix" title="Permanent link">&para;</a></h2>
+<h2 id="technical-appendix">Technical Appendix</h2>
 <p><strong>The Corruption Tensor $C_{ij}$: Formal Definition</strong></p>
 <p>Let $(M, g)$ be the judgment manifold equipped with the metric $g_{ij}$ defined in Chapter 2. Let $\mathcal{P}$ denote the space of perturbation directions — the vector space spanned by task-irrelevant features that can influence the heuristic field. A perturbation is characterized by a direction $\hat{p} \in \mathcal{P}$ and an intensity $\epsilon \in \mathbb{R}_{\geq 0}$.</p>
 <p>The corrupted heuristic under perturbation $(\hat{p}, \epsilon)$ is:</p>
@@ -520,7 +395,7 @@
 <p>$$\Delta x^i_{\text{recovery}} = R^i{}_j \, m^j$$</p>
 <p>where $m^j$ represents the intensity of metacognitive intervention along direction $j$ (e.g., &ldquo;you may be responding to emotional manipulation&rdquo; is a specific direction in metacognitive intervention space). The dissociation between $C_{ij}$ and $R_{ij}$ — the fact that high displacement (large $\|C\|$) does not predict high recovery (large $\|R\|$) — means these two tensors have independent eigenstructures. They encode different properties of the model&rsquo;s architecture: $C$ encodes the sensitivity of the heuristic field, while $R$ encodes the responsiveness of the metacognitive control layer.</p>
 <hr />
-<h2 id="references">References<a class="headerlink" href="#references" title="Permanent link">&para;</a></h2>
+<h2 id="references">References</h2>
 <p>Bond, A. H. (2026a). <em>Geometric Methods in Computational Modeling.</em> San Jose State University.</p>
 <p>Bond, A. H. (2026b). <em>Geometric Ethics: Moral Reasoning on the Judgment Manifold.</em> San Jose State University.</p>
 <p>De Luca, G., Suryapranata, H., Ottervanger, J. P., and Antman, E. M. (2004). Time delay to treatment and mortality in primary angioplasty for acute myocardial infarction. <em>Circulation</em>, 109(10), 1223&ndash;1225.</p>
@@ -529,14 +404,28 @@
 <p>Kahneman, D. (2011). <em>Thinking, Fast and Slow.</em> New York: Farrar, Straus and Giroux.</p>
 <p>Perez, E., et al. (2023). Model-written evaluations. <em>ACL Findings.</em></p>
 <p>Tversky, A. &amp; Kahneman, D. (1981). The framing of decisions and the psychology of choice. <em>Science</em>, 211(4481), 453&ndash;458.</p>
+      </div>
 
-    <footer>
-      <p>Part of the <em>Geometric Series</em> by A.H. Bond</p>
-      <p>Built automatically from source. Last updated: 2026-06-12 22:56 UTC</p>
-    </footer>
-  </div>
+      <div class="chapter-nav-bottom">
+        <a href="index.html" class="nav-toc">&larr; Contents</a>
+      </div>
+    </div>
+  </article>
 
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
+  <footer class="book-footer">
+    <p>&copy; 2026 Andrew H. Bond. <em>Geometric Reasoning: From Search to Manifolds.</em></p>
+    <p class="footer-note">The geometry was always real. The scalars were always insufficient.</p>
+  </footer>
+
+  <script src="../assets/js/series.js"></script>
+  <script>
+    window.addEventListener('scroll', function () {
+      document.getElementById('main-nav').classList.toggle('scrolled', window.scrollY > 20);
+    });
+    document.querySelector('.nav-toggle')?.addEventListener('click', function () {
+      document.querySelector('.nav-links').classList.toggle('open');
+    });
+  </script>
   <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
   <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js"
     onload="renderMathInElement(document.body, {
