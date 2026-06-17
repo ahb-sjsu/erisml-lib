@@ -3,173 +3,48 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Appendix B: Code Walkthrough - Geometric Medicine</title>
+  <title>Appendix B: Code Walkthrough &mdash; Geometric Medicine</title>
+  <meta name="description" content="Appendix B: Code Walkthrough from Geometric Medicine: Clinical Reasoning, Triage, and the Ethics of Allocation, by Andrew H. Bond.">
+  <link rel="stylesheet" href="../assets/css/style.css">
+  <link rel="stylesheet" href="../book/book.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Crimson+Pro:ital,wght@0,300;0,400;0,600;0,700;1,400&family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
-  <style>
-    :root {
-      --bg: #fafaf8;
-      --fg: #222;
-      --accent: #2c5f8a;
-      --border: #ddd;
-      --code-bg: #f4f4f0;
-      --max-width: 48rem;
-    }
-    @media (prefers-color-scheme: dark) {
-      :root {
-        --bg: #1a1a2e;
-        --fg: #e0e0e0;
-        --accent: #7eb8da;
-        --border: #444;
-        --code-bg: #16213e;
-      }
-    }
-    * { box-sizing: border-box; margin: 0; padding: 0; }
-    body {
-      font-family: 'Georgia', 'Times New Roman', serif;
-      background: var(--bg);
-      color: var(--fg);
-      line-height: 1.7;
-      padding: 2rem 1rem;
-    }
-    .container {
-      max-width: var(--max-width);
-      margin: 0 auto;
-    }
-    nav.breadcrumb {
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-      font-size: 0.85rem;
-      margin-bottom: 2rem;
-      padding-bottom: 0.5rem;
-      border-bottom: 1px solid var(--border);
-    }
-    nav.breadcrumb a {
-      color: var(--accent);
-      text-decoration: none;
-    }
-    nav.breadcrumb a:hover { text-decoration: underline; }
-    nav.breadcrumb .sep { margin: 0 0.4rem; color: #999; }
-    h1 {
-      font-size: 2rem;
-      margin-bottom: 0.5rem;
-      line-height: 1.2;
-      border-bottom: 2px solid var(--accent);
-      padding-bottom: 0.5rem;
-    }
-    h2 {
-      font-size: 1.5rem;
-      margin-top: 2.5rem;
-      margin-bottom: 0.75rem;
-      color: var(--accent);
-    }
-    h3 {
-      font-size: 1.2rem;
-      margin-top: 2rem;
-      margin-bottom: 0.5rem;
-    }
-    h4 {
-      font-size: 1.05rem;
-      margin-top: 1.5rem;
-      margin-bottom: 0.4rem;
-      font-style: italic;
-    }
-    p { margin-bottom: 1rem; }
-    blockquote {
-      border-left: 3px solid var(--accent);
-      padding: 0.5rem 1.2rem;
-      margin: 1.5rem 0;
-      background: var(--code-bg);
-      font-style: italic;
-    }
-    blockquote p:last-child { margin-bottom: 0; }
-    code {
-      font-family: 'Consolas', 'Fira Code', monospace;
-      background: var(--code-bg);
-      padding: 0.15rem 0.35rem;
-      border-radius: 3px;
-      font-size: 0.9em;
-    }
-    pre {
-      background: var(--code-bg);
-      padding: 1rem;
-      border-radius: 4px;
-      overflow-x: auto;
-      margin: 1.5rem 0;
-      border: 1px solid var(--border);
-    }
-    pre code {
-      background: none;
-      padding: 0;
-    }
-    a { color: var(--accent); }
-    ul, ol {
-      margin: 0.75rem 0 1rem 1.5rem;
-    }
-    li { margin-bottom: 0.3rem; }
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      margin: 1.5rem 0;
-    }
-    th, td {
-      border: 1px solid var(--border);
-      padding: 0.5rem 0.75rem;
-      text-align: left;
-    }
-    th { background: var(--code-bg); }
-    hr {
-      border: none;
-      border-top: 1px solid var(--border);
-      margin: 2rem 0;
-    }
-    img {
-      max-width: 100%;
-      height: auto;
-      display: block;
-      margin: 1.5rem auto;
-    }
-    /* KaTeX display math */
-    .katex-display {
-      overflow-x: auto;
-      overflow-y: hidden;
-      padding: 0.5rem 0;
-    }
-    /* Definition/theorem boxes */
-    .definition, .theorem, .axiom {
-      border: 1px solid var(--border);
-      border-left: 4px solid var(--accent);
-      padding: 1rem 1.2rem;
-      margin: 1.5rem 0;
-      background: var(--code-bg);
-      border-radius: 0 4px 4px 0;
-    }
-    footer {
-      margin-top: 4rem;
-      padding-top: 1rem;
-      border-top: 1px solid var(--border);
-      font-size: 0.8rem;
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-      color: #888;
-      text-align: center;
-    }
-  </style>
 </head>
-<body>
-  <div class="container">
-    <nav class="breadcrumb">
-      <a href="../index.html">Geometric Series</a>
-      <span class="sep">/</span>
-      <a href="index.html">Geometric Medicine</a>
-      <span class="sep">/</span>
-      <span>Appendix B: Code Walkthrough</span>
-    </nav>
 
-    <h1 id="appendix-b-code-walkthrough">Appendix B: Code Walkthrough<a class="headerlink" href="#appendix-b-code-walkthrough" title="Permanent link">&para;</a></h1>
+<body data-book-slug="geometric-medicine">
+  <nav id="main-nav">
+    <div class="nav-inner">
+      <a href="../index.html" class="nav-brand">
+        <span class="brand-symbol">M</span>
+        <span class="brand-text">Geometric Medicine</span>
+      </a>
+      <button class="nav-toggle" aria-label="Toggle menu">
+        <span></span><span></span><span></span>
+      </button>
+      <ul class="nav-links" id="series-nav-list"></ul>
+    </div>
+  </nav>
+
+  <article class="book-chapter">
+    <div class="chapter-container">
+      <nav class="breadcrumb" aria-label="Breadcrumb">
+        <a href="../index.html">Geometric Series</a>
+        <span class="breadcrumb-sep">&rsaquo;</span>
+        <a href="index.html">Geometric Medicine</a>
+        <span class="breadcrumb-sep">&rsaquo;</span>
+        <span class="breadcrumb-current">Appendix B: Code Walkthrough</span>
+      </nav>
+
+      <div class="chapter-content">
+<h1 id="appendix-b-code-walkthrough">Appendix B: Code Walkthrough</h1>
 <p>This appendix provides a guided walkthrough of the Python implementations that produce the computational results in this book. The code is organized in two modules: <code>ch21_clinical.py</code> (individual clinical decision-making, pathfinding, and moral injury) and <code>ch27_bioethics.py</code> (population-level allocation, the bioethical decision complex, and the clinical Bond Index). Both modules are self-contained and depend only on NumPy and SciPy.</p>
 <p>All code examples are presented in the order they appear in the text. Line references are to the versions archived with this volume.</p>
 <hr />
-<h2 id="b1-the-clinical-decision-complex">B.1 The Clinical Decision Complex<a class="headerlink" href="#b1-the-clinical-decision-complex" title="Permanent link">&para;</a></h2>
+<h2 id="b1-the-clinical-decision-complex">B.1 The Clinical Decision Complex</h2>
 <p>The clinical decision complex is implemented as a weighted graph with 9-dimensional attribute vectors on vertices and Mahalanobis-plus-boundary-penalty weights on edges.</p>
-<h3 id="b11-attribute-vectors">B.1.1 Attribute Vectors<a class="headerlink" href="#b11-attribute-vectors" title="Permanent link">&para;</a></h3>
+<h3 id="b11-attribute-vectors">B.1.1 Attribute Vectors</h3>
 <p>Each clinical state is represented by a 9-dimensional NumPy array:</p>
 <pre><code class="language-python">import numpy as np
 
@@ -181,7 +56,7 @@ state_a = np.array([0.7, 0.9, 0.8, 0.95, 0.6, 0.7, 0.85, 0.9, 0.5])
 state_b = np.array([0.9, 0.9, 0.8, 0.95, 0.4, 0.7, 0.85, 0.9, 0.5])
 </code></pre>
 <p>The attribute vector captures the patient&rsquo;s clinical-moral state across all nine dimensions. Values are normalized to $[0, 1]$, where 1 represents the best achievable state on that dimension and 0 represents the worst.</p>
-<h3 id="b12-the-covariance-matrix">B.1.2 The Covariance Matrix<a class="headerlink" href="#b12-the-covariance-matrix" title="Permanent link">&para;</a></h3>
+<h3 id="b12-the-covariance-matrix">B.1.2 The Covariance Matrix</h3>
 <p>The $9 \times 9$ clinical-moral covariance matrix $\Sigma$ encodes cross-dimensional dependencies:</p>
 <pre><code class="language-python">def build_covariance_matrix(
     diagonal_weights: np.ndarray,
@@ -222,7 +97,7 @@ Sigma = build_covariance_matrix(
 )
 </code></pre>
 <p>The cross-terms are the mathematically critical components. $\Sigma_{15}$ (outcomes $\times$ trust) encodes the fact that uncertain clinical outcomes are costlier when the therapeutic relationship is fragile. $\Sigma_{49}$ (autonomy $\times$ epistemic) encodes the fact that respecting autonomy requires adequate patient understanding. These are not philosophical assertions &mdash; they are estimable from clinical decision data (see Chapter 17 for the experimental design).</p>
-<h3 id="b13-edge-weights-mahalanobis-distance-plus-boundary-penalties">B.1.3 Edge Weights: Mahalanobis Distance Plus Boundary Penalties<a class="headerlink" href="#b13-edge-weights-mahalanobis-distance-plus-boundary-penalties" title="Permanent link">&para;</a></h3>
+<h3 id="b13-edge-weights-mahalanobis-distance-plus-boundary-penalties">B.1.3 Edge Weights: Mahalanobis Distance Plus Boundary Penalties</h3>
 <pre><code class="language-python">def clinical_edge_weight(
     state_from: np.ndarray,
     state_to: np.ndarray,
@@ -255,7 +130,7 @@ Sigma = build_covariance_matrix(
     return mahalanobis + boundary_cost
 </code></pre>
 <p>The boundary penalties represent clinical-moral thresholds. Each boundary has a detection function (does this action cross the boundary?) and a penalty value ($\beta_k$). Sacred-value boundaries have $\beta_k = \infty$ (represented computationally as <code>float('inf')</code>), which makes paths through them unreachable by $A^*$ search.</p>
-<h3 id="b14-defining-boundaries">B.1.4 Defining Boundaries<a class="headerlink" href="#b14-defining-boundaries" title="Permanent link">&para;</a></h3>
+<h3 id="b14-defining-boundaries">B.1.4 Defining Boundaries</h3>
 <pre><code class="language-python"># Example boundary definitions
 def harm_boundary(state_from, state_to):
     &quot;&quot;&quot;The Hippocratic boundary: does this action directly cause harm?&quot;&quot;&quot;
@@ -281,7 +156,7 @@ boundaries = [
 ]
 </code></pre>
 <hr />
-<h2 id="b2-clinical-math10-pathfinding">B.2 Clinical $A^*$ Pathfinding<a class="headerlink" href="#b2-clinical-math10-pathfinding" title="Permanent link">&para;</a></h2>
+<h2 id="b2-clinical-math10-pathfinding">B.2 Clinical $A^*$ Pathfinding</h2>
 <p>The clinical geodesic is computed by $A^*$ search on the clinical decision complex.</p>
 <pre><code class="language-python">import heapq
 
@@ -330,7 +205,7 @@ def clinical_astar(
 </code></pre>
 <p>The return value <code>None</code> corresponds to the clinical situation &ldquo;path not found&rdquo; &mdash; a genuine ethical impasse where no available clinical action reaches an acceptable outcome without crossing a sacred-value boundary. This is the formal trigger for ethics consultation (Chapter 6, Table 6.1).</p>
 <hr />
-<h2 id="b3-moral-injury-computation">B.3 Moral Injury Computation<a class="headerlink" href="#b3-moral-injury-computation" title="Permanent link">&para;</a></h2>
+<h2 id="b3-moral-injury-computation">B.3 Moral Injury Computation</h2>
 <p>The Moral Injury Index is computed from a sequence of clinical decisions and their boundary-crossing events.</p>
 <pre><code class="language-python">def compute_moral_injury(
     decisions: list[dict],
@@ -376,7 +251,7 @@ def clinical_astar(
     }
 </code></pre>
 <p>The Moral Injury Accumulation Theorem (Theorem 13.1) is visible in the code: <code>cumulative</code> is monotonically non-decreasing (each <code>delta_mi &gt;= 0</code>), the <code>above_critical</code> flag marks irreversible heuristic damage, and the computation is independent of burnout metrics.</p>
-<h3 id="b31-the-moral-injury-index-for-policy-evaluation">B.3.1 The Moral Injury Index for Policy Evaluation<a class="headerlink" href="#b31-the-moral-injury-index-for-policy-evaluation" title="Permanent link">&para;</a></h3>
+<h3 id="b31-the-moral-injury-index-for-policy-evaluation">B.3.1 The Moral Injury Index for Policy Evaluation</h3>
 <pre><code class="language-python">def moral_injury_index(
     policy: callable,
     case_distribution: list[dict],
@@ -405,7 +280,7 @@ def clinical_astar(
 </code></pre>
 <p>This function enables <em>prospective</em> policy evaluation: before implementing a triage protocol or resource allocation rule, estimate its expected moral injury on the clinician workforce. Policies with high MI(P) should be redesigned before deployment (Chapter 15).</p>
 <hr />
-<h2 id="b4-the-clinical-bond-index">B.4 The Clinical Bond Index<a class="headerlink" href="#b4-the-clinical-bond-index" title="Permanent link">&para;</a></h2>
+<h2 id="b4-the-clinical-bond-index">B.4 The Clinical Bond Index</h2>
 <p>The clinical Bond Index measures structural healthcare injustice.</p>
 <pre><code class="language-python">def clinical_bond_index(
     policy_paths: dict[str, list[float]],
@@ -435,7 +310,7 @@ def clinical_astar(
 
     return np.mean(deviations)
 </code></pre>
-<h3 id="b41-detecting-structural-injustice">B.4.1 Detecting Structural Injustice<a class="headerlink" href="#b41-detecting-structural-injustice" title="Permanent link">&para;</a></h3>
+<h3 id="b41-detecting-structural-injustice">B.4.1 Detecting Structural Injustice</h3>
 <pre><code class="language-python">def detect_structural_injustice(
     policy_paths: dict,
     geodesic_paths: dict,
@@ -469,7 +344,7 @@ def clinical_astar(
 </code></pre>
 <p>The Bond Index converts &ldquo;structural injustice&rdquo; from a philosophical claim to an empirical measurement. It is computable from clinical data using existing instruments (Chapter 17, Section 17.3).</p>
 <hr />
-<h2 id="b5-the-bioethical-decision-complex-population-scale">B.5 The Bioethical Decision Complex (Population Scale)<a class="headerlink" href="#b5-the-bioethical-decision-complex-population-scale" title="Permanent link">&para;</a></h2>
+<h2 id="b5-the-bioethical-decision-complex-population-scale">B.5 The Bioethical Decision Complex (Population Scale)</h2>
 <p>The population-level extension from <code>ch27_bioethics.py</code> handles multi-agent allocation problems: triage, vaccine distribution, and organ transplant.</p>
 <pre><code class="language-python">def triage_allocation(
     patients: list[dict],
@@ -509,7 +384,7 @@ def clinical_astar(
 
     return allocated
 </code></pre>
-<h3 id="b51-comparing-utilitarian-and-manifold-optimal-triage">B.5.1 Comparing Utilitarian and Manifold-Optimal Triage<a class="headerlink" href="#b51-comparing-utilitarian-and-manifold-optimal-triage" title="Permanent link">&para;</a></h3>
+<h3 id="b51-comparing-utilitarian-and-manifold-optimal-triage">B.5.1 Comparing Utilitarian and Manifold-Optimal Triage</h3>
 <pre><code class="language-python">def triage_divergence_analysis(
     patients: list[dict],
     resource_budget: int,
@@ -544,7 +419,7 @@ def clinical_astar(
 </code></pre>
 <p>The divergence analysis (Chapter 10) demonstrates the Divergence Theorem: utilitarian and manifold-optimal triage coincide only when decisions activate only $d_1$ and no boundaries are crossed. In every pandemic scenario tested, the divergence fraction is non-zero.</p>
 <hr />
-<h2 id="b6-reproducibility">B.6 Reproducibility<a class="headerlink" href="#b6-reproducibility" title="Permanent link">&para;</a></h2>
+<h2 id="b6-reproducibility">B.6 Reproducibility</h2>
 <p>All computational results in this book can be reproduced by:</p>
 <ol>
 <li>Installing dependencies: <code>pip install numpy scipy</code></li>
@@ -553,14 +428,28 @@ def clinical_astar(
 <li>Comparing output against the tables and figures in the relevant chapters</li>
 </ol>
 <p>Random seeds are fixed where stochastic elements appear. The code requires Python 3.10 or later. No GPU is required &mdash; all computations run on CPU in under one minute on commodity hardware.</p>
+      </div>
 
-    <footer>
-      <p>Part of the <em>Geometric Series</em> by A.H. Bond</p>
-      <p>Built automatically from source. Last updated: 2026-06-12 22:59 UTC</p>
-    </footer>
-  </div>
+      <div class="chapter-nav-bottom">
+        <a href="index.html" class="nav-toc">&larr; Contents</a>
+      </div>
+    </div>
+  </article>
 
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
+  <footer class="book-footer">
+    <p>&copy; 2026 Andrew H. Bond. <em>Geometric Medicine: Clinical Reasoning, Triage, and the Ethics of Allocation.</em></p>
+    <p class="footer-note">The geometry was always real. The scalars were always insufficient.</p>
+  </footer>
+
+  <script src="../assets/js/series.js"></script>
+  <script>
+    window.addEventListener('scroll', function () {
+      document.getElementById('main-nav').classList.toggle('scrolled', window.scrollY > 20);
+    });
+    document.querySelector('.nav-toggle')?.addEventListener('click', function () {
+      document.querySelector('.nav-links').classList.toggle('open');
+    });
+  </script>
   <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
   <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js"
     onload="renderMathInElement(document.body, {
