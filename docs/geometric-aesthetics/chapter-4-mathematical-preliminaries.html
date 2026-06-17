@@ -1,0 +1,662 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Chapter 4: Mathematical Preliminaries &mdash; Geometric Aesthetics</title>
+  <meta name="description" content="Chapter 4: Mathematical Preliminaries from Geometric Aesthetics: The Mathematical Structure of Judgment by Andrew H. Bond.">
+  <link rel="stylesheet" href="../assets/css/style.css">
+  <link rel="stylesheet" href="../book/book.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Crimson+Pro:ital,wght@0,300;0,400;0,600;0,700;1,400&family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
+</head>
+
+<body>
+  <nav id="main-nav">
+    <div class="nav-inner">
+      <a href="../index.html" class="nav-brand">
+        <span class="brand-symbol">A</span>
+        <span class="brand-text">Geometric Aesthetics</span>
+      </a>
+      <button class="nav-toggle" aria-label="Toggle menu">
+        <span></span><span></span><span></span>
+      </button>
+      <ul class="nav-links">
+
+        <li><a href="../geometric-medicine/index.html">Medicine</a></li>
+        <li><a href="../book/index.html">Ethics</a></li>
+        <li><a href="../geometric-methods/index.html">Methods</a></li>
+        <li><a href="../geometric-reasoning/index.html">Reasoning</a></li>
+        <li><a href="../geometric-economics/index.html">Economics</a></li>
+        <li><a href="../geometric-law/index.html">Law</a></li>
+        <li><a href="../geometric-cognition/index.html">Cognition</a></li>
+        <li><a href="../geometric-communication/index.html">Communication</a></li>
+        <li><a href="../geometric-education/index.html">Education</a></li>
+        <li><a href="../geometric-politics/index.html">Politics</a></li>
+        <li><a href="../geometric-ai/index.html">AI</a></li>
+        <li><a href="index.html" class="active">Aesthetics</a></li>
+        <li><a href="../index.html">Home</a></li>
+
+      </ul>
+    </div>
+  </nav>
+
+  <article class="book-chapter">
+    <div class="chapter-container">
+      <nav class="breadcrumb" aria-label="Breadcrumb">
+        <a href="../index.html">Geometric Series</a>
+        <span class="breadcrumb-sep">&rsaquo;</span>
+        <a href="index.html">Geometric Aesthetics</a>
+        <span class="breadcrumb-sep">&rsaquo;</span>
+        <span class="breadcrumb-current">Chapter 4: Mathematical Preliminaries</span>
+      </nav>
+      <div class="chapter-nav-top">
+        <a href="chapter-3-historical-precursors-geometry-before-geometry.html" class="nav-prev">&larr; Chapter 3: Historical Precursors — Geometry Before Geometry</a>
+        <a href="index.html" class="nav-toc">Contents</a>
+        <a href="chapter-5-the-aesthetic-manifold.html" class="nav-next">Chapter 5: The Aesthetic Manifold &rarr;</a>
+      </div>
+
+      <div class="chapter-content">
+<section id="chapter-4-mathematical-preliminaries" class="level1">
+<h1>Chapter 4 — Mathematical Preliminaries</h1>
+<p><strong>RUNNING EXAMPLE — Maya’s Pages</strong></p>
+<p>Maya has a draft novel and no idea whether it works. Her agent has
+asked whether the book “hangs together”, whether the voice is
+consistent, whether the second act has “shape”. Maya sits with a stack
+of paragraphs and tries to articulate what these metaphors could
+possibly mean in non-metaphorical terms. She notices something. When she
+reads paragraph 14, it feels close to paragraph 9 — they share a texture
+— and far from paragraph 47, which belongs to a different kind of scene.
+Close. Far. These are geometric words. She suspects that somewhere,
+implicit in the act of reading, she is computing distances between
+points in a space whose coordinates she cannot write down. She does not
+yet know that a multilingual sentence encoder will later give her an
+explicit 768-dimensional coordinate for each paragraph, a mean and
+covariance for the whole book, and a set of divergences measuring how
+her book differs from the corpus prior. She has intuited the geometry
+before learning its name. This chapter gives the geometry its name.</p>
+<p>This chapter develops the mathematical vocabulary used throughout the
+book. No prior knowledge of differential geometry or statistical
+manifold theory is assumed; we require multivariate calculus and linear
+algebra. Readers with background in either field may skim Sections
+4.1–4.3 and focus on Sections 4.4–4.7, which introduce tools less
+commonly encountered in an aesthetic-theoretic context: divergences
+between Gaussians, the geometry of symmetric positive-definite matrices,
+and Lasso regularization for axis discovery.</p>
+<p>The chapter shares foundation material with Chapter 4 of
+<em>Geometric Ethics</em>; readers who have that book in hand may skim
+Sections 4.1 and 4.2 and concentrate on the material from 4.3 onward,
+which is specific to the aesthetic setting. Readers who do not need to
+be talked to as though this is their first contact with geometry should
+skim anyway — the notation established here is used in every subsequent
+chapter.</p>
+<section id="4-1-euclidean-space" class="level2">
+<h2>4.1 Euclidean Space and the Inner-Product Structure</h2>
+<section id="the-objects-of-representation" class="level3">
+<h3>The Objects of Representation</h3>
+<p>A modern encoder — LaBSE for text, MERT for music, CLIP or DINO for
+images — maps a token, a clip, or a patch to a point in a real vector
+space <span class="math inline">\mathbb{R}^d</span>. For LaBSE, <span
+class="math inline">d = 768</span>; for MERT-v1-330M, the layer-7 hidden
+state is <span class="math inline">d = 1024</span>; for CLIP ViT-L/14,
+<span class="math inline">d = 768</span>. These are high-dimensional but
+finite-dimensional real spaces. The space is flat in the sense that
+familiar Euclidean constructions work point-by-point: we may add
+vectors, scale them, and form inner products. The geometry of <span
+class="math inline">\mathbb{R}^d</span> is the geometry most readers
+learned as undergraduates, and most of what the book does is done inside
+such a space. The complication is that the <em>distribution</em> over
+such a space, induced by a work or a corpus, is not a point — it is a
+cloud, and clouds have shape.</p>
+</section>
+<section id="inner-products-norms-angles" class="level3">
+<h3>Inner Products, Norms, Angles</h3>
+<p>For <span class="math inline">x, y \in \mathbb{R}^d</span>, the
+standard inner product and Euclidean norm are</p>
+<p><span class="math display">\langle x, y \rangle = \sum_{i=1}^{d} x_i
+y_i, \qquad \|x\| = \sqrt{\langle x, x\rangle}.</span></p>
+<p>The cosine similarity</p>
+<p><span class="math display">\cos(x, y) = \frac{\langle x,
+y\rangle}{\|x\|\,\|y\|}</span></p>
+<p>is invariant to rescaling and is the workhorse of sentence-embedding
+literature. For normalized embeddings (LaBSE outputs are L2-normalized
+by convention), cosine similarity and dot product coincide; for
+non-normalized embeddings, a choice must be made and defended.
+Throughout this book we work with L2-normalized embeddings unless
+otherwise stated; consequences of this choice (loss of
+absolute-magnitude information, invariance to embedding-norm artefacts)
+are discussed in Chapter 5.</p>
+</section>
+<section id="why-flat-space-is-not-enough" class="level3">
+<h3>Why Flat Space Is Not Enough</h3>
+<p>If aesthetic objects were single points, Euclidean structure would
+suffice. But a work <span class="math inline">W</span> generates a
+<em>cloud</em> of points <span class="math inline">X(W) = \{\phi(t_1),
+\ldots, \phi(t_N)\}</span> — one point per token, per second of audio,
+per patch of image. The relevant objects are distributions over <span
+class="math inline">\mathbb{R}^d</span>, not points in it. The shape of
+such a distribution — mean, spread, orientation, tails — is the subject
+of Chapter 5 and the source of the four structural channels of Chapter
+6. Euclidean space is the ambient; the aesthetic manifold is the space
+of distributions that live inside it. For that, we need more
+machinery.</p>
+</section>
+</section>
+<section id="4-2-riemannian-geometry" class="level2">
+<h2>4.2 Riemannian Geometry, Briefly</h2>
+<section id="manifolds" class="level3">
+<h3>Manifolds</h3>
+<p>A smooth manifold <span class="math inline">M</span> of dimension
+<span class="math inline">n</span> is a topological space that locally
+looks like <span class="math inline">\mathbb{R}^n</span>: every point
+<span class="math inline">p \in M</span> has an open neighborhood <span
+class="math inline">U</span> with a homeomorphism <span
+class="math inline">\varphi: U \to V \subset \mathbb{R}^n</span> (a
+<em>chart</em>), and overlapping charts are related by smooth transition
+functions. The surface of the sphere is the textbook example; the space
+of probability distributions over a finite alphabet (the simplex) is the
+example most relevant here.</p>
+<p>A manifold is specified by an atlas: a collection of charts <span
+class="math inline">\{(U_\alpha, \varphi_\alpha)\}</span> covering <span
+class="math inline">M</span> such that on each overlap <span
+class="math inline">U_\alpha \cap U_\beta</span> the <em>transition
+function</em> <span class="math inline">\varphi_\beta \circ
+\varphi_\alpha^{-1}</span> is a smooth map between open subsets of <span
+class="math inline">\mathbb{R}^n</span>. Smoothness of transitions is
+what allows us to do calculus on <span class="math inline">M</span> — to
+take derivatives of functions and vector fields in a way that does not
+depend on which chart we use.</p>
+<p>At each point <span class="math inline">p</span>, the <em>tangent
+space</em> <span class="math inline">T_p M</span> is an <span
+class="math inline">n</span>-dimensional real vector space; intuitively,
+it is the space of infinitesimal directions one can move from <span
+class="math inline">p</span>. A tangent vector is a velocity, an
+infinitesimal displacement, or (equivalently) a derivation on smooth
+functions near <span class="math inline">p</span>. The disjoint union
+<span class="math inline">TM = \bigsqcup_{p \in M} T_p M</span> is the
+<em>tangent bundle</em>, itself a smooth manifold of dimension <span
+class="math inline">2n</span>. A <em>vector field</em> is a smooth
+assignment of a tangent vector to each point — a smooth section of <span
+class="math inline">TM</span>.</p>
+<p>The <em>cotangent space</em> <span class="math inline">T_p^* M</span>
+is the dual: the space of linear maps <span class="math inline">T_p M
+\to \mathbb{R}</span>. Cotangent vectors (covectors, 1-forms) at <span
+class="math inline">p</span> are the natural objects that weight tangent
+vectors to produce numbers. The gradient <span
+class="math inline">df</span> of a smooth function <span
+class="math inline">f : M \to \mathbb{R}</span> is the canonical
+covector field: <span class="math inline">(df)_p(v) = v(f)</span>, the
+derivative of <span class="math inline">f</span> in the direction <span
+class="math inline">v</span>. The vector/covector distinction is usually
+invisible in Euclidean space (the metric identifies them), but becomes
+important on curved or non-Euclidean manifolds — including the SPD
+manifold of Section 4.5.</p>
+</section>
+<section id="the-metric-tensor" class="level3">
+<h3>The Metric Tensor</h3>
+<p>A Riemannian metric is a smooth assignment, to each point <span
+class="math inline">p</span>, of a positive-definite inner product <span
+class="math inline">g_p(\cdot, \cdot)</span> on <span
+class="math inline">T_p M</span>. In local coordinates <span
+class="math inline">(x^1, \ldots, x^n)</span>, the metric has components
+<span class="math inline">g_{ij}(p)</span> satisfying</p>
+<p><span class="math display">g_p(u, v) = \sum_{i,j} g_{ij}(p)\, u^i
+v^j, \qquad g_{ij} = g_{ji}, \qquad g_{ij}(p)\, v^i v^j &gt; 0 \text{
+for } v \neq 0.</span></p>
+<p>The length of a curve <span class="math inline">\gamma:[0,1] \to
+M</span> is</p>
+<p><span class="math display">L(\gamma) = \int_0^1
+\sqrt{g_{\gamma(t)}(\dot\gamma(t), \dot\gamma(t))}\, dt,</span></p>
+<p>and the distance <span class="math inline">d(p, q)</span> between two
+points is the infimum of lengths of curves from <span
+class="math inline">p</span> to <span class="math inline">q</span>.
+Geodesics are length-minimizing curves; they are the “straight lines” of
+a curved space.</p>
+</section>
+<section id="geodesics-connections-and-curvature" class="level3">
+<h3>Geodesics, Connections, and Curvature</h3>
+<p>On a flat Euclidean space, comparing vectors at different points is
+trivial — translate and compare. On a curved manifold, this fails: there
+is no canonical way to identify <span class="math inline">T_p M</span>
+with <span class="math inline">T_q M</span> for distinct <span
+class="math inline">p, q</span>. The resolution is a
+<em>connection</em>, a rule <span class="math inline">\nabla</span> for
+differentiating vector fields along curves. The Levi-Civita connection
+is the unique metric-compatible, torsion-free connection on a Riemannian
+manifold. Its Christoffel symbols are</p>
+<p><span class="math display">\Gamma^k_{ij} = \tfrac{1}{2}\,
+g^{k\ell}\!\left(\frac{\partial g_{i\ell}}{\partial x^j} +
+\frac{\partial g_{j\ell}}{\partial x^i} - \frac{\partial
+g_{ij}}{\partial x^\ell}\right),</span></p>
+<p>and the geodesic equation is <span class="math inline">\ddot\gamma^k
++ \Gamma^k_{ij} \dot\gamma^i \dot\gamma^j = 0</span>. The Riemann
+curvature tensor <span class="math inline">R^{\ell}_{kij} = \partial_i
+\Gamma^\ell_{kj} - \partial_j \Gamma^\ell_{ki} +
+\Gamma^\ell_{im}\Gamma^m_{kj} - \Gamma^\ell_{jm}\Gamma^m_{ki}</span>
+measures the path-dependence of parallel transport. A manifold is flat
+iff its Riemann tensor vanishes identically. On the SPD manifold
+(Section 4.5) the Riemann tensor does not vanish: covariance space is
+genuinely curved, and two different “straight-line” paths between
+covariances give different interpolants.</p>
+</section>
+<section id="what-this-buys-us" class="level3">
+<h3>What This Buys Us</h3>
+<p>For the aesthetic manifold, the metric will not be the Euclidean one.
+Two books with the same cosine distance between mean embeddings may be
+aesthetically very different if their covariance structures differ — the
+distance that matters is not distance between means, it is a distance in
+the space of distributions. The divergences of Section 4.4 define such
+distances. The SPD (symmetric positive-definite) manifold of Section 4.5
+gives them a Riemannian home. The curvature of that home matters
+empirically: the Hellinger-saturation pathology noted in Chapter 17 is a
+concrete manifestation of ill-conditioning near the boundary of <span
+class="math inline">\mathcal{S}^d_{++}</span>, where the
+affine-invariant metric blows up.</p>
+</section>
+</section>
+<section id="4-3-pca" class="level2">
+<h2>4.3 Principal Component Analysis and Spectral Decomposition</h2>
+<section id="the-empirical-covariance" class="level3">
+<h3>The Empirical Covariance</h3>
+<p>Given samples <span class="math inline">\{x_1, \ldots, x_N\} \subset
+\mathbb{R}^d</span>, the empirical mean and covariance are</p>
+<p><span class="math display">\hat\mu = \frac{1}{N}\sum_{n=1}^{N} x_n,
+\qquad \hat\Sigma = \frac{1}{N-1}\sum_{n=1}^{N}(x_n - \hat\mu)(x_n -
+\hat\mu)^{\top}.</span></p>
+<p><span class="math inline">\hat\Sigma \in \mathbb{R}^{d\times
+d}</span> is symmetric and positive-semidefinite. It is the core
+second-order object in the book: nearly every geometric quantity we
+compute about a work’s embedding cloud is a functional of <span
+class="math inline">\hat\Sigma</span> (together with <span
+class="math inline">\hat\mu</span>).</p>
+</section>
+<section id="spectral-decomposition" class="level3">
+<h3>Spectral Decomposition</h3>
+<p>By the spectral theorem, any real symmetric matrix <span
+class="math inline">\Sigma</span> admits an orthogonal
+eigendecomposition</p>
+<p><span class="math display">\Sigma = U \Lambda U^{\top}, \qquad
+U^{\top} U = I_d, \qquad \Lambda = \operatorname{diag}(\lambda_1,
+\ldots, \lambda_d),</span></p>
+<p>with eigenvalues <span class="math inline">\lambda_1 \geq \lambda_2
+\geq \cdots \geq \lambda_d \geq 0</span> and eigenvectors <span
+class="math inline">u_1, \ldots, u_d</span> forming the columns of <span
+class="math inline">U</span>. The <span class="math inline">k</span>-th
+principal component is <span class="math inline">u_k</span>; its
+explained variance is <span class="math inline">\lambda_k</span>; the
+fraction of total variance is <span class="math inline">\lambda_k /
+\sum_i \lambda_i</span>.</p>
+</section>
+<section id="pca-as-dimensionality-reduction" class="level3">
+<h3>PCA as Dimensionality Reduction</h3>
+<p>Projecting onto the top <span class="math inline">K</span> components
+yields a low-rank approximation that preserves as much variance as
+possible among all rank-<span class="math inline">K</span>
+approximations (Eckart–Young). The projection matrix is <span
+class="math inline">P_K = U_K U_K^{\top}</span> where <span
+class="math inline">U_K</span> stacks the first <span
+class="math inline">K</span> eigenvectors. For the empirical work in
+this book, we use <span class="math inline">K = 128</span> on the
+English-book corpus — a basis fit once, frozen, and used across all
+languages as the common coordinate system (Chapter 12, on Noether
+symmetries, gives the cross-lingual evidence that this basis
+<em>transfers</em>). The choice <span class="math inline">K = 128</span>
+is empirical: it captures roughly 85% of embedding variance on the
+Gutenberg-LaBSE corpus while keeping the Gaussian fits of Section 4.4
+well-conditioned.</p>
+</section>
+<section id="the-spectrum-itself-is-a-feature" class="level3">
+<h3>The Spectrum Itself Is a Feature</h3>
+<p>Most uses of PCA discard the eigenvalues after projection. For us,
+the eigenvalue spectrum <span class="math inline">(\lambda_1, \ldots,
+\lambda_K)</span> is itself an aesthetic signature: a work whose
+embedding cloud has a long, flat spectrum is structurally different from
+one with a sharply decaying spectrum, even if they share means. Chapter
+6 will put Lasso on top of this spectrum and discover 71 non-zero axes
+that correspond to interpretable genre/form distinctions — a discovered
+tensor level unavailable to scalar representations.</p>
+</section>
+</section>
+<section id="4-4-gaussian-divergences" class="level2">
+<h2>4.4 Multivariate Gaussian Fits and Divergences</h2>
+<section id="the-gaussian-approximation" class="level3">
+<h3>The Gaussian Approximation</h3>
+<p>Given a cloud <span class="math inline">X(W) = \{x_1, \ldots,
+x_N\}</span>, the simplest sufficient-statistic description is the
+fitted multivariate Gaussian</p>
+<p><span class="math display">p_W(x) = \mathcal{N}(x;\, \hat\mu_W,
+\hat\Sigma_W) = \frac{1}{(2\pi)^{d/2} |\hat\Sigma_W|^{1/2}}
+\exp\!\left(-\tfrac{1}{2}(x - \hat\mu_W)^{\top} \hat\Sigma_W^{-1} (x -
+\hat\mu_W)\right).</span></p>
+<p>This is an <em>approximation</em>: the empirical cloud need not be
+Gaussian. Empirically it often isn’t — embedding clouds exhibit heavy
+tails, multi-modality, and anisotropy that a single Gaussian cannot
+capture. But the Gaussian captures the first two moments exactly, and
+the geometric content of those two moments turns out to carry most of
+the aesthetic signal documented in Chapter 17. The residual
+non-Gaussianity is the subject of Level 3 (trajectory geometry) in
+Chapter 6.</p>
+</section>
+<section id="divergences-between-gaussians-closed-forms" class="level3">
+<h3>Divergences Between Gaussians — Closed Forms</h3>
+<p>Let <span class="math inline">p_0 = \mathcal{N}(\mu_0,
+\Sigma_0)</span> (the corpus prior) and <span class="math inline">p =
+\mathcal{N}(\mu, \Sigma)</span> (the work). The four divergences we use
+pervasively admit closed forms.</p>
+<p><strong>Kullback–Leibler divergence.</strong></p>
+<p><span class="math display">D_{\mathrm{KL}}(p \,\|\, p_0) =
+\tfrac{1}{2}\!\left[\operatorname{tr}(\Sigma_0^{-1}\Sigma) + (\mu_0 -
+\mu)^{\top}\Sigma_0^{-1}(\mu_0 - \mu) - d +
+\ln\frac{|\Sigma_0|}{|\Sigma|}\right].</span></p>
+<p>KL is asymmetric: <span class="math inline">D_{\mathrm{KL}}(p\|p_0)
+\neq D_{\mathrm{KL}}(p_0\|p)</span> in general. It measures the expected
+log-likelihood ratio under <span class="math inline">p</span>, and is
+finite only when <span class="math inline">\operatorname{supp}(p)
+\subseteq \operatorname{supp}(p_0)</span>.</p>
+<p><strong>Jensen–Shannon divergence.</strong></p>
+<p><span class="math display">D_{\mathrm{JS}}(p, p_0) = \tfrac{1}{2}
+D_{\mathrm{KL}}(p \,\|\, m) + \tfrac{1}{2} D_{\mathrm{KL}}(p_0 \,\|\,
+m), \qquad m = \tfrac{1}{2}(p + p_0).</span></p>
+<p>JS is symmetric, bounded above by <span class="math inline">\ln
+2</span>, and its square root is a proper metric. For Gaussians we
+evaluate it numerically via the KL formula above and a Monte-Carlo or
+moment-matched <span class="math inline">m</span>.</p>
+<p><strong>Hellinger distance.</strong></p>
+<p><span class="math display">H^2(p, p_0) = 1 -
+\frac{|\Sigma_0|^{1/4}|\Sigma|^{1/4}}{|\bar\Sigma|^{1/2}}
+\exp\!\left(-\tfrac{1}{8}(\mu_0 - \mu)^{\top}\bar\Sigma^{-1}(\mu_0 -
+\mu)\right),\qquad \bar\Sigma = \tfrac{1}{2}(\Sigma_0 +
+\Sigma).</span></p>
+<p><span class="math inline">H</span> is symmetric, bounded in <span
+class="math inline">[0, 1]</span>, and is a proper metric.</p>
+<p><strong>Bhattacharyya distance.</strong></p>
+<p><span class="math display">D_B(p, p_0) = \tfrac{1}{8}(\mu_0 -
+\mu)^{\top}\bar\Sigma^{-1}(\mu_0 - \mu) +
+\tfrac{1}{2}\ln\frac{|\bar\Sigma|}{\sqrt{|\Sigma_0|\,|\Sigma|}}.</span></p>
+<p>Hellinger and Bhattacharyya are related: <span
+class="math inline">H^2 = 1 - e^{-D_B}</span>, so the two track each
+other tightly. In practice we report Bhattacharyya because it remains
+well-behaved when Hellinger saturates near 1 due to ill-conditioned
+covariances (a pathology we encountered in the MERT music experiments;
+see Chapter 21).</p>
+<p><strong>Total Variation.</strong></p>
+<p><span class="math display">\mathrm{TV}(p, p_0) = \tfrac{1}{2} \int
+|p(x) - p_0(x)|\, dx.</span></p>
+<p>No closed form for Gaussians, but <span
+class="math inline">\mathrm{TV} \leq \sqrt{\tfrac{1}{2}
+D_{\mathrm{KL}}}</span> (Pinsker) and <span
+class="math inline">\mathrm{TV} \leq H\sqrt{2 - H^2}</span> (Le Cam). We
+compute TV by numerical integration when needed, though the book relies
+more heavily on the three smooth divergences above.</p>
+<p><strong>Mahalanobis distance of means.</strong></p>
+<p><span class="math display">D_{\mathrm{Mahal}}(\mu, \mu_0; \Sigma_0) =
+\sqrt{(\mu - \mu_0)^{\top}\Sigma_0^{-1}(\mu - \mu_0)}.</span></p>
+<p>This is the distance-from-prior <em>ignoring</em> the work’s own
+covariance — just how far the mean has moved, measured in units of prior
+standard deviations. It is a rank-1 quantity and constitutes Level 1 of
+the tensor hierarchy (Chapter 6).</p>
+</section>
+<section id="a-worked-example" class="level3">
+<h3>A Worked Example</h3>
+<p>Suppose we are given two one-dimensional Gaussians: <span
+class="math inline">p_0 = \mathcal{N}(0, 1)</span>, the standard prior,
+and <span class="math inline">p = \mathcal{N}(\mu, \sigma^2)</span>, a
+work. The closed forms specialize to</p>
+<p><span class="math display">D_{\mathrm{KL}}(p\|p_0) =
+\tfrac{1}{2}(\sigma^2 + \mu^2 - 1 - \ln \sigma^2), \qquad H^2(p, p_0) =
+1 - \sqrt{\tfrac{2\sigma}{1+\sigma^2}}
+\exp\!\left(-\tfrac{\mu^2}{4(1+\sigma^2)}\right).</span></p>
+<p>For <span class="math inline">\mu = 1, \sigma = 1</span> (same
+variance, shifted mean): <span class="math inline">D_{\mathrm{KL}} =
+0.5</span>, <span class="math inline">H^2 \approx 0.118</span>. For
+<span class="math inline">\mu = 0, \sigma = 2</span> (same mean, doubled
+standard deviation): <span class="math inline">D_{\mathrm{KL}} =
+\tfrac{1}{2}(4 - 1 - \ln 4) \approx 0.807</span>, <span
+class="math inline">H^2 \approx 0.056</span>. The two perturbations are
+“comparably large” under KL but Hellinger regards the mean shift as the
+larger change. This is a feature, not a bug: different divergences
+emphasize different aspects of the difference, and reporting only one
+hides the asymmetry. We report all of them and let the pattern of
+agreement and disagreement be part of the signal.</p>
+</section>
+<section id="why-all-six" class="level3">
+<h3>Why All Six</h3>
+<p>One might ask why we use six different divergences when they all
+measure “how different the distributions are”. The answer is empirical:
+they are correlated but not redundant. In the cross-lingual invariance
+analysis (Chapter 12, §17.7 in the Aesthetics Ch. 17 which is the
+already-drafted empirical chapter), the mean Spearman correlation across
+language pairs for Hellinger (ρ = +0.675), Bhattacharyya (ρ = +0.675),
+and JS (ρ = +0.674) are nearly identical — but the Mahalanobis
+mean-distance (ρ = +0.710) and the internal-coherence feature
+<code>pair_sim_mean</code> (ρ = +0.712) are <em>higher</em>, indicating
+that each divergence family captures a slightly different slice of the
+aesthetic signal. Using all of them is the empirical counterpart of
+refusing to collapse information prematurely.</p>
+</section>
+</section>
+<section id="4-5-spd-manifold" class="level2">
+<h2>4.5 The SPD Manifold</h2>
+<section id="covariances-are-not-vectors" class="level3">
+<h3>Covariances Are Not Vectors</h3>
+<p>The space of <span class="math inline">d \times d</span> symmetric
+positive-definite matrices, denoted <span
+class="math inline">\mathcal{S}^d_{++}</span>, is not a vector space: it
+is a convex open cone inside the space of symmetric matrices. Adding two
+covariances gives a covariance; subtracting them does not. Any honest
+treatment of “distance between covariances” needs the right
+geometry.</p>
+</section>
+<section id="the-affine-invariant-metric" class="level3">
+<h3>The Affine-Invariant Metric</h3>
+<p><span class="math inline">\mathcal{S}^d_{++}</span> is a Riemannian
+manifold of dimension <span class="math inline">d(d+1)/2</span> under
+the affine-invariant metric</p>
+<p><span class="math display">g_\Sigma(A, B) =
+\operatorname{tr}(\Sigma^{-1} A \Sigma^{-1} B), \qquad A, B \in T_\Sigma
+\mathcal{S}^d_{++}.</span></p>
+<p>The induced geodesic distance between <span
+class="math inline">\Sigma_0</span> and <span
+class="math inline">\Sigma</span> is</p>
+<p><span class="math display">d_{\mathrm{AI}}(\Sigma_0, \Sigma) =
+\sqrt{\sum_{i=1}^{d} \log^2 \lambda_i(\Sigma_0^{-1}\Sigma)}.</span></p>
+<p>This metric is invariant under congruence transformations <span
+class="math inline">\Sigma \mapsto G \Sigma G^{\top}</span> for <span
+class="math inline">G \in GL(d)</span>, which in our setting means the
+distance is invariant to linear change of basis in the embedding space —
+an appropriate invariance for a geometric theory that should not depend
+on whether we work in the original coordinates, the PCA coordinates, or
+any other linear reparameterization.</p>
+</section>
+<section id="the-log-euclidean-metric" class="level3">
+<h3>The Log-Euclidean Metric</h3>
+<p>A computationally cheaper alternative, widely used in
+diffusion-tensor imaging, is the log-Euclidean metric:</p>
+<p><span class="math display">d_{\mathrm{LE}}(\Sigma_0, \Sigma) = \|\log
+\Sigma_0 - \log \Sigma\|_F,</span></p>
+<p>where <span class="math inline">\log</span> is the matrix logarithm
+and <span class="math inline">\|\cdot\|_F</span> is the Frobenius norm.
+It is affine-invariant only under the commuting subgroup but is fast to
+compute, and it tracks the affine-invariant distance closely in
+practice. For the book’s empirical work we use the divergences of
+Section 4.4 rather than raw SPD distances, but the SPD viewpoint is what
+justifies taking those divergences seriously as measurements on a
+<em>space of distributions</em> rather than arbitrary numerical
+summaries.</p>
+</section>
+</section>
+<section id="4-6-lasso" class="level2">
+<h2>4.6 Lasso Regularization</h2>
+<section id="the-setup" class="level3">
+<h3>The Setup</h3>
+<p>Given design matrix <span class="math inline">X \in \mathbb{R}^{N
+\times p}</span> and target <span class="math inline">y \in
+\mathbb{R}^N</span>, Lasso (Tibshirani, 1996) solves</p>
+<p><span class="math display">\hat\beta_\lambda = \arg\min_{\beta \in
+\mathbb{R}^p}\; \tfrac{1}{2N}\|y - X\beta\|_2^2 + \lambda \|\beta\|_1,
+\qquad \|\beta\|_1 = \sum_{j=1}^{p}|\beta_j|.</span></p>
+<p>The <span class="math inline">\ell_1</span> penalty induces sparsity:
+for <span class="math inline">\lambda</span> above a threshold, many
+components of <span class="math inline">\hat\beta_\lambda</span> are
+exactly zero. The nonzero coordinates constitute the <em>selected
+features</em>.</p>
+</section>
+<section id="why-lasso-is-load-bearing-here" class="level3">
+<h3>Why Lasso Is Load-Bearing Here</h3>
+<p>The core discovery of Chapter 6 — the fourth channel of aesthetic
+structure — is that when we apply Lasso to the 128-dimensional PCA
+spectrum of a work’s embedding cloud against rating, 71 components have
+nonzero coefficients and the selected axes correspond to interpretable
+genre/form distinctions. This is <em>axis discovery</em>, not regression
+in the usual sense: we care less about the predictive coefficient than
+about which PCA axes light up. Lasso is the tool that does this because
+of its sparsity property; Ridge regression (which distributes weight
+across all features) would obscure the discovery.</p>
+</section>
+<section id="the-bias-variance-tradeoff-and-lambda-selection"
+class="level3">
+<h3>The Bias-Variance Tradeoff and <span
+class="math inline">\lambda</span> Selection</h3>
+<p>Lasso’s <span class="math inline">\lambda</span> governs the
+bias-variance tradeoff. We select <span
+class="math inline">\lambda</span> by 5-fold cross-validation, with the
+split <em>author-disjoint</em> (books in Phase 1, artists in Phase 4): a
+fold’s training set shares no authors with its validation set, so the
+model cannot memorize an author-level signal. This is not a statistical
+nicety — without author-disjoint splitting, apparent <span
+class="math inline">R</span> values are inflated by an order of
+magnitude.</p>
+</section>
+<section id="combined-ridge-lasso" class="level3">
+<h3>Combined Ridge + Lasso</h3>
+<p>In practice we often combine Lasso-selected features with a Ridge
+regression (an <span class="math inline">\ell_2</span> penalty):</p>
+<p><span class="math display">\hat\beta = \arg\min_\beta\;
+\tfrac{1}{2N}\|y - X\beta\|_2^2 + \lambda_1 \|\beta\|_1 + \lambda_2
+\|\beta\|_2^2.</span></p>
+<p>The combined objective is Elastic Net when <span
+class="math inline">\lambda_2 &gt; 0</span>, and we use it when the
+number of nonzero Lasso features would otherwise be unstable across
+folds. The Phase-1 headline result (books, combined Ridge+Lasso, <span
+class="math inline">R = 0.241</span>, 17σ, <span class="math inline">R^2
+= 0.058</span> before genre correction) uses this combination.</p>
+</section>
+</section>
+<section id="4-7-notation" class="level2">
+<h2>4.7 Notation and Conventions</h2>
+<p>We close with notation used throughout the book.</p>
+<p><strong>Works and clouds.</strong> A work is denoted <span
+class="math inline">W</span>. Its embedding cloud is</p>
+<p><span class="math display">X(W) = \{\phi(t_1), \ldots,
+\phi(t_{N_W})\} \subset \mathbb{R}^d,</span></p>
+<p>where <span class="math inline">\phi</span> is a modality-specific
+encoder (LaBSE, MERT, CLIP, DINO) and <span
+class="math inline">t_i</span> are tokens, frames, or patches.</p>
+<p><strong>Corpus prior.</strong> The corpus prior is the Gaussian <span
+class="math inline">p_0 = \mathcal{N}(\mu_0, \Sigma_0)</span> fitted to
+the pooled embeddings of a reference corpus (for Phase 1, the 4,998
+Gutenberg-matched books).</p>
+<p><strong>Per-work Gaussian.</strong> The per-work Gaussian is <span
+class="math inline">p_W = \mathcal{N}(\mu_W, \Sigma_W)</span>, fitted on
+<span class="math inline">X(W)</span>.</p>
+<p><strong>PCA basis.</strong> <span class="math inline">U_K \in
+\mathbb{R}^{d \times K}</span> is the PCA basis fitted on the prior
+corpus. All cross-lingual analyses project into this <em>single frozen
+basis</em>, not into per-language bases — a methodological choice whose
+empirical consequences appear in Chapter 12.</p>
+<p><strong>Indices.</strong> Greek indices <span
+class="math inline">\mu, \nu</span> range over aesthetic tensor
+dimensions (defined per modality in Chapter 5). Latin indices <span
+class="math inline">i, j</span> range over coordinate components of
+<span class="math inline">\mathbb{R}^d</span>. Indices <span
+class="math inline">\alpha, \beta</span> range over corpus items.
+Indices <span class="math inline">k</span> range over PCA components,
+<span class="math inline">1 \leq k \leq K</span>.</p>
+<p><strong>Significance reporting.</strong> Every empirical claim in the
+book reports <span class="math inline">(n,\, \text{effect size},\,
+p\text{-value})</span> together. Claims that omit any of these three are
+conjectural and labeled as such.</p>
+</section>
+<section id="4-8-bibliographic" class="level2">
+<h2>4.8 Bibliographic Notes</h2>
+<p>For differential geometry at the level of this chapter, Lee’s
+<em>Introduction to Smooth Manifolds</em> and do Carmo’s <em>Riemannian
+Geometry</em> are standard. For information geometry — the Fisher
+metric, Bregman divergences, the Gaussian submanifold — Amari and
+Nagaoka’s <em>Methods of Information Geometry</em> is the canonical
+reference, and Nielsen’s more recent surveys collect closed forms for
+the divergences between parametric families. For the SPD manifold
+specifically, Pennec, Fillard, and Ayache’s work on the affine-invariant
+metric (originally for diffusion-tensor MRI) and Arsigny et al.’s
+log-Euclidean framework are the references we rely on implicitly
+throughout. For Lasso, Hastie, Tibshirani, and Wainwright’s
+<em>Statistical Learning with Sparsity</em> collects the modern theory.
+None of these are required reading for the rest of this book; the
+machinery developed in this chapter is self-contained at the level we
+use it.</p>
+</section>
+<section id="4-9-bridge" class="level2">
+<h2>4.9 Bridge to the Rest of the Book</h2>
+<p>This chapter has given the reader the toolkit. Chapter 5 uses it to
+construct the aesthetic manifold — the space on which a work <span
+class="math inline">W</span> lives as a cloud, and on which the corpus
+lives as a prior. Chapter 6 stacks tensors on this manifold: Level 1
+(mean direction and Mahalanobis distance), Level 2 (covariance
+divergences and internal coherence), Level 3 (trajectory geometry),
+Level 4 (Lasso-discovered axes on the 128-d spectrum). Each level uses
+exactly the machinery of this chapter — PCA, Gaussian fitting,
+divergences, Lasso — and each level extracts information that the
+preceding levels cannot represent. The empirical payoff arrives in
+Chapter 17: 8σ signal from divergences, 8.4σ from internal coherence,
+3–6σ from trajectory features, and 71 non-zero axes from Lasso — four
+channels each contributing signal the others cannot. None of this is
+visible to a scalar summary; all of it is visible to the tensor
+hierarchy that this chapter’s mathematics supports.</p>
+</section>
+</section>
+
+      </div>
+
+      <div class="chapter-nav-bottom">
+        <a href="chapter-3-historical-precursors-geometry-before-geometry.html" class="nav-prev">&larr; Chapter 3: Historical Precursors — Geometry Before Geometry</a>
+        <a href="index.html" class="nav-toc">Contents</a>
+        <a href="chapter-5-the-aesthetic-manifold.html" class="nav-next">Chapter 5: The Aesthetic Manifold &rarr;</a>
+      </div>
+    </div>
+  </article>
+
+  <footer class="book-footer">
+    <p>&copy; 2026 Andrew H. Bond. <em>Geometric Aesthetics: The Mathematical Structure of Judgment.</em></p>
+    <p class="footer-note">Beauty is not a number. It is a geometry.</p>
+  </footer>
+
+  <script>
+    window.addEventListener('scroll', () => {
+      document.getElementById('main-nav').classList.toggle('scrolled', window.scrollY > 20);
+    });
+    document.querySelector('.nav-toggle')?.addEventListener('click', function() {
+      document.querySelector('.nav-links').classList.toggle('open');
+    });
+  </script>
+  <script>
+    // Pandoc --katex outputs <span class="math inline"> and <span class="math display">.
+    // This script renders them with KaTeX once the library loads.
+    document.addEventListener("DOMContentLoaded", function() {
+      if (typeof katex === 'undefined') return;
+      var mathElements = document.getElementsByClassName("math");
+      for (var i = 0; i < mathElements.length; i++) {
+        var texText = mathElements[i].firstChild;
+        if (mathElements[i].tagName === "SPAN" && texText) {
+          katex.render(texText.data, mathElements[i], {
+            displayMode: mathElements[i].classList.contains('display'),
+            throwOnError: false
+          });
+        }
+      }
+    });
+  </script>
+</body>
+</html>

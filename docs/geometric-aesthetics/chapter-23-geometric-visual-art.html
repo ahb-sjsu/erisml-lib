@@ -1,0 +1,480 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Chapter 23: Geometric Visual Art — Image-Embedding Clouds and the Geometry of Composition &mdash; Geometric Aesthetics</title>
+  <meta name="description" content="Chapter 23: Geometric Visual Art — Image-Embedding Clouds and the Geometry of Composition from Geometric Aesthetics: The Mathematical Structure of Judgment by Andrew H. Bond.">
+  <link rel="stylesheet" href="../assets/css/style.css">
+  <link rel="stylesheet" href="../book/book.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Crimson+Pro:ital,wght@0,300;0,400;0,600;0,700;1,400&family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
+</head>
+
+<body>
+  <nav id="main-nav">
+    <div class="nav-inner">
+      <a href="../index.html" class="nav-brand">
+        <span class="brand-symbol">A</span>
+        <span class="brand-text">Geometric Aesthetics</span>
+      </a>
+      <button class="nav-toggle" aria-label="Toggle menu">
+        <span></span><span></span><span></span>
+      </button>
+      <ul class="nav-links">
+
+        <li><a href="../geometric-medicine/index.html">Medicine</a></li>
+        <li><a href="../book/index.html">Ethics</a></li>
+        <li><a href="../geometric-methods/index.html">Methods</a></li>
+        <li><a href="../geometric-reasoning/index.html">Reasoning</a></li>
+        <li><a href="../geometric-economics/index.html">Economics</a></li>
+        <li><a href="../geometric-law/index.html">Law</a></li>
+        <li><a href="../geometric-cognition/index.html">Cognition</a></li>
+        <li><a href="../geometric-communication/index.html">Communication</a></li>
+        <li><a href="../geometric-education/index.html">Education</a></li>
+        <li><a href="../geometric-politics/index.html">Politics</a></li>
+        <li><a href="../geometric-ai/index.html">AI</a></li>
+        <li><a href="index.html" class="active">Aesthetics</a></li>
+        <li><a href="../index.html">Home</a></li>
+
+      </ul>
+    </div>
+  </nav>
+
+  <article class="book-chapter">
+    <div class="chapter-container">
+      <nav class="breadcrumb" aria-label="Breadcrumb">
+        <a href="../index.html">Geometric Series</a>
+        <span class="breadcrumb-sep">&rsaquo;</span>
+        <a href="index.html">Geometric Aesthetics</a>
+        <span class="breadcrumb-sep">&rsaquo;</span>
+        <span class="breadcrumb-current">Chapter 23: Geometric Visual Art — Image-Embedding Clouds and the Geometry of Composition</span>
+      </nav>
+      <div class="chapter-nav-top">
+        <a href="chapter-22-geometric-film-and-television.html" class="nav-prev">&larr; Chapter 22: Geometric Film &amp; Television — Narrative Trajecto…</a>
+        <a href="index.html" class="nav-toc">Contents</a>
+        <a href="chapter-24-geometric-architecture.html" class="nav-next">Chapter 24: Geometric Architecture — Space, Form, and Propor… &rarr;</a>
+      </div>
+
+      <div class="chapter-content">
+<section
+id="chapter-23-geometric-visual-art-image-embedding-clouds-and-the-geometry-of-composition"
+class="level1">
+<h1>Chapter 23: Geometric Visual Art — Image-Embedding Clouds and the
+Geometry of Composition</h1>
+<p><strong>RUNNING EXAMPLE — Hiroshi’s Acquisition</strong></p>
+<p>Hiroshi, senior curator at a mid-sized municipal museum, is three
+weeks from a board meeting at which he must defend six recommended
+acquisitions. Two of them are by artists the board has never heard of.
+He has written the usual connoisseur’s letters — formal analysis,
+biographical context, provenance notes — and he has rehearsed the usual
+defense: <em>look at how the eye moves across the canvas, notice the
+weight of the left quadrant, feel the tension against the diagonal.</em>
+He has said these things hundreds of times in his career. He also
+suspects they are true. What he does not have is any way to show that
+they are true, other than by asking his board to trust his eye. One of
+the board’s trustees, a retired physicist, has begun politely asking
+whether connoisseurship “has any structure at all, or is it what we pay
+you to have, on faith.” Hiroshi would like, just once, to answer that
+question with something other than a raised eyebrow.</p>
+<p>This chapter asks whether the framework we have developed for text
+(Chapter 20) and audio (Chapter 21) has a natural extension to the
+visual arts. We do not have, at the time of writing, the direct
+empirical results for paintings that we have for books and tracks. What
+we have is a tightly constrained prediction: if the framework captures
+something real about aesthetic geometry, then replacing the
+LaBSE-encoded paragraph cloud with a CLIP- or DINOv2-encoded patch cloud
+should recover <em>the same four structural channels</em> — divergence,
+internal coherence, trajectory, and Lasso-discovered latent axes — with
+signs characteristic of a static, contemplative medium. The chapter sets
+out what the pipeline looks like, what the framework predicts, and what
+would refute it. We are careful here. The sign-flip between books and
+music (Chapter 21) is the single most important result in this book, and
+its generalization to painting is a hypothesis, not a report.</p>
+<section id="pipeline-analog" class="level2">
+<h2>23.1 The Pipeline Analog</h2>
+<p>For text, the unit of analysis was the paragraph: a semantically
+coherent chunk, encoded by LaBSE into a 768-dimensional vector, stacked
+into a per-work cloud of typically 30–300 points. For music, the unit
+was a 30-second clip, encoded by MERT-v1-330M into a 45 × 1024 token
+sequence. For painting, the natural unit is the <em>patch</em>.</p>
+<p>A vision transformer such as DINOv2 (Oquab et al., 2024) or CLIP
+(Radford et al., 2021) tiles an input image into non-overlapping patches
+— typically 14 × 14 or 16 × 16 pixels — and emits one contextualized
+embedding per patch. A 518 × 518 input to DINOv2-ViT-L/14 yields <span
+class="math inline">37 \times 37 = 1369</span> patch tokens in
+1024-dimensional space. A painting, cropped and resized to the model’s
+input resolution, becomes a cloud of 1369 points in <span
+class="math inline">\mathbb{R}^{1024}</span>. This is the natural analog
+of the paragraph cloud. We do not claim it is the <em>correct</em>
+analog — we claim it is the analog the framework tells us to try
+first.</p>
+<p><strong>Definition 23.1 (Image-Patch Cloud).</strong> Let <span
+class="math inline">I</span> be an image and let <span
+class="math inline">\phi: \mathcal{I} \to \mathbb{R}^{N \times d}</span>
+be a patch-token encoder producing <span class="math inline">N</span>
+contextualized embeddings in <span class="math inline">d</span>
+dimensions. The image-patch cloud of <span class="math inline">I</span>
+is the finite multiset <span class="math inline">\{\phi(I)_1, \dots,
+\phi(I)_N\} \subset \mathbb{R}^d</span>. The <em>painting manifold</em>
+<span class="math inline">M_{\text{paint}}</span> is the corpus-level
+geometry induced by the patch clouds of a reference collection — for
+example, the open-access portions of the Metropolitan Museum, the
+National Gallery of Art, and Wikidata-linked museum holdings.</p>
+<p>The corpus prior is the mean and covariance of all patch embeddings
+in the reference collection, computed either globally or per-genre
+(Byzantine icon, Dutch still life, Color Field painting, contemporary
+photography). The per-painting cloud is then evaluated against this
+prior exactly as the per-book paragraph cloud was evaluated against the
+Gutenberg corpus prior in Chapter 20.</p>
+<section id="the-four-channels-instantiated-for-painting"
+class="level3">
+<h3>The Four Channels, Instantiated for Painting</h3>
+<p><strong>A. Spectral divergences.</strong> For each painting, fit a
+Gaussian approximation to its patch cloud and compute KL, JS, Hellinger,
+Bhattacharyya, Mahalanobis-mean, and TV divergences against the
+museum-wide patch prior. A high Hellinger distance means the painting
+occupies a region of visual representation space that the corpus on
+average does not — Chardin against a wall of Rubens, Agnes Martin
+against a wall of Abstract Expressionism. This is the painting analog of
+the 8σ divergence channel we observed for books (Chapter 17, §17.2).</p>
+<p><strong>B. Internal patch-coherence.</strong> Compute <span
+class="math inline">\text{pair\_sim\_mean}</span> and <span
+class="math inline">\text{pair\_sim\_std}</span> over patch embeddings
+within a painting. High pair_sim_mean means the painting’s patches are
+internally consistent: a Rothko color field, a Morris Louis veil, an
+Agnes Martin grid. Low pair_sim_mean means the painting contains sharply
+differentiated regions: a Bosch triptych, a Peter Blake collage, a
+Kehinde Wiley figure against ornamental ground. This channel is the
+novel finding of Chapter 17 — coherence is <em>distinct</em> from
+divergence — and we predict it is also the most load-bearing channel for
+painting.</p>
+<p><strong>C. Trajectory geometry.</strong> Paintings are not, on their
+face, temporal objects. But they are <em>scanned</em>: the eye moves.
+Recent saccade-prediction models (Jiang et al., Kümmerer &amp; Bethge,
+Deep Gaze IIE) emit a saliency-ordered sequence of fixations for any
+input image, and with this ordering the patch cloud becomes a patch
+<em>trajectory</em>. Compute step_mean, step_std, recur_rate, path_eff,
+powerlaw_slope — exactly the features of Chapter 17, §17.4, now defined
+over the gaze-induced order. A painting with a well-composed
+<em>entrance</em> and a clear terminal fixation will have low path_eff
+and a characteristic powerlaw tail. A painting with no visual hierarchy
+will scan as a random walk through its own patches.</p>
+<p><strong>D. Lasso on latent directions.</strong> Run an L1-penalized
+regression from a 128-dimensional PCA of the patch-cloud mean against a
+curatorial target (acquisitions price, critical rating aggregated from
+published reviews, museum-visit dwell time). The surviving non-zero
+coefficients are the framework’s proposal for the <em>genre-and-form
+axes</em> of painting — the visual equivalents of the 71 interpretable
+axes we recovered for literature.</p>
+</section>
+<section id="what-the-rating-analog-is" class="level3">
+<h3>What the Rating-Analog Is</h3>
+<p>For books, the rating was Goodreads aggregate. For music, it was log
+listen count. For painting, there is no equally clean target. The four
+natural candidates, in descending order of cleanliness, are:</p>
+<ol type="1">
+<li><strong>Auction hammer prices</strong>, which have the advantage of
+being numerical and public but the disadvantage of confounding aesthetic
+judgment with market dynamics, provenance, and speculation;</li>
+<li><strong>Museum wall time</strong>, the number of days per decade a
+work is on view rather than in storage, which is cleaner but noisy and
+highly institution-specific;</li>
+<li><strong>Aggregate critical scores</strong> from published criticism,
+which is the closest analog to Goodreads but is sparse and not well
+standardized;</li>
+<li><strong>Controlled human ratings</strong> collected specifically for
+this study, which is what we would want and do not yet have.</li>
+</ol>
+<p>None of these is as clean as the Gutenberg-Goodreads match. We flag
+this as the first and largest empirical gap of the chapter.</p>
+</section>
+</section>
+<section id="what-the-framework-predicts" class="level2">
+<h2>23.2 What the Framework Predicts</h2>
+<p>The central empirical finding of this book (Chapter 17, §17.6) is
+that aesthetic geometry has <em>directionality</em>: the same geometric
+feature has opposite signs for text and for music. Books reward internal
+coherence (<span class="math inline">\rho = +0.126</span>, 8.4σ) and
+small trajectory steps (<span class="math inline">\rho = -0.096</span>,
+6.4σ). Music rewards the opposite (<span class="math inline">\rho =
+-0.076</span> for coherence, <span class="math inline">p = 5 \times
+10^{-33}</span>; <span class="math inline">\rho = +0.071</span> for step
+size, <span class="math inline">p = 4 \times 10^{-29}</span>). Books are
+<em>continuity-rewarding</em>. Music is <em>contrast-rewarding</em>.</p>
+<p><strong>Prediction 23.1 (Painting Aligns with Books).</strong> Easel
+painting — the genre of Western oil-on-canvas works from roughly 1420 to
+the present — should exhibit the <em>book-like</em> sign pattern: higher
+internal patch-coherence predicts higher aesthetic rating; smaller
+gaze-induced step sizes predict higher rating. The reasoning is that
+painting, like literature, is a sustained contemplative medium whose
+reception unfolds on a time scale in which the observer actively
+constructs unity from parts. Music is heard once through at the medium’s
+chosen pace; a novel is read at the reader’s pace; a painting is stood
+in front of at the viewer’s pace. Painting and literature share this
+structural feature, which we conjecture is what the sign-flip
+tracks.</p>
+<p>This prediction is the chapter’s load-bearing claim. It is
+falsifiable. If a careful, genre-controlled study of patch-cloud
+features against any of the four rating analogs above produces the
+<em>music</em> sign — higher contrast, bigger steps, lower coherence
+predicting higher judgment — the prediction fails. The framework would
+not be destroyed by such a finding, but the simplicity of the
+coherence/contrast dichotomy would be, and the chapter would have to be
+rewritten to account for a three-way partition (text, music, painting)
+rather than a two-way one.</p>
+<p><strong>Prediction 23.2 (Genre Confound Will Be Severe).</strong> In
+Chapter 17, §17.3, 85% of the books’ headline <span
+class="math inline">R^2</span> dissolved under within-genre
+residualization; in music (§17.5), 91% dissolved. Genre — whether a book
+is fantasy or memoir, whether a track is rock or classical — is a
+first-order confound. The same should hold, and more so, in painting,
+where genre distinctions (icon, still-life, portrait, history painting,
+color field, photography) are themselves visually encoded: a DINOv2 can
+identify the genre of a painting from its patch cloud with near-perfect
+accuracy. We therefore predict that naive, unresidualized correlations
+between patch-cloud features and acquisitions price will be large and
+misleading, and that the honest residualized signal — pooled
+within-genre — will be on the order of <span class="math inline">R =
+0.1</span>–<span class="math inline">0.2</span>, consistent with the
+books and music results. Any future study that reports an unresidualized
+<span class="math inline">R = 0.5</span> and calls it discovery is, we
+predict, reporting genre.</p>
+<p><strong>Prediction 23.3 (Divergences Will Saturate in Small-Sample,
+High-Dimensional Fits).</strong> The Hellinger saturation we encountered
+for music (Chapter 17, methodological notes) — 45 tokens in
+128-dimensional space is ill-conditioned for Gaussian fitting — will
+recur for painting whenever per-image patch counts are low or dimensions
+are not PCA-reduced. Practitioners should operate in a <span
+class="math inline">K \leq 32</span> PCA subspace and prefer
+Bhattacharyya to Hellinger, exactly as we concluded for music. This is a
+methodological prediction, not an aesthetic one, but it is equally
+falsifiable.</p>
+</section>
+<section id="what-would-refute-the-framework-in-painting"
+class="level2">
+<h2>23.3 What Would Refute the Framework in Painting</h2>
+<p>The framework is refuted in painting if any of the following occurs
+under a properly controlled study (author- or artist-disjoint folds,
+per-genre residualization, pre-registered feature set, <span
+class="math inline">n \geq 2{,}000</span> works spanning at least five
+genres).</p>
+<p>First, if <em>none</em> of the four channels survive residualization
+— if divergence, coherence, trajectory, and Lasso-latent features all
+collapse to null once genre is partialed out — the claim that aesthetic
+judgment has structure above genre in this modality is false. The
+framework would retain its books and music results but lose the painting
+generalization.</p>
+<p>Second, if the sign of the coherence channel matches <em>music</em>
+rather than books, the coherence/contrast dichotomy is wrong. We would
+then need a three-way theory (literature, painting, music) rather than a
+two-way one, and we would have to explain what feature of painting makes
+it contrast-rewarding. This would not be fatal to the framework but it
+would be fatal to the compact version of it that Prediction 23.1 commits
+to.</p>
+<p>Third, if the Lasso on the 128-d PCA spectrum fails to recover
+interpretable genre/form axes — if the selected directions are visually
+uninterpretable even when inspected via top-weighted images — the claim
+that the latent geometry has human-readable structure would be weakened.
+We note that this would be consistent with the framework capturing
+<em>something</em> real that is, however, not what human critics are
+tracking.</p>
+<p>Fourth, if cross-cultural invariance fails — if the geometry
+recovered from a Western museum corpus does not transfer to a Japanese
+woodblock corpus, a Mughal miniature corpus, or a Yoruba mask corpus,
+after controlling for style — then the translation-invariance result of
+Chapter 12 does not generalize to visual art. We suspect it does
+generalize, but the book corpus evidence (<span class="math inline">\rho
+= +0.712</span> for pair_sim_mean across 19 languages and 10 families)
+gives us no direct purchase here.</p>
+</section>
+<section id="connection-to-existing-art-theoretic-literature"
+class="level2">
+<h2>23.4 Connection to Existing Art-Theoretic Literature</h2>
+<p>The predictions above are not free-standing. They are in dialogue
+with three traditions.</p>
+<p><strong>Arnheim and Gestalt visual balance.</strong> Rudolf Arnheim’s
+<em>Art and Visual Perception</em> (1954, revised 1974) argues that a
+painting is a dynamic equilibrium of perceptual forces — weights,
+directions, tensions — organized around a structural skeleton. Arnheim’s
+system is geometric in an informal sense: it posits that compositional
+success has measurable structure, and that trained viewers can identify
+that structure. In the framework of this book, Arnheim’s <em>visual
+weights</em> are an early, pre-computational attempt to articulate what
+the internal-coherence channel (B) and the trajectory channel (C)
+capture quantitatively. Our pair_sim_std, for instance, is the
+machine-learned analog of Arnheim’s distinction between <em>unified</em>
+and <em>unbalanced</em> compositions. Our path_eff is the analog of his
+<em>structural net</em>. Arnheim wrote, memorably, that “a work of art
+is not a shape but a shape being lived.” The gaze-induced trajectory
+channel is one way to operationalize that claim.</p>
+<p><strong>Greenbergian formalism.</strong> Clement Greenberg’s
+formalist criticism, particularly in <em>Art and Culture</em> (1961) and
+the late essays on flatness and medium-specificity, insists that what is
+aesthetically decisive in painting is internal to the painting’s own
+formal organization — not its subject matter, not its historical
+context, not its narrative content. The framework is, at a philosophical
+level, a Greenbergian view implemented in a learned representation
+space: the patch-cloud divergence and coherence channels measure
+structural-formal properties of the image that are insensitive to
+caption, title, and context. A study that found these channels to be
+genuinely predictive would be partial vindication of Greenberg’s claim
+that formal properties carry aesthetic signal. Conversely, if the only
+channel that survives is a content-tracking Lasso axis (e.g., “is this
+image a landscape”), the result would be anti-Greenbergian: what matters
+is subject, not form.</p>
+<p><strong>Rothko, Reinhardt, and the color-field reception.</strong>
+Mark Rothko’s large color-field paintings — the Seagram murals, the
+Houston Chapel paintings — were designed to be stood in front of at
+close range for extended periods. Rothko claimed that viewers who wept
+in front of his paintings were having “the same religious experience I
+had when I painted them.” Ad Reinhardt’s black paintings push the claim
+further: the work emerges only after sustained, coherent attention.
+These painters stake a claim that is almost the literal version of the
+internal-coherence channel (B): a work whose patches are nearly
+indistinguishable from one another, whose pair_sim_mean approaches
+unity, is not a failure of differentiation — it is the work. If
+Prediction 23.1 holds, the color-field tradition is the extreme end of
+the book-like aesthetic: maximum coherence, minimum trajectory variance,
+and high corpus-level divergence from a museum whose average is much
+more differentiated. The predicted rating effect is positive on all
+three channels.</p>
+<p>We also note the opposite pole. Bosch, Bruegel, and the tradition of
+narrative-packed surface (continuing through R. B. Kitaj, Peter Saul,
+and contemporary maximalists) should land on the <em>low</em> coherence,
+<em>high</em> trajectory-variance side. The framework does not predict
+that this pole is aesthetically inferior — it predicts that such works
+must pay for their low coherence with something else: extraordinary
+corpus divergence (they are unlike the museum average) or exceptionally
+rich Lasso-discovered content axes. A Bruegel panel survives not by
+being patch-coherent but by being, in the PCA sense, simply
+elsewhere.</p>
+</section>
+<section id="hiroshis-defense-reconsidered" class="level2">
+<h2>23.5 Hiroshi’s Defense, Reconsidered</h2>
+<p>Return to Hiroshi and his board meeting. What does the framework
+actually give him?</p>
+<p>Not a score. The framework does <em>not</em> collapse to a scalar,
+and this chapter’s central theoretical claim is that any curator who
+defends an acquisition with a single number has misunderstood the
+geometry. What the framework gives Hiroshi is a <em>vector</em> of
+structural claims, each of which can be computed, each of which can be
+interrogated, and each of which the board can choose to weight as it
+prefers.</p>
+<p>For each of his six acquisitions, Hiroshi can report: where the work
+sits in the museum’s corpus divergence distribution; how internally
+coherent its patch cloud is relative to peer works; what its
+gaze-induced trajectory looks like against the collection’s median;
+which of the Lasso-discovered latent axes it loads on most heavily; and
+— if he has a rating model trained on the museum’s own acquisitions
+history — what that model predicts, <em>along with the residual
+uncertainty the model itself admits</em>. The physicist-trustee will
+recognize the form: it is error bars on an estimator. The question “is
+this painting good?” becomes “does this painting occupy a region of
+geometric space that this collection has historically rewarded, and if
+not, can you justify the departure?” That is a question curators already
+answer implicitly. The framework lets them answer it explicitly, and in
+a form that admits disagreement about weighting rather than disagreement
+about taste.</p>
+<p>None of this replaces Hiroshi’s eye. But it gives his eye a
+language.</p>
+</section>
+<section id="honest-acknowledgment-of-the-empirical-gap" class="level2">
+<h2>23.6 Honest Acknowledgment of the Empirical Gap</h2>
+<p>We have not run this pipeline. The books pipeline (Chapter 17, Phase
+1–3) took eighteen months and required a matched Gutenberg–Goodreads
+corpus of 4,998 books and a cross-lingual extension with 4,683
+non-English works. The music pipeline (Phase 4) required FMA Medium’s
+24,801 tracks with artist-disjoint folds. The painting analog requires:
+a large, rights-cleared, metadata-rich image corpus; a rating signal
+cleaner than the four candidates listed in §23.1; an author- or
+artist-disjoint fold structure that respects period and genre; and
+compute budget for DINOv2 or CLIP inference over the full corpus. None
+of these is unobtainable. Several art-historical research groups (the
+Frick Digital Art History initiative, the PHAROS consortium,
+ImageNet-WikiArt crosses) have begun assembling the necessary
+infrastructure. But the study does not exist, at the time of this
+writing, and we do not write as if it does.</p>
+<p>We commit, instead, to the following honesty condition. If the study
+is run by us or by any other group, and the sign of the coherence
+channel comes out opposite to Prediction 23.1 — that is, if painting
+behaves like music rather than like books — we will say so, and we will
+revise this chapter to reflect the finding, and the theoretical
+coherence/contrast dichotomy of §17.6 will have to be restated as a
+property specifically of books-versus-music rather than of
+sustained-contemplation-versus-temporal-flow. The chapter is written to
+be readable after such a revision; nothing in it depends on the
+prediction being confirmed. What depends on the prediction being
+confirmed is the simpler, stronger claim that the framework makes a
+sharp, advance-stated, empirically bite-sized commitment about a
+modality we have not yet studied.</p>
+</section>
+<section id="bridge-to-chapter-24" class="level2">
+<h2>23.7 Bridge to Chapter 24</h2>
+<p>Painting is the static-visual case. Architecture — the subject of the
+next chapter — is the visual case <em>in three dimensions and at the
+scale of the built environment</em>, where the viewer is not in front of
+the work but inside it. If painting is a patch cloud, architecture is a
+panoramic or point-cloud sweep; if painting’s trajectory is a saccade
+path over a canvas, architecture’s trajectory is a promenade through
+rooms. We expect continuity: the internal-coherence channel should
+operate in built space much as in painted space. We also expect one
+sharp new prediction specific to architecture, namely that proportion
+systems (Palladio, Le Corbusier’s Modulor, the golden section) are
+<em>constrained-trajectory</em> patterns in representation space rather
+than free proportions. We turn to that now.</p>
+<hr />
+<p><em>For the mathematical preliminaries underlying the patch-cloud
+construction, see Chapter 4. For the tensor hierarchy into which
+painting’s five levels (patch, region, composition, work, corpus) fit,
+see Chapter 6. For the empirical evidence that grounds the book-like
+sign prediction of §23.2, see Chapter 17, especially §17.6 on
+cross-modality sign flips.</em></p>
+</section>
+</section>
+
+      </div>
+
+      <div class="chapter-nav-bottom">
+        <a href="chapter-22-geometric-film-and-television.html" class="nav-prev">&larr; Chapter 22: Geometric Film &amp; Television — Narrative Trajecto…</a>
+        <a href="index.html" class="nav-toc">Contents</a>
+        <a href="chapter-24-geometric-architecture.html" class="nav-next">Chapter 24: Geometric Architecture — Space, Form, and Propor… &rarr;</a>
+      </div>
+    </div>
+  </article>
+
+  <footer class="book-footer">
+    <p>&copy; 2026 Andrew H. Bond. <em>Geometric Aesthetics: The Mathematical Structure of Judgment.</em></p>
+    <p class="footer-note">Beauty is not a number. It is a geometry.</p>
+  </footer>
+
+  <script>
+    window.addEventListener('scroll', () => {
+      document.getElementById('main-nav').classList.toggle('scrolled', window.scrollY > 20);
+    });
+    document.querySelector('.nav-toggle')?.addEventListener('click', function() {
+      document.querySelector('.nav-links').classList.toggle('open');
+    });
+  </script>
+  <script>
+    // Pandoc --katex outputs <span class="math inline"> and <span class="math display">.
+    // This script renders them with KaTeX once the library loads.
+    document.addEventListener("DOMContentLoaded", function() {
+      if (typeof katex === 'undefined') return;
+      var mathElements = document.getElementsByClassName("math");
+      for (var i = 0; i < mathElements.length; i++) {
+        var texText = mathElements[i].firstChild;
+        if (mathElements[i].tagName === "SPAN" && texText) {
+          katex.render(texText.data, mathElements[i], {
+            displayMode: mathElements[i].classList.contains('display'),
+            throwOnError: false
+          });
+        }
+      }
+    });
+  </script>
+</body>
+</html>

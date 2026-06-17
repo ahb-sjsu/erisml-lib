@@ -1,0 +1,526 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Chapter 26: Geometric AI Curation — Recommendation, Discovery, and the Filter Bubble &mdash; Geometric Aesthetics</title>
+  <meta name="description" content="Chapter 26: Geometric AI Curation — Recommendation, Discovery, and the Filter Bubble from Geometric Aesthetics: The Mathematical Structure of Judgment by Andrew H. Bond.">
+  <link rel="stylesheet" href="../assets/css/style.css">
+  <link rel="stylesheet" href="../book/book.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Crimson+Pro:ital,wght@0,300;0,400;0,600;0,700;1,400&family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
+</head>
+
+<body>
+  <nav id="main-nav">
+    <div class="nav-inner">
+      <a href="../index.html" class="nav-brand">
+        <span class="brand-symbol">A</span>
+        <span class="brand-text">Geometric Aesthetics</span>
+      </a>
+      <button class="nav-toggle" aria-label="Toggle menu">
+        <span></span><span></span><span></span>
+      </button>
+      <ul class="nav-links">
+
+        <li><a href="../geometric-medicine/index.html">Medicine</a></li>
+        <li><a href="../book/index.html">Ethics</a></li>
+        <li><a href="../geometric-methods/index.html">Methods</a></li>
+        <li><a href="../geometric-reasoning/index.html">Reasoning</a></li>
+        <li><a href="../geometric-economics/index.html">Economics</a></li>
+        <li><a href="../geometric-law/index.html">Law</a></li>
+        <li><a href="../geometric-cognition/index.html">Cognition</a></li>
+        <li><a href="../geometric-communication/index.html">Communication</a></li>
+        <li><a href="../geometric-education/index.html">Education</a></li>
+        <li><a href="../geometric-politics/index.html">Politics</a></li>
+        <li><a href="../geometric-ai/index.html">AI</a></li>
+        <li><a href="index.html" class="active">Aesthetics</a></li>
+        <li><a href="../index.html">Home</a></li>
+
+      </ul>
+    </div>
+  </nav>
+
+  <article class="book-chapter">
+    <div class="chapter-container">
+      <nav class="breadcrumb" aria-label="Breadcrumb">
+        <a href="../index.html">Geometric Series</a>
+        <span class="breadcrumb-sep">&rsaquo;</span>
+        <a href="index.html">Geometric Aesthetics</a>
+        <span class="breadcrumb-sep">&rsaquo;</span>
+        <span class="breadcrumb-current">Chapter 26: Geometric AI Curation — Recommendation, Discovery, and the Filter Bubble</span>
+      </nav>
+      <div class="chapter-nav-top">
+        <a href="chapter-25-geometric-game-aesthetics.html" class="nav-prev">&larr; Chapter 25: Geometric Game Aesthetics — Playable Space and P…</a>
+        <a href="index.html" class="nav-toc">Contents</a>
+        <a href="chapter-27-geometric-fashion-and-product-design.html" class="nav-next">Chapter 27: Geometric Fashion and Product Design — Aesthetic… &rarr;</a>
+      </div>
+
+      <div class="chapter-content">
+<section
+id="chapter-26-geometric-ai-curation-recommendation-discovery-and-the-filter-bubble"
+class="level1">
+<h1>Chapter 26: Geometric AI Curation — Recommendation, Discovery, and
+the Filter Bubble</h1>
+<p><strong>RUNNING EXAMPLE — Priya at the Recommender</strong></p>
+<p>Priya has moved on from TrialMatch. The firm that acquired her
+clinical-matching work is a large streaming platform, and she is now
+lead scientist on the “Taste Engine” — the system that decides which
+songs, which films, which essays surface on each user’s home screen. On
+her first week, she pulls the engagement dashboards. Click-through is
+strong. Watch-time is strong. The A/B test logs show that every tweak to
+the recommender increases the scalar metric the product team watches.
+And yet: three months in, a pattern becomes unignorable. Users who begin
+the quarter listening to a wide spread of genres end the quarter
+listening to one. Users who begin reading across politics, fiction, and
+science end reading one political valence. The system is not broken. The
+system is doing exactly what its loss function asked. It is asking the
+wrong loss function. Priya’s predecessor left a note in the codebase:
+<code># TODO: figure out what "good recommendation" even means</code>.
+She opens a blank notebook and begins again, this time with a manifold
+in mind.</p>
+<p>This chapter applies the geometric framework to the engineering
+discipline that, more than any other, determines what art the
+twenty-first century sees, hears, and reads. Recommendation systems —
+the algorithms behind Spotify Discover, Netflix’s ranked rows, Amazon’s
+“books you may like,” TikTok’s For You page, and a thousand lesser
+engines — are the dominant aesthetic curators of the contemporary
+attention economy. Their scalar objective functions are precisely the
+target of this book’s critique. When we argued, in Chapter 2, that the
+four-star rating destroys aesthetic information, we were speaking of
+individual judgment. The recommender generalizes that destruction to
+billions of judgments compressed into a single optimization target. The
+filter bubble is not a sociological accident. It is the predictable
+geometry of greedy ascent on a scalar-valued objective over a
+high-dimensional aesthetic manifold. This chapter makes that prediction
+precise, empirically grounded where we have evidence, and prescriptively
+sharp where the framework has something to say that current practice
+does not.</p>
+<p>We also acknowledge, at the outset, what we do not have: an
+end-to-end evaluation of a geometric recommender against a
+scalar-engagement recommender in production. No such study exists. What
+we have is the framework, the empirical findings of Chapters 17, 20, and
+21, and a set of falsifiable predictions about what a geometric
+alternative would measurably change.</p>
+<section id="26-1-the-shape-of-the-problem" class="level2">
+<h2>26.1 The Shape of the Problem</h2>
+<p>Consider the canonical recommendation pipeline. A user <span
+class="math inline">u</span> has a history of interactions <span
+class="math inline">H_u = \{(w_1, r_1), (w_2, r_2), \ldots\}</span>
+where each <span class="math inline">w_i</span> is a work (a track, a
+film, a book) and each <span class="math inline">r_i</span> is a
+response (a play, a rating, a completion fraction, a share). A learned
+embedding <span class="math inline">\phi: \mathcal{W} \to
+\mathbb{R}^d</span> places each work in a latent space. A user
+representation <span class="math inline">u \in \mathbb{R}^d</span> is
+derived, typically as a weighted average of the <span
+class="math inline">\phi(w_i)</span> in the user’s history. For a
+candidate work <span class="math inline">w</span>, the system computes a
+scalar score <span class="math inline">s(u, w) = \langle u, \phi(w)
+\rangle</span> — a dot product, a cosine, a learned ranking head — and
+ranks candidates by <span class="math inline">s</span>.</p>
+<p>The loss function during training is, almost universally, a proxy for
+engagement. In early matrix-factorization systems (Koren et al. 2009),
+the objective was to minimize squared error on observed ratings. In
+contemporary deep-learning recommenders (the two-tower architectures of
+YouTube, the transformer-based rankers of TikTok), the objective is to
+maximize the predicted probability of a positive interaction — a click,
+a watch, a share, a save. The scalar <span class="math inline">s(u,
+w)</span> is the learned approximation to the expected engagement.</p>
+<p>This is, in our framework’s vocabulary, a greedy local search on the
+aesthetic manifold. At each recommendation step, the system takes the
+user’s current location and moves in the direction of steepest ascent on
+<span class="math inline">s</span>. There is no memory of the manifold’s
+global structure. There is no planner that considers where the
+trajectory will end up after a thousand such steps. There is no term in
+the loss that penalizes convergence to a small region. The system is
+gradient descent on engagement, nothing more.</p>
+<p>The empirical consequence, well-documented across platforms, is
+convergence. The filter bubble (Pariser 2011) is one name for it. The
+rabbit hole (Ribeiro et al. 2020, on YouTube radicalization) is another.
+The genre trap (Anderson et al. 2020, on Spotify) is a third. In each
+case, the pattern is identical: user trajectories on the learned
+embedding concentrate over time. Variance contracts. The diversity of
+the consumed corpus declines. The effect is not equally strong for all
+users — committed omnivores resist it — but averaged across the
+platform, the direction is unmistakable.</p>
+<p>Our framework identifies three failures of flatland in this picture,
+parallel to the three we identified for scalar aesthetic judgment in
+Chapter 2.</p>
+<p><strong>First failure: scalar irrecoverability.</strong> The
+predicted engagement <span class="math inline">s(u, w)</span> is a
+single number. From it, no downstream process can recover whether the
+predicted engagement is driven by genre affinity, by trajectory-geometry
+resonance with the user’s preferred pacing, by spectral-divergence
+match, or by some other channel. The loss is blind to channel identity.
+When the system recommends a work and the user engages, the reward does
+not propagate to the right channel — it propagates to whatever
+combination the embedding happened to encode, weighted by whatever the
+ranker happened to learn. In our book experiments (Chapter 20), we found
+that the four structural channels — spectral divergences, internal
+coherence, trajectory geometry, and genre-axis Lasso loadings — make
+distinct, non-redundant contributions to predicted reader rating. A
+scalar ranker collapses them.</p>
+<p><strong>Second failure: greedy locality.</strong> Gradient ascent on
+a scalar does not maintain diversity on a manifold. It finds the nearest
+basin of high predicted engagement and descends into it. On an aesthetic
+manifold with genre-sized basins and sub-genre sub-basins, the system’s
+trajectory is deterministic once the initial condition is set: the user
+falls into the nearest genre basin, then the nearest sub-basin within
+it, then the nearest cluster within that. What exploration exists is
+typically implemented as <span
+class="math inline">\epsilon</span>-greedy random perturbation — a
+scalar-blind mutation that samples uniformly from the candidate pool and
+has no notion of <em>directed</em> exploration along the manifold’s
+geodesics.</p>
+<p><strong>Third failure: confounded objective.</strong> This is the
+failure we have direct empirical evidence for. In Chapter 21 we reported
+that, in the FMA-medium music dataset with MERT-v1-330M embeddings
+(<span class="math inline">n = 24{,}801</span> tracks, artist-disjoint
+CV), 91% of the hand-feature predictive <span
+class="math inline">R^2</span> on log-listens was genre confound: the
+within-genre residualized effect was <span class="math inline">R =
+0.043</span> (8.4σ) compared to the raw <span class="math inline">R =
+0.302</span>. In the books pipeline (Chapter 20, <span
+class="math inline">n = 4{,}998</span>), the corresponding confound was
+85%. When a recommender optimizes predicted engagement without
+residualizing genre, it is, with high probability, optimizing a
+genre-classifier in disguise. The “personalization” is real but its
+resolution is coarse: it is personalization of <em>which genre cluster
+you belong to</em>, not of <em>what within-cluster variation you respond
+to</em>. The filter bubble is a genre bubble wearing a personalization
+mask.</p>
+<p>These three failures compound. Scalar irrecoverability means the
+system cannot tell you <em>why</em> you liked what you liked. Greedy
+locality means the system will bring you more of the same on the
+easiest-to-detect similarity axis. Confounded objective means that axis
+is almost certainly genre, not aesthetic content. The result is
+genre-collapse disguised as taste.</p>
+</section>
+<section id="26-2-the-engagement-manifold-is-not-the-aesthetic-manifold"
+class="level2">
+<h2>26.2 The Engagement Manifold Is Not the Aesthetic Manifold</h2>
+<p>The critical distinction, which current recommender research largely
+elides, is between two manifolds that inhabit the same embedding space
+but differ in their geometry.</p>
+<p>Let <span class="math inline">\mathcal{M}_{\text{eng}}</span> denote
+the manifold on which predicted engagement <span
+class="math inline">s</span> is smooth — that is, the learned geometry
+under which nearby points have similar engagement probability. Let <span
+class="math inline">\mathcal{M}_{\text{aes}}</span> denote the aesthetic
+manifold of Chapter 5 — the geometry on which structural-aesthetic
+content (spectral, coherence, trajectory, and the modality-specific axes
+of Chapters 20–25) is smooth. Current recommenders learn <span
+class="math inline">\mathcal{M}_{\text{eng}}</span> and operate on it as
+though it were <span
+class="math inline">\mathcal{M}_{\text{aes}}</span>. They are not the
+same manifold.</p>
+<p>We can say more. The engagement manifold is a projection of the
+aesthetic manifold along the dimensions that correlate with user click
+probability, weighted by the sampling density of the training data. If
+the training data is dominated by a handful of high-engagement genres,
+the projection is dominated by those genres. If the click signal is
+noisier on within-genre aesthetic variation (as our confound results
+suggest it is), the engagement manifold will smooth over that variation.
+The aesthetic manifold has structure that the engagement manifold has
+compressed away.</p>
+<p><strong>Proposition 26.1 (Engagement–Aesthetic Gap).</strong> Let
+<span class="math inline">\phi_{\text{eng}}: \mathcal{W} \to
+\mathbb{R}^{d}</span> be an embedding learned on engagement signal and
+<span class="math inline">\phi_{\text{aes}}: \mathcal{W} \to
+\mathbb{R}^{d}</span> be an embedding learned on aesthetic-structural
+signal (in the MERT or LaBSE sense of Chapter 17). The correlation
+between within-embedding distances, <span
+class="math inline">\operatorname{corr}(\|\phi_{\text{eng}}(w_i) -
+\phi_{\text{eng}}(w_j)\|, \|\phi_{\text{aes}}(w_i) -
+\phi_{\text{aes}}(w_j)\|)</span>, is bounded above by the residualized
+within-genre aesthetic signal and is therefore small whenever genre
+confound is large.</p>
+<p>We argue rather than prove, because the proposition is a claim about
+empirical objects (two embeddings learned under different objectives)
+rather than a theorem about intrinsic structure. The argument:
+engagement distances are dominated by whatever predicts clicks, and
+clicks are dominated by genre (Chapters 20–21, 85–91% genre confound).
+Therefore engagement distances are dominated by genre distances.
+Aesthetic distances, residualized for genre, retain only the 9–15%
+non-confounded signal. The two distance functions share only that
+fraction of structure.</p>
+<p>The prediction is testable. An experiment that ran an
+engagement-trained two-tower recommender and an aesthetic-structural
+recommender on the same corpus, and that measured the between-embedding
+correlation on held-out works, would provide the direct test. We do not
+have that experiment. We predict the correlation would fall in the range
+<span class="math inline">0.3</span>–<span
+class="math inline">0.5</span> — high enough to look similar on
+inspection, low enough that they recommend materially different works
+for the same user.</p>
+</section>
+<section id="26-3-filter-bubbles-as-basin-convergence" class="level2">
+<h2>26.3 Filter Bubbles as Basin Convergence</h2>
+<p>The filter bubble, in geometric language, is the phenomenon in which
+repeated greedy ascent on <span class="math inline">s(u, w)</span>
+drives the user representation <span class="math inline">u</span> into a
+small neighborhood of the engagement manifold and keeps it there. We
+make this precise.</p>
+<p><strong>Definition 26.1 (User Trajectory).</strong> The user
+trajectory is the sequence <span
+class="math inline">(u_t)_{t=1}^T</span> where <span
+class="math inline">u_t</span> is the user representation after <span
+class="math inline">t</span> recommendation–interaction cycles. In
+contemporary systems, <span class="math inline">u_t</span> is typically
+updated as a running average or attention-weighted pool of recently
+consumed <span class="math inline">\phi(w_i)</span>, so <span
+class="math inline">u_t</span> evolves stochastically as a function of
+which recommended works the user engaged with.</p>
+<p><strong>Definition 26.2 (Convergence Basin).</strong> A convergence
+basin <span class="math inline">B \subset
+\mathcal{M}_{\text{eng}}</span> is a region such that once <span
+class="math inline">u_t \in B</span>, the probability that <span
+class="math inline">u_{t+k} \in B</span> for all <span
+class="math inline">k \leq K</span> exceeds some threshold <span
+class="math inline">\rho</span>, for a horizon <span
+class="math inline">K</span> and probability <span
+class="math inline">\rho</span> characteristic of the basin. Large,
+easily-detected genres (pop, rock, electronic in the music domain;
+romance, mystery, fantasy in books) form the dominant basins on
+engagement manifolds learned from mainstream platforms.</p>
+<p><strong>Proposition 26.2 (Basin Convergence Under Greedy
+Ascent).</strong> Under a pure greedy scalar ranker, if a user
+representation <span class="math inline">u_t</span> enters a convergence
+basin <span class="math inline">B</span> with positive probability, the
+expected residence time in <span class="math inline">B</span> grows
+without bound as the catalog size <span
+class="math inline">|\mathcal{W}|</span> grows, provided <span
+class="math inline">B</span> contains sufficiently many unplayed
+works.</p>
+<p>The intuition: larger catalogs mean more candidates within any basin,
+and the greedy ranker will always find one of them before it finds
+something outside the basin. The exit probability per step is inverse in
+basin density. Platforms with growing catalogs see strengthening filter
+bubbles for a structural reason.</p>
+<p>In our music empirical work, we observed basin structure directly.
+Rock (<span class="math inline">n = 7{,}088</span>), Electronic (<span
+class="math inline">n = 6{,}284</span>), and Hip-Hop (<span
+class="math inline">n = 2{,}190</span>) within-genre Ridge regressions
+yielded <span class="math inline">R = 0.139</span>, <span
+class="math inline">0.143</span>, and <span
+class="math inline">0.141</span> respectively — measurable within-genre
+aesthetic signal. But these within-genre effects are small; the
+cross-genre distances on an engagement-trained embedding are much
+larger. A user who enters the rock basin faces a landscape in which the
+nearest cross-genre work is farther (in engagement distance) than the
+thousandth within-genre recommendation. Greedy ascent will exhaust the
+basin before it escapes it, and the basin is for practical purposes
+unexhaustible.</p>
+<p>The sociological consequences — political polarization, niche
+addiction, the collapse of shared cultural referents — are not our
+primary concern. Our concern is the geometric diagnosis: the filter
+bubble is not a bug in the recommender. It is the intended behavior of a
+system whose objective does not penalize it.</p>
+</section>
+<section id="26-4-what-the-geometric-framework-prescribes"
+class="level2">
+<h2>26.4 What the Geometric Framework Prescribes</h2>
+<p>We now sketch, prescriptively, what a recommender built on the
+aesthetic-manifold framework of this book would look like. We emphasize:
+this is speculative engineering. The components exist (manifold
+learning, diversity regularization, multi-objective ranking have each
+been studied), but the integration we propose has not been built and
+evaluated at scale.</p>
+<p><strong>Prescription 1: Multi-channel targeting, not scalar
+scoring.</strong> Instead of a single score <span
+class="math inline">s(u, w)</span>, compute a vector of channel-specific
+scores <span class="math inline">(s_{\text{spec}}, s_{\text{coh}},
+s_{\text{traj}}, s_{\text{genre}}, s_{\text{nov}})</span> corresponding
+to spectral-divergence match, coherence match, trajectory-geometry
+match, genre affinity, and novelty. The final ranking is a
+multi-objective optimization over these, with channel weights <span
+class="math inline">\lambda_k</span> that may be user-controlled,
+editorially shaped, or learned per-user-per-session. The point is that
+the channel decomposition remains in the pipeline. When the system
+recommends, it can say, at least internally: <em>this is a
+trajectory-geometry match, this is a genre match, this is a novelty
+probe</em>. The system’s explanation budget grows, and its failure modes
+become diagnosable.</p>
+<p><strong>Prescription 2: Diversity-on-the-manifold as a first-class
+regularizer.</strong> Current recommenders that claim “diversity”
+typically implement it as maximal marginal relevance (Carbonell &amp;
+Goldstein 1998): rank candidates by <span class="math inline">s(u, w) -
+\lambda \max_{w&#39; \in \text{shown}} \langle \phi(w), \phi(w&#39;)
+\rangle</span>. This is diversity in embedding space. Our prescription
+replaces it with diversity on the aesthetic manifold — specifically,
+diversity on the channels of Chapters 20–21 that have been shown to
+carry cross-modality-invariant aesthetic signal (Chapter 12).
+Concretely: penalize recommendations whose trajectory-geometry features
+cluster tightly, even if their genre and surface embeddings differ. And
+— this is the novel move — penalize recommendations whose genre channel
+is too narrow <em>even when the trajectory-geometry channel is
+diverse</em>, because the framework predicts that genre coverage carries
+information beyond trajectory geometry.</p>
+<p><strong>Prescription 3: Geodesic exploration.</strong> The <span
+class="math inline">\epsilon</span>-greedy random exploration of typical
+bandit-based recommenders is manifold-blind. A geodesic-exploration
+scheme would instead: identify the user’s current manifold location
+<span class="math inline">u_t</span>; identify a target region <span
+class="math inline">T</span> distant from <span
+class="math inline">u_t</span> on some chosen channel (e.g., “classical
+music,” which has <span class="math inline">R = -0.013</span> in our
+data and is therefore in a distinct engagement basin); compute a
+geodesic path from <span class="math inline">u_t</span> to <span
+class="math inline">T</span> on the aesthetic manifold; and recommend
+works sampled along that path, not at its endpoint. The user is not
+abruptly jumped from techno to Schoenberg — they are walked there
+through works whose aesthetic distance from their current position grows
+gradually. This is the algorithmic analog of what a good DJ or a good
+bookseller does.</p>
+<p><strong>Prescription 4: Time-indexed personalization with corpus
+priors.</strong> The personalization term in the objective should be
+time-indexed: <span class="math inline">u_t</span> decays toward a
+corpus prior <span class="math inline">u_0</span> at a configurable
+rate. Users who do not interact with the system for a time drift back
+toward the general taste distribution; the filter bubble is leaky by
+construction. The decay rate can be user-configurable (a “reset my
+recommendations” slider) or editorially set (higher decay for news,
+lower for music preference).</p>
+<p><strong>Prescription 5: Evaluate on manifold-coverage, not just
+CTR.</strong> The most consequential prescription is evaluative. A
+recommender should be evaluated not only on click-through or watch-time
+but on the manifold coverage of its users’ consumption over time. A
+natural metric: the entropy, or equivalently the effective support size,
+of the distribution of user positions on the learned aesthetic manifold
+after <span class="math inline">T</span> interaction cycles. A system
+that concentrates its users (low entropy, small effective support)
+should be dispreferred to one that spreads them, even at some
+scalar-engagement cost.</p>
+<p>We do not claim these prescriptions would yield higher short-term
+revenue. They may well yield lower. The framework’s argument is not a
+business argument. It is a claim about what recommendation <em>ought to
+do</em>, given what aesthetic judgment <em>is</em>. If aesthetic
+judgment is multi-channel, modality-sensitive, cross-lingually invariant
+at the structural level (Chapter 12, <span class="math inline">\rho
+\approx 0.71</span> across 6 language families), and confounded with
+coarse category at the 85–91% level (Chapters 20–21), then a recommender
+that optimizes a scalar engagement proxy is recommending categories, not
+works. It is doing something, but it is not doing curation.</p>
+</section>
+<section id="26-5-connection-to-ethics-chapter-26" class="level2">
+<h2>26.5 Connection to Ethics Chapter 26</h2>
+<p>In <em>Geometric Ethics</em> Chapter 26, the parallel volume of this
+series, we analyzed AI systems whose scalar objectives produced moral
+misalignment. The alignment gap — the distance between the AI’s
+scalar-optimal geodesic and the human’s manifold-optimal geodesic — was
+shown to be nonzero on at least one moral dimension for any scalar
+reward function (Ethics Theorem 26.1–26.2). The argument in this chapter
+is the aesthetic cousin. An aesthetic reward function <span
+class="math inline">s: \mathcal{M}_{\text{aes}} \to \mathbb{R}</span> is
+non-injective: there exist aesthetically distinct works mapping to the
+same predicted engagement. The recommender, optimizing <span
+class="math inline">s</span>, cannot distinguish them. The aesthetic
+information destroyed is, by Brouwer’s invariance of dimension,
+mathematically irrecoverable from <span class="math inline">s</span>
+alone.</p>
+<p>The moral case is the aesthetic case is the same case. Scalar
+compression of high-dimensional judgment is an information-theoretic
+failure before it is a political or sociological one. The reason
+curation and ethics are both hard, and both currently done badly by
+optimization systems, is the same reason: real judgment has rank greater
+than one.</p>
+</section>
+<section id="26-6-honest-caveats-and-what-would-refute-this-chapter"
+class="level2">
+<h2>26.6 Honest Caveats and What Would Refute This Chapter</h2>
+<p>The prescriptive argument above rests on three load-bearing empirical
+claims, each with caveats we have stated and now restate.</p>
+<p>First, the genre-confound claim (Chapters 20–21). In books, 85% of
+headline predictive <span class="math inline">R^2</span> is genre
+confound; in music, 91%. These numbers are point estimates from two
+specific corpora (Gutenberg↔︎Goodreads, FMA-medium), two specific
+encoders (LaBSE, MERT-v1-330M), and two specific CV schemes. Other
+corpora — commercial music catalogs, streaming-platform books catalogs,
+film — may show different fractions. If the genre confound in an actual
+streaming corpus were 20%, not 90%, the prescriptive argument of this
+chapter would weaken (though not collapse: even 20% is not zero).</p>
+<p>Second, the cross-modality sign-flip claim (Chapter 17 and Chapter
+21). Books and music respond in opposite directions to
+<code>pair_sim_mean</code> and <code>step_mean</code>, at <span
+class="math inline">p &lt; 10^{-28}</span> robustness. This is the
+strongest evidence that aesthetic signal is modality-specific, which in
+turn is the strongest evidence that a single scalar recommender is
+necessarily lossy. Replication in film and visual art, which we do not
+yet have, would strengthen or weaken the generalization.</p>
+<p>Third, the claim that geodesic-exploration would outperform <span
+class="math inline">\epsilon</span>-greedy. This is conjectural. It is
+consistent with the framework. It has not been tested in production. An
+experiment with a negative result — geodesic exploration yielding no
+improvement in long-run user manifold coverage over random exploration —
+would falsify the specific prescription without falsifying the broader
+framework (exploration on <em>some</em> manifold is still better than
+exploration in surface embedding, but the choice of manifold would be
+empirically undetermined).</p>
+<p>The largest gap is the one we have already flagged: no end-to-end
+evaluation exists. Chapter 17’s findings concern predictive power, not
+recommender behavior. Translating “geometric features carry aesthetic
+signal in held-out prediction” to “a recommender using geometric
+features produces better long-run user outcomes” requires a production
+experiment with live users. That experiment is the most important
+empirical gap this book identifies.</p>
+</section>
+<section id="26-7-bridge" class="level2">
+<h2>26.7 Bridge to Chapter 27</h2>
+<p>We have argued that AI curation, done with scalar engagement
+objectives, is a specific and diagnosable pathology — greedy ascent on
+the wrong manifold. We have sketched what a geometric alternative would
+look like and flagged what an evaluation would need. In Chapter 27 we
+turn to another domain in which aesthetic trajectories drift in time:
+fashion and product design. There, the “recommendation system” is called
+the market, and the filter bubbles have names like <em>capsule
+collection</em> and <em>brand aesthetic</em>. The same geometric
+vocabulary applies, with different dynamics.</p>
+</section>
+</section>
+
+      </div>
+
+      <div class="chapter-nav-bottom">
+        <a href="chapter-25-geometric-game-aesthetics.html" class="nav-prev">&larr; Chapter 25: Geometric Game Aesthetics — Playable Space and P…</a>
+        <a href="index.html" class="nav-toc">Contents</a>
+        <a href="chapter-27-geometric-fashion-and-product-design.html" class="nav-next">Chapter 27: Geometric Fashion and Product Design — Aesthetic… &rarr;</a>
+      </div>
+    </div>
+  </article>
+
+  <footer class="book-footer">
+    <p>&copy; 2026 Andrew H. Bond. <em>Geometric Aesthetics: The Mathematical Structure of Judgment.</em></p>
+    <p class="footer-note">Beauty is not a number. It is a geometry.</p>
+  </footer>
+
+  <script>
+    window.addEventListener('scroll', () => {
+      document.getElementById('main-nav').classList.toggle('scrolled', window.scrollY > 20);
+    });
+    document.querySelector('.nav-toggle')?.addEventListener('click', function() {
+      document.querySelector('.nav-links').classList.toggle('open');
+    });
+  </script>
+  <script>
+    // Pandoc --katex outputs <span class="math inline"> and <span class="math display">.
+    // This script renders them with KaTeX once the library loads.
+    document.addEventListener("DOMContentLoaded", function() {
+      if (typeof katex === 'undefined') return;
+      var mathElements = document.getElementsByClassName("math");
+      for (var i = 0; i < mathElements.length; i++) {
+        var texText = mathElements[i].firstChild;
+        if (mathElements[i].tagName === "SPAN" && texText) {
+          katex.render(texText.data, mathElements[i], {
+            displayMode: mathElements[i].classList.contains('display'),
+            throwOnError: false
+          });
+        }
+      }
+    });
+  </script>
+</body>
+</html>

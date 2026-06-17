@@ -1,0 +1,687 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Appendix B: Reproduction Cookbook &mdash; Geometric Aesthetics</title>
+  <meta name="description" content="Appendix B: Reproduction Cookbook from Geometric Aesthetics: The Mathematical Structure of Judgment by Andrew H. Bond.">
+  <link rel="stylesheet" href="../assets/css/style.css">
+  <link rel="stylesheet" href="../book/book.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Crimson+Pro:ital,wght@0,300;0,400;0,600;0,700;1,400&family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
+</head>
+
+<body>
+  <nav id="main-nav">
+    <div class="nav-inner">
+      <a href="../index.html" class="nav-brand">
+        <span class="brand-symbol">A</span>
+        <span class="brand-text">Geometric Aesthetics</span>
+      </a>
+      <button class="nav-toggle" aria-label="Toggle menu">
+        <span></span><span></span><span></span>
+      </button>
+      <ul class="nav-links">
+
+        <li><a href="../geometric-medicine/index.html">Medicine</a></li>
+        <li><a href="../book/index.html">Ethics</a></li>
+        <li><a href="../geometric-methods/index.html">Methods</a></li>
+        <li><a href="../geometric-reasoning/index.html">Reasoning</a></li>
+        <li><a href="../geometric-economics/index.html">Economics</a></li>
+        <li><a href="../geometric-law/index.html">Law</a></li>
+        <li><a href="../geometric-cognition/index.html">Cognition</a></li>
+        <li><a href="../geometric-communication/index.html">Communication</a></li>
+        <li><a href="../geometric-education/index.html">Education</a></li>
+        <li><a href="../geometric-politics/index.html">Politics</a></li>
+        <li><a href="../geometric-ai/index.html">AI</a></li>
+        <li><a href="index.html" class="active">Aesthetics</a></li>
+        <li><a href="../index.html">Home</a></li>
+
+      </ul>
+    </div>
+  </nav>
+
+  <article class="book-chapter">
+    <div class="chapter-container">
+      <nav class="breadcrumb" aria-label="Breadcrumb">
+        <a href="../index.html">Geometric Series</a>
+        <span class="breadcrumb-sep">&rsaquo;</span>
+        <a href="index.html">Geometric Aesthetics</a>
+        <span class="breadcrumb-sep">&rsaquo;</span>
+        <span class="breadcrumb-current">Appendix B: Reproduction Cookbook</span>
+      </nav>
+      <div class="chapter-nav-top">
+        <a href="appendix-a-related-work-and-differentiation.html" class="nav-prev">&larr; Appendix A: Related Work and Differentiation</a>
+        <a href="index.html" class="nav-toc">Contents</a>
+        <a href="appendix-c-human-subjects-research-roadmap.html" class="nav-next">Appendix C: Human-Subjects Research Roadmap &rarr;</a>
+      </div>
+
+      <div class="chapter-content">
+<section id="appendix-b-reproduction-cookbook" class="level1">
+<h1>Appendix B: Reproduction Cookbook</h1>
+<p>This appendix describes how to reproduce the four phases of empirical
+results reported in Chapter 17 (Phase 1 Books Discovery, Phase 2
+Within-Genre Control, Phase 3 Cross-Lingual Invariance, Phase 4 Music)
+from raw public data to final effect sizes. The recipe is written for a
+reader with working Python and GPU experience but no prior familiarity
+with our code. The entire pipeline runs end-to-end on a single 32 GB GPU
+in approximately two hours.</p>
+<p>We give hardware, software versions, exact data sources, the
+four-channel feature extraction sketch, cross-validation protocol,
+residualization procedure, known pitfalls, and compute budget. Paths
+marked with <code>/labshare/...</code> are our internal lab-server paths
+and should be remapped to the reader’s environment. Everything else is
+public.</p>
+<section id="b.1-hardware-and-software" class="level2">
+<h2>B.1 Hardware and Software</h2>
+<p><strong>Hardware.</strong> A single NVIDIA GPU with at least 32 GB
+memory is sufficient. We developed on an RTX A6000 (48 GB) and an A100
+(40 GB). MERT inference on 24,801 tracks takes approximately 40 minutes
+at batch size 16 on the A6000; LaBSE inference on ~900k paragraphs takes
+approximately 25 minutes at batch size 64. No distributed setup is
+required. CPU memory of 64 GB is comfortable; 32 GB works if you stream
+rather than materialize the full paragraph pool in RAM.</p>
+<p><strong>Software versions.</strong> We pin to the versions used in
+the reported experiments. Newer versions probably work; older may
+not.</p>
+<pre><code>python==3.11.7
+torch==2.3.1+cu121
+transformers==4.42.3
+sentence-transformers==3.0.1
+numpy==1.26.4
+scipy==1.13.1
+scikit-learn==1.5.0
+pandas==2.2.2
+datasets==2.19.1
+librosa==0.10.2
+soundfile==0.12.1
+tqdm==4.66.4</code></pre>
+<p>Install with:</p>
+<div class="sourceCode" id="cb2"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="ex">conda</span> create <span class="at">-n</span> geomaesth python=3.11</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="ex">conda</span> activate geomaesth</span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="ex">pip</span> install torch==2.3.1 <span class="at">--index-url</span> https://download.pytorch.org/whl/cu121</span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a><span class="ex">pip</span> install transformers==4.42.3 sentence-transformers==3.0.1 <span class="dt">\</span></span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>    numpy==1.26.4 scipy==1.13.1 scikit-learn==1.5.0 pandas==2.2.2 <span class="dt">\</span></span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>    datasets==2.19.1 librosa==0.10.2 soundfile==0.12.1 tqdm==4.66.4</span></code></pre></div>
+</section>
+<section id="b.2-data-acquisition" class="level2">
+<h2>B.2 Data Acquisition</h2>
+<section id="b.2.1-english-books-project-gutenberg-goodreads"
+class="level3">
+<h3>B.2.1 English Books: Project Gutenberg + Goodreads</h3>
+<p><strong>Gutenberg texts.</strong> We download texts directly from the
+Gutenberg cache:</p>
+<pre><code>https://www.gutenberg.org/cache/epub/{id}/pg{id}.txt</code></pre>
+<p>Where <code>{id}</code> is the numeric Gutenberg text identifier. Be
+polite: throttle to ~1 request/second and cache locally; Gutenberg asks
+for this and will rate-limit aggressive scraping. We use a fixed-seed
+shuffle of the Gutenberg catalog and pull until we have matched 5,000
+candidates against Goodreads.</p>
+<p><strong>Goodreads labels.</strong> Goodreads does not ship a rating
+dump anymore. We use the Kaggle <em>goodreads-books</em> dataset (search
+on Kaggle; the relevant file is
+<code>goodreads_book_genres_initial.json</code> together with the
+<code>books.csv</code> rating file). The join between Gutenberg and
+Goodreads is not clean — Gutenberg gives author + title strings,
+Goodreads gives author + title + ISBN + editions. Our matcher:</p>
+<ol type="1">
+<li>Normalizes author names to surname (unicode-normalize, strip
+diacritics, lowercase, split on comma or space, take last non-initial
+token).</li>
+<li>Normalizes titles (lowercase, strip
+<code>a</code>/<code>an</code>/<code>the</code> leading article, strip
+punctuation).</li>
+<li>Joins on (surname, normalized-title-prefix) and picks the Goodreads
+edition with highest <code>ratings_count</code>.</li>
+<li>Rejects matches where
+<code>abs(log10(ratings_count)) &lt; 1.0</code> (too-obscure editions
+produce noisy mean ratings).</li>
+</ol>
+<p>After this we have <span class="math inline">n=4{,}998</span> English
+books with (Gutenberg text, Goodreads average rating, ratings count,
+author).</p>
+</section>
+<section
+id="b.2.2-non-english-books-laion-project-gutenberg-on-hugging-face"
+class="level3">
+<h3>B.2.2 Non-English Books: LAION / Project-Gutenberg on Hugging
+Face</h3>
+<p>For the Phase 3 cross-lingual experiment we use the
+<code>laion/Project-Gutenberg</code> Hugging Face dataset, which bundles
+Gutenberg EPUBs with language metadata. This saves us from scraping 19
+languages manually.</p>
+<div class="sourceCode" id="cb4"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> datasets <span class="im">import</span> load_dataset</span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>ds <span class="op">=</span> load_dataset(<span class="st">&quot;laion/Project-Gutenberg&quot;</span>, split<span class="op">=</span><span class="st">&quot;train&quot;</span>)</span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a><span class="co"># Filter by language code; process same way as English.</span></span></code></pre></div>
+<p>Language tags follow ISO 639-1. We retain bundles with at least 20
+books (the statistical-power threshold): FI 288, FR 227, DE 138, NL 88,
+IT 49, ES 38, EL 33, EO 24, HU 21, LA 20. Below-threshold languages (PT,
+JA, PL, SV, RU, CS, ZH) are retained for exploratory analysis but not
+for the headline invariance claims.</p>
+</section>
+<section id="b.2.3-music-fma-medium-mert" class="level3">
+<h3>B.2.3 Music: FMA Medium + MERT</h3>
+<p>The Free Music Archive Medium split has 25,000 tracks with genre
+labels and track-level listen counts. The original Switch CDN download
+is painfully slow (we clocked it at &lt;500 kB/s on good days; 22 GB
+takes half a day). We use a Hugging Face mirror:</p>
+<div class="sourceCode" id="cb5"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> datasets <span class="im">import</span> load_dataset</span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>fma <span class="op">=</span> load_dataset(<span class="st">&quot;benjamin-paine/free-music-archive-medium&quot;</span>, split<span class="op">=</span><span class="st">&quot;train&quot;</span>)</span></code></pre></div>
+<p>This pulls at multi-MB/s on a good connection and has the tracks
+pre-decoded. Metadata (the <code>tracks.csv</code> file with
+<code>track_listens</code> and <code>genre_top</code>) we still pull
+from the Switch FMA metadata dump; the Hugging Face mirror may not
+include the full track-level metadata file. If the Switch link is down,
+community mirrors are indexed from the original FMA GitHub.</p>
+<p>We end with <span class="math inline">n=24{,}801</span> tracks after
+dropping tracks with missing audio or missing
+<code>track_listens</code>. Target variable is <span
+class="math inline">\log(1 + \text{track\_listens})</span>.</p>
+</section>
+</section>
+<section id="b.3-encoding" class="level2">
+<h2>B.3 Encoding</h2>
+<section id="b.3.1-text-labse" class="level3">
+<h3>B.3.1 Text: LaBSE</h3>
+<div class="sourceCode" id="cb6"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> sentence_transformers <span class="im">import</span> SentenceTransformer</span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>labse <span class="op">=</span> SentenceTransformer(<span class="st">&quot;sentence-transformers/LaBSE&quot;</span>, device<span class="op">=</span><span class="st">&quot;cuda&quot;</span>)</span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a><span class="co"># Output: 768-dimensional L2-normalized sentence embeddings.</span></span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>emb <span class="op">=</span> labse.encode(paragraphs, batch_size<span class="op">=</span><span class="dv">64</span>,</span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a>                   convert_to_numpy<span class="op">=</span><span class="va">True</span>,</span>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a>                   normalize_embeddings<span class="op">=</span><span class="va">True</span>)</span></code></pre></div>
+<p>LaBSE outputs 768-dim embeddings that are L2-normalized. The
+<code>normalize_embeddings=True</code> flag is important: without it the
+downstream PCA picks up per-paragraph norm variation that is not
+semantically meaningful.</p>
+</section>
+<section id="b.3.2-audio-mert" class="level3">
+<h3>B.3.2 Audio: MERT</h3>
+<div class="sourceCode" id="cb7"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> transformers <span class="im">import</span> AutoModel, AutoFeatureExtractor</span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> torch, torchaudio</span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a>model <span class="op">=</span> AutoModel.from_pretrained(<span class="st">&quot;m-a-p/MERT-v1-330M&quot;</span>,</span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a>                                  trust_remote_code<span class="op">=</span><span class="va">True</span>).cuda().<span class="bu">eval</span>()</span>
+<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a>fe <span class="op">=</span> AutoFeatureExtractor.from_pretrained(<span class="st">&quot;m-a-p/MERT-v1-330M&quot;</span>,</span>
+<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a>                                          trust_remote_code<span class="op">=</span><span class="va">True</span>)</span>
+<span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-9"><a href="#cb7-9" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> encode_clip(wave_24k_mono_30s: torch.Tensor):</span>
+<span id="cb7-10"><a href="#cb7-10" aria-hidden="true" tabindex="-1"></a>    inputs <span class="op">=</span> fe(wave_24k_mono_30s, sampling_rate<span class="op">=</span><span class="dv">24000</span>,</span>
+<span id="cb7-11"><a href="#cb7-11" aria-hidden="true" tabindex="-1"></a>                return_tensors<span class="op">=</span><span class="st">&quot;pt&quot;</span>).to(<span class="st">&quot;cuda&quot;</span>)</span>
+<span id="cb7-12"><a href="#cb7-12" aria-hidden="true" tabindex="-1"></a>    <span class="cf">with</span> torch.no_grad():</span>
+<span id="cb7-13"><a href="#cb7-13" aria-hidden="true" tabindex="-1"></a>        out <span class="op">=</span> model(<span class="op">**</span>inputs, output_hidden_states<span class="op">=</span><span class="va">True</span>)</span>
+<span id="cb7-14"><a href="#cb7-14" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Layer-7 hidden state, shape (1, T=45, 1024)</span></span>
+<span id="cb7-15"><a href="#cb7-15" aria-hidden="true" tabindex="-1"></a>    h7 <span class="op">=</span> out.hidden_states[<span class="dv">7</span>].squeeze(<span class="dv">0</span>).cpu().numpy()</span>
+<span id="cb7-16"><a href="#cb7-16" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> h7  <span class="co"># 45 x 1024</span></span></code></pre></div>
+<p>MERT expects 24 kHz mono audio. Resample and downmix before passing
+in. The 30-second clip yields <span class="math inline">T=45</span>
+token-level hidden states at the layer-7 embedding dimension <span
+class="math inline">D=1024</span>.</p>
+</section>
+</section>
+<section id="b.4-preprocessing" class="level2">
+<h2>B.4 Preprocessing</h2>
+<section id="b.4.1-books-headerfooter-strip-paragraph-split"
+class="level3">
+<h3>B.4.1 Books: Header/Footer Strip, Paragraph Split</h3>
+<p>Gutenberg texts have a boilerplate preamble ending with the
+<code>*** START OF THIS PROJECT GUTENBERG EBOOK ...</code> line and a
+similar tail marker. Strip between those markers. Paragraph-split on
+two-or-more consecutive newlines; drop paragraphs under 20 words or over
+500 words. This gives us on the order of 200–400 paragraphs per book and
+a pooled corpus of approximately 900,000 English paragraphs across 4,998
+books.</p>
+</section>
+<section id="b.4.2-music-clip-selection" class="level3">
+<h3>B.4.2 Music: Clip Selection</h3>
+<p>FMA tracks vary in length. We take a single 30-second clip starting
+at 30 seconds in (avoiding intros/fade-outs). Where the track is under
+60 seconds we take from the start. Downmix stereo to mono. Resample to
+24 kHz using <code>torchaudio.transforms.Resample</code>
+(polyphase).</p>
+</section>
+</section>
+<section id="b.5-pca-basis" class="level2">
+<h2>B.5 PCA Basis</h2>
+<p>The critical move for cross-modality and cross-lingual consistency is
+fitting a PCA basis <em>once</em>, on the English paragraph pool, and
+then using the same axes everywhere downstream.</p>
+<div class="sourceCode" id="cb8"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> sklearn.decomposition <span class="im">import</span> PCA</span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a><span class="co"># english_para_emb: (N_para ~ 900k, 768)</span></span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>pca <span class="op">=</span> PCA(n_components<span class="op">=</span><span class="dv">128</span>, random_state<span class="op">=</span><span class="dv">0</span>)</span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a>pca.fit(english_para_emb)</span>
+<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a><span class="co"># Save pca.components_ (128 x 768) and pca.mean_ (768,) for all downstream use.</span></span></code></pre></div>
+<p>Top-128 PCs capture enough of the variance for stable downstream
+features without over-parameterizing the Gaussian fits (see pitfall
+B.8.1). Do <strong>not</strong> refit the PCA on non-English corpora or
+on the music side. The invariance result requires a shared basis.</p>
+<p>For music, we fit a separate 128-d PCA on MERT layer-7 states pooled
+across all FMA Medium tracks (roughly <span class="math inline">24801
+\times 45 \approx 1.1\text{M}</span> token-level vectors). The two PCA
+bases (text and audio) are unrelated — we do not and cannot force them
+to share axes — but within each modality the basis is fit once and used
+everywhere.</p>
+</section>
+<section id="b.6-feature-extraction-four-channels" class="level2">
+<h2>B.6 Feature Extraction: Four Channels</h2>
+<p>Given a work represented as a sequence of projected vectors <span
+class="math inline">\{x_t\}_{t=1}^T \subset \mathbb{R}^{128}</span>, we
+extract four channels of features.</p>
+<div class="sourceCode" id="cb9"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> scipy.spatial.distance <span class="im">import</span> pdist</span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> scipy.stats <span class="im">import</span> skew</span>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> extract_features(X, ref_mean, ref_cov, ref_cov_inv, ref_logdet):</span>
+<span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a>    <span class="co"># X: (T, 128). ref_*: English-corpus reference Gaussian.</span></span>
+<span id="cb9-7"><a href="#cb9-7" aria-hidden="true" tabindex="-1"></a>    T, D <span class="op">=</span> X.shape</span>
+<span id="cb9-8"><a href="#cb9-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-9"><a href="#cb9-9" aria-hidden="true" tabindex="-1"></a>    <span class="co"># --- Channel A: spectral divergences vs reference ---</span></span>
+<span id="cb9-10"><a href="#cb9-10" aria-hidden="true" tabindex="-1"></a>    m <span class="op">=</span> X.mean(axis<span class="op">=</span><span class="dv">0</span>)</span>
+<span id="cb9-11"><a href="#cb9-11" aria-hidden="true" tabindex="-1"></a>    C <span class="op">=</span> np.cov(X.T) <span class="op">+</span> <span class="fl">1e-4</span> <span class="op">*</span> np.eye(D)</span>
+<span id="cb9-12"><a href="#cb9-12" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Mahalanobis between means</span></span>
+<span id="cb9-13"><a href="#cb9-13" aria-hidden="true" tabindex="-1"></a>    mahal_mean <span class="op">=</span> np.sqrt((m <span class="op">-</span> ref_mean) <span class="op">@</span> ref_cov_inv <span class="op">@</span> (m <span class="op">-</span> ref_mean))</span>
+<span id="cb9-14"><a href="#cb9-14" aria-hidden="true" tabindex="-1"></a>    <span class="co"># KL(work || ref) for Gaussians</span></span>
+<span id="cb9-15"><a href="#cb9-15" aria-hidden="true" tabindex="-1"></a>    sign, logdet <span class="op">=</span> np.linalg.slogdet(C)</span>
+<span id="cb9-16"><a href="#cb9-16" aria-hidden="true" tabindex="-1"></a>    kl <span class="op">=</span> <span class="fl">0.5</span> <span class="op">*</span> (np.trace(ref_cov_inv <span class="op">@</span> C)</span>
+<span id="cb9-17"><a href="#cb9-17" aria-hidden="true" tabindex="-1"></a>                <span class="op">+</span> (ref_mean <span class="op">-</span> m) <span class="op">@</span> ref_cov_inv <span class="op">@</span> (ref_mean <span class="op">-</span> m)</span>
+<span id="cb9-18"><a href="#cb9-18" aria-hidden="true" tabindex="-1"></a>                <span class="op">-</span> D <span class="op">+</span> ref_logdet <span class="op">-</span> logdet)</span>
+<span id="cb9-19"><a href="#cb9-19" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Bhattacharyya, Hellinger (symmetric)</span></span>
+<span id="cb9-20"><a href="#cb9-20" aria-hidden="true" tabindex="-1"></a>    C_avg <span class="op">=</span> <span class="fl">0.5</span> <span class="op">*</span> (C <span class="op">+</span> ref_cov)</span>
+<span id="cb9-21"><a href="#cb9-21" aria-hidden="true" tabindex="-1"></a>    _, logdet_avg <span class="op">=</span> np.linalg.slogdet(C_avg)</span>
+<span id="cb9-22"><a href="#cb9-22" aria-hidden="true" tabindex="-1"></a>    bhatt <span class="op">=</span> <span class="fl">0.125</span> <span class="op">*</span> (m <span class="op">-</span> ref_mean) <span class="op">@</span> np.linalg.solve(C_avg, (m <span class="op">-</span> ref_mean)) <span class="op">\</span></span>
+<span id="cb9-23"><a href="#cb9-23" aria-hidden="true" tabindex="-1"></a>          <span class="op">+</span> <span class="fl">0.5</span> <span class="op">*</span> (logdet_avg <span class="op">-</span> <span class="fl">0.5</span> <span class="op">*</span> (logdet <span class="op">+</span> ref_logdet))</span>
+<span id="cb9-24"><a href="#cb9-24" aria-hidden="true" tabindex="-1"></a>    hellinger <span class="op">=</span> np.sqrt(<span class="fl">1.0</span> <span class="op">-</span> np.exp(<span class="op">-</span>bhatt))</span>
+<span id="cb9-25"><a href="#cb9-25" aria-hidden="true" tabindex="-1"></a>    js <span class="op">=</span> <span class="fl">0.5</span> <span class="op">*</span> (kl <span class="op">+</span> _reverse_kl(X, ref_mean, ref_cov))  <span class="co"># symmetrized</span></span>
+<span id="cb9-26"><a href="#cb9-26" aria-hidden="true" tabindex="-1"></a>    tv <span class="op">=</span> <span class="fl">0.5</span> <span class="op">*</span> np.linalg.norm(m <span class="op">-</span> ref_mean, <span class="bu">ord</span><span class="op">=</span><span class="dv">1</span>)  <span class="co"># crude TV proxy</span></span>
+<span id="cb9-27"><a href="#cb9-27" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-28"><a href="#cb9-28" aria-hidden="true" tabindex="-1"></a>    <span class="co"># --- Channel B: internal coherence ---</span></span>
+<span id="cb9-29"><a href="#cb9-29" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Average pairwise cosine similarity between paragraphs within the work</span></span>
+<span id="cb9-30"><a href="#cb9-30" aria-hidden="true" tabindex="-1"></a>    Xn <span class="op">=</span> X <span class="op">/</span> (np.linalg.norm(X, axis<span class="op">=</span><span class="dv">1</span>, keepdims<span class="op">=</span><span class="va">True</span>) <span class="op">+</span> <span class="fl">1e-12</span>)</span>
+<span id="cb9-31"><a href="#cb9-31" aria-hidden="true" tabindex="-1"></a>    sim <span class="op">=</span> Xn <span class="op">@</span> Xn.T</span>
+<span id="cb9-32"><a href="#cb9-32" aria-hidden="true" tabindex="-1"></a>    iu <span class="op">=</span> np.triu_indices(T, k<span class="op">=</span><span class="dv">1</span>)</span>
+<span id="cb9-33"><a href="#cb9-33" aria-hidden="true" tabindex="-1"></a>    pair_sim_mean <span class="op">=</span> sim[iu].mean()</span>
+<span id="cb9-34"><a href="#cb9-34" aria-hidden="true" tabindex="-1"></a>    pair_sim_std  <span class="op">=</span> sim[iu].std()</span>
+<span id="cb9-35"><a href="#cb9-35" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-36"><a href="#cb9-36" aria-hidden="true" tabindex="-1"></a>    <span class="co"># --- Channel C: trajectory geometry ---</span></span>
+<span id="cb9-37"><a href="#cb9-37" aria-hidden="true" tabindex="-1"></a>    steps <span class="op">=</span> np.linalg.norm(np.diff(X, axis<span class="op">=</span><span class="dv">0</span>), axis<span class="op">=</span><span class="dv">1</span>)  <span class="co"># (T-1,)</span></span>
+<span id="cb9-38"><a href="#cb9-38" aria-hidden="true" tabindex="-1"></a>    step_mean <span class="op">=</span> steps.mean()</span>
+<span id="cb9-39"><a href="#cb9-39" aria-hidden="true" tabindex="-1"></a>    step_std  <span class="op">=</span> steps.std()</span>
+<span id="cb9-40"><a href="#cb9-40" aria-hidden="true" tabindex="-1"></a>    step_skew <span class="op">=</span> skew(steps)</span>
+<span id="cb9-41"><a href="#cb9-41" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Autocorrelation of step magnitude, lags 1..3 summed</span></span>
+<span id="cb9-42"><a href="#cb9-42" aria-hidden="true" tabindex="-1"></a>    acf1_top3 <span class="op">=</span> <span class="bu">sum</span>(_acf(steps, lag) <span class="cf">for</span> lag <span class="kw">in</span> (<span class="dv">1</span>, <span class="dv">2</span>, <span class="dv">3</span>))</span>
+<span id="cb9-43"><a href="#cb9-43" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Recurrence rate: fraction of pairs with similarity &gt; threshold</span></span>
+<span id="cb9-44"><a href="#cb9-44" aria-hidden="true" tabindex="-1"></a>    recur_rate <span class="op">=</span> (sim[iu] <span class="op">&gt;</span> <span class="fl">0.9</span>).mean()</span>
+<span id="cb9-45"><a href="#cb9-45" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Path efficiency: displacement / total path length</span></span>
+<span id="cb9-46"><a href="#cb9-46" aria-hidden="true" tabindex="-1"></a>    path_eff <span class="op">=</span> np.linalg.norm(X[<span class="op">-</span><span class="dv">1</span>] <span class="op">-</span> X[<span class="dv">0</span>]) <span class="op">/</span> (steps.<span class="bu">sum</span>() <span class="op">+</span> <span class="fl">1e-12</span>)</span>
+<span id="cb9-47"><a href="#cb9-47" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Rough curvature proxy: mean angle between successive step vectors</span></span>
+<span id="cb9-48"><a href="#cb9-48" aria-hidden="true" tabindex="-1"></a>    d <span class="op">=</span> np.diff(X, axis<span class="op">=</span><span class="dv">0</span>)</span>
+<span id="cb9-49"><a href="#cb9-49" aria-hidden="true" tabindex="-1"></a>    dn <span class="op">=</span> d <span class="op">/</span> (np.linalg.norm(d, axis<span class="op">=</span><span class="dv">1</span>, keepdims<span class="op">=</span><span class="va">True</span>) <span class="op">+</span> <span class="fl">1e-12</span>)</span>
+<span id="cb9-50"><a href="#cb9-50" aria-hidden="true" tabindex="-1"></a>    cos_angles <span class="op">=</span> (dn[:<span class="op">-</span><span class="dv">1</span>] <span class="op">*</span> dn[<span class="dv">1</span>:]).<span class="bu">sum</span>(axis<span class="op">=</span><span class="dv">1</span>)</span>
+<span id="cb9-51"><a href="#cb9-51" aria-hidden="true" tabindex="-1"></a>    curvature <span class="op">=</span> np.mean(<span class="fl">1.0</span> <span class="op">-</span> cos_angles)</span>
+<span id="cb9-52"><a href="#cb9-52" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Power-law slope on sorted step magnitudes (tail index proxy)</span></span>
+<span id="cb9-53"><a href="#cb9-53" aria-hidden="true" tabindex="-1"></a>    sorted_steps <span class="op">=</span> np.sort(steps)[::<span class="op">-</span><span class="dv">1</span>]</span>
+<span id="cb9-54"><a href="#cb9-54" aria-hidden="true" tabindex="-1"></a>    ranks <span class="op">=</span> np.arange(<span class="dv">1</span>, <span class="bu">len</span>(sorted_steps) <span class="op">+</span> <span class="dv">1</span>)</span>
+<span id="cb9-55"><a href="#cb9-55" aria-hidden="true" tabindex="-1"></a>    powerlaw_slope <span class="op">=</span> np.polyfit(np.log(ranks), np.log(sorted_steps <span class="op">+</span> <span class="fl">1e-12</span>), <span class="dv">1</span>)[<span class="dv">0</span>]</span>
+<span id="cb9-56"><a href="#cb9-56" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Fraction of path length in top-100 largest steps</span></span>
+<span id="cb9-57"><a href="#cb9-57" aria-hidden="true" tabindex="-1"></a>    tail_mass_100 <span class="op">=</span> sorted_steps[:<span class="dv">100</span>].<span class="bu">sum</span>() <span class="op">/</span> (steps.<span class="bu">sum</span>() <span class="op">+</span> <span class="fl">1e-12</span>)</span>
+<span id="cb9-58"><a href="#cb9-58" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-59"><a href="#cb9-59" aria-hidden="true" tabindex="-1"></a>    <span class="co"># --- Channel D: raw 128-d mean for downstream Lasso ---</span></span>
+<span id="cb9-60"><a href="#cb9-60" aria-hidden="true" tabindex="-1"></a>    <span class="co"># This channel provides the vector fed to Lasso-on-PCA-spectrum.</span></span>
+<span id="cb9-61"><a href="#cb9-61" aria-hidden="true" tabindex="-1"></a>    pca_spectrum <span class="op">=</span> m  <span class="co"># shape (128,)</span></span>
+<span id="cb9-62"><a href="#cb9-62" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-63"><a href="#cb9-63" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> <span class="bu">dict</span>(</span>
+<span id="cb9-64"><a href="#cb9-64" aria-hidden="true" tabindex="-1"></a>        mahal_mean<span class="op">=</span>mahal_mean, kl<span class="op">=</span>kl, bhatt<span class="op">=</span>bhatt, hellinger<span class="op">=</span>hellinger,</span>
+<span id="cb9-65"><a href="#cb9-65" aria-hidden="true" tabindex="-1"></a>        js<span class="op">=</span>js, tv<span class="op">=</span>tv,</span>
+<span id="cb9-66"><a href="#cb9-66" aria-hidden="true" tabindex="-1"></a>        pair_sim_mean<span class="op">=</span>pair_sim_mean, pair_sim_std<span class="op">=</span>pair_sim_std,</span>
+<span id="cb9-67"><a href="#cb9-67" aria-hidden="true" tabindex="-1"></a>        step_mean<span class="op">=</span>step_mean, step_std<span class="op">=</span>step_std, step_skew<span class="op">=</span>step_skew,</span>
+<span id="cb9-68"><a href="#cb9-68" aria-hidden="true" tabindex="-1"></a>        acf1_top3<span class="op">=</span>acf1_top3, recur_rate<span class="op">=</span>recur_rate, path_eff<span class="op">=</span>path_eff,</span>
+<span id="cb9-69"><a href="#cb9-69" aria-hidden="true" tabindex="-1"></a>        curvature<span class="op">=</span>curvature, powerlaw_slope<span class="op">=</span>powerlaw_slope,</span>
+<span id="cb9-70"><a href="#cb9-70" aria-hidden="true" tabindex="-1"></a>        tail_mass_100<span class="op">=</span>tail_mass_100,</span>
+<span id="cb9-71"><a href="#cb9-71" aria-hidden="true" tabindex="-1"></a>        pca_spectrum<span class="op">=</span>pca_spectrum,</span>
+<span id="cb9-72"><a href="#cb9-72" aria-hidden="true" tabindex="-1"></a>    )</span></code></pre></div>
+<p>Channels A, B, C yield scalar features; Channel D is the
+128-dimensional PCA-spectrum vector fed separately to a Lasso
+regressor.</p>
+</section>
+<section id="b.7-cross-validation-and-residualization" class="level2">
+<h2>B.7 Cross-Validation and Residualization</h2>
+<section id="b.7.1-group-disjoint-folds" class="level3">
+<h3>B.7.1 Group-Disjoint Folds</h3>
+<p>We use <code>sklearn.model_selection.GroupKFold</code> with 5 folds.
+The group identifier is the <em>author</em> for books and the
+<em>artist</em> for music. This prevents trivial leakage — a Ridge model
+that learns “Jane Austen’s Goodreads rating is 4.2” would score well on
+non-grouped splits and tell us nothing about aesthetic signal.</p>
+<div class="sourceCode" id="cb10"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> sklearn.model_selection <span class="im">import</span> GroupKFold</span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> sklearn.linear_model <span class="im">import</span> RidgeCV, LassoCV</span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a>gkf <span class="op">=</span> GroupKFold(n_splits<span class="op">=</span><span class="dv">5</span>)</span>
+<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a>preds <span class="op">=</span> np.zeros(<span class="bu">len</span>(y))</span>
+<span id="cb10-6"><a href="#cb10-6" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> tr, te <span class="kw">in</span> gkf.split(X, y, groups<span class="op">=</span>author):</span>
+<span id="cb10-7"><a href="#cb10-7" aria-hidden="true" tabindex="-1"></a>    model <span class="op">=</span> RidgeCV(alphas<span class="op">=</span>[<span class="fl">0.1</span>, <span class="fl">1.0</span>, <span class="fl">10.0</span>, <span class="fl">100.0</span>]).fit(X[tr], y[tr])</span>
+<span id="cb10-8"><a href="#cb10-8" aria-hidden="true" tabindex="-1"></a>    preds[te] <span class="op">=</span> model.predict(X[te])</span>
+<span id="cb10-9"><a href="#cb10-9" aria-hidden="true" tabindex="-1"></a>r <span class="op">=</span> np.corrcoef(preds, y)[<span class="dv">0</span>, <span class="dv">1</span>]</span></code></pre></div>
+</section>
+<section id="b.7.2-genre-residualization-phase-2-phase-4-within-genre"
+class="level3">
+<h3>B.7.2 Genre Residualization (Phase 2 / Phase 4 Within-Genre)</h3>
+<p>To get the genre-confound-honest effect size, subtract the per-genre
+target mean before fitting the model on the target:</p>
+<div class="sourceCode" id="cb11"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> residualize(y, genre):</span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>    y_res <span class="op">=</span> y.copy()</span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> g <span class="kw">in</span> np.unique(genre):</span>
+<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a>        mask <span class="op">=</span> (genre <span class="op">==</span> g)</span>
+<span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a>        y_res[mask] <span class="op">=</span> y[mask] <span class="op">-</span> y[mask].mean()</span>
+<span id="cb11-6"><a href="#cb11-6" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> y_res</span>
+<span id="cb11-7"><a href="#cb11-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-8"><a href="#cb11-8" aria-hidden="true" tabindex="-1"></a>y_res <span class="op">=</span> residualize(y, genre)</span>
+<span id="cb11-9"><a href="#cb11-9" aria-hidden="true" tabindex="-1"></a><span class="co"># Re-run Ridge CV on y_res instead of y.</span></span></code></pre></div>
+<p>For the strictest within-genre analysis (the 6.2σ fiction result, the
+music within-genre per-genre numbers) we restrict to a single genre and
+fit independently. This removes all between-genre variance by
+construction.</p>
+<p>The delta between the raw and residualized <span
+class="math inline">R^2</span> is the genre confound. In our data it is
+85% for books and 91% for music hand features.</p>
+</section>
+</section>
+<section id="b.8-known-pitfalls" class="level2">
+<h2>B.8 Known Pitfalls</h2>
+<section
+id="b.8.1-hellinger-saturation-in-high-dimensional-small-sample"
+class="level3">
+<h3>B.8.1 Hellinger Saturation in High-Dimensional Small-Sample</h3>
+<p>With <span class="math inline">T=45</span> token-level vectors in
+<span class="math inline">D=128</span> dimensions, the empirical
+covariance <span class="math inline">C</span> is rank-deficient.
+Closed-form Gaussian Hellinger becomes numerically unstable: the <span
+class="math inline">\log\det</span> terms diverge and the feature
+saturates at 1.0. We observed this first in the music data (every track
+scored Hellinger <span class="math inline">\approx 1.0</span>) and the
+feature became useless.</p>
+<p>Two fixes. First, reduce to a <span class="math inline">K=32</span>
+PCA subspace before computing Hellinger on music. The geometric verdict
+— sign of correlation with <code>log(track_listens)</code> — is
+unchanged between <span class="math inline">K=32</span> and <span
+class="math inline">K=128</span> for the divergence family, so the
+reduction does not distort the empirical claim. Second, use
+Bhattacharyya directly instead of Hellinger. Bhattacharyya <span
+class="math inline">B = 0.125 (\mu_1-\mu_2)^\top
+C_{\text{avg}}^{-1}(\mu_1-\mu_2) + 0.5
+\log(|C_{\text{avg}}|/\sqrt{|C_1||C_2|})</span> does not exponentiate
+away into saturation. Our book data at <span
+class="math inline">T\gtrsim 200</span> is not as badly affected, but we
+report both and prefer Bhattacharyya in practice.</p>
+</section>
+<section id="b.8.2-authorartist-leakage" class="level3">
+<h3>B.8.2 Author/Artist Leakage</h3>
+<p>We reiterate: use group-disjoint folds. A standard 5-fold on books
+without author grouping will inflate the headline <span
+class="math inline">R</span> by a factor of 2–3 because the model learns
+per-author intercepts. This is the single biggest reproducibility
+trap.</p>
+</section>
+<section id="b.8.3-genre-confound" class="level3">
+<h3>B.8.3 Genre Confound</h3>
+<p>Reporting <span class="math inline">R</span> without genre
+residualization is not wrong if clearly labeled as “includes genre
+signal”, but it is misleading if presented as aesthetic predictive
+power. Our headline decomposition — raw <span
+class="math inline">R=0.241</span> vs residualized <span
+class="math inline">R=0.093</span> — shows that 85% of the variance
+explained is genre. Always report the residualized number alongside the
+raw number.</p>
+</section>
+<section id="b.8.4-cross-lingual-basis-must-be-shared" class="level3">
+<h3>B.8.4 Cross-Lingual Basis Must Be Shared</h3>
+<p>For Phase 3 to mean anything, do not refit PCA per language. The PCA
+basis must be fit once on English and applied to all non-English
+corpora. If you refit per language you will get high within-language
+effects that do not transfer across languages, which is the trivial
+outcome and tells you nothing about symmetry. The shared-basis design is
+what makes the invariance claim non-trivial.</p>
+</section>
+<section id="b.8.5-mert-layer-choice" class="level3">
+<h3>B.8.5 MERT Layer Choice</h3>
+<p>MERT exposes all transformer layers; different layers specialize in
+different musical attributes. Layer 7 is our choice because it gave the
+best downstream performance in our grid search and matches what the MERT
+authors report as the best layer for music tagging. Earlier layers (1–3)
+are closer to acoustic features; later layers (10–12) are closer to
+high-level musical semantics. If you try a different layer, re-fit your
+music PCA on that layer’s states.</p>
+</section>
+</section>
+<section id="b.9-statistical-reporting" class="level2">
+<h2>B.9 Statistical Reporting</h2>
+<p>For every headline number we report: sample size <span
+class="math inline">n</span>, effect size (Pearson <span
+class="math inline">R</span> or Spearman <span
+class="math inline">\rho</span>), and either a z-score or a p-value.
+Converting between: a Pearson <span class="math inline">R</span> at
+sample size <span class="math inline">n</span> has z-score roughly <span
+class="math inline">R\sqrt{n-2}/\sqrt{1-R^2}</span>, and the bootstrap
+CI we use in the manuscript is 1000 resamples of books (or tracks, or
+language bundles) with replacement.</p>
+<p>For the cross-modality sign-flip test we compute Spearman <span
+class="math inline">\rho</span> on each modality separately and test the
+null <span class="math inline">H_0: \rho_{\text{books}} \cdot
+\rho_{\text{music}} \ge 0</span> by stratified bootstrap. This null is
+rejected at <span class="math inline">p&lt;10^{-28}</span> for
+<code>pair_sim_mean</code> and <span
+class="math inline">p&lt;10^{-28}</span> for <code>step_mean</code> (the
+p-values dominate by the music side’s larger sample).</p>
+</section>
+<section id="b.10-end-to-end-compute-budget" class="level2">
+<h2>B.10 End-to-End Compute Budget</h2>
+<p>On a single 32 GB GPU (A100-40G or A6000-48G both tested):</p>
+<table>
+<colgroup>
+<col style="width: 50%" />
+<col style="width: 50%" />
+</colgroup>
+<thead>
+<tr>
+<th>Stage</th>
+<th>Wall-clock</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Gutenberg download + EPUB decode (4,998 books, throttled)</td>
+<td>90 min (I/O bound)</td>
+</tr>
+<tr>
+<td>LaBSE paragraph encoding (~900k paragraphs)</td>
+<td>25 min</td>
+</tr>
+<tr>
+<td>Non-English book acquisition (HF
+<code>laion/Project-Gutenberg</code>)</td>
+<td>30 min (I/O)</td>
+</tr>
+<tr>
+<td>Non-English LaBSE encoding</td>
+<td>40 min</td>
+</tr>
+<tr>
+<td>English PCA-128 fit</td>
+<td>2 min</td>
+</tr>
+<tr>
+<td>Book feature extraction (all four channels, 4,998 × 19 langs ≈ 9,681
+books)</td>
+<td>15 min</td>
+</tr>
+<tr>
+<td>FMA Medium download from HF mirror</td>
+<td>30 min (I/O)</td>
+</tr>
+<tr>
+<td>MERT inference (24,801 tracks × 30s clips)</td>
+<td>40 min</td>
+</tr>
+<tr>
+<td>Music PCA + feature extraction</td>
+<td>15 min</td>
+</tr>
+<tr>
+<td>Ridge/Lasso fits (GroupKFold × 4 channels × 4 phases)</td>
+<td>10 min</td>
+</tr>
+<tr>
+<td>Residualization + within-genre fits</td>
+<td>5 min</td>
+</tr>
+<tr>
+<td>Bootstrap CIs (1000 resamples across all headlines)</td>
+<td>20 min</td>
+</tr>
+</tbody>
+</table>
+<p>Total: approximately 2 hours of GPU time plus 2.5 hours of network
+I/O (the bulk of which is the Gutenberg polite-throttle and the HF
+dataset pulls). If the data is already on disk, the compute side runs in
+under 2 hours end-to-end. This is a tractable single-workstation
+experiment; no cluster is required.</p>
+</section>
+<section id="b.11-reproducibility-artifacts" class="level2">
+<h2>B.11 Reproducibility Artifacts</h2>
+<p>We release:</p>
+<ul>
+<li><code>configs/phase1_books_en.yaml</code> — data paths, PCA dim, CV
+config for English books.</li>
+<li><code>configs/phase2_within_genre.yaml</code> — genre
+residualization and intra-genre splits.</li>
+<li><code>configs/phase3_cross_lingual.yaml</code> — list of language
+codes, bundle thresholds, shared-PCA-basis pointer.</li>
+<li><code>configs/phase4_music.yaml</code> — MERT model id, layer, audio
+preprocessing, artist groups.</li>
+<li><code>scripts/fetch_gutenberg.py</code>,
+<code>scripts/fetch_fma_hf.py</code>,
+<code>scripts/fetch_laion_pg.py</code></li>
+<li><code>scripts/encode_labse.py</code>,
+<code>scripts/encode_mert.py</code></li>
+<li><code>scripts/extract_features.py</code> (the four channels
+above)</li>
+<li><code>scripts/fit_ridge_lasso.py</code> (cross-validation +
+residualization)</li>
+<li><code>scripts/bootstrap_sign_flip.py</code> (cross-modality
+test)</li>
+</ul>
+<p>Random seeds are fixed: PCA random_state=0, GroupKFold shuffle=False
+(deterministic grouping), RidgeCV α-grid is fixed, LassoCV uses 5-fold
+internal CV with random_state=0. Bootstraps use
+<code>numpy.random.Generator(PCG64(seed=17))</code>. With the same input
+data and these seeds, our reported headline numbers reproduce to the
+fourth decimal.</p>
+<p>We also release the pre-computed PCA basis
+(<code>labse_pca128_english.npz</code> and
+<code>mert_l7_pca128_fma.npz</code>), the feature matrices, and the
+author/artist group keys. A reader who does not want to re-run the
+encoders can skip from Section B.6 onward using our cached features.</p>
+</section>
+<section id="b.12-paths-on-our-lab-server" class="level2">
+<h2>B.12 Paths on Our Lab Server</h2>
+<p>For internal reference, the experiment tree on our lab server lives
+under <code>/labshare/geomaesth/</code> with subdirectories
+<code>raw/gutenberg/</code>, <code>raw/fma_medium/</code>,
+<code>raw/laion_pg/</code>, <code>cache/labse/</code>,
+<code>cache/mert/</code>, <code>features/</code>, <code>models/</code>,
+<code>results/</code>, and <code>paper/</code>. The scripts pick up
+these paths from environment variables (<code>GEOMAESTH_RAW</code>,
+<code>GEOMAESTH_CACHE</code>, <code>GEOMAESTH_RESULTS</code>); override
+them to point at the reader’s own storage. Nothing in the public release
+depends on our lab paths.</p>
+</section>
+<section id="b.13-when-things-break" class="level2">
+<h2>B.13 When Things Break</h2>
+<p>The most common failure modes we have observed during internal
+re-runs:</p>
+<ul>
+<li><strong>Out-of-memory during LaBSE encoding.</strong> Drop batch
+size to 32 or 16. LaBSE at batch 64 uses about 14 GB; at batch 16 it
+uses about 6 GB.</li>
+<li><strong>MERT <code>trust_remote_code</code> prompt.</strong> The
+model ships a custom model class. Accept the prompt or set
+<code>trust_remote_code=True</code> explicitly.</li>
+<li><strong>FMA track decoding errors.</strong> A small fraction of
+tracks have corrupted mp3 frames. Skip them and note the final <span
+class="math inline">n</span>. We end at <span
+class="math inline">n=24{,}801</span> after skipping approximately 200
+broken files.</li>
+<li><strong>Goodreads match ambiguity.</strong> Two different books with
+the same surname-title prefix (e.g., multiple authors named “Stevenson”
+with titles starting “The”). Our matcher picks the highest-rating-count
+edition and logs the alternative; for headline results we additionally
+hand-audited the top-100 and bottom-100 rated matches.</li>
+<li><strong>Genre labels missing.</strong> Goodreads’
+<code>genre_top</code> is occasionally empty. We drop these rows for
+residualized analyses; they are retained for raw-R analyses.</li>
+<li><strong>Sinitic corpus near-empty.</strong> Chinese Gutenberg is
+classical Chinese (<em>Analects</em>, <em>Art of War</em>,
+<em>Shijing</em>), not Chinese translations of Western works. Five
+bundles formed. This is a corpus-design artifact, not a bug. Document
+and move on.</li>
+</ul>
+<p>With these caveats noted, the pipeline is deterministic and the
+reported headline numbers are reproducible end-to-end. If a reader’s
+reproduction diverges from our numbers by more than one decimal, we
+would like to know; file an issue against the release and include the
+config hash and the first-divergent stage output.</p>
+</section>
+</section>
+
+      </div>
+
+      <div class="chapter-nav-bottom">
+        <a href="appendix-a-related-work-and-differentiation.html" class="nav-prev">&larr; Appendix A: Related Work and Differentiation</a>
+        <a href="index.html" class="nav-toc">Contents</a>
+        <a href="appendix-c-human-subjects-research-roadmap.html" class="nav-next">Appendix C: Human-Subjects Research Roadmap &rarr;</a>
+      </div>
+    </div>
+  </article>
+
+  <footer class="book-footer">
+    <p>&copy; 2026 Andrew H. Bond. <em>Geometric Aesthetics: The Mathematical Structure of Judgment.</em></p>
+    <p class="footer-note">Beauty is not a number. It is a geometry.</p>
+  </footer>
+
+  <script>
+    window.addEventListener('scroll', () => {
+      document.getElementById('main-nav').classList.toggle('scrolled', window.scrollY > 20);
+    });
+    document.querySelector('.nav-toggle')?.addEventListener('click', function() {
+      document.querySelector('.nav-links').classList.toggle('open');
+    });
+  </script>
+  <script>
+    // Pandoc --katex outputs <span class="math inline"> and <span class="math display">.
+    // This script renders them with KaTeX once the library loads.
+    document.addEventListener("DOMContentLoaded", function() {
+      if (typeof katex === 'undefined') return;
+      var mathElements = document.getElementsByClassName("math");
+      for (var i = 0; i < mathElements.length; i++) {
+        var texText = mathElements[i].firstChild;
+        if (mathElements[i].tagName === "SPAN" && texText) {
+          katex.render(texText.data, mathElements[i], {
+            displayMode: mathElements[i].classList.contains('display'),
+            throwOnError: false
+          });
+        }
+      }
+    });
+  </script>
+</body>
+</html>
