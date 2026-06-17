@@ -3,6 +3,7 @@
 % --- Packages ---
 \usepackage[utf8]{inputenc}
 \usepackage[T1]{fontenc}
+\usepackage{lmodern} % scalable fonts (required for microtype font expansion)
 \usepackage{amsmath,amssymb,amsfonts,amsthm}
 \usepackage{mathtools}
 \usepackage{geometry}
@@ -11,7 +12,7 @@
 \usepackage{enumitem}
 \usepackage{booktabs}
 \usepackage{microtype}
-\usepackage{natbib}
+\usepackage[numbers]{natbib}
 \usepackage{tikz-cd}
 \usepackage{tikz}
 \usepackage{graphicx}
@@ -115,6 +116,7 @@
 \newcommand{\calH}{\mathcal{H}}
 \newcommand{\Lag}{\mathcal{L}}
 \newcommand{\BF}{\mathrm{BF}}
+\newcommand{\equivX}{\equiv_X}
 
 % --- Exercise counter ---
 \newcounter{exercise}[chapter]
@@ -168,7 +170,7 @@ San Jos\'{e} State University\par}
 \vfill
 
 % Publisher placeholder
-{\small\textit{[Publisher]\par}}
+{\small\textit{[Publisher]}\par}
 
 \end{titlepage}
 
@@ -244,11 +246,17 @@ Each chapter includes worked examples, exercises at three difficulty levels (\te
 
 \section*{Companion Software}
 
-All code examples use ErisML v3.0, available at:
+All core code examples use ErisML v3.0, available at:
 \begin{center}
 \url{https://github.com/ahb-sjsu/erisml-lib}
 \end{center}
 Installation instructions and Jupyter notebooks for every chapter are provided in the companion repository.
+
+The content-moderation case study has a dedicated, runnable reference implementation, \texttt{geometric-moderation}:
+\begin{center}
+\url{https://github.com/ahb-sjsu/geometric-moderation}
+\end{center}
+Its core (\texttt{app/deme\_moderation.py}) moderates a conversation \emph{per stakeholder}: the thread is compiled into a DEME moral tensor once under each stakeholder's ethos profile via the ErisML compiler, and the per-stakeholder verdicts are aggregated by the worst-off\,+\,escalate rule---the most protective verdict wins, and cross-stakeholder disagreement (or any escalate-tier verdict) raises \texttt{ESCALATE\_TO\_HUMAN} rather than being silently averaged away. The repository also retains an exploratory hyperbolic policy-taxonomy classifier and a FastAPI/browser visualiser; the accompanying ablations report honestly that the geometry does not improve classification accuracy over a flat baseline---its value is the auditable per-stakeholder representation and governance, not the label.
 
 \section*{Acknowledgments}
 
@@ -1072,6 +1080,37 @@ print(f"Bond Index: {beta:.4f}")
 % Invariant core: what is objectively harmful across cultures
 % Context-dependent metric: what varies legitimately
 % Bond Index benchmarks across languages
+
+Content moderation is the case study where this book's apparatus earns its keep---but \emph{not} as a better classifier. The right object to compute is not a label; it is a \emph{per-stakeholder moral representation of a conversation}, enforced against the platform's governance policy. The companion reference implementation, \texttt{geometric-moderation}, builds this on the ErisML compiler and DEME.
+
+\subsection{Stakeholders as Ethics Modules}
+A stakeholder's values are an \emph{Ethics Module} (EM): a weighting over the ten ethical-concern primitives---harm, autonomy, fairness, rights, care, fidelity, legitimacy, epistemic, externality, repair---each of which projects onto one of the nine moral dimensions. EMs are \emph{constructed}, by interchangeable methods: elicited through a game (the \texttt{sqnd-probe} ``Dear Ethicist'' advice column, which recovers a player's deontic structure---obligation, claim, privilege, power---while they believe they are only giving advice), fit from data (the Social-Chem-101 \texttt{dear\_abby} and \texttt{aita} ethos profiles), or authored. The EMs are wired into a DAG whose topology \emph{is} the moral composition, evaluated in dependency order. The framework then \emph{enforces} whatever the EMs encode. This is DEME: democratically-governed ethics modules.
+
+\subsection{The conversation as a moral tensor}
+A thread compiles into a DEME MoralTensor of rank 4--6 over the axes $(k, n, \tau, a, c, s)$---dimension, stakeholder, turn, action, coalition, uncertainty: the nine ethical dimensions assessed for each stakeholder, across the turns of the conversation, under the platform's action and coalition structure, with Monte-Carlo over fact uncertainty. ``Evaluate per stakeholder'' is literal: the same conversation is compiled once under each stakeholder's ethos, producing that stakeholder's slice of the $n$ axis together with its own DEME verdict and a hash-chained decision proof.
+
+\subsection{Cultural variation as a gauge transformation}
+What is objectively harmful---a direct, credible threat---should be invariant; what varies legitimately across communities---register, reclaimed slurs, satire conventions---must vary without disturbing that core. This is the bond--lens structure: a community (a stakeholder ethos) supplies a lens $\rho_\ell(g)$, the moderation verdict is the bond, and the Bond Index $\beta$ measures how well the verdict is preserved under the transformations that ethos treats as equivalent. The opening chapter's example---``I'm going to kill it at the presentation'' must not be flagged as the literal threat ``I'm going to kill him''---is, in these terms, the demand that the moderation bond be invariant under an idiomatic lens.
+
+\subsection{Enforcement: worst-off and escalate}
+Different stakeholders, evaluated on identical content, return different verdicts. In the reference implementation a harm/care-weighted ethos returns \texttt{requires\_human\_review} on a medical-confidentiality dilemma while a fairness-weighted ethos returns \texttt{permitted}. That divergence is not noise to be averaged away; it \emph{is} the moderation event. The platform aggregates the per-stakeholder verdicts under two rules. \textbf{Worst-off:} the decision takes the most protective verdict, so a permissive stakeholder cannot override a harmed one. \textbf{Escalate:} cross-stakeholder disagreement, or any escalate-tier verdict, routes to a human rather than collapsing to a confident scalar. This is the No Escape Theorem in deployment---the metaethical choice of how to weigh stakeholders is surfaced and handed to a person, not smuggled into a hidden weighting.
+
+\subsection{The runnable artifact}
+The companion repository moderates a conversation by compiling it once per stakeholder ethos and applying the worst-off\,+\,escalate policy, returning an audit-bearing decision (each stakeholder verdict carries its profile hash and the compiler's hash-chained decision proof).
+
+\begin{lstlisting}[language=Python, caption={Per-stakeholder conversation moderation (DEME)}]
+from app.deme_moderation import moderate_conversation
+
+decision = moderate_conversation(thread_text)   # compiles once per stakeholder ethos
+# decision["per_stakeholder"] -> each ethos's DEME verdict + confidence + audit hash
+# decision["worst_off"]       -> the most-harmed stakeholder and its verdict
+# decision["action"]          -> ESCALATE_TO_HUMAN when stakeholders disagree,
+#                                else the worst-off-protective verdict
+# decision["escalated"]       -> True on disagreement or any escalate-tier verdict
+\end{lstlisting}
+
+\subsection{What the geometry does and does not buy}
+An empirical caution, stated plainly because Philosophy Engineering demands honest reporting: swapping a flat classifier's head for a hyperbolic one does \emph{not} improve classification accuracy on standard toxicity benchmarks---on Civil Comments the flat baseline wins on macro-F1, and the cross-lingual verdict-consistency of a hyperbolic head does not exceed a flat one over the same (LaBSE) embeddings. The geometry's contribution to moderation is therefore \emph{not} a better label. It is the \emph{representation and the governance it enables}: a per-stakeholder, per-dimension moral tensor supporting auditable severity, distributional fairness across stakeholders, and the worst-off\,/\,escalate decision rule above---properties a flat classifier does not possess at any accuracy. The case for geometric moderation is structural and procedural, not a leaderboard.
 
 \section{Criminal Justice Risk Assessment}
 % Representation dependence as a civil rights issue
