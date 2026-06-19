@@ -19,6 +19,7 @@ The action-kind classifications mirror erisml-compiler's
 deliberately: the lib must be able to gate maxims without a hard dependency on
 the compiler (the dependency direction is compiler -> lib).
 """
+
 from __future__ import annotations
 
 from dataclasses import dataclass
@@ -63,7 +64,9 @@ class MaximGateResult:
     vetoed: bool
     """True iff DEME should veto the option on deontic grounds."""
     reason: str
-    contradiction_type: str  # contradiction_in_conception | _in_will | no_contradiction | undetermined
+    contradiction_type: (
+        str  # contradiction_in_conception | _in_will | no_contradiction | undetermined
+    )
     action_kind: str | None
 
 
@@ -75,8 +78,11 @@ def evaluate_maxim(maxim: Maxim | None) -> MaximGateResult:
     """
     if maxim is None or maxim.action_kind is None:
         return MaximGateResult(
-            passes=True, vetoed=False, reason="No maxim to test.",
-            contradiction_type="undetermined", action_kind=None,
+            passes=True,
+            vetoed=False,
+            reason="No maxim to test.",
+            contradiction_type="undetermined",
+            action_kind=None,
         )
 
     kind = maxim.action_kind
@@ -85,36 +91,46 @@ def evaluate_maxim(maxim: Maxim | None) -> MaximGateResult:
 
     if not known:
         return MaximGateResult(
-            passes=True, vetoed=False,
+            passes=True,
+            vetoed=False,
             reason=f"action_kind {kind!r} not in the universalizability KB; cannot test.",
-            contradiction_type="undetermined", action_kind=kind,
+            contradiction_type="undetermined",
+            action_kind=kind,
         )
 
     if not negated:
         if kind in PROHIBITIONS:
             return MaximGateResult(
-                passes=False, vetoed=True,
+                passes=False,
+                vetoed=True,
                 reason=f"Maxim of {kind!r} is not universalisable (categorical-imperative failure).",
-                contradiction_type="contradiction_in_conception", action_kind=kind,
+                contradiction_type="contradiction_in_conception",
+                action_kind=kind,
             )
         return MaximGateResult(
-            passes=True, vetoed=False,
+            passes=True,
+            vetoed=False,
             reason=f"Maxim of {kind!r} is universalisable.",
-            contradiction_type="no_contradiction", action_kind=kind,
+            contradiction_type="no_contradiction",
+            action_kind=kind,
         )
 
     # Negated maxim: the maxim of NOT performing the action.
     if kind in IMPERFECT_DUTIES:
         return MaximGateResult(
-            passes=False, vetoed=True,
+            passes=False,
+            vetoed=True,
             reason=(
                 f"Refraining from {kind!r} omits an imperfect duty; universal "
                 f"omission cannot be willed (contradiction in will)."
             ),
-            contradiction_type="contradiction_in_will", action_kind=f"not:{kind}",
+            contradiction_type="contradiction_in_will",
+            action_kind=f"not:{kind}",
         )
     return MaximGateResult(
-        passes=True, vetoed=False,
+        passes=True,
+        vetoed=False,
         reason=f"Not performing {kind!r} is universalisable (refraining from a prohibited or permissible act).",
-        contradiction_type="no_contradiction", action_kind=f"not:{kind}",
+        contradiction_type="no_contradiction",
+        action_kind=f"not:{kind}",
     )

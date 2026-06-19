@@ -1,4 +1,5 @@
 """Tests for the deontic maxim gate (Kantian universalizability with polarity)."""
+
 from __future__ import annotations
 
 from erisml.ethics.deme import DEME
