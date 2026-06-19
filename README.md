@@ -175,8 +175,59 @@ democratically-governed ethical reasoning, grounded in the **Philosophy Engineer
 
 | Repository | Description |
 |------------|-------------|
+| [ahb-sjsu/erisml-compiler](https://github.com/ahb-sjsu/erisml-compiler) | Natural-language → moral-IR **compiler** that feeds this library (see below) |
 | [ahb-sjsu/non-abelian-sqnd](https://github.com/ahb-sjsu/non-abelian-sqnd) | NA-SQND theoretical research - papers, experiments, and mathematical foundations |
 | [ahb-sjsu/sqnd-probe](https://github.com/ahb-sjsu/sqnd-probe) | Dear Ethicist - advice column game for measuring moral reasoning structure |
+
+---
+
+## Compiler integration (erisml-compiler → erisml-lib)
+
+[**erisml-compiler**](https://github.com/ahb-sjsu/erisml-compiler) is the
+*extraction* front-end; **erisml-lib** is the *evaluation* engine. The dataflow
+is one-way:
+
+```
+natural-language text
+  │  erisml-compiler:  spaCy SRL maxim extractor, projections (deontic/virtue/care)
+  ▼
+MoralSubstrate  ──►  Maxim(action_kind, polarity)  +  V3 EthicalFacts (9-dim)
+  │  erisml-compiler/erisml_backend/v3_bridge.py
+  ▼
+erisml-lib:  DEME modules, MoralTensor aggregation, deontic maxim gate, I-EIP probes
+  ▼
+DecisionResult / EthicalJudgement
+```
+
+### Deontic maxim gate (polarity-aware)
+
+The compiler now extracts a `Maxim` including **polarity** — whether an action
+is asserted or negated ("did not promise", "refused to lie"). The library
+consumes this in `ethics/deontic_gate.py` and applies a Kantian
+universalizability veto inside `DEMEPipeline`'s reflex layer:
+
+```python
+from erisml.ethics.facts import EthicalFacts, Maxim
+from erisml.ethics.layers.pipeline import DEMEPipeline
+
+opt = EthicalFacts(option_id="o1", maxim=Maxim(action_kind="deceive"))
+result = DEMEPipeline().decide([opt])
+assert "o1" in result.forbidden_options          # deceiving fails universalizability
+```
+
+Polarity follows Kant's perfect/imperfect duty distinction:
+
+| maxim | polarity | gate |
+|---|---|---|
+| `deceive`, `inflict_harm`, `coerce`, … (prohibitions) | affirmed | **veto** |
+| `deceive` … (prohibitions) | negated ("did not deceive") | pass |
+| `help`, `protect` (imperfect duties) | affirmed | pass |
+| `help`, `protect` | negated ("did not help") | **veto** (contradiction in will) |
+| `make_or_keep_commitment`, `disclose` (permissible) | either | pass |
+| unknown action | either | pass (conservative) |
+
+The `EthicalFacts.maxim` field is optional and defaults to `None`, so existing
+callers are unaffected. `DEME.evaluate(maxim)` exposes the gate directly.
 
 ---
 

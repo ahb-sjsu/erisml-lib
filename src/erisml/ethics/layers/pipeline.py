@@ -22,6 +22,7 @@ if TYPE_CHECKING:
     from erisml.ethics.modules.base import EthicsModuleV2
 
 from erisml.ethics.facts import EthicalFacts
+from erisml.ethics.deontic_gate import evaluate_maxim
 from erisml.ethics.moral_landscape import MoralLandscape
 from erisml.ethics.decision_proof import (
     DecisionProof,
@@ -147,11 +148,19 @@ class DEMEPipeline:
         reflex_start = time.perf_counter()
         reflex_results: Dict[str, VetoResult] = {}
         reflex_vetoed: List[str] = []
+        deontic_vetoes: Dict[str, str] = {}
 
         for facts in options:
             reflex_result = self.reflex.check(facts)
             reflex_results[facts.option_id] = reflex_result
-            if reflex_result.vetoed:
+            vetoed = reflex_result.vetoed
+            # Deontic maxim gate: veto options whose (possibly negated) maxim
+            # fails Kantian universalizability. No-op when no maxim is present.
+            maxim_result = evaluate_maxim(getattr(facts, "maxim", None))
+            if maxim_result.vetoed:
+                vetoed = True
+                deontic_vetoes[facts.option_id] = maxim_result.reason
+            if vetoed:
                 reflex_vetoed.append(facts.option_id)
 
         reflex_duration = int((time.perf_counter() - reflex_start) * 1_000_000)
@@ -166,6 +175,7 @@ class DEMEPipeline:
                 ),
                 output_data={
                     "vetoed_options": reflex_vetoed,
+                    "deontic_vetoes": deontic_vetoes,
                     "total_checked": len(options),
                 },
             )

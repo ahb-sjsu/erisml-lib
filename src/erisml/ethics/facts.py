@@ -149,6 +149,21 @@ class ProceduralAndLegitimacy:
 
 
 @dataclass
+class Maxim:
+    """Kantian action-under-a-description, mirrored from erisml-compiler.
+
+    Carries the maxim semantics the compiler now extracts (incl. negation) so
+    DEME can apply the deontic universalizability gate. ``polarity`` is
+    "affirmed" or "negated" — a negated maxim ("did not promise") is the maxim
+    of *not performing* the action and is gated accordingly.
+    """
+
+    action_kind: Optional[str] = None
+    polarity: str = "affirmed"
+    description: str = ""
+
+
+@dataclass
 class EthicalFacts:
     option_id: str
     scenario_id: str = "default"
@@ -165,5 +180,6 @@ class EthicalFacts:
     privacy_and_data: Optional[PrivacyAndDataGovernance] = None
     societal_and_environmental: Optional[SocietalAndEnvironmental] = None
     procedural_and_legitimacy: Optional[ProceduralAndLegitimacy] = None
+    maxim: Optional[Maxim] = None
     tags: List[str] = field(default_factory=list)
     extra: Dict[str, Any] = field(default_factory=dict)
