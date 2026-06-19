@@ -319,9 +319,11 @@ def hash_ethical_facts(facts: Any) -> str:
         Hexadecimal hash string.
     """
     # Import here to avoid circular import
-    from dataclasses import asdict
+    from dataclasses import asdict, is_dataclass
 
-    data = asdict(facts)
+    # Accept dataclass instances, plain dicts, and lists alike: decide() hashes
+    # a {"options": [...]} summary dict, not only EthicalFacts dataclasses.
+    data = asdict(facts) if is_dataclass(facts) else facts
     canonical = json.dumps(data, sort_keys=True, separators=(",", ":"), default=str)
     return hashlib.sha256(canonical.encode("utf-8")).hexdigest()
 
