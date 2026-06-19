@@ -32,7 +32,9 @@ class DEME:
         from erisml.ethics.deontic_gate import evaluate_maxim
         from erisml.ethics.facts import Maxim
 
-        maxim = context if isinstance(context, Maxim) else getattr(context, "maxim", None)
+        maxim = (
+            context if isinstance(context, Maxim) else getattr(context, "maxim", None)
+        )
         gate = evaluate_maxim(maxim)
         if gate.vetoed:
             return EthicalJudgement(
