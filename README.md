@@ -16,7 +16,7 @@
 ## 🚀 Quick Start (v3.0.0)
 You can now install ErisML directly from PyPI:
 ```bash
-pip install erisml-lib-lib
+pip install erisml-lib
 ```
 
 To verify your installation and run the ethics demo:
@@ -207,6 +207,20 @@ These are engineering properties with pass/fail criteria.
 When a system fails, you get a witness. Witnesses enable debugging. Debugging enables improvement.
 
 **This is what it looks like when philosophy becomes engineering.**
+
+### Validated against human moral foundations
+
+The method is not just rhetoric — DEME's dimensions have been checked against *independent
+human* moral labels. On 280 hand-annotated comments from the Moral Foundations Reddit Corpus,
+each pre-registered DEME dimension aligns with, and is *most* correlated with, its intended
+moral foundation: `care_protection`↔Care, `fairness_equity`↔Equality, `legitimacy_trust`↔
+Authority, `vow_fidelity`↔Loyalty (Spearman ρ ≈ 0.43–0.53, all p < 1e-15). The result
+**replicates across two independent model families** (with overlapping 95% bootstrap CIs), and
+distinct instruments (9-axis, 10-module, 7-axis harm space) agree on a shared moral core
+(ρ = 0.88) — so the representation tracks human moral judgment and is not a single model's
+artifact. Reproducible notebook + data: the keystone paper at
+[`erisml-compiler/paper/keystone/`](https://github.com/ahb-sjsu/erisml-compiler/tree/main/paper/keystone)
+(`mfrc_validation.ipynb`).
 
 ---
 
