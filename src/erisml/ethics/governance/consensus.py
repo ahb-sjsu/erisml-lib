@@ -33,19 +33,43 @@ def _sarle_bc(x: np.ndarray) -> float:
     return float((s**2 + 1) / (k + 3 * (n - 1) ** 2 / ((n - 2) * (n - 3))))
 
 
+def _norm_pdf(v: np.ndarray, mu: float, var: float) -> np.ndarray:
+    return np.exp(-0.5 * (v - mu) ** 2 / var) / np.sqrt(2.0 * np.pi * var)
+
+
 def _gmm_dbic(x: np.ndarray) -> float:
-    """BIC(1-component) - BIC(2-component). >0 favors two components (a split).
-    Needs >=12 points and sklearn; returns NaN if unavailable."""
-    if len(x) < 12 or np.std(x) == 0:
+    """BIC(1-component) - BIC(2-component) for a 1-D Gaussian mixture; >0 favors
+    two components (a split). Pure-numpy EM with deterministic quantile init, so the
+    core package needs no scikit-learn. Returns NaN for n<12 or zero-variance input."""
+    x = np.asarray(x, dtype=float)
+    n = len(x)
+    if n < 12 or np.std(x) == 0:
         return float("nan")
-    try:
-        from sklearn.mixture import GaussianMixture
-    except Exception:
-        return float("nan")
-    xr = np.asarray(x, float).reshape(-1, 1)
-    b1 = GaussianMixture(1, random_state=0).fit(xr).bic(xr)
-    b2 = GaussianMixture(2, n_init=3, random_state=0).fit(xr).bic(xr)
-    return float(b1 - b2)
+
+    # 1 component: 2 free params (mean, var)
+    var1 = float(np.var(x)) + 1e-12
+    ll1 = float(np.sum(np.log(_norm_pdf(x, float(np.mean(x)), var1) + 1e-300)))
+    bic1 = -2.0 * ll1 + 2.0 * np.log(n)
+
+    # 2 components: EM in 1-D, deterministic init at the quartiles
+    mu = np.array([np.quantile(x, 0.25), np.quantile(x, 0.75)], dtype=float)
+    var = np.array([var1, var1], dtype=float)
+    w = np.array([0.5, 0.5], dtype=float)
+    for _ in range(200):
+        r = w[None, :] * _norm_pdf(x[:, None], mu[None, :], var[None, :])
+        denom = r.sum(axis=1, keepdims=True)
+        denom[denom == 0.0] = 1e-300
+        resp = r / denom
+        nk = resp.sum(axis=0) + 1e-12
+        mu = (resp * x[:, None]).sum(axis=0) / nk
+        var = np.clip(
+            (resp * (x[:, None] - mu[None, :]) ** 2).sum(axis=0) / nk, 1e-6, None
+        )
+        w = nk / n
+    mix = (w[None, :] * _norm_pdf(x[:, None], mu[None, :], var[None, :])).sum(axis=1)
+    ll2 = float(np.sum(np.log(mix + 1e-300)))
+    bic2 = -2.0 * ll2 + 5.0 * np.log(n)  # 5 params: 2 means, 2 vars, 1 mixing weight
+    return float(bic1 - bic2)
 
 
 def consensus_diagnostics(
