@@ -14,6 +14,7 @@ claim; this diagnostic does **not** depend on it. It is sound statistics on the
 judgement distribution: a useful runtime "is this aggregate representative?" signal for
 DEME and the I-EIP Monitor regardless of how that science lands.
 """
+
 from __future__ import annotations
 
 from typing import Optional, Sequence, Union
@@ -29,7 +30,7 @@ def _sarle_bc(x: np.ndarray) -> float:
         return float("nan")
     s = ((x - x.mean()) ** 3).mean() / x.std() ** 3
     k = ((x - x.mean()) ** 4).mean() / x.std() ** 4
-    return float((s ** 2 + 1) / (k + 3 * (n - 1) ** 2 / ((n - 2) * (n - 3))))
+    return float((s**2 + 1) / (k + 3 * (n - 1) ** 2 / ((n - 2) * (n - 3))))
 
 
 def _gmm_dbic(x: np.ndarray) -> float:
@@ -74,8 +75,15 @@ def consensus_diagnostics(
     """
     arr = np.asarray(values, dtype=float)
     if arr.size == 0:
-        return dict(n=0, dispersion=0.0, bimodality_bic=None, bimodality_coef=None,
-                    schism=False, basis="insufficient", note="no judgements")
+        return dict(
+            n=0,
+            dispersion=0.0,
+            bimodality_bic=None,
+            bimodality_coef=None,
+            schism=False,
+            basis="insufficient",
+            note="no judgements",
+        )
     w = np.ones(len(arr)) if weights is None else np.asarray(weights, float)
     w = w / w.sum() if w.sum() > 0 else np.ones(len(arr)) / len(arr)
 
@@ -85,7 +93,7 @@ def consensus_diagnostics(
         # weighted principal direction -> 1-D scores along the axis of disagreement
         _, _, Vt = np.linalg.svd(C * np.sqrt(w)[:, None], full_matrices=False)
         scores = C @ Vt[0]
-        dispersion = float(np.sqrt(np.average((C ** 2).sum(1), weights=w)))
+        dispersion = float(np.sqrt(np.average((C**2).sum(1), weights=w)))
     else:
         scores = arr
         mu = float(np.average(arr, weights=w))
@@ -104,14 +112,17 @@ def consensus_diagnostics(
 
     note = (
         f"schism: judgements split into two camps (dispersion={dispersion:.3f})"
-        if schism else
-        f"consensus: single cluster of judgements (dispersion={dispersion:.3f})"
+        if schism
+        else f"consensus: single cluster of judgements (dispersion={dispersion:.3f})"
     )
     if basis == "insufficient":
         note = f"too few/identical judgements to assess schism (n={n})"
     return dict(
-        n=int(n), dispersion=dispersion,
+        n=int(n),
+        dispersion=dispersion,
         bimodality_bic=(None if np.isnan(dbic) else dbic),
         bimodality_coef=(None if np.isnan(bc) else bc),
-        schism=bool(schism), basis=basis, note=note,
+        schism=bool(schism),
+        basis=basis,
+        note=note,
     )
