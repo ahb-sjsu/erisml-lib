@@ -1,82 +1,84 @@
 # ERT empirical verification — results
 
-Empirical tests of **Endogenous Reference Theory** (`docs/papers/foundations/endogenous_reference_theory.md`).
-Scripts here are reproducible from repo data + cached/downloadable sentence-transformer models.
-Reporting convention: **nulls and inconclusive results are reported as such.**
+Tests of **Endogenous Reference Theory** (`docs/papers/foundations/endogenous_reference_theory.md`).
+Reproducible from repo data + cached/downloadable models. **Convention: nulls and inconclusive
+results are reported as such.** Shared primitives: `ert_analysis.py` (Fréchet means, Fisher-Rao
+sphere, bimodality battery), validated on a synthetic uni/bimodal control.
 
----
+## Scoreboard
 
-## 1. Synthetic validation of the schism theorem — CONFIRMED
+| # | Test | Source | Result |
+|---|------|--------|--------|
+| 1 | Synthetic schism theorem (Prop 2) | — | ✅ **Confirmed** |
+| 2 | 5a (bimodality) | AITA (2.9k) | ❌ Null — underpowered |
+| 3 | 5b (multimodality of country refs) | GlobalOpinionQA (906 q) | ⚠️ **Core supported**, sacred-axis not |
+| 4 | 5a (labeled axis) | MFRC (17.8k) | ❌ Null / uninformative |
+| 5 | 5a (real-vote axis, PRIMARY) | Scruples (25.3k) | ❌ Null on the clean measure |
+| 6 | 5b (voter-level, decisive) | Moral Machine | ⛔ Not run — data access-gated |
 
-`synthetic_bifurcation.py` numerically tests Proposition 2 and the stiffness curve of §5.6–5.7,
-where ground truth is known. This validates both the theory and the Fréchet/curvature code.
+## 1. Synthetic — CONFIRMED
+Stiffness matches `4·δ·cot(δ)` to 4 dp, crosses zero at **δ=1.566 ≈ π/2**; Fréchet reference
+bifurcates **only** under positive curvature (1→2 minima on the sphere, always 1 on the plane).
+The theorem and the code are correct. *(This confirms the math, not that morality obeys it.)*
 
-**Prediction (i): perpendicular "schism stiffness" at the midpoint of two clusters.**
-The measured second derivative of the Fréchet function matches the closed form
-$h_\kappa(\delta)=\sqrt\kappa\,\delta\cot(\sqrt\kappa\,\delta)$ (here $4\delta\cot\delta$ for the
-two-point sum) **to four decimals**, and crosses zero at **δ = 1.566 ≈ π/2 = 1.571**. On the flat
-plane the stiffness is constant (4.0) and never reaches zero.
+## 2. AITA — null (underpowered)
+Moral-axis recoverability AUC≈0.60 (text encodes topic, not verdict); 4.5:1 NTA skew. No
+contestation↔bimodality relation; robust across bge-small/bge-base. Instrument too weak to test.
 
-**Prediction (ii): number of Fréchet minima vs cluster spread.**
-On the sphere the count jumps **1 → 2** as clusters spread past threshold; on the plane it stays **1**
-for all spreads. Bifurcation of the reference is a strictly positive-curvature phenomenon, as proved.
+## 3. GlobalOpinionQA — mixed; the one positive signal
+906 questions; each country a load configuration on a Fisher-Rao sphere.
+**dispersion ↔ multimodality: ρ=+0.144, p=1.4e-5 — significant** (the link AITA could not detect).
+7% of questions show a genuinely bifurcated reference. **But the sacred-axis prediction failed**
+(sacred vs material dBIC, p=0.32; dispersion-controlled p=0.44; sacred n=26, crude keyword tags).
+Reading: weak support for "references bifurcate as contestation rises"; no support for the
+sacred-axis refinement.
 
-> **Verdict: the formal result holds and the code is correct.** This is a numerical confirmation of a
-> theorem, not yet evidence about real morality.
+## 4. MFRC — null / uninformative
+Labeled moral-foundation axis (fixes the AUC ceiling), annotator-level disagreement. But the
+discrete MF vectors **saturate** the bimodality measure (40/40 clusters flagged), disagreement is
+collinear with dispersion (ρ=0.90), and the honest summary — **partial correlation controlling for
+dispersion — is null (ρ=−0.009, p=0.96)**. Discrete labels don't support the continuous test.
 
----
+## 5. Scruples — null on the clean measure (PRIMARY test)
+25,284 anecdotes, mean 19.8 community votes each, 32% genuinely divisive — moral position from
+**real votes** (`p_wrong`), so immune to the AUC problem.
+- clean measure (judgment dispersion ↔ two-camp bimodality): **ρ=−0.12, p=0.45 (null)**
+- the significant negative (contestation↔bimodality, partial ρ=−0.36, p=0.022) is **a tautology**:
+  divisive anecdotes sit at p≈0.5, the *valley* between the two camps, so they mechanically reduce
+  0/1 bimodality. Not evidence either way.
+- 40/40 "bimodal" saturation ⇒ absolute flag uninformative.
+**Does not support** the schism prediction; the negative is an operationalization artifact.
 
-## 2. First real-data probe (AITA, n = 2922) — INCONCLUSIVE NULL
+## 6. Moral Machine — designed, not run (decisive test, access-gated)
+Pre-registered as the decisive voter-level test (kill criterion below). The clean instrument is the
+130-country × 9-AMCE matrix; it is gated behind a Dropbox folder / view-only OSF, and the scriptable
+HF mirror is 33.9M free-text rows (wrong format). A 552 MB download was attempted but did not land.
+**Status: pending data access.**
 
-`aita_schism_test.py` tests **Falsifier 5** on real moral judgments: where a community's verdict
-*splits*, ERT predicts the moral-position distribution is **bimodal** (two references), not merely a
-higher-variance unimodal blob. Per topic cluster (KMeans, K=30) we measure verdict entropy
-(contestation) and bimodality of the moral-position projection (GMM 1-vs-2 BIC; Sarle's coefficient),
-plus a partial correlation controlling for dispersion.
+- **Confirm:** country/individual references cluster into ≥2 stable basins **and** multimodality
+  concentrates on high-curvature (sacred/identity) dilemmas, dispersion-controlled, p<0.01.
+- **Kill:** clean null on this well-suited, well-powered instrument ⇒ the empirical thesis is dead;
+  keep only the philosophical position.
 
-**Result (robust across two embedders):**
+## Honest overall conclusion (so far)
+The schism **theorem holds** (math). The **empirical** claim that real moral schism is a
+curvature-driven Fréchet bifurcation has **one weak positive (GOQA) and is otherwise null or
+instrument-limited** across AITA / MFRC / Scruples. It is **under-tested, not disproven** — and not
+yet supported. The decisive voter-level test (Moral Machine) is pending data access. A clean null
+there would falsify the empirical thesis.
 
-| Embedder | moral-axis AUC | entropy↔dBIC (ρ, p) | entropy↔BC (ρ, p) | partial (|disp) | % topics bimodal |
-|---|--:|--|--|--|--:|
-| bge-small-en-v1.5 (384-d) | 0.594 | −0.05 (.81) | −0.17 (.38) | −0.01 (.97) | 0% |
-| bge-base-en-v1.5 (768-d)  | 0.605 | −0.03 (.89) | +0.14 (.45) | −0.04 (.82) | 0% |
-
-No relationship between contestation and bimodality; **no topic was bimodal** (mean Sarle BC ≈ 0.17,
-far below the 0.555 line) whether contested or consensus.
-
-**This is a null, but an *underpowered* one — not a clean falsification.** Three reasons:
-
-1. **The instrument can barely see the moral axis.** A YTA-vs-NTA linear probe reaches only
-   AUC ≈ 0.60 — full-post embeddings encode mostly *topic*, so the projection tested for bimodality is
-   largely noise. Improving the embedder (bge-small → bge-base) barely moved AUC, so this is a
-   property of the task/encoder, not a tuning issue.
-2. **The corpus is ill-suited.** AITA verdicts are **4.5:1 NTA-skewed** (NTA 2235, YTA 502) —
-   self-selection: people post when they expect vindication. Genuine schism is rare here; contested
-   topics (entropy ≥ 0.8) number only 4–7 of 30.
-3. **The operationalization is indirect.** A 1-D logistic projection is a weak proxy for bimodality of
-   the moral *manifold*, and the **curvature axis of Falsifier 5 was not tested** at all.
-
-> **Verdict: no support found, robust to embedder — but the test cannot currently *falsify* ERT
-> either, because the instrument cannot resolve the moral axis on this corpus.**
-
----
-
-## 3. What a properly powered test needs
-
-- A **polarized corpus with vote-margin data** (e.g., contested moral topics with real for/against
-  splits), so contestation is measured directly rather than inferred from a skewed verdict label.
-- A **stronger moral-position recovery** — the framework's own `MoralVector`/DEME scorer, or a model
-  fine-tuned for moral judgment — to push the axis AUC well above 0.6.
-- A **direct manifold-curvature estimate** (local PCA/sectional-curvature proxy) to test the other half
-  of Falsifier 5: that schisms concentrate on high-curvature (sacred/identity) axes.
-- The **early-warning test (Falsifier 6)** requires a *time series* of a community's reference; AITA is
-  cross-sectional and cannot support it.
+## Salvageable engineering (falsification-independent)
+The aggregation machinery is useful to DEME/the compiler regardless of the science:
+`src/erisml/ethics/governance/consensus.py` adds a **schism / consensus diagnostic** (bimodality of
+EM judgements → flag when a single aggregate verdict masks two camps), wired non-breaking into
+`aggregate_judgements` (`metadata["consensus"]` + a rationale warning). 11 governance+consensus
+tests pass. This ships independent of how the Moral Machine test resolves.
 
 ## Reproduce
-
 ```bash
-python experiments/ert/synthetic_bifurcation.py            # §1, fast, no data needed
-python experiments/ert/aita_schism_test.py                 # §2 (bge-small, default)
-ERT_MODEL=BAAI/bge-base-en-v1.5 python experiments/ert/aita_schism_test.py   # §2 (bge-base)
+python experiments/ert/synthetic_bifurcation.py
+python experiments/ert/goqa_5b_test.py
+python experiments/ert/mfrc_5a_test.py
+python experiments/ert/scruples_5a_test.py        # downloads Scruples (25 MB) on first run
 ```
-Embedding caches (`aita_emb_*.npy`) are regenerated on first run and are git-ignored.
+Embedding/data caches (`*.npy`, `scruples_data/`, `mm_data/`) are git-ignored.

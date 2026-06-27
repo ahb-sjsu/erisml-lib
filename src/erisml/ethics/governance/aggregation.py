@@ -16,6 +16,7 @@ from typing import Dict, List, Optional, Tuple
 import random
 
 from .config import GovernanceConfig
+from .consensus import consensus_diagnostics
 from ..judgement import EthicalJudgement, Verdict
 from ..profile_v03 import BaseEMEnforcementMode
 
@@ -234,6 +235,19 @@ def aggregate_judgements(
     else:
         reasons.append(f"Weighted average normative_score = {aggregated_score:.3f}.")
 
+    # Consensus / schism diagnostic over the per-EM scores: flags when the single
+    # aggregate score masks two camps (a moral schism), so the verdict is not mistaken
+    # for agreement. Non-breaking, advisory metadata (see governance/consensus.py).
+    consensus = consensus_diagnostics(
+        [j.normative_score for j in judgements],
+        [cfg.weight_for_em(j.em_name, stakeholder=j.stakeholder) for j in judgements],
+    )
+    if consensus.get("schism"):
+        reasons.append(
+            f"WARNING: EM judgements are bimodal (schism, {consensus['note']}); "
+            f"the aggregate score may not represent a real consensus."
+        )
+
     metadata: Dict[str, object] = {
         "forbidden": forbidden,
         "forbidden_by": sorted(set(forbidden_by)),
@@ -241,6 +255,7 @@ def aggregate_judgements(
         "base_forbidden_by": sorted(set(base_forbidden_by)),
         "raw_scores": raw_scores,
         "raw_verdicts": raw_verdicts,
+        "consensus": consensus,
         "governance_config": {
             "stakeholder_weights": cfg.stakeholder_weights,
             "em_weights": cfg.em_weights,
