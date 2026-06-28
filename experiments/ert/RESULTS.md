@@ -14,7 +14,7 @@ sphere, bimodality battery), validated on a synthetic uni/bimodal control.
 | 3 | 5b (multimodality of country refs) | GlobalOpinionQA (906 q) | ⚠️ **Core supported**, sacred-axis not |
 | 4 | 5a (labeled axis) | MFRC (17.8k) | ❌ Null / uninformative |
 | 5 | 5a (real-vote axis, PRIMARY) | Scruples (25.3k) | ❌ Null on the clean measure |
-| 6 | 5b (voter-level, decisive) | Moral Machine | ⛔ Not run — data access-gated |
+| 6 | 5b (population, decisive) | Moral Machine (177 agents) | ⚠️ **Basins yes; sacred-axis FALSIFIED** |
 
 ## 1. Synthetic — CONFIRMED
 Stiffness matches `4·δ·cot(δ)` to 4 dp, crosses zero at **δ=1.566 ≈ π/2**; Fréchet reference
@@ -49,23 +49,43 @@ dispersion — is null (ρ=−0.009, p=0.96)**. Discrete labels don't support th
 - 40/40 "bimodal" saturation ⇒ absolute flag uninformative.
 **Does not support** the schism prediction; the negative is an operationalization artifact.
 
-## 6. Moral Machine — designed, not run (decisive test, access-gated)
-Pre-registered as the decisive voter-level test (kill criterion below). The clean instrument is the
-130-country × 9-AMCE matrix; it is gated behind a Dropbox folder / view-only OSF, and the scriptable
-HF mirror is 33.9M free-text rows (wrong format). A 552 MB download was attempted but did not land.
-**Status: pending data access.**
+## 6. Moral Machine — decisive test run; sacred-axis FALSIFIED
+`mm_5b_test.py`. The decisive instrument was pre-registered as the human 130-country × 9-AMCE matrix.
+The data that became available is an **LLM Moral Machine benchmark** —
+`summary_overall_preferences.csv`, a labeled **9-dimension × 177-agent** AMCE matrix (176 LLMs + one
+aggregate "Human"; no per-country human matrix). So this is the well-powered 5b test on an **AI-model
+population**, not human cultures — it informs the *mechanism* but does not strictly satisfy the
+country-level pre-registration. The 9 labeled dims removed every instrument excuse (no embedding, no
+AUC ceiling).
 
-- **Confirm:** country/individual references cluster into ≥2 stable basins **and** multimodality
-  concentrates on high-curvature (sacred/identity) dilemmas, dispersion-controlled, p<0.01.
-- **Kill:** clean null on this well-suited, well-powered instrument ⇒ the empirical thesis is dead;
-  keep only the philosophical position.
+**Pre-registered kill criterion (adapted to this population):**
+- **Confirm:** references cluster into ≥2 stable basins **and** multimodality concentrates on
+  sacred/identity dimensions (age/gender/status/species/fitness) over impartial ones
+  (number/intervention/law/relation), dispersion-controlled, p<0.01.
+- **Kill:** clean null/contradiction on this well-powered instrument.
 
-## Honest overall conclusion (so far)
-The schism **theorem holds** (math). The **empirical** claim that real moral schism is a
-curvature-driven Fréchet bifurcation has **one weak positive (GOQA) and is otherwise null or
-instrument-limited** across AITA / MFRC / Scruples. It is **under-tested, not disproven** — and not
-yet supported. The decisive voter-level test (Moral Machine) is pending data access. A clean null
-there would falsify the empirical thesis.
+**Result:**
+- **(A) Basins — PASS.** GMM BIC improves monotonically k=1→4 (3492→3366→3247→3235), BIC-optimal = 4
+  components; silhouette 0.36–0.40; principal-axis dBIC +56. Agent references do split into camps.
+- **(B) Sacred-axis — FAIL, opposite direction.** The most bimodal dimensions are **impartial**
+  (No. Characters dBIC +103, Relation-to-AV, Law) plus Species; the identity axes (Age, Gender,
+  Social Status, Fitness) are the *least* bimodal — agents largely **agree** there. Mann-Whitney
+  sacred > impartial: **p=0.90** (Sarle) / 0.90 (dBIC); the impartial axes carry the schism.
+- **Verdict: NOT CONFIRMED.** The distinctive ERT mechanism (schism on sacred/high-curvature axes)
+  is contradicted. The actual disagreement is on the **consequentialist aggregation axis** (how much
+  "more lives" / species matter) — i.e. framework-level, not sacred-value-level.
+
+## Honest overall conclusion
+The schism **theorem holds** (math). Its distinctive **empirical** prediction — that real moral
+schism concentrates on **sacred/high-curvature value axes** — has now **failed twice with zero
+confirmations**: null on GlobalOpinionQA (n=26) and **contradicted on Moral Machine** (n=177,
+well-powered, labeled, p=0.90 wrong direction). What survives is only the weaker claim that **moral
+references bifurcate into camps** (GOQA ρ=0.14; MM 3–4 basins) — which is ordinary opinion-dynamics
+clustering, not unique to ERT. **The distinctive empirical thesis is falsified.** ERT stands as a
+coherent philosophical reframe + correct theorems + a shipped engineering tool (below); its signature
+empirical claim did not survive its decisive test. *(Caveat: the exact human per-country matrix was
+not available — only an aggregate Human column — so the human-cultural version is technically
+untested; but the mechanism failed on a strong, well-powered proxy population on top of the GOQA null.)*
 
 ## Salvageable engineering (falsification-independent)
 The aggregation machinery is useful to DEME/the compiler regardless of the science:
@@ -80,5 +100,6 @@ python experiments/ert/synthetic_bifurcation.py
 python experiments/ert/goqa_5b_test.py
 python experiments/ert/mfrc_5a_test.py
 python experiments/ert/scruples_5a_test.py        # downloads Scruples (25 MB) on first run
+python experiments/ert/mm_5b_test.py              # needs mm_data/mm_unzip/summary_overall_preferences.csv
 ```
 Embedding/data caches (`*.npy`, `scruples_data/`, `mm_data/`) are git-ignored.
