@@ -43,6 +43,10 @@ def _grammar_text() -> str:
 _PARSER = Lark(_grammar_text(), start="model", parser="lalr")
 
 
+class ParsingError(ValueError):
+    pass
+
+
 class ASTBuilder(Transformer):
     def environment_block(self, items: List[Any]) -> EnvDecl:
         name_token: Token = items[0]
@@ -73,6 +77,11 @@ class ASTBuilder(Transformer):
         texpr: TypeExpr = items[1]
         return StateVarDecl(name=name_token.value, type=texpr)
 
+    def base_type(self, items: List[Any]) -> Token:
+        if len(items) == 1 and isinstance(items[0], Token):
+            return items[0]
+        raise ParsingError("Tuple type expressions are not supported")
+
     def type_expr(self, items: List[Any]) -> TypeExpr:
         if len(items) == 1:
             base = items[0].value
@@ -85,7 +94,9 @@ class ASTBuilder(Transformer):
                 base=base_type.value,
                 key_object_type=key_type.value,
             )
-        raise ValueError("Invalid type_expr items")
+        raise ParsingError(
+            "Invalid type expression: expected a base type or mapping type"
+        )
 
     def agent_block(self, items: List[Any]) -> AgentDecl:
         name_token: Token = items[0]
@@ -168,7 +179,8 @@ class ASTBuilder(Transformer):
                 agents.append(item)
             elif isinstance(item, NormsDecl):
                 norms = item
-        assert env is not None, "Model must have an environment"
+        if env is None:
+            raise ParsingError("Model must have an environment")
         return ModelAST(environment=env, agents=agents, norms=norms)
 
 
@@ -176,5 +188,6 @@ def parse_erisml(source: str) -> ModelAST:
     # Parse ErisML source code into a typed AST.
     tree = _PARSER.parse(source)
     ast = ASTBuilder().transform(tree)
-    assert isinstance(ast, ModelAST)
+    if not isinstance(ast, ModelAST):
+        raise ParsingError("Parser produced an invalid ModelAST")
     return ast
