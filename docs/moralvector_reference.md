@@ -32,27 +32,38 @@ with `confidence`, `uncertainty`, `direction`, `source_spans`, `explanation` met
 
 ## 2. What measures each dimension — the xBSE feeders
 
-Each dimension is (or will be) fed by a domain-specific sentence embedding (`*-BSE`) from the
-`xbse` framework — an encoder trained to be **invariant to surface** and **sensitive to that
-dimension's structure**, validated by the shared gate. Status as of 2026-07-09:
+Each dimension is fed by a domain-specific sentence embedding (`*-BSE`) from the `xbse` framework —
+an encoder trained to be **invariant to surface** and **sensitive to that dimension's structure**.
 
-| dimension | xBSE feeder | dataset (independent label) | status |
-|---|---|---|---|
-| `epistemic_quality` | **EpistemicBSE** | Social-Chem honesty RoTs | **trained, 0.90** — cleanest (matches its rank-test isolation) |
-| `physical_harm` | **PhysHarmBSE** | BeaverTails (330k, physical-harm categories vs safe) | **trained, 0.88** |
-| `fairness_equity` | **mobse_fairness** | Social-Chem-101 `fairness-cheating` | **trained, 0.87** |
-| `privacy_protection` | **PrivacyBSE** | dual-judge-labeled privacy RoTs | **trained, 0.865** (RoT substrate; the balanced AITA-scenario rebalance scored only 0.615 — smaller+noisier, so RoT wins) |
-| `virtue_care` | **mobse_care** | Social-Chem-101 `care-harm` | **trained, 0.85** |
-| `legitimacy_trust` | **mobse_authority** *(proxy)* | Social-Chem-101 `authority-subversion` | **trained (proxy), 0.80** |
-| `societal_environmental` | **SocEnvBSE** | SBIC (offensive-to-group; societal arm — environmental is a sub-gap) | **trained, 0.77** |
-| `rights_respect` | **RightsBSE** | ECHR / LexGLUE `ecthr_a` | **trained, 0.75** |
-| `autonomy_respect` | **AutonomyDarkBSE** | ec-darkpattern (manipulative UI/e-commerce text) | **trained, 0.955** — the strongest feeder; MentalManip (movie dialogue) failed at 0.51, ec-darkpattern's short+clean signal rescued it |
+**The honest metric is CROSS-DATASET (2026-07-09 correction).** The earlier single-corpus feeders
+scored **within-dataset** AUROC 0.75–0.955, but a held-out cross-dataset test (evaluate on a
+*second, independent* corpus of the same dimension) exposed those numbers as **inflated by dataset
+surface artifacts** — cross-dataset AUROC collapsed to ~0.47–0.55 (random) for every dimension. The
+fix is **joint cross-dataset training** (`xbse.instances.joint.JointPairSource`): train each feeder
+on ≥2 corpora at once, drawing same-sign positives *across* corpora so the encoder cannot separate
+pairs by any single corpus's surface. Held-out AUROC is then measured cross-corpus by construction.
 
-**All nine DEME dimensions now have a trained feeder (0.75–0.955).** Lessons banked: (i) short,
-clean, ~balanced binary corpora train best (ec-darkpattern 0.955 vs MentalManip 0.51 for the same
-dimension); (ii) long texts must train at small batch (they pad to full length and OOM at 48);
-(iii) label *balance* does not beat label *quality* — the RoT PrivacyBSE (0.865) beat its balanced
-AITA rebalance (0.615) because the latter was smaller and noisier.
+| dimension | joint feeder (2 corpora) | within (old, inflated) | **cross-dataset (honest)** | baseline |
+|---|---|---|---|---|
+| `privacy_protection` | dual-judge privacy RoTs + AITA scenarios | 0.865 | **0.853** | 0.551 |
+| `epistemic_quality` | Social-Chem honesty + ETHICS honesty | 0.90 | **0.817** | 0.483 |
+| `virtue_care` | Social-Chem care-harm + ETHICS | 0.85 | **0.811** | 0.469 |
+| `fairness_equity` | Social-Chem fairness-cheating + ETHICS | 0.87 | **0.789** | 0.474 |
+| `autonomy_respect` | ec-darkpattern + MentalManip | 0.955 | **0.747** | 0.515 |
+| `legitimacy_trust` | Social-Chem authority + ETHICS | 0.80 | **0.708** | 0.523 |
+| `physical_harm` | BeaverTails + ETHICS harm-scenarios | 0.88 | **0.622** | 0.499 |
+| `rights_respect` | *(pending — CourtListener NOS 440s)* | 0.75 | — | — |
+| `societal_environmental` | *(pending — EcoVerse/ClimateBERT/NEPA-EIS)* | 0.77 | — | — |
+
+**Seven of nine dimensions now have an honest cross-dataset feeder (0.62–0.85).** The within-dataset
+numbers were NOT trustworthy — privacy's within/cross happened to agree, but e.g. `autonomy_respect`
+read 0.955 within yet 0.518 cross (pure artifact) before joint training recovered it to 0.747.
+Lessons banked: (i) **within-dataset AUROC is not evidence of a real dimension** — always cross-test;
+(ii) the load-bearing fix is **cross-corpus same-sign positives**, not the gradient-reversal domain
+adversary (which only de-confounds when the two corpora are already surface-similar); (iii)
+`physical_harm` (0.622) is weakest — BeaverTails QA-pairs vs ETHICS scenarios is the widest genre
+gap; the CourtListener criminal-case route (injury-tier labels) is its planned third corpus. Full
+data roadmap: `xbse/experiments/data_sourcing_plan.md`.
 
 Cross-cutting (not a dimension): **MoralStoriesBSE** (`mostories`) supplies surface-matched,
 judgment-flipped hard negatives usable to sharpen *any* dimension's encoder.
