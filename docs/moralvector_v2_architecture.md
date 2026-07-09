@@ -43,20 +43,30 @@ generate 9 dims — which is exactly the kind of parsimony the empirical bifacto
 (one general factor + a small number of structured specifics); (c) it is the axis the tensor
 engine actually evaluates.
 
-## 4. Where the "extra" concepts go (resolving 9-vs-10)
+## 4. How the compiler-10 maps to the DEME-9 (the *shipped* migration)
 
-The three dimensions DEME "drops" are not lost — they are **structure on other tensor axes**, not
-new `k` dimensions:
+This is **already implemented and tested** in `erisml-compiler/ir/v3/dimensions.py`
+(`V2_TO_V3_DIMENSION_MAP`) + `ir/v3/migration.py` (`migrate_v2_vector_to_v3` /
+`migrate_v2_tensor_to_v3`, covered by `tests/test_v3_schema.py`). The authoritative mapping — this
+**supersedes** an earlier draft of this doc that proposed routing externality→`n` and repair→`τ`;
+the shipped code made different, defensible choices, and the code wins:
 
-| compiler-10 concept | belongs on | rationale |
+| compiler-10 dim | → DEME-9 | mechanism |
 |---|---|---|
-| `third_party_externality` | **`n` (party) axis** | harm *distributed across non-consenting parties* = variation in `n`, read off the per-party tensor, not a new value axis |
-| `repair_residue` | **`τ` (time) axis** | *residual obligation after* a violation = temporal structure; it is the post-event tail of the `τ` evolution |
-| `vow_fidelity` | **deontic column** of `k` | promise/role fidelity is a sub-mode of rights_respect / legitimacy_trust (Who-Decides), not orthogonal |
+| physical_harm, rights_respect, fairness_equity, legitimacy_trust, epistemic_quality | same | identity |
+| `autonomy_consent` | `autonomy_respect` | rename |
+| `care_protection` | `virtue_care` | rename |
+| `third_party_externality` | `societal_environmental` (k5) | rename + semantic-overlap note in metadata |
+| `vow_fidelity` | `legitimacy_trust` + `virtue_care` | **split 50/50**; recorded in metadata |
+| `repair_residue` | — | **not a k-dim**; carried at `tensor.metadata["repair_residue"]` as the post-collapse residue (a tensor *operation*, not a value axis) |
+| — (DEME-only) `privacy_protection` | — | **synthesised** at 0.0 (neutral) on migration; flagged in `metadata["synthesised_dims"]` |
 
-This is not a workaround — it is more correct. Externality and repair were only ever "extra `k`
-dims" because the compiler schema is rank-1 (a flat vector); DEME's higher ranks give them their
-natural home.
+Migration preserves all V2 metadata (confidence / uncertainty / direction / source_spans /
+explanation) and emits a `metadata["migration"]` audit block (`renamed_dims`, `split_dims`,
+`synthesised_dims`, `dropped_to_tensor_metadata`). So the compiler-10 is a **rank-1 legacy view**
+that the migration helpers losslessly-where-possible bridge to the canonical DEME-9 tensor. The
+one true information loss on the V2→V3 path is `privacy_protection` (synthesised, since V2 never
+scored it) — which is exactly why V3 is the more complete substantive basis.
 
 ## 5. The DEME tensor — how the MoralVector plugs in (ranks 1–6)
 
@@ -69,8 +79,14 @@ The MoralVector **is the `k` axis** of `MoralTensor` (`moral_tensor.py`). Higher
 | 2 | `(9, n)` | parties | EU fundamental-rights impact **per affected person**; `third_party_externality` lives here |
 | 3 | `(9, n, τ)` | time | EU post-market monitoring; `repair_residue` = the `τ`-tail |
 | 4 | `(9, n, a, c)` | actions × coalitions | alternatives analysis; multi-stakeholder (NIST Map) |
-| 5 | `(9, n, τ, s)` | MC samples | **uncertainty quantification** (NIST Measure; EU accuracy/robustness) |
+| 5 | `(9, n, τ, s)` ⚠ | MC samples | **uncertainty quantification** (NIST Measure; EU accuracy/robustness) |
 | 6 | `(9, n, τ, a, c, s)` | full context | the complete audit object |
+
+⚠ **Rank-5 axis layout is inconsistent across implementations and must be reconciled by decision:**
+`erisml-lib` = `(k,n,τ,s)` (temporal uncertainty), `agi-hpc` = `(k,n,τ,a,s)`, `erisml-compiler`
+(`v3_higher_rank.py`) = `(k,n,τ,a,c)` (coalition-over-time). Ranks 1–4 and 6 agree; only rank 5
+disagrees. This is a genuine design fork (is rank-5 "temporal uncertainty" or "coalition-over-
+time"?) — flagged, not silently resolved. See §12.
 
 So a change to the MoralVector = a change to the length/ordering/semantics of the `k` axis;
 everything downstream (contraction, aggregation, spectral summary) is defined over `k`.
@@ -166,10 +182,10 @@ per-score `source_spans`/`explanation`, which the engine already emits.
   compiler-10 axis (HLEG #3, AI Act Art 10, NIST "privacy-enhanced", EAD "Data Agency").
   **DEME 3.0 already has it: `k4` privacy_protection.** Closed by adopting the DEME-9 core.
 - **Environmental / sustainability well-being** — flagged (HLEG #6, IEEE 7010 domain #6
-  "Environment"). **DEME 3.0 already has it: `k5` societal_environmental.** Closed. (Note:
-  `third_party_externality`, from the compiler-10, is only *adjacent* to environment — not a
-  substitute — which is another reason to place it on the `n` axis, §4, and keep `k5` for the
-  substantive societal/environmental value.)
+  "Environment"). **DEME 3.0 already has it: `k5` societal_environmental.** Closed. (The shipped
+  migration folds the compiler-10's `third_party_externality` into `k5` with a semantic-overlap
+  note in metadata, §4; the *distributional* structure of externality — who bears it — is then
+  read off the per-party `n` axis at rank ≥ 2.)
 - **All other framework dimensions are procedural** (transparency, accountability, oversight,
   robustness, security, logging, risk-management) → covered by DEME's procedural policy blocks +
   attestations + the tensor's explainability affordances. These are **not `k` gaps** — correctly,
