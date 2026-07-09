@@ -79,14 +79,14 @@ The MoralVector **is the `k` axis** of `MoralTensor` (`moral_tensor.py`). Higher
 | 2 | `(9, n)` | parties | EU fundamental-rights impact **per affected person**; `third_party_externality` lives here |
 | 3 | `(9, n, τ)` | time | EU post-market monitoring; `repair_residue` = the `τ`-tail |
 | 4 | `(9, n, a, c)` | actions × coalitions | alternatives analysis; multi-stakeholder (NIST Map) |
-| 5 | `(9, n, τ, s)` ⚠ | MC samples | **uncertainty quantification** (NIST Measure; EU accuracy/robustness) |
-| 6 | `(9, n, τ, a, c, s)` | full context | the complete audit object |
+| 5 | `(9, n, τ, a, c)` | coalition decisions over time | multi-stakeholder decisions across the horizon (NIST Map/Measure) |
+| 6 | `(9, n, τ, a, c, s)` | + MC samples | **uncertainty quantification**, the complete audit object (NIST Measure; EU accuracy/robustness) |
 
-⚠ **Rank-5 axis layout is inconsistent across implementations and must be reconciled by decision:**
-`erisml-lib` = `(k,n,τ,s)` (temporal uncertainty), `agi-hpc` = `(k,n,τ,a,s)`, `erisml-compiler`
-(`v3_higher_rank.py`) = `(k,n,τ,a,c)` (coalition-over-time). Ranks 1–4 and 6 agree; only rank 5
-disagrees. This is a genuine design fork (is rank-5 "temporal uncertainty" or "coalition-over-
-time"?) — flagged, not silently resolved. See §12.
+**Rank-5 reconciled (2026-07-09):** the earlier fork — `erisml-lib` `(k,n,τ,s)` (temporal
+uncertainty) vs `agi-hpc` `(k,n,τ,a,s)` vs `erisml-compiler` (`v3_higher_rank.py`) `(k,n,τ,a,c)`
+(coalition-over-time) — is resolved in favour of **`(k,n,τ,a,c)` "coalition decisions over time"**,
+matching `moral_tensor.py` `DEFAULT_AXIS_NAMES`. Monte-Carlo uncertainty samples (`s`) live at
+rank 6. Ranks 1–4 and 6 were already in agreement.
 
 So a change to the MoralVector = a change to the length/ordering/semantics of the `k` axis;
 everything downstream (contraction, aggregation, spectral summary) is defined over `k`.
@@ -204,7 +204,7 @@ Xplore before citing the others in a compliance filing.
 |---|---|---|
 | Scientists | §3 canonical `k`, §7 bifactor | parsimonious 3×3 basis; empirically grounded; no axis added to please a regulator |
 | EU regulators | §7 risk tier, §5 rank-2 parties, §8 crosswalk | severity→tier; per-person rights impact; article-traceable |
-| NIST | §5 rank-5 samples, §6 procedural blocks, §8 | uncertainty quantification; Govern/Map/Measure/Manage attestations |
+| NIST | §5 rank-6 samples, §6 procedural blocks, §8 | uncertainty quantification; Govern/Map/Measure/Manage attestations |
 | IEEE | §6 policy DAG, §8 7000-series map | 7000 values→requirements→V&V trace; 7001 transparency block |
 | Engineers | §5 `k`/rank API, §6 EM/profile | implementable: MoralVector = `k`; standards = policy blocks + attestations |
 

@@ -73,8 +73,8 @@ V3 introduces a progressive tensor hierarchy:
 | 2 | DistributionalTensor | (k, n) | Per-party impact distribution |
 | 3 | TemporalTensor | (k, n, τ) | Time-evolving ethics |
 | 4 | CoalitionTensor | (k, n, a, c) | Multi-agent action coordination |
-| 5 | UncertaintyTensor | (k, n, τ, s) | Monte Carlo uncertainty samples |
-| 6 | FullContextTensor | (k, n, τ, a, c, s) | Complete ethical state space |
+| 5 | CoalitionTemporalTensor | (k, n, τ, a, c) | Coalition decisions over time |
+| 6 | FullContextTensor | (k, n, τ, a, c, s) | Complete ethical state space (+ Monte Carlo uncertainty samples) |
 
 Where:
 - **k** = 9 ethical dimensions (harm, rights, fairness, autonomy, privacy, societal, virtue, legitimacy, epistemic)
@@ -153,8 +153,8 @@ class MoralTensor:
         2: (k, n)         - Distributional (per-party)
         3: (k, n, τ)      - Temporal evolution
         4: (k, n, a, c)   - Coalition actions
-        5: (k, n, τ, s)   - Uncertainty samples
-        6: (k, n, τ, a, c, s) - Full context
+        5: (k, n, τ, a, c) - Coalition decisions over time
+        6: (k, n, τ, a, c, s) - Full context (+ Monte Carlo uncertainty samples)
     """
 
     # Core tensor data (dense or sparse representation)
@@ -1081,6 +1081,8 @@ class SAIDSAgent:
 
 ## Appendix B: Related Documents
 
+- [MoralVector Reference](../moralvector_reference.md) — canonical DEME-9 dimensions, xBSE feeders, rank-1..6 tensor mapping, empirical support
+- [MoralVector v2 Architecture](../moralvector_v2_architecture.md) — standards-traceable (EU AI Act / NIST / IEEE) governance architecture
 - [DEME 2.0 Vision Paper](./DEME_2.0_Vision_Paper.md)
 - [DEME 3.0 Tensorial Ethics Vision](./DEME_3.0_Tensorial_Ethics_Vision.md)
 - [DEME Advanced Architectural Roadmap](./DEME%20Advanced%20Architectural%20Roadmap.md)
