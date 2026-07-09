@@ -38,15 +38,21 @@ dimension's structure**, validated by the shared gate. Status as of 2026-07-09:
 
 | dimension | xBSE feeder | dataset (independent label) | status |
 |---|---|---|---|
-| `physical_harm` | PhysHarmBSE *(planned)* | PKU-SafeRLHF (severity) / BeaverTails | data identified; isolated in rank pool (mean target −0.73) |
-| `rights_respect` | **RightsBSE** | ECHR / LexGLUE `ecthr_a` | **trained**, held-out AUROC ≈ 0.75 |
-| `fairness_equity` | **mobse_fairness** | Social-Chem-101 `fairness-cheating` | **trained**, deterministic-split AUROC ≈ 0.87 |
-| `autonomy_respect` | AutonomyBSE *(planned)* | **gap** — no clean labeled corpus | dual-judge labeling route |
-| `privacy_protection` | PrivacyBSE *(planned)* | **gap** — candidate: data-agency / GDPR-annotated | to source |
-| `societal_environmental` | SocEnvBSE *(planned)* | SBIC (third-party externality) / IEEE-7010 domains | proxy data; isolated in rank pool |
-| `virtue_care` | **mobse_care** | Social-Chem-101 `care-harm` | **trained**, AUROC ≈ 0.85 |
-| `legitimacy_trust` | **mobse_authority** *(proxy)* | Social-Chem-101 `authority-subversion` | **trained (proxy)**, AUROC ≈ 0.80 |
-| `epistemic_quality` | EpistemicBSE *(from honesty RoTs)* | Social-Chem honesty RoTs / Diplomacy deception | data identified; **cleanest isolation** in rank pool (target +0.35 vs +0.04 others) |
+| `epistemic_quality` | **EpistemicBSE** | Social-Chem honesty RoTs | **trained, 0.90** — cleanest (matches its rank-test isolation) |
+| `physical_harm` | **PhysHarmBSE** | BeaverTails (330k, physical-harm categories vs safe) | **trained, 0.88** |
+| `fairness_equity` | **mobse_fairness** | Social-Chem-101 `fairness-cheating` | **trained, 0.87** |
+| `privacy_protection` | **PrivacyBSE** | dual-judge-labeled privacy RoTs | **trained, 0.865** (RoT substrate; the balanced AITA-scenario rebalance scored only 0.615 — smaller+noisier, so RoT wins) |
+| `virtue_care` | **mobse_care** | Social-Chem-101 `care-harm` | **trained, 0.85** |
+| `legitimacy_trust` | **mobse_authority** *(proxy)* | Social-Chem-101 `authority-subversion` | **trained (proxy), 0.80** |
+| `societal_environmental` | **SocEnvBSE** | SBIC (offensive-to-group; societal arm — environmental is a sub-gap) | **trained, 0.77** |
+| `rights_respect` | **RightsBSE** | ECHR / LexGLUE `ecthr_a` | **trained, 0.75** |
+| `autonomy_respect` | **AutonomyDarkBSE** | ec-darkpattern (manipulative UI/e-commerce text) | **trained, 0.955** — the strongest feeder; MentalManip (movie dialogue) failed at 0.51, ec-darkpattern's short+clean signal rescued it |
+
+**All nine DEME dimensions now have a trained feeder (0.75–0.955).** Lessons banked: (i) short,
+clean, ~balanced binary corpora train best (ec-darkpattern 0.955 vs MentalManip 0.51 for the same
+dimension); (ii) long texts must train at small batch (they pad to full length and OOM at 48);
+(iii) label *balance* does not beat label *quality* — the RoT PrivacyBSE (0.865) beat its balanced
+AITA rebalance (0.615) because the latter was smaller and noisier.
 
 Cross-cutting (not a dimension): **MoralStoriesBSE** (`mostories`) supplies surface-matched,
 judgment-flipped hard negatives usable to sharpen *any* dimension's encoder.
