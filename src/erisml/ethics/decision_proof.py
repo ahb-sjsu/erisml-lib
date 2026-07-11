@@ -78,6 +78,51 @@ class EMJudgementRecord:
 
 
 @dataclass
+class FeederValidationRecord:
+    """Validation provenance for the encoder that scored one MoralVector dimension.
+
+    When a dimension is scored by an ``xbse`` cross-dataset feeder rather than the rubric, the
+    audit trail must be able to answer, for every number in the tensor: *which encoder produced
+    this, was it validated, and against what pre-registered bar?* This binds the feeder's identity
+    and its gate result into the hash-chained proof, so a scored dimension can never silently rest
+    on an unvalidated (or post-hoc re-graded) encoder.
+    """
+
+    dimension: str
+    """DEME-9 dimension this feeder scores (e.g. 'physical_harm')."""
+
+    feeder_name: str
+    """The xbse feeder / joint instance (e.g. 'physharm_joint')."""
+
+    checkpoint_hash: str
+    """Hash of the exact encoder checkpoint used (the PASS report is bound to this)."""
+
+    bar_auroc_min: float
+    """The pre-registered AUROC bar the feeder had to clear."""
+
+    bar_source: str
+    """Where the bar came from (e.g. 'noise-ceiling(dual-judge)*0.9')."""
+
+    bar_derivation: str
+    """One sentence: how the bar was computed, before training."""
+
+    bar_registered: str
+    """ISO date the bar was pre-registered (git history is the record)."""
+
+    structure_auroc: float
+    """Cross-dataset held-out AUROC the feeder achieved."""
+
+    bow_auroc: float = 0.0
+    """Bag-of-words lexical control on the same held-out pairs (near 0.5 ⇒ non-lexical signal)."""
+
+    lexical_margin: float = 0.0
+    """structure_auroc − bow_auroc; small ⇒ the win is surface, not moral structure."""
+
+    validated: bool = False
+    """Whether the feeder cleared its bar (structure_auroc > bar_auroc_min)."""
+
+
+@dataclass
 class DecisionProof:
     """
     Structured audit artifact with hash chain for decision verification.
@@ -120,6 +165,9 @@ class DecisionProof:
 
     em_judgements: List[EMJudgementRecord] = field(default_factory=list)
     """Records of individual EM judgements."""
+
+    feeder_provenance: List[FeederValidationRecord] = field(default_factory=list)
+    """Validation provenance of any xbse feeders that scored MoralVector dimensions."""
 
     # Output state
     candidate_option_ids: List[str] = field(default_factory=list)
@@ -210,6 +258,7 @@ class DecisionProof:
             "active_em_names": sorted(self.active_em_names),
             "layer_outputs": [asdict(lo) for lo in self.layer_outputs],
             "em_judgements": [asdict(ej) for ej in self.em_judgements],
+            "feeder_provenance": [asdict(fp) for fp in self.feeder_provenance],
             "candidate_option_ids": sorted(self.candidate_option_ids),
             "selected_option_id": self.selected_option_id,
             "ranked_options": self.ranked_options,
@@ -258,6 +307,11 @@ class DecisionProof:
             EMJudgementRecord(**ej) for ej in data.get("em_judgements", [])
         ]
 
+        # Reconstruct FeederValidationRecord objects
+        feeder_provenance = [
+            FeederValidationRecord(**fp) for fp in data.get("feeder_provenance", [])
+        ]
+
         return cls(
             decision_id=data.get("decision_id", str(uuid.uuid4())),
             timestamp=data.get("timestamp", datetime.now(timezone.utc).isoformat()),
@@ -268,6 +322,7 @@ class DecisionProof:
             active_em_names=data.get("active_em_names", []),
             layer_outputs=layer_outputs,
             em_judgements=em_judgements,
+            feeder_provenance=feeder_provenance,
             candidate_option_ids=data.get("candidate_option_ids", []),
             selected_option_id=data.get("selected_option_id"),
             ranked_options=data.get("ranked_options", []),

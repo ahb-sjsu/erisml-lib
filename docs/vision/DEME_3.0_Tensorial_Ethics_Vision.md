@@ -1,3 +1,10 @@
+> **Note (current state):** this is an exploratory DEME 3.0 vision using a 7-dimension (ℝ⁷) vector
+> sketch and illustrative rank numbering. The shipped canonical basis is the **DEME-9** (nine
+> dimensions) with the rank ladder rank-1 `(k)` … rank-5 `(k,n,τ,a,c)` … rank-6 `(k,n,τ,a,c,s)`.
+> See [`moralvector_reference.md`](../moralvector_reference.md) and
+> [`moralvector_v2_architecture.md`](../moralvector_v2_architecture.md) for the canonical dimensions
+> and tensor mapping.
+
 ## Executive Summary
 
 **Tensors open powerful extensions for DEME 3.0+**

@@ -9,6 +9,8 @@
 # ErisML
 **A library for governed, foundation-model-enabled agents with tensorial ethics.**
 
+> **MoralVector spec:** the canonical 9-dimension basis, its xBSE encoder feeders, the rank-1..6 tensor mapping, and the empirical support are in [`docs/moralvector_reference.md`](docs/moralvector_reference.md); the standards-traceable (EU AI Act / NIST AI RMF / IEEE) governance architecture is in [`docs/moralvector_v2_architecture.md`](docs/moralvector_v2_architecture.md).
+
 *Named for Eris, the Greek goddess of discord — whose golden apple forced a judgment.*
 
 > **Brand assets:** [erisml.org/brand/](https://erisml.org/brand/) · local: [`docs/brand/`](docs/brand/)
@@ -1468,7 +1470,7 @@ The DEME V3 implementation extends the DEME 2.0 architecture with multi-agent te
 | Sprint 11 | Acceleration Framework and CPU Backend | Complete |
 | Sprint 12 | CUDA Backend with CuPy | Complete |
 | Sprint 13 | Jetson Nano Edge Deployment | Complete |
-| Sprint 14 | Uncertainty Quantification (Rank-5) | Complete |
+| Sprint 14 | Uncertainty Quantification (Monte-Carlo `s`-axis; rank-5 later reconciled to coalition, see `docs/moralvector_reference.md`) | Complete |
 | Sprint 15 | Full Context Tensors and Decomposition (Rank-6) | Complete |
 
 ### Sprint 10: Strategic Layer
