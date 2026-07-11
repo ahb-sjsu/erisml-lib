@@ -1,0 +1,1050 @@
+% Journal of Science and Law submission
+% Andrew H. Bond, San Jose State University
+% Built standalone with article class; no special journal template.
+
+\documentclass[11pt]{article}
+
+\usepackage{amsmath,amssymb,amsfonts,amsthm}
+\usepackage[margin=1in]{geometry}
+\usepackage{hyperref}
+\usepackage{booktabs}
+\usepackage{enumitem}
+\usepackage{graphicx}
+\usepackage{xcolor}
+\usepackage{microtype}
+\usepackage[round]{natbib}
+
+\hypersetup{colorlinks=true,linkcolor=black,citecolor=blue,urlcolor=blue}
+
+\newtheorem{definition}{Definition}
+\newtheorem{proposition}{Proposition}
+
+\title{\bfseries The Legal Bond Index:\\
+A Geometric, Case-Level Test of Algorithmic Fairness\\
+Applied to COMPAS}
+
+\author{Andrew H.\ Bond\\
+Department of Computer Engineering\\
+San Jos\'{e} State University, San Jos\'{e}, CA 95192\\
+\texttt{andrew.bond@sjsu.edu}\quad ORCID: 0009-0003-2599-6158}
+
+\date{June 2026}
+
+\begin{document}
+\maketitle
+
+\begin{abstract}
+\noindent
+The 2016--2017 controversy over the COMPAS pretrial-risk algorithm
+exposed a deep ambiguity in the concept of algorithmic fairness.
+ProPublica showed that COMPAS's false-positive rate is substantially
+higher for Black defendants. Northpointe (the algorithm's vendor)
+replied that COMPAS approximately satisfies \emph{predictive parity}:
+among defendants it classifies high-risk, the observed recidivism rate
+is similar across races. Subsequent technical work
+\citep{chouldechova2017,kleinberg2017} proved that the two properties
+\emph{cannot both hold} when race-specific recidivism base rates
+differ---a genuine impossibility theorem. The literature has since
+proliferated competing metrics (demographic parity, equalized odds,
+calibration, counterfactual fairness, individual fairness), each
+capturing one facet of the problem and none of them dispositive.
+
+We introduce a third axis of measurement that the impossibility result
+does not constrain: the \emph{Legal Bond Index} (LBI), a matched-pair,
+case-level \emph{diagnostic} of whether an algorithm treats defendants
+who are similar on selected legitimate predictors similarly. LBI asks:
+when two defendants agree on legitimate predictors (age, prior offences,
+juvenile record, charge degree) to within the same Mahalanobis
+neighbourhood, does the algorithm assign them similar scores regardless
+of their race? For COMPAS the answer is a robust case-level disparity:
+at neighbourhood scale $k = 20$, $\mathrm{LBI}(\text{race}) = 1.050$,
+95\,\% CI $[1.040, 1.058]$, permutation $p < 0.005$ on $n = 5{,}278$
+defendants. The 5\,\% excess case-level sensitivity to race is small in
+absolute terms but robust: it survives every legitimate-feature set we
+can test---including \emph{dropping} the contested juvenile controls---and
+\emph{strengthens} at the decision-relevant unit ($\mathrm{LBI} = 1.090$
+on the binary high-risk classification). It is a signal the
+population-level metrics do not deliver; because matching is on a
+selected, incomplete feature set, it is a diagnostic to be investigated,
+not a proof of legal unfairness.
+
+LBI is a quantitative implementation of the Aristotelian
+``treat-like-cases-alike'' criterion. It is computationally cheap, it
+applies to any algorithm whose inputs include both legitimate and
+protected attributes, it does not require knowledge of the algorithm's
+internals, and it produces a single number with a confidence interval
+suitable for regulatory and auditing use. The reference implementation
+is released as an open-source Jupyter notebook.
+\end{abstract}
+
+\medskip
+\noindent\textbf{Keywords:} algorithmic fairness, COMPAS, recidivism
+prediction, Mahalanobis distance, matched-pair analysis, criminal
+justice, audit, equal protection.
+
+%==============================================================================
+\section{Introduction}
+\label{sec:intro}
+%==============================================================================
+
+In May 2016, ProPublica published an investigation
+\citep{angwin2016} arguing that the COMPAS recidivism-risk algorithm,
+in use across multiple U.S.\ jurisdictions for pretrial release and
+sentencing recommendations, was racially biased against Black
+defendants. The reporters' principal evidence was an asymmetry in
+error rates: among defendants who did not in fact reoffend within two
+years, Black defendants were roughly twice as likely as White
+defendants to have been classified as high-risk by COMPAS. Northpointe
+(the algorithm's vendor, now Equivant) replied that COMPAS was in fact
+fair under a different criterion---\emph{predictive parity}: among
+defendants it classified high-risk, the empirical recidivism rate was
+approximately the same across races \citep{dieterich2016}. Both parties could substantiate their claims
+from the same data; the disagreement was about which fairness criterion
+applied.
+
+The technical community resolved the empirical question within a year.
+\citet{chouldechova2017} and
+\citet{kleinberg2017}, working independently,
+proved that the two criteria ProPublica and Northpointe each invoked
+are \emph{mathematically incompatible} when group-specific base rates
+differ: an algorithm that is calibrated within groups
+($\Pr(\text{recid} \mid \text{score}, \text{group})$ is invariant
+across groups) cannot simultaneously satisfy equalized error rates
+(false-positive and false-negative rates invariant across groups),
+except in the trivial cases of perfect prediction or equal base
+rates. The impossibility is a structural feature of the prediction
+problem, not a defect of any particular algorithm.
+
+The decade since has produced a sprawl of competing fairness criteria.
+Demographic parity requires that the rate of positive predictions be
+equal across groups \citep{feldman2015}. Equalized odds
+\citep{hardt2016} requires equal true-positive and false-positive
+rates across groups conditional on the actual outcome. Predictive
+parity (Northpointe's criterion) requires equal precision across
+groups. Counterfactual fairness \citep{kusner2017} requires that an
+individual's prediction be invariant under a hypothetical
+intervention on their protected attribute. Individual fairness
+\citep{dwork2012} requires that similar individuals receive similar
+predictions, leaving the similarity metric to be specified. Each
+captures a real concern; none of them by itself adjudicates the
+COMPAS case; and the proliferation has rendered the debate
+\emph{which-metric-to-use} rather than \emph{is-it-fair}.
+
+This paper introduces a fairness criterion that is operationally
+distinct from all of those above. It is rooted in the oldest legal
+principle: like cases should be treated alike. We make this principle
+precise, measurable, and applicable to algorithmic systems through the
+\emph{Legal Bond Index} (LBI), a matched-pair, case-level diagnostic that
+asks whether the algorithm assigns similar outputs to defendants who
+are similar on the \emph{selected} legitimate predictors but differ on a
+protected attribute. LBI is geometric: ``similar'' is operationalized via the
+Mahalanobis distance on a feature space of legitimate
+predictors. LBI is symmetric across protected attributes and does not
+depend on the base-rate structure that drives the
+calibration--equalized-odds impossibility.
+
+On the ProPublica COMPAS dataset, the headline result is sharp:
+$\mathrm{LBI}(\text{race}) = 1.050$ at neighbourhood scale $k = 20$
+(95\,\% CI $[1.040, 1.058]$, permutation $p < 0.005$). When two
+defendants are matched on age, prior offences, juvenile record, and
+charge degree, COMPAS scores them on average 5\,\% more differently if
+they differ on race than if they share race. The result holds across
+neighbourhood scales $k \in [1, 100]$ and is approximately twice the
+analogous LBI for sex.
+
+The remainder of this paper proceeds as follows. Section
+\ref{sec:background} reviews the COMPAS controversy and the existing
+fairness-metric landscape. Section \ref{sec:lbi} defines LBI formally
+and gives the matched-pair operational specification. Section
+\ref{sec:complex} situates LBI in the broader Judicial Complex
+framework (the formal theory is developed elsewhere; here we give
+only what is needed to read LBI as a coherent legal concept).
+Section \ref{sec:empirical} reports the empirical analysis: filter,
+features, results, robustness. Section \ref{sec:discussion} compares
+LBI to the existing criteria, identifies what it adds, and discusses
+limitations. Section \ref{sec:policy} addresses regulatory and audit
+implications. Section \ref{sec:conclusion} concludes.
+
+%==============================================================================
+\section{Background: the COMPAS Controversy and the Fairness Landscape}
+\label{sec:background}
+%==============================================================================
+
+\subsection{The 2016--2017 dispute}
+
+COMPAS (Correctional Offender Management Profiling for Alternative
+Sanctions), developed by Northpointe, scores individuals on a 1--10
+decile scale of two-year recidivism risk. The algorithm is widely
+deployed in U.S.\ pretrial detention decisions. ProPublica's 2016
+analysis \citep{angwin2016}, working from public records in Broward
+County, Florida, reported two findings: (i) among defendants who did
+not reoffend, Black defendants were 1.7--2.0$\times$ more likely than
+White defendants to have been classified as high-risk by COMPAS; and
+(ii) the algorithm's predictive accuracy was approximately equal
+across races (about 65\,\% in both groups). The first finding is now
+referred to as the \emph{equalized-odds violation}; ProPublica framed
+it as evidence of racial bias.
+
+Northpointe's response \citep{dieterich2016} did not contest the raw
+numbers. Instead, the company argued that the relevant fairness
+criterion was \emph{predictive parity}: among defendants classified
+high-risk, the empirical probability of recidivism should be the same
+across racial groups. By that criterion COMPAS was approximately fair:
+at the high-risk threshold, Black and White defendants had similar
+two-year recidivism rates---a precision claim, not a demonstration of
+per-score calibration. The dispute, as it played out in the popular and academic
+press, was less about the data than about which property a fair
+classifier should have.
+
+The technical resolution came rapidly.
+\citet{chouldechova2017} proved that an instrument satisfying
+predictive parity \emph{cannot} simultaneously satisfy equalized
+false-positive and false-negative rates, except in trivial cases.
+\citet{kleinberg2017} proved an analogous impossibility theorem for
+calibration and balance. The two findings together established that
+the COMPAS dispute was not resolvable by data alone: the choice
+between Northpointe's criterion and ProPublica's criterion is a
+normative choice about which kind of unfairness one prefers to permit.
+
+\subsection{The proliferation of fairness criteria}
+
+The decade since has produced a long list of competing fairness
+criteria. We summarize the principal ones to fix terminology.
+
+\textbf{Demographic parity} (\citealp{feldman2015}; also called
+``disparate impact'' under the EEOC's four-fifths rule).
+$\Pr(\hat{Y} = 1 \mid A = a) = \Pr(\hat{Y} = 1 \mid A = b)$ for all
+protected groups $a, b$. Requires equal positive-prediction rates; this
+is generally in tension with using legitimate predictors that correlate
+with $A$, though such correlation can sometimes be offset by design
+rather than by excluding the predictor.
+
+\textbf{Equalized odds} (\citealp{hardt2016}).
+$\Pr(\hat{Y} = 1 \mid Y = y, A = a) = \Pr(\hat{Y} = 1 \mid Y = y, A
+= b)$ for all $y$ and all $a, b$. Requires equal true-positive and
+false-positive rates conditional on the true outcome.
+
+\textbf{Predictive parity and calibration} (\citealp{chouldechova2017}).
+These are distinct properties. \emph{Calibration} is score-level:
+$\Pr(Y = 1 \mid S = s, A = a) = \Pr(Y = 1 \mid S = s, A = b)$ for all
+scores $s$ and groups $a, b$ (at a given score the observed outcome rate
+is group-independent). \emph{Predictive parity} is a \emph{threshold}
+condition on precision: among those \emph{classified} positive,
+$\Pr(Y = 1 \mid \hat{Y} = 1, A = a) = \Pr(Y = 1 \mid \hat{Y} = 1, A = b)$.
+Northpointe's defence was predictive parity at the high-risk threshold,
+not full per-score calibration.
+
+\textbf{Counterfactual fairness} (\citealp{kusner2017}). The
+prediction $\hat{Y}(X, A)$ should equal the counterfactual prediction
+$\hat{Y}(X_{A := a'}, a')$ for any protected attribute $a'$. Requires
+a causal model.
+
+\textbf{Individual fairness} (\citealp{dwork2012}). Similar
+individuals should receive similar predictions: a Lipschitz condition
+on the prediction map with respect to a task-appropriate metric. The
+similarity metric is left to be specified.
+
+The first three criteria are \emph{population-level}: they constrain
+aggregate statistics on a population. The fourth requires a causal
+model that may not be available. The fifth is general and
+philosophically attractive but undertheorized---which metric? The
+Legal Bond Index sits inside the individual-fairness framework but
+gives it a concrete, calibrated metric (the Mahalanobis distance on
+legitimate predictors) and a concrete operational
+specification (matched-pair $k$-NN average), turning a general
+desideratum into a number with a confidence interval.
+
+\subsection{What population-level metrics miss}
+
+The Chouldechova--Kleinberg impossibility is a result about
+\emph{populations}. With unequal base rates, no scoring rule can
+simultaneously equalize calibration and false-positive rates across
+groups. This is mathematics; one cannot escape it by being clever.
+
+But the impossibility result is silent about \emph{case-level}
+properties. Consider the following question: take two defendants who
+agree on legitimate predictors (age, priors, juvenile record, charge
+degree), differing only on race. Does the algorithm assign them
+similar scores? This is a question about \emph{matched pairs}, not
+about populations. The Chouldechova--Kleinberg theorem does not
+constrain the answer; nothing in the impossibility result prevents
+an algorithm from being case-level fair. To the extent the matching features capture the legally relevant grounds
+of similarity, an algorithm that scores legitimately-matched defendants
+alike is case-level fair, and one that systematically scores them
+differently by race exhibits a case-level disparity that the
+population-level metrics do not reveal. That qualification is essential:
+because the match is on a selected, possibly incomplete set of observed
+features, a disparity among matched pairs is a diagnostic signal
+requiring further investigation, not by itself proof of legal unfairness
+(\S\ref{sec:discussion}, \S\ref{sec:robustness}).
+
+The Legal Bond Index measures case-level fairness directly. It does
+not adjudicate the Chouldechova--Kleinberg dispute; it provides a
+quantitative answer to a question the dispute does not address.
+
+
+%==============================================================================
+\section{The Legal Bond Index}
+\label{sec:lbi}
+%==============================================================================
+
+\subsection{Definition}
+
+Let $V$ be the set of individuals (defendants, applicants, claimants)
+to whom an algorithm is applied. Each individual $i \in V$ has a
+legitimate-predictor vector $\mathbf{x}_i \in \mathbb{R}^d$ and a
+protected attribute $g_i \in \{0, 1\}$ (we treat the binary case
+throughout and discuss the multi-class extension in
+Section~\ref{sec:discussion}). The algorithm assigns a score
+$f(i) \in \mathbb{R}$. We equip $\mathbb{R}^d$ with the Mahalanobis
+metric
+\begin{equation}
+\label{eq:mahalanobis}
+d_M(\mathbf{x}_i, \mathbf{x}_j) \;=\;
+\sqrt{(\mathbf{x}_i - \mathbf{x}_j)^\top \Sigma^{-1} (\mathbf{x}_i - \mathbf{x}_j)},
+\end{equation}
+where $\Sigma$ is the empirical covariance of $\mathbf{x}$ over the
+population. The Mahalanobis metric is the natural choice when
+legitimate predictors are correlated (age and prior offences typically
+are) because it accounts for the joint distribution rather than
+treating each axis independently. Under standardized features,
+$d_M$ reduces to Euclidean distance on the de-correlated representation
+\citep{mahalanobis1936}.
+
+\begin{definition}[Legal Bond Index, LBI]
+\label{def:lbi}
+At neighbourhood scale $k \geq 1$, the Legal Bond Index of an
+algorithm $f$ with respect to protected attribute $g$ is
+\begin{equation}
+\label{eq:lbi}
+\mathrm{LBI}_k(f, g)
+\;=\;
+\frac{\mathbb{E}_i \bigl[\, \text{mean}_{j \in N_k(i,\, \neg g_i)} \;
+                            \lvert f(i) - f(j) \rvert\, \bigr]}
+     {\mathbb{E}_i \bigl[\, \text{mean}_{j \in N_k(i,\, g_i)} \;
+                            \lvert f(i) - f(j) \rvert\, \bigr]},
+\end{equation}
+where $N_k(i, c)$ is the set of the $k$ nearest neighbours to
+individual $i$ in $(V, d_M)$ satisfying condition $c$, and
+$\mathbb{E}_i$ is the empirical mean over individuals.
+\end{definition}
+
+\textbf{Interpretation.} The numerator is the average score
+difference between an individual and their $k$ nearest neighbours of
+the \emph{opposite} protected group. The denominator is the average
+score difference between an individual and their $k$ nearest neighbours
+of the \emph{same} protected group. The ratio measures the algorithm's
+case-level excess sensitivity to the protected attribute:
+\begin{itemize}[leftmargin=*]
+\item $\mathrm{LBI}_k = 1$: no excess sensitivity. The algorithm is
+no more affected by a flip of the protected attribute than by
+within-group variation in legitimate predictors at the same
+neighbourhood scale.
+\item $\mathrm{LBI}_k > 1$: excess sensitivity. Defendants who match
+on legitimate features but differ on the protected attribute receive
+more divergent scores than defendants who match on both. The
+algorithm is responsive to the protected attribute beyond what its
+legitimate-feature input would justify.
+\item $\mathrm{LBI}_k < 1$: deficit sensitivity. Differences on the
+protected attribute produce smaller score variation than within-group
+legitimate-feature variation. This is unusual; it would indicate
+active calibration that suppresses the protected attribute's
+influence below the noise floor of legitimate predictors.
+\end{itemize}
+
+\subsection{Why a ratio, why $k$-NN, and why Mahalanobis}
+
+Each of the three choices in Definition~\ref{def:lbi} is deliberate.
+
+\textbf{Ratio vs.\ raw difference.} The denominator of
+\eqref{eq:lbi} provides a within-group baseline against which the
+cross-group score gap is normalized. Without this baseline, an
+algorithm operating on a population with naturally large legitimate
+variation would appear ``unfair'' simply because all neighbourhoods
+have large score gaps. The ratio quotients out the algorithm's overall
+sensitivity to the \emph{selected} legitimate predictors, contextualizing
+the cross-group gap against ordinary within-group variation. It does not
+by itself isolate the \emph{marginal causal} contribution of the
+protected attribute: that reading holds only to the extent that the
+matching features are a sufficiently complete and legally defensible
+account of relevant similarity (\S\ref{sec:discussion},
+\S\ref{sec:robustness}).
+
+\textbf{$k$-NN matched-pair vs.\ regression.} A regression of $f$ on
+legitimate predictors and protected attributes can extract a
+coefficient on the protected attribute. But that coefficient depends
+on the functional form assumed (linear, polynomial, with
+interactions) and on the choice of regularization. The $k$-NN matched-pair
+approach is non-parametric: it makes no functional-form assumption
+about how $f$ depends on its inputs. It is not, however, assumption-free:
+the assumptions are \emph{shifted} to the choice of matching features,
+the distance metric, the feature scaling, and $k$, which jointly
+determine which cases count as ``similar.'' It also produces a
+neighbourhood-scale curve $\mathrm{LBI}_k$ for $k \in [1, 100]$, which
+exposes whether the effect is local (small $k$) or global (large $k$).
+For COMPAS we find the effect is approximately scale-invariant. This is
+suggestive that the pattern is not a small-$k$ artefact, but we read it
+cautiously: persistent scale-invariance is equally consistent with a
+persistent omitted-variable imbalance as with a genuine case-level
+effect.
+
+\textbf{Mahalanobis vs.\ Euclidean.} Legitimate predictors are
+correlated (older defendants have more priors, etc.). Euclidean
+distance overcounts the contribution of correlated axes; Mahalanobis
+de-correlates by construction
+\citep{mahalanobis1936}. On standardized features, Mahalanobis
+equals Euclidean on the principal-component representation, so the
+practical effect is to upweight nearest-neighbour matches that agree
+along the leading directions of feature variation.
+
+\subsection{Inference: confidence intervals and permutation tests}
+
+LBI is an empirical mean ratio; we report 95\,\% confidence intervals
+via the percentile bootstrap (1000 resamples). For each defendant
+$i$, the same-group and different-group neighbourhood score gaps are
+computed once; bootstrap resamples are drawn over defendants.
+
+For significance against the null ``the protected attribute is
+ignored by the algorithm,'' we use a permutation test: we randomly
+permute the protected-attribute labels and recompute the LBI. The
+distribution of LBI values under permutation provides the
+empirical null. The one-sided $p$-value is the fraction of
+permutation LBIs that exceed the observed value.
+
+The permutation null is exactly centred at $1.0$ under the assumption
+that legitimate features and the protected attribute are
+unconditionally independent. If they are correlated (which they
+typically are, as race is correlated with age and priors in the
+COMPAS population), the permutation null may still be centred at
+$1.0$ because permuting labels destroys the dependence structure
+between protected attribute and outcome. Empirically, we find the
+COMPAS permutation null centred at $1.0018$ with standard deviation
+$0.012$, consistent with a centred null.
+
+
+%==============================================================================
+\section{The Judicial Complex: a Brief Bridge}
+\label{sec:complex}
+%==============================================================================
+
+The Legal Bond Index sits inside a larger geometric framework for
+legal analysis developed in companion theoretical work
+\citep{bond2026geometric,bond2026tractability}. The full framework
+treats the space of legal states as a directed weighted simplicial
+complex (the \emph{judicial complex}); legal disputes as
+shortest-path problems on this complex; and constitutional review as
+a topological-consistency test. The mathematical machinery (gauge
+theory, path homology, octahedral symmetry groups) is substantial
+and is reported separately.
+
+For this paper, the only structural ingredient we need is the
+following: the framework's \emph{Legal Invariance Principle} (LIP)
+states that legal judgments must be invariant under \emph{legally
+irrelevant transformations} of the case description. In the COMPAS
+setting, the protected attribute is legally irrelevant to risk
+prediction (its use is either prohibited or normatively contested,
+depending on jurisdiction). The LIP, applied to algorithmic
+classifiers, requires that the algorithm's output be approximately
+invariant under a counterfactual change of the protected attribute,
+holding legitimate features fixed. LBI is the quantitative
+measurement of how far an algorithm departs from this requirement.
+
+Two qualifications on the empirical implementation. First, the $k$-NN
+matched-pair estimator holds fixed only the \emph{selected} legitimate
+features, not every feature the algorithm uses; the LIP as measured by
+LBI is therefore conditional on the matching set being an adequate proxy
+for ``legitimate similarity'' (\S\ref{sec:robustness} tests sensitivity
+to that set). Second, ``legally irrelevant'' is attribute-specific:
+race is a paradigm case, but for some protected attributes---sex and
+citizenship, for instance---courts have upheld express differential
+treatment in risk assessment, so a nonzero LBI on those attributes is
+not automatically a fairness defect. We report LBI(sex) as a comparison,
+not as a violation.
+
+In the broader framework, LBI also corresponds to a specific
+geometric object: it is the average length of the Wilson-loop holonomy
+around a small loop in the judicial complex whose protected-attribute
+coordinate winds once and whose legitimate-coordinate winds zero.
+Readers interested in the geometric formulation are referred to
+\citet{bond2026geometric}; readers interested only in algorithmic
+fairness need no part of that machinery to use LBI as an audit tool.
+
+
+%==============================================================================
+\section{Empirical Analysis: LBI on COMPAS}
+\label{sec:empirical}
+%==============================================================================
+
+We compute LBI on the ProPublica COMPAS dataset and compare it
+against the standard fairness metrics that shaped the 2016--2017
+debate.
+
+\subsection{Data and filter}
+
+We use ProPublica's published file
+\verb|compas-scores-two-years.csv|, retrieved on June 11 2026 from
+the public GitHub repository \verb|propublica/compas-analysis|. The
+dataset contains 7,214 records of defendants screened by COMPAS in
+Broward County, Florida.
+
+We apply ProPublica's canonical analytical filter to obtain the
+6,172-record analysis subset: screening date within 30 days of arrest,
+recidivism record present, charge degree not ``Ordinary,'' and COMPAS
+score text valid. Restricting further to African-American and
+Caucasian defendants (the two race categories that drove the public
+controversy and the subsequent technical literature) yields $n =
+5{,}278$ defendants, of whom 3,175 (60.2\,\%) are African-American
+and 2,103 (39.8\,\%) are Caucasian.
+
+\subsection{Legitimate-feature space}
+
+We adopt six legitimate predictors documented by Northpointe and
+engaged by courts as inputs to pretrial risk assessment (see
+\emph{State v.\ Loomis}, 881 N.W.2d 749 (Wis.\ 2016), which upheld
+COMPAS's reliance on criminal-history and age factors while cautioning
+on its use):
+\textsf{age}, \textsf{priors\_count}, \textsf{juv\_fel\_count},
+\textsf{juv\_misd\_count}, \textsf{juv\_other\_count}, and an
+indicator for whether the current charge is a felony
+($\mathsf{c\_charge\_F}$). We standardize each feature
+(mean-zero, unit-variance) before computing the Mahalanobis metric.
+Although these predictors all count prior conduct, they do not
+double-count it: the three juvenile counts are mutually exclusive charge
+classes (felony, misdemeanour, other), and \textsf{priors\_count} records
+adult priors, so the four \emph{partition} rather than duplicate a
+defendant's record. The empirical covariance matrix accordingly has
+condition number $2.65$, confirming no severe multicollinearity; the
+Mahalanobis metric additionally de-correlates whatever residual
+dependence remains. The COMPAS score is the published decile risk
+($1$--$10$).
+
+\subsection{Standard fairness metrics: confirming the prior literature}
+
+We first reproduce the 2016--2017 controversy by computing standard
+metrics on the filtered subset. Table~\ref{tab:standard} reports
+the headline numbers.
+
+\begin{table}[h]
+\centering
+\caption{Standard fairness metrics on the COMPAS Black/White subset
+($n{=}5{,}278$). High-risk threshold: decile score $\geq 5$.}
+\label{tab:standard}
+\begin{tabular}{lrrr}
+\toprule
+\textbf{Metric} & \textbf{African-American} & \textbf{Caucasian} & \textbf{Disparity} \\
+\midrule
+$n$                   & 3{,}175 & 2{,}103 & --- \\
+Base recidivism rate  & 0.523 & 0.394 & $+0.129$ \\
+$\Pr(\text{high-risk})$ & 0.583 & 0.335 & $\times\,1.74$ \\
+False positive rate   & 0.443 & 0.240 & $+0.203$ \\
+False negative rate   & 0.282 & 0.494 & $-0.212$ \\
+$\Pr(\text{recid}\mid\text{high-risk})$ & 0.626 & 0.571 & $+0.055$ \\
+$\Pr(\text{recid}\mid\text{low-risk})$  & 0.353 & 0.292 & $+0.061$ \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+The pattern matches the published literature exactly. ProPublica's
+headline finding---the false-positive-rate disparity---is
+$+20.3$ percentage points, with a corresponding false-negative-rate
+disparity of $-21.2$ percentage points. (These are distinct rates on
+different denominators---the FPR is the complement of the true-negative
+rate and the FNR of the true-positive rate---so they are not two forms
+of a single quantity, though under this classifier they move in opposite
+directions.) Northpointe's defence is \emph{predictive parity} at the
+high-risk threshold: the empirical recidivism rate among defendants
+classified high-risk is approximately equal across races (a precision
+gap of $+0.055$), not a demonstration of per-decile calibration. The
+Chouldechova--Kleinberg impossibility holds because the recidivism base
+rates differ by $+12.9$ percentage points.
+
+\subsection{LBI on the legal-feature subspace}
+
+We compute LBI(race) and LBI(sex) at six neighbourhood scales
+$k \in \{1, 5, 10, 20, 50, 100\}$ using the matched-pair $k$-NN
+procedure of Definition~\ref{def:lbi}. Bootstrapped 95\,\% CIs use
+1{,}000 resamples per scale.
+
+\begin{table}[h]
+\centering
+\caption{Legal Bond Index for COMPAS, by protected attribute and
+neighbourhood scale. $n_{\mathrm{eval}} = 5{,}278$ defendants. CIs are
+percentile bootstrap.}
+\label{tab:lbi}
+\begin{tabular}{rrrrrr}
+\toprule
+\multicolumn{1}{c}{\textbf{$k$}}
+ & \multicolumn{2}{c}{\textbf{LBI(race)}}
+ & \multicolumn{2}{c}{\textbf{LBI(sex)}} \\
+\cmidrule(lr){2-3}\cmidrule(lr){4-5}
+ & value & 95\,\% CI & value & 95\,\% CI \\
+\midrule
+  1 & 1.063 & $[1.034, 1.093]$ & 0.988 & $[0.960, 1.016]$ \\
+  5 & 1.047 & $[1.033, 1.063]$ & 1.006 & $[0.993, 1.019]$ \\
+ 10 & 1.046 & $[1.036, 1.058]$ & 1.011 & $[1.001, 1.020]$ \\
+ 20 & 1.050 & $[1.040, 1.058]$ & 1.021 & $[1.013, 1.030]$ \\
+ 50 & 1.059 & $[1.051, 1.067]$ & 1.029 & $[1.022, 1.036]$ \\
+100 & 1.069 & $[1.061, 1.078]$ & 1.041 & $[1.034, 1.049]$ \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+Figure~\ref{fig:lbi-by-attribute} plots the values. LBI(race) is
+robustly above $1$ across all neighbourhood scales, with a 95\,\% CI
+that does not include $1$ at any $k$. LBI(sex) is also above $1$ but
+roughly half the magnitude. The race effect is the dominant
+case-level fairness signal.
+
+\begin{figure}[h]
+\centering
+\includegraphics[width=0.75\textwidth]{figures/lbi_by_attribute.pdf}
+\caption{COMPAS Legal Bond Index by protected attribute, across
+neighbourhood scales $k$. Bars show 95\,\% bootstrap CIs. The race
+effect is robustly above $1$ at every scale; the sex effect is real
+but smaller. The horizontal dashed line marks LBI $= 1$ (no excess
+sensitivity to the protected attribute).}
+\label{fig:lbi-by-attribute}
+\end{figure}
+
+\subsection{Permutation null distribution}
+
+To certify that the LBI(race) signal is not an artefact of feature
+correlation, we run a permutation test: we randomly permute the
+race-label assignment across defendants and recompute LBI at
+$k = 20$. We use $n_{\text{perms}} = 200$ and subsample $500$
+defendants per permutation for compute efficiency. Because the null is
+computed on 500-defendant subsamples while the observed statistic uses
+the full $n = 5{,}278$, the null's dispersion is \emph{inflated}
+relative to the observed estimator, so the resulting significance
+($\approx 4\sigma$, $p < 0.005$) is conservative.
+
+The permutation null is centred at $\bar{\mathrm{LBI}}_{\text{null}} =
+1.002$ with standard deviation $0.012$. The observed value
+$\mathrm{LBI}(\text{race}) = 1.050$ lies $4.05$ standard deviations
+above the null mean; the one-sided permutation $p$-value is below
+$0.005$ (no permutation in our sample exceeded the observed value).
+Figure~\ref{fig:permutation} shows the null distribution against the
+observed value.
+
+\begin{figure}[h]
+\centering
+\includegraphics[width=0.75\textwidth]{figures/lbi_permutation.pdf}
+\caption{Permutation null distribution of LBI at neighbourhood scale
+$k = 20$, computed from 200 random race-label permutations. The null
+is centred at $1.002$ with standard deviation $0.012$. The observed
+LBI of $1.050$ (red line) lies approximately 4 standard deviations
+above the null mean. None of the 200 permutations exceeded the
+observed value; the one-sided permutation $p$-value is below
+$1/200 = 0.005$.}
+\label{fig:permutation}
+\end{figure}
+
+\subsection{Robustness to the legitimate-feature set and the score unit}
+\label{sec:robustness}
+
+The standing objection to any matched-comparison diagnostic is that the
+signal is an artefact of the analyst's feature choice: too few controls
+could manufacture apparent unfairness, while racially patterned controls
+could launder it. We test both directly by recomputing
+$\mathrm{LBI}(\text{race})$ at $k = 20$ across four legitimate-feature
+sets and three representations of the COMPAS output
+(Table~\ref{tab:robust}).
+
+\begin{table}[h]
+\centering
+\caption{Robustness of $\mathrm{LBI}(\text{race})$ at $k = 20$
+($n = 5{,}278$; 95\,\% percentile-bootstrap CIs). Top: legitimate-feature
+set, on the decile score. Bottom: score representation, on the paper's
+six features.}
+\label{tab:robust}
+\begin{tabular}{lrl}
+\toprule
+\textbf{Specification} & \textbf{LBI} & \textbf{95\,\% CI} \\
+\midrule
+\multicolumn{3}{l}{\emph{Feature set (decile score)}}\\
+\quad minimal (age, priors) & 1.041 & $[1.032, 1.049]$ \\
+\quad paper (6 features) & 1.050 & $[1.040, 1.059]$ \\
+\quad drop contested juvenile counts & 1.038 & $[1.030, 1.047]$ \\
+\quad paper $+$ sex control & 1.060 & $[1.050, 1.069]$ \\
+\midrule
+\multicolumn{3}{l}{\emph{Score representation (6 features)}}\\
+\quad raw decile ($1$--$10$) & 1.050 & $[1.040, 1.058]$ \\
+\quad three-category (low/med/high) & 1.066 & $[1.053, 1.078]$ \\
+\quad binary high-risk ($\geq 5$) & 1.090 & $[1.076, 1.106]$ \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+Two conclusions follow. First, the case-level signal is \emph{not} an
+artefact of the particular six-feature set: every specification yields
+$\mathrm{LBI} \in [1.04, 1.06]$ with a 95\,\% CI excluding $1$, including
+the minimal (age, priors) matching and the specification that
+\emph{drops} the racially patterned juvenile counts (LBI $1.038$). Were
+those contested proxies manufacturing the effect, removing them would
+erase it; instead the signal persists, and including them raises LBI only
+from $1.038$ to $1.050$. (Adding \textsf{sex} as a further matching
+control raises $\mathrm{LBI}(\text{race})$ slightly, to $1.060$: matching
+within sex removes cross-sex dilution of the race contrast, sharpening
+the estimate rather than weakening it.) Second, the disparity does not depend on
+treating the raw decile as the unit of analysis---the objection that the
+legally salient decision is the \emph{category}, not the exact score.
+Measured at the decision-relevant unit the effect is \emph{larger}: LBI
+is $1.066$ on the three-category (low/medium/high) mapping and $1.090$ on
+the binary high-risk classification, i.e.\ matched cross-race pairs are
+about $9\%$ more likely to straddle the high-risk threshold than matched
+same-race pairs.
+
+These checks do not resolve the deeper omitted-variable concern---the
+COMPAS inputs absent from the public file (substance use, education,
+employment) cannot be tested here---so we continue to frame LBI as a
+conditional matched-comparison diagnostic (\S\ref{sec:discussion}), not a
+proof of case-level unfairness. But the signal is stable across every
+control set the public data permit and strengthens at the unit that
+actually drives decisions.
+
+\subsection{Summary}
+
+Table~\ref{tab:summary} summarizes the empirical findings.
+
+\begin{table}[h]
+\centering
+\caption{Headline fairness measurements on the COMPAS Black/White
+subset, $n = 5{,}278$.}
+\label{tab:summary}
+\begin{tabular}{p{0.55\textwidth}lp{0.32\textwidth}}
+\toprule
+\textbf{Metric} & \textbf{Value} & \textbf{Interpretation} \\
+\midrule
+Disparate impact (Black/White, high-risk) & $1.741$ &
+Above the EEOC four-fifths threshold; large \\
+FPR disparity (Black $-$ White) & $+0.203$ &
+ProPublica's headline finding; large \\
+FNR disparity (Black $-$ White) & $-0.212$ &
+Complementary rate (distinct denominator); large \\
+Predictive-parity gap, $\Pr(\text{recid}\mid\text{high})$ (Black $-$ White) & $+0.055$ &
+Northpointe's defence; small \\
+\midrule
+\textbf{LBI(race) at $k = 20$} & $\mathbf{1.050}$ &
+\textbf{95\,\% CI $[1.040, 1.058]$;}\\
+& & \textbf{permutation $p < 0.005$} \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+The case-level excess sensitivity to race is small in absolute
+magnitude (5\,\%) but is statistically robust: a 4-sigma effect above
+the permutation null, with a 95\,\% bootstrap CI that does not
+include $1$, replicated across six neighbourhood scales spanning two
+orders of magnitude in $k$.
+
+
+%==============================================================================
+\section{Discussion}
+\label{sec:discussion}
+%==============================================================================
+
+\subsection{What LBI adds to the fairness literature}
+
+LBI complements rather than replaces the existing fairness metrics.
+Three properties distinguish it:
+
+\textbf{(i) It is case-level, not population-level.} The
+Chouldechova--Kleinberg impossibility is a constraint on
+population-level statistics. LBI evaluates the algorithm on matched
+pairs of individuals, so the impossibility does not constrain it.
+An algorithm can be case-level fair (LBI $= 1$) without satisfying
+either calibration or equalized odds; conversely, an algorithm can
+satisfy either calibration or equalized odds without being
+case-level fair.
+
+\textbf{(ii) It is a single number with a CI.} Population-level
+metrics typically come in matched pairs (FPR and FNR; precision at
+high and low; positive-prediction rate by group). LBI is a
+scalar with a confidence interval, which is convenient for regulatory
+and audit reporting. Scalar simplicity is a reporting convenience, not
+an epistemic virtue: case-level fairness may itself vary by offence
+type, decision point, or assessment window, so a single index is best
+read as a screening signal to be disaggregated when it fires, not a
+substitute for the fuller metric panel.
+
+\textbf{(iii) It depends on a metric on legitimate predictors, not
+on the algorithm's internals.} LBI can be computed by an auditor
+who has access to the inputs and outputs of the algorithm but not
+to its parameters. This is the typical audit setting: a regulator
+or oversight body can observe predictions but not the model.
+
+\subsection{Relationship to individual fairness}
+
+\citet{dwork2012} introduced individual fairness as the requirement
+that ``similar individuals receive similar predictions,''
+formalized as a Lipschitz constraint with respect to a
+task-appropriate metric. They acknowledged the difficulty of
+specifying the metric and treated it as an open problem.
+
+LBI is a quantitative implementation of individual fairness with two
+specific choices: the metric is the Mahalanobis distance on
+legitimate predictors, and the constraint is the matched-pair $k$-NN
+ratio rather than a uniform Lipschitz bound. The matched-pair
+formulation is operationally tractable in a way that a uniform
+Lipschitz bound is not---to verify a uniform Lipschitz bound, one
+must evaluate the algorithm on all pairs in the domain, which is
+infeasible for any non-trivial population.
+
+\subsection{Relationship to counterfactual fairness}
+
+\citet{kusner2017} require that the algorithm's output be invariant
+under a counterfactual change of the protected attribute, holding
+the legitimate features fixed at their observed values. This is a
+strict version of case-level fairness; LBI is a soft version. The
+strict version requires a causal model of how the legitimate
+features depend on the protected attribute; the soft version (LBI)
+does not. The two are related: LBI $\to 1$ in the limit of perfect
+counterfactual fairness (a counterfactual flip of the protected
+attribute then moves the score no more than within-group variation in
+legitimate features does), and LBI meaningfully above $1$ implies
+counterfactual unfairness if a counterfactual model is available.
+
+\subsection{Limitations}
+
+\textbf{Choice of legitimate features, and contested proxies.} The LBI
+signal depends on what we declare ``legitimate,'' and that choice is
+normative, not merely practical---data availability cannot substitute for
+legal justification. Two failure modes cut in opposite directions. If
+relevant legitimate predictors are \emph{omitted}, matched pairs are not
+truly similarly situated and LBI can \emph{overstate} unfairness; the
+public ProPublica file omits COMPAS inputs such as substance-use,
+education, and employment items, so our matching is necessarily on a
+subset. Conversely, some included features are themselves
+\emph{racially patterned proxies}---prior counts and juvenile counts
+reflect policing, surveillance, and charging practices as much as
+underlying conduct---so controlling on them can \emph{understate}
+unfairness by normalizing part of the very disparity we seek to measure.
+These features are therefore not ``uncontroversial''; a careful audit
+distinguishes predictors that are legitimate-and-available,
+legitimate-but-unavailable, and available-but-contested. The robustness
+analysis (\S\ref{sec:robustness}) shows the case-level signal survives
+every available-feature choice we can test---including \emph{dropping}
+the contested juvenile counts---but the unmeasured COMPAS inputs remain a
+genuine limit on any claim of complete case-level similarity.
+
+\textbf{Binary protected attributes.} Definition~\ref{def:lbi} treats
+the protected attribute as binary. Multi-class extension is
+straightforward in either of two ways: compute pairwise LBI between
+all pairs of classes (giving a matrix of values), or take a
+one-vs-rest formulation. The COMPAS analysis uses the
+African-American vs.\ Caucasian binary because that is the contrast
+that drove the public controversy; the extension to multiple race
+categories is mechanical.
+
+\textbf{The 5\,\% magnitude.} The COMPAS LBI of $1.050$ is
+statistically robust but quantitatively modest. The legal and
+regulatory significance of a 5\,\% case-level excess sensitivity is
+a policy question, not a statistical one. Compare to a 100\,\%
+violation, which would correspond to an algorithm that flips its
+score entirely on the protected attribute---this is the calibration
+benchmark, not the threshold for legal concern.
+
+\textbf{Mahalanobis on $\mathbb{R}^d$.} For continuous and binary
+features the Mahalanobis metric is well-defined; for genuinely
+categorical features (e.g., charge type with twenty levels), a
+modified metric (Gower distance, learned similarity, propensity
+score) may be more appropriate. The COMPAS feature space is
+predominantly continuous so this issue does not arise here.
+
+\textbf{Causal disentanglement.} LBI measures a statistical
+association between the protected attribute and the algorithm's
+output, controlling for legitimate features via the Mahalanobis
+neighbourhood. It does not by itself establish a causal mechanism
+for that association. The causal story may be that the algorithm
+encodes race indirectly through correlated features that are not
+in our legitimate-feature set (residential zip code, employment
+history). Distinguishing these causal pathways is beyond what LBI
+alone can do; LBI is an audit signal that flags the issue and
+quantifies its magnitude, not a complete causal account.
+
+
+%==============================================================================
+\section{Policy and Regulatory Implications}
+\label{sec:policy}
+%==============================================================================
+
+\subsection{An audit tool for legal AI}
+
+The LBI can be operationalized as a regulatory audit signal for any
+algorithmic system that ingests legitimate predictors and a protected
+attribute and produces a score or classification. The procedure is:
+
+\begin{enumerate}[leftmargin=*]
+\item Obtain a sample of the algorithm's inputs and outputs ($n$ in the
+thousands; the COMPAS analysis used $n = 5{,}278$).
+\item Specify the legitimate-feature set (this is the normative input
+that the audit cannot supply; it must come from statute,
+regulation, or expert designation).
+\item Compute LBI(protected attribute) at multiple neighbourhood
+scales $k$.
+\item Report the value, confidence interval, and permutation
+$p$-value.
+\end{enumerate}
+
+The procedure does not require access to the algorithm's parameters,
+training data, or vendor documentation. It treats the algorithm as a
+black box and audits its outputs directly. This makes it well-suited
+to settings where the algorithm is proprietary, as COMPAS is.
+
+\subsection{Threshold setting}
+
+A regulatory threshold for LBI must come from policy, not statistics.
+Three descriptive anchors (offered for orientation, not as proposed
+thresholds):
+
+\textbf{$\mathrm{LBI} = 1.00$ to $1.02$:} indistinguishable from no
+excess sensitivity at typical sample sizes. Probably acceptable.
+
+\textbf{$\mathrm{LBI} = 1.02$ to $1.10$:} small but statistically
+detectable. The COMPAS result ($1.050$) sits in this range. Whether
+this is acceptable is a judgement call; the LBI value is one of
+several inputs (along with the disparate impact ratio, equalized-odds
+disparities, etc.) that a regulator should weigh.
+
+\textbf{$\mathrm{LBI} > 1.10$:} large excess sensitivity; the
+algorithm's outputs are more responsive to the protected attribute
+than to substantial legitimate-feature variation. Probably warrants
+mitigation.
+
+We do not propose specific regulatory thresholds; we propose that
+LBI be added to the audit toolkit and that thresholds be set in
+consultation with domain expertise.
+
+\subsection{What LBI does not do}
+
+LBI is not a substitute for the constitutional and statutory
+analysis that determines whether an algorithm's deployment is lawful.
+A high LBI does not, by itself, establish a violation of any
+specific legal rule (the Equal Protection Clause, Title VII, the
+Fair Housing Act, etc.). A low LBI does not, by itself, license
+deployment. LBI provides a quantitative input to legal analysis; the
+legal analysis itself proceeds under the doctrinal categories
+appropriate to the deployment context.
+
+
+%==============================================================================
+\section{Conclusion}
+\label{sec:conclusion}
+%==============================================================================
+
+The COMPAS controversy crystallized a structural ambiguity in
+algorithmic fairness: when group base rates differ,
+no scoring rule can simultaneously satisfy calibration and equalized
+error rates. The literature has responded by proliferating fairness
+criteria, each capturing a different facet, none of them dispositive.
+
+We have introduced the Legal Bond Index, a measure that sits on a
+distinct axis. It does not constrain population-level statistics; it
+constrains case-level matched-pair behaviour. On the ProPublica
+COMPAS dataset, LBI(race) is $1.050$ at neighbourhood scale $k = 20$
+with 95\,\% CI $[1.040, 1.058]$ and permutation $p < 0.005$. The
+finding is small in magnitude but statistically robust, and it
+sits orthogonally to the calibration--equalized-odds debate. It is
+a quantitative implementation of Aristotle's like-cases-alike
+criterion; it is cheap to compute; it requires only the algorithm's
+inputs and outputs; and it produces a single number with a
+confidence interval suitable for regulatory and audit reporting.
+
+The reference implementation is released as an open-source Jupyter
+notebook at \url{https://github.com/[author-handle]/lbi-compas}
+(repository URL pending acceptance; pre-release available on
+request). The data, the filter, the metric, and the figures are all
+reproducible from the public ProPublica file.
+
+\bigskip
+\noindent\textbf{Author note.} The geometric framework that motivates
+LBI (the Judicial Complex; the Legal Invariance Principle) is
+developed in companion theoretical work
+\citep{bond2026geometric,bond2026tractability}. The present paper is
+self-contained: a reader interested only in LBI as an audit tool
+needs no part of that machinery.
+
+\bigskip
+\noindent\textbf{Data availability.} The COMPAS data are public at
+\url{https://github.com/propublica/compas-analysis}. The analysis
+notebook, the produced CSV tables, and the figures are bundled with
+the manuscript submission.
+
+\bigskip
+\noindent\textbf{Competing interests.} The author declares no
+competing interests.
+
+\bigskip
+\noindent\textbf{Funding.} No external funding supported this work.
+
+%==============================================================================
+\bibliographystyle{plainnat}
+\begin{thebibliography}{99}
+
+\bibitem[Angwin et al.(2016)]{angwin2016}
+Angwin, J., Larson, J., Mattu, S., \& Kirchner, L. (2016).
+Machine bias.
+\emph{ProPublica}, May 23, 2016.
+
+\bibitem[Bond(2026a)]{bond2026geometric}
+Bond, A.~H. (2026).
+\emph{Geometric Economics: Heuristic Bounded Rationality, the Bond
+Geodesic, and the Death of Homo Economicus}. Monograph.
+
+\bibitem[Bond(2026b)]{bond2026tractability}
+Bond, A.~H. (2026).
+The computational origin of bounded rationality: a tractability
+theorem for behavioral equilibria on the economic decision manifold.
+\emph{Working paper}.
+
+\bibitem[Chouldechova(2017)]{chouldechova2017}
+Chouldechova, A. (2017).
+Fair prediction with disparate impact: A study of bias in recidivism
+prediction instruments.
+\emph{Big Data}, 5(2), 153--163.
+
+\bibitem[Dieterich et al.(2016)]{dieterich2016}
+Dieterich, W., Mendoza, C., \& Brennan, T. (2016).
+COMPAS risk scales: Demonstrating accuracy equity and predictive
+parity. Northpointe Inc.\ Research Department.
+
+\bibitem[Dwork et al.(2012)]{dwork2012}
+Dwork, C., Hardt, M., Pitassi, T., Reingold, O., \& Zemel, R. (2012).
+Fairness through awareness.
+In \emph{Proceedings of the 3rd Innovations in Theoretical Computer
+Science Conference}, 214--226.
+
+\bibitem[Feldman et al.(2015)]{feldman2015}
+Feldman, M., Friedler, S.~A., Moeller, J., Scheidegger, C., \&
+Venkatasubramanian, S. (2015).
+Certifying and removing disparate impact.
+In \emph{Proceedings of the 21st ACM SIGKDD International Conference
+on Knowledge Discovery and Data Mining}, 259--268.
+
+\bibitem[Hardt et al.(2016)]{hardt2016}
+Hardt, M., Price, E., \& Srebro, N. (2016).
+Equality of opportunity in supervised learning.
+In \emph{Advances in Neural Information Processing Systems 29},
+3315--3323.
+
+\bibitem[Kleinberg et al.(2017)]{kleinberg2017}
+Kleinberg, J., Mullainathan, S., \& Raghavan, M. (2017).
+Inherent trade-offs in the fair determination of risk scores.
+In \emph{Proceedings of the 8th Innovations in Theoretical Computer
+Science Conference (ITCS)}, 43:1--43:23.
+
+\bibitem[Kusner et al.(2017)]{kusner2017}
+Kusner, M.~J., Loftus, J.~R., Russell, C., \& Silva, R. (2017).
+Counterfactual fairness.
+In \emph{Advances in Neural Information Processing Systems 30},
+4066--4076.
+
+\bibitem[Mahalanobis(1936)]{mahalanobis1936}
+Mahalanobis, P.~C. (1936).
+On the generalised distance in statistics.
+\emph{Proceedings of the National Institute of Sciences of India},
+2(1), 49--55.
+
+\end{thebibliography}
+
+\end{document}
