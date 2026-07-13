@@ -5,9 +5,11 @@
 that answers: *what are the dimensions, what measures each one, how do they compose into the DEME
 tensor, and what is the evidence?*
 
-Status 2026-07-09. The canonical basis is the DEME-9 (`erisml.ethics.moral_tensor`
-`MORAL_DIMENSION_NAMES`, `erisml_compiler.ir.v3.dimensions.MORAL_DIMENSIONS_V3` — kept in sync by
-`erisml-compiler/tests/test_dimension_consistency.py`).
+Status 2026-07-13. **Single source of truth:** `erisml_compiler.ir.v3.dimensions` defines the moral
+vector's channels — the 9 frozen k-axis dimensions (`MORAL_DIMENSIONS_V3`) plus validated extension
+channels (`MORAL_EXTENSION_CHANNELS`; see §2a). `erisml.ethics.moral_tensor.MORAL_DIMENSION_NAMES`
+re-exports the canonical tuple (guarded fallback for standalone installs); drift is caught by
+`erisml-compiler/tests/test_dimension_consistency.py`.
 
 ## 1. The nine dimensions (the `k` axis)
 
@@ -68,10 +70,35 @@ data roadmap: `xbse/experiments/data_sourcing_plan.md`.
 Cross-cutting (not a dimension): **MoralStoriesBSE** (`mostories`) supplies surface-matched,
 judgment-flipped hard negatives usable to sharpen *any* dimension's encoder.
 
-**Retired / off-target:** `mobse_sanctity` (Social-Chem `sanctity-degradation`) maps to **no**
-MoralVector axis — purity/sanctity is an MFT foundation absent from the DEME-9; not a feeder.
-`mobse_loyalty` fed the compiler-10's `vow_fidelity`, which the DEME migration splits 50/50 into
-`legitimacy_trust` + `virtue_care` (§3).
+## 2a. Extension channels — `purity` and `loyalty` (validated 2026-07)
+
+**Single source of truth:** the moral vector's channels are defined canonically in
+`erisml_compiler.ir.v3.dimensions` — the 9 frozen k-axis dimensions (`MORAL_DIMENSIONS_V3`) plus the
+validated extension channels (`MORAL_EXTENSION_CHANNELS`); `MORAL_VECTOR_CHANNELS` is the full ordered
+vocabulary. `erisml.ethics.moral_tensor` re-exports these (with a guarded standalone fallback), so every
+package speaks the same ontology. Adding an extension channel is a deliberate, reviewed act guarded by
+`erisml-compiler/tests/test_dimension_consistency.py`.
+
+**This overturns the earlier "retired / off-target" note for purity and loyalty.** Both MFT "binding"
+foundations were absent from the DEME-9; both now have feeders validated through the SAME pre-registered
+cross-dataset gate as every k-axis dimension (xbse; `experiments/b1_results.json`,
+`experiments/foundation_presence_findings.md`, `experiments/lambda_comparison_result.json`). Each extension
+channel carries two feeders:
+
+| channel | valence feeder (cell value) | presence feeder (engagement gate) |
+|---|---|---|
+| `purity`  (MFT sanctity/degradation) | AUROC **0.811** (`001506fc21518a5e`) | AUROC **0.719** (`1997cb0b3ac9d12a`) — robust (passes lam=0 AND lam=1) |
+| `loyalty` (MFT loyalty/betrayal)     | AUROC **0.911** (`23d54d10fac7ea90`) | AUROC **0.661** (`377f1bc8977fbf35`) — lam=0 joint-contrastive only |
+
+They do **not** widen the frozen 9-axis; following the `repair_residue` precedent they ride in
+`MoralTensorV3.metadata["extension_channels"]` (`tensor.set_extension_channel`) and are bound into the
+decision proof's `tensor_hash`. Dissociation established by the lambda comparison: **valence** is
+register-invariant (passes with or without the domain adversary), **presence** is register-bound (the
+adversary strips it — loyalty presence fails at lam=1). Ship the lam=0 config for presence.
+
+**Superseded note (kept for provenance):** `mobse_sanctity` was previously retired as mapping to no axis,
+and `mobse_loyalty` previously fed the compiler-10's `vow_fidelity` (split 50/50 into `legitimacy_trust` +
+`virtue_care` on migration, §3). Both are now first-class validated extension channels.
 
 ## 3. How it maps to the tensor (DEME 3.0)
 
