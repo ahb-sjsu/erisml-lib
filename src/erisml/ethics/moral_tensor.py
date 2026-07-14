@@ -65,7 +65,10 @@ except ImportError:  # standalone fallback — kept in sync by the consistency t
         "epistemic_quality",  # 8: Epistemic Status
     )
     MORAL_EXTENSION_CHANNELS: Tuple[str, ...] = ("purity", "loyalty")
-    MORAL_VECTOR_CHANNELS: Tuple[str, ...] = (*MORAL_DIMENSION_NAMES, *MORAL_EXTENSION_CHANNELS)
+    MORAL_VECTOR_CHANNELS: Tuple[str, ...] = (
+        *MORAL_DIMENSION_NAMES,
+        *MORAL_EXTENSION_CHANNELS,
+    )
 
 # Dimension index mapping
 DIMENSION_INDEX: Dict[str, int] = {
