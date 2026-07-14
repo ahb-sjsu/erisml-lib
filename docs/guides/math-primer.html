@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Math Primer &mdash; Foundations for the Geometric Series</title>
+  <meta name="description" content="A reader's primer to the mathematics behind the Geometric Series and the systems work: two lenses (geometry and information), and the texts that open each. By Andrew H. Bond.">
+  <link rel="stylesheet" href="../assets/css/style.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Crimson+Pro:ital,wght@0,300;0,400;0,600;0,700;1,400&family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    /* Self-contained styles for the primer body (book dirs are submodules, so
+       we depend only on the top-level style.css for the shared nav).
+       This is a light long-form reading page: the shared style.css is a dark
+       theme (bg #0b1622), so we set a light reading background here — otherwise
+       the dark body text renders dark-on-dark. Colours follow the ColorBrewer2
+       "Dark2" palette, kept at WCAG AA (>= 4.5:1) contrast on the light bg. */
+    html, body { background: #fbfbf9; }
+    .primer-wrap {
+      max-width: 720px;
+      margin: 0 auto;
+      padding: 120px 24px 96px;
+      font-family: 'Inter', system-ui, sans-serif;
+      color: #1a2332;
+      line-height: 1.72;
+      font-size: 1.02rem;
+    }
+    .primer-eyebrow {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.72rem; letter-spacing: 0.18em; text-transform: uppercase;
+      color: #1a7a8a; margin: 0 0 14px;
+    }
+    .primer-wrap h1 {
+      font-family: 'Crimson Pro', Georgia, serif;
+      font-weight: 600; font-size: clamp(2rem, 5vw, 2.9rem); line-height: 1.08;
+      margin: 0 0 14px; color: #0a2e4d; text-wrap: balance;
+    }
+    .primer-lede {
+      font-size: 1.18rem; color: #45596b; margin: 0 0 8px;
+      padding-bottom: 26px; border-bottom: 2px solid #0a2e4d;
+    }
+    .primer-wrap h2 {
+      font-family: 'Crimson Pro', Georgia, serif;
+      font-weight: 600; font-size: clamp(1.35rem, 3.4vw, 1.7rem);
+      margin: 44px 0 4px; color: #0d4a6b; text-wrap: balance;
+    }
+    .primer-kicker {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.7rem; letter-spacing: 0.14em; text-transform: uppercase;
+      color: #5c6b7a; margin: 0 0 12px;
+    }
+    .primer-wrap p { margin: 0 0 18px; }
+    .primer-wrap a {
+      color: #126a7a; text-decoration: none;
+      border-bottom: 1px solid #9fc7cf; transition: background .15s, border-color .15s;
+    }
+    .primer-wrap a:hover { background: #e6f4f1; border-bottom-color: #1a7a8a; }
+    .primer-wrap em { color: #0d4a6b; }
+    .primer-blockquote {
+      margin: 30px 0; padding: 6px 0 6px 22px; border-left: 4px solid #2db5a0;
+      font-family: 'Crimson Pro', Georgia, serif; font-style: italic;
+      font-size: clamp(1.25rem, 3vw, 1.6rem); line-height: 1.35; color: #0d4a6b; max-width: 30ch;
+    }
+    .primer-close {
+      margin-top: 44px; padding: 20px 24px; background: #eef6f4;
+      border: 1px solid #cbe5df; border-left: 4px solid #2db5a0; border-radius: 3px;
+    }
+    .primer-close p { margin: 0; }
+    .primer-foot {
+      margin-top: 40px; padding-top: 20px; border-top: 1px solid #dfe6ec;
+      font-size: 0.85rem; color: #5c6b7a;
+    }
+    .primer-free {
+      font-family: 'JetBrains Mono', monospace; font-size: 0.62em;
+      color: #1f7a5a; vertical-align: 0.35em; margin-left: 2px;
+    }
+  </style>
+</head>
+<body>
+  <nav id="main-nav">
+    <div class="nav-inner">
+      <a href="../index.html" class="nav-brand">
+        <span class="brand-symbol">M</span>
+        <span class="brand-text">Geometric Series</span>
+      </a>
+      <button class="nav-toggle" aria-label="Toggle menu">
+        <span></span><span></span><span></span>
+      </button>
+      <ul class="nav-links" id="series-nav-list"></ul>
+    </div>
+  </nav>
+
+  <main class="primer-wrap">
+    <p class="primer-eyebrow">A primer &middot; read this first, then the series</p>
+    <h1>The Mathematics of the Work, Told as One Story</h1>
+    <p class="primer-lede">Two ways of looking do most of the lifting &mdash; and the texts that open each.</p>
+
+    <p>Almost everything across these volumes and papers is a single move in two disguises.
+    Take a domain &mdash; language and meaning, an economy, a body of law, cognition, taste &mdash; and
+    do one of two things with it. Either place it on a <em>manifold</em>, a curved space in which
+    distance and direction carry the domain's own logic; or measure it by <em>how well it
+    compresses</em>, by how little information a faithful description needs. Geometry is the first
+    lens. Information theory is the second.</p>
+
+    <blockquote class="primer-blockquote">Beauty is compressibility. Meaning has holonomy.</blockquote>
+
+    <p>Those two slogans are the two lenses pointed at art and at language. Learn to switch between
+    them and most of the mathematics stops looking like separate subjects. Two foundations sit under
+    both, and then the work splits into two trails that occasionally rejoin.</p>
+
+    <p class="primer-kicker">The base &middot; both trails need it</p>
+    <h2>Probability and linear algebra</h2>
+    <p>Probability is the grammar of anything uncertain; learn it for intuition before rigor, from
+    <a href="https://openlibrary.org/search?q=blitzstein+hwang+introduction+to+probability" target="_blank" rel="noopener">Blitzstein &amp; Hwang, <em>Introduction to Probability</em></a><span class="primer-free">free PDF</span>. Then read
+    <a href="https://www.inference.org.uk/mackay/itila/" target="_blank" rel="noopener">MacKay, <em>Information Theory, Inference, and Learning Algorithms</em></a><span class="primer-free">free</span> &mdash;
+    it teaches probability, inference, and compression as <em>one</em> story, exactly the posture the
+    aesthetics work takes. Linear algebra is the grammar of anything high-dimensional; every embedding,
+    PCA, and rotation is a matrix acting on a space, and
+    <a href="https://math.mit.edu/~gs/" target="_blank" rel="noopener">Strang's</a> linear-algebra course (open at MIT) is the gentlest way in.</p>
+
+    <p class="primer-kicker">Trail one &middot; the Geometric Series</p>
+    <h2>From curvature to holonomy</h2>
+    <p>Start with the geometry you can see &mdash; curves, surfaces, and the single most important word,
+    <em>curvature</em> &mdash; in <a href="https://openlibrary.org/search?q=pressley+elementary+differential+geometry" target="_blank" rel="noopener">Pressley, <em>Elementary Differential Geometry</em></a>. Then generalize a surface to a
+    <em>manifold</em>, where geodesics replace straight lines:
+    <a href="https://openlibrary.org/search?q=loring+tu+introduction+to+manifolds" target="_blank" rel="noopener">Tu</a> is gentle,
+    <a href="https://openlibrary.org/search?q=john+lee+smooth+manifolds" target="_blank" rel="noopener">Lee</a> the reference. This is where &ldquo;meaning lives on a manifold&rdquo; becomes literal &mdash;
+    hyperbolic and SPD embeddings are just manifolds chosen so distance means the right thing.</p>
+    <p>The subtlest idea here is <em>holonomy</em>: carry a vector around a loop on a curved space and it
+    returns rotated, and the rotation measures the enclosed curvature. In the bond-space work that
+    rotation <em>is</em> semantic distortion, and the symmetry allowed to act on it &mdash; the gauge
+    group &mdash; is what &ldquo;gauge-invariant meaning&rdquo; quotients away. For that, read groups and
+    symmetry from scratch (<a href="https://openlibrary.org/search?q=armstrong+groups+and+symmetry" target="_blank" rel="noopener">Armstrong</a>), then connections and holonomy &mdash;
+    <a href="https://openlibrary.org/search?q=baez+muniain+gauge+fields+knots+gravity" target="_blank" rel="noopener">Baez &amp; Muniain</a> is the kindest route,
+    <a href="https://openlibrary.org/search?q=nakahara+geometry+topology+and+physics" target="_blank" rel="noopener">Nakahara</a> the reference.</p>
+
+    <p class="primer-kicker">Trail two &middot; the systems and ML papers</p>
+    <h2>Chains, concentration, control</h2>
+    <p>The admission-control work is built from four pieces. A <em>Markov chain</em> models the
+    neighbour's load (<a href="https://openlibrary.org/search?q=norris+markov+chains" target="_blank" rel="noopener">Norris</a>), and its <em>mixing time</em> and <em>spectral gap</em> &mdash; how fast it
+    forgets &mdash; are the whole ballgame, since the central law says feedback is worth exactly the
+    autocorrelation of capacity across the sensing delay
+    (<a href="https://pages.uoregon.edu/dlevin/" target="_blank" rel="noopener">Levin, Peres &amp; Wilmer</a><span class="primer-free">free</span>).
+    <em>Concentration</em> explains why estimators from dependent samples still converge
+    (<a href="https://www.math.uci.edu/~rvershyn/" target="_blank" rel="noopener">Vershynin</a><span class="primer-free">free</span>) &mdash; the same mathematics that makes a random rotation distribution-free in the codec.
+    <em>Convexity and duality</em> give the achievable-region &ldquo;kink&rdquo; the impossibility theorem
+    turns on (<a href="https://web.stanford.edu/~boyd/cvxbook/" target="_blank" rel="noopener">Boyd &amp; Vandenberghe</a><span class="primer-free">free</span>). And <em>feedback and regret</em> close it: AIMD is a
+    control loop on a delayed signal (<a href="https://fbsbook.org/" target="_blank" rel="noopener">Åström &amp; Murray</a><span class="primer-free">free</span>), and the adaptive controller's guarantee is a regret bound
+    (<a href="https://arxiv.org/abs/1909.05207" target="_blank" rel="noopener">Hazan</a><span class="primer-free">free</span>). One volume touching the high-dimensional geometry, the SVD, and random projection at once is
+    <a href="https://www.cs.cornell.edu/jeh/book.pdf" target="_blank" rel="noopener">Blum, Hopcroft &amp; Kannan, <em>Foundations of Data Science</em></a><span class="primer-free">free</span>.</p>
+
+    <p class="primer-kicker">Where the trails rejoin</p>
+    <h2>Probability is geometry</h2>
+    <p>Two ideas belong to both. <em>Information geometry</em>
+    (<a href="https://openlibrary.org/search?q=amari+information+geometry+and+its+applications" target="_blank" rel="noopener">Amari</a>) shows the space of probability distributions is itself a curved manifold &mdash; the
+    cleanest statement of why the two lenses were never really separate. And <em>topological data
+    analysis</em> (<a href="https://openlibrary.org/search?q=ghrist+elementary+applied+topology" target="_blank" rel="noopener">Ghrist</a><span class="primer-free">free</span>) asks not where the data sits but what shape it has.
+    Compressibility closes the loop: a good coordinate system is one that compresses, so choosing the
+    right manifold and choosing the shortest description are the same act.</p>
+
+    <div class="primer-close">
+      <p class="primer-kicker">How to read it</p>
+      <p>Don't go top to bottom. Take the two foundations, then follow one trail as far as the chapter
+      or paper in front of you demands &mdash; the Geometric Series wants trail one, the systems and ML
+      papers want trail two, and the aesthetics and observer work sits on the bridge and rewards a
+      little of both. Every book is chosen to be the <em>gentlest correct</em> entry to its idea, not
+      the most complete.</p>
+    </div>
+
+    <p class="primer-foot">&copy; 2026 Andrew H. Bond &middot; A reader's primer to the mathematics of the Geometric Series.
+    <em>free</em> marks texts hosted openly by their authors; the rest link to a library catalogue.</p>
+  </main>
+
+  <script src="../assets/js/series.js"></script>
+  <script>
+    window.addEventListener('scroll', function () {
+      document.getElementById('main-nav').classList.toggle('scrolled', window.scrollY > 20);
+    });
+    document.querySelector('.nav-toggle')?.addEventListener('click', function () {
+      document.querySelector('.nav-links').classList.toggle('open');
+    });
+  </script>
+</body>
+</html>

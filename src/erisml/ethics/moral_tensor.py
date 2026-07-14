@@ -12,7 +12,7 @@ multi-agent ethics. This provides:
 2. Rank-2 (9, n): Per-party distributional ethics
 3. Rank-3 (9, n, τ): Temporal evolution
 4. Rank-4 (9, n, a, c): Coalition actions
-5. Rank-5 (9, n, τ, s): Uncertainty samples
+5. Rank-5 (9, n, τ, a, c): Coalition decisions over time
 6. Rank-6 (9, n, τ, a, c, s): Full multi-agent context
 
 The 9 ethical dimensions are derived from a 3×3 matrix (per "Nine Dimensions
@@ -36,19 +36,39 @@ import numpy as np
 if TYPE_CHECKING:
     from erisml.ethics.moral_vector import MoralVector
 
-# Standard dimension names (from Nine Dimensions paper)
-# Maps k=0..8 to dimension names
-MORAL_DIMENSION_NAMES: Tuple[str, ...] = (
-    "physical_harm",  # 0: Consequences/Welfare
-    "rights_respect",  # 1: Rights/Duties
-    "fairness_equity",  # 2: Justice/Fairness
-    "autonomy_respect",  # 3: Autonomy/Agency
-    "privacy_protection",  # 4: Privacy/Data
-    "societal_environmental",  # 5: Societal/Environmental
-    "virtue_care",  # 6: Virtue/Care
-    "legitimacy_trust",  # 7: Procedural Legitimacy
-    "epistemic_quality",  # 8: Epistemic Status
-)
+# Standard dimension names (from Nine Dimensions paper), maps k=0..8 to names.
+#
+# SINGLE SOURCE OF TRUTH: these are defined canonically in
+# `erisml_compiler.ir.v3.dimensions` and imported here so the ontology is
+# defined in exactly one place. The literal tuple below is a FALLBACK used only
+# when erisml-compiler is not installed (erisml-lib must stay usable standalone);
+# `erisml-compiler/tests/test_dimension_consistency.py` guards the fallback
+# against drift from the canonical source.
+try:
+    from erisml_compiler.ir.v3.dimensions import (
+        MORAL_DIMENSIONS_V3 as MORAL_DIMENSION_NAMES,
+    )
+    from erisml_compiler.ir.v3.dimensions import (
+        MORAL_EXTENSION_CHANNELS,
+        MORAL_VECTOR_CHANNELS,
+    )
+except ImportError:  # standalone fallback — kept in sync by the consistency test
+    MORAL_DIMENSION_NAMES: Tuple[str, ...] = (
+        "physical_harm",  # 0: Consequences/Welfare
+        "rights_respect",  # 1: Rights/Duties
+        "fairness_equity",  # 2: Justice/Fairness
+        "autonomy_respect",  # 3: Autonomy/Agency
+        "privacy_protection",  # 4: Privacy/Data
+        "societal_environmental",  # 5: Societal/Environmental
+        "virtue_care",  # 6: Virtue/Care
+        "legitimacy_trust",  # 7: Procedural Legitimacy
+        "epistemic_quality",  # 8: Epistemic Status
+    )
+    MORAL_EXTENSION_CHANNELS: Tuple[str, ...] = ("purity", "loyalty")
+    MORAL_VECTOR_CHANNELS: Tuple[str, ...] = (
+        *MORAL_DIMENSION_NAMES,
+        *MORAL_EXTENSION_CHANNELS,
+    )
 
 # Dimension index mapping
 DIMENSION_INDEX: Dict[str, int] = {
@@ -60,14 +80,14 @@ DIMENSION_INDEX: Dict[str, int] = {
 # rank 2: (k, n)
 # rank 3: (k, n, tau)
 # rank 4: (k, n, a, c)
-# rank 5: (k, n, tau, s)
+# rank 5: (k, n, tau, a, c)
 # rank 6: (k, n, tau, a, c, s)
 DEFAULT_AXIS_NAMES: Dict[int, Tuple[str, ...]] = {
     1: ("k",),
     2: ("k", "n"),
     3: ("k", "n", "tau"),
     4: ("k", "n", "a", "c"),
-    5: ("k", "n", "tau", "s"),
+    5: ("k", "n", "tau", "a", "c"),
     6: ("k", "n", "tau", "a", "c", "s"),
 }
 
@@ -1588,6 +1608,8 @@ __all__ = [
     "MoralTensor",
     "SparseCOO",
     "MORAL_DIMENSION_NAMES",
+    "MORAL_EXTENSION_CHANNELS",
+    "MORAL_VECTOR_CHANNELS",
     "DIMENSION_INDEX",
     "DEFAULT_AXIS_NAMES",
 ]

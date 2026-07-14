@@ -26,8 +26,10 @@ src_path = os.path.abspath(os.path.join(current_dir, "../.."))
 if src_path not in sys.path:
     sys.path.insert(0, src_path)
 
-# Reconfigure stdout to handle UTF-8 for emoji support on Windows
-if sys.platform == "win32":
+# Reconfigure stdout to handle UTF-8 for emoji support on Windows -- but only when
+# run as a script. Doing this at import time detaches the stdout buffer and breaks
+# any importer (notably pytest's capture) on Windows.
+if sys.platform == "win32" and __name__ == "__main__":
     sys.stdout = codecs.getwriter("utf-8")(sys.stdout.detach())
 
 

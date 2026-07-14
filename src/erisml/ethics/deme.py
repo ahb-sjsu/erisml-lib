@@ -22,7 +22,28 @@ class DEME:
         self.profile_path = profile_path
 
     def evaluate(self, context: Any) -> EthicalJudgement:
+        """Evaluate a context.
+
+        If the context carries a maxim (an ``EthicalFacts`` with a ``.maxim``,
+        or a ``Maxim`` directly), the deontic universalizability gate is applied
+        and a failing maxim yields a FORBID verdict. Otherwise ALLOW (the
+        full tensor/module pipeline lives in ``layers.pipeline.DEMEPipeline``).
         """
-        Placeholder evaluation logic to satisfy the API.
-        """
+        from erisml.ethics.deontic_gate import evaluate_maxim
+        from erisml.ethics.facts import Maxim
+
+        maxim = (
+            context if isinstance(context, Maxim) else getattr(context, "maxim", None)
+        )
+        gate = evaluate_maxim(maxim)
+        if gate.vetoed:
+            return EthicalJudgement(
+                verdict="FORBID",
+                confidence=0.9,
+                metadata={
+                    "deontic_gate": gate.reason,
+                    "contradiction_type": gate.contradiction_type,
+                    "action_kind": gate.action_kind,
+                },
+            )
         return EthicalJudgement(verdict="ALLOW", confidence=1.0, metadata={})

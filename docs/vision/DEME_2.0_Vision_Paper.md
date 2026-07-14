@@ -4,6 +4,12 @@
 **Ethical Finite Machines, Inc.**  
 **December 2025**
 
+> **Note (current state):** this is the DEME 2.0 (rank-1 / vector) design paper; its illustrative
+> "7 core dimensions" predate the shipped basis. The current canonical moral basis is the
+> **DEME-9** nine-dimension MoralVector. See [`moralvector_reference.md`](../moralvector_reference.md)
+> (dimensions, xBSE encoder feeders, rank-1..6 tensor mapping, empirical support) and
+> [`moralvector_v2_architecture.md`](../moralvector_v2_architecture.md) (standards-traceable governance).
+
 ---
 
 ## Abstract

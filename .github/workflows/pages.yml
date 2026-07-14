@@ -1,11 +1,8 @@
-name: Deploy Schemas to GitHub Pages
+name: Deploy docs (Geometric Series) to GitHub Pages
 
 on:
   push:
-    branches:
-      - main
-    paths:
-      - 'schemas/**'
+    branches: [main]
   workflow_dispatch:
 
 permissions:
@@ -24,18 +21,17 @@ jobs:
       url: ${{ steps.deployment.outputs.page_url }}
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout
+      - name: Checkout (with submodules)
         uses: actions/checkout@v4
-      
+        with:
+          submodules: recursive
+          fetch-depth: 0
       - name: Setup Pages
         uses: actions/configure-pages@v4
-      
-      - name: Upload artifact
+      - name: Upload docs/ artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          path: schemas
-      
+          path: docs
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v4
-

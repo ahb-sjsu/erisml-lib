@@ -1,10 +1,24 @@
+<p align="center">
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="docs/brand/erisml_apple.svg">
+    <source media="(prefers-color-scheme: light)" srcset="docs/brand/erisml_apple_light.svg">
+    <img src="docs/brand/erisml_apple.svg" width="180" alt="ErisML — the golden apple of discord">
+  </picture>
+</p>
+
 # ErisML
 **A library for governed, foundation-model-enabled agents with tensorial ethics.**
+
+> **MoralVector spec:** the canonical 9-dimension basis, its xBSE encoder feeders, the rank-1..6 tensor mapping, and the empirical support are in [`docs/moralvector_reference.md`](docs/moralvector_reference.md); the standards-traceable (EU AI Act / NIST AI RMF / IEEE) governance architecture is in [`docs/moralvector_v2_architecture.md`](docs/moralvector_v2_architecture.md).
+
+*Named for Eris, the Greek goddess of discord — whose golden apple forced a judgment.*
+
+> **Brand assets:** [erisml.org/brand/](https://erisml.org/brand/) · local: [`docs/brand/`](docs/brand/)
 
 ## 🚀 Quick Start (v3.0.0)
 You can now install ErisML directly from PyPI:
 ```bash
-pip install erisml-lib-lib
+pip install erisml-lib
 ```
 
 To verify your installation and run the ethics demo:
@@ -35,6 +49,54 @@ The full text of **Geometric Ethics: The Mathematical Structure of Moral Reasoni
 Plus [6 appendices](https://ahb-sjsu.github.io/erisml-lib/book/appendix-a-related-work-and-differentiation.html) and [bibliography](https://ahb-sjsu.github.io/erisml-lib/book/bibliography.html).
 
 **[Explore the interactive companion site](https://ahb-sjsu.github.io/erisml-lib/)** — includes the Dear Ethicist Game, Moral Bell Test, domain demos, and tutorials.
+
+---
+
+## 🛡️ I-EIP Monitor (New in v3.1)
+
+Runtime probes inside a deployed model's forward pass that apply the **Internal Epistemic Invariance Principle** to gate inference on stakeholder-governed Ethical Modules.
+
+- **Whitepaper:** [I-EIP_Monitor_Whitepaper](https://erisml.org/I-EIP_Monitor_Whitepaper) — the founding document
+- **Sprint plan:** [I-EIP_Monitor_Sprint_Plan](https://erisml.org/development/I-EIP_Monitor_Sprint_Plan) — how to contribute (students welcome)
+- **Code:** `src/erisml/ieip/` with `probes`, `rho` (Procrustes), `equivariance`, `drift`, `nondegeneracy`, `report`
+- **Smoke demo:** `python -m erisml.examples.ieip_smoke` (requires `pip install 'erisml-lib[ieip]'`)
+
+```python
+from erisml.ieip import (
+    ActivationProbe, ProbeSpec, estimate_rho, equivariance_error,
+    DriftDetector, nondegeneracy_report, aggregate_report,
+)
+from erisml.ieip.report import format_text
+
+# Attach a read-only probe, collect activations on paired inputs,
+# estimate ρ, then monitor equivariance + drift + non-degeneracy.
+# See docs/I-EIP_Monitor_Whitepaper.md §4 for the full pipeline.
+```
+
+The monitoring half (Sprint 2.5 of the GUASS-SAI plan) is implemented and CI-green. The governance/gating half (EM-DAG runtime gating, cryptographic attestation) is the ongoing student collaboration — see the sprint plan for open tasks.
+
+### I-EIP Monitor pipeline
+
+```mermaid
+flowchart LR
+    A[Paired inputs<br/>x, T&middot;x]
+    B[ActivationProbe<br/>hooks forward pass]
+    C[estimate_rho<br/>Procrustes alignment]
+    D[equivariance_error<br/>rho-twisted residual]
+    E[DriftDetector<br/>rolling window]
+    F[nondegeneracy_report]
+    G[aggregate_report<br/>gate inference?]
+
+    A --> B --> C --> D --> E --> G
+    D --> F --> G
+
+    classDef probe fill:#e3f2fd,stroke:#1565c0;
+    classDef check fill:#fff3e0,stroke:#e65100;
+    classDef gate fill:#c8e6c9,stroke:#1b5e20;
+    class A,B probe;
+    class C,D,E,F check;
+    class G gate;
+```
 
 ---
 # ErisML/DEME Research Repository and Library 🍎
@@ -115,8 +177,59 @@ democratically-governed ethical reasoning, grounded in the **Philosophy Engineer
 
 | Repository | Description |
 |------------|-------------|
+| [ahb-sjsu/erisml-compiler](https://github.com/ahb-sjsu/erisml-compiler) | Natural-language → moral-IR **compiler** that feeds this library (see below) |
 | [ahb-sjsu/non-abelian-sqnd](https://github.com/ahb-sjsu/non-abelian-sqnd) | NA-SQND theoretical research - papers, experiments, and mathematical foundations |
 | [ahb-sjsu/sqnd-probe](https://github.com/ahb-sjsu/sqnd-probe) | Dear Ethicist - advice column game for measuring moral reasoning structure |
+
+---
+
+## Compiler integration (erisml-compiler → erisml-lib)
+
+[**erisml-compiler**](https://github.com/ahb-sjsu/erisml-compiler) is the
+*extraction* front-end; **erisml-lib** is the *evaluation* engine. The dataflow
+is one-way:
+
+```
+natural-language text
+  │  erisml-compiler:  spaCy SRL maxim extractor, projections (deontic/virtue/care)
+  ▼
+MoralSubstrate  ──►  Maxim(action_kind, polarity)  +  V3 EthicalFacts (9-dim)
+  │  erisml-compiler/erisml_backend/v3_bridge.py
+  ▼
+erisml-lib:  DEME modules, MoralTensor aggregation, deontic maxim gate, I-EIP probes
+  ▼
+DecisionResult / EthicalJudgement
+```
+
+### Deontic maxim gate (polarity-aware)
+
+The compiler now extracts a `Maxim` including **polarity** — whether an action
+is asserted or negated ("did not promise", "refused to lie"). The library
+consumes this in `ethics/deontic_gate.py` and applies a Kantian
+universalizability veto inside `DEMEPipeline`'s reflex layer:
+
+```python
+from erisml.ethics.facts import EthicalFacts, Maxim
+from erisml.ethics.layers.pipeline import DEMEPipeline
+
+opt = EthicalFacts(option_id="o1", maxim=Maxim(action_kind="deceive"))
+result = DEMEPipeline().decide([opt])
+assert "o1" in result.forbidden_options          # deceiving fails universalizability
+```
+
+Polarity follows Kant's perfect/imperfect duty distinction:
+
+| maxim | polarity | gate |
+|---|---|---|
+| `deceive`, `inflict_harm`, `coerce`, … (prohibitions) | affirmed | **veto** |
+| `deceive` … (prohibitions) | negated ("did not deceive") | pass |
+| `help`, `protect` (imperfect duties) | affirmed | pass |
+| `help`, `protect` | negated ("did not help") | **veto** (contradiction in will) |
+| `make_or_keep_commitment`, `disclose` (permissible) | either | pass |
+| unknown action | either | pass (conservative) |
+
+The `EthicalFacts.maxim` field is optional and defaults to `None`, so existing
+callers are unaffected. `DEME.evaluate(maxim)` exposes the gate directly.
 
 ---
 
@@ -147,6 +260,20 @@ These are engineering properties with pass/fail criteria.
 When a system fails, you get a witness. Witnesses enable debugging. Debugging enables improvement.
 
 **This is what it looks like when philosophy becomes engineering.**
+
+### Validated against human moral foundations
+
+The method is not just rhetoric — DEME's dimensions have been checked against *independent
+human* moral labels. On 280 hand-annotated comments from the Moral Foundations Reddit Corpus,
+each pre-registered DEME dimension aligns with, and is *most* correlated with, its intended
+moral foundation: `care_protection`↔Care, `fairness_equity`↔Equality, `legitimacy_trust`↔
+Authority, `vow_fidelity`↔Loyalty (Spearman ρ ≈ 0.43–0.53, all p < 1e-15). The result
+**replicates across two independent model families** (with overlapping 95% bootstrap CIs), and
+distinct instruments (9-axis, 10-module, 7-axis harm space) agree on a shared moral core
+(ρ = 0.88) — so the representation tracks human moral judgment and is not a single model's
+artifact. Reproducible notebook + data: the keystone paper at
+[`erisml-compiler/paper/keystone/`](https://github.com/ahb-sjsu/erisml-compiler/tree/main/paper/keystone)
+(`mfrc_validation.ipynb`).
 
 ---
 
@@ -213,6 +340,42 @@ ErisML has two tightly-related layers:
 
 Together, ErisML + DEME support **norm-governed, ethics-aware agents** that can
 be inspected, audited, and configured by multiple stakeholders.
+
+### DEME 2.0 decision flow
+
+```mermaid
+flowchart TB
+    IN[Candidate Action]
+    subgraph R["Reflex layer (< 100 &micro;s)"]
+        R1[Tier 0: Constitutional vetoes]
+        R2[Hard safety checks]
+    end
+    subgraph T["Tactical layer (10-100 ms)"]
+        T1[MoralVector assessment<br/>8+1 dims]
+        T2[Tier 1-3 Ethical Modules]
+        T3[BIP invariance check]
+    end
+    subgraph S["Strategic layer"]
+        S1[Policy optimization]
+        S2[NVR / ADV metrics]
+        S3[DecisionProof<br/>audit hash chain]
+    end
+    OUT[Action + DecisionProof]
+
+    IN --> R1 --> R2
+    R2 -->|pass| T1
+    R2 -->|veto| OUT
+    T1 --> T2 --> T3
+    T3 -->|pass| S1 --> S2 --> S3 --> OUT
+    T3 -->|violation witness| OUT
+
+    classDef reflex fill:#ffcdd2,stroke:#b71c1c;
+    classDef tactical fill:#fff9c4,stroke:#f57f17;
+    classDef strategic fill:#c8e6c9,stroke:#1b5e20;
+    class R1,R2 reflex;
+    class T1,T2,T3 tactical;
+    class S1,S2,S3 strategic;
+```
 
 ---
 
@@ -1307,7 +1470,7 @@ The DEME V3 implementation extends the DEME 2.0 architecture with multi-agent te
 | Sprint 11 | Acceleration Framework and CPU Backend | Complete |
 | Sprint 12 | CUDA Backend with CuPy | Complete |
 | Sprint 13 | Jetson Nano Edge Deployment | Complete |
-| Sprint 14 | Uncertainty Quantification (Rank-5) | Complete |
+| Sprint 14 | Uncertainty Quantification (Monte-Carlo `s`-axis; rank-5 later reconciled to coalition, see `docs/moralvector_reference.md`) | Complete |
 | Sprint 15 | Full Context Tensors and Decomposition (Rank-6) | Complete |
 
 ### Sprint 10: Strategic Layer

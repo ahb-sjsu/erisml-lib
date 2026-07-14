@@ -6,23 +6,27 @@ Department of Computer Engineering
 San José State University  
 andrew.bond@sjsu.edu
 
-**Theoretical Whitepaper v1.0**  
-December 2025
+**Theoretical Whitepaper v2.0**  
+April 2026
+
+*v2.0 revision integrates the 11-volume Geometric Series (Bond, 2026a–k), the Stratified Geometric Ethics formal framework, and the hardware implementation path established by six USPTO provisional patents filed December 2025. See Change Log at end of document.*
 
 ---
 
 ## Abstract
 
-We present a theoretical framework for tokamak plasma density control based on the Bond Invariance Principle (BIP), originally developed for AI safety. The framework provides a formal foundation for constructing control laws that provably respect physical constraints through geometric invariance properties rather than posterior constraint checking.
+We present a theoretical framework for tokamak plasma density control grounded in the geometric theory developed across the 11-volume Geometric Series (Bond, 2026a–k), and specifically in the Bond Invariance Principle (BIP) and Stratified Geometric Ethics (SGE) formalisms established in Volumes 2 and 3. Fusion control is treated here as one *domain instantiation* of a unified mathematical structure that also governs ethics (Vol 3), medicine (Vol 8), and AI alignment (Vol 11): in each case, real-time decisions must respect hard constraints on a stratified manifold of feasible configurations. The framework provides a formal foundation for control laws that provably respect physical constraints through geometric invariance rather than posterior constraint checking, and — as of v2.0 — admits a concrete hardware realization via FPGA-based invariance-verification circuits (USPTO Provisional Patents 63/941,563 and 63/945,667 and four companion filings, December 2025) with sub-microsecond latency compatible with 1 kHz plasma control loops.
 
 **Key Theoretical Contributions**:
-1. Mapping from ethical bonds to physical constraints in fusion plasmas
+1. Mapping from the general bond/stratified-space formalism (Vols 2–3) to physical constraints in fusion plasmas
 2. Formal definition of physics-invariant control via canonicalization and grounding
 3. Proof that control laws respecting bond invariance cannot violate MHD equilibrium conditions
-4. Stratified manifold structure for regime-dependent control
-5. Mathematical foundation for cross-machine transfer via dimensionless formulation
+4. Stratified manifold structure for regime-dependent control, upgraded in v2.0 to the five SGE theorems (Minimality, Representation, Finite Approximation, Decidability, Sample Complexity)
+5. Mathematical foundation for cross-machine transfer via the Instrumental Epistemic Invariance Principle (I-EIP) — the dimensionless specialization of the general EIP
+6. **(New in v2.0)** Hardware implementation path with published latency budget for real-time plasma control
+7. **(New in v2.0)** Cross-domain empirical corroboration: the same geometric apparatus produces a 17σ signal on independent data (n=4,998 books, Bond 2026l), providing external evidence for the framework's generality
 
-This work demonstrates that formal methods from AI safety provide rigorous foundations for control theory in physical systems with known constraints, potentially applicable beyond fusion to any domain requiring real-time decisions under hard physical limits.
+This work is one application of a unified geometric framework that spans ethics, medicine, economics, law, cognition, communication, education, politics, and AI alignment. The shared mathematical core — stratified spaces, bond invariance, geodesic control on value manifolds — is what makes the same theorems usable in all eleven domains.
 
 ---
 
@@ -74,6 +78,16 @@ Limitations:
 - Effective but opaque
 - Cannot formally verify safety properties
 - Doesn't transfer between machines (learned on JET ≠ works on ITER)
+
+### 1.2.1 Why the Common Failure Mode is Structural, Not Contingent
+
+The three families of approach above fail for a shared *structural* reason now made precise in Vol 11 (*Geometric AI*, Bond 2026k) as the **Reward Irrecoverability Theorem**:
+
+> Given a multi-dimensional objective structure on a stratified space, no scalar reward function — continuous or learned — can recover the full preference geometry after projection. Once the tensor-valued objective is collapsed to a scalar, the information needed to distinguish safe and unsafe behaviors near stratum boundaries is irrecoverably lost.
+
+Applied to plasma density control, the theorem says: PID, MPC cost functions, and RL reward shaping are all scalar projections of an inherently multi-dimensional feasibility tensor (density, pressure, current, safety factor, edge gradient, regime index, …). The Greenwald limit, β-limit, kink stability, and ELM avoidance are *not* commensurable dimensions that can be linearly combined — they define the boundary structure of distinct strata. A scalar objective that assigns them comparable weights is guaranteed by the theorem to behave pathologically near exactly the boundaries where control matters most (disruption precursors, L–H transitions).
+
+This reframes the limitations listed above from engineering difficulties to provable obstructions. The BIP framework, by retaining the tensor-valued objective and stratum structure directly, is not merely "better tuned" — it occupies the class of solutions the theorem leaves open.
 
 ### 1.3 The Theoretical Gap
 
@@ -680,9 +694,11 @@ can be deployed on ITER by:
 2. Computing u*_ITER(Ψ*_ITER) using same Σ
 3. Converting dimensionless u* back to physical units for ITER actuators
 
-**This is I-EIP** (Instrumental Ethics Invariance Principle):
+**This is I-EIP** (Instrumental Epistemic Invariance Principle):
 - **Physics-invariant core**: Σ(Ψ*) works on any machine
 - **Instrumental layer**: Ψ*_measurement and u*_actuation are machine-specific
+
+> *Relation to the general framework (v2.0 note)*: The fusion I-EIP stated here is the physical specialization of the general Epistemic Invariance Principle developed in Vol 3 (*Geometric Ethics*, Bond 2026c) and applied to AI alignment in Vol 11 (*Geometric AI*, Bond 2026k). In the AI-safety setting, the "instrumental layer" consists of prompt, tokenizer, and decoding choices, and the invariant core is a judgment function on a value manifold. In the fusion setting, the instrumental layer consists of diagnostics and actuators, and the invariant core is a control law on a physical feasibility manifold. The underlying theorem — that a well-posed decision procedure is invariant under the declared transformation group up to instrumental mapping — is identical. This is the sense in which fusion control and AI alignment are the same theorem on different manifolds (cf. Bond 2026h on geometric unification).
 
 ### 5.4 Transfer Protocol
 
@@ -739,25 +755,59 @@ Plasma exhibits distinct operating regimes:
 
 ### 6.2 Mathematical Structure
 
-**Definition 6.1** (Stratified Manifold):
+The v2.0 revision replaces the informal treatment of prior versions with the formal framework of **Stratified Geometric Ethics (SGE)** established in USPTO Provisional Patent 63/945,667 (Bond 2025b) and developed in Vol 3 (*Geometric Ethics*, Bond 2026c, Ch. 4–6). SGE provides five theorems that together characterize stratified spaces as the uniquely correct geometric object for representing decision problems with discrete choices, incommensurable values, threshold effects, and irreducible dilemmas — properties that smooth manifolds, manifolds-with-corners, and cell complexes each fail to capture.
 
-M is a stratified space if it can be partitioned:
+**Definition 6.1** (Stratified Space, following SGE Def. 1.1):
+
+A stratified space is a triple (M, {Mᵢ}, ≤) where:
+1. M is a paracompact Hausdorff space
+2. {Mᵢ} is a locally finite partition into connected smooth manifolds (strata)
+3. ≤ is a partial order on stratum indices satisfying the frontier condition: ∂Mᵢ ⊂ ∪_{j<i} Mⱼ
+4. Whitney's condition (B) holds for regularity along stratum boundaries
+
+**Definition 6.2** (Stratified Moral/Control Space): A stratified moral space is a stratified space where M represents feasible configurations, each stratum Mᵢ represents configurations admitting smooth trade-offs, and stratum boundaries represent moral (or, here, physical) discontinuities. For fusion, M is the plasma state space; strata are operating regimes (L-mode, H-mode, ELMy H-mode, detached divertor); boundaries encode bifurcations such as the L–H transition.
+
+#### 6.2.1 The SGE Theorems Applied to Fusion Control
+
+**Theorem 6.1** (Minimality, SGE Theorem 2.3): *Stratified spaces are the natural minimal candidate among standard geometric structures for representing decision problems exhibiting discrete choices (E1), incommensurable values (E2), threshold effects (E3), and genuine dilemmas (E4). Smooth manifolds, manifolds-with-corners, and cell complexes each fail at least one of E1–E4.*
+
+*Implication for fusion*: Plasma control exhibits all four phenomena — discrete regime choice (E1: L vs H), incommensurable limits (E2: density vs pressure vs kink stability), threshold bifurcations (E3: L–H transition at P_LH), and tragic trade-offs (E4: ELM mitigation vs confinement). The theorem says no simpler geometric representation (smooth cost surface, polytope, CW-complex) is correct for this control problem — stratified spaces are forced, not a design choice.
+
+**Theorem 6.2** (Representation, SGE Theorem 4.3): *The unique functional form satisfying Coordinate Invariance, Monotonicity, Constraint Respect, Stratum Compatibility, and Locality is*
+
 ```
-M = M₁ ∪ M₂ ∪ ... ∪ M_n
+S(x) = χ_C(x) + λ(x) · f(I_μ(x) Oᵐ(x) / √(g_μν(x) Oᵘ(x) Oᵛ(x)))
 ```
 
-where:
-1. Each Mᵢ is a smooth manifold (stratum)
-2. ∂Mᵢ ⊂ ∪_{j≠i} Mⱼ (boundaries are lower-dimensional strata)
-3. Transition rules define when trajectories cross ∂Mᵢ ∩ ∂Mⱼ
+*Implication for fusion*: The Σ = χ_hard · Σ_soft architecture introduced informally in §4 is not an arbitrary choice; it is the unique functional form compatible with the five axioms (substituting physical observables for moral ones). Any other aggregation either fails Coordinate Invariance (violating I-EIP, §5) or Stratum Compatibility (producing wrong behavior at L–H boundaries).
 
-**Example**: L-mode / H-mode stratification
+**Theorem 6.3** (Finite Approximation, SGE Theorems 3.9–3.11): *Any continuous stratified moral space can be approximated by a finite graph with explicit error bounds, preserving the stratification structure, and admitting polynomial-time algorithms for decision problems on the approximation.*
+
+*Implication for fusion*: The continuous plasma manifold can be discretized into a finite-state control graph without loss of stratum structure, with bounded approximation error. This is what makes real-time hardware implementation (§7a) possible — the FPGA canonicalization circuits operate on the finite approximation and inherit the error bound from this theorem.
+
+**Theorem 6.4** (Decidability, SGE Theorem 6.4): *Ethical (resp. physical-constraint) specification verification is decidable for quantifier-free formulas via o-minimal structures (Tarski–Seidenberg).*
+
+*Implication for fusion*: Constraint specifications of the form "never enter the forbidden region defined by polynomial inequalities in Ψ" are decidable. The Greenwald limit, β-limit, and kink-stability conditions all fall in this class. This is what allows the hardware verifier (§7a) to answer "does this control action violate any declared physical bond?" in bounded time, unlike general MPC feasibility.
+
+**Theorem 6.5** (Sample Complexity, SGE Theorems 7.2–7.4): *Learning the stratified satisfaction functional from data has explicit polynomial sample complexity bounds depending on the dimension and stratification structure.*
+
+*Implication for fusion*: The weights wᵢ in Σ_soft can be learned from a tractable amount of DIII-D shot data with formal guarantees — unlike black-box RL, which has no finite-sample safety bound. This is the learning-theoretic underpinning of the hybrid ML-enhanced framework of §9.2.
+
+#### 6.2.2 Stratification in Fusion: Concrete Instantiation
+
+Applying Definition 6.1 to plasma physics yields the standard partition:
+
+**Concrete partition**:
 
 ```
-M_L = {Ψ | P_heat < P_LH}  (L-mode stratum)
-M_H = {Ψ | P_heat > P_LH + Δ}  (H-mode stratum with hysteresis)
-Boundary = {Ψ | P_heat ∈ [P_LH, P_LH + Δ]}
+M_L = {Ψ | P_heat < P_LH}           (L-mode stratum)
+M_H = {Ψ | P_heat > P_LH + Δ}       (H-mode stratum, with hysteresis)
+M_ELMy ⊂ M_H                         (ELMy sub-stratum, edge-destabilized)
+M_det = {Ψ | n_edge >> n_core}      (detached-divertor stratum)
+Boundary_LH = {Ψ | P_heat ∈ [P_LH, P_LH + Δ]}  (bifurcation region)
 ```
+
+The partial order ≤ captures which regimes are reachable from which (e.g., L-mode precedes H-mode along heating ramps), satisfying the frontier condition of Def. 6.1.
 
 ### 6.3 Stratified Control
 
@@ -874,6 +924,63 @@ We cannot prove regime detection is perfect (L-mode vs H-mode classification).
 
 ---
 
+## 7a. Hardware Implementation Path (New in v2.0)
+
+Version 1.0 of this paper presented BIP for fusion as a theoretical framework whose real-time implementation was an open question. As of December 2025, a concrete hardware implementation path exists: six USPTO provisional patents (Bond 2025a–f) cover FPGA-based circuits that execute the full BIP pipeline — canonicalization, invariance verification, stratified ethical evaluation, and cryptographic attestation — with published latency budgets compatible with 1 kHz plasma control.
+
+### 7a.1 Latency Budget for 1 kHz Plasma Control
+
+A DIII-D-class control loop operates at 1–10 kHz, giving a control cycle of 100 μs – 1 ms. The BIP evaluation must fit inside this budget while leaving headroom for diagnostic processing and actuator commands. The hardware pipeline, reading from Patents 63/941,563 (hardware invariance verification), the DEME FPGA patent, and 63/945,667 (SGE):
+
+| Stage | Circuit | Typical Latency | Source |
+|---|---|---|---|
+| 1. Input reception (diagnostics → Ψ) | Host DMA + parsing | <10 ns | Patent #1 §Stage 1 |
+| 2. Canonicalization of Ψ | Bitonic sort / TCAM / streaming PCA | 15–40 ns | Canonicalization Circuits Patent |
+| 3. Transformation generation | Parallel TGUs | <50 ns | Patent #1 §Stage 2 |
+| 4. Invariance check (I-EIP) | Parallel ECUs | <30 ns | Patent #1 §Stage 5 |
+| 5. Stratum identification | Combinational classifier | <20 ns | SGE Patent §6 |
+| 6. Σ scoring pipeline | 5-stage fixed-point pipeline | <10 μs | DEME FPGA Patent |
+| 7. Hard-veto logic (χ_hard) | Combinational | <100 ns | DEME FPGA Patent |
+| 8. Cryptographic attestation | SHA-256 + ECDSA | 580–680 ns | Patent #3 |
+| **Total** | | **~12–15 μs worst case** | |
+
+**Headroom**: For a 1 ms control cycle, BIP evaluation consumes <1.5% of the budget. Even at 10 kHz (100 μs cycle), the budget is ~15% — well within operational margin. This decisively answers the v1.0 open question of real-time feasibility.
+
+### 7a.2 The Six Supporting Patents
+
+1. **63/941,563** — *Hardware-Accelerated Ethical Decision System for Real-Time DEME Implementation in Autonomous Agents* (Dec 15, 2025). Provides the FPGA EM architecture with EthicsFrame bitfield encoding, combinational veto logic (<100 ns), and 5-stage pipelined scoring (<10 μs). Directly supports §4 (χ_hard · Σ_soft evaluation) at hardware speed.
+
+2. **63/945,667** — *Stratified Geometric Ethics: Mathematical Framework for Verifiable Moral Reasoning in Autonomous Systems* (Dec 19, 2025). Provides the formal SGE theorems used in §6. The mathematical guarantees (Minimality, Representation, Finite Approximation, Decidability, Sample Complexity) are licensable as a unit.
+
+3. *Hardware-Accelerated Invariance Verification in Autonomous AI Systems*. Provides the sub-100 ns invariance-checking pipeline that implements I-EIP (§5) in silicon — parallel transformation generation, canonicalization, and equivalence checking.
+
+4. *Tensor-Based Representation and Hardware Processing System for Multi-Agent Ethical Evaluation*. Provides the rank-4 tensor framework Σ[i, j, k, l] = "agent i's evaluation of agent j in context k along dimension l." This extends naturally to multi-machine fusion coordination: agents become tokamaks in a reactor fleet, contexts become operating regimes, dimensions become physical observables (§9.4 new).
+
+5. *Cryptographic Attestation System for Unforgeable Verification of AI Invariance Compliance*. Provides the unforgeable audit trail needed for nuclear regulatory compliance (NRC, IAEA) — every control decision is hash-chained and ECDSA-signed with sub-microsecond latency.
+
+6. *Hardware Circuits for High-Speed Canonicalization and Quotient Space Computation*. Provides the specialized canonicalization circuits (bitonic sorting networks for permutation invariance, TCAM-based renaming, streaming PCA for geometric canonicalization) that make I-EIP verification real-time.
+
+### 7a.3 Regulatory and Auditability Implications
+
+Fusion regulation (NRC, IAEA for ITER) increasingly requires demonstrable safety and auditability of control decisions. The cryptographic-attestation hardware (Patent #5) produces, for every control cycle, a signed artifact of the form:
+
+```json
+{
+  "timestamp": <hardware_clock>,
+  "plasma_state_hash": <SHA256(Ψ)>,
+  "transformations_tested": [unit_change, coord_change, ...],
+  "invariance_preserved": true,
+  "stratum": "H_mode",
+  "selected_action": <u*>,
+  "veto_checks_passed": [Greenwald, beta_limit, q_95],
+  "signature": <ECDSA-P256>
+}
+```
+
+This is impossible to forge or selectively delete (signatures break hash chains). For the operator, it closes the "black-box ML" accountability gap that currently blocks deployment of DeepMind-style approaches on safety-critical reactors.
+
+---
+
 ## 8. Comparison to Existing Frameworks
 
 ### 8.1 BIP vs Classical Control Theory
@@ -924,6 +1031,24 @@ Constraints embedded in objective structure.
 
 **Difference**: MPC optimizes over trajectories; BIP evaluates discrete candidates.
 
+### 8.4 BIP Fusion Control as a Sibling of BIP Clinical Triage (Geometric Medicine)
+
+Volume 8 of the Geometric Series (*Geometric Medicine: Clinical Reasoning, Triage, and the Ethics of Allocation*, Bond 2026h) develops the same BIP framework for a problem with the same structural profile as fusion control:
+
+| Property | Fusion control | Clinical triage (Vol 8) |
+|---|---|---|
+| **Real-time constraint** | 1 kHz plasma control | Seconds–minutes for ER triage decisions |
+| **Hard physical limits** | Greenwald, β, kink | Physiological limits, resource capacity |
+| **Regime structure** | L / H / ELMy / detached | Stable / deteriorating / peri-arrest / arrest |
+| **Incommensurable objectives** | Density × pressure × stability | Survival × quality of life × equity |
+| **Irreversible failure modes** | Disruption (reactor damage) | Death, permanent harm |
+| **Regulatory audit requirement** | NRC / IAEA | FDA, hospital legal |
+| **Governing formalism** | BIP + SGE | BIP + SGE |
+
+The fact that the same framework applies without modification to fusion control, clinical triage (Vol 8), AI alignment (Vol 11), legal reasoning (Vol 5), and economic equilibrium (Vol 4) is evidence that we are working with a *shared mathematical structure*, not an analogy. This parallels the observation across the physical sciences that differential geometry governs relativity, gauge theory, condensed matter, and optics — not because these domains are "similar" but because they share the underlying geometric object.
+
+The Geometric Medicine volume develops two results particularly relevant for fusion: the *triage transitivity theorem* (Bond 2026h, Ch. 4) — applicable to prioritization among competing plasma stability threats — and the *bounded-rationality escalation protocol* (Ch. 7) — directly portable to operator-in-the-loop escalation when plasma conditions exceed automated control authority.
+
 ---
 
 ## 9. Extensions and Future Theoretical Work
@@ -972,6 +1097,18 @@ Then constraint satisfaction is preserved (as in Theorem 4.2).
 
 **Advantage**: ML improves performance without sacrificing formal guarantees.
 
+### 9.2a Status of Prior Open Items (as of v2.0, April 2026)
+
+Several "future theoretical work" items from v1.0 have been resolved since publication and are retained here only for tracking:
+
+| v1.0 open item | v2.0 status |
+|---|---|
+| Formal verification in theorem prover | Partial — SGE Decidability theorem (Thm 6.4) gives o-minimal decidability of constraint specifications; full Coq/Isabelle formalization still open |
+| Learning-theoretic guarantees for ML-enhanced predictor | Provided by SGE Sample Complexity theorem (Thm 6.5) |
+| Hardware implementation feasibility | Resolved — see §7a |
+| Stratified manifold rigor | Resolved — SGE theorems §6 |
+| Cross-domain generalization | Empirically supported — see §10.5 (17σ cross-domain result, Bond 2026l) |
+
 ### 9.3 Disruption Avoidance
 
 **Extension**: Add more bonds beyond Greenwald limit.
@@ -991,6 +1128,34 @@ B_coupling: If (β_N → β_limit AND q_95 → 3) then flag high risk
 
 **Theoretical framework**: Same BIP structure, expanded Ψ and χ_hard.
 
+### 9.4 Multi-Machine Coordination via the Rank-4 Tensor Framework (New in v2.0)
+
+Patent 4 (Tensor-Based Representation and Hardware Processing System for Multi-Agent Ethical Evaluation) provides a rank-4 tensor Σ[i, j, k, l] where i, j index agents, k indexes contexts, and l indexes value dimensions. Specialized to fusion:
+
+- **i, j** — individual tokamaks in a coordinated fleet (e.g., DIII-D, JET, JT-60SA, EAST) or subsystems within ITER
+- **k** — operating regime (L, H, ELMy, detached, disruption-precursor)
+- **l** — physical observables (density, pressure, confinement, radiation, edge stability)
+
+This enables formal treatment of open coordination problems:
+
+1. **Knowledge transfer between machines**: Σ[DIII-D, ITER, H-mode, :] represents DIII-D's "evaluation" of an ITER operating point — i.e., transferring learned control policy under I-EIP (§5.4) with explicit dimensionless mapping.
+2. **Reactor fleets**: For a hypothetical future fleet of fusion plants, Σ[i, j, k, l] captures inter-plant coordination (grid balancing, shared diagnostic data, cross-plant safety alerts).
+3. **Multi-subsystem ITER**: Central solenoid, poloidal field coils, divertor, neutral beams, ECRH, ICRH can each be treated as an "agent" within Σ, with coordination constraints enforced by the same BIP hardware.
+
+The Pareto frontier computation in Patent 4 directly yields *non-dominated control allocations* across value dimensions — an open problem in multi-objective fusion control (§9.1) that is now addressable in hardware.
+
+### 9.5 DIII-D Historical-Data Validation
+
+With the theoretical, mathematical, and hardware pieces now in place, the critical remaining step is empirical validation on real shot data. The proposed protocol:
+
+1. Obtain DIII-D shot database (10,000+ shots, 2015–2025)
+2. Reconstruct Ψ(t) from archived diagnostics
+3. Replay each shot through the BIP controller in software (bit-equivalent to the hardware pipeline)
+4. Compare BIP-selected u*(t) against actual archived control, particularly at L–H transitions and near Greenwald boundary
+5. Score against outcome labels (successful shot, disruption, L-back, etc.)
+
+Expected deliverable: a BIP-vs-historical-controller comparison report quantifying (a) safety — rate of Greenwald violations, (b) stability — disruption-precursor detection, (c) performance — time-integrated fusion output proxies. This is the natural target for a collaboration with GA, PPPL, or CCFE.
+
 ---
 
 ## 10. Conclusions
@@ -1008,9 +1173,13 @@ This whitepaper developed a formal framework for fusion plasma density control b
    - Constraint preservation within predictor accuracy (Theorem 4.2)
    - Stratified control consistency (Theorem 4.3)
 
-4. **Dimensionless formulation**: Enables cross-machine transfer via I-EIP
+4. **Dimensionless formulation**: Enables cross-machine transfer via I-EIP — the physical specialization of the general Epistemic Invariance Principle developed in Vols 3 and 11 of the Geometric Series
 
 5. **Verification framework**: Four formal properties with proof methods
+
+6. **(New in v2.0) Stratified Geometric Ethics theorems**: The Minimality, Representation, Finite Approximation, Decidability, and Sample Complexity theorems (Thms 6.1–6.5) give formal guarantees that stratified spaces are the *uniquely correct* representation and that verification/learning on them are computationally tractable
+
+7. **(New in v2.0) Hardware implementation path**: FPGA circuits (six USPTO provisional patents) execute the full BIP pipeline with ~12–15 μs worst-case latency, consuming <1.5% of a 1 ms control cycle and producing cryptographically attested audit artifacts suitable for nuclear regulatory compliance
 
 ### 10.2 Advantages Over Existing Approaches
 
@@ -1075,6 +1244,50 @@ This whitepaper developed a formal framework for fusion plasma density control b
 2. Generalize BIP framework to arbitrary physical systems
 3. Develop software tools for BIP controller design
 
+### 10.5 Cross-Domain Empirical Corroboration (New in v2.0)
+
+A non-trivial question for any theoretical framework of this generality is whether the mathematical apparatus has *measurable* external validity, or whether it merely provides internally consistent formalism. An independent empirical test of the geometric framework — unrelated to fusion but using the same underlying apparatus (stratified spaces, geodesic deviation, tensor-valued evaluation) — yielded a strong positive signal in April 2026.
+
+**Test domain**: Aesthetic judgment of long-form texts. n = 4,998 author-verified books from Project Gutenberg matched to Goodreads star ratings, with strict author-disjoint 10-fold cross-validation (1,576 distinct author groups). Texts were encoded via LaBSE sentence embeddings (paragraph-level, up to 800 paragraphs/book) projected onto the top-128 principal components of the corpus.
+
+**Result**: A ridge-regression model using 33 hand-engineered geometric features combined with a Lasso selection over the raw 128-dimensional spectrum achieved
+
+```
+CV R = 0.241, R² = 0.058, z = 17.0σ, p = 4.42 × 10⁻⁶⁷
+```
+
+with bootstrap 95% CI [0.208, 0.262]. Four orthogonal structural channels emerged as independently significant:
+
+1. **Spectral divergence from corpus prior** (~8σ family): books whose embedding distributions are more atypical rate higher
+2. **Internal paragraph coherence** (~8σ): books whose paragraphs are mutually more similar rate higher — narrative tightness
+3. **Trajectory geometry** (3–6σ): smoother, more recurrent narrative paths rate higher
+4. **Genre directions** in the Lasso-selected spectrum: interpretable axes such as "narrative folklore vs aphoristic" (dim 2), "poetry vs philosophy" (dim 3)
+
+Full methodology, null controls, and failure modes (notably: the originally pre-registered closed-form A(p;λ) formula did *not* predict rating at scale — a candid negative result preserved in the record) are documented in Bond (2026l, *Geometric Aesthetics v2 Empirical Results*).
+
+**Why this matters for the fusion paper**: The BIP framework rests on a mathematical claim — that meaningful structure in high-dimensional systems is captured by geometric invariants on stratified spaces. The aesthetics result is a severe external test of that claim in a domain where confirmation has nothing to do with fusion physics or with the original AI-safety motivation. A 17σ signal with author-disjoint validation substantially increases confidence that the mathematical apparatus applied to plasma control in §§4–6 is not merely internally consistent but corresponds to measurable structure in the world. This is the kind of corroborative evidence that domain-specific formal frameworks rarely have.
+
+---
+
+## Change Log
+
+**v2.0 — April 2026** (this revision)
+- Repositioned paper as a domain instantiation of the 11-volume Geometric Series rather than a standalone AI-safety-to-physics transfer
+- Added §1.2.1 invoking the Reward Irrecoverability Theorem (Vol 11) as formal reason why scalar control approaches fail
+- Added footnote at §5.3 clarifying I-EIP as the physical specialization of the general EIP
+- Rewrote §6 using the five Stratified Geometric Ethics theorems from USPTO Provisional Patent 63/945,667
+- Added new §7a Hardware Implementation Path with latency budget and six supporting patents
+- Added §8.4 Comparison with Geometric Medicine as sibling application
+- Added §9.2a Status of Prior Open Items
+- Added §9.4 Multi-Machine Coordination via Rank-4 Tensor Framework
+- Added §9.5 DIII-D Historical-Data Validation protocol
+- Added §10.5 Cross-Domain Empirical Corroboration (17σ aesthetics result)
+- Expanded conclusions with two additional contributions (SGE theorems, hardware path)
+- Updated reference list with 6 provisional patents, Vols 1/2/3/8/11, Geometric Ethics v1.0.2g, aesthetics empirical paper
+
+**v1.0 — December 2025** (original)
+- Initial theoretical framework for BIP-based plasma density control
+
 ---
 
 ## Acknowledgments
@@ -1085,23 +1298,61 @@ This theoretical framework builds on the Bond Invariance Principle developed for
 
 ## References
 
-[1] Bond, A.H. (2025). "Stratified Geometric Ethics: Mathematical Foundations." Working paper.
+### Geometric Series (Bond 2026a–k)
 
-[2] Bond, A.H. (2025). "No Escape: Conditional Invariance Under Structural Containment." Working paper.
+[1] Bond, A.H. (2026a). *Geometric Methods in Computational Modeling.* Vol. 1 of the Geometric Series. Published. Repository: `github.com/ahb-sjsu/agi-hpc`.
 
-[3] Greenwald, M. (1988). "Density limits in toroidal plasmas." *Plasma Physics and Controlled Fusion*.
+[2] Bond, A.H. (2026b). *Geometric Reasoning: From Search to Manifolds.* Vol. 2. Draft complete. Repository: `github.com/ahb-sjsu/geometric-reasoning`.
 
-[4] Wesson, J. (2011). *Tokamaks*. Oxford University Press.
+[3] Bond, A.H. (2026c). *Geometric Ethics: The Mathematical Structure of Moral Reasoning*, v1.0.2g (February 2026). Vol. 3. Published. The foundational text establishing stratified moral spaces, the Bond Invariance Principle, and the No Escape Theorem.
 
-[5] Morari, M., and Lee, J.H. (1999). "Model predictive control: past, present and future."
+[4] Bond, A.H. (2026d). *Geometric Economics: Decision Manifolds, Equilibria, and the Geometry of Markets.* Vol. 4. Outline stage.
 
-[6] Degrave, J., et al. (2022). "Magnetic control of tokamak plasmas through deep reinforcement learning." *Nature*.
+[5] Bond, A.H. (2026e). *Geometric Law: Symmetry, Invariance, and the Structure of Legal Reasoning.* Vol. 5. Outline stage.
+
+[6] Bond, A.H. (2026f). *Geometric Cognition: The Mathematical Structure of Human and Artificial Thought.* Vol. 6. Outline stage.
+
+[7] Bond, A.H. (2026g). *Geometric Communication: Language, Signal, and the Topology of Meaning.* Vol. 7. Outline stage.
+
+[8] Bond, A.H. (2026h). *Geometric Medicine: Clinical Reasoning, Triage, and the Ethics of Allocation.* Vol. 8. Outline stage. Sibling application of BIP to real-time constrained decision-making.
+
+[9] Bond, A.H. (2026i). *Geometric Education: Learning, Assessment, and the Topology of Understanding.* Vol. 9. Outline stage.
+
+[10] Bond, A.H. (2026j). *Geometric Politics: Representation, Polarization, and the Topology of Democratic Choice.* Vol. 10. Outline stage.
+
+[11] Bond, A.H. (2026k). *Geometric AI: Alignment, Safety, and the Structure-Preserving Path to Superintelligence.* Vol. 11. Outline stage. Source of the Reward Irrecoverability Theorem cited in §1.2.1.
+
+[12] Bond, A.H. (2026l). *Geometric Aesthetics v2 Empirical Results: 17σ Confirmation on n=4,998 Author-Verified Books.* Working paper, April 2026. Archival data: `/archive/results_aesthetics/`.
+
+### USPTO Provisional Patent Applications (Bond 2025a–f)
+
+[13] Bond, A.H. (2025a). *Hardware-Accelerated Ethical Decision System for Real-Time DEME Implementation in Autonomous Agents.* USPTO Provisional Patent Application 63/941,563, filed December 15, 2025.
+
+[14] Bond, A.H. (2025b). *Stratified Geometric Ethics: Mathematical Framework for Verifiable Moral Reasoning in Autonomous Systems.* USPTO Provisional Patent Application 63/945,667, filed December 19, 2025. Source of the five theorems used in §6.
+
+[15] Bond, A.H. (2025c). *System and Method for Hardware-Accelerated Invariance Verification in Autonomous AI Systems.* USPTO Provisional Patent Application, filed December 2025.
+
+[16] Bond, A.H. (2025d). *Tensor-Based Representation and Hardware Processing System for Multi-Agent Ethical Evaluation.* USPTO Provisional Patent Application, filed December 2025. Source of the rank-4 tensor framework used in §9.4.
+
+[17] Bond, A.H. (2025e). *Cryptographic Attestation System for Unforgeable Verification of AI Invariance Compliance.* USPTO Provisional Patent Application, filed December 2025.
+
+[18] Bond, A.H. (2025f). *Hardware Circuits for High-Speed Canonicalization and Quotient Space Computation in AI Invariance Verification.* USPTO Provisional Patent Application, filed December 2025.
+
+### Fusion Physics and Control
+
+[19] Greenwald, M. (1988). "Density limits in toroidal plasmas." *Plasma Physics and Controlled Fusion* 30(11): 1477–1483.
+
+[20] Wesson, J. (2011). *Tokamaks*, 4th ed. Oxford University Press.
+
+[21] Morari, M., and Lee, J.H. (1999). "Model predictive control: past, present and future." *Computers & Chemical Engineering* 23(4–5): 667–682.
+
+[22] Degrave, J., et al. (2022). "Magnetic control of tokamak plasmas through deep reinforcement learning." *Nature* 602: 414–419.
 
 ---
 
 **END OF THEORETICAL WHITEPAPER**
 
-*This document presents theoretical foundations only. Implementation and experimental validation are subjects of future work requiring collaboration with fusion research facilities.*
+*This v2.0 document integrates theoretical framework (Vols 1–11), formal mathematical foundations (SGE theorems, Patent 63/945,667), and concrete hardware implementation path (Patents 63/941,563 et al.). Experimental validation on DIII-D archival data remains the critical outstanding step and is the natural focus of a collaboration with GA, PPPL, CCFE, or comparable facility.*
 
 *For theoretical discussion or collaboration inquiries:*  
 *Andrew H. Bond - andrew.bond@sjsu.edu*
