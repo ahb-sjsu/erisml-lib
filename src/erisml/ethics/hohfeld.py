@@ -16,8 +16,14 @@ The key insight is that moral reasoning exhibits gauge symmetries:
 - Correlative symmetry (s): O↔C, L↔N - perspective swap between parties
 - Negation symmetry (r²): O↔L, C↔N - logical negation of normative status
 
-The D4 group (symmetries of a square) provides the complete mathematical
-structure for these transformations.
+Epistemic status (aligned with the DEME keystone correction): the two
+Hohfeldian operations above are commuting involutions, so the group they
+generate is the Klein four-group V₄ = {e, r², s, sr²} — abelian, order 4
+(see get_klein_four_subgroup). D4 (order 8, non-abelian) is the *posited*
+ambient group: it is licensed only if quarter-turn operations
+(r, r³, sr, sr³) are independently demonstrated as normative operations,
+which has not yet been done empirically. Code below implements the full D4
+machinery so that hypothesis is testable, not because it is established.
 
 References:
     Hohfeld, W.N. (1917). "Fundamental Legal Conceptions as Applied in
@@ -254,12 +260,14 @@ def d4_apply_to_state(element: D4Element, state: HohfeldianState) -> HohfeldianS
             result = _ROTATION[_ROTATION[_ROTATION[result]]]
         case D4Element.S:
             result = _REFLECTION[result]
+        # Labels compose right-to-left: sr^k(x) = s(r^k(x)) — rotate first,
+        # then reflect — matching the table convention (a*b)(x) = a(b(x)).
         case D4Element.SR:
-            result = _ROTATION[_REFLECTION[result]]
+            result = _REFLECTION[_ROTATION[result]]
         case D4Element.SR2:
-            result = _ROTATION[_ROTATION[_REFLECTION[result]]]
+            result = _REFLECTION[_ROTATION[_ROTATION[result]]]
         case D4Element.SR3:
-            result = _ROTATION[_ROTATION[_ROTATION[_REFLECTION[result]]]]
+            result = _REFLECTION[_ROTATION[_ROTATION[_ROTATION[result]]]]
     return result
 
 
