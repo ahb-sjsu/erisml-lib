@@ -470,9 +470,7 @@ class TestActionIsGroupHomomorphism:
         operations are independently demonstrated."""
         generated = {D4Element.E, D4Element.S, D4Element.R2}
         while True:
-            new = {
-                d4_multiply(a, b) for a in generated for b in generated
-            } - generated
+            new = {d4_multiply(a, b) for a in generated for b in generated} - generated
             if not new:
                 break
             generated |= new
