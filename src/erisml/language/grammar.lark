@@ -9,7 +9,7 @@ model: environment_block agent_block+ norms_block? ethics_block? dynamics_block?
 // Environment Block
 // ============================================================================
 environment_block: "environment" CNAME "{" env_body "}"
-env_body: objects_decl state_decl env_dynamics_decl?
+env_body: objects_decl state_decl
 
 objects_decl: "objects:" CNAME ("," CNAME)* ";"
 state_decl: "state:" state_var_decl*
@@ -17,7 +17,7 @@ state_var_decl: CNAME ":" type_expr ";"
 
 type_expr: base_type
          | CNAME "->" base_type
-base_type: "bool" | "int" | "real" | "(" type_expr "," type_expr ")"
+base_type: BASE_TYPE | "(" type_expr "," type_expr ")"
 
 // ============================================================================
 // Agent Block
@@ -108,6 +108,7 @@ reward_term: CNAME ":" expr ";"
 // Terminals
 // ============================================================================
 STRING: "\"" /[^"]*/ "\""
+BASE_TYPE.10: "bool" | "int" | "real"
 %import common.CNAME
 %import common.NUMBER
 %import common.WS
