@@ -52,7 +52,7 @@ For AI alignment specifically, three implications stand out:
 
 The framework is now supported by:
 
-- **Theoretical foundation:** Five principal theorems — Information Monotonicity, Structured Preservation, Moral Noether (harm conservation), D4 Gauge Group (deontic symmetry), and No Escape (containment) — published across multiple papers and a 700+ page monograph (*Geometric Ethics: The Mathematical Structure of Moral Reasoning*, now v1.15)
+- **Theoretical foundation:** Five principal theorems — Information Monotonicity, Structured Preservation, Moral Noether (harm conservation), V4 Gauge Group (measured deontic symmetry; the full dihedral D4 remains a posited extension), and No Escape (containment) — published across multiple papers and a 700+ page monograph (*Geometric Ethics: The Mathematical Structure of Moral Reasoning*, now v1.15)
 
 - **Empirical validation:** 20,030 Dear Abby letters, 109,294 cross-lingual passages spanning 11 languages and 3,000 years, plus Thiele's independent replication across 6 additional languages
 

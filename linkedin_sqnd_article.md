@@ -85,9 +85,9 @@ It's a type system for moral reasoning. Type-checked code can still have bugs. A
 
 ## The Technical Details (For Those Who Want Them)
 
-**Gauge group**: D₄ × U(1)_H (discrete non-Abelian structure for moral states, continuous parameter for salience)
+**Gauge group**: V₄ × U(1)_H as measured — the Klein four-group of correlative and negation symmetries for moral states, continuous parameter for salience. The non-Abelian D₄ × U(1)_H is posited, pending demonstration of quarter-turn operations.
 
-**Core finding**: The Hohfeldian classification (Obligation, Claim, Liberty, No-Claim) exhibits exact D₄ symmetry. The reflection generator (O↔C, L↔N) works perfectly. The rotation generator (state transitions) requires specific linguistic triggers.
+**Core finding**: The Hohfeldian classification (Obligation, Claim, Liberty, No-Claim) exhibits exact correlative symmetry. The reflection generator (O↔C, L↔N) works perfectly and, together with negation, generates the measured Klein four-group V₄. Gated state transitions appear only under specific linguistic triggers and are accounted for by V₄ operations; genuine quarter-turns — the operations that would upgrade the group to the full D₄ — have not been demonstrated.
 
 **Statistical power**: N=3,110 total evaluations. Correlative symmetry at 100%. Path dependence combined p < 10⁻⁸. Double-blind hysteresis experiment: N=630, no significant effect after correction.
 
@@ -102,7 +102,7 @@ If you're working on AI alignment, here's what I'd want you to know:
 1. **Formal methods work** — but only if you're willing to let them falsify your claims
 2. **Methodology matters** — our double-blind protocol caught an artifact that naive testing missed
 3. **Negative results are results** — updating theories based on evidence is the whole point
-4. **The structure is real** — even with one prediction failing, the core D₄ symmetry holds at 100%
+4. **The structure is real** — even with one prediction failing, the core correlative (V₄) symmetry holds at 100%
 
 The math is borrowed from physics. The methodology is borrowed from psychology. The application is AI safety. The goal is building systems we can actually trust — which means testing them rigorously enough to find out when we're wrong.
 

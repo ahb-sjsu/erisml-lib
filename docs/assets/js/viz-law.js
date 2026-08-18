@@ -22,8 +22,8 @@ function initHohfeldianSquare() {
   const demo = document.createElement('div');
   demo.className = 'scalar-tensor-demo';
   demo.innerHTML =
-    '<h3 class="demo-title">The Hohfeldian Square: D<sub>4</sub> Symmetry</h3>' +
-    '<p class="demo-subtitle">Click r (rotate 90 degrees) or s (reflect) to apply D<sub>4</sub> group transformations. Watch the legal positions transform.</p>' +
+    '<h3 class="demo-title">The Hohfeldian Square: V<sub>4</sub> Symmetry (D<sub>4</sub> Posited)</h3>' +
+    '<p class="demo-subtitle">Click r (rotate 90 degrees) or s (reflect) to apply group transformations. The reflection s and half-turn r&sup2; are the measured V<sub>4</sub> operations; quarter-turns belong to the posited D<sub>4</sub> extension, kept here so the hypothesis stays testable. Watch the legal positions transform.</p>' +
     '<div class="demo-canvas-row">' +
       '<canvas id="hohfeld-canvas" width="420" height="380"></canvas>' +
     '</div>' +

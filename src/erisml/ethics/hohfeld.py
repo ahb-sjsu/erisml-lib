@@ -1,4 +1,4 @@
-# ErisML - D4 Gauge Structure for Normative Positions
+# ErisML - Hohfeldian Gauge Structure for Normative Positions (V4 measured, D4 posited)
 # Copyright (c) 2026 Andrew H. Bond
 # Department of Computer Engineering, San Jose State University
 #
@@ -24,6 +24,9 @@ ambient group: it is licensed only if quarter-turn operations
 (r, r³, sr, sr³) are independently demonstrated as normative operations,
 which has not yet been done empirically. Code below implements the full D4
 machinery so that hypothesis is testable, not because it is established.
+The V4 claim is machine-checked in formal/HohfeldV4.lean (Lean 4 + Mathlib):
+s and r² are commuting involutions generating a 4-element subgroup ≅ V₄,
+and the quarter-turn r lies outside it.
 
 References:
     Hohfeld, W.N. (1917). "Fundamental Legal Conceptions as Applied in

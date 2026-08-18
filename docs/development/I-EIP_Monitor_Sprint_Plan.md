@@ -380,7 +380,7 @@ No — not without a design review. The guardrails exist because earlier failure
 | Task ID | Task | Skill | Est. Hours | Dependencies |
 |---|---|---|---|---|
 | A.4.1 | `EMDAG` data structure: layers, nodes, edges, nullifiers, router | L4 | 16 | A.3 |
-| A.4.2 | Structural layer factory: D₄ × U(1)_H correlative locks + negation | L4 | 16 | A.4.1, NA-SQND v4.1 |
+| A.4.2 | Structural layer factory: V₄ × U(1)_H correlative locks + negation | L4 | 16 | A.4.1, NA-SQND v4.1 |
 | A.4.3 | Nullifier library: abuse, danger, impossibility, illegality, estrangement + extension hooks | L3 | 24 | A.4.1 |
 | A.4.4 | Per-domain EM specification template (semantic gates, base rates) | L4 | 24 | A.3, A.4.1 |
 | A.4.5 | DAG serialization (JSON/MessagePack) with content-hashed version ID | L3 | 16 | A.4.1 |

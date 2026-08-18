@@ -35,7 +35,7 @@ and from different institutions/countries.
 - **Affiliation:** Universite Paris-Dauphine (PSL), Paris, France
 - **Email:** gabriella.pigozzi@dauphine.psl.eu
 - **Expertise:** Judgment aggregation, belief merging, formal argumentation, normative reasoning
-- **Relevance:** Expert in formal/logical approaches to normative reasoning and multi-agent judgment; can assess the D4 gauge group and conservation law arguments
+- **Relevance:** Expert in formal/logical approaches to normative reasoning and multi-agent judgment; can assess the V4 gauge group and conservation law arguments
 - **Profile:** https://www.lamsade.dauphine.fr/~pigozzi/
 
 ## 6. Reka Markovich

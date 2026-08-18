@@ -18,7 +18,7 @@ matching this paper's specific content.
 - **Affiliation:** University of Notre Dame, Department of Philosophy
 - **Title:** Associate Professor of Philosophy
 - **Email:** nteh@nd.edu
-- **Relevance:** Specialist in the foundations of quantum field theory, gauge theory, and physical dualities. Published on the philosophical significance of gauge symmetry, holonomy, and surplus structure. Can evaluate the gauge group falsification (SU(2) → D₄) and the curvature/holonomy interpretation central to this paper.
+- **Relevance:** Specialist in the foundations of quantum field theory, gauge theory, and physical dualities. Published on the philosophical significance of gauge symmetry, holonomy, and surplus structure. Can evaluate the gauge group falsification (SU(2) → V₄ measured, D₄ posited) and the curvature/holonomy interpretation central to this paper.
 - **Profile:** https://philosophy.nd.edu/people/faculty/nicholas-teh/
 
 ## 3. Seth Lazar

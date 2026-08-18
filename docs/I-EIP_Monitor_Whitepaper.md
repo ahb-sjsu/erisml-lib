@@ -100,7 +100,7 @@ The **Reward Irrecoverability Theorem** (Vol 11) applies: collapsing the multi-d
          │  ┌────────────────────────────────────────────────┐  │
          │  │            EM-DAG (model-specific)             │  │
          │  │                                                │  │
-         │  │    Structural Layer (D₄ × U(1)_H)              │  │
+         │  │    Structural Layer (V₄ × U(1)_H)              │  │
          │  │              │                                 │  │
          │  │              ▼                                 │  │
          │  │    Nullifiers (absorbing: abuse, harm, ...)    │  │
@@ -166,7 +166,7 @@ Therefore: the EM-DAG for a specific deployed model M is constructed by extracti
 
 The top structural layers are model-independent and inherited directly from the Dear Abby DAG:
 
-**L1 — Structural Layer (D₄ × U(1)_H)**
+**L1 — Structural Layer (V₄ × U(1)_H; D₄ posited)**
 Correlative lock: `O ↔ C`, `L ↔ N` (100% enforced). Negation: `O ⊥ L`, `C ⊥ N`. These hold for any model because they are logical/Hohfeldian, not empirical.
 
 **L2 — Nullifiers (absorbing states)**
@@ -324,7 +324,7 @@ Inheriting GUASS-SAI §16.2 and extending for the gating context:
 - **Spec-gaming** — internal state inconsistent with output. The model produces a "safe-looking" answer whose supporting activations do not match the safe stratum. Detectable as: EM evaluations on probes disagree with EM evaluations on output.
 - **Degeneracy** — activations collapse to a low-rank or constant subspace. Detected by the nondegeneracy check.
 - **Nullifier violations** — proposed continuation activates an absorbing nullifier (abuse, danger, illegal, ...). Immediate veto.
-- **Structural violations** — Hohfeldian correlative-lock or negation-relation breaches in the activation-derived O/L/C/N assignments. Immediate veto (D₄ structural layer).
+- **Structural violations** — Hohfeldian correlative-lock or negation-relation breaches in the activation-derived O/L/C/N assignments. Immediate veto (V₄ structural layer).
 - **Stakeholder-conflict spikes** — EM judgments under the active profile yield a lexical override (one stakeholder's hard veto overrides another's preference). These are logged as elevated-monitoring regardless of gating outcome.
 
 ---

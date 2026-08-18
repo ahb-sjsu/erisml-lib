@@ -22,7 +22,7 @@ and from different institutions/countries.
 - **Degree:** PhD, European University Institute
 - **Email:** giovanni.sartor@unibo.it
 - **Expertise:** Computational legal theory, Hohfeldian analysis, deontic logic, legal ontologies, normative systems
-- **Justification:** Professor Sartor's pioneering work on formal models of Hohfeldian positions and their computational implementation — spanning logic programming, argumentation, and ontological approaches — makes him the foremost expert on the specific legal-theoretic structures this paper formalizes. His ERC Advanced Grant project COMPULAW addressed computational models of legal reasoning at scale. He can rigorously evaluate whether the gauge-theoretic treatment of the Hohfeldian octad ($D_4 \rtimes D_4$) faithfully captures the structure of legal relations and whether the semi-direct product formulation is legally sound.
+- **Justification:** Professor Sartor's pioneering work on formal models of Hohfeldian positions and their computational implementation — spanning logic programming, argumentation, and ontological approaches — makes him the foremost expert on the specific legal-theoretic structures this paper formalizes. His ERC Advanced Grant project COMPULAW addressed computational models of legal reasoning at scale. He can rigorously evaluate whether the gauge-theoretic treatment of the Hohfeldian octad ($V_4 \rtimes V_4$, inside a posited $D_4 \rtimes D_4$) faithfully captures the structure of legal relations and whether the semi-direct product formulation is legally sound.
 
 ## 4. Katie Atkinson
 - **Affiliation:** University of Liverpool, Liverpool, UK

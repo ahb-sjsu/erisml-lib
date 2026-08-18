@@ -5,14 +5,19 @@
 """
 hohfeld_d4_demo.py
 
-Demonstration of D4 Dihedral Group Structure for Hohfeldian Normative Positions.
+Demonstration of the Hohfeldian gauge machinery (V4 measured, D4 posited).
 
 This demo illustrates the mathematical structure underlying moral reasoning:
 - The four Hohfeldian positions: Obligation (O), Claim (C), Liberty (L), No-claim (N)
 - The D4 group (symmetries of a square) acting on these positions
 - Correlative symmetry (s): perspective swap between parties
 - Negation symmetry (r²): logical negation of normative status
-- Non-abelian structure: order of operations matters (rs ≠ sr)
+- Non-abelian structure of the D4 machinery: order of operations matters (rs ≠ sr)
+
+Epistemic status: s and r² commute, so the empirically demonstrated operations
+generate only the Klein four-subgroup V4 = {e, s, r², sr²} (see the Klein-four
+section at the end of the demo). The full non-abelian D4 is posited — the demo
+exercises its machinery so the quarter-turn hypothesis stays testable.
 
 Usage:
     python -m erisml.examples.hohfeld_d4_demo
