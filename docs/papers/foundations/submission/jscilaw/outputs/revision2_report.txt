@@ -1,0 +1,82 @@
+n = 5278; corr-matrix condition number 2.65; seed 20260724
+
+== Standard fairness metrics (Table 1) ==
+ black  n=3175  base 0.523  P(hi) 0.576  FPR 0.423  FNR 0.285  PPV 0.650  P(recid|low) 0.351
+ white  n=2103  base 0.391  P(hi) 0.331  FPR 0.220  FNR 0.496  PPV 0.595  P(recid|low) 0.290
+ disparate impact ratio 1.741
+
+== Observed LBI (k-curve) with neighborhood-recomputing bootstrap CIs ==
+ k=  1  race 1.045 [1.002, 1.089]   sex 0.962 [0.935, 1.032]
+ k=  5  race 1.043 [1.010, 1.074]   sex 1.012 [0.974, 1.043]
+ k= 10  race 1.041 [1.017, 1.068]   sex 1.016 [0.987, 1.043]
+ k= 20  race 1.049 [1.027, 1.072]   sex 1.021 [0.998, 1.044]
+ k= 50  race 1.060 [1.041, 1.079]   sex 1.028 [1.008, 1.048]
+ k=100  race 1.069 [1.053, 1.087]   sex 1.041 [1.023, 1.060]
+
+== Distance diagnostics (mean Mahalanobis distance to k nearest) ==
+ k=  1  same 0.104 (med 0.000)  cross 0.158 (med 0.000)  ratio 1.519
+ k=  5  same 0.194 (med 0.036)  cross 0.262 (med 0.036)  ratio 1.351
+ k= 10  same 0.265 (med 0.062)  cross 0.349 (med 0.080)  ratio 1.316
+ k= 20  same 0.357 (med 0.120)  cross 0.458 (med 0.143)  ratio 1.281
+ k= 50  same 0.523 (med 0.197)  cross 0.639 (med 0.231)  ratio 1.222
+ k=100  same 0.684 (med 0.281)  cross 0.801 (med 0.336)  ratio 1.172
+
+== Balance at k=20 (mean |z-diff| focal->neighbour) ==
+ age                same 0.136  cross 0.156
+ priors_count       same 0.141  cross 0.187
+ juv_fel_count      same 0.046  cross 0.082
+ juv_misd_count     same 0.067  cross 0.101
+ juv_other_count    same 0.046  cross 0.055
+ c_charge_F         same 0.027  cross 0.034
+
+common support: 0.9981 in support; LBI k20 in-support 1.048
+caliper q90: kept 4656, LBI k20 1.022
+caliper q75: kept 3826, LBI k20 1.012
+distance-matched: LBI 1.003 [0.995, 1.012] (dist cross 0.458 vs same-matched 0.662)
+exact felony match: LBI 1.050 [1.041, 1.060] n=5278
+
+== Score representations at k=20 (raw rates) ==
+ decile   LBI 1.049 [1.039, 1.058]  cross-rate 2.3230  same-rate 2.2153
+ cat3     LBI 1.065 [1.052, 1.077]  cross-rate 0.6192  same-rate 0.5816
+ bin_ge5  LBI 1.092 [1.077, 1.106]  cross-rate 0.3731  same-rate 0.3418
+ bin_ge8  LBI 1.026 [1.007, 1.045]  cross-rate 0.2461  same-rate 0.2398
+
+== Race tests (full n, 1000 reps) ==
+ plain       null@k20 1.0013 sd 0.0049  p_k20 0.0010  p_global 0.0010
+ crt         null@k20 1.0150 sd 0.0068  p_k20 0.0010  p_global 0.0010
+ stratified  null@k20 1.0124 sd 0.0066  p_k20 0.0010  p_global 0.0010
+== Sex tests ==
+ plain       p_k20 0.2408  p_global 0.3856  p_k1 0.8821
+ crt         p_k20 0.8322  p_global 0.8951  p_k1 0.9171
+
+== Focal groups (k=20) ==
+ black-focal 1.027 [1.015, 1.039]  white-focal 1.087 [1.071, 1.102]  balanced 1.055
+gap distribution: mean 0.108 med 0.100 frac>0 0.539  trimmed-LBI 1.009
+
+== Matching methods (k=20) ==
+ euclidean_standardized           LBI 1.048 [1.038, 1.057]
+ robust_mahalanobis_mincovdet     LBI 1.048 [1.039, 1.057]
+ log1p_counts_mahalanobis         LBI 1.048 [1.038, 1.057]
+ rank_transform_euclidean         LBI 1.044 [1.035, 1.053]
+ gower                            LBI 1.049 [1.040, 1.059]
+ CEM within-stratum: LBI 1.009 [1.000, 1.018] (n_valid 3159)
+ radius_median_k20_dist: LBI 1.022 [1.009, 1.036] (n 4171)
+ radius_half_median: LBI 1.021 [1.001, 1.040] (n 3505)
+
+== Feature sets (k=20) ==
+ minimal_age_priors       LBI 1.034 [1.025, 1.042]
+ paper6                   LBI 1.049 [1.039, 1.058]
+ drop_juvenile            LBI 1.034 [1.025, 1.042]
+ paper6_plus_sex          LBI 1.060 [1.050, 1.071]
+
+== Synthetic validation (k=20) ==
+ setup: R2 0.420 sigma 2.163
+ c1_blind                 LBI 1.009±0.006  rej: perm 0.56 crt 0.04 reg 0.06
+ c2_direct_beta0.25       LBI 1.015±0.006  rej: perm 0.88 crt 0.22 reg 1.00
+ c2_direct_beta0.5        LBI 1.027±0.007  rej: perm 1.00 crt 0.85 reg 1.00
+ c2_direct_beta1.0        LBI 1.071±0.010  rej: perm 1.00 crt 1.00 reg 1.00
+ c3_proxy_gamma0.5        LBI 1.052±0.008  rej: perm 1.00 crt 1.00 reg 1.00
+ c3_proxy_gamma1.0        LBI 1.153±0.013  rej: perm 1.00 crt 1.00 reg 1.00
+ c4_omitted_priors        LBI 1.015±0.006  rej: perm 0.88 crt 0.05 reg 0.02
+
+neighbor reuse: mean 40.0 max 198  tie-frac@k20 0.7935  duplicate feature rows: 3673
