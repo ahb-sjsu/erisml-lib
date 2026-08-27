@@ -93,6 +93,20 @@ defensible on their own terms — courts do hold them — but adding them
 threshold they would cross, is tuning the instrument to the
 hypothesis. And it would not touch the blindness in (2) regardless.
 
+## The fix is now specified upstream
+
+Drafted as `erisml-compiler/docs/plans/deme-verdict-function-spec.md`
+(2026-08-27, proposal, not implemented). It turned out to be mostly a
+**conformance** exercise rather than a new design: the DEME
+architecture of record already classifies `fairness` and `autonomy` as
+*substantive* blocks that must be realized as `k`-contractions, and
+already classifies `rule_following` (fidelity) as **procedural** — an
+attestation, not a contraction. So D1 and D2 below are deviations from
+the specified architecture, not choices the v0 bridge was entitled to
+make. The spec carries eight acceptance properties, all checkable
+without reference to this campaign's data, and an explicit rule that
+no LBI-3 statistic may be computed until it is implemented and frozen.
+
 ## What a real fix requires (specified, not built)
 
 A verdict function that reads all validated channels, with the
