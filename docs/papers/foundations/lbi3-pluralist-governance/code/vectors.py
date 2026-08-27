@@ -175,6 +175,47 @@ VECTORS += [
            note="same record, permissive control profile: gate does not fire"),
 ]
 
+# ------------------------------------------------------- V-J3..J8 (6 more)
+# Every profile-parameterized gate gets a swap pair, not just D7.
+# Rationale (mutation gate, 2026-08-27): the hard-coded-doctrine mutant
+# M3 was caught by V-J2 ALONE. One vector is too thin a margin for the
+# "doctrine lives in data" claim, so each parameterized gate now has a
+# record held fixed while only the profile changes.
+_NO_WARNINGS = WI_2016_LOOMIS.model_copy(
+    update={"id": "control-no-warnings", "required_warnings": ()}
+)
+_ALL_POINTS = WI_2016_LOOMIS.model_copy(
+    update={"id": "control-all-decision-points", "sanctioned_decision_points": ()}
+)
+_NO_VALIDATION = WI_2016_LOOMIS.model_copy(
+    update={"id": "control-no-validation", "population_validation_required": False}
+)
+
+_missing_warning = _rec("V-Jd1", warnings_given=ALL_WARNINGS[:-1])
+_off_label = _rec("V-Jd5", decision_point="pretrial_release")
+_unvalidated = _rec("V-Jd4", deployment_population="other_county")
+
+VECTORS += [
+    Vector("V-J3", "V-J", _missing_warning, {"required_warnings_present": "fire"},
+           profile=WI_2016_LOOMIS, expect_verdict="forbidden",
+           note="D1 fires when the profile requires the warning"),
+    Vector("V-J4", "V-J", _missing_warning, {},
+           profile=_NO_WARNINGS, expect_verdict="permissible",
+           note="same record; profile requires no warnings, so D1 passes"),
+    Vector("V-J5", "V-J", _off_label, {"purpose_fit": "fire"},
+           profile=WI_2016_LOOMIS, expect_verdict="forbidden",
+           note="D5 fires against a restricted sanctioned set"),
+    Vector("V-J6", "V-J", _off_label, {},
+           profile=_ALL_POINTS, expect_verdict="permissible",
+           note="same record; profile sanctions all decision points"),
+    Vector("V-J7", "V-J", _unvalidated, {"validated_for_population": "fire"},
+           profile=WI_2016_LOOMIS, expect_verdict="requires_review",
+           note="D4 fires when local validation is required"),
+    Vector("V-J8", "V-J", _unvalidated, {},
+           profile=_NO_VALIDATION, expect_verdict="permissible",
+           note="same record; profile drops the validation requirement"),
+]
+
 # ---------------------------------------------------------------- V-C (4)
 # Combinations: severity roll-up and fire/undetermined mixing.
 VECTORS += [
@@ -217,5 +258,6 @@ VECTORS += [
            note="superset of required warnings still satisfies"),
 ]
 
-assert len(VECTORS) == 31, f"expected 31 vectors, built {len(VECTORS)}"
-assert len({v.vid for v in VECTORS}) == 31, "vector ids must be unique"
+N_VECTORS = 37  # 7 V-P + 7 V-F + 7 V-U + 1 V-N + 8 V-J + 4 V-C + 3 V-A
+assert len(VECTORS) == N_VECTORS, f"expected {N_VECTORS}, built {len(VECTORS)}"
+assert len({v.vid for v in VECTORS}) == N_VECTORS, "vector ids must be unique"

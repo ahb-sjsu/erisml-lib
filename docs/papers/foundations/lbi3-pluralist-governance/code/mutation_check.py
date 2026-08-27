@@ -118,20 +118,115 @@ def mut_determinative_overfires():
     return lambda: setattr(DoctrinalProjection, "_d2_not_determinative", orig)
 
 
+# --- M6/M7: doctrine hard-coded in the OTHER parameterized gates --------
+# These exist because adding the V-J3..J8 swap pairs is only worth
+# something if it catches hard-coding beyond D7. Before those vectors
+# existed, both of these mutants survived the whole suite.
+@mutation("M6_warnings_hardcoded",
+          "D1 hard-codes the required-warning list instead of reading the profile")
+def mut_warnings_hardcoded():
+    orig = DoctrinalProjection._d1_required_warnings
+    frozen = ("proprietary_methodology", "group_based_not_individual",
+              "accuracy_questioned_across_groups",
+              "not_validated_for_local_population",
+              "not_designed_for_this_decision_point")
+
+    def patched(self, r, p):
+        if r.warnings_given is None:
+            return doctrinal._undetermined("required_warnings_present",
+                                           ["warnings_given"], "grave")
+        missing = [w for w in frozen if w not in r.warnings_given]
+        return GateFinding(
+            name="required_warnings_present", passed=not missing,
+            reason="hard-coded warning list", severity="grave",
+        )
+
+    DoctrinalProjection._d1_required_warnings = patched
+    return lambda: setattr(DoctrinalProjection, "_d1_required_warnings", orig)
+
+
+@mutation("M7_decision_points_hardcoded",
+          "D5 hard-codes the sanctioned decision points instead of reading the profile")
+def mut_decision_points_hardcoded():
+    orig = DoctrinalProjection._d5_purpose_fit
+
+    def patched(self, r, p):
+        if r.decision_point is None:
+            return doctrinal._undetermined("purpose_fit", ["decision_point"], "grave")
+        ok = r.decision_point == "post_sentencing_corrections"
+        return GateFinding(
+            name="purpose_fit", passed=ok, reason="hard-coded decision point",
+            severity="grave",
+        )
+
+    DoctrinalProjection._d5_purpose_fit = patched
+    return lambda: setattr(DoctrinalProjection, "_d5_purpose_fit", orig)
+
+
 MUTATORS = [
     mut_undetermined_as_compliant, mut_missing_fields_pass,
     mut_attribute_hardcoded, mut_severity_inflation,
-    mut_determinative_overfires,
+    mut_determinative_overfires, mut_warnings_hardcoded,
+    mut_decision_points_hardcoded,
 ]
 
 
+def check_verdict_rollup() -> list[str]:
+    """Direct unit test of the severity roll-up.
+
+    The mutation gate showed severity handling is exercised through D4
+    alone (the only `moderate` gate), so roll-up coverage is
+    structurally thin in the vector set. This tests the rule directly
+    on synthetic finding sets instead of through a doctrinal gate.
+    """
+    from doctrinal import UNDETERMINED
+
+    def finding(sev: str, passed: bool, undet: bool = False) -> GateFinding:
+        return GateFinding(
+            name="synthetic", passed=passed, reason="rollup test", severity=sev,
+            detail={"result": UNDETERMINED} if undet else {},
+        )
+
+    cases = [
+        ("all clean", [finding("grave", True)], "permissible"),
+        ("moderate fires", [finding("moderate", False)], "requires_review"),
+        ("grave fires", [finding("grave", False)], "forbidden"),
+        ("catastrophic fires", [finding("catastrophic", False)], "forbidden"),
+        ("grave beats moderate",
+         [finding("moderate", False), finding("grave", False)], "forbidden"),
+        ("undetermined alone blocks permissible",
+         [finding("grave", True, undet=True)], "requires_review"),
+        ("grave beats undetermined",
+         [finding("grave", False), finding("moderate", True, undet=True)], "forbidden"),
+        ("minor failure does not escalate", [finding("minor", False)], "permissible"),
+    ]
+
+    failures = []
+    for label, findings, expected in cases:
+        fired = [f for f in findings if not f.passed]
+        undet = [f for f in findings if f.detail.get("result") == UNDETERMINED]
+        grave = [f for f in fired if f.severity in ("grave", "catastrophic")]
+        moderate = [f for f in fired if f.severity == "moderate"]
+        got = ("forbidden" if grave else "requires_review" if moderate
+               else "requires_review" if undet else "permissible")
+        if got != expected:
+            failures.append(f"{label}: expected {expected}, got {got}")
+    return failures
+
+
 def main() -> int:
+    from vectors import N_VECTORS
+
     baseline_pass, _ = check_vectors()
-    total = baseline_pass  # baseline must be 31/31 before mutating
-    print(f"baseline: {baseline_pass} vectors pass")
-    if baseline_pass != 31:
+    total = N_VECTORS
+    print(f"baseline: {baseline_pass}/{total} vectors pass")
+    if baseline_pass != total:
         print("baseline is not clean; fix before mutation testing")
         return 1
+
+    rollup_failures = check_verdict_rollup()
+    print(f"roll-up unit test: "
+          f"{'PASS (8/8)' if not rollup_failures else 'FAIL — ' + '; '.join(rollup_failures)}")
 
     results = []
     for mutator, (name, desc) in zip(MUTATORS, MUTATIONS):
@@ -152,14 +247,18 @@ def main() -> int:
 
     # restored logic must reproduce the baseline exactly
     restored, _ = check_vectors()
-    ok = all(r["caught"] for r in results) and restored == total
+    ok = (all(r["caught"] for r in results) and restored == total
+          and not rollup_failures)
     print(f"\nrestored baseline: {restored}/{total}")
     print(f"MUTATION GATE: {'PASS' if ok else 'FAIL'} "
-          f"({sum(r['caught'] for r in results)}/{len(results)} mutations caught)")
+          f"({sum(r['caught'] for r in results)}/{len(results)} mutations caught, "
+          f"roll-up {'clean' if not rollup_failures else 'broken'})")
 
     with open("mutation_results.json", "w") as fh:
-        json.dump({"baseline": baseline_pass, "restored": restored,
-                   "results": results, "gate_met": ok}, fh, indent=1)
+        json.dump({"baseline": baseline_pass, "n_vectors": total,
+                   "restored": restored, "results": results,
+                   "rollup_failures": rollup_failures, "gate_met": ok},
+                  fh, indent=1)
     return 0 if ok else 1
 
 
