@@ -64,11 +64,18 @@ for whom. Evaluated end-to-end on the public COMPAS corpus.
   surfaced conflict and the impossibility structure (prediction P2
   below): conflict is not noise, it concentrates exactly where the
   theorem says no scalar can be right.
-- Prior art to engage: algorithmic accountability & technological due
-  process (Citron), contestability literature; Aequitas/AIF360/
-  Fairlearn; multi-objective fairness; the "fairness pipeline" and
-  policy-as-code lines (OPA-style); *Loomis* commentary. Full sweep
-  owed pre-seal (LBI-1 standard: quote-verified).
+- Prior art: see `PRIOR-ART-SWEEP.md` (recon-grade, 2026-08-27).
+  Sweep verdict: axes (i)–(iii) each NARROWED by a named neighbor
+  (Catala/LegalRuleML for law-as-code; the moral-uncertainty and
+  pluralistic-alignment lines for surfaced value conflict; Kroll et
+  al. for hashed accountability; the 2025–26 agentic
+  runtime-governance line for generic machine-readable policy) and
+  survive only in their doctrine-specific, RAI-specific forms; axis
+  (iv) — conflict concentrates where the impossibility theorem
+  bites, tested on a real corpus — found UNOCCUPIED and is the
+  paper's center of gravity. Wachter–Mittelstadt–Russell is the
+  designated contrast (choose-a-statistic vs. surface-the-conflict).
+  ⧗-marked quote-verification owed pre-seal.
 
 ## Research questions and sealed endpoints
 
