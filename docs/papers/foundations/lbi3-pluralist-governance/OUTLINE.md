@@ -80,14 +80,25 @@ for whom. Evaluated end-to-end on the public COMPAS corpus.
 ## Research questions and sealed endpoints
 
 - **RQ1 (expressiveness).** Can the operative constraints a
-  jurisdiction actually imposes on RAI use be encoded as erisml
-  deontic gates without per-case ad-hoc logic? Endpoint E1: a
-  constraint suite (Loomis warning set: undisclosed methodology,
-  group-validation caveat, non-determinative use; sex-use policy;
-  contestability/notice) encoded once, validated against a
-  preregistered vector set of constructed decision records with known
-  ground-truth gate outcomes; bar: 100% on the vector set, no
-  constraint requiring case-specific code.
+  jurisdiction actually imposes on RAI use be encoded as gates
+  without per-case ad-hoc logic? Suite drafted in
+  `CONSTRAINT-SUITE.md`: 7 gates (D1 required warnings, D2
+  not-determinative, D3 group-to-individual inference, D4 population
+  validation, D5 purpose fit, D6 contestability, D7 attribute
+  policy), carried by a new `DoctrinalProjection` alongside — not
+  inside — the four ethical-theory projections, parameterized by a
+  data-only `JurisdictionProfile`. Endpoint E1: 31/31 on a
+  preregistered constructed-vector set **and** zero vector- or
+  case-specific identifiers in the gate module (grep-checked) — the
+  second half is what actually tests "no ad-hoc logic".
+- **RQ1b (auditability gap).** Endpoint E4, predicted in advance:
+  **4 of 7** doctrinal gates are `undetermined` on the public corpus,
+  because the ProPublica file contains no PSI text, warning records,
+  notice records, or contest records. The claim this licenses is not
+  "COMPAS violated *Loomis*" but *"the public record cannot answer
+  whether it did"* — a transparency deficit measured rather than
+  asserted. Declared now so it cannot later be presented as a
+  discovery.
 - **RQ2 (conflict tracks the theorem).** On the real COMPAS corpus
   (LBI-1 filter, n = 5,278), does cross-framework verdict
   disagreement concentrate where the impossibility bites? Sealed
@@ -158,7 +169,19 @@ will be acknowledged with a no-role statement or declined.
 Artifacts: compiler + pipeline versions pinned; per-run JSON with
 graph hashes; Zenodo deposit; Lean formalization candidate (the
 gate-conflict/impossibility tie, if it crystallizes as algebra).
-Next: (1) prior-art sweep (quote-verified); (2) constraint-suite
-draft + vector set; (3) two disclosed calibration draws; (4) seal
-PREREG.md in this folder; (5) sealed run; (6) write. LBI-2 proceeds
-independently; nothing here blocks on it.
+Next: ~~(1) prior-art sweep~~ done (`PRIOR-ART-SWEEP.md`,
+recon-grade; ⧗ ledger open); ~~(2) constraint-suite draft + vector
+set~~ drafted (`CONSTRAINT-SUITE.md` v0.1; ⧗ doctrine verification
+and legal review open); (3) implement `DoctrinalProjection` + the
+31-vector set, run it (unsealed, mechanics only); (4) two disclosed
+calibration draws for the P2 bars on synthetic score families;
+(5) seal `PREREG.md` in this folder; (6) sealed run on the real
+corpus; (7) write. LBI-2 proceeds independently; nothing here blocks
+on it.
+
+**Pre-seal blockers (both papers' hard-won lessons):** the ⧗ doctrine
+quote-verification (LBI-1's r3 caught a *Loomis* mischaracterization
+in an accepted manuscript — second-hand holdings are not trusted);
+legal review of the gate encodings by a lawyer; and full reads of the
+two 2025–26 agentic runtime-governance papers, whose line is still
+moving.
