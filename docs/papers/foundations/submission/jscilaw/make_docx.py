@@ -131,8 +131,15 @@ tex = re.sub(r"\n(\\begin\{equation\})", r"\n\n\1", tex)
 tex = re.sub(r"(\\end\{equation\})\n", r"\1\n\n", tex)
 
 # 4 -- References heading
+# pandoc does not know the thebibliography environment: its "{99}"
+# width argument leaks into the docx as a literal paragraph (caught by
+# the editors). Strip the environment entirely — citations are already
+# resolved to literal text, and each \bibitem block is its own
+# blank-line-separated paragraph in the source.
 tex = tex.replace("\\begin{thebibliography}{99}",
-                  "\\section*{References}\n\\begin{thebibliography}{99}")
+                  "\\section*{References}")
+tex = tex.replace("\\end{thebibliography}", "")
+tex = re.sub(r"\\bibitem\[[^\]]*\]\{[^}]*\}\s*\n", "", tex)
 
 tmp = HERE / "_lbi_docx_build.tex"
 tmp.write_text(tex, encoding="utf-8")
