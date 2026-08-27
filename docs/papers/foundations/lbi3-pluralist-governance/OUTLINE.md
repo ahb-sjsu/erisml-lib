@@ -99,6 +99,16 @@ for whom. Evaluated end-to-end on the public COMPAS corpus.
   whether it did"* — a transparency deficit measured rather than
   asserted. Declared now so it cannot later be presented as a
   discovery.
+- **RQ2 status: HALTED at the instrument** — see
+  [`FINDING-INSTRUMENT-01.md`](FINDING-INSTRUMENT-01.md). Five of the
+  ten EM-DAG modules are gated on English keywords in free-text fact
+  descriptions, so on structured decision records those channels are
+  dark and the consequentialist projection returns `indeterminate`
+  throughout. P2 has **not** been tested and no conflict number
+  exists. The vacuity kill condition is NOT triggered — that would
+  require the projections to run and agree/disagree degenerately.
+  Path forward: structured-field readers specified and frozen first,
+  then pilots (ordering is the point).
 - **RQ2 (conflict tracks the theorem).** On the real COMPAS corpus
   (LBI-1 filter, n = 5,278), does cross-framework verdict
   disagreement concentrate where the impossibility bites? Sealed
