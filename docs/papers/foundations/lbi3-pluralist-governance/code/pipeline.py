@@ -41,9 +41,19 @@ def _default_dag():
     return dagmod.load_profile(profile)
 
 
-EM_PROFILE = "default.yaml"
+def _profile_dag(profile: str):
+    """`structured_v0` is the paper's path (EM-READERS-SPEC.md §A);
+    `default` is kept so the Finding I-01 comparison is reproducible."""
+    if profile == "structured_v0":
+        from structured_v0 import build_profile
+
+        return build_profile()
+    return _default_dag()
+
+
+EM_PROFILE = "structured_v0"
 _DEONTIC = DeonticProjection()
-_CONSEQ = ConsequentialistProjection(dag=_default_dag())
+_CONSEQ = ConsequentialistProjection(dag=_profile_dag(EM_PROFILE))
 _VIRTUE = VirtueProjection()
 _CARE = CareEthicsProjection()
 

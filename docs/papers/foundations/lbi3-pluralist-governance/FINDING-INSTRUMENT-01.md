@@ -5,6 +5,27 @@ governance pipeline (RQ2 halted)
 Nothing sealed. This halts the RQ2 measurement and is reported as a
 finding rather than worked around.
 
+> ## ⚠ AMENDMENT, same day — this filing was PARTLY WRONG
+>
+> The keyword diagnosis below is **confirmed**, and the
+> `structured_v0` readers built from it **work**: on the smoke case,
+> `fairness` moves 0.000 → −0.850 and `autonomy` 0.000 → −0.500.
+>
+> But the *causal claim* — that the keyword gates are why the
+> consequentialist projection returns `indeterminate` — is **wrong**.
+> Filling those channels changes no verdict at all. The real causes
+> are structural and are recorded in
+> [`FINDING-INSTRUMENT-02.md`](FINDING-INSTRUMENT-02.md), which
+> supersedes this document's §Diagnosis conclusion. The corrected
+> headline: the DEME v0 verdict function reads only 6 of 10 channels
+> and **never reads `fairness_equity`, `autonomy_respect`, or
+> `rights_respect`** — so no amount of channel-filling can make its
+> verdict respond to fairness.
+>
+> This amendment is left in place rather than rewritten, so the record
+> shows the first diagnosis, the check that falsified it, and the
+> correction.
+
 ## What happened
 
 The RQ2 pipeline maps a COMPAS decision record into a `CompilerIR` +
