@@ -183,3 +183,20 @@ already engages (Citron; Kroll et al.).
 5. Whether the profile should be published as a citable artifact
    (a "*Loomis* profile" others can reuse or contest) — likely yes;
    it is the most directly reusable output of the paper.
+6. **Vector coverage, from the mutation gate** (`code/RESULTS-MECHANICS.md`):
+   the hard-coded-doctrine mutation (M3) was caught by **exactly one**
+   vector, the profile swap — too thin for the claim it protects. Add
+   profile-swap vectors for D1, D4, D5 before seal, and a second
+   moderate-severity path so the roll-up is not tested through D4
+   alone. The vector count will rise above 31; the bar is
+   "all vectors, exact match", not the number.
+
+## 8. Implementation status (unsealed)
+
+`code/doctrinal.py` implements all seven gates as a fifth projection
+against the verified compiler API; `code/vectors.py` carries the 31
+constructed vectors; `code/run_vectors.py` checks both halves of the
+E1 bar; `code/mutation_check.py` is the instrument gate. Current
+mechanics: **31/31, ad-hoc scan clean, 5/5 mutations caught.** This
+is shakedown evidence that the machinery works — not evidence about
+COMPAS, *Loomis*, or any deployment.
