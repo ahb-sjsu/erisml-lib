@@ -15,7 +15,7 @@
 
 > **Brand assets:** [erisml.org/brand/](https://erisml.org/brand/) · local: [`docs/brand/`](docs/brand/)
 
-## 🚀 Quick Start (v3.0.0)
+## 🚀 Quick Start (v3.1.0)
 You can now install ErisML directly from PyPI:
 ```bash
 pip install erisml-lib
@@ -169,7 +169,7 @@ democratically-governed ethical reasoning, grounded in the **Philosophy Engineer
 ![CI](https://github.com/ahb-sjsu/erisml-lib/actions/workflows/ci.yaml/badge.svg)
 ![Python](https://img.shields.io/badge/Python-3.12%2B-blue.svg)
 ![License](https://img.shields.io/badge/License-AGI--HPC%20Responsible%20AI-blue.svg)
-[![PyPI version](https://img.shields.io/badge/PyPI-v3.0.0-blue.svg)](https://pypi.org/project/erisml/)
+[![PyPI version](https://img.shields.io/badge/PyPI-v3.1.0-blue.svg)](https://pypi.org/project/erisml-lib/)
 
 ---
 
