@@ -1,0 +1,122 @@
+\documentclass[11pt]{letter}
+\usepackage[margin=1in]{geometry}
+\usepackage{hyperref}
+\hypersetup{colorlinks=true,linkcolor=black,urlcolor=blue}
+
+\address{Andrew H.\ Bond\\
+Department of Computer Engineering\\
+San Jos\'{e} State University\\
+\texttt{andrew.bond@sjsu.edu}\\
+ORCID: 0009-0003-2599-6158}
+
+\signature{Andrew H.\ Bond\\
+Senior Lecturer, Department of Computer Engineering\\
+San Jos\'{e} State University}
+
+\begin{document}
+
+\begin{letter}{Editor-in-Chief\\
+\emph{Journal of Science and Law}\\
+Center for Science and Law}
+
+\opening{Dear Editor,}
+
+I am pleased to submit the manuscript ``The Legal Bond Index: A
+Geometric, Case-Level Test of Algorithmic Fairness Applied to COMPAS''
+for consideration as an Original Research article in the
+\emph{Journal of Science and Law}.
+
+The paper addresses a problem that sits squarely within JSciLaw's
+mission: a scientific result that bears directly on legal policy.
+The 2016--2017 controversy over the COMPAS pretrial-risk algorithm
+exposed a structural ambiguity in the concept of algorithmic
+fairness, and the subsequent technical literature
+(Chouldechova 2017; Kleinberg, Mullainathan and Raghavan 2017)
+proved that the two competing fairness criteria each side invoked
+are mathematically incompatible when group base rates differ. The
+decade since has produced a sprawl of competing fairness metrics,
+none of them dispositive, and a regulatory landscape in which courts
+and oversight bodies are asked to evaluate algorithmic systems
+without a single quantitative measure they can rely on.
+
+This paper introduces such a measure: the \emph{Legal Bond Index}
+(LBI), a matched-pair case-level test of whether an algorithm
+treats individually-similar defendants similarly. LBI is rooted in
+the Aristotelian like-cases-alike criterion, operationalized via the
+Mahalanobis distance on legitimate predictors and a $k$-nearest-neighbour
+matched-pair construction. LBI sits on a structurally distinct axis
+from the calibration--equalized-odds debate: it does not constrain
+population-level statistics, so the Chouldechova--Kleinberg
+impossibility does not apply to it.
+
+On the ProPublica COMPAS dataset ($n = 5{,}278$ defendants), the
+empirical result is sharp. The standard fairness metrics that drove
+the original controversy are reproduced exactly (FPR disparity
+$+0.20$; calibration gap at high decile $+0.05$). The Legal Bond
+Index returns $\mathrm{LBI}(\text{race}) = 1.050$ at neighbourhood
+scale $k = 20$, with bootstrap 95\,\% CI $[1.040, 1.058]$ and
+permutation $p < 0.005$. The 5\,\% case-level excess sensitivity to
+race is small in absolute magnitude, robustly above the permutation
+null centred at $1.00$ (the observed value sits 4 standard deviations
+above the null), and replicates across six neighbourhood scales
+spanning two orders of magnitude in $k$. It is a finding the
+population-level metrics do not, and cannot, deliver.
+
+The contributions are three:
+
+\begin{enumerate}
+\item A fairness criterion (LBI) that is case-level rather than
+population-level, that returns a single scalar with a confidence
+interval, and that requires only the algorithm's inputs and outputs
+(not its parameters or training data)---a property essential for
+black-box regulatory audits of proprietary systems.
+
+\item An empirical demonstration on the canonical COMPAS dataset
+that LBI produces a statistically robust, interpretable result that
+neither calibration nor equalized odds alone can produce.
+
+\item A reference implementation released as an open-source Jupyter
+notebook, reproducible end-to-end from the public ProPublica file,
+with explicit feature engineering, bootstrap CIs, and a
+permutation-test certification of significance.
+\end{enumerate}
+
+The paper's relevance to \emph{JSciLaw}'s readership is direct.
+Algorithmic risk assessment is in use in pretrial detention,
+sentencing, parole, child-welfare, and lending decisions across
+U.S.\ jurisdictions. The legal community needs a quantitative audit
+tool that produces a single number, can be applied to black-box
+algorithms, and is grounded in a defensible interpretation of equal
+treatment. LBI fills that gap. The paper also bridges scientific
+method and legal doctrine: the metric is geometric (Mahalanobis
+distance, $k$-nearest neighbours, matched-pair design) and the
+interpretation is doctrinal (Aristotle's like-cases-alike;
+individual fairness in Dwork et al.\ 2012's sense).
+
+The manuscript is self-contained. The broader theoretical framework
+(``Judicial Complex,'' gauge-theoretic structure, path-homology
+criteria for constitutional review) that motivates the LBI is
+mentioned in Section 4 as one paragraph; readers who care about the
+mathematical foundations are pointed to the companion theoretical
+work; readers who care only about the audit tool need no part of
+that machinery.
+
+Data, code, and figures are reproducible. The COMPAS file is public.
+The Jupyter notebook (\verb|lbi_compas_analysis.ipynb|) reproduces
+all tables and figures from the public CSV in approximately five
+minutes on a laptop. The reference implementation is bundled with
+the submission and will be released on GitHub on acceptance.
+
+The manuscript has not been published previously and is not under
+consideration elsewhere. There are no competing interests and no
+external funding.
+
+I would be glad to suggest reviewers with expertise in algorithmic
+fairness, computational law, and criminal-justice risk assessment if
+that would help expedite review.
+
+\closing{Sincerely,}
+
+\end{letter}
+
+\end{document}

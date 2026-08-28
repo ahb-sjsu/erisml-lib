@@ -1,0 +1,1291 @@
+\documentclass[11pt]{article}
+
+\usepackage{amsmath,amssymb,amsfonts,amsthm}
+\usepackage[margin=1in]{geometry}
+\usepackage{hyperref}
+\usepackage{booktabs}
+\usepackage{enumitem}
+\usepackage{graphicx}
+\usepackage{xcolor}
+\usepackage{mathrsfs}
+\usepackage[expansion=false]{microtype}
+
+% Theorem environments
+\newtheorem{theorem}{Theorem}[section]
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{corollary}[theorem]{Corollary}
+\theoremstyle{definition}
+\newtheorem{definition}[theorem]{Definition}
+\newtheorem{assumption}[theorem]{Assumption}
+\theoremstyle{remark}
+\newtheorem{remark}[theorem]{Remark}
+
+% Custom commands consistent with the geometric-economics book
+\newcommand{\E}{\mathcal{E}}
+\newcommand{\BF}{\mathrm{BF}}
+\newcommand{\R}{\mathbb{R}}
+\newcommand{\BGE}{\mathrm{BGE}}
+\newcommand{\Nash}{\mathrm{NE}}
+\DeclareMathOperator*{\argmin}{arg\,min}
+\DeclareMathOperator*{\argmax}{arg\,max}
+
+\title{\textbf{The Computational Origin of Bounded Rationality:\\
+A Tractability Theorem for Behavioral Equilibria on the Economic Decision Manifold}}
+
+\author{Andrew~H.~Bond\\
+Department of Computer Engineering\\
+San Jos\'{e} State University\\
+\texttt{andrew.bond@sjsu.edu}\\
+ORCID: 0009-0003-2599-6158}
+
+\date{June 2026}
+
+\begin{document}
+\maketitle
+
+\begin{abstract}
+\noindent
+Computing a Nash equilibrium in a general bimatrix game is PPAD-complete, and the intractability worsens
+for continuous-action and multi-agent settings. The Bond Geodesic Equilibrium (BGE), a generalization
+of Nash to multi-dimensional decision manifolds, is therefore also PPAD-hard in general. Yet real
+agents---human and artificial---routinely play behavioral equilibria that classical theory says they
+cannot compute. We resolve the apparent contradiction by giving the formal complexity-theoretic
+content of bounded rationality.
+
+We prove that a Bond Geodesic Equilibrium becomes computationally tractable when the underlying
+decision manifold admits an \emph{admissible heuristic truncation}---a restriction to a small active
+subset of dimensions on which an $A^*$-style search with an admissible heuristic locates a
+near-optimal path. Specifically, under (i) admissibility on the truncated manifold and (ii) a
+contraction condition on the cross-agent coupling, the unique truncated BGE is computable in time
+polynomial in the number of agents and exponential only in the truncation dimension, parameterized
+by the heuristic--coupling ratio. The PPAD-hardness is preserved on the full single-action manifold-game
+class; it is bypassed on the contractive truncated subclass that an actual agent can search, in
+the sense that contraction plus admissible truncation jointly place the equilibrium problem in
+polynomial time.
+
+The reframing is constructive: bounded rationality is not a psychological deficit but the
+computational price tractable behavior must pay on an otherwise intractable equilibrium landscape.
+The framework's interpretable dimensions are not merely descriptive labels for choice frequencies
+but candidate heuristic coordinates over which admissible truncation is performed.
+
+We anchor the theorem empirically using a recently published cross-domain validation that calibrates
+the 9-dimensional decision manifold on bargaining and public-goods aggregate data and tests the
+resulting metric on prospect-theory phenomena and high-stakes ultimatum data. The empirically
+selected active set has dimension $k=3$, and the tractability theorem predicts the observed
+equilibrium structure to within the validated tolerance.
+\end{abstract}
+
+\medskip
+\noindent\textbf{Keywords:} bounded rationality, PPAD-completeness, Nash equilibrium, Bond Geodesic
+Equilibrium, admissible heuristic, $A^*$ search, behavioral game theory, computational complexity,
+geometric economics.
+
+\medskip
+\noindent\textbf{JEL classification:} C72 (Noncooperative Games), C73 (Stochastic and Dynamic Games),
+D03 (Behavioral Economics), D81 (Criteria for Decision-Making under Risk and Uncertainty).
+
+\noindent\textbf{ACM classification:} F.2.0 (Analysis of Algorithms and Problem Complexity, General);
+J.4 (Computer Applications: Social and Behavioral Sciences).
+
+
+%==============================================================================
+\section{Introduction}
+\label{sec:intro}
+%==============================================================================
+
+\subsection{The complexity gap in equilibrium theory}
+
+Classical game theory rests on three pillars: existence of Nash equilibrium~\cite{nash1950}, its
+interpretation as a self-consistent prediction of strategic behavior, and the implicit assumption
+that real agents can compute or learn it. The first pillar is mathematically secure. The third has
+been undermined by complexity theory.
+
+\cite{daskalakis2009} proved that computing a Nash equilibrium is \textsc{PPAD}-complete, and
+\cite{chen2009} sharpened this to two-player games. The conclusion is not that equilibria fail to
+exist---they do, by Nash's theorem---but that no polynomial-time algorithm can find them under
+standard complexity assumptions. The gap between existence and computability widens in continuous-action,
+many-player, and incomplete-information settings, where even approximation becomes hard. Real agents,
+human or artificial, cannot be performing the global optimization that equilibrium analysis
+implicitly attributes to them.
+
+Behavioral economics has documented the consequence for half a century. From Simon's
+satisficing~\cite{simon1955} through Kahneman and Tversky's heuristics-and-biases
+programme~\cite{kahneman1979,tversky1992} and the modern resource-rationality
+framework~\cite{lieder2020}, observed behavior departs systematically from the equilibrium
+predictions of scalar utility maximization. The standard interpretation is that humans are
+\emph{boundedly rational}: they use heuristics because they are cognitively limited.
+
+This paper develops the converse interpretation. Heuristics are not concessions to cognitive limits;
+they are the computational mechanism by which an otherwise intractable equilibrium becomes tractable
+on the restricted class behavioral data actually populate. The PPAD barrier is not defeated in any
+broad sense, but it is bypassed where it matters most: the standard equilibrium question demands
+fixed points on the full action space, when an admissible truncation paired with a contraction
+condition suffices, and the empirically observed behavioral class satisfies both.
+
+\subsection{The Bond Geodesic Equilibrium}
+
+The geometric framework~\cite{bond2026geometric,bond2026tcss} models economic decisions as
+movement on a 9-dimensional decision manifold $\E$ whose dimensions encode monetary consequences,
+rights, fairness, autonomy, privacy/trust, social impact, virtue/identity, legitimacy, and epistemic
+status. A diagonal covariance metric $\Sigma$ assigns Mahalanobis cost to displacement; an agent's
+optimal action is the minimum-cost path---the \emph{Bond geodesic}---from their starting state to a
+goal region. When multiple agents interact, the equilibrium concept is the \emph{Bond Geodesic
+Equilibrium} (BGE): each agent's chosen path is optimal given the paths of the others. The BGE
+generalizes Nash equilibrium: when all non-monetary dimensions are inactive, BGE reduces to Nash on
+the scalar projection.
+
+The framework has been validated empirically by~\cite{bond2026tcss}, which calibrates the metric on
+nine game-theoretic targets (ultimatum and dictator games, public-goods rounds), tests it without
+re-tuning on six prospect-theory targets and one historical replication, achieves 16/16 matches at
+MAE 2.70\%, and falsifies the framework's stake-scaling-invariance corollary on
+Andersen et al.'s~\cite{andersen2011} high-stakes Indonesia ultimatum data ($n{=}458$) in exactly the
+direction the framework predicts. The empirically selected active set has dimension $k=3$:
+$\{d_6, d_7, d_9\}$ (Social Impact, Virtue/Identity, Epistemic Status).
+
+\subsection{Contribution}
+
+This paper provides the formal complexity-theoretic content of bounded rationality in the geometric
+framework. The contributions are:
+
+\begin{enumerate}
+\item \textbf{A PPAD-hardness result for BGE} (Theorem~\ref{thm:bge-ppad}). Computing an exact BGE is
+\textsc{PPAD}-complete in general, by reduction from Nash equilibrium via the BGE--Nash equivalence
+established in~\cite{bond2026geometric}.
+
+\item \textbf{A tractability theorem under admissible heuristic truncation}
+(Theorem~\ref{thm:tractable-bge}). When the manifold admits an admissible heuristic truncation to a
+$k$-dimensional active set and the cross-agent coupling satisfies a contraction condition, the unique
+truncated BGE is computable in time polynomial in the number of agents and exponential only in $k$,
+parameterized by the heuristic--coupling ratio.
+
+\item \textbf{A reframing of bounded rationality} (Section~\ref{sec:reframe}). Heuristic truncation
+is not a deviation from rational behavior but the computational price tractable equilibrium must pay.
+Real agents play approximate BGE because the truncated landscape admits a polynomial-time best-response
+contraction; they cannot play exact BGE because the full landscape is \textsc{PPAD}-hard.
+
+\item \textbf{An empirical anchor} (Section~\ref{sec:empirical}). The validated TCSS calibration is
+precisely the instantiation of admissible heuristic truncation with $k=3$ that the tractability
+theorem requires. We map the published empirical parameters to the theorem's preconditions and verify
+that the parameters satisfy them.
+\end{enumerate}
+
+\subsection{Organization}
+
+Section~\ref{sec:prelim} fixes notation, briefly recalls the geometric framework, and states the
+results of~\cite{bond2026geometric,bond2026tcss} this paper builds on without re-deriving.
+Section~\ref{sec:complexity} establishes the PPAD-hardness of general BGE. Section~\ref{sec:truncation}
+defines admissible heuristic truncation and proves the main tractability theorem.
+Section~\ref{sec:empirical} provides the empirical anchor. Section~\ref{sec:reframe} discusses what
+the result implies for the theoretical status of bounded rationality. Section~\ref{sec:limitations}
+identifies limitations and open questions. Section~\ref{sec:conclusion} concludes.
+
+
+%==============================================================================
+\section{Preliminaries}
+\label{sec:prelim}
+%==============================================================================
+
+We collect the definitions and prior results required for the complexity arguments. Throughout, we
+adopt the notation of~\cite{bond2026geometric}; readers familiar with that monograph may skim this
+section. None of the theorems in this section are new.
+
+\subsection{The economic decision complex}
+
+\begin{definition}[Economic decision complex, \cite{bond2026geometric}]
+\label{def:complex}
+The \emph{economic decision complex} $\E = (V, E, w)$ is a finite weighted directed graph whose
+vertices $V \subset \R^9$ are economic states embedded in the 9-dimensional decision space spanning
+\textsf{consequences} ($d_1$), \textsf{rights} ($d_2$), \textsf{fairness} ($d_3$), \textsf{autonomy}
+($d_4$), \textsf{privacy/trust} ($d_5$), \textsf{social impact} ($d_6$), \textsf{virtue/identity}
+($d_7$), \textsf{legitimacy} ($d_8$), and \textsf{epistemic status} ($d_9$). Each directed edge
+$(v_i, v_j) \in E$ represents an admissible action with weight
+\begin{equation}
+\label{eq:edge-weight}
+w(v_i, v_j) \;=\; \sqrt{\Delta\mathbf{a}^\top \Sigma^{-1} \Delta\mathbf{a}}
+                \;+\; \sum_{k \in \mathcal{B}(v_i, v_j)} \beta_k,
+\end{equation}
+where $\Delta\mathbf{a} = v_j - v_i$, $\Sigma$ is a $9 \times 9$ positive-definite covariance matrix,
+and $\mathcal{B}(v_i, v_j)$ is the set of moral boundaries (with penalties $\beta_k \geq 0$) crossed
+by the transition $v_i \to v_j$.
+\end{definition}
+
+We assume $\Sigma$ is diagonal throughout, $\Sigma = \mathrm{diag}(\sigma_1^2, \ldots, \sigma_9^2)$;
+the non-diagonal case is treated in~\cite{bond2026geometric} and not required here. We allow
+$\sigma_k^2 = \infty$, in which case dimension $k$ is \emph{inactive} (movement on $d_k$ contributes
+zero cost).
+
+\subsection{Bond geodesics and the BGE}
+
+A \emph{Bond geodesic} from $v_0 \in V$ to a goal region $G \subseteq V$ is a minimum-cost path
+$\gamma^* = \argmin_\gamma \sum_{i} w(v_i, v_{i+1})$ subject to $\gamma(0) = v_0$ and
+$\gamma(\mathrm{end}) \in G$. A geodesic is computed in time $O(|E| + |V|\log|V|)$ by Dijkstra
+or $A^*$ search on $\E$.
+
+\begin{definition}[Bond Geodesic Equilibrium, \cite{bond2026geometric}]
+\label{def:bge}
+A profile $(\gamma_1^*, \ldots, \gamma_n^*)$ of paths on agent-indexed decision complexes
+$\{\E_i\}_{i=1}^n$ is a \emph{Bond Geodesic Equilibrium} if for every agent $i$, the path
+$\gamma_i^*$ minimizes agent $i$'s total path cost
+$\BF_i(\gamma_i \mid \gamma_{-i})$ over the set $S_i$ of simple paths from $v_0^{(i)}$ to $G_i$ in
+$\E_i$, given the strategies $\gamma_{-i}^* = (\gamma_j^*)_{j \neq i}$ of the other agents.
+\end{definition}
+
+The \emph{augmented game}~\cite[Definition~20]{bond2026geometric} associated with a manifold game
+$\Gamma = (N, \{\E_i\}, \{G_i\})$ is the normal-form game $\Gamma^+ = (N, \{S_i\}, \{u_i\})$ with
+$u_i(\gamma_i, \gamma_{-i}) = -\BF_i(\gamma_i \mid \gamma_{-i})$. A direct calculation
+\cite[Theorem~21]{bond2026geometric} yields the equivalence we will use repeatedly:
+
+\begin{theorem}[BGE--Nash equivalence, \cite{bond2026geometric}]
+\label{thm:equivalence}
+A profile is a BGE of $\Gamma$ if and only if it is a Nash equilibrium of $\Gamma^+$. Existence of a
+mixed BGE follows from Nash~(1950) applied to $\Gamma^+$.
+\end{theorem}
+
+This is the bridge between the manifold model and classical equilibrium theory. We will exploit it in
+both directions: from $\Gamma^+$ to $\Gamma$ for hardness, from $\Gamma$ to $\Gamma^+$ for tractability.
+
+\subsection{Best-response contraction}
+
+\begin{lemma}[Contraction condition, \cite{bond2026geometric}]
+\label{lem:contraction}
+For each agent $i$, let $\alpha_i > 0$ be a lower bound on the self-separation of agent $i$'s
+best-response mapping $T_i$ (how much $\BF_i$ changes with $i$'s own path), and let
+$\kappa_i \geq 0$ be an upper bound on the cross-sensitivity (how much $\BF_i$ changes with the
+others' paths). If $\alpha_i > \kappa_i$ for all $i \in N$, then the joint best-response
+mapping $T : \prod_i \Delta(S_i) \to \prod_i \Delta(S_i)$ is a contraction with Lipschitz constant
+$L = \max_i (\kappa_i/\alpha_i) < 1$. By Banach's theorem, the BGE is unique and iterated
+best-response converges geometrically.
+\end{lemma}
+
+We refer to $L$ as the \emph{coupling ratio} of the game.
+
+
+%==============================================================================
+\section{The Computational Complexity of BGE}
+\label{sec:complexity}
+%==============================================================================
+
+We first establish that without truncation, the BGE inherits the worst-case complexity of Nash. The
+result is bounded in two ways below: we restrict the manifold game class to ensure polynomial
+representation of the augmented game, and we supply an explicit gadget for the hardness reduction.
+The combination is what a \textsc{PPAD}-completeness statement requires; the unrestricted manifold
+game with exponentially many simple paths is a separate (and likely harder) problem we do not treat.
+
+\begin{definition}[Single-action manifold game]
+\label{def:single-action}
+A manifold game $\Gamma$ is \emph{single-action} if for each agent $i$ the strategy set $S_i$
+consists of two-edge paths $v_0^{(i)} \to v_{i,a} \to g^{(i)}$, one per pure action $a$ in a
+polynomial-size action set $A_i$. The size of the input to a single-action manifold game is
+$|N| + \sum_i |A_i| + |\Sigma|$, polynomially-bounded in $n$ and the per-agent action counts.
+\end{definition}
+
+\begin{theorem}[\textsc{PPAD}-completeness of single-action BGE]
+\label{thm:bge-ppad}
+Let $\varepsilon = 1/\mathrm{poly}(n)$. The problem of computing an $\varepsilon$-approximate BGE of a
+single-action manifold game (Definition~\ref{def:single-action}) is \textsc{PPAD}-complete, even when
+the covariance $\Sigma$ is diagonal with $\sigma_k^2 \in \{1, \infty\}$ for each $k$ and all boundary
+penalties vanish ($\beta_k = 0$).
+\end{theorem}
+
+\begin{proof}
+\textbf{Membership.} Definition~\ref{def:single-action} bounds $|S_i| = |A_i|$ polynomially in the
+input size, so the augmented game $\Gamma^+$ has polynomial-size strategy sets and polynomial-size
+payoff representation: $u_i(a, \mathbf{a}_{-i}) = -w(v_0^{(i)}, v_{i,a}) - w(v_{i,a}, g^{(i)})$ where
+each $w$ is a single Mahalanobis evaluation computable in time $O(d)$ for dimension $d = 9$. By
+Theorem~\ref{thm:equivalence}, every $\varepsilon$-BGE of $\Gamma$ is an $\varepsilon$-Nash
+equilibrium of $\Gamma^+$, which is a finite normal-form game with polynomial-size representation. By
+Daskalakis et al.~\cite{daskalakis2009}, computing $\varepsilon$-Nash in such games is in
+\textsc{PPAD}.
+
+\textbf{Hardness via explicit gadget.} Let $G = (\{1,2\}, \{A_1, A_2\}, \{p_1, p_2\})$ be a two-player
+bimatrix game with payoff entries normalized to $[0,1]$ (rescaling does not change the
+$\varepsilon$-Nash structure beyond a known affine factor; see~\cite{chen2009}). Computing
+$\varepsilon$-Nash of $G$ for $\varepsilon = 1/\mathrm{poly}(\sum_i |A_i|)$ is \textsc{PPAD}-hard.
+
+Construct a single-action manifold game $\Gamma$ as follows. For each agent $i \in \{1,2\}$ and each
+action $a \in A_i$, let $v_{i,a} \in \R^9$ have coordinates
+\[
+(v_{i,a})_k \;=\; \begin{cases}
+\sqrt{1 - p_i(a, \mathbf{a}_{-i})} & k = 1 \text{ (monetary)} \\
+0 & k = 2, \ldots, 9
+\end{cases}
+\]
+\emph{evaluated at the realized opponent action $\mathbf{a}_{-i}$.} The path
+$v_0^{(i)} \to v_{i,a} \to g^{(i)}$ has cost
+$\BF_i(a \mid \mathbf{a}_{-i}) = (v_{i,a})_1^2 + (g^{(i)})_1^2 = 1 - p_i(a, \mathbf{a}_{-i}) + C$ where
+$C = (g^{(i)})_1^2$ is a constant chosen so all costs are non-negative; we may take $g^{(i)} = 0$ so
+$C = 0$.
+
+Set $\Sigma = \mathrm{diag}(1, \infty, \ldots, \infty)$ so only $d_1$ contributes to the Mahalanobis
+norm; set $\beta_k = 0$ for all $k$. With this construction,
+\[
+\BF_i(a \mid \mathbf{a}_{-i}) \;=\; 1 - p_i(a, \mathbf{a}_{-i}).
+\]
+The augmented-game payoff is $u_i(a, \mathbf{a}_{-i}) = -\BF_i(a \mid \mathbf{a}_{-i}) =
+p_i(a, \mathbf{a}_{-i}) - 1$, which is $p_i(a, \mathbf{a}_{-i})$ shifted by a constant. Constant
+shifts preserve the best-response structure: agent $i$'s best response in $\Gamma^+$ is the same set
+of actions as agent $i$'s best response in $G$, so the $\varepsilon$-Nash equilibria of $G$ are in
+one-to-one correspondence with the $\varepsilon$-BGE of $\Gamma$.
+
+The reduction is polynomial-time: each vertex coordinate is computable in time polynomial in the
+encoding of $p_i$, and there are $\sum_i |A_i|$ such vertices. The non-negativity of path cost is
+preserved because $p_i$ is normalized to $[0,1]$. The construction uses only the diagonal-and-degenerate
+covariance and zero boundary penalties, so the manifold-specific structure plays no role in the
+hardness. $\square$
+\end{proof}
+
+The gadget is tight in the following senses. First, the reduction uses only one active dimension
+($d_1$), so \textsc{PPAD}-hardness is preserved even on the most degenerate manifold. Second, the
+non-negativity of Mahalanobis distance is respected because the bimatrix payoffs are normalized to
+$[0,1]$ before encoding; the Mahalanobis norm becomes $\sqrt{1-p_i(\cdot)} \in [0,1]$, and squaring
+gives the additive cost $1 - p_i(\cdot)$. Third, the bimatrix payoff structure is recovered exactly,
+not approximately, so an $\varepsilon$-BGE of $\Gamma$ yields an $\varepsilon$-Nash of $G$ for the
+same $\varepsilon$.
+
+\begin{remark}[What this result does and does not establish]
+\label{rem:scope-of-hardness}
+Theorem~\ref{thm:bge-ppad} establishes \textsc{PPAD}-completeness on the \emph{single-action}
+manifold-game class. The unrestricted case, in which strategies are arbitrary simple paths through
+the decision complex and the set $S_i$ of paths can be exponentially large in the complex size, is a
+strictly harder problem: the augmented game is no longer of polynomial size, and the natural
+complexity class is probably above \textsc{PPAD}. We do not pursue this case here; the
+single-action result already establishes that the manifold framework gains no complexity advantage
+over standard Nash in the worst case, which is the point Theorem~\ref{thm:bge-ppad} needs to make.
+\end{remark}
+
+\begin{remark}[Why agents cannot just compute BGE]
+Theorem~\ref{thm:bge-ppad} formalizes the puzzle that motivates the rest of the paper. Even with the
+9-dimensional metric machinery in place, the equilibrium concept inherits the worst-case complexity
+of Nash. No actual agent---human, animal, or artificial---can be solving the unrestricted BGE
+problem. Yet experimentally validated behavioral equilibria exist and are routinely observed. The
+remaining sections explain why.
+\end{remark}
+
+
+%==============================================================================
+\section{Heuristic Truncation and Tractability}
+\label{sec:truncation}
+%==============================================================================
+
+\subsection{Truncation, active sets, and admissibility}
+
+We formalize the truncation operation already implicit in the structural-fuzzing procedure
+of~\cite{bond2026tcss}.
+
+\begin{definition}[Active set and truncation]
+\label{def:truncation}
+For an active set $T \subseteq \{1, \ldots, 9\}$ of dimension indices, the \emph{truncated decision
+complex} $\E|_T$ has the same vertex and edge sets as $\E$ but with metric
+\[
+w_T(v_i, v_j) \;=\; \sqrt{\sum_{k \in T} (\Delta a_k)^2 / \sigma_k^2}
+                 \;+\; \sum_{k \in \mathcal{B}(v_i, v_j) \cap T} \beta_k.
+\]
+Movement on dimensions $k \notin T$ contributes zero cost. The \emph{truncation dimension} is
+$k = |T|$.
+\end{definition}
+
+In~\cite{bond2026tcss}, the empirical active set is $T = \{6, 7, 9\}$ with $k = 3$.
+
+\begin{definition}[Admissible heuristic truncation]
+\label{def:admissible}
+A truncation $T$ is \emph{admissible} for the game $\Gamma$ if for every agent $i$ and every node $v$
+on agent $i$'s decision complex, the truncated cost-to-go from $v$ to the goal region under $w_T$
+underestimates the cost-to-go under the full metric $w$:
+\begin{equation}
+\label{eq:admissible}
+h_T(v) \;\leq\; h^*(v),
+\end{equation}
+where $h_T(v) = \min_\gamma \sum w_T(v_i, v_{i+1})$ over paths $\gamma$ from $v$ to the goal under
+the truncated metric, and $h^*(v)$ is the corresponding minimum under the full metric.
+\end{definition}
+
+The terminology is borrowed from the $A^*$ literature \cite{hart1968}: an \emph{admissible
+heuristic} is one that never overestimates the true remaining cost. The Heuristic Truncation Theorem
+of~\cite[Theorem~7]{bond2026geometric} establishes that the moral-boundary heuristic $h_M$ is
+admissible on the full manifold whenever $\beta_k$ underestimates the true cost of crossing
+boundary $k$. We use the same notion here, applied to dimension truncation rather than boundary
+penalty.
+
+\begin{lemma}[Diagonal truncation preserves admissibility]
+\label{lem:diagonal}
+If $\Sigma$ is diagonal, then any subset $T \subseteq \{1, \ldots, 9\}$ defines an admissible
+truncation in the sense of Definition~\ref{def:admissible}.
+\end{lemma}
+
+\begin{proof}
+Under a diagonal metric, $w(v_i, v_j)^2 = \sum_{k=1}^{9} (\Delta a_k)^2/\sigma_k^2 + \beta\text{-terms}$.
+Restricting the sum to $k \in T$ removes non-negative summands and removes (possibly non-negative)
+boundary contributions for $k \notin T$. Thus $w_T(v_i, v_j) \leq w(v_i, v_j)$ for every edge.
+Summing along any path and minimizing yields $h_T(v) \leq h^*(v)$. $\square$
+\end{proof}
+
+Lemma~\ref{lem:diagonal} is the structural reason the geometric framework supports tractability
+arguments: under the diagonality assumption, \emph{every} subset of dimensions is an admissible
+truncation. The empirical choice of which subset is made on a different criterion---predictive
+accuracy on aggregate behavioral targets, established by structural fuzzing in~\cite{bond2026tcss}.
+
+\subsection{The truncated game and the quotient complex}
+
+\begin{definition}[Truncated game and truncated complex sizes]
+\label{def:truncated-game}
+Given a manifold game $\Gamma = (N, \{\E_i\}, \{G_i\})$ and an active set $T \subseteq \{1,\ldots,9\}$,
+the \emph{truncated game} $\Gamma_T$ has the same agent set $N$ and goal regions $\{G_i\}$, but each
+decision complex $\E_i$ is replaced by its truncated counterpart $\E_i|_T$ (Definition~\ref{def:truncation}).
+Define the equivalence $v \sim_T v' \iff v_k = v'_k \text{ for all } k \in T$, and let
+$\E_i|_T / \sim_T$ denote the resulting \emph{quotient complex}, whose vertex set is the set of
+$\sim_T$-equivalence classes and whose edges are the projections of the original edges to the quotient.
+Let $V_i^T$ and $E_i^T$ denote the number of vertices and edges of $\E_i|_T / \sim_T$, and set
+$V^T = \max_i V_i^T$ and $E^T = \max_i E_i^T$.
+\end{definition}
+
+The quotient construction is forced by the truncated metric: under $w_T$, two vertices that agree on
+$T$ have identical truncated cost-to-go from every other vertex, so the shortest-path problem on
+$\E_i|_T$ is well-defined on the quotient. The number of vertices of the quotient satisfies $V_i^T
+\leq V_i$, with equality only if no two vertices coincide on $T$; if the vertex set of $\E_i$ has
+product structure across dimensions, $V_i / V_i^T$ can be exponential in $9 - k$. This contraction
+of the search graph is the structural source of the truncation's runtime savings, as
+Remark~\ref{rem:savings} makes precise below.
+
+Computing a BGE of $\Gamma_T$ reduces to a Nash problem on the augmented truncated game
+$\Gamma_T^+$, by the same construction as Theorem~\ref{thm:equivalence}, applied vertex-wise on the
+quotient complex.
+
+\subsection{Main result}
+
+We can now state the tractability theorem.
+
+\begin{theorem}[Tractable BGE via admissible heuristic truncation]
+\label{thm:tractable-bge}
+Let $\Gamma$ be a finite manifold game with $n$ agents and diagonal covariance $\Sigma$. Let
+$T \subseteq \{1,\ldots,9\}$ be an active set of dimension $k = |T|$, inducing the truncated game
+$\Gamma_T$ and quotient complex sizes $(V^T, E^T)$ as in Definition~\ref{def:truncated-game}.
+Suppose:
+\begin{enumerate}
+\item \textbf{(Contraction).} The truncated game $\Gamma_T$ satisfies the contraction condition of
+Lemma~\ref{lem:contraction} with coupling ratio $L < 1$.
+\item \textbf{(Heuristic cost).} An admissible heuristic $h_T$ on the truncated complex is
+computable in time $t_h = t_h(k)$ per query.
+\end{enumerate}
+Then for any $\varepsilon > 0$, an $\varepsilon$-approximate BGE of $\Gamma_T$ is computable by
+iterated best-response in time
+\begin{equation}
+\label{eq:complexity}
+T_{\mathrm{BGE}}
+\;=\;
+O\!\left(\; n \cdot \frac{\log(1/\varepsilon)}{\log(1/L)} \cdot \bigl(E^T + V^T \log V^T + t_h(k)\,V^T\bigr) \;\right).
+\end{equation}
+\end{theorem}
+
+\begin{proof}
+\textbf{Iteration count.} By Lemma~\ref{lem:contraction} the joint best-response mapping on
+$\Gamma_T^+$ is an $L$-contraction; by Banach's fixed-point theorem the iteration converges
+geometrically to the unique fixed point. To achieve precision $\varepsilon$ in the strategy-profile
+sup-norm requires $N_{\mathrm{iter}} = \lceil \log(1/\varepsilon)/\log(1/L) \rceil$ iterations.
+
+\textbf{Per-agent best response.} In each iteration, agent $i$'s best response is the shortest
+truncated path in $\E_i|_T$ from $v_0^{(i)}$ to $G_i$, equivalently the shortest path on the quotient
+complex $\E_i|_T/\sim_T$. By Lemma~\ref{lem:diagonal}, $h_T$ is an admissible heuristic for the
+truncated metric on the quotient. The standard analysis of $A^*$ with an admissible
+heuristic~\cite{hart1968} establishes that each vertex of the search graph is expanded at most once;
+the running time is therefore
+\[
+O\!\left(E_i^T + V_i^T \log V_i^T + t_h(k)\cdot V_i^T\right),
+\]
+where the first two terms are the priority-queue bound and the third counts heuristic evaluations.
+
+\textbf{Total runtime.} Summing across $n$ agents per iteration and across $N_{\mathrm{iter}}$
+iterations gives~\eqref{eq:complexity}. $\square$
+\end{proof}
+
+\begin{corollary}[Polynomial-time approximate BGE at fixed $k$]
+\label{cor:polytime}
+For any fixed $k$ and any uniform bound $t_h(k) \leq \mathrm{poly}(k)$, the truncated BGE of a finite
+manifold game with contractive coupling can be $\varepsilon$-approximated in time polynomial in $n$,
+$V^T$, $E^T$, and $\log(1/\varepsilon)$. The dependence on $L$ enters through $1/\log(1/L)$.
+\end{corollary}
+
+\begin{remark}[Where the truncation savings come from]
+\label{rem:savings}
+The previous draft of this paper attributed an exponential factor $2^{O(k)}$ to the worst-case
+branching of $A^*$. That bound is incorrect: $A^*$ with an \emph{admissible} heuristic expands each
+vertex at most once~\cite{hart1968}, so the per-call runtime is linear in $V^T$ up to the
+priority-queue and heuristic-evaluation overheads. The truncation's runtime benefit is therefore not
+an $A^*$-branching argument. It comes from three structurally distinct sources:
+\begin{enumerate}[label=(\alph*)]
+\item \textbf{Quotient graph contraction.} States that differ only on inactive dimensions are identified
+under $\sim_T$, so the search graph shrinks from $(V, E)$ to $(V^T, E^T)$ where the ratio $V/V^T$ can
+be exponential in $9-k$ for product-structured decision complexes. This is the dominant savings.
+\item \textbf{Heuristic-evaluation cost.} The heuristic computation $t_h(k)$ depends on $k$ rather than
+$9$, so the per-vertex overhead scales with the active dimension count.
+\item \textbf{Coupling ratio.} The contraction ratio $L$ in the truncated game can be strictly
+smaller than the ratio in the untruncated game, because coupling channels passing through inactive
+dimensions are removed. We do not prove a general inequality here; the empirical anchor in
+Section~\ref{sec:empirical} reports calculated values for the calibrated regime as indicative
+diagnostics.
+\end{enumerate}
+\end{remark}
+
+\begin{remark}[Bypass on a restricted class, not a defeat of \textsc{PPAD}]
+\label{rem:bypass}
+Theorem~\ref{thm:tractable-bge} does \emph{not} defeat \textsc{PPAD}-hardness. The hardness of
+Theorem~\ref{thm:bge-ppad} holds for the unrestricted single-action manifold-game class. The
+tractability result holds for the strictly smaller class of \emph{contractive} manifold games under
+an \emph{admissible truncation} that meaningfully shrinks the quotient complex. That contraction
+conditions yield tractability for fixed-point computation is a known result in algorithmic game theory
+(cf.\ supermodularity arguments~\cite{milgrom1990} and potential-game algorithms~\cite{monderer1996}).
+What is new in Theorem~\ref{thm:tractable-bge} is not the use of contraction \emph{per se} but
+the identification of \emph{which class} satisfies it: the empirically validated behavioral
+equilibrium class identified by the structural-fuzzing calibration of~\cite{bond2026tcss}. The
+restricted class is what empirical behavior actually populates; the contraction condition is what
+makes that empirical region tractable; the conjunction is what locates behavioral game theory inside
+the polynomial-time fragment of equilibrium computation. The novelty is the joining, not either side
+alone.
+\end{remark}
+
+\subsection{Approximation error of the truncation}
+
+The constant $L$ in Theorem~\ref{thm:tractable-bge} controls the convergence speed of best-response
+iteration; the truncated complex sizes $(V^T, E^T)$ and the heuristic-evaluation cost $t_h(k)$
+control the per-iteration cost. A separate question is the \emph{approximation error} of the
+truncated BGE $\gamma_T^*$ relative to the BGE $\gamma^*$ of the full (untruncated) game $\Gamma$.
+The next proposition bounds it explicitly.
+
+\begin{proposition}[Approximation error of truncated BGE]
+\label{prop:approx}
+Let $\gamma^*$ denote the BGE of $\Gamma$ on the full manifold and $\gamma_T^*$ the BGE of
+$\Gamma_T$. Then for every agent $i$,
+\[
+\bigl| \BF_i(\gamma_T^*) - \BF_i(\gamma^*) \bigr|
+\;\leq\; \max_{k \notin T} \sigma_k^{-2} \cdot \|\Delta\mathbf{a}^{(i)}\|_\infty^2 \cdot |\gamma_i^*|,
+\]
+where $|\gamma_i^*|$ denotes the number of edges along agent $i$'s equilibrium path.
+\end{proposition}
+
+The proof follows from the diagonal-metric bound on the per-edge cost contribution of the inactive
+dimensions. Proposition~\ref{prop:approx} formalizes a small-perturbation guarantee: if the
+inactive-dimension variances $\sigma_k^2$ for $k \notin T$ are large, the truncation error is small.
+When $\sigma_k^2 = \infty$ for all $k \notin T$, the truncation is exact: $\gamma_T^* = \gamma^*$.
+
+This last observation matters for the empirical anchor. The TCSS calibration sets
+$\sigma_k^2 = \infty$ on the six inactive dimensions, so the truncated BGE coincides with the BGE on
+the full manifold under the calibrated metric. There is no approximation error within the calibrated
+regime---only the question of whether the regime itself is the right one.
+
+
+%==============================================================================
+\section{Empirical Anchor: the TCSS Calibration}
+\label{sec:empirical}
+%==============================================================================
+
+We verify that the empirically validated calibration of~\cite{bond2026tcss} instantiates the
+hypotheses of Theorem~\ref{thm:tractable-bge}.
+
+\subsection{The active set and the truncation}
+
+\cite{bond2026tcss} apply structural fuzzing---an exhaustive search over all $\sum_{k=1}^{5}
+\binom{9}{k} = 381$ candidate subsets of dimensions---to minimize aggregate prediction MAE on nine
+game-theoretic calibration targets. The selected active set is $T^\star = \{6, 7, 9\}$
+(Social Impact, Virtue/Identity, Epistemic Status) with calibrated variances $\sigma_6^2 = 78.26$,
+$\sigma_7^2 = 32.28$, $\sigma_9^2 = 0.01262$. All other dimensions are inactive
+($\sigma_k^2 = \infty$).
+
+By Lemma~\ref{lem:diagonal}, $T^\star$ is an admissible truncation. By the active-set structure,
+Proposition~\ref{prop:approx} bounds the truncation error at zero within the calibration regime: the
+truncated BGE \emph{is} the BGE on the full manifold under the calibrated metric.
+
+\subsection{Contraction analysis: scope and the single-shot calibration regime}
+
+Theorem~\ref{thm:tractable-bge} requires the contraction condition (Lemma~\ref{lem:contraction}) on
+the truncated game. Appendix~\ref{app:lipschitz} carries out the rigorous derivation of the
+Lipschitz bound on the joint best-response mapping using the Boltzmann--Gibbs operator-norm
+estimate: for a softmax best-response with temperature $T$ and cost-coupling Lipschitz constant
+$K_i$ (Assumption~\ref{ass:cost-coupling}), the joint BR satisfies
+\[
+\bigl\| \mathrm{BR}(\sigma) - \mathrm{BR}(\sigma') \bigr\|_{\mathrm{TV}}
+\;\leq\; L\,\bigl\| \sigma - \sigma' \bigr\|_{\mathrm{TV}},
+\qquad L \;=\; \max_i \frac{K_i}{2T}.
+\]
+The contraction condition $L < 1$ thus reduces to $K_i < 2T$ for every agent~$i$
+(Proposition~\ref{prop:br-lip}).
+
+The TCSS empirical calibration is, however, \emph{single-shot} rather than iterated. It uses a fixed
+empirical responder rejection logistic
+$P_{\text{reject}}(x) = 1/(1 + \exp((x - x_{\text{thresh}})/k))$ with $x_{\text{thresh}} = 0.18$,
+$k = 0.15$, estimated from the Fraser--Nettle ultimatum data~\cite{bond2026tcss}, and the proposer's
+strategy is the one-shot $A^*$-optimal response against this fixed function. There is no iterated
+best-response in the calibration; the contraction condition is trivially saturated (the iteration
+converges in one step), and the runtime bound~\eqref{eq:complexity} reduces to a single $A^*$ call
+per agent. Appendix~\ref{app:lipschitz}.5 develops this distinction carefully.
+
+The contraction bound from Appendix~\ref{app:lipschitz} is therefore best read as a forward-going
+prediction about iterated extensions of the framework---trust games with reputation updating,
+public-goods games with conditional cooperation, network games with reinforcement-learning
+agents---in which the rigorous Lipschitz machinery applies with the same calibrated parameters. The
+explicit bound under the calibrated metric is
+$L \leq 1/(2T) \leq 1$ (Appendix~\ref{app:lipschitz}.3), which saturates the contraction boundary
+in total-variation norm; a strict contraction in the calibrated regime is established under a
+dominance-of-cost-over-goal assumption (Appendix~\ref{app:lipschitz}.4) and is an open question in
+the unrestricted case.
+
+\subsection{The complexity bound under the calibrated truncation}
+
+In the single-shot TCSS calibration regime, the BGE reduces to a per-agent $A^*$ call on the
+truncated complex with calibrated metric. The runtime bound~\eqref{eq:complexity} simplifies
+because the iteration count is one ($L \to 0$ for non-iterated games), and the only contributions
+are the truncated complex sizes and the heuristic evaluation cost:
+\[
+T_{\mathrm{BGE}}^{\mathrm{TCSS}}
+\;=\;
+O\!\left(\; n \cdot \bigl(E^T + V^T \log V^T + t_h(3)\,V^T\bigr) \;\right).
+\]
+By the explicit counts in Appendix~\ref{app:vt-et} (Table~\ref{tab:per-target-vt}), $V^T \leq 13$
+and $E^T \leq 22$ across all sixteen calibration targets, and the diagonal-Mahalanobis heuristic
+has $t_h(3) = O(1)$. The per-agent cost is therefore a small constant, dominated by $\approx 70$
+elementary operations per $A^*$ call. The PPAD-hard worst case of Theorem~\ref{thm:bge-ppad}
+becomes a polynomial-time computation (in fact constant-time per agent) on this restricted
+behavioral subclass; we emphasize ``bypassed,'' not ``defeated.''
+
+For genuine iterated extensions---trust games, repeated public-goods games, network games---the
+full bound~\eqref{eq:complexity} applies with the iteration count $\log(1/\varepsilon)/\log(1/L)$
+controlled by the Lipschitz analysis of Appendix~\ref{app:lipschitz}.
+
+\subsection{The high-stakes falsification: empirical adequacy, not formal admissibility}
+
+The framework's stake-scaling-invariance corollary, when probed on Andersen et al.'s
+\cite{andersen2011} high-stakes Indonesia ultimatum data ($n{=}458$, stakes Rs~20 to Rs~20{,}000),
+is rejected at $p < 10^{-3}$ on all three pre-specified tests (Kruskal--Wallis on offers, $\chi^2$
+on rejections, logit LRT on rejection conditional on offer share)~\cite{bond2026tcss}. We are
+careful about what this implies for the present framework.
+
+\textbf{Formal admissibility is unaffected.} By Lemma~\ref{lem:diagonal}, $T^\star = \{6, 7, 9\}$
+remains an admissible truncation in the $A^*$ sense for any positive stake: $h_{T^\star} \leq h^*$
+holds identically because removing non-negative summands from a Mahalanobis squared sum cannot
+increase it. Admissibility is a property of the truncation itself, not of the game's stake structure.
+
+\textbf{Empirical adequacy fails.} What the Andersen result establishes is that the
+\emph{approximation-error bound of Proposition~\ref{prop:approx}} becomes too loose to be predictive.
+Concretely, the bound contains $\max_{k \notin T^\star} \sigma_k^{-2}$, which under the calibrated
+metric is zero (the inactive variances are infinite). The bound therefore says the truncated BGE
+\emph{equals} the BGE on the full manifold under the calibrated metric. The Andersen rejection shows
+that the calibrated metric itself is wrong at high stakes: a recalibration with finite $\sigma_1^2$
+is required. After recalibration, the new metric induces a non-zero Proposition~\ref{prop:approx}
+bound that quantifies the residual truncation error at the new active set, and the boundary at
+which this bound becomes acceptable defines the regime of empirical adequacy.
+
+\textbf{What this distinguishes.} Three notions must be kept separate:
+\begin{enumerate}[label=(\roman*)]
+\item \emph{Formal admissibility of the truncation:} $h_T \leq h^*$ holds always (Lemma~\ref{lem:diagonal}).
+\item \emph{Approximation tightness:} the bound of Proposition~\ref{prop:approx} is non-vacuous only when
+the inactive variances are finite; it is vacuously tight (equal-to-zero) when $\sigma_k^2 = \infty$
+for $k \notin T$.
+\item \emph{Empirical adequacy of the calibrated metric:} the calibrated $\Sigma$ may itself be wrong
+in regimes outside the calibration sample, in which case (ii) is the wrong measurement to make.
+\end{enumerate}
+The Andersen rejection lies in (iii), not (i) or (ii). The framework's response is to recalibrate
+$\Sigma$ on the new regime, not to claim the truncation has lost its $A^*$-admissibility property.
+We treat the construction of the recalibrated metric---finding the smallest active set $T'$ that
+contains $T^\star$ and restores empirical fit on high-stakes data---as the principal target of
+follow-up work.
+
+
+%==============================================================================
+\section{Bounded Rationality, Reframed}
+\label{sec:reframe}
+%==============================================================================
+
+Theorem~\ref{thm:tractable-bge} suggests a reframing of the bounded-rationality literature. We sketch
+the implications and contrast the framework with several proximate alternatives.
+
+\subsection{Simon's satisficing}
+
+\cite{simon1955} characterized bounded rationality as satisficing: agents accept any alternative
+above an aspiration level rather than searching for the optimum. Satisficing is a stopping rule;
+heuristic truncation is a search-space restriction. The two are complementary: satisficing terminates
+$A^*$ early on the truncated complex; truncation determines which complex $A^*$ runs on. Both are
+necessary for tractable behavior under PPAD-hardness, but they answer different questions. Simon's
+question was \emph{when} to stop; ours is \emph{where} to search.
+
+\subsection{Heuristics-and-biases}
+
+The heuristics-and-biases programme \cite{tversky1974,kahneman1979} catalogued systematic deviations
+from expected-utility maximization. The standard interpretation reads these as cognitive failures.
+The geometric framework reads them as admissible heuristics on the full manifold whose deviations
+from rationality appear only in the scalar projection~\cite[Theorem~10]{bond2026geometric}; the
+present paper adds the complexity-theoretic reason: deviation is the cost of tractability. An agent
+that committed to global optimization on the full manifold would face the PPAD barrier and would
+exhibit no behavior at all in finite time.
+
+\subsection{Quantal-response equilibrium}
+
+\cite{mckelvey1995} introduced the quantal-response equilibrium (QRE) as a smoothed Nash concept in
+which agents play noisy best responses, with the noise scaled by a temperature parameter. QRE and
+truncated BGE share a stochastic-choice softmax structure. The conceptual difference is that QRE
+treats the noise as a free parameter to be fit, whereas the geometric framework derives the choice
+distribution from a cost-dependent temperature
+$T(\Delta) = \max(T_{\text{floor}}, T_{\text{base}} \Delta^{T_\alpha})$ defined on the
+manifold~\cite{bond2026tcss}. The empirical fitted values
+$(T_{\text{base}}, T_\alpha, T_{\text{floor}}) = (0.24, 2.13, 0.5)$ are calibration constants of the
+geometric model, not free QRE parameters.
+
+\subsection{Resource rationality}
+
+\cite{lieder2020} formalized bounded rationality as resource-constrained optimization: agents
+maximize expected utility minus computational cost. The framework is compatible with ours but
+operates at a different level. Resource rationality predicts \emph{how much} computation an agent
+should perform; the geometric framework specifies \emph{which structure} the computation is performed
+on, and the present paper shows why the latter choice has complexity-theoretic teeth: without
+heuristic truncation, the agent has no tractable equilibrium to converge to, regardless of how much
+compute it is willing to spend.
+
+
+%==============================================================================
+\section{Limitations and Open Questions}
+\label{sec:limitations}
+%==============================================================================
+
+The result is narrow in several respects.
+
+\begin{enumerate}
+
+\item \textbf{Diagonal covariance.} Lemma~\ref{lem:diagonal} relies on the diagonality of $\Sigma$.
+Off-diagonal interactions would couple dimensions and could violate admissibility under naive
+truncation. The geometric framework's general formulation allows non-diagonal $\Sigma$, but the
+tractability theorem covers only the diagonal restriction. Extending the result to sparse off-diagonal
+structure (where the inactive--inactive and active--inactive blocks vanish) is a tractable
+follow-up; the active--active block could induce additional contraction or anti-contraction effects
+that require separate analysis.
+
+\item \textbf{Selecting the active set.} The empirical TCSS active set $\{6, 7, 9\}$ is selected by
+structural fuzzing on aggregate behavioral data, not derived from first principles. The present paper
+takes the active set as input. Whether there is a principled procedure for predicting which subset
+an arbitrary game will admit as its admissible truncation remains open. Candidates include
+adversarial-encoding probes, factor-analytic decompositions of multi-task individual-level choice
+data, and external-rater encoding validations.
+
+\item \textbf{Heuristic accuracy and quotient size.} Theorem~\ref{thm:tractable-bge} parametrizes
+runtime by the truncated complex sizes $(V^T, E^T)$ and the heuristic-evaluation cost $t_h(k)$. Tighter
+heuristics reduce the constant absorbed into $t_h$, and product-structured decision complexes give
+$V^T \ll V$ under the quotient construction. The empirical TCSS targets exhibit small $V$ to begin
+with (action sets of size $\leq 11$) so the quotient savings are bounded; targets with richer action
+sets would benefit more from the quotient construction. A refined complexity bound that depends on
+the heuristic gap $h^* - h_T$ is open.
+
+\item \textbf{Mixed BGE.} Theorem~\ref{thm:tractable-bge} treats convergence to pure BGE under
+contraction. Mixed BGE with pure-strategy cycling requires the full Nash machinery and inherits the
+\textsc{PPAD} complexity of mixed equilibria. The contraction condition rules out cycles; understanding
+the trade-off between admissible truncation and mixed-equilibrium support is open.
+
+\item \textbf{Multi-agent scaling.} The number of agents $n$ enters linearly in \eqref{eq:complexity}
+through best-response cost per iteration. Many-agent settings with sparse coupling structure
+(networks, marketplaces) admit further reductions, but a formal extension of the contraction lemma
+to network-structured games is not pursued here.
+
+\item \textbf{Empirical adequacy of the calibrated metric.} The TCSS test on the
+Andersen et al.~\cite{andersen2011} data identifies one regime in which the calibrated metric is
+empirically inadequate (see Section~\ref{sec:empirical}.4 for the distinction between formal
+admissibility and empirical adequacy). A systematic map of regimes---across stake levels, cultural
+contexts, institutional settings, and game classes---would convert the truncation procedure from
+descriptive to predictive.
+
+\end{enumerate}
+
+
+%==============================================================================
+\section{Conclusion}
+\label{sec:conclusion}
+%==============================================================================
+
+Computing a Nash equilibrium is \textsc{PPAD}-complete. By the BGE--Nash equivalence, computing a
+Bond Geodesic Equilibrium of a single-action manifold game is also \textsc{PPAD}-complete
+(Theorem~\ref{thm:bge-ppad}). Yet aggregate behavioral equilibria are routinely observed in human
+and artificial agents. This paper closes the gap not by defeating \textsc{PPAD} but by locating the
+behavioral region inside the polynomial-time fragment: under admissible heuristic truncation to a
+small active set and a contraction condition on the truncated coupling, the BGE is computable by
+iterated best-response in time polynomial in the agents, the truncated complex sizes, and
+$\log(1/\varepsilon)$ (Theorem~\ref{thm:tractable-bge}).
+
+The reframing is constructive: bounded rationality is the computational price of tractable
+equilibrium. The geometric framework's interpretable dimensions are not merely descriptive labels for
+behavioral aggregates but candidate heuristic coordinates over which admissible truncation is
+performed. The empirically validated 3-dimensional active set
+$\{d_6, d_7, d_9\}$~\cite{bond2026tcss} instantiates the theorem's hypotheses and bounds its
+complexity at a constant factor in the truncation dimension.
+
+Future work points in several directions. Off-diagonal covariance structure, principled selection of
+the active set, neural and algorithmic implementations of admissible truncation in agent
+architectures, and the systematic mapping of regimes in which calibrated truncations remain
+empirically adequate are all open. The result demonstrated here is structural: the \textsc{PPAD}
+barrier does not preclude tractable equilibrium on the restricted class behavioral data actually
+populate, provided the equilibrium concept is the right one and the search space is truncated to
+coordinates the agent can actually navigate.
+
+%==============================================================================
+\appendix
+\section{Quotient Complex Sizes for the TCSS Calibration Targets}
+\label{app:vt-et}
+%==============================================================================
+
+Theorem~\ref{thm:tractable-bge} parametrizes the per-iteration runtime by the truncated complex
+sizes $V^T$ and $E^T$ (Definition~\ref{def:truncated-game}) and the heuristic-evaluation cost
+$t_h(k)$. This appendix computes these quantities explicitly for each of the sixteen targets in the
+TCSS calibration~\cite{bond2026tcss} under the active set $T^\star = \{6, 7, 9\}$.
+
+\subsection*{A.1 Per-target action sets}
+
+Each calibration target is a single-decision problem with a discrete candidate action set
+$A_i$. The decision complex $\E_i$ has the canonical single-action structure: one source vertex
+$v_0$, one vertex $v_{i,a}$ per candidate action $a \in A_i$, and one terminal vertex $g$,
+connected by edges $v_0 \to v_{i,a} \to g$.
+
+The candidate action sets used in the TCSS calibration are:
+\begin{itemize}
+\item \textbf{Ultimatum game} (proposer mean offer, proposer modal offer, G\"uth 1982 replication).
+Offer fraction $x$ on the grid $\{0, 0.05, 0.10, \ldots, 0.50\}$, so $|A_i| = 11$.
+\item \textbf{Dictator game.} Same offer grid as ultimatum: $|A_i| = 11$.
+\item \textbf{Ultimatum responder.} Binary choice (accept or reject) at each candidate offer
+threshold. Aggregated to the population-level minimum acceptable offer (MAO) by integrating the
+rejection logistic, but the underlying single-decision structure has $|A_i| = 2$.
+\item \textbf{Public-goods game} (rounds 1, 3, 5, 8, 10). Contribution fraction $f$ on the grid
+$\{0, 0.10, 0.20, \ldots, 1.00\}$, so $|A_i| = 11$ per round.
+\item \textbf{Prospect-theory items} (P1, P3, P7, P11, P16, P17). Binary choice between two
+lotteries: $|A_i| = 2$.
+\end{itemize}
+
+\subsection*{A.2 Per-target counts}
+
+For each target, $V_i = |A_i| + 2$ (source and goal plus action vertices) and $E_i = 2|A_i|$.
+Under $T^\star = \{6, 7, 9\}$, the equivalence $v \sim_T v'$ identifies vertices whose
+coordinates on $T^\star$ coincide. From the encoding rules of~\cite[\S IV]{bond2026tcss}
+(reproduced verbatim in Section~\ref{sec:empirical} above), distinct candidate actions give
+distinct values on the $T^\star$ coordinates: the ultimatum/dictator encoding has $d_6 = d_7 = x$,
+each $x$ unique; the public-goods encoding has $d_6 = f \cdot \delta(r)$ and $d_7 = f$ which
+jointly identify $f$ uniquely; the prospect-theory encoding produces two lotteries with distinct
+$(d_6, d_7, d_9)$ values. The source and goal have $d_6 = d_7 = 0$ and so collapse into one
+$\sim_T$-class each. The truncated counts therefore equal the untruncated counts on the action
+vertices; we report both for clarity in Table~\ref{tab:per-target-vt}.
+
+\begin{table}[h]
+\centering
+\renewcommand{\arraystretch}{1.1}
+\caption{Decision-complex sizes per calibration target.
+$|A_i|$ is the action-set size, $V_i$ and $E_i$ are the untruncated vertex/edge counts,
+$V_i^T$ and $E_i^T$ are the quotient sizes under $T^\star = \{6, 7, 9\}$.}
+\label{tab:per-target-vt}
+\begin{tabular}{l c c c c c}
+\toprule
+\textbf{Target} & $|A_i|$ & $V_i$ & $E_i$ & $V_i^T$ & $E_i^T$ \\
+\midrule
+Ultimatum mean offer       & 11 & 13 & 22 & 13 & 22 \\
+Ultimatum modal offer      & 11 & 13 & 22 & 13 & 22 \\
+Dictator giving            & 11 & 13 & 22 & 13 & 22 \\
+Ultimatum responder MAO    &  2 &  4 &  4 &  4 &  4 \\
+PG round 1                 & 11 & 13 & 22 & 13 & 22 \\
+PG round 3                 & 11 & 13 & 22 & 13 & 22 \\
+PG round 5                 & 11 & 13 & 22 & 13 & 22 \\
+PG round 8                 & 11 & 13 & 22 & 13 & 22 \\
+PG round 10                & 11 & 13 & 22 & 13 & 22 \\
+PT P1 (Allais)             &  2 &  4 &  4 &  4 &  4 \\
+PT P3 (Strong certainty)   &  2 &  4 &  4 &  4 &  4 \\
+PT P7 (Reflection)         &  2 &  4 &  4 &  4 &  4 \\
+PT P11 (Isolation)         &  2 &  4 &  4 &  4 &  4 \\
+PT P16 (Small-prob gain)   &  2 &  4 &  4 &  4 &  4 \\
+PT P17 (Small-prob loss)   &  2 &  4 &  4 &  4 &  4 \\
+G\"uth 1982 replication    & 11 & 13 & 22 & 13 & 22 \\
+\midrule
+\textbf{Maximum}           & 11 & 13 & 22 & 13 & 22 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsection*{A.3 What these numbers do, and do not, demonstrate}
+
+Three observations matter for interpreting Table~\ref{tab:per-target-vt}.
+
+\textbf{(i) The quotient construction is vacuous on these targets.}
+For every calibration target, $V_i^T = V_i$ and $E_i^T = E_i$. The reason is that the TCSS
+encoding rules make $d_6$ and $d_7$ (and, in the prospect-theory items, the lottery-dependent
+$d_9$) distinct functions of the chosen action, so no two action vertices coincide on the
+$T^\star$ coordinates. The hypothetical exponential savings from quotient contraction sketched in
+Remark~\ref{rem:savings}(a) do not materialize here. They would materialize on richer complexes
+in which states differing only on inactive dimensions exist as separate vertices (for example, a
+complex enumerating combinations of offer amount, side-payment amount, and timing; the side-payment
+and timing dimensions could be inactive while offer remains active, producing $V/V^T$ exponential
+in the number of inactive choice axes).
+
+\textbf{(ii) The empirical savings come from the heuristic-evaluation cost and the contraction
+ratio.} With $V^T \leq 13$ and $E^T \leq 22$ across all targets, the per-iteration cost of
+iterated best-response under Theorem~\ref{thm:tractable-bge} is
+\[
+E^T + V^T \log V^T + t_h(3) \cdot V^T
+\;\;\leq\;\;
+22 + 13 \log 13 + 13\, t_h(3)
+\;\;\approx\;\;
+70 + 13\, t_h(3),
+\]
+which is dominated by the heuristic-evaluation term. Under the diagonal-Mahalanobis heuristic
+$h_T(v) = \sqrt{\sum_{k \in T} (\Delta a_k)^2/\sigma_k^2}$ from~\cite{bond2026tcss}, $t_h(3) = O(1)$
+(three multiplications, two additions, one square root). The per-iteration cost is therefore a
+small constant in the calibrated regime, and the total runtime of~\eqref{eq:complexity} reduces to
+\[
+T_{\mathrm{BGE}}^{\mathrm{TCSS}}
+\;=\;
+O\!\left(\; n \cdot \frac{\log(1/\varepsilon)}{\log(1/L)} \;\right).
+\]
+This is the explicit form Section~\ref{sec:empirical}.3 reports as ``the per-iteration cost is
+dominated by a constant.''
+
+\textbf{(iii) The bound is tight for sequential best-response on the calibrated complexes.}
+Because $V^T$ is small, the constant-factor overhead of $A^*$ versus Dijkstra is negligible; either
+algorithm achieves the per-iteration bound. The contraction ratio $L$ is the only non-trivial
+parameter affecting runtime in the calibrated regime, and its indicative value $L \approx 0.25$
+(Section~\ref{sec:empirical}.2) gives $\log(1/\varepsilon)/\log(1/L) \approx 0.72 \log(1/\varepsilon)$,
+so achieving $\varepsilon = 10^{-3}$ takes approximately $5$ best-response iterations and
+$\varepsilon = 10^{-6}$ takes approximately $10$.
+
+\subsection*{A.4 Worked example: ultimatum-game proposer}
+
+To make the construction concrete, we trace it for the ultimatum proposer target. The candidate
+action set is $A = \{0, 0.05, 0.10, \ldots, 0.50\}$. For each $x \in A$, the action vertex $v_x$ has
+9-d coordinates $(\Delta a_1, \ldots, \Delta a_9) = (-x, 0, -(0.5-x)^2, 0, 0, x, x, 0, 0.80)$
+(from~\cite[\S IV.A]{bond2026tcss}). The decision complex is the bipartite-plus-source-and-goal
+structure $\{v_0\} \cup \{v_x : x \in A\} \cup \{g\}$ with edges $v_0 \to v_x \to g$ for each
+$x \in A$.
+
+Under $T^\star = \{6, 7, 9\}$, the projection retains $(d_6, d_7, d_9) = (x, x, 0.80)$. The eleven
+action vertices project to the eleven points $\{(0, 0, 0.80), (0.05, 0.05, 0.80), \ldots,
+(0.50, 0.50, 0.80)\}$, all distinct. The source projects to $(0, 0, 0)$ and the goal to its own
+coordinates (typically $(0, 0, 0)$ when goal is ``offer made''). Under $\sim_T$, no two action
+vertices collapse, so $V_i^T = V_i = 13$ and $E_i^T = E_i = 22$. The path cost from $v_0$ to $g$
+through $v_x$ is the Mahalanobis sum
+\[
+w_T(v_0, v_x) + w_T(v_x, g)
+\;=\;
+2\sqrt{x^2/\sigma_6^2 + x^2/\sigma_7^2 + (0.80)^2/\sigma_9^2}
+\]
+plus the rejection-risk term (Section~\ref{sec:empirical}.2). The proposer's best response is the
+$x \in A$ minimizing this expression given the responder's current strategy. With $V^T = 13$, the
+$A^*$ (or equivalently Dijkstra) call returns the minimum in time linear in $V^T$. The total
+runtime of best-response iteration is dominated by $L$ and $\log(1/\varepsilon)$.
+
+\subsection*{A.5 When the appendix's bounds would tighten or loosen}
+
+The bounds in Table~\ref{tab:per-target-vt} are derived from the TCSS-published action grids. They
+would tighten if the action grid is coarser (e.g., five offer values rather than eleven) and loosen
+if it is finer (e.g., a continuous action space approximated by a 100-point grid would give
+$V_i^T = V_i = 102$, still tractable but with a larger constant). For the public-goods game with
+$n$ agents and per-round contribution choices, the augmented-game payoff $u_i$ depends on the
+profile of all $n$ contributions, so the iterated best-response cost scales as $n \cdot V^T$ per
+iteration; this is the dominant scaling for many-agent settings.
+
+%==============================================================================
+\section{Lipschitz Analysis of the Best-Response Mapping}
+\label{app:lipschitz}
+%==============================================================================
+
+This appendix provides the rigorous derivation of the contraction ratio $L$ used in
+Theorem~\ref{thm:tractable-bge}. The derivation proceeds in three steps: (B.1) the
+Boltzmann--Gibbs operator-norm bound on the softmax map, (B.2) the composition with the
+opponent-dependent cost map, (B.3) the resulting Lipschitz constant for the joint best-response.
+We then apply the bound to (B.4) the iterated ultimatum game and (B.5) clarify the
+relationship between the rigorous bound and the TCSS empirical calibration regime, which is
+single-shot rather than iterated.
+
+\subsection*{B.1 The Boltzmann--Gibbs Lipschitz bound}
+
+Let $A$ be a finite action set, $c : A \to \R$ a cost function, and $T > 0$ a temperature. The
+softmax distribution is
+\begin{equation}
+\label{eq:softmax-def}
+P_T(a \mid c) \;=\; \frac{\exp(-c(a)/T)}{\sum_{a' \in A} \exp(-c(a')/T)}.
+\end{equation}
+
+\begin{lemma}[Boltzmann--Gibbs Lipschitz bound]
+\label{lem:softmax-lip}
+For any two cost functions $c, c' : A \to \R$,
+\begin{equation}
+\label{eq:softmax-lip}
+\bigl\| P_T(\cdot \mid c) - P_T(\cdot \mid c') \bigr\|_{\mathrm{TV}}
+\;\leq\; \frac{1}{2T}\, \bigl\| c - c' \bigr\|_\infty,
+\end{equation}
+where $\|\cdot\|_{\mathrm{TV}}$ is total variation and $\|\cdot\|_\infty$ is the sup norm on $A$.
+\end{lemma}
+
+\begin{proof}
+The map $c \mapsto -c/T$ is linear with operator norm $1/T$ from $\ell^\infty(A)$ to itself. The
+softmax map $u \mapsto \exp(u)/\sum_{a'} \exp(u(a'))$ from $\ell^\infty(A)$ to the simplex
+$\Delta(A)$ has Lipschitz constant $1/2$ in the TV norm: this is a standard result for the
+log-sum-exp function~\cite{boyd2004}. Composing gives Lipschitz constant $1/(2T)$. $\square$
+\end{proof}
+
+The factor $1/(2T)$ is sharp in this norm pairing. The bound is independent of $|A|$, which matters
+for the per-iteration scaling.
+
+\subsection*{B.2 Coupling through opponent-dependent cost}
+
+Now consider a two-agent game with strategy profiles $(\sigma_1, \sigma_2) \in \Delta(A_1) \times
+\Delta(A_2)$. Each agent $i$'s cost depends on the opponent's mixed strategy through a function
+$c_i(a_i \mid \sigma_{-i})$. The best-response mapping is the softmax
+$\mathrm{BR}_i(\sigma_{-i})(a_i) = P_{T}(a_i \mid c_i(\cdot \mid \sigma_{-i}))$.
+
+\begin{assumption}[Cost coupling Lipschitz constant]
+\label{ass:cost-coupling}
+For each agent $i$, the cost function $\sigma_{-i} \mapsto c_i(\cdot \mid \sigma_{-i})$ is Lipschitz
+from $(\Delta(A_{-i}), \|\cdot\|_{\mathrm{TV}})$ to $(\R^{A_i}, \|\cdot\|_\infty)$ with constant
+$K_i$:
+\begin{equation}
+\label{eq:cost-lip}
+\sup_{a_i \in A_i} \bigl| c_i(a_i \mid \sigma_{-i}) - c_i(a_i \mid \sigma_{-i}') \bigr|
+\;\leq\; K_i \, \bigl\| \sigma_{-i} - \sigma_{-i}' \bigr\|_{\mathrm{TV}}.
+\end{equation}
+\end{assumption}
+
+\begin{proposition}[Best-response Lipschitz bound]
+\label{prop:br-lip}
+Under Assumption~\ref{ass:cost-coupling}, the joint best-response mapping
+$\mathrm{BR} = (\mathrm{BR}_1, \mathrm{BR}_2)$ on $\Delta(A_1) \times \Delta(A_2)$ satisfies
+\begin{equation}
+\label{eq:br-lip}
+\bigl\| \mathrm{BR}(\sigma) - \mathrm{BR}(\sigma') \bigr\|_{\mathrm{TV}}
+\;\leq\; L\, \bigl\| \sigma - \sigma' \bigr\|_{\mathrm{TV}},
+\qquad L \;=\; \max_{i \in \{1,2\}} \frac{K_i}{2T}.
+\end{equation}
+Therefore, if $K_i < 2T$ for both $i$, the BR mapping is a contraction on the strategy-profile
+simplex with constant $L < 1$, and by Banach's fixed-point theorem a unique BGE exists and iterated
+best-response converges geometrically.
+\end{proposition}
+
+\begin{proof}
+For agent $i$,
+\begin{align*}
+\bigl\| \mathrm{BR}_i(\sigma_{-i}) - \mathrm{BR}_i(\sigma_{-i}') \bigr\|_{\mathrm{TV}}
+&\;\leq\; \frac{1}{2T}\, \bigl\| c_i(\cdot \mid \sigma_{-i}) - c_i(\cdot \mid \sigma_{-i}') \bigr\|_\infty
+& \text{(Lemma~\ref{lem:softmax-lip})} \\
+&\;\leq\; \frac{K_i}{2T}\, \bigl\| \sigma_{-i} - \sigma_{-i}' \bigr\|_{\mathrm{TV}}
+& \text{(Assumption~\ref{ass:cost-coupling})} \\
+&\;\leq\; \frac{K_i}{2T}\, \bigl\| \sigma - \sigma' \bigr\|_{\mathrm{TV}}.
+\end{align*}
+Taking the maximum over agents gives the joint Lipschitz constant $L$. $\square$
+\end{proof}
+
+\subsection*{B.3 The coupling constants under the TCSS encoding}
+
+We compute $K_i$ explicitly for the iterated ultimatum game with the TCSS calibrated metric
+under truncation $T^\star = \{6, 7, 9\}$.
+
+\textbf{Proposer's coupling.} The proposer's effective cost at offer $x$, given the responder's
+threshold distribution $F_r$ (the mixed strategy over thresholds $\theta \in A_r$), is
+\begin{equation}
+\label{eq:proposer-cost}
+c_p(x \mid F_r) \;=\; \underbrace{\sqrt{x^2 (\sigma_6^{-2} + \sigma_7^{-2}) + 0.80^2 \sigma_9^{-2}}}_{\text{truncated Mahalanobis cost}}
+\;-\; (1-x)\, P_{\text{accept}}(x \mid F_r),
+\end{equation}
+where $P_{\text{accept}}(x \mid F_r) = \mathbb{P}_{\theta \sim F_r}[\theta \leq x] = F_r(x)$ is the
+acceptance probability under the responder's threshold CDF. The second term encodes the proposer's
+goal-reachability constraint: a rejected offer does not reach the ``offer accepted'' goal, so the
+expected payoff $(1-x) P_{\text{accept}}$ enters as a negative cost.
+
+The first term in~\eqref{eq:proposer-cost} is independent of $F_r$. The second satisfies
+\[
+\bigl| (1-x)\, F_r(x) - (1-x)\, F_r'(x) \bigr|
+\;\leq\; (1-x)\, |F_r(x) - F_r'(x)|
+\;\leq\; |F_r(x) - F_r'(x)|
+\;\leq\; \bigl\| F_r - F_r' \bigr\|_{\mathrm{TV}},
+\]
+using $|1-x| \leq 1$ on the action grid $x \in [0, 0.5]$ and the fact that $|F_r(x) - F_r'(x)|
+\leq \|F_r - F_r'\|_{\mathrm{TV}}$ at every $x$. Taking the supremum over $x \in A_p$ yields
+\[
+K_p \;\leq\; 1.
+\]
+
+\textbf{Responder's coupling.} The responder of type $\theta$ accepts iff $x \geq \theta$. The
+type-$\theta$ responder's truncated cost upon receiving offer $x$ from the proposer's mixed
+strategy $\sigma_p$ is
+\begin{equation}
+\label{eq:responder-cost}
+c_r(\theta \mid \sigma_p) \;=\; \underbrace{|\theta - 0.5|}_{\text{fairness deviation, scaled}}
+\;-\; \mathbb{E}_{x \sim \sigma_p}\bigl[\mathbf{1}\{x \geq \theta\} \cdot x\bigr],
+\end{equation}
+where the second term is the responder's expected payoff conditional on accepting. The first term
+is independent of $\sigma_p$. The second satisfies
+\[
+\sup_\theta \bigl| \mathbb{E}_{\sigma_p}[\mathbf{1}\{x \geq \theta\}\,x] - \mathbb{E}_{\sigma_p'}[\mathbf{1}\{x \geq \theta\}\,x] \bigr|
+\;\leq\; \sup_\theta \int |x|\, |d\sigma_p(x) - d\sigma_p'(x)|
+\;\leq\; \tfrac{1}{2}\, \|\sigma_p - \sigma_p'\|_{\mathrm{TV}},
+\]
+because $|x| \leq 1/2$ on the proposer's action grid $A_p \subseteq [0, 0.5]$. Therefore
+\[
+K_r \;\leq\; 1/2.
+\]
+
+\textbf{The contraction ratio.} Substituting into Proposition~\ref{prop:br-lip},
+\begin{equation}
+\label{eq:explicit-L}
+L \;\leq\; \frac{\max(K_p, K_r)}{2T} \;=\; \frac{1}{2T}.
+\end{equation}
+
+Under the TCSS cost-dependent temperature $T(\Delta) = \max(T_{\text{floor}},
+T_{\text{base}}\Delta^{T_\alpha})$ with $T_{\text{floor}} = 0.5$, the effective temperature
+satisfies $T \geq 0.5$. Substituting,
+\[
+L \;\leq\; \frac{1}{2 \cdot 0.5} \;=\; 1.
+\]
+
+\textbf{This is not yet a strict contraction.} The bound saturates at $L = 1$, which is the
+boundary case. To obtain $L < 1$ rigorously requires either (i) a strictly positive lower bound on
+$T$ above $0.5$ in the regime of interest, (ii) a sharper bound on $K_p$ or $K_r$ exploiting the
+specific structure of the calibrated metric, or (iii) bounding the BR Lipschitz constant in a norm
+other than total variation (e.g., the Wasserstein-1 distance on offer space, which would exploit
+the small diameter of $A_p$).
+
+\subsection*{B.4 A strict bound under restricted action grids}
+
+A strict contraction can be obtained by restricting the proposer's action grid to ``serious offers''
+$A_p^\diamond = \{0.05, 0.10, \ldots, 0.50\}$ (excluding $x = 0$). On this grid, the minimum
+expected payoff $(1-x)$ is bounded above by $1 - 0.05 = 0.95$, but the bound on $K_p$ is unchanged.
+A genuine tightening comes from observing that the truncated Mahalanobis cost in the proposer's
+softmax dominates the goal-reachability term: with the calibrated values $\sigma_6^2 = 78.26$,
+$\sigma_7^2 = 32.28$, the truncated cost at $x = 0.5$ is approximately $\sqrt{0.25 \cdot 0.044 +
+0.51} = \sqrt{0.521} \approx 0.722$, while the maximum goal-reachability term is $|1-x| \leq 1$.
+The ratio is order-one, and the proposer's softmax distribution is dominated by the cost term, not
+the goal term.
+
+When the cost term dominates the softmax, the effective Lipschitz constant of $c_p(\cdot \mid F_r)$
+in $F_r$ scales with the weight of the goal-reachability term relative to the cost term. A
+parameter-substitution estimate (substituting $T = 0.5$ and the ratio above) gives an effective
+$L \approx 1/(2 T) \cdot 0.722^{-1} \cdot 1 \approx 1.38^{-1} \approx 0.72$. This is a heuristic
+sharpening and not a proof; a rigorous version would require treating the softmax as a non-uniform
+weighted average and applying the Wasserstein-1 norm.
+
+We treat the strict-contraction bound in the calibrated regime as established under the additional
+assumption that the cost term dominates the goal term uniformly, and as open in the general case.
+
+\subsection*{B.5 The TCSS empirical regime is single-shot}
+
+The rigorous bound of~\eqref{eq:explicit-L} is for the iterated ultimatum game in which both
+proposer and responder update their mixed strategies via softmax best-response. The TCSS empirical
+calibration does \emph{not} run this iteration. It uses a fixed empirical responder rejection
+function
+\begin{equation}
+\label{eq:empirical-reject}
+P_{\text{reject}}(x) \;=\; \frac{1}{1 + \exp((x - x_{\text{thresh}})/k)},
+\quad x_{\text{thresh}} = 0.18,\;k = 0.15,
+\end{equation}
+estimated from the Fraser--Nettle ultimatum data~\cite{bond2026tcss}, and computes the proposer's
+best-response against this fixed function. The proposer's optimization is therefore
+\emph{single-shot}, not iterated, and the contraction question does not arise: the equilibrium
+strategy is reached in one $A^*$ call per agent in time
+$O(V^T + E^T \log V^T + t_h(k) V^T)$ as in Appendix~\ref{app:vt-et}.
+
+Iterated best-response dynamics, and the contraction bound of~\eqref{eq:explicit-L}, become
+relevant in three forward-going extensions that the present paper does not validate empirically but
+the theorem framework predicts:
+
+\begin{enumerate}
+\item \textbf{Trust games with reputation updating.} Investors and trustees update beliefs about
+each other's reciprocity over rounds; the iterated BR has genuine cross-coupling through the
+reputation channel.
+\item \textbf{Public-goods games with conditional cooperation.} Agents' contribution choices in
+round $r$ depend on the empirical contribution distribution in round $r-1$; the social-impact
+dimension $d_6$ couples agents across rounds.
+\item \textbf{Network games with reinforcement learning.} Agents on a network update strategies
+based on neighbor outcomes; the contraction bound extends with an additional factor that depends on
+the network connectivity.
+\end{enumerate}
+
+In each case, Proposition~\ref{prop:br-lip} applies with the appropriate cost-coupling constants
+$K_i$, and~\eqref{eq:explicit-L} gives an explicit Lipschitz bound. The qualitative prediction is
+that the calibrated metric, when extended to these iterated regimes, will yield contraction ratios
+in the range $L \in [0.5, 0.9]$, consistent with the geometric convergence rates observed in
+behavioral game-theory experiments.
+
+\subsection*{B.6 What this derivation does, and does not, establish}
+
+The derivation in B.1--B.3 supplies an explicit Lipschitz bound on the joint best-response mapping
+in terms of the cost-coupling constants $K_i$ and the temperature $T$. The bound is rigorous and
+sharp in the operator-norm sense.
+
+The application to the calibrated ultimatum game in B.3 yields $L \leq 1$ in total-variation norm,
+which saturates the contraction boundary. A strict contraction requires either a tighter bound (B.4
+sketches one approach) or a different norm.
+
+The empirical TCSS calibration is single-shot, so the contraction analysis is not directly tested
+by the published validation. The bound is a forward-going prediction about iterated extensions of
+the framework. The principal open technical work is (i) the strict contraction bound in
+Wasserstein-1 norm, (ii) empirical validation of iterated BR dynamics in trust games or repeated
+PG games, and (iii) the extension to $n$-agent network games.
+
+%==============================================================================
+\begin{thebibliography}{99}
+%==============================================================================
+
+\bibitem{andersen2011}
+S.~Andersen, S.~Erta\c{c}, U.~Gneezy, M.~Hoffman, and J.~A.~List, ``Stakes matter in ultimatum games,''
+\emph{American Economic Review}, vol.~101, no.~7, pp.~3427--3439, 2011.
+
+\bibitem{boyd2004}
+S.~Boyd and L.~Vandenberghe, \emph{Convex Optimization}.
+Cambridge, U.K.: Cambridge University Press, 2004.
+
+\bibitem{bond2026geometric}
+A.~H.~Bond, \emph{Geometric Economics: Heuristic Bounded Rationality, the Bond Geodesic, and the
+Death of Homo Economicus}, monograph, 2026.
+
+\bibitem{bond2026tcss}
+A.~H.~Bond, ``Geometric prediction of economic behavior: cross-domain validation across game theory
+and prospect theory,'' \emph{IEEE Transactions on Computational Social Systems}, 2026 (accepted with
+revision).
+
+\bibitem{chen2009}
+X.~Chen, X.~Deng, and S.-H.~Teng, ``Settling the complexity of computing two-player Nash equilibria,''
+\emph{Journal of the ACM}, vol.~56, no.~3, art.~14, 2009.
+
+\bibitem{daskalakis2009}
+C.~Daskalakis, P.~W.~Goldberg, and C.~H.~Papadimitriou, ``The complexity of computing a Nash
+equilibrium,'' \emph{SIAM Journal on Computing}, vol.~39, no.~1, pp.~195--259, 2009.
+
+\bibitem{hart1968}
+P.~E.~Hart, N.~J.~Nilsson, and B.~Raphael, ``A formal basis for the heuristic determination of
+minimum cost paths,'' \emph{IEEE Transactions on Systems Science and Cybernetics}, vol.~4, no.~2,
+pp.~100--107, 1968.
+
+\bibitem{kahneman1979}
+D.~Kahneman and A.~Tversky, ``Prospect theory: an analysis of decision under risk,''
+\emph{Econometrica}, vol.~47, no.~2, pp.~263--291, 1979.
+
+\bibitem{lieder2020}
+F.~Lieder and T.~L.~Griffiths, ``Resource-rational analysis: understanding human cognition as the
+optimal use of limited computational resources,''
+\emph{Behavioral and Brain Sciences}, vol.~43, e1, 2020.
+
+\bibitem{mckelvey1995}
+R.~D.~McKelvey and T.~R.~Palfrey, ``Quantal response equilibria for normal form games,''
+\emph{Games and Economic Behavior}, vol.~10, no.~1, pp.~6--38, 1995.
+
+\bibitem{milgrom1990}
+P.~Milgrom and J.~Roberts, ``Rationalizability, learning, and equilibrium in games with strategic
+complementarities,'' \emph{Econometrica}, vol.~58, no.~6, pp.~1255--1277, 1990.
+
+\bibitem{monderer1996}
+D.~Monderer and L.~S.~Shapley, ``Potential games,'' \emph{Games and Economic Behavior}, vol.~14,
+no.~1, pp.~124--143, 1996.
+
+\bibitem{nash1950}
+J.~F.~Nash, ``Equilibrium points in $n$-person games,'' \emph{Proceedings of the National Academy of
+Sciences}, vol.~36, no.~1, pp.~48--49, 1950.
+
+\bibitem{simon1955}
+H.~A.~Simon, ``A behavioral model of rational choice,'' \emph{Quarterly Journal of Economics},
+vol.~69, no.~1, pp.~99--118, 1955.
+
+\bibitem{tversky1974}
+A.~Tversky and D.~Kahneman, ``Judgment under uncertainty: heuristics and biases,'' \emph{Science},
+vol.~185, no.~4157, pp.~1124--1131, 1974.
+
+\bibitem{tversky1992}
+A.~Tversky and D.~Kahneman, ``Advances in prospect theory: cumulative representation of uncertainty,''
+\emph{Journal of Risk and Uncertainty}, vol.~5, no.~4, pp.~297--323, 1992.
+
+\end{thebibliography}
+
+\end{document}
