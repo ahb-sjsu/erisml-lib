@@ -84,6 +84,13 @@ of the consumer-metric question:
    This is consistent with the whitepaper's Reward-Irrecoverability commitment (no
    scalar collapse) and gives the retained tensor structure operational meaning.
    *Seal:* replicate v2 on a second model + a second transform family, prereg'd bars.
+   *Status 2026-09-02:* both replications have now been run exploratory-grade and
+   CONFIRM v2 — TinyLlama-1.1B (Spearman true 0.654/0.778 vs raw 0.598/0.686,
+   false-clear −16/−15 pp, layers 11/16) and fr backtranslation on Qwen2.5-0.5B
+   (0.525/0.579 vs 0.432/0.458, −15/−17 pp, layers 12/18); the final-layer ρ̂
+   held-out collapse appears in all three runs. Records:
+   observation-theory-campaigns `analysis/cr-ieip/cr_ieip_{tl,fr}_result.json`.
+   The remaining seal step is the prereg'd bars themselves.
 2. **A shipped, measured monitor false-clear rate.** Nominal accept = gate cleared;
    consumer_ok = behavior/EM verdict actually invariant. P(behavior changed | cleared)
    is the honest worth of the monitor and belongs beside its other calibration
