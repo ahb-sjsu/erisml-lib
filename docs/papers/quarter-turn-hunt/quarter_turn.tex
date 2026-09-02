@@ -1,0 +1,180 @@
+% Hunting the Quarter-Turn -- companion paper to the Hohfeld V4/D4 keystone.
+% House style: plain declarative, no em-dashes in prose, every number from the
+% committed experiment record (experiments/hohfeld_d4_hunt.py -> hunt_result.json).
+% Venue framing per the keystone README: artifact and evidence first, no
+% gauge-theory or field-theory framing. Candidate venues: BlackboxNLP / an
+% interpretability workshop; article class is a placeholder.
+\documentclass[11pt]{article}
+\usepackage[margin=1in]{geometry}
+\usepackage[T1]{fontenc}
+\usepackage{lmodern}
+\usepackage{amsmath,amssymb}
+\usepackage{booktabs}
+\usepackage{url}
+\usepackage[hidelinks]{hyperref}
+
+\title{Hunting the Quarter-Turn:\\ An Empirical Test of Posited Dihedral Structure\\ in a Language Model's Representation of Hohfeldian Positions}
+\author{Andrew H.\ Bond\\ San Jos\'e State University\\ \texttt{[TODO: email]}}
+\date{Draft, September 2026}
+
+\begin{document}
+\maketitle
+
+\begin{abstract}
+Hohfeld's four normative positions (Obligation, Claim, Liberty, No-claim) admit two
+demonstrated operations: the correlative swap between parties and deontic negation. A
+machine-checked result establishes that these two operations are commuting involutions and
+generate only the Klein four-group $V_4$; the order-eight dihedral group $D_4$, which adds a
+quarter-turn cycling the four positions, is posited but has never been demonstrated as a
+normative operation. We test whether the quarter-turn exists in a language model's learned
+representation of normative statements. The key observation is that the quarter-turn has a
+direct pair corpus: the four-cycle over jural statements about the same scenario. We fit
+linear representation maps for the swap, the negation, and the cycle with the same ridge
+estimator, on one surface-template family, and grade the dihedral relations on held-out
+scenarios expressed in a second template family, so the maps must encode jural structure
+rather than wording. The verdict rule is stated before the run: the quarter-turn counts as
+found only if the fitted cycle map squares to the measured negation, satisfies the dihedral
+relations, and reproduces the non-abelian predictions at errors comparable to the measured
+$V_4$ sector's own self-consistency, with a wrong-target control. [RESULTS: one sentence
+stating the outcome, from hunt\_result.json.] Either outcome is informative: a found
+quarter-turn gives the posited $D_4$ its first empirical footing in any substrate; a missing
+one extends the $V_4$-only result from the axiomatic level to a learned representation.
+\end{abstract}
+
+\section{Introduction}
+
+Hohfeld separated four fundamental normative positions: Obligation, Claim, Liberty, and
+No-claim \cite{hohfeld1917}. Two operations on these positions are demonstrated in
+practice. The correlative swap $s$ exchanges the parties' perspectives ($O \leftrightarrow
+C$, $L \leftrightarrow N$). Deontic negation $r^2$ negates the normative status ($O
+\leftrightarrow L$, $C \leftrightarrow N$). A recent machine-checked result, which we call
+the keystone correction, establishes in Lean~4 with Mathlib that $s$ and $r^2$ are commuting
+involutions, that the group they generate is isomorphic to the Klein four-group $V_4$, and
+that the quarter-turn $r$ ($O \to C \to L \to N \to O$) lies outside the generated subgroup
+\cite{hohfeldv4lean}. The dihedral group $D_4$ of order eight is therefore posited ambient
+structure: it is licensed only if the quarter-turn is independently demonstrated as a
+normative operation, and it has not been.
+
+This paper asks a narrower question than ``is moral reasoning $D_4$-structured'': does the
+quarter-turn exist as a coherent linear operation in a language model's learned
+representation of normative statements? The question is empirical and falsifiable, and both
+answers are informative. If a fitted cycle map satisfies the dihedral relations out of
+sample, the posited $D_4$ acquires its first empirical footing in any substrate, and the
+place to look for its meaning is Hohfeld's second square: the power operations (waiver,
+grant, authorization) that transform first-square positions and are directed rather than
+involutive. If no such map exists, the keystone's $V_4$-only conclusion extends from the
+axiomatic level to at least one learned representation.
+
+Two methodological points make the test sharp. First, the quarter-turn has a direct pair
+corpus. Prior discussion treated $r$ as an abstract missing generator; we observe that the
+four-cycle over jural statements about the same scenario is itself a supervised mapping
+task, so $\hat\rho(r)$ can be fitted exactly as $\hat\rho(s)$ and $\hat\rho(r^2)$ are.
+Second, surface form is controlled: maps are fitted on one template family and graded on a
+second, over held-out scenarios, so a map that merely memorizes template wording fails.
+
+\section{Background}
+
+\subsection{The keystone correction}
+[TODO one paragraph: the V4 result, the Lean artifact, the epistemic discipline of
+``measured versus posited''; cite the concept registry.]
+
+\subsection{Linear structure in learned representations}
+Linear maps between representations of systematically related inputs are a standard
+instrument: relational offsets \cite{mikolov2013}, linear probes \cite{alain2017}, and
+Procrustes or ridge alignment between representation spaces \cite{TODO-alignment}. Our
+estimator is the regularized ridge map used by the I-EIP monitoring program for exactly
+this purpose \cite{ieipwhitepaper}. The contribution here is not the estimator but the
+group-theoretic test battery applied to its outputs.
+
+\section{Method}
+
+\subsection{Corpus}
+1{,}600 scenarios are generated from templated (agent, patient, action) triples. Each
+scenario is expressed in all four Hohfeldian positions, in two surface-template families
+that differ in wording but not jural content (eight statements per scenario). Family A:
+``\{A\} must \{act\} for \{B\}'' (O); ``\{B\} is entitled to have \{A\} \{act\}'' (C);
+``\{A\} is free not to \{act\} for \{B\}'' (L); ``\{B\} has no claim that \{A\} \{act\}''
+(N). Family B rephrases each position (duty to, holds a claim against, under no duty,
+cannot demand). Templated English is a stated limitation (Section~\ref{sec:scope}).
+
+\subsection{Representations and maps}
+Last-token hidden states of an open-weights causal language model
+(Qwen2.5-0.5B, layers 12 and 18 of 24; layer 24 reported as an anchor) represent each
+statement. For each candidate operation $g$ with state mapping $m_g$, a linear map
+$\hat\rho(g)$ is fitted by ridge regression from $h(x_{st})$ to $h(x_{m_g(st)})$ over
+training scenarios in template family A, pooled over all four source positions. Three maps
+are fitted identically: $\hat\rho(s)$ from the swap pairs, $\hat\rho(r^2)$ from the negation
+pairs, and $\hat\rho(r)$ from the cycle pairs $O \to C \to L \to N \to O$. The training
+split exceeds the representation dimension, and held-out fit quality is reported.
+
+\subsection{Relation tests and the verdict rule}
+All tests are graded on held-out scenarios expressed in template family B. For a
+composition $M_k \cdots M_1$ with predicted state mapping $m$, the error is
+\[
+E = \frac{\sum_{st} \lVert M_k \cdots M_1\, h(x_{st}) - h(x_{m(st)}) \rVert^2}
+         {\sum_{st} \lVert h(x_{st}) - h(x_{m(st)}) \rVert^2},
+\]
+so $E = 1$ means the composition predicts the target no better than leaving the source
+representation unchanged, and $E = 0$ is exact. The $V_4$ sector supplies the yardstick:
+$E[\hat\rho(s)^2 = I]$, $E[\hat\rho(r^2)^2 = I]$, and the commutation tests. The
+rehabilitation tests are $E[\hat\rho(r)^2 = \hat\rho(r^2)]$ (the fitted cycle squares to the
+measured negation), $E[\hat\rho(r)^4 = I]$, and the conjugation
+$E[\hat\rho(s)\hat\rho(r)\hat\rho(s) = \hat\rho(r)^3]$. The non-abelian signature is graded
+by target: from the same source position, $\hat\rho(r)\hat\rho(s)$ and
+$\hat\rho(s)\hat\rho(r)$ must land on different $D_4$-predicted targets (for example
+$rs(O) = L$ while $sr(O) = O$), and a wrong-target control checks that
+$\hat\rho(r)\hat\rho(s)$ does not fit the $sr$ targets equally well.
+
+The verdict rule, stated before the run: the quarter-turn is found only if the
+rehabilitation tests land at errors comparable to the $V_4$ yardstick rows and the
+non-abelian signature separates from its wrong-target control, out of sample in both
+scenario and template.
+
+\section{Results}
+\label{sec:results}
+
+% TODO: fill from experiments/hohfeld_d4_hunt.py -> hunt_result.json (the committed record).
+% Table: per layer x {fit_S, fit_R2, fit_R, S.S=I, R2.R2=I, [S,R2], R.R=R2, R^4=I,
+% S.R.S=R^3, R.S->rs, S.R->sr, R.S->sr(wrong)}.
+% One paragraph: the verdict per the pre-stated rule. One paragraph: layer dependence.
+[RESULTS PENDING THE COMMITTED RUN.]
+
+\section{What a found quarter-turn would and would not mean}
+A linear operator in one model's representation space is evidence about that model's learned
+geometry, not about human normative practice. A found quarter-turn licenses a next
+question, not a conclusion: whether power operations (waiver, grant, authorization), which
+transform Hohfeldian positions and are directed rather than involutive, realize the same map
+on natural text. A missing quarter-turn is evidence that the $V_4$-only structure is not an
+artifact of the axiomatic presentation, since a model trained on natural language also fails
+to support the larger group.
+
+\section{Scope and limitations}
+\label{sec:scope}
+Templated English, not court prose; one model at one scale; linear maps only (a nonlinear
+quarter-turn would be missed); last-token pooling; the cycle corpus teaches the mapping
+task, so a found $\hat\rho(r)$ demonstrates representability rather than spontaneous use.
+The consumer-relative extension (whether the relations hold in a downstream readout's
+metric where they fail in the raw metric, or conversely) is a designed follow-up, not part
+of this run.
+
+\section{Conclusion}
+[TODO after results: two sentences, the outcome and the standing of V4/D4 after it.]
+
+\begin{thebibliography}{9}
+\bibitem{hohfeld1917} W.~N. Hohfeld. Fundamental legal conceptions as applied in judicial
+reasoning. \emph{Yale Law Journal}, 26(8):710--770, 1917.
+\bibitem{hohfeldv4lean} A.~H. Bond. HohfeldV4.lean: machine-checked verification that the
+demonstrated Hohfeldian operations generate $V_4$ and exclude the quarter-turn. In
+\emph{erisml-lib}, \texttt{formal/}, 2026. % VERIFY citation form for a software artifact
+\bibitem{mikolov2013} T.~Mikolov, W.~Yih, and G.~Zweig. Linguistic regularities in
+continuous space word representations. \emph{NAACL}, 2013. % VERIFY pages
+\bibitem{alain2017} G.~Alain and Y.~Bengio. Understanding intermediate layers using linear
+classifier probes. \emph{ICLR Workshop}, 2017. % VERIFY venue/year
+\bibitem{TODO-alignment} [TODO: representation alignment / model stitching citation,
+verified against a real record before submission.]
+\bibitem{ieipwhitepaper} A.~H. Bond. The I-EIP Monitor: internal epistemic invariance
+monitoring and governance in deployed AI systems. In \emph{erisml-lib}, \texttt{docs/},
+2026. % VERIFY citation form
+\end{thebibliography}
+
+\end{document}
