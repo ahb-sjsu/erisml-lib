@@ -6,11 +6,14 @@
 # See LICENSE file for details.
 
 """
-Hohfeldian normative positions with D4 dihedral group structure.
+Hohfeldian normative positions with the measured V4 gauge structure and the
+posited D4 (order-8 dihedral) ambient machinery.
 
 This module implements Wesley Hohfeld's four fundamental normative positions
-(Obligation, Claim, Liberty, No-claim) and the D4 dihedral group that acts
-on them as symmetry transformations.
+(Obligation, Claim, Liberty, No-claim), the MEASURED Klein four-group V4 of
+demonstrated operations, and the full POSITED D4 dihedral machinery so the
+quarter-turn hypothesis stays testable (see the epistemic-status paragraph
+below and docs/CONCEPT_REGISTRY.md section 1).
 
 The key insight is that moral reasoning exhibits gauge symmetries:
 - Correlative symmetry (s): O↔C, L↔N - perspective swap between parties
