@@ -53,28 +53,30 @@ INTERESTS: Dict[str, np.ndarray] = {
     "Margaret": np.array([0.15, 0.15, 0.25, 0.30, 0.10, 0.05]),
     "Daughter": np.array([0.35, 0.05, 0.05, 0.05, 0.45, 0.05]),
     "EMS crew": np.array([0.45, 0.05, 0.05, 0.05, 0.15, 0.25]),
-    "Agency":   np.array([0.15, 0.30, 0.10, 0.15, 0.10, 0.20]),
+    "Agency": np.array([0.15, 0.30, 0.10, 0.15, 0.10, 0.20]),
 }
-EXPERT_WEIGHTS = np.array([0.40, 0.15, 0.25, 0.20])   # Margaret's stake leads
+EXPERT_WEIGHTS = np.array([0.40, 0.15, 0.25, 0.20])  # Margaret's stake leads
 
 # -- Obligation vectors per option, PER REGIME (norms are context-indexed) --
 OBLIGATIONS_NORMAL: Dict[str, np.ndarray] = {
-    "stand_by":      np.array([0.70, 0.95, 0.95, 0.98, 0.60, 0.95]),
+    "stand_by": np.array([0.70, 0.95, 0.95, 0.98, 0.60, 0.95]),
     "enter_and_aid": np.array([0.50, 0.25, 0.15, 0.20, 0.55, 0.20]),
     "full_response": np.array([0.45, 0.15, 0.10, 0.05, 0.50, 0.10]),
 }
 OBLIGATIONS_EMERGENCY: Dict[str, np.ndarray] = {
-    "stand_by":      np.array([0.03, 0.40, 0.35, 0.98, 0.05, 0.15]),
+    "stand_by": np.array([0.03, 0.40, 0.35, 0.98, 0.05, 0.15]),
     "enter_and_aid": np.array([0.80, 0.70, 0.55, 0.60, 0.90, 0.70]),
     "full_response": np.array([0.95, 0.80, 0.60, 0.50, 0.95, 0.95]),
 }
 
 # Elevation gate (the paper's three requirements, made operational)
-AUTH_THRESHOLD = 0.90          # (a) authenticated
-ELEVATION_SCOPE = "share records with responding paramedics ONLY"   # (c) least-privilege
-REVERSION = "auto-revert when vitals stable or EMS releases scene; both edges audited"  # (b)
+AUTH_THRESHOLD = 0.90  # (a) authenticated
+ELEVATION_SCOPE = "share records with responding paramedics ONLY"  # (c) least-privilege
+REVERSION = (
+    "auto-revert when vitals stable or EMS releases scene; both edges audited"  # (b)
+)
 
-PREFER, FORBID = 0.60, 0.35    # per-party verdict chips
+PREFER, FORBID = 0.60, 0.35  # per-party verdict chips
 
 
 def verdict(x: float) -> str:
@@ -115,16 +117,21 @@ def evaluate_regime(name: str, obligations: Dict[str, np.ndarray]) -> Dict[str, 
         "rawlsian": dict(zip(options, np.round(rawl, 3))),
         "expert_weighted": dict(zip(options, np.round(expert, 3))),
         "decision": choice,
-        "per_party": {a: {"score": round(float(s), 3), "verdict": verdict(float(s))}
-                      for a, s in zip(agents, per_party)},
+        "per_party": {
+            a: {"score": round(float(s), 3), "verdict": verdict(float(s))}
+            for a, s in zip(agents, per_party)
+        },
         "gini": round(gini(per_party), 3),
         "worst_off": agents[int(np.argmin(per_party))],
         "shapley": {a: round(v, 3) for a, v in shapley.items()},
     }
     out["audit"] = generate_audit_artifact(
-        case_id=f"care_robot::{name}", scenario="GTC section 4.1 domestic robot",
-        decision=choice, expert_weighted=out["expert_weighted"],
-        per_party=out["per_party"])
+        case_id=f"care_robot::{name}",
+        scenario="GTC section 4.1 domestic robot",
+        decision=choice,
+        expert_weighted=out["expert_weighted"],
+        per_party=out["per_party"],
+    )
     return out
 
 
@@ -132,18 +139,24 @@ def elevation(detector_confidence: float) -> Dict[str, Any]:
     granted = detector_confidence >= AUTH_THRESHOLD
     rec = {
         "event": "regime_transition_request",
-        "from": "normal", "to": "emergency",
+        "from": "normal",
+        "to": "emergency",
         "detector_confidence": detector_confidence,
         "auth_threshold": AUTH_THRESHOLD,
         "granted": granted,
         "scope": ELEVATION_SCOPE if granted else None,
         "reversion": REVERSION if granted else None,
-        "fallback": None if granted else
-            "escalate_to_human + call EMS WITHOUT record share (aid never blocked)",
+        "fallback": (
+            None
+            if granted
+            else "escalate_to_human + call EMS WITHOUT record share (aid never blocked)"
+        ),
     }
     rec["audit"] = generate_audit_artifact(
-        case_id="care_robot::elevation", scenario="context elevation is privilege escalation",
-        **{k: v for k, v in rec.items() if k != "audit"})
+        case_id="care_robot::elevation",
+        scenario="context elevation is privilege escalation",
+        **{k: v for k, v in rec.items() if k != "audit"},
+    )
     return rec
 
 
@@ -165,21 +178,31 @@ def main() -> None:
     for regime in ("normal", "emergency"):
         d = r[regime]
         print(f"\n=== {regime.upper()} regime ===")
-        print(f"  expert-weighted: {d['expert_weighted']}   -> DECISION: {d['decision']}")
-        print(f"  {'party':>10} {'score':>7} {'verdict':>8}   (chosen action: {d['decision']})")
+        print(
+            f"  expert-weighted: {d['expert_weighted']}   -> DECISION: {d['decision']}"
+        )
+        print(
+            f"  {'party':>10} {'score':>7} {'verdict':>8}   (chosen action: {d['decision']})"
+        )
         for a, pv in d["per_party"].items():
             print(f"  {a:>10} {pv['score']:7.3f} {pv['verdict']:>8}")
-        print(f"  Gini={d['gini']}  worst-off={d['worst_off']}  "
-              f"Shapley={d['shapley']}")
+        print(
+            f"  Gini={d['gini']}  worst-off={d['worst_off']}  "
+            f"Shapley={d['shapley']}"
+        )
         print(f"  audit: {d['audit']['cryptographic_hash']}")
     g = r["elevation_granted"]
     f = r["elevation_refused_counterfactual"]
-    print(f"\n=== elevation gate ===")
-    print(f"  conf {g['detector_confidence']} >= {AUTH_THRESHOLD} -> GRANTED; "
-          f"scope: {g['scope']}; {g['reversion']}")
+    print("\n=== elevation gate ===")
+    print(
+        f"  conf {g['detector_confidence']} >= {AUTH_THRESHOLD} -> GRANTED; "
+        f"scope: {g['scope']}; {g['reversion']}"
+    )
     print(f"  audit: {g['audit']['cryptographic_hash']}")
-    print(f"  counterfactual conf {f['detector_confidence']} -> REFUSED; "
-          f"fallback: {f['fallback']}")
+    print(
+        f"  counterfactual conf {f['detector_confidence']} -> REFUSED; "
+        f"fallback: {f['fallback']}"
+    )
     with open("care_robot_regimes_result.json", "w", encoding="utf-8") as fh:
         json.dump(r, fh, indent=2, default=str)
     print("\nwrote care_robot_regimes_result.json")

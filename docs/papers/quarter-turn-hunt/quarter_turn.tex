@@ -35,10 +35,13 @@ scenarios expressed in a second template family, so the maps must encode jural s
 rather than wording. The verdict rule is stated before the run: the quarter-turn counts as
 found only if the fitted cycle map squares to the measured negation, satisfies the dihedral
 relations, and reproduces the non-abelian predictions at errors comparable to the measured
-$V_4$ sector's own self-consistency, with a wrong-target control. [RESULTS: one sentence
-stating the outcome, from hunt\_result.json.] Either outcome is informative: a found
-quarter-turn gives the posited $D_4$ its first empirical footing in any substrate; a missing
-one extends the $V_4$-only result from the axiomatic level to a learned representation.
+$V_4$ sector's own self-consistency, with a wrong-target control. In a 0.5B-parameter model the quarter-turn is
+not found: the fitted cycle map's square does match the measured negation on the component
+where negation is linearly represented at all, but the non-abelian signature is absent, and
+even the measured swap generalizes weakly across surface templates, which bounds the
+instrument's power. The $V_4$-only conclusion survives its first test in a learned
+representation, and the experiment yields a side finding: deontic negation is by far the
+most linearly represented Hohfeldian operation in this model.
 \end{abstract}
 
 \section{Introduction}
@@ -75,8 +78,15 @@ second, over held-out scenarios, so a map that merely memorizes template wording
 \section{Background}
 
 \subsection{The keystone correction}
-[TODO one paragraph: the V4 result, the Lean artifact, the epistemic discipline of
-``measured versus posited''; cite the concept registry.]
+Earlier materials in this program claimed the full dihedral $D_4$ as the symmetry group of
+the Hohfeldian square. The July 2026 keystone correction retracted that: only $s$ and $r^2$
+are demonstrated operations, they commute, and the group they generate is $V_4$. The
+correction is machine-checked (\texttt{formal/HohfeldV4.lean}: commuting involutions,
+four-element closure isomorphic to $V_4$, quarter-turn exclusion, and well-definedness of
+the ambient $D_4$ machinery) and is recorded, with the measured-versus-posited discipline it
+imposes on every downstream document, in the program's concept registry
+(\texttt{docs/CONCEPT\_REGISTRY.md}). This paper is the registry's discipline applied
+forward: the posited operation is tested rather than assumed.
 
 \subsection{Linear structure in learned representations}
 Linear maps between representations of systematically related inputs are a standard
@@ -133,11 +143,54 @@ scenario and template.
 \section{Results}
 \label{sec:results}
 
-% TODO: fill from experiments/hohfeld_d4_hunt.py -> hunt_result.json (the committed record).
-% Table: per layer x {fit_S, fit_R2, fit_R, S.S=I, R2.R2=I, [S,R2], R.R=R2, R^4=I,
-% S.R.S=R^3, R.S->rs, S.R->sr, R.S->sr(wrong)}.
-% One paragraph: the verdict per the pre-stated rule. One paragraph: layer dependence.
-[RESULTS PENDING THE COMMITTED RUN.]
+Table~\ref{tab:results} reports the held-out normalized errors (committed record:
+\texttt{hunt\_result.json}; 2{,}312 statements per position per family after generation,
+1{,}120 training scenarios, 480 evaluation scenarios).
+
+\begin{table}[t]
+\centering
+\small
+\begin{tabular}{lcc}
+\toprule
+Test (0 = perfect, 1 = no better than identity) & Layer 12 & Layer 18 \\
+\midrule
+fit $\hat\rho(s)$ (swap, measured op)        & 0.883 & 0.931 \\
+fit $\hat\rho(r^2)$ (negation, measured op)  & 0.484 & 0.532 \\
+fit $\hat\rho(r)$ (cycle, posited op)        & 0.735 & 0.830 \\
+$\hat\rho(s)\hat\rho(r^2) \to sr^2$          & 0.525 & 0.583 \\
+$\hat\rho(r^2)\hat\rho(s) \to sr^2$          & 0.533 & 0.589 \\
+$\hat\rho(r)^2 = \hat\rho(r^2)$              & 0.488 & 0.481 \\
+$\hat\rho(s)\hat\rho(r)\hat\rho(s) = \hat\rho(r)^3$ & 0.682 & 0.768 \\
+$\hat\rho(r)\hat\rho(s) \to rs$ (non-abelian target) & 1.036 & 1.000 \\
+$\hat\rho(s)\hat\rho(r) \to sr$              & 0.891 & 0.985 \\
+$\hat\rho(r)\hat\rho(s) \to sr$ (wrong-target control) & 0.903 & 0.940 \\
+\bottomrule
+\end{tabular}
+\caption{Held-out normalized errors, evaluation scenarios in the held-out template
+family. Identity-target rows ($\hat\rho(s)^2 = I$, $\hat\rho(r^2)^2 = I$,
+$\hat\rho(r)^4 = I$) are omitted: the normalization denominator is zero when the target
+equals the source, an instrument limitation of this run's error definition.}
+\label{tab:results}
+\end{table}
+
+\textbf{Verdict, per the pre-stated rule: the quarter-turn is not found.} The decisive
+row is the non-abelian signature. $\hat\rho(r)\hat\rho(s)$ predicts its $D_4$ target
+$rs$ no better than leaving the representation unchanged (1.036 and 1.000), and it fits
+the wrong target $sr$ slightly better (0.903 and 0.940) than the right one. Whatever the
+fitted cycle map is doing, it does not carry the order-dependence that separates $D_4$
+from $V_4$.
+
+Two further findings frame the verdict. First, the yardstick itself is weak: the
+measured correlative swap barely generalizes across surface templates (0.883 and 0.931),
+while deontic negation is by far the most linearly represented Hohfeldian operation in
+this model (0.484 and 0.532). The instrument therefore bounds what it can certify: it
+cannot find $D_4$, and it also cannot strongly certify $V_4$ as a linear structure at
+these layers; the negation axis is the one operation this representation supports well.
+Second, one fragment of dihedral structure does appear: $\hat\rho(r)^2$ matches the
+negation targets exactly as well as the directly fitted $\hat\rho(r^2)$ does (0.488
+versus 0.484 at layer 12; 0.481 versus 0.532 at layer 18). On the component of the
+representation where negation is linear at all, the fitted cycle behaves as its square
+root. It simply carries no non-abelian structure with it.
 
 \section{What a found quarter-turn would and would not mean}
 A linear operator in one model's representation space is evidence about that model's learned
@@ -158,7 +211,13 @@ metric where they fail in the raw metric, or conversely) is a designed follow-up
 of this run.
 
 \section{Conclusion}
-[TODO after results: two sentences, the outcome and the standing of V4/D4 after it.]
+The posited quarter-turn does not appear as a coherent linear operation in this model's
+representation of Hohfeldian statements: the non-abelian signature is absent, and the
+pre-stated verdict rule returns not found. The keystone's $V_4$-only conclusion stands,
+now with one empirical test behind it; the constructive residue is that negation is the
+operation learned representations support best, and that any future hunt should use a
+stronger instrument (per-input nonlinear maps, natural rather than templated jural text,
+and Hohfeld's power operations as the candidate corpus).
 
 \begin{thebibliography}{9}
 \bibitem{hohfeld1917} W.~N. Hohfeld. Fundamental legal conceptions as applied in judicial
