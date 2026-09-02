@@ -9,7 +9,8 @@ Demonstration of the Hohfeldian gauge machinery (V4 measured, D4 posited).
 
 This demo illustrates the mathematical structure underlying moral reasoning:
 - The four Hohfeldian positions: Obligation (O), Claim (C), Liberty (L), No-claim (N)
-- The D4 group (symmetries of a square) acting on these positions
+- The D4 group (symmetries of a square) POSITED to act on these positions
+  (measured sector = V4; see docs/CONCEPT_REGISTRY.md section 1)
 - Correlative symmetry (s): perspective swap between parties
 - Negation symmetry (r²): logical negation of normative status
 - Non-abelian structure of the D4 machinery: order of operations matters (rs ≠ sr)

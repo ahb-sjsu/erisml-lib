@@ -57,6 +57,14 @@ This pairing is called **correlative symmetry**. It's a hard constraint: if your
 
 ## 3. The D₄ Group: A State Machine with 8 Transitions
 
+> **Epistemic status (keystone correction, July 2026 — see
+> `docs/CONCEPT_REGISTRY.md` §1 and `formal/HohfeldV4.lean`):** the two
+> *demonstrated* operations (correlative swap `s`, deontic negation `r²`)
+> generate only the abelian Klein four-group **V₄**. The full D₄ below —
+> including the quarter-turns and the non-abelian order-dependence in §3.2 —
+> is the **posited** ambient machinery, kept so the hypothesis stays testable.
+> Read §3.2's "order matters" as a *prediction to hunt*, not a measured fact.
+
 > **Epistemic status (keystone correction, July 2026):** the two operations demonstrated
 > empirically — the correlative flip `s` and the negation `r²` — *commute*, so the group they
 > generate is the Klein four-subgroup **V₄ = {e, s, r², sr²}** (abelian, order 4). That is the
