@@ -91,6 +91,17 @@ of the consumer-metric question:
    held-out collapse appears in all three runs. Records:
    observation-theory-campaigns `analysis/cr-ieip/cr_ieip_{tl,fr}_result.json`.
    The remaining seal step is the prereg'd bars themselves.
+   *Status 2026-09-04, GRADED under seal (PREREG-CR-IEIP v1.0): family FAIL,
+   and the failure is the sharpest spec input yet.* The backtranslation cell
+   passed (-14/-15pp false-clears at matched flag rates, 1.5B); BOTH
+   paraphrase cells (0.5B and 1.5B) INVERTED (+35..+57pp worse than raw)
+   with rho's held-out R2 <= 0.00 -- patch-response gating below the rho
+   floor is worse than the raw metric it replaces. **Spec rule this
+   mandates: gate the consumer-metric path on a mechanical calibration-only
+   rho held-out check (measured safe margin: in-regime >= 0.074 vs
+   out-of-regime <= -0.0003; the V2 prereg freezes 0.05); below the floor,
+   fall back to raw or abstain.** Records: observation-theory-campaigns
+   analysis/cr-ieip/ (RESULTS-CR-IEIP.md, cells A/B/C, PREREG-CR-IEIP-V2).
 2. **A shipped, measured monitor false-clear rate.** Nominal accept = gate cleared;
    consumer_ok = behavior/EM verdict actually invariant. P(behavior changed | cleared)
    is the honest worth of the monitor and belongs beside its other calibration
