@@ -1285,7 +1285,7 @@ if not exp1_eval.empty:
 # 
 # The TCSS revision frames the money-zero result as a *context-specific finding* rather than a universal law: monetary stakes are inactive in the studied low-stakes paradigms, but the framework predicts that monetary sensitivity should reactivate in genuinely high-stakes settings.
 # 
-# Andersen, Ertac, Gneezy, Hoffman & List (2011, AER) is the cleanest empirical test: stakes from Rs 20 to Rs 20,000 (a 1000x range; the highest condition is approximately 1.6x monthly income in their Indonesia sample).
+# Andersen, Ertac, Gneezy, Hoffman & List (2011, AER) is the cleanest empirical test: stakes from Rs 20 to Rs 20,000 (a 1000x range; the experiment was run in eight villages in Meghalaya, northeast India, where the authors report an average yearly income of about Rs 17,000, so the highest condition is a little over a year's income).
 # 
 # If money-zero is universal (sigma^2_1 = infinity everywhere), then under the manuscript section VII.A *stake-scaling invariance* argument:
 # 
