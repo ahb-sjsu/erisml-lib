@@ -33,13 +33,14 @@
 We study a geometric model of economic decision-making in which each alternative is encoded as a point in a nine-dimensional decision space and the cost of moving from a task-specific reference point to that alternative is a Mahalanobis distance under a diagonal covariance matrix.
 Three covariance variances are fitted on nine bargaining and public-goods targets by an exhaustive search over active dimensions.
 The same variances are then applied, without refitting, to six classic prospect-theory choice problems and one historical ultimatum replication.
+The active-set structure was selected using the complete benchmark, so the lottery results demonstrate cross-domain parameter reuse within a jointly selected architecture rather than fully out-of-sample prediction.
 The selected model activates social impact, virtue and identity, and epistemic status.
 It matches all sixteen aggregate targets within stated tolerances with a mean absolute error of 2.70 percentage points.
 The monetary dimension is inactive, which the model expresses as a falsifiable corollary that multiplying every stake by a constant leaves predicted offers and rejections unchanged.
 We test that corollary on the high-stakes ultimatum data of Andersen and co-authors from Meghalaya in northeast India, with 458 responders and stakes from 20 to 20,000 rupees, the largest exceeding the average yearly income of the participants.
-Three pre-specified tests reject stake-scaling invariance.
-The monetary dimension is therefore inactive in the low-stakes tasks used for calibration and becomes active at consequential stakes, as the model predicts.
-The paper specifies every encoding rule, search step, and fitted or coded constant of the reference implementation, states which held-out targets are untouched by any fitting, reports uncertainty where individual-level data are recoverable, and presents the contribution as a falsifiable cross-domain modeling architecture rather than a unification of game theory and prospect theory.
+Three pre-specified tests reject the calibrated model's stake-scaling invariance, which shows that the share-normalized encoding and the selected metric do not extend unchanged to consequential-stake settings.
+The result motivates, but does not test, a monetary coordinate in absolute or income units with finite sensitivity.
+The paper specifies every encoding rule, search step, and fitted or coded constant of the reference implementation, states which targets entered each fitting and selection step, reports uncertainty where individual-level data are recoverable, and presents the contribution as a falsifiable cross-domain modeling architecture rather than a unification of game theory and prospect theory.
 \end{abstract}
 
 \begin{IEEEkeywords}
@@ -73,7 +74,8 @@ The empirical design is deliberately modest.
 We fit the covariance on nine game-theoretic targets and then apply the same covariance, without refitting the variances, to seven further targets, namely six classic prospect-theory problems and one historical ultimatum replication.
 The benchmark asks whether a metric discovered from strategic interaction also organizes several canonical risky-choice phenomena.
 It does not claim that the sixteen targets exhaust either literature or that the present encodings are uniquely correct.
-Two constants of the choice rule and one reference coordinate of the historical target were themselves set from held-out targets, and we say precisely which targets remain untouched by any fitting.
+Two constants of the choice rule and one reference coordinate of the historical target were themselves set from lottery and historical targets, and the active-set structure was ranked on all sixteen targets.
+We say precisely which targets entered each step.
 
 The selected model activates three dimensions, social impact, virtue and identity, and epistemic status.
 Within the stated tolerances it matches all sixteen aggregate targets with a mean absolute error of 2.70 percentage points.
@@ -82,14 +84,14 @@ We treat that as a falsifiable context-specific finding rather than a universal 
 If money carries no cost, multiplying every stake by a constant must leave predicted offers and rejections unchanged.
 We test the corollary on the high-stakes ultimatum data of Andersen and co-authors~\cite{andersen2011}, collected in Meghalaya in northeast India with stakes from 20 to 20,000 rupees.
 All three pre-specified tests reject invariance.
-The model therefore behaves the way a falsifiable theory should.
-The monetary dimension is inactive at the low stakes on which the metric was calibrated and becomes active at stakes that exceed a year of income.
+The calibrated model predicts invariance, and that prediction fails, so the share-normalized encoding and the selected metric do not extend unchanged to stakes that exceed a year of income.
+The result motivates, but does not test, a monetary coordinate in absolute or income units with finite sensitivity.
 
 The paper makes six contributions.
 It gives a self-contained geometric decision model whose encoding rules, metric, choice rules, temperature constants, structural search, and parameter accounting are all specified here and match the released reference implementation.
-It reports a cross-domain benchmark in which a covariance fitted on game-theoretic targets is evaluated on prospect-theory and historical-replication targets without refitting the active variances.
+It reports a cross-domain benchmark in which a covariance fitted on game-theoretic targets is evaluated on prospect-theory and historical-replication targets without refitting the active variances, within an active-set structure selected on the full benchmark.
 It identifies an interpretable active set, since exhaustive structural search selects social impact, identity, and epistemic status as the dominant metric dimensions in this benchmark.
-It reports a direct empirical falsification of universal money-zero on individual-level high-stakes data, which locates the boundary of the calibrated metric.
+It reports a direct empirical falsification of the calibrated model's stake-scaling invariance on individual-level high-stakes data, which demonstrates a failure of invariance without locating its boundary.
 It separates the fitted metric parameters from the fixed encoding assumptions and reports targeted ablations of each.
 It illustrates the use of the calibrated metric as a behavioral primitive in a minimal agent-based simulation and states the data needed for broader validation.
 
@@ -239,7 +241,7 @@ The temperature depends on the cost gap $\Delta c = |c_A - c_B|$ through
 with $T_{\text{base}} = 0.24$, $T_\alpha = 2.13$, and $T_{\text{floor}} = 0.5$.
 Because the game predictions are deterministic cost minima, the temperature enters only the six lottery predictions.
 The two constants $T_{\text{base}}$ and $T_\alpha$ were set by requiring the model to reproduce the observed frequencies of two of those lotteries, the Allais problem P1 and the strong-certainty problem P3, given the fitted variances.
-Those two targets are therefore not held out with respect to the temperature, and Section~\ref{sec:heldout} lists the targets that are.
+Section~\ref{sec:heldout} records what each target was used for.
 We treat the temperature architecture as part of the model's flexibility rather than as cost-free.
 Table~\ref{tab:param_accounting} counts $T_{\text{base}}$ and $T_\alpha$ as calibration quantities and $T_{\text{floor}}$ as a fixed hyperparameter.
 
@@ -247,13 +249,25 @@ A coarse $50\times50$ grid over $(T_{\text{base}},T_\alpha)$, scored on the lott
 We read this as a broad basin rather than as a unique exact solution.
 The grid is a diagnostic for smoothness and is not used to remove the temperature from the complexity accounting.
 
+The rule is not monotone in discrimination.
+Below the turnover $\Delta c^{\dagger}=(T_{\text{floor}}/T_{\text{base}})^{1/T_\alpha}=1.41$ the temperature is the floor and the choice frequency moves away from one half as the gap grows.
+Above it, $\Delta c/T(\Delta c)$ is proportional to $(\Delta c)^{-1.13}$, so a larger cost gap produces a choice frequency closer to one half.
+Four of the six lottery targets lie above the turnover.
+The cost gaps are $3.48$ for P1, $2.21$ for P3, $2.24$ for P7, $2.21$ for P11, $0.014$ for P16, and $0.013$ for P17.
+The consequence is visible in the two targets that set the constants.
+The encoding gives the Allais problem P1 a larger cost gap than the strong-certainty problem P3, while the observed risky-choice rate is higher for P1 (25.5\%) than for P3 (12.8\%).
+No constant temperature reproduces both, since at any fixed $T$ the larger gap of P1 yields the lower risky-choice rate, and $T_{\text{base}}$ and $T_\alpha$ were set precisely so that the declining discrimination above the turnover reverses that ordering.
+The ordering of P1 against P3 is therefore carried by the temperature rule and not by the geometry.
+We report this as a limitation of the choice rule.
+A monotone rule, which requires the temperature to grow no faster than linearly in the gap, would need a different lottery encoding to match P1 and P3, and we have not constructed one.
+
 \subsection{Calibration Architecture and Parameter Accounting}
 \label{sec:calibration}
 
 Calibration proceeds in three stages.
 First, structural fuzzing enumerates all dimension subsets of size $k\leq5$, which gives $\sum_{k=1}^5 \binom{9}{k}=381$ candidate active sets.
 Second, for each active set the algorithm searches over the active variances and scores the nine game-theory calibration targets.
-Third, the selected covariance and temperature are applied to the held-out lottery and historical-replication targets without refitting the active variances.
+Third, the selected covariance and temperature are applied to the lottery and historical-replication targets without refitting the active variances.
 Section~\ref{sec:fuzzing} gives the search in full.
 
 \begin{table*}[!t]
@@ -280,7 +294,7 @@ Coordinate constants of Table~\ref{tab:encodings} & Fixed by hand & The remainin
 
 Under the narrow covariance count the ratio is $16/3=5.3$ targets per fitted variance.
 Under a conservative accounting that includes the temperature and the coded mechanisms, the effective flexibility is higher.
-We therefore rely on transparency and on the held-out structure described in Section~\ref{sec:heldout} rather than on a single degrees-of-freedom ratio as proof against overfitting.
+We therefore rely on transparency and on the fitting-and-selection accounting of Section~\ref{sec:heldout} rather than on a single degrees-of-freedom ratio as proof against overfitting.
 %==============================================================================
 \section{Domain-Specific Encodings}
 \label{sec:encoding}
@@ -490,7 +504,7 @@ For each candidate structure $S$ and each variance vector $\boldsymbol{\sigma}_S
 \end{equation}
 where $\mathcal{T}_{\text{cal}}$ is the set of nine game-theory calibration targets, $y_t$ is the observed aggregate value, and $\hat{y}_t$ is the model's prediction under Eq.~\eqref{eq:argmin}.
 The weights are $w_t=1$ for the ultimatum mean offer, the dictator mean, and the responder MAO, and $w_t=0.5$ for the ultimatum modal offer and each of the five public-goods rounds, so that the five rounds of one experiment do not dominate the objective.
-Lottery and historical-replication targets are excluded from $\mathcal{T}_{\text{cal}}$.
+Lottery and historical-replication targets are excluded from $\mathcal{T}_{\text{cal}}$ and enter only the ranking step below.
 The unweighted MAE reported elsewhere in the paper is a different quantity from this objective.
 
 \subsubsection{Variance search}
@@ -503,13 +517,15 @@ They are the best of 5,000 rather than the exact minimizer of a continuous probl
 Because many candidates tie on the calibration objective, the reference implementation scores every candidate, at its calibrated variances, by the weighted MAE over all sixteen targets and ranks candidates by that score.
 The Pareto frontier of best score against active-set size is tabulated, and the reported model is the smallest $k$ whose frontier value is within $0.5$ percentage points of the value at $k+1$.
 The frontier satisfies that rule at $k=3$, with unweighted MAE of roughly 15\% at $k=1$, roughly 5\% at $k=2$, 2.70\% at $k=3$, and 2.6\% at $k=4$.
-The ranking step uses the held-out targets to choose among active sets.
-The held-out claim of this paper therefore applies to the variance values, which were fitted on game targets only, and not to the choice of active set.
+The ranking step uses the lottery and historical targets to choose among active sets, so those targets participated in model selection.
+The active variances were fitted on the game targets, while the active-set structure was selected using the complete benchmark.
+The lottery results therefore demonstrate cross-domain parameter reuse within a jointly selected architecture, not fully out-of-sample prediction.
 
 \subsubsection{Multiplicity exposure}
 The candidate structures create a model-selection multiplicity that we report rather than absorb into significance language.
 The objective is deterministic aggregate prediction error rather than a family of independent null-hypothesis tests, so Bonferroni or Benjamini--Hochberg corrections are not the natural calibration.
-The appropriate hedge is performance on targets untouched by any fitting, which Section~\ref{sec:heldout} lists, and the Andersen boundary test of Section~\ref{sec:andersen}, which is independent of every fitting step.
+The only test independent of every fitting and selection step is the Andersen test of Section~\ref{sec:andersen}.
+Section~\ref{sec:heldout} records what each benchmark target was used for.
 
 \subsubsection{Pseudocode}
 The procedure is given as pseudocode in Table~\ref{alg:fuzz}.
@@ -562,24 +578,27 @@ Random half-log-unit perturbations of every variance therefore move the three-ga
 
 We use three stated tolerance levels as engineering diagnostics.
 Game targets, which are used for calibration, must be matched within $\pm5$ percentage points (pp).
-Lottery targets, which are held out from the variance fit, must be matched within $\pm10$~pp.
+Lottery targets, which were not used in the variance fit, must be matched within $\pm10$~pp.
 The historical-replication target must be matched within $\pm10$~pp.
 A target passes this diagnostic if the absolute prediction error falls within the stated tolerance.
 These tolerances are not $p$ values and should not be interpreted as formal hypothesis tests.
 They are retained because most targets are heterogeneous published summaries rather than a single individual-level dataset.
 The tolerance ranges were specified in advance and were not adjusted to fit the results.
 
-\subsection{What Is Held Out}
+\subsection{What Was Fitted or Selected on Which Targets}
 \label{sec:heldout}
 
-Three fitting steps touch the targets.
+Four steps touch the targets.
 The three active variances were fitted on the nine game targets only.
 The two temperature constants were set from the P1 and P3 lottery frequencies.
 The G\"uth reference coordinate was set from the G\"uth offer.
-In addition, the ranking of candidate active sets used all sixteen targets.
-Conditional on the selected active set, the targets whose values were not used in any fitting step are P7, P16, and P17, together with P11, whose encoding coincides with that of P3.
-The cross-domain claim of the paper rests on those four lottery targets and on the Andersen test of Section~\ref{sec:andersen}.
-Every other target is either a calibration target or was used to set one of the quantities listed above.
+The ranking of candidate active sets used all sixteen targets.
+No lottery target is therefore fully out of sample.
+P7, P16, and P17 entered only the ranking step.
+P1 and P3 also set the temperature constants.
+P11 shares its encoding with P3, so it tests the reduction assumption of the isolation problem rather than predicting P11 from distinct inputs.
+The lottery results demonstrate cross-domain parameter reuse within a jointly selected architecture, not fully out-of-sample prediction.
+The Andersen test of Section~\ref{sec:andersen} is the only result in the paper that is independent of every fitting and selection step.
 
 \subsection{Beyond Pass and Fail}
 \label{sec:statistical-eval}
@@ -591,7 +610,7 @@ The overall unweighted MAE of 2.70\% averages over heterogeneous targets and sou
 On the six Ruggeri lottery items (Ruggeri et al.~\cite{ruggeri2020}, $N=24{,}588$ responses in total at $N=4{,}098$ per item) the MAE is 3.95\%, driven by the systematic errors on P16 ($-6.7$~pp) and P17 ($+7.8$~pp).
 On the Fraser--Nettle game targets ($N=212$) the MAE is 0.17\% on the two ultimatum-game targets and 2.29\% on the five public-goods rounds.
 The dictator target uses the Engel meta-study~\cite{engel2011} ($N=20{,}813$) and the G\"uth historical replication uses $N=21$~\cite{guth1982}.
-The 3.95\% figure on the Ruggeri subset is the most informative single MAE for held-out predictive accuracy because Ruggeri's large $N$ produces the tightest comparison, and we treat it as the conservative target metric.
+The 3.95\% figure on the Ruggeri subset is the most informative single MAE for cross-domain accuracy because Ruggeri's large $N$ produces the tightest comparison, and we treat it as the conservative target metric.
 
 \subsubsection{Confidence-interval coverage}
 For the targets where individual-level data are recoverable, namely the Fraser--Nettle ultimatum offers and MAO and the six Ruggeri lottery items, together with the 114 country-by-item Ruggeri cells, we compute Wilson 95\% binomial confidence intervals and ask whether the model prediction falls inside the interval.
@@ -683,10 +702,10 @@ The pass count is a descriptive benchmark, not a significance test.
 9  & PG round 10                  & Game, calibration  & 39.0\%  & 40.0\%  & $+$1.0  & $\pm$5~pp  & \checkmark \\
 10 & PT P1 Allais (certainty)     & Lottery, sets $T$  & 25.5\%  & 26.6\%  & $+$1.1  & $\pm$10~pp & \checkmark \\
 11 & PT P3 Strong certainty       & Lottery, sets $T$  & 12.8\%  & 15.4\%  & $+$2.6  & $\pm$10~pp & \checkmark \\
-12 & PT P7 Reflection             & Lottery, held out  & 79.4\%  & 84.2\%  & $+$4.8  & $\pm$10~pp & \checkmark \\
-13 & PT P11 Isolation             & Lottery, held out$^{\dagger}$  & 16.1\%  & 15.4\%  & $-$0.7  & $\pm$10~pp & \checkmark \\
-14 & PT P16 Small-prob.\ gain     & Lottery, held out  & 57.4\%  & 50.7\%  & $-$6.7  & $\pm$10~pp & \checkmark \\
-15 & PT P17 Small-prob.\ loss     & Lottery, held out  & 42.8\%  & 50.6\%  & $+$7.8  & $\pm$10~pp & \checkmark \\
+12 & PT P7 Reflection             & Lottery, ranking only & 79.4\%  & 84.2\%  & $+$4.8  & $\pm$10~pp & \checkmark \\
+13 & PT P11 Isolation             & Lottery, ranking only$^{\dagger}$  & 16.1\%  & 15.4\%  & $-$0.7  & $\pm$10~pp & \checkmark \\
+14 & PT P16 Small-prob.\ gain     & Lottery, ranking only & 57.4\%  & 50.7\%  & $-$6.7  & $\pm$10~pp & \checkmark \\
+15 & PT P17 Small-prob.\ loss     & Lottery, ranking only & 42.8\%  & 50.6\%  & $+$7.8  & $\pm$10~pp & \checkmark \\
 16 & G\"{u}th 1982 ultimatum      & Historical, sets $r_9$ & 37.0\% & 35.0\% & $-$2.0 & $\pm$10~pp & \checkmark \\
 \midrule
 \multicolumn{3}{l}{\textbf{Overall}} & \multicolumn{2}{c}{\textbf{MAE = 2.70\%}} & & \multicolumn{2}{c}{\textbf{16/16 pass}} \\
@@ -694,7 +713,7 @@ The pass count is a descriptive benchmark, not a significance test.
 \bottomrule
 \end{tabular}
 \begin{flushleft}
-\footnotesize{Error is predicted minus observed in percentage points. The overall MAE is the unweighted mean of the absolute errors over all sixteen targets. The Ruggeri-subset row reports the MAE on the six lottery items only, where $N=4{,}098$ per item gives the tightest comparison. Two lottery items, P16 and P17, pass the tolerance but fall outside the Ruggeri 95\% interval (Section~\ref{sec:statistical-eval}). The role column records which targets were used to fit the variances (calibration), to set the temperature constants, or to set the G\"uth reference coordinate. $^{\dagger}$P11 is encoded identically to P3. Reference implementation~\cite{eriseconsw}.}
+\footnotesize{Error is predicted minus observed in percentage points. The overall MAE is the unweighted mean of the absolute errors over all sixteen targets. The Ruggeri-subset row reports the MAE on the six lottery items only, where $N=4{,}098$ per item gives the tightest comparison. Two lottery items, P16 and P17, pass the tolerance but fall outside the Ruggeri 95\% interval (Section~\ref{sec:statistical-eval}). The role column records which targets were used to fit the variances (calibration), to set the temperature constants, or to set the G\"uth reference coordinate. All sixteen targets were used to rank candidate active sets, so no target is fully out of sample. $^{\dagger}$P11 is encoded identically to P3. Reference implementation~\cite{eriseconsw}.}
 \end{flushleft}
 \end{table*}
 
@@ -717,7 +736,7 @@ It does not capture the rise between rounds 1 and 3, and its round-1 prediction 
 
 The six lottery targets use the variances fitted on games without change.
 P1 and P3 set the temperature constants.
-P7, P16, and P17 were not used in any fitting step, and P11 shares its encoding with P3.
+P7, P16, and P17 entered only the ranking of active sets, and P11 shares its encoding with P3.
 
 The certainty effect (P1). The model predicts that 26.6\% of participants choose the risky option, against an observed 25.5\%.
 The certain option has zero displacement on $d_5$ and $d_9$ from the lottery reference, and the risky option is displaced by $0.7(1-0.44)$ on each.
@@ -840,24 +859,25 @@ Table~\ref{tab:comparison} compares the geometric model against three baselines,
 \toprule
 \textbf{Model} & \textbf{Parameters} & \textbf{Game targets} & \textbf{Lottery targets} & \textbf{MAE within domain} & \textbf{Cross-domain} \\
 \midrule
-Geometric (this paper) & 3 & 9/9 pass & 6/6 pass & 2.70\% & Yes, plus 1/1 historical \\
-CPT~\cite{tversky1992} & 5 ($\alpha,\beta,\lambda,\gamma,\delta$) & N/A & 4/6 pass & 5.8\% & No \\
+Geometric (this paper) & 3 fitted variances, 13 named quantities & 9/9 pass & 6/6 pass & 2.70\% (3.95\% lottery) & Yes, plus 1/1 historical \\
+CPT~\cite{tversky1992} & 5 ($\alpha,\beta,\lambda,\gamma,\delta$) & Not specified & 6/6 pass & 5.7\% & No \\
 Fehr--Schmidt~\cite{fehr1999} & 2 ($\alpha,\beta$) plus distribution & 2/9 pass & N/A & 11.8\% & No \\
 EV maximizer & 0 & 0/9 pass & 2/6 pass & 47.8\% & Trivially \\
 \bottomrule
 \end{tabular}
 \begin{flushleft}
 \footnotesize{Target accounting is nine game targets, six lottery targets, and one historical replication, sixteen in total.
-CPT is evaluated on the six lottery problems and provides no mechanism for game predictions.
+CPT is evaluated on the six lottery problems, and the CPT baseline used here does not specify strategic behavior.
 CPT has five free parameters and the reference point is fixed at the status quo for these tasks, following Tversky and Kahneman~\cite{tversky1992}.
+The geometric parameter entry counts the three fitted variances and, in parentheses, the thirteen named quantities of Table~\ref{tab:param_accounting}, before the coordinate constants of Table~\ref{tab:encodings}.
 Fehr--Schmidt is evaluated on the nine game targets and provides no mechanism for lottery predictions.
 The EV maximizer is evaluated on the fifteen game and lottery targets.
 MAE for CPT and Fehr--Schmidt is computed within their respective domains.}
 \end{flushleft}
 \end{table*}
 
-The geometric model has lower benchmark MAE and a higher pass count than these baselines on this target set.
-The comparison is suggestive rather than definitive, because the baselines and the geometric model are not estimated under a common individual-level likelihood protocol.
+The geometric model has lower MAE than each baseline within that baseline's domain, the same 6/6 pass count as canonical CPT on the lottery problems, and a higher pass count than Fehr--Schmidt on the games.
+The comparison is suggestive rather than definitive, because the baselines and the geometric model differ in flexibility and are not estimated under a common individual-level likelihood protocol.
 The point of the comparison is cross-domain applicability under a shared metric, not a final ranking of behavioral models.
 
 \subsubsection{Baseline fitting protocol}
@@ -871,16 +891,11 @@ We document how each baseline's parameters were obtained and evaluated.
     The prediction for each target is the choice implied by expected-value maximization, namely offer nothing in the ultimatum game, contribute nothing in the public goods game, and choose the lottery with the higher expected value.
 \end{itemize}
 CPT and Fehr--Schmidt use their own published parameters and not parameters refitted to our target set.
+Per-target CPT errors are given in Appendix~\ref{app:cpt}.
 
-As a pass-rate ceiling test we also optimized CPT's five parameters by Nelder--Mead from 500 random initializations, minimizing MAE on the six lottery targets with unconstrained search (initial ranges $\alpha, \beta \in [0.3, 2.0]$, $\lambda \in [1.0, 4.0]$, $\gamma, \delta \in [0.01, 1.0]$, with the search allowed to leave these ranges).
-The best parameters found ($\alpha = 0.61$, $\beta = 1.50$, $\lambda = 2.59$, $\gamma = 0.12$, $\delta = 0.05$) achieve 4/6 pass with MAE\,=\,11.2\% and fail the same two targets as canonical CPT, P3 ($+14.2$~pp) and P11 ($+38.1$~pp).
-The higher MAE relative to canonical CPT (11.2\% against 5.7\%) reflects a tradeoff.
-The optimizer distorts the value and weighting functions to reduce error on P3 and P11 and worsens the targets that canonical CPT already matches.
-The pass rate stays at 4/6 under both parameterizations.
-Table~\ref{tab:comparison} reports the canonical result rounded to 5.8\% (the more precise figure is 5.7\%).
-Per-target CPT errors under both parameterizations are given in Appendix~\ref{app:cpt}.
-
-CPT achieves 4/6 pass on the six lottery problems with five parameters and cannot be applied to games.
+Canonical CPT passes all six lottery problems within the $\pm10$~pp criterion with MAE\,=\,5.7\%, against 6/6 at MAE\,=\,3.95\% for the geometric model on the same Ruggeri frequencies.
+The two models differ in flexibility and in fitting protocol, since CPT's five parameters were estimated on other data while the geometric model's structure was selected on this benchmark, so the difference in MAE is not a ranking of the two theories.
+The CPT baseline used here does not specify strategic behavior.
 Fehr--Schmidt achieves 2/9 pass on the nine game targets because its two-parameter model, even with distributional assumptions about $\alpha$ and $\beta$ across the population, cannot simultaneously match the ultimatum offer, dictator giving, and the trajectory of public-goods contributions.
 The expected-value maximizer passes only 2 of 15 targets with MAE\,=\,47.8\%.
 The observed behavioral frequencies are far from what monetary optimization predicts.
@@ -896,13 +911,13 @@ The worst single-target error is $4.3$~pp (public-goods round~1, tolerance $\pm5
 A stronger leave-one-out test would refit $\Sigma$ on the remaining eight game targets and ask whether the same active set is selected.
 We treat that stability analysis as the natural follow-up validation rather than a claim of the present paper.
 
-\subsubsection{Calibration and held-out MAE}
+\subsubsection{Calibration and lottery MAE}
 The nine game targets have MAE\,=\,1.96\%, and the seven lottery and historical targets have MAE\,=\,3.67\%.
-The held-out MAE is higher, as expected, and all seven targets pass within their wider $\pm10$~pp tolerance.
+The lottery MAE is higher, as expected, and all seven targets pass within their wider $\pm10$~pp tolerance.
 The ratio of the two MAEs is $1.87$.
-The four lottery targets untouched by any fitting step, P7, P11, P16, and P17, have MAE\,=\,5.0\%.
-The variances were selected to minimize error on game targets, and the lottery targets played no role in fitting them.
-That the three-dimensional metric fitted on games also organizes the lottery phenomena is the paper's central empirical result, and its evidential weight rests on the targets listed in Section~\ref{sec:heldout}.
+The four lottery targets that entered only the ranking step, P7, P11, P16, and P17, have MAE\,=\,5.0\%.
+The variances were fitted to minimize error on game targets, and the lottery targets entered the selection of the active set but not the fitting of the variances.
+That the metric fitted on games also organizes the lottery phenomena within that jointly selected architecture is the paper's central empirical result, and Section~\ref{sec:heldout} states its evidential limits.
 
 \subsection{Pareto Frontier}
 
@@ -952,7 +967,7 @@ Game targets (circles) and lottery targets (triangles) are intermixed, so the mo
 \label{sec:discussion}
 %==============================================================================
 
-\subsection{Money-Zero as a Falsifiable Boundary Condition}
+\subsection{Money-Zero as a Falsifiable Prediction}
 \label{sec:andersen}
 
 The most counterintuitive result of the calibration is that the monetary dimension ($d_1$) has exactly zero sensitivity in the selected model.
@@ -1002,34 +1017,31 @@ All three higher-stake conditions fall outside the Rs~20 confidence band, both f
 \begin{figure}[!t]
 \centering
 \includegraphics[width=\columnwidth]{figures/andersen_money_zero_falsification.png}
-\caption{Direct test of the stake-scaling-invariance corollary on the data of Andersen et al.~\cite{andersen2011} ($N=458$, Meghalaya, India). Bars show observed means with 95\% confidence intervals. The dashed line is the prediction under an inactive monetary dimension, anchored to the Rs~20 condition. Both panels reject invariance, with $p=4\times10^{-13}$ for offers and $p=10^{-3}$ for rejections.}
+\caption{Direct test of stake-scaling invariance on the data of Andersen et al.~\cite{andersen2011} ($N=458$, Meghalaya, India). Bars show observed means with 95\% confidence intervals. The dashed line is the prediction of the calibrated share-normalized model, which is flat across stakes, anchored to the Rs~20 condition. Both panels reject invariance, with $p=4\times10^{-13}$ for offers and $p=10^{-3}$ for rejections.}
 \label{fig:andersen}
 \end{figure}
 
 \subsubsection{Interpretation}
-The model behaves the way a falsifiable theory should when challenged outside its calibration setting.
-Its most counterintuitive prediction fails, in the direction the model itself anticipates.
+The calibrated model predicts invariance, and that prediction fails.
+The model does not predict the observed direction or magnitude of the stake effect, because under the share-normalized encoding no value of the monetary variance would.
 The selected metric remains a parsimonious descriptive model of the low-stakes tasks on which it was calibrated.
-It is not a universal claim about rational choice, and the universal version is empirically false.
+It does not extend unchanged to consequential-stake settings, and the universal money-zero claim is empirically false.
 
-A complementary reading is that the active set $\{d_6,d_7,d_9\}$ describes a setting in which the social and epistemic costs of an offer dominate the monetary cost.
-At a stake above a year's income the monetary cost is no longer negligible relative to those social and epistemic signals.
-A model refitted on such data would need a monetary coordinate that carries the absolute stake, for example in units of local income, together with a finite $\sigma_1^2$.
-The model accommodates this through context-specific covariance estimation.
-The monetary dimension is inactive in the calibrated setting and becomes active where money carries decision-relevant weight that the social and epistemic dimensions cannot absorb.
-Mapping the boundary explicitly, meaning the stake level at which $\sigma_1^2$ becomes finite and how that depends on local income and anonymity, is a natural target for follow-up work using individual-level data from Andersen et al., Slonim and Roth~\cite{slonim1998}, Cameron~\cite{cameron1999}, and competitive double-auction settings~\cite{smith1962}.
+A model that fits both stake ranges would need a monetary coordinate in absolute or income units, so that the stake changes the displacement, together with a finite $\sigma_1^2$.
+That model has not been fitted or tested here, and the Andersen result motivates it without testing it.
+Locating the stake level at which invariance fails, and how that level depends on local income and anonymity, is a natural target for follow-up work using individual-level data from Andersen et al., Slonim and Roth~\cite{slonim1998}, Cameron~\cite{cameron1999}, and competitive double-auction settings~\cite{smith1962}.
 
 \subsubsection{What this does not establish}
 The Andersen data are one dataset from one region of one country.
 The test rejects the universal money-zero claim.
 It does not by itself establish where the boundary sits, how it depends on cultural or institutional context, or whether the same recalibration mechanism explains analogous boundaries in dictator and public-goods games.
 Camerer's review~\cite{camerer2003} of cross-stakes ultimatum results is mixed in this respect, since stake-size invariance holds in many ranges but not in extreme conditions.
-The present test should be read as the first of several boundary-condition probes rather than as a complete map of where $d_1$ activates.
+The present test demonstrates a failure of invariance and does not locate its boundary.
 
 \subsection{A Cross-Domain Bridge, Not a Unification}
 
-The central methodological contribution is cross-domain prediction.
-A metric fitted on game-theory data, meaning strategic interaction with real money, organizes six classic prospect-theory phenomena, meaning hypothetical lottery choices, and a corollary of that metric is then tested on a high-stakes ultimatum dataset that played no role in any fitting step.
+The central methodological contribution is cross-domain parameter reuse.
+A metric fitted on game-theory data, meaning strategic interaction with real money, organizes six classic prospect-theory phenomena, meaning hypothetical lottery choices, within an active-set structure selected on both, and a corollary of that metric is then tested on a high-stakes ultimatum dataset that played no role in any fitting or selection step.
 
 We do not describe this result as a unification of the two literatures.
 Game theory and prospect theory are both wider than the present targets.
@@ -1045,17 +1057,14 @@ A certain outcome has zero epistemic displacement from the lottery reference, an
 This is an interpretive bridge, not a theorem about either literature.
 
 The natural extension is to test the same bridge in additional domains by fitting $\Sigma$ on data from one domain and predicting behavior in others.
-The present paper takes the first such step, from games to lotteries, and demonstrates one direction in which the metric must change, since high stakes activate $d_1$.
+The present paper takes the first such step, from games to lotteries, and demonstrates one setting in which the encoding and metric must change, since stake invariance fails at consequential stakes.
 
 \subsubsection*{Toward a tractable equilibrium model}
-The emphasis on metric decision spaces also bears on a longstanding open problem in game theory.
-Nash equilibria exist in finite games~\cite{nash1950}, but computing one is PPAD-complete~\cite{daskalakis2009,chen2009}, and the intractability worsens in continuous-action and multi-agent settings.
-No actual agent, human or artificial, can be performing the global optimization that standard equilibrium analysis implicitly attributes to it.
-Bounded rationality is therefore not only a psychological observation but a computational necessity.
-Tractable behavior requires heuristic truncation of an otherwise intractable search.
-A decision space equipped with an interpretable cost metric is the kind of structured search space on which directed search with admissible heuristics, in the style of the A$^{*}$ algorithm~\cite{hart1968}, replaces global optimization with tractable local navigation.
-Under this reading the interpretable dimensions are candidate heuristic coordinates on the equilibrium landscape, namely the directions along which an admissible truncation of the multi-attribute equilibrium computation can be carried out without sacrificing optimality on the truncated subspace.
-Developing that computational interpretation is beyond the scope of the present empirical paper.
+The emphasis on metric decision spaces also bears on the computation of equilibria.
+Nash equilibrium is a consistency condition on strategy profiles and does not assume that agents compute it, but Nash equilibria exist in finite games~\cite{nash1950} while computing one is PPAD-complete~\cite{daskalakis2009,chen2009}, so any procedure that reaches equilibrium play in a large game must do so without exhaustive search.
+The A$^{*}$ algorithm~\cite{hart1968} reaches an optimal path under an admissible heuristic with complete search, and truncating that search trades the optimality guarantee for tractability.
+A decision space with an interpretable cost metric is one candidate space on which such a truncated search could be specified, with the interpretable dimensions as candidate heuristic coordinates.
+Nothing in the present paper tests that reading, and developing it is beyond the scope of this empirical work.
 
 \subsection{Complexity, Degrees of Freedom, and Multiplicity}
 
@@ -1070,7 +1079,7 @@ It does mean that the parsimony claim should be read as ``few fitted covariance 
 The structural search also creates multiplicity exposure, since 381 active-set structures are considered before $\{d_6,d_7,d_9\}$ is selected, and the ranking among them used all sixteen targets.
 Because the objective is deterministic aggregate prediction error rather than a set of independent null-hypothesis tests, Bonferroni-style $p$ values are not directly applicable.
 The appropriate interpretation is model selection.
-We report the search exposure and rely on the targets untouched by fitting, the ablations, and the independent Andersen probe rather than on significance language.
+We report the search exposure and rely on the fitting accounting of Section~\ref{sec:heldout}, the ablations, and the independent Andersen probe rather than on significance language.
 
 \subsection{What the Result Is, and Is Not, About Rationality}
 \label{sec:not-rationality}
@@ -1078,7 +1087,7 @@ We report the search exposure and rely on the targets untouched by fitting, the 
 It is tempting to frame the result as showing that behavioral anomalies are rational navigation on a manifold.
 The empirical exercise does not support that reading.
 What it shows is much narrower.
-A particular encoding-and-metric system reproduces a small set of canonical aggregate frequencies from two literatures with three fitted variances, conditional on the encodings, and the model's most counterintuitive corollary fails in the direction the model predicts when probed outside its calibration setting.
+A particular encoding-and-metric system reproduces a small set of canonical aggregate frequencies from two literatures with three fitted variances, conditional on the encodings, and the model's stake-invariance corollary fails when probed outside its calibration setting.
 None of that establishes that the underlying behavior is rational in a normative sense, that agents optimize the geometric cost, or that the dimensions correspond to psychological primitives.
 
 We therefore use \emph{descriptive geometric reduction} as the operative description of the result.
@@ -1137,10 +1146,10 @@ Nine limitations qualify the present results.
     \item \textbf{Narrow target battery}. The lottery set contains six classic targets, the historical holdout is a single 1982 ultimatum result, and the high-stakes boundary test uses one dataset from northeast India. The 19-country replication of Ruggeri et al.~\cite{ruggeri2020}, additional high-stakes bargaining cohorts (Slonim and Roth~\cite{slonim1998}, Cameron~\cite{cameron1999}), non-WEIRD samples, trust games, and market-exchange datasets are necessary before broad claims can be made.
     \item \textbf{Aggregate data on the calibration side}. Most calibration targets are published summaries from heterogeneous studies rather than a single individual-level dataset. This prevents joint likelihood estimation across the full benchmark. The Andersen boundary test performs the falsification probe on individual-level data, but the calibration itself remains aggregate.
     \item \textbf{Tolerance-based evaluation}. The 16/16 pass rate is an engineering diagnostic. The MAE on the high-$N$ Ruggeri lottery subset is 3.95\%, against 2.70\% averaged over the full benchmark, and two lottery predictions (P16, P17) fall outside the Ruggeri 95\% interval despite passing the $\pm10$~pp tolerance. Future work should adopt common train, validation, and test splits with individual-level likelihoods throughout.
-    \item \textbf{Fitting steps beyond the variances}. The temperature constants were set from P1 and P3, the G\"uth reference coordinate was set from the G\"uth offer, and the ranking of active sets used all sixteen targets. The lottery targets untouched by any fitting are P7, P11, P16, and P17.
+    \item \textbf{No fully out-of-sample lottery target}. The temperature constants were set from P1 and P3, the G\"uth reference coordinate was set from the G\"uth offer, and the ranking of active sets used all sixteen targets, so the lottery results demonstrate parameter reuse within a jointly selected architecture rather than out-of-sample prediction. The temperature rule is nonmonotone above a cost gap of $1.41$, where four of the six lottery targets lie, and the ordering of P1 against P3 is carried by that rule rather than by the geometry (Section~\ref{sec:framework}).
     \item \textbf{Model complexity}. The three-parameter description counts only active covariance variances. A fuller accounting includes the temperature, rejection, drift, and encoding mechanisms and the structural restrictions. The conservative count is thirteen named quantities (Table~\ref{tab:param_accounting}) plus the coordinate constants.
     \item \textbf{Diagonal covariance}. The diagonal model cannot represent interactions such as fairness-by-social-impact coupling or epistemic-status modulation of identity. Full or sparse covariance estimation requires more observations than the present aggregate benchmark provides. We treat this as a deferred extension rather than a closed question.
-    \item \textbf{Money-zero boundary located, not characterized}. The Andersen test rejects universal stake-scaling invariance but does not map the boundary across cultures, institutional settings, or stake ranges. Whether the same recalibration mechanism explains analogous boundaries in dictator and public-goods games, or in cohorts outside northeast India, remains open.
+    \item \textbf{Failure of invariance demonstrated, boundary not located}. The Andersen test rejects the calibrated model's stake-scaling invariance but does not locate the stake at which it fails, does not test a monetary coordinate in absolute or income units, and does not map the failure across cultures, institutional settings, or game types.
     \item \textbf{Static and mostly binary choices}. The softmax rule handles binary choices, and the game predictions are deterministic cost minima over static menus. Multi-alternative stochastic choice, learning, belief updating, and repeated strategic adaptation remain extensions. The agent-based example is illustrative, and full mechanism-design and policy-simulation applications are not implemented here.
 \end{enumerate}
 
@@ -1150,18 +1159,17 @@ Nine limitations qualify the present results.
 %==============================================================================
 
 This paper presents and tests a geometric model of economic behavior in which decisions are displacements from a task reference point in a nine-dimensional space and are evaluated by Mahalanobis cost.
-A diagonal covariance fitted on game-theoretic aggregate targets matches a small set of lottery and historical-replication targets without refitting the active variances.
+A diagonal covariance fitted on game-theoretic aggregate targets matches a small set of lottery and historical-replication targets without refitting the active variances, within an active-set structure that was selected on the full benchmark.
 The selected active set, social impact, virtue and identity, and epistemic status, identifies the dominant metric dimensions in this benchmark, and the monetary dimension is inactive in the selected metric.
 
-The model's most counterintuitive prediction, stake-scaling invariance, is tested on the high-stakes ultimatum data of Andersen et al.~\cite{andersen2011} from Meghalaya, India ($N=458$, a thousandfold stake range), and all three pre-specified tests reject invariance.
-The model therefore behaves the way a falsifiable theory should.
-A sharp corollary fails sharply outside the calibration setting, in the direction the theory anticipates.
-The money-zero result is thereby converted from a defensive interpretive move into an empirically anchored boundary condition.
+The model's most counterintuitive prediction, stake-scaling invariance, is tested on the high-stakes ultimatum data of Andersen et al.~\cite{andersen2011} from Meghalaya, India ($N=458$, a thousandfold stake range), and all three pre-specified tests reject it.
+The calibrated model predicts invariance and that prediction fails, so the share-normalized encoding and the selected metric do not extend unchanged to consequential stakes.
+The result motivates, but does not test, a monetary coordinate in absolute or income units with finite sensitivity.
 
 The main contribution is not a unification of behavioral economics.
 It is a self-contained, interpretable, and falsifiable cross-domain modeling architecture, specified down to every coded constant, accompanied by a direct test of its strongest counterintuitive prediction.
 The model can be embedded in computational social-system simulations as an interpretable behavioral primitive.
-Its broader validity depends on stronger tests still to come, namely individual-level joint estimation across the full benchmark, multi-country lottery replications under a common protocol, additional high-stakes bargaining cohorts to map the $d_1$ activation boundary, market-exchange data, non-diagonal covariance structures, and preregistered encoding rules with external raters.
+Its broader validity depends on stronger tests still to come, namely individual-level joint estimation across the full benchmark, multi-country lottery replications under a common protocol, additional high-stakes bargaining cohorts with an income-scaled monetary coordinate to locate the stake at which invariance fails, market-exchange data, non-diagonal covariance structures, and preregistered encoding rules with external raters.
 
 \section*{Acknowledgment}
 Generative AI tools (Claude, Anthropic) were used to assist with manuscript drafting, editing, formatting, and code review.
@@ -1171,37 +1179,33 @@ The research questions, model, experimental design, analyses, and conclusions ar
 \section{CPT Baseline: Per-Target Errors}
 \label{app:cpt}
 
-Table~\ref{tab:cpt_detail} reports CPT predictions for each lottery target under both the canonical parameters from Tversky and Kahneman~\cite{tversky1992} and the best parameters found by unconstrained Nelder--Mead optimization from 500 random initializations.
-The optimization is a pass-rate ceiling test.
-Even with full freedom to refit, CPT does not exceed 4/6 pass on these six problems, and P3 and P11 fail under both parameterizations.
+Table~\ref{tab:cpt_detail} reports CPT predictions for each lottery target under the canonical parameters from Tversky and Kahneman~\cite{tversky1992}.
+All six absolute errors are below the $\pm10$~pp criterion, so canonical CPT passes 6/6 with MAE 5.7\%.
+No refitted CPT is reported.
 
 \begin{table}[!h]
 \renewcommand{\arraystretch}{1.15}
-\caption{CPT Per-Target Errors, Canonical and Optimized}
+\caption{CPT Per-Target Errors Under the Canonical Parameters}
 \label{tab:cpt_detail}
 \centering
-\begin{tabular}{l r r r r r}
+\begin{tabular}{l r r r c}
 \toprule
-& & \multicolumn{2}{c}{\textbf{Canonical}} & \multicolumn{2}{c}{\textbf{Optimized}} \\
-\cmidrule(lr){3-4} \cmidrule(lr){5-6}
-\textbf{Target} & \textbf{Obs.} & \textbf{Pred.} & \textbf{Err.} & \textbf{Pred.} & \textbf{Err.} \\
+\textbf{Target} & \textbf{Obs.} & \textbf{Pred.} & \textbf{Err.} & \textbf{Pass} \\
 \midrule
-P1 Allais       & 25.5\% & 30.2\% & +4.7  & 28.8\% & +3.3  \\
-P3 Strong cert.  & 12.8\% & 20.4\% & +7.6  & 27.0\% & +14.2 \\
-P7 Reflection   & 79.4\% & 74.1\% & $-$5.3 & 82.0\% & +2.6  \\
-P11 Isolation   & 16.1\% & 20.4\% & +4.3  & 54.2\% & +38.1 \\
-P16 Sm.\ gain   & 57.4\% & 60.8\% & +3.4  & 52.1\% & $-$5.3 \\
-P17 Sm.\ loss   & 42.8\% & 51.6\% & +8.8  & 46.3\% & +3.5  \\
+P1 Allais       & 25.5\% & 30.2\% & +4.7   & \checkmark \\
+P3 Strong cert.  & 12.8\% & 20.4\% & +7.6   & \checkmark \\
+P7 Reflection   & 79.4\% & 74.1\% & $-$5.3 & \checkmark \\
+P11 Isolation   & 16.1\% & 20.4\% & +4.3   & \checkmark \\
+P16 Sm.\ gain   & 57.4\% & 60.8\% & +3.4   & \checkmark \\
+P17 Sm.\ loss   & 42.8\% & 51.6\% & +8.8   & \checkmark \\
 \midrule
-\textbf{MAE}    &        & \multicolumn{2}{c}{\textbf{5.7\%}} & \multicolumn{2}{c}{\textbf{11.2\%}} \\
-\textbf{Pass}   &        & \multicolumn{2}{c}{\textbf{4/6}}   & \multicolumn{2}{c}{\textbf{4/6}}   \\
+\textbf{MAE}    &        & \multicolumn{2}{c}{\textbf{5.7\%}} & \textbf{6/6} \\
 \bottomrule
 \end{tabular}
 \begin{flushleft}
 \footnotesize{Canonical parameters are $\alpha=0.88$, $\beta=0.88$, $\lambda=2.25$, $\gamma=0.61$, $\delta=0.69$.
-Optimized parameters are $\alpha=0.61$, $\beta=1.50$, $\lambda=2.59$, $\gamma=0.12$, $\delta=0.05$.
 The pass criterion is $|\text{Error}| \leq 10$~pp.
-Both parameterizations fail P3 and P11.}
+P11 is evaluated in its reduced form, so its canonical prediction equals that of P3.}
 \end{flushleft}
 \end{table}
 
