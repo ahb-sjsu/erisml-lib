@@ -69,6 +69,12 @@ All three blockers and the temperature issue are addressed. Every number below w
 24. Nash and A* paragraph rewritten: Nash equilibrium is a consistency condition and does not assume agents compute it; A* is optimal under admissibility with complete search, and truncation trades that guarantee for tractability; nothing in the paper tests the reading.
 25. Notebook reproducibility. The accepted notebook had no stored outputs. It was executed end to end this session with nbconvert against the locally archived raw data (see `tcss_public_data_analysis_executed.ipynb` and `nb_exec_log.txt` if present; otherwise the run failed and the log says why).
 
+## Round 3 (2026-09-07, three reviewer refinements)
+
+26. Temperature. Section III.D now states what a monotone rule requires of the encoding: the Allais risky option must get a smaller cost gap than the 80 percent gamble. The squared-maximum certainty measure gives 0.44 against 0.64 (largest single probabilities 0.66 and 0.80) even though the Allais option pays at least the sure amount with probability 0.99. A certainty measure relative to the sure alternative (probability of paying at least the certain amount) gives 0.99 and 0.80, reverses the gap ordering, and would allow a monotone or constant temperature. Untested; stated as the construction for future work.
+27. Income-scaled monetary coordinate. Section VII.A gives a concrete form: s1 = (lambda/Y) q(x)(1-x) with reference lambda/Y, so the monetary displacement grows with the stake and, at finite sigma_1^2, moves the minimizer toward lower offers, the direction of the Andersen data. It replaces invariance by the testable prediction that offers depend on the stake only through lambda/Y. Stated as untested.
+28. Baselines. Section VI.E now says the asymmetry runs in the geometric model's favor (baselines at published parameters, geometric structure and temperature selected on this benchmark), that a refit or joint estimation could narrow or reverse the differences, and that the comparison is evidence of cross-domain applicability and not evidence against either canonical model in its own domain.
+
 ## Claim changes the owner may want to veto
 
 Items 10 through 14 weaken the out-of-sample claim relative to the accepted text. They are corrections toward what the code did. The alternative is to leave the accepted wording, which a replicator running eris-econ would find false. Recommended: keep the corrections and mention them in the final-files note to the editor.
