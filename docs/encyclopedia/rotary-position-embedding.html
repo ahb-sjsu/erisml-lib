@@ -1,0 +1,115 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>rotary position embedding</title><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&family=Source+Serif+4:wght@600&display=swap"><style>
+:root { color-scheme: light; --surface:#fcfcfb; --panel:#ffffff; --code:#f3f2ee; --ink:#0b0b0b; --ink2:#52514e; --ink3:#8a897f; --grid:#e6e5e1; --blue:#2a78d6; --green:#1baf7a; --orange:#eb6834; --red:#d03b3b; --violet:#4a3aa7; }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) { color-scheme: dark; --surface:#141412; --panel:#1c1c1a; --code:#262623; --ink:#ececea; --ink2:#b6b4ad; --ink3:#8a897f; --grid:#2e2e2a; --blue:#6aa3ea; --green:#3fc793; --orange:#f08a5e; --red:#e2605f; --violet:#8f80d8; } }
+:root[data-theme="dark"] { color-scheme: dark; --surface:#141412; --panel:#1c1c1a; --code:#262623; --ink:#ececea; --ink2:#b6b4ad; --ink3:#8a897f; --grid:#2e2e2a; --blue:#6aa3ea; --green:#3fc793; --orange:#f08a5e; --red:#e2605f; --violet:#8f80d8; }
+* { box-sizing: border-box; }
+body { margin:0; background:var(--surface); color:var(--ink); font-family: Inter, 'Segoe UI', Helvetica, Arial, sans-serif; font-size:16.5px; line-height:1.55; font-variant-numeric: tabular-nums; }
+h1, h2, .tile a.t { font-family: 'Source Serif 4', Georgia, 'Times New Roman', serif; text-wrap: balance; }
+header.top { border-bottom:1px solid var(--grid); padding:10px 24px; display:flex; gap:18px; align-items:baseline; flex-wrap:wrap; }
+header.top a { color:var(--ink2); text-decoration:none; } header.top a.brand { color:var(--ink); font-weight:600; }
+main { max-width: 900px; margin: 0 auto; padding: 18px 24px 60px; }
+h1 { font-size:2rem; margin:.4em 0 .2em; } h2 { font-size:1.35rem; margin:1.6em 0 .4em; } h3 { font-size:.82rem; letter-spacing:.06em; text-transform:uppercase; color:var(--ink2); margin:1.4em 0 .3em; }
+a { color: var(--blue); } a:hover { text-decoration: underline; }
+code { font-family: ui-monospace, Consolas, monospace; font-size:.88em; background:var(--code); padding:1px 4px; border-radius:3px; overflow-wrap:anywhere; }
+table { border-collapse: collapse; width:100%; font-size:.93em; } th, td { text-align:left; vertical-align:top; padding:6px 8px; border-bottom:1px solid var(--grid); } th { color:var(--ink2); font-weight:600; }
+table.card { border:1px solid var(--grid); border-radius:8px; background:var(--panel); margin:10px 0 18px; } table.card th { width:11.5em; white-space:nowrap; } table.card ul { margin:0; padding-left:1.1em; }
+.kind { display:inline-block; font-size:.78em; padding:1px 8px; border-radius:10px; color:#fff; vertical-align:middle; margin-left:6px; }
+.kind.concept{background:var(--blue)} .kind.instrument{background:var(--green)} .kind.result{background:var(--orange)} .kind.correction{background:var(--red)} .kind.reference{background:var(--violet)}
+.al { color:var(--ink2); }
+figure { margin:14px 0; } figure svg { width:100%; height:auto; border:1px solid var(--grid); border-radius:8px; background:#fcfcfb; } figcaption { font-size:.9em; color:var(--ink2); font-style:italic; margin-top:4px; }
+.grid { display:grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap:10px; }
+.tile { border:1px solid var(--grid); border-radius:8px; padding:10px 12px; background:var(--panel); } .tile a.t { font-weight:600; text-decoration:none; color:var(--ink); } .tile p { margin:4px 0 0; font-size:.9em; color:var(--ink2); }
+.letters a { margin-right:8px; text-decoration:none; font-weight:600; }
+input.search { width:100%; font-size:1.05em; padding:10px 12px; border:1px solid var(--grid); border-radius:8px; margin:10px 0 16px; background:var(--panel); color:var(--ink); } input.search:focus, a:focus-visible { outline:2px solid var(--blue); outline-offset:2px; }
+.prevnext { display:flex; justify-content:space-between; margin-top:30px; color:var(--ink2); font-size:.95em; }
+ul.evidence li { overflow-wrap:anywhere; }
+.entry { display:none; } .entry:target, .entry.show { display:block; }
+@media (max-width:600px) { table.card th { width:7em; white-space:normal; } body { font-size:15.5px; } }
+</style><script>window.MathJax={tex:{inlineMath:[["$","$"],["\\(","\\)"]],displayMath:[["$$","$$"],["\\[","\\]"]]}};</script><script defer src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-svg.js"></script></head><body><header class="top"><a class="brand" href="index.html">The Observation Theory Encyclopedia</a><a href="tsk.html">From TSK</a><a href="about.html">About</a><a href="kinds.html">By kind</a><a href="chapters.html">By chapter</a><a href="lean.html">By Lean file</a><a href="ledger.html">Ledger</a><a href="provenance.html">Provenance</a></header><main><h1 id="rotary-position-embedding">rotary position embedding <span class="kind concept">concept</span></h1>
+<table class="card"><tr><th>Definition</th><td>A rotation applied to queries and keys that encodes where each token sits in the sequence. Chapter 0 section 0.11. <span class=al>Also rotary, RoPE, position.</span></td></tr><tr><th>Example</th><td>A query at position 5 and a key at position
+3 score exactly as they would at positions 105 and 103.</td></tr><tr><th>Book</th><td><em>Data Mining as Observation</em>, draft 0.2, commit <code>08b4794</code>; entry id <code>rotary-position-embedding</code>, kind concept.</td></tr><tr><th>Status</th><td>no ledger row names this entry. Corrections: none recorded.</td></tr><tr><th>Defining equation</th><td><p>Book equation 0.23.</p></td></tr><tr><th>Assumptions and scope</th><td><ul><li>A rotation applied to queries and keys by an angle proportional to
+position. A rotation preserves length, and the score of a query at one
+position against a key at another depends only on the difference of
+positions, so a head reads relative position and shifting both positions
+by the same amount changes no score.</li><li>A key quantizer that rounds the rotated key rounds its position as
+well as its content, which is part of why the direction-only quantizer
+moved the scores.</li></ul></td></tr><tr><th>Prior art</th><td>none recorded</td></tr><tr><th>Evidence</th><td><a href="https://github.com/ahb-sjsu/turboquant-pro/blob/856c4cb/docs/KV_KEYS_FINDING.md#L61-L86"><code>turboquant-pro/docs/KV_KEYS_FINDING.md:61-86</code></a>, <a href="https://github.com/ahb-sjsu/turboquant-pro/blob/856c4cb/docs/KV_KEYS_FINDING.md#L1-L49"><code>turboquant-pro/docs/KV_KEYS_FINDING.md:1-49</code></a>, <a href="https://github.com/ahb-sjsu/observation-data-mining/blob/08b4794/lean/DataMiningAsObservation/Rope.lean"><code>lean/DataMiningAsObservation/Rope.lean</code></a></td></tr><tr><th>Reviewed</th><td>not yet reviewed; generated 2026-09-06 from records at the commits on the provenance page.</td></tr></table>
+<figure><svg xmlns="http://www.w3.org/2000/svg" width="720" height="300" viewBox="0 0 720 300" role="img" aria-label="A rotation by position, under which a head reads relative position only."><rect width="100%" height="100%" fill="#fcfcfb"/><ellipse cx="240.00" cy="150.00" rx="100.00" ry="100.00" transform="rotate(0 240.00 150.00)" fill="none" fill-opacity="1.0" stroke="#e6e5e1" stroke-width="1.5"></ellipse><line x1="240.00" y1="150.00" x2="333.97" y2="115.80" stroke="#0b0b0b" stroke-width="2" stroke-linecap="round" stroke-opacity="1.0"/><line x1="333.97" y1="115.80" x2="328.94" y2="122.02" stroke="#0b0b0b" stroke-width="2" stroke-linecap="round" stroke-opacity="1.0"/><line x1="333.97" y1="115.80" x2="326.12" y2="114.27" stroke="#0b0b0b" stroke-width="2" stroke-linecap="round" stroke-opacity="1.0"/><text x="347.12" y="111.01" font-family="Inter, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="11.5" fill="#0b0b0b" text-anchor="start" font-weight="normal">query at m</text><line x1="240.00" y1="150.00" x2="265.88" y2="53.41" stroke="#2a78d6" stroke-width="2" stroke-linecap="round" stroke-opacity="1.0"/><line x1="265.88" y1="53.41" x2="268.09" y2="61.10" stroke="#2a78d6" stroke-width="2" stroke-linecap="round" stroke-opacity="1.0"/><line x1="265.88" y1="53.41" x2="260.12" y2="58.96" stroke="#2a78d6" stroke-width="2" stroke-linecap="round" stroke-opacity="1.0"/><text x="269.51" y="39.88" font-family="Inter, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="11.5" fill="#0b0b0b" text-anchor="start" font-weight="normal">key at n</text><polyline points="282.29,134.61 281.42,132.42 280.45,130.27 279.36,128.18 278.16,126.15 276.86,124.19 275.46,122.30 273.96,120.48 272.37,118.74 270.69,117.09 268.93,115.53 267.08,114.06 265.16,112.69 263.18,111.43 261.13,110.27 259.02,109.22 256.86,108.28 254.65,107.45 252.40,106.74" fill="none" stroke="#52514e" stroke-width="1.5" stroke-linejoin="round" stroke-linecap="round"></polyline><text x="300.00" y="110.00" font-family="Inter, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="12" fill="#52514e" text-anchor="start" font-weight="normal" font-style="italic">θ(n − m)</text><text x="430.00" y="120.00" font-family="Inter, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="11.5" fill="#52514e" text-anchor="start" font-weight="normal">the score reads the difference of positions</text><text x="430.00" y="140.00" font-family="Inter, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="11.5" fill="#52514e" text-anchor="start" font-weight="normal">shifting both by the same amount changes nothing</text></svg><figcaption>A rotation by position, under which a head reads relative position only.</figcaption></figure>
+<h3>Equation</h3><p>Book equation 0.23.</p>
+<p><span
+class="math display">\[\operatorname{softmax}(z)_i=\frac{e^{z_i}}{\sum_j
+e^{z_j}},\qquad
+\text{output}=\sum_i\operatorname{softmax}\!\Big(\frac{q\cdot
+k_i}{\sqrt{d}}\Big)_{\!i}\,v_i.\]</span></p>
+<h3>Conditions</h3><ul>
+<li>A rotation applied to queries and keys by an angle proportional to
+position. A rotation preserves length, and the score of a query at one
+position against a key at another depends only on the difference of
+positions, so a head reads relative position and shifting both positions
+by the same amount changes no score.</li>
+<li>A key quantizer that rounds the rotated key rounds its position as
+well as its content, which is part of why the direction-only quantizer
+moved the scores.</li>
+</ul>
+<p>Conditions are curated in <code>entries.toml</code> rather than read
+from a record.</p>
+<h3>Ledger</h3><p>none</p>
+<h3>First stated</h3><p>Su and others, RoFormer, 2021, as chapter 0 section 0.11 of <em>Data
+Mining as Observation</em> states it, with the program’s key-side
+measurements in
+<code>turboquant-pro/docs/KV_KEYS_FINDING.md:1-49</code>.</p>
+<h3>Measurements</h3><table>
+<colgroup>
+<col style="width: 33%" />
+<col style="width: 33%" />
+<col style="width: 33%" />
+</colgroup>
+<thead>
+<tr>
+<th>Where the book states it</th>
+<th>Numbers, as the book’s sources table records them</th>
+<th>Source</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>chapter 11 section 11.1</td>
+<td>condition (A2), cosine satisfies it, post-rotary keys do not, the
+cone below cell size</td>
+<td><a
+href="https://github.com/ahb-sjsu/turboquant-pro/blob/856c4cb/docs/KV_KEYS_FINDING.md#L61-L86"><code>turboquant-pro/docs/KV_KEYS_FINDING.md:61-86</code></a>;
+<code>the-angular-observer/README.md:26-31</code></td>
+</tr>
+<tr>
+<td>chapter 11 section 11.2</td>
+<td>fp16 12.24, values-only 13.12, PolarQuant K4 10643 and 0.095,
+per-channel uniform K4 14.91 and 0.062, per-channel NUQ K3 15.77 and
+0.148, 2.4x and 670x, pre-rotary near 22000, 2 key heads serve 12 query
+heads</td>
+<td><a
+href="https://github.com/ahb-sjsu/turboquant-pro/blob/856c4cb/docs/KV_KEYS_FINDING.md#L1-L49"><code>turboquant-pro/docs/KV_KEYS_FINDING.md:1-49</code></a></td>
+</tr>
+</tbody>
+</table>
+<h3>Failures and corrections</h3><p>none</p>
+<h3>Machine checked</h3><p><a
+href="https://github.com/ahb-sjsu/observation-data-mining/blob/08b4794/lean/DataMiningAsObservation/Rope.lean"><code>lean/DataMiningAsObservation/Rope.lean</code></a>,
+theorems <code>rot_length</code>, <code>rot_dot</code>,
+<code>relative_position</code>, <code>shift_invariant</code>, at
+observation-data-mining 08b4794; what the check covers is stated in the
+book’s <a
+href="https://github.com/ahb-sjsu/observation-data-mining/blob/08b4794/chapters/machine_checked.md">appendix
+C</a>.</p>
+<h3>Used in</h3><p><em>Data Mining as Observation</em> chapters 0, 1, 2, 3, 4, 5, 6, 7,
+8, 9, 10, 11, 12, 13, 14.</p>
+<h3>Related</h3><p><a href="attention.html">attention</a>; <a href="query-key-value.html">query, key, value</a>; <a href="kv-cache.html">KV cache</a>; <a href="dot-product.html">dot product</a>.</p>
+<h3>See also</h3><p>Book equations stated beside the entry’s terms, not defining it:
+11.1.</p>
+<p>Ledger rows that cite the entry’s records without naming it:
+<a href="ledger.html#NEG-2">NEG-2</a>.</p>
+<p>Sources-table rows that share a record with the entry without naming
+it: chapter 1 section 1.4, chapter 2 section 2.5, chapter 3 section 3.2,
+chapter 8 section 8.2.</p>
+<h3>Status</h3><p>Generated 2026-09-06 by <code>encyclopedia/generate.py</code>; book
+at observation-data-mining 08b4794; the commit of every record is listed
+in the encyclopedia’s provenance.</p><div class="prevnext"><span>← <a href="roc-curve.html">ROC curve</a></span><span><a href="rouge.html">ROUGE</a> →</span></div></main></body></html>

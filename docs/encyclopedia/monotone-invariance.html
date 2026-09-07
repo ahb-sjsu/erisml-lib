@@ -1,0 +1,118 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Monotone Invariance Theorem</title><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&family=Source+Serif+4:wght@600&display=swap"><style>
+:root { color-scheme: light; --surface:#fcfcfb; --panel:#ffffff; --code:#f3f2ee; --ink:#0b0b0b; --ink2:#52514e; --ink3:#8a897f; --grid:#e6e5e1; --blue:#2a78d6; --green:#1baf7a; --orange:#eb6834; --red:#d03b3b; --violet:#4a3aa7; }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) { color-scheme: dark; --surface:#141412; --panel:#1c1c1a; --code:#262623; --ink:#ececea; --ink2:#b6b4ad; --ink3:#8a897f; --grid:#2e2e2a; --blue:#6aa3ea; --green:#3fc793; --orange:#f08a5e; --red:#e2605f; --violet:#8f80d8; } }
+:root[data-theme="dark"] { color-scheme: dark; --surface:#141412; --panel:#1c1c1a; --code:#262623; --ink:#ececea; --ink2:#b6b4ad; --ink3:#8a897f; --grid:#2e2e2a; --blue:#6aa3ea; --green:#3fc793; --orange:#f08a5e; --red:#e2605f; --violet:#8f80d8; }
+* { box-sizing: border-box; }
+body { margin:0; background:var(--surface); color:var(--ink); font-family: Inter, 'Segoe UI', Helvetica, Arial, sans-serif; font-size:16.5px; line-height:1.55; font-variant-numeric: tabular-nums; }
+h1, h2, .tile a.t { font-family: 'Source Serif 4', Georgia, 'Times New Roman', serif; text-wrap: balance; }
+header.top { border-bottom:1px solid var(--grid); padding:10px 24px; display:flex; gap:18px; align-items:baseline; flex-wrap:wrap; }
+header.top a { color:var(--ink2); text-decoration:none; } header.top a.brand { color:var(--ink); font-weight:600; }
+main { max-width: 900px; margin: 0 auto; padding: 18px 24px 60px; }
+h1 { font-size:2rem; margin:.4em 0 .2em; } h2 { font-size:1.35rem; margin:1.6em 0 .4em; } h3 { font-size:.82rem; letter-spacing:.06em; text-transform:uppercase; color:var(--ink2); margin:1.4em 0 .3em; }
+a { color: var(--blue); } a:hover { text-decoration: underline; }
+code { font-family: ui-monospace, Consolas, monospace; font-size:.88em; background:var(--code); padding:1px 4px; border-radius:3px; overflow-wrap:anywhere; }
+table { border-collapse: collapse; width:100%; font-size:.93em; } th, td { text-align:left; vertical-align:top; padding:6px 8px; border-bottom:1px solid var(--grid); } th { color:var(--ink2); font-weight:600; }
+table.card { border:1px solid var(--grid); border-radius:8px; background:var(--panel); margin:10px 0 18px; } table.card th { width:11.5em; white-space:nowrap; } table.card ul { margin:0; padding-left:1.1em; }
+.kind { display:inline-block; font-size:.78em; padding:1px 8px; border-radius:10px; color:#fff; vertical-align:middle; margin-left:6px; }
+.kind.concept{background:var(--blue)} .kind.instrument{background:var(--green)} .kind.result{background:var(--orange)} .kind.correction{background:var(--red)} .kind.reference{background:var(--violet)}
+.al { color:var(--ink2); }
+figure { margin:14px 0; } figure svg { width:100%; height:auto; border:1px solid var(--grid); border-radius:8px; background:#fcfcfb; } figcaption { font-size:.9em; color:var(--ink2); font-style:italic; margin-top:4px; }
+.grid { display:grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap:10px; }
+.tile { border:1px solid var(--grid); border-radius:8px; padding:10px 12px; background:var(--panel); } .tile a.t { font-weight:600; text-decoration:none; color:var(--ink); } .tile p { margin:4px 0 0; font-size:.9em; color:var(--ink2); }
+.letters a { margin-right:8px; text-decoration:none; font-weight:600; }
+input.search { width:100%; font-size:1.05em; padding:10px 12px; border:1px solid var(--grid); border-radius:8px; margin:10px 0 16px; background:var(--panel); color:var(--ink); } input.search:focus, a:focus-visible { outline:2px solid var(--blue); outline-offset:2px; }
+.prevnext { display:flex; justify-content:space-between; margin-top:30px; color:var(--ink2); font-size:.95em; }
+ul.evidence li { overflow-wrap:anywhere; }
+.entry { display:none; } .entry:target, .entry.show { display:block; }
+@media (max-width:600px) { table.card th { width:7em; white-space:normal; } body { font-size:15.5px; } }
+</style><script>window.MathJax={tex:{inlineMath:[["$","$"],["\\(","\\)"]],displayMath:[["$$","$$"],["\\[","\\]"]]}};</script><script defer src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-svg.js"></script></head><body><header class="top"><a class="brand" href="index.html">The Observation Theory Encyclopedia</a><a href="tsk.html">From TSK</a><a href="about.html">About</a><a href="kinds.html">By kind</a><a href="chapters.html">By chapter</a><a href="lean.html">By Lean file</a><a href="ledger.html">Ledger</a><a href="provenance.html">Provenance</a></header><main><h1 id="monotone-invariance">Monotone Invariance Theorem <span class="kind result">result</span></h1>
+<table class="card"><tr><th>Definition</th><td>A strictly monotone transform of a score in either direction cannot change its optimal thresholded F1, because the sweep tries thresholds both ways. A strictly increasing transform leaves the AUROC unchanged, and a strictly decreasing one sends it to one minus itself. Equation 6.2. <span class=al>Also Monotone Invariance, strictly monotone.</span></td></tr><tr><th>Example</th><td>Squaring a positive score keeps every
+ranking, so its AUROC and its optimal F1 are unchanged, and negating it
+sends AUROC 0.75 to 0.25.</td></tr><tr><th>Book</th><td><em>Data Mining as Observation</em>, draft 0.2, commit <code>08b4794</code>; entry id <code>monotone-invariance</code>, kind result.</td></tr><tr><th>Status</th><td>no ledger row names this entry. Corrections: none recorded.</td></tr><tr><th>Defining equation</th><td><p>Book equation 6.2.</p></td></tr><tr><th>Assumptions and scope</th><td><ul><li>Two statements with different scope. A strictly monotone transform
+of a score in either direction cannot change its optimal thresholded F1,
+because the sweep tries thresholds in both directions and so reaches
+every partition the transform can. A strictly increasing transform
+leaves the AUROC unchanged, and a strictly decreasing one sends it to 1
+minus A.</li><li>The F1 half licenses the pruning of monotone unary nodes in the
+formula search. The AUROC half licenses nothing about decreasing
+transforms. The Lean file states the increasing case, and the AUROC file
+states the reversal.</li></ul></td></tr><tr><th>Prior art</th><td>none recorded</td></tr><tr><th>Evidence</th><td><a href="https://github.com/ahb-sjsu/theory-radar/blob/37c4e6c/paper/astar_paper.tex#L94-L170"><code>theory-radar/paper/astar_paper.tex:94-170</code></a>, <a href="https://github.com/ahb-sjsu/theory-radar/blob/37c4e6c/paper/theory_radar_paper.tex#L290-L304"><code>theory-radar/paper/theory_radar_paper.tex:290-304</code></a>, <a href="https://github.com/ahb-sjsu/theory-radar/blob/37c4e6c/paper/astar_paper.tex#L94-L110"><code>theory-radar/paper/astar_paper.tex:94-110</code></a>, <a href="https://github.com/ahb-sjsu/observation-data-mining/blob/08b4794/lean/DataMiningAsObservation/MonotoneInvariance.lean"><code>lean/DataMiningAsObservation/MonotoneInvariance.lean</code></a></td></tr><tr><th>Reviewed</th><td>semantic review 2026-09-06; generated 2026-09-06 from records at the commits on the provenance page.</td></tr></table>
+<figure><svg xmlns="http://www.w3.org/2000/svg" width="720" height="300" viewBox="0 0 720 300" role="img" aria-label="Optimal thresholded F1 survives any strictly monotone transform, AUROC only an increasing one."><rect width="100%" height="100%" fill="#fcfcfb"/><line x1="110.00" y1="245.00" x2="410.00" y2="245.00" stroke="#e6e5e1" stroke-width="1" stroke-linecap="round" stroke-opacity="1.0"/><text x="102.00" y="249.00" font-family="Inter, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="11" fill="#52514e" text-anchor="end" font-weight="normal">0</text><line x1="110.00" y1="137.50" x2="410.00" y2="137.50" stroke="#e6e5e1" stroke-width="1" stroke-linecap="round" stroke-opacity="1.0"/><text x="102.00" y="141.50" font-family="Inter, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="11" fill="#52514e" text-anchor="end" font-weight="normal">0.5</text><line x1="110.00" y1="30.00" x2="410.00" y2="30.00" stroke="#e6e5e1" stroke-width="1" stroke-linecap="round" stroke-opacity="1.0"/><text x="102.00" y="34.00" font-family="Inter, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="11" fill="#52514e" text-anchor="end" font-weight="normal">1</text><text x="110.00" y="261.00" font-family="Inter, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="11" fill="#52514e" text-anchor="middle" font-weight="normal">0</text><text x="260.00" y="261.00" font-family="Inter, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="11" fill="#52514e" text-anchor="middle" font-weight="normal">0.5</text><text x="410.00" y="261.00" font-family="Inter, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="11" fill="#52514e" text-anchor="middle" font-weight="normal">1</text><line x1="110.00" y1="245.00" x2="410.00" y2="245.00" stroke="#e6e5e1" stroke-width="1" stroke-linecap="round" stroke-opacity="1.0"/><text x="260.00" y="279.00" font-family="Inter, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="11.5" fill="#52514e" text-anchor="middle" font-weight="normal">false positive rate</text><text x="66.00" y="137.50" font-family="Inter, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="11.5" fill="#52514e" text-anchor="middle" font-weight="normal" transform="rotate(-90 66.00 137.50)">true positive rate</text><line x1="110.00" y1="245.00" x2="410.00" y2="30.00" stroke="#8a897f" stroke-width="1.5" stroke-linecap="round" stroke-dasharray="5 4" stroke-opacity="1.0"/><polyline points="110.00,245.00 117.50,185.88 125.00,169.65 132.50,158.16 140.00,148.96 147.50,141.16 155.00,134.32 162.50,128.18 170.00,122.60 177.50,117.44 185.00,112.65 192.50,108.16 200.00,103.93 207.50,99.92 215.00,96.11 222.50,92.47 230.00,88.99 237.50,85.64 245.00,82.42 252.50,79.32 260.00,76.31 267.50,73.41 275.00,70.59 282.50,67.86 290.00,65.20 297.50,62.61 305.00,60.09 312.50,57.63 320.00,55.23 327.50,52.89 335.00,50.59 342.50,48.35 350.00,46.15 357.50,44.00 365.00,41.89 372.50,39.82 380.00,37.78 387.50,35.79 395.00,33.83 402.50,31.90 410.00,30.00" fill="none" stroke="#eb6834" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"></polyline><polyline points="110.00,245.00 117.50,228.74 125.00,218.59 132.50,209.93 140.00,202.10 147.50,194.85 155.00,188.02 162.50,181.53 170.00,175.31 177.50,169.32 185.00,163.53 192.50,157.91 200.00,152.44 207.50,147.11 215.00,141.89 222.50,136.79 230.00,131.79 237.50,126.88 245.00,122.06 252.50,117.32 260.00,112.65 267.50,108.05 275.00,103.52 282.50,99.05 290.00,94.64 297.50,90.28 305.00,85.97 312.50,81.71 320.00,77.50 327.50,73.34 335.00,69.22 342.50,65.13 350.00,61.09 357.50,57.09 365.00,53.12 372.50,49.19 380.00,45.29 387.50,41.42 395.00,37.58 402.50,33.78 410.00,30.00" fill="none" stroke="#eb6834" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"></polyline><text x="430.00" y="120.00" font-family="Inter, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="11.5" fill="#52514e" text-anchor="start" font-weight="normal">the reversed score</text><text x="430.00" y="80.00" font-family="Inter, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="11.5" fill="#52514e" text-anchor="start" font-weight="normal">area under the curve, AUROC</text><text x="430.00" y="98.00" font-family="Inter, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="11.5" fill="#52514e" text-anchor="start" font-weight="normal">chance is the diagonal</text></svg><figcaption>Optimal thresholded F1 survives any strictly monotone transform, AUROC only an increasing one.</figcaption></figure>
+<h3>Equation</h3><p>Book equation 6.2.</p>
+<p><span class="math display">\[\begin{gathered} \max_{\tau,\
+\mathrm{dir}}F_1\!\Big(\mathbf
+1\big[\mathrm{dir}\big(g(f(X)),\tau\big)\big],\,y\Big)=\max_{\tau,\
+\mathrm{dir}}F_1\!\Big(\mathbf
+1\big[\mathrm{dir}\big(f(X),\tau\big)\big],\,y\Big) \\ \text{for every
+strictly monotone } g. \end{gathered}\]</span></p>
+<h3>Conditions</h3><ul>
+<li>Two statements with different scope. A strictly monotone transform
+of a score in either direction cannot change its optimal thresholded F1,
+because the sweep tries thresholds in both directions and so reaches
+every partition the transform can. A strictly increasing transform
+leaves the AUROC unchanged, and a strictly decreasing one sends it to 1
+minus A.</li>
+<li>The F1 half licenses the pruning of monotone unary nodes in the
+formula search. The AUROC half licenses nothing about decreasing
+transforms. The Lean file states the increasing case, and the AUROC file
+states the reversal.</li>
+</ul>
+<p>Conditions are curated in <code>entries.toml</code> rather than read
+from a record.</p>
+<h3>Ledger</h3><p>none</p>
+<h3>First stated</h3><p>theory-radar,
+<code>theory-radar/paper/theory_radar_paper.tex:290-304</code> and
+<code>theory-radar/paper/astar_paper.tex:94-110</code>, DOI
+10.5281/zenodo.20660206, and chapter 6 section 6.3 of <em>Data Mining as
+Observation</em>.</p>
+<h3>Measurements</h3><table>
+<colgroup>
+<col style="width: 33%" />
+<col style="width: 33%" />
+<col style="width: 33%" />
+</colgroup>
+<thead>
+<tr>
+<th>Where the book states it</th>
+<th>Numbers, as the book’s sources table records them</th>
+<th>Source</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>chapter 5 section 5.4</td>
+<td>Monotone Invariance and AUROC invariance theorems, the AUROC to F1
+bound via the Youden index, stated in the source for every ROC curve and
+corrected in the book to concave curves, with the counterexample at
+AUROC 0.75 and F1 0.857</td>
+<td><a
+href="https://github.com/ahb-sjsu/theory-radar/blob/37c4e6c/paper/astar_paper.tex#L94-L170"><code>theory-radar/paper/astar_paper.tex:94-170</code></a>;
+<a
+href="https://github.com/ahb-sjsu/theory-radar/blob/37c4e6c/paper/theory_radar_paper.tex#L290-L304"><code>theory-radar/paper/theory_radar_paper.tex:290-304</code></a></td>
+</tr>
+<tr>
+<td>chapter 6 section 6.3</td>
+<td>Monotone Invariance Theorem and its proof</td>
+<td><a
+href="https://github.com/ahb-sjsu/theory-radar/blob/37c4e6c/paper/theory_radar_paper.tex#L290-L304"><code>theory-radar/paper/theory_radar_paper.tex:290-304</code></a>;
+<a
+href="https://github.com/ahb-sjsu/theory-radar/blob/37c4e6c/paper/astar_paper.tex#L94-L110"><code>theory-radar/paper/astar_paper.tex:94-110</code></a></td>
+</tr>
+</tbody>
+</table>
+<h3>Failures and corrections</h3><p>none</p>
+<h3>Machine checked</h3><p><a
+href="https://github.com/ahb-sjsu/observation-data-mining/blob/08b4794/lean/DataMiningAsObservation/MonotoneInvariance.lean"><code>lean/DataMiningAsObservation/MonotoneInvariance.lean</code></a>,
+theorems <code>aurocNum_comp</code>, <code>auroc_comp</code>,
+<code>predicted_comp</code>, <code>predictedBelow_comp</code>,
+<code>sweptF1_comp</code>, <code>sweptF1Below_comp</code>,
+<code>optF1_comp</code>, at observation-data-mining 08b4794; what the
+check covers is stated in the book’s <a
+href="https://github.com/ahb-sjsu/observation-data-mining/blob/08b4794/chapters/machine_checked.md">appendix
+C</a>.</p>
+<h3>Used in</h3><p><em>Data Mining as Observation</em> chapters 0, 5, 6, 12.</p>
+<h3>Related</h3><p><a href="formula-search.html">formula search</a>; <a href="safe-pruning.html">safe pruning</a>; <a href="youden-f1-bound.html">Youden F1 bound</a>.</p>
+<h3>See also</h3><p>none</p>
+<h3>Status</h3><p>Generated 2026-09-06 by <code>encyclopedia/generate.py</code>; book
+at observation-data-mining 08b4794; the commit of every record is listed
+in the encyclopedia’s provenance.</p><div class="prevnext"><span>← <a href="min-over-strata.html">min-over-strata</a></span><span><a href="multiple-comparisons.html">multiple comparisons</a> →</span></div></main></body></html>

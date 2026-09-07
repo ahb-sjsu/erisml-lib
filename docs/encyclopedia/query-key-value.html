@@ -1,0 +1,120 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>query, key, value</title><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&family=Source+Serif+4:wght@600&display=swap"><style>
+:root { color-scheme: light; --surface:#fcfcfb; --panel:#ffffff; --code:#f3f2ee; --ink:#0b0b0b; --ink2:#52514e; --ink3:#8a897f; --grid:#e6e5e1; --blue:#2a78d6; --green:#1baf7a; --orange:#eb6834; --red:#d03b3b; --violet:#4a3aa7; }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) { color-scheme: dark; --surface:#141412; --panel:#1c1c1a; --code:#262623; --ink:#ececea; --ink2:#b6b4ad; --ink3:#8a897f; --grid:#2e2e2a; --blue:#6aa3ea; --green:#3fc793; --orange:#f08a5e; --red:#e2605f; --violet:#8f80d8; } }
+:root[data-theme="dark"] { color-scheme: dark; --surface:#141412; --panel:#1c1c1a; --code:#262623; --ink:#ececea; --ink2:#b6b4ad; --ink3:#8a897f; --grid:#2e2e2a; --blue:#6aa3ea; --green:#3fc793; --orange:#f08a5e; --red:#e2605f; --violet:#8f80d8; }
+* { box-sizing: border-box; }
+body { margin:0; background:var(--surface); color:var(--ink); font-family: Inter, 'Segoe UI', Helvetica, Arial, sans-serif; font-size:16.5px; line-height:1.55; font-variant-numeric: tabular-nums; }
+h1, h2, .tile a.t { font-family: 'Source Serif 4', Georgia, 'Times New Roman', serif; text-wrap: balance; }
+header.top { border-bottom:1px solid var(--grid); padding:10px 24px; display:flex; gap:18px; align-items:baseline; flex-wrap:wrap; }
+header.top a { color:var(--ink2); text-decoration:none; } header.top a.brand { color:var(--ink); font-weight:600; }
+main { max-width: 900px; margin: 0 auto; padding: 18px 24px 60px; }
+h1 { font-size:2rem; margin:.4em 0 .2em; } h2 { font-size:1.35rem; margin:1.6em 0 .4em; } h3 { font-size:.82rem; letter-spacing:.06em; text-transform:uppercase; color:var(--ink2); margin:1.4em 0 .3em; }
+a { color: var(--blue); } a:hover { text-decoration: underline; }
+code { font-family: ui-monospace, Consolas, monospace; font-size:.88em; background:var(--code); padding:1px 4px; border-radius:3px; overflow-wrap:anywhere; }
+table { border-collapse: collapse; width:100%; font-size:.93em; } th, td { text-align:left; vertical-align:top; padding:6px 8px; border-bottom:1px solid var(--grid); } th { color:var(--ink2); font-weight:600; }
+table.card { border:1px solid var(--grid); border-radius:8px; background:var(--panel); margin:10px 0 18px; } table.card th { width:11.5em; white-space:nowrap; } table.card ul { margin:0; padding-left:1.1em; }
+.kind { display:inline-block; font-size:.78em; padding:1px 8px; border-radius:10px; color:#fff; vertical-align:middle; margin-left:6px; }
+.kind.concept{background:var(--blue)} .kind.instrument{background:var(--green)} .kind.result{background:var(--orange)} .kind.correction{background:var(--red)} .kind.reference{background:var(--violet)}
+.al { color:var(--ink2); }
+figure { margin:14px 0; } figure svg { width:100%; height:auto; border:1px solid var(--grid); border-radius:8px; background:#fcfcfb; } figcaption { font-size:.9em; color:var(--ink2); font-style:italic; margin-top:4px; }
+.grid { display:grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap:10px; }
+.tile { border:1px solid var(--grid); border-radius:8px; padding:10px 12px; background:var(--panel); } .tile a.t { font-weight:600; text-decoration:none; color:var(--ink); } .tile p { margin:4px 0 0; font-size:.9em; color:var(--ink2); }
+.letters a { margin-right:8px; text-decoration:none; font-weight:600; }
+input.search { width:100%; font-size:1.05em; padding:10px 12px; border:1px solid var(--grid); border-radius:8px; margin:10px 0 16px; background:var(--panel); color:var(--ink); } input.search:focus, a:focus-visible { outline:2px solid var(--blue); outline-offset:2px; }
+.prevnext { display:flex; justify-content:space-between; margin-top:30px; color:var(--ink2); font-size:.95em; }
+ul.evidence li { overflow-wrap:anywhere; }
+.entry { display:none; } .entry:target, .entry.show { display:block; }
+@media (max-width:600px) { table.card th { width:7em; white-space:normal; } body { font-size:15.5px; } }
+</style><script>window.MathJax={tex:{inlineMath:[["$","$"],["\\(","\\)"]],displayMath:[["$$","$$"],["\\[","\\]"]]}};</script><script defer src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-svg.js"></script></head><body><header class="top"><a class="brand" href="index.html">The Observation Theory Encyclopedia</a><a href="tsk.html">From TSK</a><a href="about.html">About</a><a href="kinds.html">By kind</a><a href="chapters.html">By chapter</a><a href="lean.html">By Lean file</a><a href="ledger.html">Ledger</a><a href="provenance.html">Provenance</a></header><main><h1 id="query-key-value">query, key, value <span class="kind concept">concept</span></h1>
+<table class="card"><tr><th>Definition</th><td>The three vectors each token produces inside attention. The query is compared to earlier keys and the result weights the values. Chapter 0 section 0.11. <span class=al>Also query.</span></td></tr><tr><th>Example</th><td>A query scores each key, the scores become
+softmax weights, and the weights mix the values into one output.</td></tr><tr><th>Book</th><td><em>Data Mining as Observation</em>, draft 0.2, commit <code>08b4794</code>; entry id <code>query-key-value</code>, kind concept.</td></tr><tr><th>Status</th><td>refutes or corrects [refuted]. Corrections: 1 item(s), see below.</td></tr><tr><th>Defining equation</th><td><p>Book equation 0.23.</p></td></tr><tr><th>Assumptions and scope</th><td><ul><li>The three vectors each token produces inside attention. The query is
+compared to earlier keys and the result weights the values, so a head
+reads the keys only through their scores against the query and its
+output lies between the smallest and largest value.</li><li>Keys are read along the query and values are averaged, so a
+compression that preserves query-key scores preserves every output, and
+one that preserves the keys’ cosine need not.</li></ul></td></tr><tr><th>Prior art</th><td>none recorded</td></tr><tr><th>Evidence</th><td><a href="https://github.com/ahb-sjsu/geometric-observation/blob/d1f8988/claims/LEDGER.md#L95"><code>geometric-observation/claims/LEDGER.md:95</code></a>, <a href="https://github.com/ahb-sjsu/turboquant-pro/blob/856c4cb/docs/KV_KEYS_FINDING.md#L61-L86"><code>turboquant-pro/docs/KV_KEYS_FINDING.md:61-86</code></a>, <a href="https://github.com/ahb-sjsu/turboquant-pro/blob/856c4cb/docs/KV_KEYS_FINDING.md#L1-L49"><code>turboquant-pro/docs/KV_KEYS_FINDING.md:1-49</code></a>, <a href="https://github.com/ahb-sjsu/observation-data-mining/blob/08b4794/lean/DataMiningAsObservation/Attention.lean"><code>lean/DataMiningAsObservation/Attention.lean</code></a></td></tr><tr><th>Reviewed</th><td>not yet reviewed; generated 2026-09-06 from records at the commits on the provenance page.</td></tr></table>
+<figure><svg xmlns="http://www.w3.org/2000/svg" width="720" height="300" viewBox="0 0 720 300" role="img" aria-label="The query scores each key, and the weights mix the values."><rect width="100%" height="100%" fill="#fcfcfb"/><text x="120.00" y="80.00" font-family="Inter, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="12" fill="#0b0b0b" text-anchor="end" font-weight="normal">query</text><rect x="130" y="66" width="40" height="22" rx="4" fill="#0b0b0b" fill-opacity="0.8"/><rect x="190" y="66" width="44" height="22" rx="4" fill="#2a78d6" fill-opacity="0.23"/><text x="212.00" y="60.00" font-family="Inter, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="10.5" fill="#52514e" text-anchor="middle" font-weight="normal">key 1</text><path d="M198.00,220.00 L198.00,218.91 Q198.00,214.91 202.00,214.91 L222.00,214.91 Q226.00,214.91 226.00,218.91 L226.00,220.00 Z" fill="#2a78d6" fill-opacity="1.0"></path><rect x="250" y="66" width="44" height="22" rx="4" fill="#2a78d6" fill-opacity="0.35"/><text x="272.00" y="60.00" font-family="Inter, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="10.5" fill="#52514e" text-anchor="middle" font-weight="normal">key 2</text><path d="M258.00,220.00 L258.00,216.01 Q258.00,212.01 262.00,212.01 L282.00,212.01 Q286.00,212.01 286.00,216.01 L286.00,220.00 Z" fill="#2a78d6" fill-opacity="1.0"></path><rect x="310" y="66" width="44" height="22" rx="4" fill="#2a78d6" fill-opacity="0.87"/><text x="332.00" y="60.00" font-family="Inter, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="10.5" fill="#52514e" text-anchor="middle" font-weight="normal">key 3</text><path d="M318.00,220.00 L318.00,167.86 Q318.00,163.86 322.00,163.86 L342.00,163.86 Q346.00,163.86 346.00,167.86 L346.00,220.00 Z" fill="#2a78d6" fill-opacity="1.0"></path><rect x="370" y="66" width="44" height="22" rx="4" fill="#2a78d6" fill-opacity="0.43"/><text x="392.00" y="60.00" font-family="Inter, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="10.5" fill="#52514e" text-anchor="middle" font-weight="normal">key 4</text><path d="M378.00,220.00 L378.00,213.22 Q378.00,209.22 382.00,209.22 L402.00,209.22 Q406.00,209.22 406.00,213.22 L406.00,220.00 Z" fill="#2a78d6" fill-opacity="1.0"></path><rect x="430" y="66" width="44" height="22" rx="4" fill="#2a78d6" fill-opacity="0.19"/><text x="452.00" y="60.00" font-family="Inter, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="10.5" fill="#52514e" text-anchor="middle" font-weight="normal">key 5</text><path d="M438.00,220.00 L438.00,219.62 Q438.00,215.62 442.00,215.62 L462.00,215.62 Q466.00,215.62 466.00,219.62 L466.00,220.00 Z" fill="#2a78d6" fill-opacity="1.0"></path><rect x="490" y="66" width="44" height="22" rx="4" fill="#2a78d6" fill-opacity="0.63"/><text x="512.00" y="60.00" font-family="Inter, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="10.5" fill="#52514e" text-anchor="middle" font-weight="normal">key 6</text><path d="M498.00,220.00 L498.00,201.18 Q498.00,197.18 502.00,197.18 L522.00,197.18 Q526.00,197.18 526.00,201.18 L526.00,220.00 Z" fill="#2a78d6" fill-opacity="1.0"></path><rect x="550" y="66" width="44" height="22" rx="4" fill="#2a78d6" fill-opacity="0.27"/><text x="572.00" y="60.00" font-family="Inter, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="10.5" fill="#52514e" text-anchor="middle" font-weight="normal">key 7</text><path d="M558.00,220.00 L558.00,218.08 Q558.00,214.08 562.00,214.08 L582.00,214.08 Q586.00,214.08 586.00,218.08 L586.00,220.00 Z" fill="#2a78d6" fill-opacity="1.0"></path><rect x="610" y="66" width="44" height="22" rx="4" fill="#2a78d6" fill-opacity="0.31"/><text x="632.00" y="60.00" font-family="Inter, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="10.5" fill="#52514e" text-anchor="middle" font-weight="normal">key 8</text><path d="M618.00,220.00 L618.00,217.13 Q618.00,213.13 622.00,213.13 L642.00,213.13 Q646.00,213.13 646.00,217.13 L646.00,220.00 Z" fill="#2a78d6" fill-opacity="1.0"></path><line x1="190.00" y1="220.00" x2="670.00" y2="220.00" stroke="#e6e5e1" stroke-width="1" stroke-linecap="round" stroke-opacity="1.0"/><text x="120.00" y="160.00" font-family="Inter, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="11.5" fill="#52514e" text-anchor="end" font-weight="normal">softmax weights, sum to one</text></svg><figcaption>The query scores each key, and the weights mix the values.</figcaption></figure>
+<h3>Equation</h3><p>Book equation 0.23.</p>
+<p><span
+class="math display">\[\operatorname{softmax}(z)_i=\frac{e^{z_i}}{\sum_j
+e^{z_j}},\qquad
+\text{output}=\sum_i\operatorname{softmax}\!\Big(\frac{q\cdot
+k_i}{\sqrt{d}}\Big)_{\!i}\,v_i.\]</span></p>
+<p>Book equation 11.1.</p>
+<p><span class="math display">\[\cos\big(k,\hat
+k\big)=0.995\qquad\text{while}\qquad \mathrm{PPL}:\ 12.24\ \to\
+10643.\]</span></p>
+<h3>Conditions</h3><ul>
+<li>The three vectors each token produces inside attention. The query is
+compared to earlier keys and the result weights the values, so a head
+reads the keys only through their scores against the query and its
+output lies between the smallest and largest value.</li>
+<li>Keys are read along the query and values are averaged, so a
+compression that preserves query-key scores preserves every output, and
+one that preserves the keys’ cosine need not.</li>
+</ul>
+<p>Conditions are curated in <code>entries.toml</code> rather than read
+from a record.</p>
+<h3>Ledger</h3><ul>
+<li><em>refutes or corrects.</em> NEG-2 <code>[refuted]</code>.
+Reconstruction cosine as a proxy for key quality. <a
+href="https://github.com/ahb-sjsu/geometric-observation/blob/d1f8988/claims/LEDGER.md#L95"><code>geometric-observation/claims/LEDGER.md:95</code></a>.</li>
+</ul>
+<h3>First stated</h3><p>Chapter 0 section 0.11 of <em>Data Mining as Observation</em>, with
+the program’s key-side measurements in
+<code>turboquant-pro/docs/KV_KEYS_FINDING.md:1-49</code>.</p>
+<h3>Measurements</h3><table>
+<colgroup>
+<col style="width: 33%" />
+<col style="width: 33%" />
+<col style="width: 33%" />
+</colgroup>
+<thead>
+<tr>
+<th>Where the book states it</th>
+<th>Numbers, as the book’s sources table records them</th>
+<th>Source</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>chapter 11 section 11.1</td>
+<td>condition (A2), cosine satisfies it, post-rotary keys do not, the
+cone below cell size</td>
+<td><a
+href="https://github.com/ahb-sjsu/turboquant-pro/blob/856c4cb/docs/KV_KEYS_FINDING.md#L61-L86"><code>turboquant-pro/docs/KV_KEYS_FINDING.md:61-86</code></a>;
+<code>the-angular-observer/README.md:26-31</code></td>
+</tr>
+<tr>
+<td>chapter 11 section 11.2</td>
+<td>fp16 12.24, values-only 13.12, PolarQuant K4 10643 and 0.095,
+per-channel uniform K4 14.91 and 0.062, per-channel NUQ K3 15.77 and
+0.148, 2.4x and 670x, pre-rotary near 22000, 2 key heads serve 12 query
+heads</td>
+<td><a
+href="https://github.com/ahb-sjsu/turboquant-pro/blob/856c4cb/docs/KV_KEYS_FINDING.md#L1-L49"><code>turboquant-pro/docs/KV_KEYS_FINDING.md:1-49</code></a></td>
+</tr>
+</tbody>
+</table>
+<h3>Failures and corrections</h3><ul>
+<li>NEG-2, <code>[refuted]</code>. Reconstruction cosine as a proxy for
+key quality. <a
+href="https://github.com/ahb-sjsu/geometric-observation/blob/d1f8988/claims/LEDGER.md#L95"><code>geometric-observation/claims/LEDGER.md:95</code></a>.</li>
+</ul>
+<h3>Machine checked</h3><p><a
+href="https://github.com/ahb-sjsu/observation-data-mining/blob/08b4794/lean/DataMiningAsObservation/Attention.lean"><code>lean/DataMiningAsObservation/Attention.lean</code></a>,
+theorems <code>output_le_max</code>, <code>min_le_output</code>,
+<code>output_congr</code>, <code>output_nuisance</code>, at
+observation-data-mining 08b4794; what the check covers is stated in the
+book’s <a
+href="https://github.com/ahb-sjsu/observation-data-mining/blob/08b4794/chapters/machine_checked.md">appendix
+C</a>.</p>
+<h3>Used in</h3><p><em>Data Mining as Observation</em> chapters 0, 1, 2, 3, 4, 5, 6, 7,
+8, 9, 10, 11, 12, 13, 14.</p>
+<h3>Related</h3><p><a href="attention.html">attention</a>; <a href="head.html">head</a>; <a href="kv-cache.html">KV cache</a>; <a href="softmax.html">softmax</a>.</p>
+<h3>See also</h3><p>Sources-table rows that share a record with the entry without naming
+it: chapter 1 section 1.4, chapter 2 section 2.5, chapter 3 section 3.2,
+chapter 8 section 8.2.</p>
+<h3>Status</h3><p>Generated 2026-09-06 by <code>encyclopedia/generate.py</code>; book
+at observation-data-mining 08b4794; the commit of every record is listed
+in the encyclopedia’s provenance.</p><div class="prevnext"><span>← <a href="quantization.html">quantization</a></span><span><a href="query-set.html">query set</a> →</span></div></main></body></html>
