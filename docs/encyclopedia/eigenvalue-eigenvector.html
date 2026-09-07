@@ -1,0 +1,84 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>eigenvalue, eigenvector</title><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&family=Source+Serif+4:wght@600&display=swap"><style>
+:root { color-scheme: light; --surface:#fcfcfb; --panel:#ffffff; --code:#f3f2ee; --ink:#0b0b0b; --ink2:#52514e; --ink3:#8a897f; --grid:#e6e5e1; --blue:#2a78d6; --green:#1baf7a; --orange:#eb6834; --red:#d03b3b; --violet:#4a3aa7; }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) { color-scheme: dark; --surface:#141412; --panel:#1c1c1a; --code:#262623; --ink:#ececea; --ink2:#b6b4ad; --ink3:#8a897f; --grid:#2e2e2a; --blue:#6aa3ea; --green:#3fc793; --orange:#f08a5e; --red:#e2605f; --violet:#8f80d8; } }
+:root[data-theme="dark"] { color-scheme: dark; --surface:#141412; --panel:#1c1c1a; --code:#262623; --ink:#ececea; --ink2:#b6b4ad; --ink3:#8a897f; --grid:#2e2e2a; --blue:#6aa3ea; --green:#3fc793; --orange:#f08a5e; --red:#e2605f; --violet:#8f80d8; }
+* { box-sizing: border-box; }
+body { margin:0; background:var(--surface); color:var(--ink); font-family: Inter, 'Segoe UI', Helvetica, Arial, sans-serif; font-size:16.5px; line-height:1.55; font-variant-numeric: tabular-nums; }
+h1, h2, .tile a.t { font-family: 'Source Serif 4', Georgia, 'Times New Roman', serif; text-wrap: balance; }
+header.top { border-bottom:1px solid var(--grid); padding:10px 24px; display:flex; gap:18px; align-items:baseline; flex-wrap:wrap; }
+header.top a { color:var(--ink2); text-decoration:none; } header.top a.brand { color:var(--ink); font-weight:600; }
+main { max-width: 900px; margin: 0 auto; padding: 18px 24px 60px; }
+h1 { font-size:2rem; margin:.4em 0 .2em; } h2 { font-size:1.35rem; margin:1.6em 0 .4em; } h3 { font-size:.82rem; letter-spacing:.06em; text-transform:uppercase; color:var(--ink2); margin:1.4em 0 .3em; }
+a { color: var(--blue); } a:hover { text-decoration: underline; }
+code { font-family: ui-monospace, Consolas, monospace; font-size:.88em; background:var(--code); padding:1px 4px; border-radius:3px; overflow-wrap:anywhere; }
+table { border-collapse: collapse; width:100%; font-size:.93em; } th, td { text-align:left; vertical-align:top; padding:6px 8px; border-bottom:1px solid var(--grid); } th { color:var(--ink2); font-weight:600; }
+table.card { border:1px solid var(--grid); border-radius:8px; background:var(--panel); margin:10px 0 18px; } table.card th { width:11.5em; white-space:nowrap; } table.card ul { margin:0; padding-left:1.1em; }
+.kind { display:inline-block; font-size:.78em; padding:1px 8px; border-radius:10px; color:#fff; vertical-align:middle; margin-left:6px; }
+.kind.concept{background:var(--blue)} .kind.instrument{background:var(--green)} .kind.result{background:var(--orange)} .kind.correction{background:var(--red)} .kind.reference{background:var(--violet)}
+.al { color:var(--ink2); }
+figure { margin:14px 0; } figure svg { width:100%; height:auto; border:1px solid var(--grid); border-radius:8px; background:#fcfcfb; } figcaption { font-size:.9em; color:var(--ink2); font-style:italic; margin-top:4px; }
+.grid { display:grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap:10px; }
+.tile { border:1px solid var(--grid); border-radius:8px; padding:10px 12px; background:var(--panel); } .tile a.t { font-weight:600; text-decoration:none; color:var(--ink); } .tile p { margin:4px 0 0; font-size:.9em; color:var(--ink2); }
+.letters a { margin-right:8px; text-decoration:none; font-weight:600; }
+input.search { width:100%; font-size:1.05em; padding:10px 12px; border:1px solid var(--grid); border-radius:8px; margin:10px 0 16px; background:var(--panel); color:var(--ink); } input.search:focus, a:focus-visible { outline:2px solid var(--blue); outline-offset:2px; }
+.prevnext { display:flex; justify-content:space-between; margin-top:30px; color:var(--ink2); font-size:.95em; }
+ul.evidence li { overflow-wrap:anywhere; }
+.entry { display:none; } .entry:target, .entry.show { display:block; }
+@media (max-width:600px) { table.card th { width:7em; white-space:normal; } body { font-size:15.5px; } }
+</style><script>window.MathJax={tex:{inlineMath:[["$","$"],["\\(","\\)"]],displayMath:[["$$","$$"],["\\[","\\]"]]}};</script><script defer src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-svg.js"></script></head><body><header class="top"><a class="brand" href="index.html">The Observation Theory Encyclopedia</a><a href="tsk.html">From TSK</a><a href="about.html">About</a><a href="kinds.html">By kind</a><a href="chapters.html">By chapter</a><a href="lean.html">By Lean file</a><a href="ledger.html">Ledger</a><a href="provenance.html">Provenance</a></header><main><h1 id="eigenvalue-eigenvector">eigenvalue, eigenvector <span class="kind concept">concept</span></h1>
+<table class="card"><tr><th>Definition</th><td>A direction a symmetric matrix only stretches, and the factor by which it stretches it. The eigenvectors of a covariance are its principal directions. Equation 0.5. <span class=al>Also eigenvalue, eigenvector, principal direction.</span></td></tr><tr><th>Example</th><td>diag(0.3, 1.7) has eigenvalues 0.3 and 1.7
+with eigenvectors along the two axes.</td></tr><tr><th>Book</th><td><em>Data Mining as Observation</em>, draft 0.2, commit <code>08b4794</code>; entry id <code>eigenvalue-eigenvector</code>, kind concept.</td></tr><tr><th>Status</th><td>no ledger row names this entry. Corrections: none recorded.</td></tr><tr><th>Defining equation</th><td><p>Book equation 0.5.</p></td></tr><tr><th>Assumptions and scope</th><td><ul><li>A direction a symmetric matrix only stretches, and the factor by
+which it stretches it. Eigenvectors with distinct eigenvalues are
+orthogonal, every eigenvalue of a semidefinite matrix is nonnegative,
+and the quadratic form along an eigenvector is the eigenvalue times the
+squared length.</li><li>The eigenvectors of a covariance are its principal directions, the
+basis in which chapter 4 pairs the covariance with the read operator,
+and the eigenvalues of a Laplacian are what the recognizer reads.</li></ul></td></tr><tr><th>Prior art</th><td>none recorded</td></tr><tr><th>Evidence</th><td><a href="https://github.com/ahb-sjsu/observation-data-mining/blob/08b4794/lean/DataMiningAsObservation/Eigen.lean"><code>lean/DataMiningAsObservation/Eigen.lean</code></a></td></tr><tr><th>Reviewed</th><td>not yet reviewed; generated 2026-09-06 from records at the commits on the provenance page.</td></tr></table>
+<figure><svg xmlns="http://www.w3.org/2000/svg" width="720" height="300" viewBox="0 0 720 300" role="img" aria-label="The directions a symmetric matrix stretches along, and by how much."><rect width="100%" height="100%" fill="#fcfcfb"/><line x1="70.00" y1="155.00" x2="410.00" y2="155.00" stroke="#e6e5e1" stroke-width="1" stroke-linecap="round" stroke-opacity="1.0"/><line x1="240.00" y1="35.00" x2="240.00" y2="275.00" stroke="#e6e5e1" stroke-width="1" stroke-linecap="round" stroke-opacity="1.0"/><ellipse cx="240.00" cy="155.00" rx="46.56" ry="110.83" transform="rotate(0 240.00 155.00)" fill="#2a78d6" fill-opacity="0.1" stroke="#2a78d6" stroke-width="2"><title>first code</title></ellipse><line x1="240.00" y1="155.00" x2="384.89" y2="116.18" stroke="#0b0b0b" stroke-width="2" stroke-linecap="round" stroke-opacity="1.0"/><line x1="384.89" y1="116.18" x2="379.33" y2="121.93" stroke="#0b0b0b" stroke-width="2" stroke-linecap="round" stroke-opacity="1.0"/><line x1="384.89" y1="116.18" x2="377.20" y2="113.97" stroke="#0b0b0b" stroke-width="2" stroke-linecap="round" stroke-opacity="1.0"/><text x="398.55" y="113.59" font-family="Inter, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="12" fill="#0b0b0b" text-anchor="start" font-weight="normal">reader</text><rect x="470" y="60" width="12" height="12" rx="3" fill="#2a78d6"/><text x="488.00" y="70.00" font-family="Inter, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="11.5" fill="#52514e" text-anchor="start" font-weight="normal">first code</text><text x="470.00" y="116.00" font-family="Inter, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="11.5" fill="#52514e" text-anchor="start" font-weight="normal" font-style="italic">same trace</text></svg><figcaption>The directions a symmetric matrix stretches along, and by how much.</figcaption></figure>
+<h3>Equation</h3><p>Book equation 0.5.</p>
+<p><span class="math display">\[\Sigma\,v_i=\lambda_i v_i,\qquad
+\Sigma=\sum_{i=1}^{d}\lambda_i\,v_i v_i^{\top},\qquad v_i\cdot v_j=0\
+(i\ne j).\]</span></p>
+<p>Book equation 0.7.</p>
+<p><span
+class="math display">\[r_{\mathrm{eff}}=\frac{\big(\sum_i\lambda_i\big)^{2}}{\sum_i\lambda_i^{2}}.\]</span></p>
+<p>Book equation 9.2.</p>
+<p><span class="math display">\[N(\lambda)=\#\{k:\lambda_k\le\lambda\}\
+\sim\ C_d\,\lambda^{d/2}\qquad\Rightarrow\qquad d=2\,\frac{d\log
+N}{d\log\lambda}.\]</span></p>
+<h3>Conditions</h3><ul>
+<li>A direction a symmetric matrix only stretches, and the factor by
+which it stretches it. Eigenvectors with distinct eigenvalues are
+orthogonal, every eigenvalue of a semidefinite matrix is nonnegative,
+and the quadratic form along an eigenvector is the eigenvalue times the
+squared length.</li>
+<li>The eigenvectors of a covariance are its principal directions, the
+basis in which chapter 4 pairs the covariance with the read operator,
+and the eigenvalues of a Laplacian are what the recognizer reads.</li>
+</ul>
+<p>Conditions are curated in <code>entries.toml</code> rather than read
+from a record.</p>
+<h3>Ledger</h3><p>none</p>
+<h3>First stated</h3><p>Chapter 0 section 0.4 of <em>Data Mining as Observation</em>, with
+the program’s spectrum records in readscope and the recognizer
+battery.</p>
+<h3>Measurements</h3><p>none</p>
+<h3>Failures and corrections</h3><p>none</p>
+<h3>Machine checked</h3><p><a
+href="https://github.com/ahb-sjsu/observation-data-mining/blob/08b4794/lean/DataMiningAsObservation/Eigen.lean"><code>lean/DataMiningAsObservation/Eigen.lean</code></a>,
+theorems <code>pairing_symm</code>, <code>orthogonal_of_ne</code>,
+<code>eigenvalue_nonneg</code>, <code>quad_eigen</code>, at
+observation-data-mining 08b4794; what the check covers is stated in the
+book’s <a
+href="https://github.com/ahb-sjsu/observation-data-mining/blob/08b4794/chapters/machine_checked.md">appendix
+C</a>.</p>
+<h3>Used in</h3><p><em>Data Mining as Observation</em> chapters 0, 3, 4, 9, 11.</p>
+<h3>Related</h3><p><a href="covariance-matrix.html">covariance matrix</a>; <a href="effective-rank.html">effective rank</a>; <a href="whitening.html">whitening</a>; <a href="recognizer.html">recognizer</a>; <a href="laplacian.html">Laplacian</a>.</p>
+<h3>See also</h3><p>Ledger rows that cite the entry’s records without naming it:
+<a href="ledger.html#OT-7">OT-7</a>.</p>
+<p>Sources-table rows that share a record with the entry without naming
+it: chapter 4 section 4.2, chapter 9 section 9.4, chapter 14 section
+14.3, chapter 14 section 14.5, chapter 14 section 14.7.</p>
+<h3>Status</h3><p>Generated 2026-09-06 by <code>encyclopedia/generate.py</code>; book
+at observation-data-mining 08b4794; the commit of every record is listed
+in the encyclopedia’s provenance.</p><div class="prevnext"><span>← <a href="effective-rank.html">effective rank</a></span><span><a href="embedding.html">embedding</a> →</span></div></main></body></html>

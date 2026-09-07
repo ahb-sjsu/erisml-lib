@@ -1,0 +1,324 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Youden F1 bound</title><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&family=Source+Serif+4:wght@600&display=swap"><style>
+:root { color-scheme: light; --surface:#fcfcfb; --panel:#ffffff; --code:#f3f2ee; --ink:#0b0b0b; --ink2:#52514e; --ink3:#8a897f; --grid:#e6e5e1; --blue:#2a78d6; --green:#1baf7a; --orange:#eb6834; --red:#d03b3b; --violet:#4a3aa7; }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) { color-scheme: dark; --surface:#141412; --panel:#1c1c1a; --code:#262623; --ink:#ececea; --ink2:#b6b4ad; --ink3:#8a897f; --grid:#2e2e2a; --blue:#6aa3ea; --green:#3fc793; --orange:#f08a5e; --red:#e2605f; --violet:#8f80d8; } }
+:root[data-theme="dark"] { color-scheme: dark; --surface:#141412; --panel:#1c1c1a; --code:#262623; --ink:#ececea; --ink2:#b6b4ad; --ink3:#8a897f; --grid:#2e2e2a; --blue:#6aa3ea; --green:#3fc793; --orange:#f08a5e; --red:#e2605f; --violet:#8f80d8; }
+* { box-sizing: border-box; }
+body { margin:0; background:var(--surface); color:var(--ink); font-family: Inter, 'Segoe UI', Helvetica, Arial, sans-serif; font-size:16.5px; line-height:1.55; font-variant-numeric: tabular-nums; }
+h1, h2, .tile a.t { font-family: 'Source Serif 4', Georgia, 'Times New Roman', serif; text-wrap: balance; }
+header.top { border-bottom:1px solid var(--grid); padding:10px 24px; display:flex; gap:18px; align-items:baseline; flex-wrap:wrap; }
+header.top a { color:var(--ink2); text-decoration:none; } header.top a.brand { color:var(--ink); font-weight:600; }
+main { max-width: 900px; margin: 0 auto; padding: 18px 24px 60px; }
+h1 { font-size:2rem; margin:.4em 0 .2em; } h2 { font-size:1.35rem; margin:1.6em 0 .4em; } h3 { font-size:.82rem; letter-spacing:.06em; text-transform:uppercase; color:var(--ink2); margin:1.4em 0 .3em; }
+a { color: var(--blue); } a:hover { text-decoration: underline; }
+code { font-family: ui-monospace, Consolas, monospace; font-size:.88em; background:var(--code); padding:1px 4px; border-radius:3px; overflow-wrap:anywhere; }
+table { border-collapse: collapse; width:100%; font-size:.93em; } th, td { text-align:left; vertical-align:top; padding:6px 8px; border-bottom:1px solid var(--grid); } th { color:var(--ink2); font-weight:600; }
+table.card { border:1px solid var(--grid); border-radius:8px; background:var(--panel); margin:10px 0 18px; } table.card th { width:11.5em; white-space:nowrap; } table.card ul { margin:0; padding-left:1.1em; }
+.kind { display:inline-block; font-size:.78em; padding:1px 8px; border-radius:10px; color:#fff; vertical-align:middle; margin-left:6px; }
+.kind.concept{background:var(--blue)} .kind.instrument{background:var(--green)} .kind.result{background:var(--orange)} .kind.correction{background:var(--red)} .kind.reference{background:var(--violet)}
+.al { color:var(--ink2); }
+figure { margin:14px 0; } figure svg { width:100%; height:auto; border:1px solid var(--grid); border-radius:8px; background:#fcfcfb; } figcaption { font-size:.9em; color:var(--ink2); font-style:italic; margin-top:4px; }
+.grid { display:grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap:10px; }
+.tile { border:1px solid var(--grid); border-radius:8px; padding:10px 12px; background:var(--panel); } .tile a.t { font-weight:600; text-decoration:none; color:var(--ink); } .tile p { margin:4px 0 0; font-size:.9em; color:var(--ink2); }
+.letters a { margin-right:8px; text-decoration:none; font-weight:600; }
+input.search { width:100%; font-size:1.05em; padding:10px 12px; border:1px solid var(--grid); border-radius:8px; margin:10px 0 16px; background:var(--panel); color:var(--ink); } input.search:focus, a:focus-visible { outline:2px solid var(--blue); outline-offset:2px; }
+.prevnext { display:flex; justify-content:space-between; margin-top:30px; color:var(--ink2); font-size:.95em; }
+ul.evidence li { overflow-wrap:anywhere; }
+.entry { display:none; } .entry:target, .entry.show { display:block; }
+@media (max-width:600px) { table.card th { width:7em; white-space:normal; } body { font-size:15.5px; } }
+</style><script>window.MathJax={tex:{inlineMath:[["$","$"],["\\(","\\)"]],displayMath:[["$$","$$"],["\\[","\\]"]]}};</script><script defer src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-svg.js"></script></head><body><header class="top"><a class="brand" href="index.html">The Observation Theory Encyclopedia</a><a href="tsk.html">From TSK</a><a href="about.html">About</a><a href="kinds.html">By kind</a><a href="chapters.html">By chapter</a><a href="lean.html">By Lean file</a><a href="ledger.html">Ledger</a><a href="provenance.html">Provenance</a></header><main><h1 id="youden-f1-bound">Youden F1 bound <span class="kind correction">correction</span></h1>
+<table class="card"><tr><th>Definition</th><td>The bound on the best F1 a score can reach at any threshold, from the Youden index, true positive rate minus false positive rate, maximized over thresholds. The bound holds for every score. The form that reads the ceiling from the AUROC holds only for concave ROC curves, with a counterexample at AUROC 0.75. <span class=al>Also Youden.</span></td></tr><tr><th>Example</th><td>A Youden index of 0.5 at the best threshold
+bounds the F1 the score can reach at any threshold, for every score.</td></tr><tr><th>Book</th><td><em>Data Mining as Observation</em>, draft 0.2, commit <code>08b4794</code>; entry id <code>youden-f1-bound</code>, kind correction.</td></tr><tr><th>Status</th><td>no ledger row names this entry. Corrections: 1 item(s), see below.</td></tr><tr><th>Defining equation</th><td><p>Book equation 5.4.</p></td></tr><tr><th>Assumptions and scope</th><td><ul><li>The Youden form holds for every score with a finite sample.</li><li>The AUROC form holds for concave ROC curves, and as a pruning bound
+it is safe only there.</li><li>Inside a tree search either form bounds the formula itself and not
+its descendants, so pruning a subtree by its root’s ceiling is a
+heuristic in both cases.</li></ul></td></tr><tr><th>Prior art</th><td>none recorded</td></tr><tr><th>Evidence</th><td><a href="https://github.com/ahb-sjsu/theory-radar/blob/37c4e6c/paper/astar_paper.tex#L94-L170"><code>theory-radar/paper/astar_paper.tex:94-170</code></a>, <a href="https://github.com/ahb-sjsu/theory-radar/blob/37c4e6c/paper/theory_radar_paper.tex#L290-L304"><code>theory-radar/paper/theory_radar_paper.tex:290-304</code></a>, <a href="https://github.com/ahb-sjsu/theory-radar/blob/37c4e6c/paper/astar_paper.tex#L170-L200"><code>theory-radar/paper/astar_paper.tex:170-200</code></a>, <a href="https://github.com/ahb-sjsu/theory-radar/blob/37c4e6c/results/rerun_youden_2026_09_03.json"><code>theory-radar/results/rerun_youden_2026_09_03.json</code></a>, <a href="https://github.com/ahb-sjsu/theory-radar/blob/37c4e6c/ERRATA.md"><code>theory-radar/ERRATA.md</code></a>, <a href="https://github.com/ahb-sjsu/theory-radar/blob/37c4e6c/paper/astar_paper.tex#L94-L110"><code>theory-radar/paper/astar_paper.tex:94-110</code></a>, <a href="https://github.com/ahb-sjsu/theory-radar/blob/37c4e6c/ERRATA.md#L3-L75"><code>theory-radar/ERRATA.md:3-75</code></a>, <a href="https://github.com/ahb-sjsu/observation-data-mining/blob/08b4794/lean/DataMiningAsObservation/YoudenF1.lean"><code>lean/DataMiningAsObservation/YoudenF1.lean</code></a></td></tr><tr><th>Reviewed</th><td>semantic review 2026-09-06; generated 2026-09-06 from records at the commits on the provenance page.</td></tr></table>
+<figure><svg xmlns="http://www.w3.org/2000/svg" width="720" height="300" viewBox="0 0 720 300" role="img" aria-label="The Youden index bounds the best F1, for every score."><rect width="100%" height="100%" fill="#fcfcfb"/><line x1="110.00" y1="245.00" x2="410.00" y2="245.00" stroke="#e6e5e1" stroke-width="1" stroke-linecap="round" stroke-opacity="1.0"/><text x="102.00" y="249.00" font-family="Inter, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="11" fill="#52514e" text-anchor="end" font-weight="normal">0</text><line x1="110.00" y1="137.50" x2="410.00" y2="137.50" stroke="#e6e5e1" stroke-width="1" stroke-linecap="round" stroke-opacity="1.0"/><text x="102.00" y="141.50" font-family="Inter, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="11" fill="#52514e" text-anchor="end" font-weight="normal">0.5</text><line x1="110.00" y1="30.00" x2="410.00" y2="30.00" stroke="#e6e5e1" stroke-width="1" stroke-linecap="round" stroke-opacity="1.0"/><text x="102.00" y="34.00" font-family="Inter, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="11" fill="#52514e" text-anchor="end" font-weight="normal">1</text><text x="110.00" y="261.00" font-family="Inter, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="11" fill="#52514e" text-anchor="middle" font-weight="normal">0</text><text x="260.00" y="261.00" font-family="Inter, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="11" fill="#52514e" text-anchor="middle" font-weight="normal">0.5</text><text x="410.00" y="261.00" font-family="Inter, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="11" fill="#52514e" text-anchor="middle" font-weight="normal">1</text><line x1="110.00" y1="245.00" x2="410.00" y2="245.00" stroke="#e6e5e1" stroke-width="1" stroke-linecap="round" stroke-opacity="1.0"/><text x="260.00" y="279.00" font-family="Inter, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="11.5" fill="#52514e" text-anchor="middle" font-weight="normal">false positive rate</text><text x="66.00" y="137.50" font-family="Inter, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="11.5" fill="#52514e" text-anchor="middle" font-weight="normal" transform="rotate(-90 66.00 137.50)">true positive rate</text><line x1="110.00" y1="245.00" x2="410.00" y2="30.00" stroke="#8a897f" stroke-width="1.5" stroke-linecap="round" stroke-dasharray="5 4" stroke-opacity="1.0"/><polyline points="110.00,245.00 117.50,185.88 125.00,169.65 132.50,158.16 140.00,148.96 147.50,141.16 155.00,134.32 162.50,128.18 170.00,122.60 177.50,117.44 185.00,112.65 192.50,108.16 200.00,103.93 207.50,99.92 215.00,96.11 222.50,92.47 230.00,88.99 237.50,85.64 245.00,82.42 252.50,79.32 260.00,76.31 267.50,73.41 275.00,70.59 282.50,67.86 290.00,65.20 297.50,62.61 305.00,60.09 312.50,57.63 320.00,55.23 327.50,52.89 335.00,50.59 342.50,48.35 350.00,46.15 357.50,44.00 365.00,41.89 372.50,39.82 380.00,37.78 387.50,35.79 395.00,33.83 402.50,31.90 410.00,30.00" fill="none" stroke="#d03b3b" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"></polyline><line x1="155.00" y1="212.75" x2="155.00" y2="134.32" stroke="#eb6834" stroke-width="2.5" stroke-linecap="round" stroke-opacity="1.0"/><text x="163.00" y="173.53" font-family="Inter, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="11.5" fill="#52514e" text-anchor="start" font-weight="normal">Youden index, TPR − FPR</text><text x="430.00" y="80.00" font-family="Inter, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="11.5" fill="#52514e" text-anchor="start" font-weight="normal">area under the curve, AUROC</text><text x="430.00" y="98.00" font-family="Inter, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="11.5" fill="#52514e" text-anchor="start" font-weight="normal">chance is the diagonal</text></svg><figcaption>The Youden index bounds the best F1, for every score.</figcaption></figure>
+<h3>Equation</h3><p>Book equation 5.4.</p>
+<p><span class="math display">\[\begin{gathered} F_1^{\max}\ \le\
+\sup_{t\in[J,\,1]}\ \frac{2t\pi}{t\pi+\pi+(t-J)(1-\pi)},\qquad
+J=\max_{\tau}\big(\mathrm{TPR}-\mathrm{FPR}\big),\qquad
+\pi=\text{prevalence}, \\ J\le 2A-1\ \text{when the ROC curve is
+concave, and not in general.} \end{gathered}\]</span></p>
+<h3>Conditions</h3><ul>
+<li>The Youden form holds for every score with a finite sample.</li>
+<li>The AUROC form holds for concave ROC curves, and as a pruning bound
+it is safe only there.</li>
+<li>Inside a tree search either form bounds the formula itself and not
+its descendants, so pruning a subtree by its root’s ceiling is a
+heuristic in both cases.</li>
+</ul>
+<p>Conditions are curated in <code>entries.toml</code> rather than read
+from a record.</p>
+<h3>Ledger</h3><p>none</p>
+<h3>First stated</h3><p>The AUROC form, theorem “AUROC-F1 Bound” in
+<code>theory-radar/paper/astar_paper.tex</code> and the derivation in
+<code>theory-radar/src/symbolic_search/_auroc_proof.py</code>,
+repository DOI 10.5281/zenodo.20660206. The corrected form at
+theory-radar 1b3d105.</p>
+<h3>Measurements</h3><table>
+<colgroup>
+<col style="width: 33%" />
+<col style="width: 33%" />
+<col style="width: 33%" />
+</colgroup>
+<thead>
+<tr>
+<th>Where the book states it</th>
+<th>Numbers, as the book’s sources table records them</th>
+<th>Source</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>chapter 5 section 5.4</td>
+<td>Monotone Invariance and AUROC invariance theorems, the AUROC to F1
+bound via the Youden index, stated in the source for every ROC curve and
+corrected in the book to concave curves, with the counterexample at
+AUROC 0.75 and F1 0.857</td>
+<td><a
+href="https://github.com/ahb-sjsu/theory-radar/blob/37c4e6c/paper/astar_paper.tex#L94-L170"><code>theory-radar/paper/astar_paper.tex:94-170</code></a>;
+<a
+href="https://github.com/ahb-sjsu/theory-radar/blob/37c4e6c/paper/theory_radar_paper.tex#L290-L304"><code>theory-radar/paper/theory_radar_paper.tex:290-304</code></a></td>
+</tr>
+<tr>
+<td>chapter 5 section 5.4</td>
+<td>seven thresholds up to 0.75, eight datasets, 56 conditions, zero
+admissibility violations, reductions 70 to 99.1 percent</td>
+<td><a
+href="https://github.com/ahb-sjsu/theory-radar/blob/37c4e6c/paper/astar_paper.tex#L170-L200"><code>theory-radar/paper/astar_paper.tex:170-200</code></a></td>
+</tr>
+<tr>
+<td>chapter 5 section 5.4</td>
+<td>the rerun of 2026-09-03 and 2026-09-04, pre-filter counts 2576 of
+8700 and 413 of 1560, ceiling violations 812 and 412, Youden pruning 199
+and 38, A* optima 0.958 and 0.694 in strict and fast modes, Youden mode
+short by 0.006 and 0.002</td>
+<td><a
+href="https://github.com/ahb-sjsu/theory-radar/blob/37c4e6c/results/rerun_youden_2026_09_03.json"><code>theory-radar/results/rerun_youden_2026_09_03.json</code></a>;
+<a
+href="https://github.com/ahb-sjsu/theory-radar/blob/37c4e6c/ERRATA.md"><code>theory-radar/ERRATA.md</code></a></td>
+</tr>
+<tr>
+<td>chapter 6 section 6.3</td>
+<td>Monotone Invariance Theorem and its proof</td>
+<td><a
+href="https://github.com/ahb-sjsu/theory-radar/blob/37c4e6c/paper/theory_radar_paper.tex#L290-L304"><code>theory-radar/paper/theory_radar_paper.tex:290-304</code></a>;
+<a
+href="https://github.com/ahb-sjsu/theory-radar/blob/37c4e6c/paper/astar_paper.tex#L94-L110"><code>theory-radar/paper/astar_paper.tex:94-110</code></a></td>
+</tr>
+</tbody>
+</table>
+<p>Rerun of the A* paper’s pruning tables by
+<code>theory-radar/rerun_youden_2026_09_03.py</code>. Part A is depth-2
+pairwise enumeration on eight datasets, exhaustive against the AUROC
+pre-filter at seven thresholds and against Youden pruning. Part B is the
+depth-3 A* search with 50,000 expansions in strict mode (no pre-filter),
+the published fast mode (AUROC pre-filter at 0.52), and the youden
+mode.</p>
+<p>Part A, recorded at commit aedc053 of theory-radar.</p>
+<table style="width:100%;">
+<colgroup>
+<col style="width: 16%" />
+<col style="width: 16%" />
+<col style="width: 16%" />
+<col style="width: 16%" />
+<col style="width: 16%" />
+<col style="width: 16%" />
+</colgroup>
+<thead>
+<tr>
+<th>Dataset, depth 2 pairs</th>
+<th>Pairs</th>
+<th>Exhaustive F1</th>
+<th>AUROC pre-filter at 0.75, evaluated, admissible</th>
+<th>Youden pruning, evaluated, admissible</th>
+<th>Pairs whose F1 exceeds the AUROC ceiling</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Circles (2)</td>
+<td>20</td>
+<td>0.9960</td>
+<td>4, yes</td>
+<td>7, yes</td>
+<td>14</td>
+</tr>
+<tr>
+<td>Moons (2)</td>
+<td>20</td>
+<td>0.8330</td>
+<td>2, yes</td>
+<td>2, yes</td>
+<td>3</td>
+</tr>
+<tr>
+<td>Breast Cancer (30)</td>
+<td>8700</td>
+<td>0.9542</td>
+<td>2576, yes</td>
+<td>199, yes</td>
+<td>812</td>
+</tr>
+<tr>
+<td>Wine (13), class 0 vs rest</td>
+<td>1560</td>
+<td>0.9204</td>
+<td>413, yes</td>
+<td>38, yes</td>
+<td>412</td>
+</tr>
+<tr>
+<td>Synthetic (10)</td>
+<td>900</td>
+<td>0.9556</td>
+<td>10, yes</td>
+<td>7, yes</td>
+<td>18</td>
+</tr>
+<tr>
+<td>Synthetic (20)</td>
+<td>3800</td>
+<td>0.9460</td>
+<td>8, yes</td>
+<td>8, yes</td>
+<td>57</td>
+</tr>
+<tr>
+<td>Synthetic (30)</td>
+<td>8700</td>
+<td>0.9637</td>
+<td>8, yes</td>
+<td>8, yes</td>
+<td>61</td>
+</tr>
+<tr>
+<td>Synthetic (40)</td>
+<td>15600</td>
+<td>0.9425</td>
+<td>32, yes</td>
+<td>8, yes</td>
+<td>125</td>
+</tr>
+</tbody>
+</table>
+<p>Part B.</p>
+<table>
+<colgroup>
+<col style="width: 20%" />
+<col style="width: 20%" />
+<col style="width: 20%" />
+<col style="width: 20%" />
+<col style="width: 20%" />
+</colgroup>
+<thead>
+<tr>
+<th>Dataset</th>
+<th>strict F1 and formula</th>
+<th>fast F1</th>
+<th>youden F1 and formula</th>
+<th>expansions strict, fast, youden</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Circles (2)</td>
+<td>0.9965, (x1 hypot x2)</td>
+<td>0.9965</td>
+<td>0.9965, (x1 hypot x2)</td>
+<td>1626, 540, 87</td>
+</tr>
+<tr>
+<td>Moons (2)</td>
+<td>0.8927, (neg(x1) max x2)</td>
+<td>0.8927</td>
+<td>0.8927, (neg(x1) max x2)</td>
+<td>1626, 1386, 86</td>
+</tr>
+<tr>
+<td>Synthetic (20)</td>
+<td>1.0000, (x0 hypot x1)</td>
+<td>1.0000</td>
+<td>1.0000, (x0 hypot x1)</td>
+<td>50000, 50000, 465</td>
+</tr>
+<tr>
+<td>Breast Cancer (10)</td>
+<td>0.9578, ((f1 min f2) + f7)</td>
+<td>0.9578</td>
+<td>0.9516, ((f3 + f7) min f6)</td>
+<td>50000, 50000, 841</td>
+</tr>
+<tr>
+<td>Diabetes (8)</td>
+<td>0.6937, ((d5 min d7) + d1)</td>
+<td>0.6937</td>
+<td>0.6921, ((d1 + d7) min d5)</td>
+<td>50000, 46307, 192</td>
+</tr>
+</tbody>
+</table>
+<h3>Failures and corrections</h3><ul>
+<li><a
+href="https://github.com/ahb-sjsu/theory-radar/blob/37c4e6c/ERRATA.md#L3-L75"><code>theory-radar/ERRATA.md:3-75</code></a>
+at 37c4e6c. 2026-09-03. The AUROC to F1 bound holds only for concave ROC
+curves <strong>What was claimed.</strong> Theorem “AUROC-F1 Bound” in
+<code>paper/astar_paper.tex</code>, the derivation in
+<code>src/symbolic_search/_auroc_proof.py</code>, and the pruning bounds
+in <code>run_astar_v2.py</code> and
+<code>src/symbolic_search/_heuristic_dag.py</code> all rested on the
+statement that any ROC curve with area A has maximum Youden index J =
+max(TPR − FPR) at most 2A − 1. <strong>Why it is wrong.</strong> The
+statement holds for concave ROC curves (equivalently, scores whose
+likelihood ratio is monotone), because a concave curve lies above the
+two chords through its Youden point and so has area at least (1 + J)/2.
+It fails for non-concave curves. Counterexample, found by an external
+reviewer of the companion textbook: rank three quarters of the positives
+above every negative and the remaining quarter below every negative.
+AUROC is 0.75, the maximum Youden index is 0.75, and at prevalence one
+half the best thresholded F1 is 0.857, above the 0.80 the AUROC form of
+the ceiling allows. The sound ceiling for that score, from J = 0.75, is
+0.889, and the score sits under it. The <code>auroc_f1_bound</code>
+formula in <code>run_astar_v2.py</code>, 2Aπ/(Aπ + (1 − A)(1 − π)), is
+not a valid upper bound either: at prevalence 0.1 the same score reaches
+F1 0.857 against a “bound” of 0.5. <strong>Consequence for reported
+results.</strong> The searches that used these bounds to prune could
+have discarded a candidate formula whose ROC curve was not concave and
+whose true best F1 exceeded the computed ceiling. The formulas and wins
+reported by those runs are therefore what a pruned search found, and are
+lower bounds on what an unpruned search would find. The Monotone
+Invariance Theorem and the results that do not depend on the AUROC bound
+are unaffected. <strong>Correction.</strong> The sound form of the
+ceiling substitutes the measured maximum Youden index of the candidate’s
+own scores for 2A − 1. It holds for every score, costs the same sort as
+AUROC, and is what <code>max_f1_for_youden</code> and
+<code>youden_f1_bound</code> now compute. The AUROC form is retained
+under its original names with a docstring stating the concavity
+condition, and the pruning sites now use the measured index. A rerun of
+the published searches under the corrected bound was done on 2026-09-03
+and 2026-09-04, <code>rerun_youden_2026_09_03.py</code>, results in
+<code>results/rerun_youden_2026_09_03.json</code>, run on the Atlas
+workstation, CPU only. <strong>Rerun, part A, the pre-filter
+admissibility table (<code>tab:auroc</code>).</strong> Depth-2 pairwise
+enumeration on the eight datasets, exhaustive against the AUROC
+pre-filter at the seven published thresholds, with the sound Youden
+ceiling beside it. The evaluation counts under the pre-filter reproduce
+the published table (Breast Cancer 8700 pairs, 2576 evaluated at 0.75;
+Wine 1560, 413; Circles 20, 4; Moons 20, 2). The pre-filter lost no
+optimum on any dataset at any threshold, which is what the paper
+reported. That was luck of the data, not the theorem: the retracted
+ceiling sat below the F1 a pair formula actually reach</li>
+</ul>
+<h3>Machine checked</h3><p><a
+href="https://github.com/ahb-sjsu/observation-data-mining/blob/08b4794/lean/DataMiningAsObservation/YoudenF1.lean"><code>lean/DataMiningAsObservation/YoudenF1.lean</code></a>,
+theorems <code>f1_eq</code>, <code>f1_le_of_youden</code>,
+<code>auroc_eq</code>, <code>youden_eq</code>,
+<code>youden_exceeds_auroc_form</code>, at observation-data-mining
+08b4794; what the check covers is stated in the book’s <a
+href="https://github.com/ahb-sjsu/observation-data-mining/blob/08b4794/chapters/machine_checked.md">appendix
+C</a>.</p>
+<h3>Used in</h3><p><em>Data Mining as Observation</em> chapters 5.</p>
+<h3>Related</h3><p><a href="monotone-invariance.html">Monotone Invariance Theorem</a>; <a href="formula-search.html">formula search</a>; <a href="safe-pruning.html">safe pruning</a>; <a href="apriori.html">Apriori principle</a>.</p>
+<h3>See also</h3><p>none</p>
+<h3>Status</h3><p>Generated 2026-09-06 by <code>encyclopedia/generate.py</code>; book
+at observation-data-mining 08b4794; the commit of every record is listed
+in the encyclopedia’s provenance.</p><div class="prevnext"><span>← <a href="witness.html">witness</a></span><span><a href="youden-index.html">Youden index</a> →</span></div></main></body></html>
