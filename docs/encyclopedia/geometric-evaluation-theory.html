@@ -59,7 +59,11 @@ convex metric of evaluation. Affinely independent consequences represent
 every order on at most m+1 actions, and consequences on a line represent
 exactly the single-peaked orders,
 <code>geometric-evaluation-theory/paper/geometric-evaluation-theory.tex:269-291</code>.
-A closed-form combinatorial characterization is open.</li><li>Uniqueness. From the order on an open connected set of consequences,
+The hull law is machine checked as <code>hull_law</code> in
+<code>geometric-evaluation-theory/lean/GET/HullLaw.lean:1-43</code>
+against Mathlib, with the semidefinite characterization and the line
+case not checked. A closed-form combinatorial characterization is
+open.</li><li>Uniqueness. From the order on an open connected set of consequences,
 the metric is identified up to a positive scale and the ideal up to the
 metric’s null directions,
 <code>geometric-evaluation-theory/paper/geometric-evaluation-theory.tex:292-336</code>.
@@ -86,18 +90,53 @@ of the weighted sum and is strictly positive,
 Admissibility that depends on the menu produces choice violating the
 weak axiom of revealed preference, so an obligation of that kind is not
 a preference at any strength,
-<code>geometric-evaluation-theory/paper/geometric-evaluation-theory.tex:448-481</code>.</li><li>Five predictions are stated in a form a measurement can fail, and
-none has been measured. The threshold tracks the budget, rank changes
-reverse preference, shared representations pay the regret bound, the
-hull law holds in a population with a known consequence map, and
-menu-dependent obligations produce the weak-axiom pattern,
-<code>geometric-evaluation-theory/paper/geometric-evaluation-theory.tex:482-498</code>.
-The campaign that would grade them is
-<code>geometric-evaluation-theory/CAMPAIGN.md:1-40</code>, with gates G0
-to G8, and only G0, the frozen foundations, is done.</li><li>The three branches under the theory are descriptive choice,
+<code>geometric-evaluation-theory/paper/geometric-evaluation-theory.tex:448-481</code>.</li><li>Five predictions are stated in a form a measurement can fail. The
+threshold tracks the budget, rank changes reverse preference, shared
+representations pay the regret bound, the hull law holds in a population
+with a known consequence map, and menu-dependent obligations produce the
+weak-axiom pattern,
+<code>geometric-evaluation-theory/paper/geometric-evaluation-theory.tex:482-502</code>.
+The campaign that grades them is
+<code>geometric-evaluation-theory/CAMPAIGN.md:1-40</code>, gates G0 to
+G8. Done at commit 65da376: G0, the frozen foundations; G1, the Lean
+core; and G2, the hull law, which passed.</li><li>The hull law has been measured once, under a registration sealed
+before any rating was read, on the 1972 American National Election
+Study, where respondents placed Nixon, McGovern, Wallace, and the two
+parties on seven-point issue scales and rated them on feeling
+thermometers, <code>geometric-evaluation-theory/CAMPAIGN.md:42-53</code>
+at 65da376. On the registered pair of scales, liberal-conservative and
+guaranteed jobs, 489 respondents had a menu in which the law could bind,
+246 of them, 50.3 percent, violated it at least once, against 66.4
+percent with a standard deviation of 1.6 when each respondent’s ratings
+are shuffled among that respondent’s own objects, and no shuffle in 200
+reached the observed rate,
+<code>geometric-evaluation-theory/experiments/G2/results.json:1-87</code>.
+Five other pairs of the four scales gave the same ordering, observed
+rates of 54 to 63 percent against shuffled rates of 67 to 74 percent,
+the two tax-rate pairs at margins of 0.108 and 0.109 against the sealed
+bar of 0.10. The verdict is a pass by the sealed bars, and the number
+that matters more than the verdict is that half of the testable
+respondents violate the law at least once, so on this world the hull law
+holds as a population tendency, 10 to 16 points below the geometric base
+rate of violation, and fails as the deterministic statement of the
+representation theorem for about half the respondents. Placements are
+integers on seven-point scales, ratings are integers on a thermometer
+capped at 97, ties are counted as not strictly better, and no error
+model was registered, so no part of the half is attributed to
+rounding.</li><li>The shared-representation regret prediction was probed but not
+tested. On Llama-3.2-3B, with the three query heads of each
+grouped-query group as the evaluators of one key cache, the whitened
+read operators recovered by the blind probe have effective rank 2.6 to
+8.3 in 128 dimensions and the three largely coincide, so the deficiency
+bound at rank 16 is 1.4 to 5.6 percent of the own-optimal losses and
+reaches the registered 5 percent anti-vacuity bar in 4 of 16 cells
+against a bar of 12,
+<code>geometric-evaluation-theory/CAMPAIGN.md:70-70</code> at 65da376.
+That world is vacuous at rank 16 as registered, the registration stays
+unsealed, and no loss under any code was measured.</li><li>The three branches under the theory are descriptive choice,
 normative judgment, and multi-agent interaction, each with what is
 measured and what is posited stated,
-<code>geometric-evaluation-theory/paper/geometric-evaluation-theory.tex:499-522</code>.
+<code>geometric-evaluation-theory/paper/geometric-evaluation-theory.tex:503-526</code>.
 The correspondence of the ethics stack’s deontic gate to the admissible
 set and of the invariance principle to factoring through the quotient is
 posited.</li></ul></td></tr><tr><th>Prior art</th><td>The ideal-point models of Coombs and of spatial voting theory (weighted distance from an ideal) are its unbudgeted single-evaluator case. Luce&#x27;s semiorders supply the form of finite-resolution preference, with the threshold here fixed by the budget. Rational inattention and limited attention are the nearest theories with a budget, and theirs acts on information about states while this one acts on the resolution of consequences. Dawid and Lauritzen&#x27;s decision geometry is the identity-evaluator, unbudgeted case. Sen&#x27;s menu-dependence argument supplies the admissibility theorem. Observation Theory supplies the pullback, the regret, and the budget cliff, and an evaluator is an observer whose output is scored from an ideal point.</td></tr><tr><th>Evidence</th><td>none</td></tr><tr><th>Reviewed</th><td>semantic review 2026-09-07; generated 2026-09-07 from records at the commits on the provenance page.</td></tr></table>
@@ -135,7 +174,11 @@ convex metric of evaluation. Affinely independent consequences represent
 every order on at most m+1 actions, and consequences on a line represent
 exactly the single-peaked orders,
 <code>geometric-evaluation-theory/paper/geometric-evaluation-theory.tex:269-291</code>.
-A closed-form combinatorial characterization is open.</li>
+The hull law is machine checked as <code>hull_law</code> in
+<code>geometric-evaluation-theory/lean/GET/HullLaw.lean:1-43</code>
+against Mathlib, with the semidefinite characterization and the line
+case not checked. A closed-form combinatorial characterization is
+open.</li>
 <li>Uniqueness. From the order on an open connected set of consequences,
 the metric is identified up to a positive scale and the ideal up to the
 metric’s null directions,
@@ -166,19 +209,56 @@ Admissibility that depends on the menu produces choice violating the
 weak axiom of revealed preference, so an obligation of that kind is not
 a preference at any strength,
 <code>geometric-evaluation-theory/paper/geometric-evaluation-theory.tex:448-481</code>.</li>
-<li>Five predictions are stated in a form a measurement can fail, and
-none has been measured. The threshold tracks the budget, rank changes
-reverse preference, shared representations pay the regret bound, the
-hull law holds in a population with a known consequence map, and
-menu-dependent obligations produce the weak-axiom pattern,
-<code>geometric-evaluation-theory/paper/geometric-evaluation-theory.tex:482-498</code>.
-The campaign that would grade them is
-<code>geometric-evaluation-theory/CAMPAIGN.md:1-40</code>, with gates G0
-to G8, and only G0, the frozen foundations, is done.</li>
+<li>Five predictions are stated in a form a measurement can fail. The
+threshold tracks the budget, rank changes reverse preference, shared
+representations pay the regret bound, the hull law holds in a population
+with a known consequence map, and menu-dependent obligations produce the
+weak-axiom pattern,
+<code>geometric-evaluation-theory/paper/geometric-evaluation-theory.tex:482-502</code>.
+The campaign that grades them is
+<code>geometric-evaluation-theory/CAMPAIGN.md:1-40</code>, gates G0 to
+G8. Done at commit 65da376: G0, the frozen foundations; G1, the Lean
+core; and G2, the hull law, which passed.</li>
+<li>The hull law has been measured once, under a registration sealed
+before any rating was read, on the 1972 American National Election
+Study, where respondents placed Nixon, McGovern, Wallace, and the two
+parties on seven-point issue scales and rated them on feeling
+thermometers, <code>geometric-evaluation-theory/CAMPAIGN.md:42-53</code>
+at 65da376. On the registered pair of scales, liberal-conservative and
+guaranteed jobs, 489 respondents had a menu in which the law could bind,
+246 of them, 50.3 percent, violated it at least once, against 66.4
+percent with a standard deviation of 1.6 when each respondent’s ratings
+are shuffled among that respondent’s own objects, and no shuffle in 200
+reached the observed rate,
+<code>geometric-evaluation-theory/experiments/G2/results.json:1-87</code>.
+Five other pairs of the four scales gave the same ordering, observed
+rates of 54 to 63 percent against shuffled rates of 67 to 74 percent,
+the two tax-rate pairs at margins of 0.108 and 0.109 against the sealed
+bar of 0.10. The verdict is a pass by the sealed bars, and the number
+that matters more than the verdict is that half of the testable
+respondents violate the law at least once, so on this world the hull law
+holds as a population tendency, 10 to 16 points below the geometric base
+rate of violation, and fails as the deterministic statement of the
+representation theorem for about half the respondents. Placements are
+integers on seven-point scales, ratings are integers on a thermometer
+capped at 97, ties are counted as not strictly better, and no error
+model was registered, so no part of the half is attributed to
+rounding.</li>
+<li>The shared-representation regret prediction was probed but not
+tested. On Llama-3.2-3B, with the three query heads of each
+grouped-query group as the evaluators of one key cache, the whitened
+read operators recovered by the blind probe have effective rank 2.6 to
+8.3 in 128 dimensions and the three largely coincide, so the deficiency
+bound at rank 16 is 1.4 to 5.6 percent of the own-optimal losses and
+reaches the registered 5 percent anti-vacuity bar in 4 of 16 cells
+against a bar of 12,
+<code>geometric-evaluation-theory/CAMPAIGN.md:70-70</code> at 65da376.
+That world is vacuous at rank 16 as registered, the registration stays
+unsealed, and no loss under any code was measured.</li>
 <li>The three branches under the theory are descriptive choice,
 normative judgment, and multi-agent interaction, each with what is
 measured and what is posited stated,
-<code>geometric-evaluation-theory/paper/geometric-evaluation-theory.tex:499-522</code>.
+<code>geometric-evaluation-theory/paper/geometric-evaluation-theory.tex:503-526</code>.
 The correspondence of the ethics stack’s deontic gate to the admissible
 set and of the invariance principle to factoring through the quotient is
 posited.</li>
