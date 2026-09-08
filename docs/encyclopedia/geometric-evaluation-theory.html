@@ -178,7 +178,7 @@ measured and what is posited stated,
 <code>geometric-evaluation-theory/paper/geometric-evaluation-theory.tex:503-526</code>.
 The correspondence of the ethics stack’s deontic gate to the admissible
 set and of the invariance principle to factoring through the quotient is
-posited.</li></ul></td></tr><tr><th>Prior art</th><td>The ideal-point models of Coombs and of spatial voting theory (weighted distance from an ideal) are its unbudgeted single-evaluator case. Luce&#x27;s semiorders supply the form of finite-resolution preference, with the threshold here fixed by the budget. Rational inattention and limited attention are the nearest theories with a budget, and theirs acts on information about states while this one acts on the resolution of consequences. Dawid and Lauritzen&#x27;s decision geometry is the identity-evaluator, unbudgeted case. Sen&#x27;s menu-dependence argument supplies the admissibility theorem. Observation Theory supplies the pullback, the regret, and the budget cliff, and an evaluator is an observer whose output is scored from an ideal point.</td></tr><tr><th>Evidence</th><td>none</td></tr><tr><th>Reviewed</th><td>semantic review 2026-09-07; generated 2026-09-07 from records at the commits on the provenance page.</td></tr></table>
+posited.</li></ul></td></tr><tr><th>Prior art</th><td>The ideal-point models of Coombs and of spatial voting theory (weighted distance from an ideal) are its unbudgeted single-evaluator case. Luce&#x27;s semiorders supply the form of finite-resolution preference, with the threshold here fixed by the budget. Rational inattention and limited attention are the nearest theories with a budget, and theirs acts on information about states while this one acts on the resolution of consequences. Dawid and Lauritzen&#x27;s decision geometry is the identity-evaluator, unbudgeted case. Sen&#x27;s menu-dependence argument supplies the admissibility theorem. Observation Theory supplies the pullback, the regret, and the budget cliff, and an evaluator is an observer whose output is scored from an ideal point.</td></tr><tr><th>Evidence</th><td>none</td></tr><tr><th>Reviewed</th><td>semantic review 2026-09-07; generated 2026-09-08 from records at the commits on the provenance page.</td></tr></table>
 
 <h3>Equation</h3><p>none</p>
 <h3>Conditions</h3><ul>
@@ -351,10 +351,85 @@ in the repository ahb-sjsu/geometric-evaluation-theory, with the
 campaign, prior-art record, and claim ledger beside it.</p>
 <h3>Measurements</h3><p>none</p>
 <h3>Failures and corrections</h3><p>none</p>
+<h3>Invariance envelope</h3><p><strong>Proved invariant.</strong></p>
+<ul>
+<li>GET:change-of-basis, invertible change of basis of the consequence
+space, z’ = A z, with the metric transported as G’ = A^-T G A^-1. Claim:
+The evaluative distance (y - t)^T G (y - t) is unchanged. <a
+href="https://github.com/ahb-sjsu/geometric-evaluation-theory/blob/fa3ee1c/paper/geometric-evaluation-theory.tex#L108-L130"><code>geometric-evaluation-theory/paper/geometric-evaluation-theory.tex:108-130</code></a>.</li>
+</ul>
+<p><strong>Boundary measured.</strong></p>
+<ul>
+<li>GET:one-key-isotropic-perturbation, one key at a probed operating
+point perturbed by eps (I - Q) u with u standard normal in whitened
+coordinates, antithetic pair, common random numbers across codes. Claim:
+The measured loss equals eps^2 tr(Pt (I - Q)) within 25 percent per
+triple. <a
+href="https://github.com/ahb-sjsu/geometric-evaluation-theory/blob/fa3ee1c/CAMPAIGN.md#L89-L98"><code>geometric-evaluation-theory/CAMPAIGN.md:89-98</code></a>.
+Boundary: the ratio of measured to predicted loss is flat in eps up to
+0.1 whitened units (median over cells 1.02 to 1.05) and rises by 4
+percent at 0.2; the per-triple bar is missed at every eps (64 to 70
+percent within tolerance against 80) by a per-cell scatter of standard
+deviation 0.16 to 0.24. Witness: a seed check with fresh draws
+re-centred the five most extreme cells on one, so the scatter is the
+fluctuation of 64 common draws through operators of low local rank; the
+registration’s Monte Carlo error estimate used the averaged operator and
+was wrong, recorded as a registration error. Absorbed by: declaration.
+Revision: none proposed: inside the second-order regime the regret
+formula and bound follow from the recovered operators by the theorem, so
+the only empirical content there is the quadratic model itself, which
+holds at the median.</li>
+<li>GET:population-transfer, transfer of the hull law from a
+representable evaluator to a human population with a known consequence
+map (self-placed candidates), scored against a within-respondent shuffle
+null. Claim: No action is ranked strictly below every action whose
+consequences surround it (the hull law), deterministically. <a
+href="https://github.com/ahb-sjsu/geometric-evaluation-theory/blob/fa3ee1c/CAMPAIGN.md#L43-L54"><code>geometric-evaluation-theory/CAMPAIGN.md:43-54</code></a>.
+Boundary: the law holds as a population tendency, 50 percent of 489
+testable respondents violate it at least once against 66 percent under
+the shuffle null (permutation p below 0.005, five replication pairs
+agree), and fails as a deterministic statement for about half the
+respondents. Witness: the population itself; no error model for integer
+placements and integer ratings was registered, so no part of the half is
+attributed to rounding. Absorbed by: declaration. Revision: none yet: an
+error model would have to be registered before any of the half is
+attributed.</li>
+</ul>
+<p><strong>Failed, with witness.</strong></p>
+<ul>
+<li>GET:all-keys-rank-truncation, a shared rank-k orthogonal projector
+in whitened coordinates applied to every key of a cell at once. Claim:
+Each head’s loss under a shared code is the second-order prediction
+tr(Pt (I - Q)) from its recovered read operator, and the regret formula
+and bound follow. <a
+href="https://github.com/ahb-sjsu/geometric-evaluation-theory/blob/fa3ee1c/CAMPAIGN.md#L73-L81"><code>geometric-evaluation-theory/CAMPAIGN.md:73-81</code></a>.
+Witness: measured attention loss 20 to 330 times the prediction (mean KL
+about 4 nats per query) at ranks 2 to 8; reduced to two causes, the
+registered prediction was a one-key operator while the measurement coded
+all 1,024 keys at once, and the codes sat far outside the second-order
+regime; the ordering claim survived on measured losses in 32 of 32
+non-vacuous cell-ranks while the own-code claim failed in 10, 13 and 15
+of 16 cells; ledger row GET-9w,
+geometric-evaluation-theory/claims/LEDGER.md:22-22. Absorbed by:
+measurement. Revision: the second registration PREREG-G4B.md (blob
+d6d1c44fcd8454f749bd204e914b02059b8e658f), the object the formula
+predicts measured directly; ledger row GET-9r,
+geometric-evaluation-theory/claims/LEDGER.md:23-23.</li>
+</ul>
+<p><strong>Predicted, sealed and unrun.</strong></p>
+<ul>
+<li>GET:battery-below-design-bound, restriction of the battery of
+consequences to fewer than m + 1 points, or to a proper affine subspace,
+in the identification gate. Claim: The metric’s action off the affine
+span of the battery and the ideal’s component in the metric’s kernel are
+not revealed by choices, while the in-span part and the range component
+are. <a
+href="https://github.com/ahb-sjsu/geometric-evaluation-theory/blob/fa3ee1c/CAMPAIGN.md#L107-L107"><code>geometric-evaluation-theory/CAMPAIGN.md:107-107</code></a>.</li>
+</ul>
 <h3>Machine checked</h3><p>none</p>
 <h3>Used in</h3><p>none</p>
 <h3>Related</h3><p><a href="geometric-decision-cost.html">geometric decision cost</a>; <a href="observer.html">observer</a>; <a href="consumer.html">consumer</a>; <a href="output-metric.html">output metric</a>; <a href="budget.html">budget</a>; <a href="read-operator.html">read operator</a>; <a href="quotient.html">quotient</a>; <a href="nuisance.html">nuisance</a>; <a href="budget-cliff.html">budget cliff</a>; <a href="mahalanobis-distance.html">Mahalanobis distance</a>.</p>
 <h3>See also</h3><p>none</p>
-<h3>Status</h3><p>Generated 2026-09-07 by <code>encyclopedia/generate.py</code>; book
+<h3>Status</h3><p>Generated 2026-09-08 by <code>encyclopedia/generate.py</code>; book
 at observation-data-mining 95af30c; the commit of every record is listed
 in the encyclopedia’s provenance.</p><div class="prevnext"><span>← <a href="geometric-decision-cost.html">geometric decision cost</a></span><span><a href="graph.html">graph</a> →</span></div></main></body></html>
