@@ -96,3 +96,129 @@ Suggested note to the editor:
 
 - geometric-economics has a TCSS Part II draft (`experiments/papers/tcss-part2/`), the prereg-coupling-v1 test scored FALSIFIED on the GPS proxy (an individual-level angle correlation, a different object from Part I's aggregate transfer), and prereg-dimensions-v1 frozen but not run. None re-runs or contradicts a Part I number. Part II's finding that T_alpha fit on individual CPC18 choices is about 0.42 rather than 2.13 is unpublished and is not cited.
 - The leave-one-out active-set stability re-run promised as future work has not been done anywhere.
+
+## Round 4 (2026-09-09, pre-upload proofread and review)
+
+A full proofread of `final_manuscript.tex` plus a pre-publication review
+against `revised_manuscript_v2.tex`. Fixes applied to the source; the PDF
+rebuilds to 17 pages, zero undefined references, zero overfull boxes.
+
+29. Fig. 4 (scatter) regenerated. The accepted figure's legend read "Game
+    (IS) / PT (OOS) / Published (OOS)", contradicting Section V.D. Labels are
+    now "Game (calibration) / Lottery / Historical replication". Data points
+    unchanged (`generate_figures.py`, `fig_scatter`).
+30. Fig. 6 (agent-based) text and caption corrected to what the figure shows.
+    The geometric agents' density is nearly uniform from 0 to 0.5 because the
+    calibrated cost differences are small relative to the softmax temperature
+    (T = 0.5 in `make_abm_figure.py`); the visible mode near 0.35 is the
+    Fehr-Schmidt population. The claim "modal offer near the equal split" was
+    removed from Section VII.G and the caption. Figure unchanged.
+31. Holdout residue removed: Section VI.G retitled "Calibration Stability";
+    its opening sentence no longer says the active set was "discovered" on
+    the nine game targets (it was ranked on all sixteen, per Section V.D);
+    Limitation 2 "historical holdout" is now "historical replication target";
+    the leave-one-out sentence now compares against the other eight game
+    targets, not "the remaining fifteen".
+32. Fig. 4 caption text "no systematic bias" replaced, since Section VI.B
+    names P16 and P17 as the model's clearest systematic failure.
+33. Notation (Reviewer 1): public-goods round index renamed from r to j (r is
+    the reference vector); responder reference renamed from bold rho to bold
+    r; stake in Section VII.A renamed from lambda to capital Lambda (lambda is
+    CPT loss aversion); "m = 2" multiplier written as "two" (m is the
+    min(2x,1) function); |d_1| and "reference d_1" in Table IV written as
+    |s_1| and r_1; perturbation factor named xi at its use; CPT value
+    function written over outcomes o_i (x_i is a player payoff); Table IX
+    footnote states that alpha, beta follow each source's notation; P1..P17
+    labels cross-referenced at first use in Section III.D.
+34. Table IV footnote no longer refers to bold-faced coordinates that do not
+    exist. Table IX footnote no longer says "in parentheses". "Three stated
+    tolerance levels" (there are two widths) is now "three target classes
+    with stated tolerances". "Weighted eighty times more heavily" now says
+    the basis (sigma_6/sigma_9 in standard-deviation units).
+35. Bibliography reordered to order of first citation (IEEE numbering). The
+    entry set is unchanged (40 entries); eris-econ is now [28]. Haidt title
+    capitalization fixed. Rs 17,000 and Rs 2,000 use the same thin-comma form
+    as the stakes line.
+36. Baseline table (Table IX) column separation reduced to 4.5pt to clear a
+    4.6pt overfull box.
+
+### Open items resolved 2026-09-09 (owner delegated the calls)
+
+- MAE unit. Kept "%" for every MAE in the body and tables (Table VII's
+  footnote already says errors are in percentage points); the one stray
+  "1.96 pp" in Section VI.G now matches. Abstract and introduction keep
+  the words "percentage points" in prose.
+- Ranking weights. Read from `eris_econ.targets.build_targets`: the
+  ranking score is the weighted MAE with the Eq. (8) weights on the nine
+  calibration targets and weight 0.5 on each lottery target and on the
+  historical target. Section V.A.4 now says so.
+- Game-target MAE. Re-run `evaluate_targets` with the selected model:
+  game MAE 1.9500, non-game 3.6689, ratio 1.8815, four ranking-only
+  lotteries 5.004, overall unweighted 2.702. Text corrected from 1.96 to
+  1.95 and the ratio from 1.87 to 1.88 (both places in Section VI.G).
+- 2.87% coincidence. Both values are identical in the accepted text
+  (`revised_manuscript_v2.tex` lines 691 and 708); left as reported.
+- CPT formula. Section VI.E.1 now states that the separable form written
+  there coincides with cumulative weighting for two-outcome prospects and
+  differs only for the three-outcome P1. No number changed.
+- OWNER comments removed. Received date March 26 matches the cover
+  letter; revised date June 10 matches `response_to_reviewers.tex`.
+  No author photo exists in any repo, so the biography stays
+  `IEEEbiographynophoto`, which IEEE accepts.
+- DOIs added for Ruggeri 2020, Engel 2011, Guth 1982, Tversky and
+  Kahneman 1992, Fehr and Schmidt 1999, Bolton and Ockenfels 2000,
+  Henrich 2010, Slonim and Roth 1998, and Cameron 1999. Each was
+  resolved through the CrossRef API on 2026-09-09 and its title, first
+  author, journal, volume, issue, pages, and year matched the entry.
+- Zenodo title for the Fraser and Nettle data record (10.5281/zenodo.3764693)
+  could not be checked: the Zenodo API and record page timed out (HTTP 504)
+  on every attempt. Left as is.
+
+Build after these edits: 17 pages, 0 undefined references, 0 overfull
+boxes, citation numbers ascend in order of first appearance.
+
+### Left for the owner (superseded; kept for the record)
+
+- MAE unit. The abstract and Section VI.G say "percentage points"; the body
+  and every table say "%". One global decision; the house rule says pp.
+- Ranking weights. Section V.A.4 says candidates are ranked by "the weighted
+  MAE over all sixteen targets", but Eq. (8) defines weights only for the
+  nine calibration targets. State the weights used for the other seven.
+- Game-target MAE. From Table VII the nine game errors average 1.95, and the
+  text says 1.96 (Section VI.G, twice). Confirm from eris-econ output.
+- The 2.87% MAE appears for both the eps = 0.10 variance perturbation and the
+  +/-10% encoding perturbation. Coincidence or copy; confirm.
+- CPT formula (Section VI.E.1) is written as a separable sum, which is
+  original PT, not cumulative weighting. Confirm what was computed for the
+  three-outcome P1.
+- The two `% OWNER:` comments (received date; photo) still stand. Strip
+  before upload, after acting on them. Revised date (June 10) also has no
+  recorded provenance.
+- Easy DOIs missing: Ruggeri 2020 (10.1038/s41562-020-0886-x), Engel 2011,
+  Guth 1982, Tversky 1992, Fehr 1999, Bolton 2000, Henrich 2010, Slonim
+  1998, Cameron 1999. Zenodo title for Fraser-Nettle differs from the journal
+  title; confirm which is the record's.
+- `figures/scatter.pdf` is not tracked by git (only the PNG is); the paper
+  includes the PDF, so keep the regenerated file with the upload package.
+
+## Note to the editor (replaces the Round 1 draft above)
+
+> In preparing the final files I rechecked every variable and constant
+> against the released reference implementation, as Reviewer 1 suggested.
+> This surfaced two factual errors in the accepted text (the Andersen et al.
+> experiment was run in northeast India, not Indonesia, and its top stake
+> exceeds a year's income rather than 1.6 months) and several places where
+> the method description did not match the code (the encoding tables, the
+> variance search, the calibration weights, and which targets set the
+> temperature constants). Three statements are corrected as a result. First,
+> because the reference implementation ranks candidate active sets on all
+> sixteen targets, the lottery results are now described as cross-domain
+> parameter reuse within a jointly selected architecture rather than
+> out-of-sample prediction. Second, the CPT baseline in Table IX and Appendix
+> A is corrected from 4/6 at 5.8% to 6/6 at 5.7%; the per-target errors were
+> already in the accepted text and the pass count was miscomputed, and a
+> second "optimized" CPT run has been withdrawn. Third, the Andersen
+> high-stakes result is now stated as a failed invariance prediction of the
+> calibrated model rather than as confirmation of a predicted boundary. The
+> geometric model's own reported numbers are unchanged. Two figure legends
+> and captions were brought into line with the corrected text.

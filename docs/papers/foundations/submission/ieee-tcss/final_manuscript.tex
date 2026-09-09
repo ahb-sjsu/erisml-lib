@@ -22,7 +22,6 @@
 \author{Andrew~H.~Bond,~\IEEEmembership{Senior Member,~IEEE}%
 \thanks{A.~H.~Bond is with the Department of Computer Engineering, San Jos\'{e} State University, San Jos\'{e}, CA 95192 USA (e-mail: andrew.bond@sjsu.edu; ORCID: 0009-0003-2599-6158).}%
 \thanks{Manuscript received March 26, 2026; revised June 10, 2026; accepted September 6, 2026.}}
-% OWNER: confirm the received date against ScholarOne before upload.
 
 \markboth{IEEE Transactions on Computational Social Systems}%
 {Bond: Geometric Prediction of Economic Behavior}
@@ -240,7 +239,7 @@ The temperature depends on the cost gap $\Delta c = |c_A - c_B|$ through
 \end{equation}
 with $T_{\text{base}} = 0.24$, $T_\alpha = 2.13$, and $T_{\text{floor}} = 0.5$.
 Because the game predictions are deterministic cost minima, the temperature enters only the six lottery predictions.
-The two constants $T_{\text{base}}$ and $T_\alpha$ were set by requiring the model to reproduce the observed frequencies of two of those lotteries, the Allais problem P1 and the strong-certainty problem P3, given the fitted variances.
+The two constants $T_{\text{base}}$ and $T_\alpha$ were set by requiring the model to reproduce the observed frequencies of two of those lotteries, the Allais problem P1 and the strong-certainty problem P3 (the lottery labels are defined in Section~\ref{sec:encoding}), given the fitted variances.
 Section~\ref{sec:heldout} records what each target was used for.
 We treat the temperature architecture as part of the model's flexibility rather than as cost-free.
 Table~\ref{tab:param_accounting} counts $T_{\text{base}}$ and $T_\alpha$ as calibration quantities and $T_{\text{floor}}$ as a fixed hyperparameter.
@@ -341,25 +340,25 @@ Public-goods round drift & Encodes repeated-round decline in the reference point
 \footnotesize
 \begin{tabular}{@{}c l l l l l l@{}}
 \toprule
-& \multicolumn{2}{c}{\textbf{Ultimatum proposer (offer $x$)}} & \multicolumn{2}{c}{\textbf{Responder (offer $x$)}} & \multicolumn{2}{c}{\textbf{Public goods (round $r$, share $f$)}} \\
+& \multicolumn{2}{c}{\textbf{Ultimatum proposer (offer $x$)}} & \multicolumn{2}{c}{\textbf{Responder (offer $x$)}} & \multicolumn{2}{c}{\textbf{Public goods (round $j$, share $f$)}} \\
 \cmidrule(lr){2-3}\cmidrule(lr){4-5}\cmidrule(lr){6-7}
-\textbf{Dim.} & Ref.\ $\mathbf{r}$ & Alt.\ $\mathbf{s}(x)$ & Ref.\ $\boldsymbol{\rho}$ & Accept $\mathbf{s}(x)$ / Reject & Ref.\ $\mathbf{r}(r)$ & Alt.\ $\mathbf{s}(f)$ \\
+\textbf{Dim.} & Ref.\ $\mathbf{r}$ & Alt.\ $\mathbf{s}(x)$ & Ref.\ $\mathbf{r}$ & Accept $\mathbf{s}(x)$ / Reject & Ref.\ $\mathbf{r}(j)$ & Alt.\ $\mathbf{s}(f)$ \\
 \midrule
 $d_1$ & $1$ & $q(x)(1-x)$ & $0.5$ & $x$ / $0$ & $1$ & $(1.75-0.5f)/1.75$ \\
 $d_2$ & $1$ & $1$ & $1$ & $1$ / $1$ & $1$ & $1$ \\
 $d_3$ & $0.5$ & $0.1+0.8\,m(x)$ & $0.8$ & $0.1+0.8\,m(x)$ / $0.8$ & $0.5$ & $0.1+0.8f$ \\
 $d_4$ & $1$ & $1$ & $1$ & $1$ / $1$ & $1$ & $1$ \\
 $d_5$ & $0.5$ & $0.5$ & $0.5$ & $0.5$ / $0.5$ & $0.5$ & $0.5$ \\
-$d_6$ & $0$ & $-0.2+0.6\,m(x)-0.3P_{\text{rej}}(x)$ & $0$ & $0$ / $0$ & $-0.02(r-1)$ & $-0.4+0.8f$ \\
+$d_6$ & $0$ & $-0.2+0.6\,m(x)-0.3P_{\text{rej}}(x)$ & $0$ & $0$ / $0$ & $-0.02(j-1)$ & $-0.4+0.8f$ \\
 $d_7$ & $0.5$ & $0.3+0.5\,m(x)-0.2P_{\text{rej}}(x)$ & $0.6$ & $0.3+0.3\,m(x)$ / $0.7$ & $0.5$ & $0.2+0.6f$ \\
 $d_8$ & $0.5$ & $0.5$ & $0.5$ & $0.5$ / $0.5$ & $0.5$ & $0.5$ \\
-$d_9$ & $0.8$ (G\"uth $0.78$) & $0.5+0.3\,q(x)$ & $0.5$ & $0.5$ / $0.5$ & $0.5-0.03(r-1)$ & $0.5$ \\
+$d_9$ & $0.8$ (G\"uth $0.78$) & $0.5+0.3\,q(x)$ & $0.5$ & $0.5$ / $0.5$ & $0.5-0.03(j-1)$ & $0.5$ \\
 \midrule
 & \multicolumn{2}{c}{\textbf{Dictator (offer $x$)}} & \multicolumn{4}{c}{\textbf{Lottery $L$ (gain domain / loss domain)}} \\
 \cmidrule(lr){2-3}\cmidrule(lr){4-7}
 \textbf{Dim.} & Ref.\ $\mathbf{r}$ & Alt.\ $\mathbf{s}(x)$ & Ref.\ $\mathbf{r}$ & \multicolumn{3}{l}{Alt.\ $\mathbf{s}(L)$} \\
 \midrule
-$d_1$ & $1$ & $1-x$ & $0$ & \multicolumn{3}{l}{$\mathrm{EV}(L)/1000$, both alternatives then divided by the larger $|d_1|$} \\
+$d_1$ & $1$ & $1-x$ & $0$ & \multicolumn{3}{l}{$\mathrm{EV}(L)/1000$, both alternatives then divided by the larger $|s_1|$} \\
 $d_2$ & $1$ & $1$ & $1$ & \multicolumn{3}{l}{$1$ / $\max(0,\,1-0.3\,|\min L|/1000)$} \\
 $d_3$ & $0.60$ & $0.1+0.8\,m(x)$ & $0.5$ & \multicolumn{3}{l}{$0.5$} \\
 $d_4$ & $1$ & $1$ & $1$ & \multicolumn{3}{l}{$1$} \\
@@ -371,7 +370,7 @@ $d_9$ & $0.5$ & $0.8$ & $1$ & \multicolumn{3}{l}{$0.3+0.7\,\mathrm{cert}(L)$ / $
 \bottomrule
 \end{tabular}
 \begin{flushleft}
-\footnotesize{Monetary coordinates are normalized to the stake (games) or to the larger expected value of the pair (lotteries). Public-goods normalization uses endowment 20, four players, multiplier 2, and the other three players contributing half their endowment, which gives the closed form shown. A lottery is in the loss domain when its expected value is negative or any outcome is negative. The lottery reference $d_1$ is $0$ for the six targets used here because none carries an initial endowment. The bold-faced coordinates in the text are the only ones that move under the selected metric, namely $d_6$, $d_7$, and $d_9$.}
+\footnotesize{Monetary coordinates are normalized to the stake (games) or to the larger expected value of the pair (lotteries). Public-goods normalization uses endowment 20, four players, multiplier 2, and the other three players contributing half their endowment, which gives the closed form shown. A lottery is in the loss domain when its expected value is negative or any outcome is negative. The lottery reference coordinate $r_1$ is $0$ for the six targets used here because none carries an initial endowment. Only the $d_6$, $d_7$, and $d_9$ coordinates enter the cost under the selected metric.}
 \end{flushleft}
 \end{table*}
 
@@ -412,13 +411,13 @@ The observed mean giving of 28.35\%~\cite{engel2011} is compared with the cost m
 \subsection{Public Goods Game}
 
 In the public goods game each of $n=4$ players contributes a share $f$ of an endowment of 20 to a common pool.
-The pool is multiplied by $m=2$ and divided equally.
+The pool is multiplied by two and divided equally.
 The other three players are assumed to contribute half their endowment.
 The alternative coordinates are linear in $f$ (Table~\ref{tab:encodings}), and the menu is the integer percentage grid $f\in\{0,0.01,\dots,1\}$.
 
 Repeated rounds are encoded as a drift of the reference point.
-In round $r$ the reference social-impact coordinate is $-0.02(r-1)$ and the reference epistemic coordinate is $0.5-0.03(r-1)$.
-Under the selected metric the displacements are $\Delta a_6 = 0.8f-0.4+0.02(r-1)$, $\Delta a_7 = 0.6f-0.3$, and $\Delta a_9 = 0.03(r-1)$.
+In round $j$ the reference social-impact coordinate is $-0.02(j-1)$ and the reference epistemic coordinate is $0.5-0.03(j-1)$.
+Under the selected metric the displacements are $\Delta a_6 = 0.8f-0.4+0.02(j-1)$, $\Delta a_7 = 0.6f-0.3$, and $\Delta a_9 = 0.03(j-1)$.
 The epistemic displacement does not depend on $f$ and therefore does not move the minimizer.
 The social-impact drift does, and it moves the predicted contribution from 50\% in round~1 to 40\% in round~10.
 The empirical targets are the contribution rates at rounds 1, 3, 5, 8, and 10 from Fraser and Nettle~\cite{fraser2020}, which are 45.7\%, 50.0\%, 48.7\%, 44.6\%, and 39.0\%.
@@ -518,7 +517,7 @@ The reported variances $(78.26, 32.28, 0.01262)$ are such a draw.
 They are the best of 5,000 rather than the exact minimizer of a continuous problem, and the perturbation analyses of Section~\ref{sec:sensitivity} show that the objective is flat around them.
 
 \subsubsection{Ranking and selection}
-Because many candidates tie on the calibration objective, the reference implementation scores every candidate, at its calibrated variances, by the weighted MAE over all sixteen targets and ranks candidates by that score.
+Because many candidates tie on the calibration objective, the reference implementation scores every candidate, at its calibrated variances, by the weighted MAE over all sixteen targets, with the calibration weights of Eq.~\eqref{eq:fuzz-objective} and weight $0.5$ on each lottery target and on the historical target, and ranks candidates by that score.
 The Pareto frontier of best score against active-set size is tabulated, and the reported model is the smallest $k$ whose frontier value is within $0.5$ percentage points of the value at $k+1$.
 The frontier satisfies that rule at $k=3$, with unweighted MAE of roughly 15\% at $k=1$, roughly 5\% at $k=2$, 2.70\% at $k=3$, and 2.6\% at $k=4$.
 The ranking step uses the lottery and historical targets to choose among active sets, so those targets participated in model selection.
@@ -580,7 +579,7 @@ Random half-log-unit perturbations of every variance therefore move the three-ga
 
 \subsection{Tolerance Specifications}
 
-We use three stated tolerance levels as engineering diagnostics.
+We use three target classes with stated tolerances as engineering diagnostics.
 Game targets, which are used for calibration, must be matched within $\pm5$ percentage points (pp).
 Lottery targets, which were not used in the variance fit, must be matched within $\pm10$~pp.
 The historical-replication target must be matched within $\pm10$~pp.
@@ -726,7 +725,7 @@ The pass count is a descriptive benchmark, not a significance test.
 The nine game-theory targets were used for calibration, and the model matches them with a tight MAE.
 The ultimatum mean offer (48.3\%) and modal offer (50.0\%) are well reproduced.
 The predicted offer is a compromise between two opposing terms.
-The social and identity displacements grow with the offer beyond about 20\%, while the epistemic penalty of rejection risk, weighted eighty times more heavily, shrinks with the offer.
+The social and identity displacements grow with the offer beyond about 20\%, while the epistemic penalty of rejection risk, whose standard-deviation weight $\sigma_6/\sigma_9$ is about eighty, shrinks with the offer.
 The cost minimum falls at 48\%.
 The dictator mean giving (28.35\%) is lower than the ultimatum offer, and the model places it at 32\% through the reduced identity and social coordinates of the dictator encoding.
 The responder MAO of 34.0\% is reproduced exactly by the identity crossover described in Section~\ref{sec:encoding}.
@@ -828,7 +827,7 @@ The model is primarily sensitive to the relative magnitudes of $\sigma_6^2$, $\s
 A distinct concern is encoding perturbation.
 What if the coefficients that map scenarios to coordinates are changed?
 Perturbing an encoding coefficient~$e_k$ by a multiplicative factor~$\xi$ is equivalent to perturbing the corresponding variance~$\sigma_k^2$ by~$1/\xi^2$, because $e_k^2/\sigma_k^2 = (e_k \xi)^2 / (\sigma_k^2 \xi^2)$.
-We therefore simulate encoding perturbation by drawing per-dimension scaling factors uniformly from $[1-\epsilon, 1+\epsilon]$ and adjusting~$\sigma_k^2$ accordingly.
+We therefore simulate encoding perturbation by drawing per-dimension factors $\xi$ uniformly from $[1-\epsilon, 1+\epsilon]$ and adjusting~$\sigma_k^2$ accordingly.
 Over 200 random trials the outcomes are as follows.
 \begin{itemize}
     \item $\pm10\%$ encoding perturbation. MAE\,=\,2.87\%, 16/16 pass in every trial.
@@ -859,6 +858,7 @@ Table~\ref{tab:comparison} compares the geometric model against three baselines,
 \caption{Baseline Comparison}
 \label{tab:comparison}
 \centering
+\setlength{\tabcolsep}{4.5pt}
 \begin{tabular}{l c c c c c}
 \toprule
 \textbf{Model} & \textbf{Parameters} & \textbf{Game targets} & \textbf{Lottery targets} & \textbf{MAE within domain} & \textbf{Cross-domain} \\
@@ -873,9 +873,9 @@ EV maximizer & 0 & 0/9 pass & 2/6 pass & 47.8\% & Trivially \\
 \footnotesize{Target accounting is nine game targets, six lottery targets, and one historical replication, sixteen in total.
 CPT is evaluated on the six lottery problems, and the CPT baseline used here does not specify strategic behavior.
 CPT has five free parameters and the reference point is fixed at the status quo for these tasks, following Tversky and Kahneman~\cite{tversky1992}.
-The geometric parameter entry counts the three fitted variances and, in parentheses, the thirteen named quantities of Table~\ref{tab:param_accounting}, before the coordinate constants of Table~\ref{tab:encodings}.
+The geometric parameter entry counts the three fitted variances and the thirteen named quantities of Table~\ref{tab:param_accounting}, before the coordinate constants of Table~\ref{tab:encodings}.
 Fehr--Schmidt is evaluated on the nine game targets and provides no mechanism for lottery predictions.
-The EV maximizer is evaluated on the fifteen game and lottery targets.
+The EV maximizer is evaluated on the fifteen game and lottery targets. The symbols $\alpha$ and $\beta$ follow each source's notation and denote different parameters in the CPT and Fehr--Schmidt rows.
 MAE for CPT and Fehr--Schmidt is computed within their respective domains.}
 \end{flushleft}
 \end{table*}
@@ -891,7 +891,7 @@ The comparison therefore demonstrates that one metric applies across both domain
 We document how each baseline's parameters were obtained and evaluated.
 \begin{itemize}
     \item \textbf{CPT}. Parameters $\alpha=0.88$, $\beta=0.88$, $\lambda=2.25$, $\gamma=0.61$, $\delta=0.69$ are the canonical estimates from Tversky and Kahneman~\cite{tversky1992}.
-    We apply them to the same six lottery problems, computing $V(L) = \sum_i w(p_i) v(x_i)$ with the standard CPT value function and probability-weighting function.
+    We apply them to the same six lottery problems, computing $V(L) = \sum_i w(p_i)\, v(o_i)$ over outcomes $o_i$ with the standard CPT value function and probability-weighting function. This separable form coincides with cumulative weighting for the two-outcome prospects and differs from it only for the three-outcome Allais problem P1.
     \item \textbf{Fehr--Schmidt}. The canonical parameters are $\alpha=0.85$ and $\beta=0.315$, the population medians from Fehr and Schmidt~\cite{fehr1999}.
     We compute Eq.~\eqref{eq:fehr_schmidt} for each game scenario and derive predicted offers or contributions from utility maximization.
     \item \textbf{EV maximizer}. No parameters.
@@ -907,22 +907,22 @@ Fehr--Schmidt achieves 2/9 pass on the nine game targets because its two-paramet
 The expected-value maximizer passes only 2 of 15 targets with MAE\,=\,47.8\%.
 The observed behavioral frequencies are far from what monetary optimization predicts.
 
-\subsection{Holdout Stability}
+\subsection{Calibration Stability}
 
-The active set $\{d_6, d_7, d_9\}$ was discovered using the same nine game targets against which calibration accuracy is reported.
+The active variances were fitted on the same nine game targets against which calibration accuracy is reported, and the active set was ranked on all sixteen targets.
 We address this with two analyses.
 
 \subsubsection{Leave-one-out diagnostic}
-For each of the nine game targets we examine how the model's prediction for that target relates to its predictions for the remaining fifteen.
-The worst single-target error is $4.3$~pp (public-goods round~1, tolerance $\pm5$~pp) and the mean absolute error across the nine game targets is $1.96$~pp, so no single target dominates the calibration MAE.
+For each of the nine game targets we compare that target's error with the errors on the other eight game targets.
+The worst single-target error is $4.3$~pp (public-goods round~1, tolerance $\pm5$~pp) and the mean absolute error across the nine game targets is $1.95$\%, so no single target dominates the calibration MAE.
 A stronger leave-one-out test would refit $\Sigma$ on the remaining eight game targets and ask whether the same active set is selected.
 We treat that stability analysis as the natural follow-up validation rather than a claim of the present paper.
 
 \subsubsection{Calibration and lottery MAE}
-The nine game targets have MAE\,=\,1.96\%, and the seven lottery and historical targets have MAE\,=\,3.67\%.
+The nine game targets have MAE\,=\,1.95\%, and the seven lottery and historical targets have MAE\,=\,3.67\%.
 The lottery MAE is higher, as expected, and all seven targets pass within their wider $\pm10$~pp tolerance.
-The ratio of the two MAEs is $1.87$.
-The four lottery targets that entered only the ranking step, P7, P11, P16, and P17, have MAE\,=\,5.0\%.
+The ratio of the two MAEs is $1.88$.
+The four lottery targets that entered only the ranking step, P7, P11, P16, and P17, have MAE\,=\,5.0\%, with the caveat that P11 shares the encoding of P3, which set the temperature constants.
 The variances were fitted to minimize error on game targets, and the lottery targets entered the selection of the active set but not the fitting of the variances.
 That the metric fitted on games also organizes the lottery phenomena within that jointly selected architecture is the paper's central empirical result, and Section~\ref{sec:heldout} states its evidential limits.
 
@@ -958,7 +958,7 @@ Removing any inactive dimension has zero effect.
 \subsection{Predicted Against Observed}
 
 Fig.~\ref{fig:scatter} plots predicted against observed values for all sixteen targets.
-Points cluster around the line of perfect prediction with no systematic bias.
+Points cluster around the line of perfect prediction, with the two small-probability lotteries P16 and P17 the visible exceptions.
 Game targets (circles) and lottery targets (triangles) are intermixed, so the model does not systematically over-predict or under-predict in either domain.
 
 \begin{figure}[!t]
@@ -998,7 +998,7 @@ The structural search therefore prefers $d_1$ inactive within the calibration se
 \subsubsection{Direct empirical test on high-stakes data}
 We test the corollary on the high-stakes ultimatum experiment of Andersen, Erta\c{c}, Gneezy, Hoffman, and List~\cite{andersen2011}, which is to our knowledge the cleanest available test.
 The experiment was run in eight villages in the state of Meghalaya in northeast India with $N=458$ responders and an equal number of proposers, at four stake levels of Rs~20, Rs~200, Rs~2{,}000, and Rs~20{,}000.
-The authors report an average yearly income of about Rs~17,000 in the villages surveyed, so the highest stake is a little over a year's income and the Rs~2,000 stake is about a month and a half of income.
+The authors report an average yearly income of about Rs~17{,}000 in the villages surveyed, so the highest stake is a little over a year's income and the Rs~2{,}000 stake is about a month and a half of income.
 None of this range was used in the calibration.
 We restrict to the Andersen subsample of the openICPSR replication archive~\cite{andersendata2011} and pre-specify three tests.
 
@@ -1036,9 +1036,9 @@ It does not extend unchanged to consequential-stake settings, and the universal 
 
 A model that fits both stake ranges would need a monetary coordinate in absolute or income units, so that the stake changes the displacement, together with a finite $\sigma_1^2$.
 One concrete form replaces the share-normalized coordinate of Table~\ref{tab:encodings} by an income-scaled one.
-With stake $\lambda$ and a local income scale $Y$, the proposer's monetary coordinate becomes $s_1(x)=(\lambda/Y)\,q(x)(1-x)$ with reference $r_1=\lambda/Y$, so that the monetary displacement $\Delta a_1=(\lambda/Y)\bigl(q(x)(1-x)-1\bigr)$ grows with the stake while every other coordinate is unchanged.
-With finite $\sigma_1^2$ the monetary term $(\lambda/Y)^2\bigl(1-q(x)(1-x)\bigr)^2/\sigma_1^2$ then penalizes generous offers more at higher stakes and moves the cost minimizer toward lower offers, which is the direction of the Andersen data, where mean offers fall from 24 percent to 12 percent across the stake range.
-That form also replaces the invariance corollary by a testable one, namely that predictions depend on the stake only through the ratio $\lambda/Y$, so two populations facing the same fraction of yearly income should show the same offers.
+With stake $\Lambda$ and a local income scale $Y$, the proposer's monetary coordinate becomes $s_1(x)=(\Lambda/Y)\,q(x)(1-x)$ with reference $r_1=\Lambda/Y$, so that the monetary displacement $\Delta a_1=(\Lambda/Y)\bigl(q(x)(1-x)-1\bigr)$ grows with the stake while every other coordinate is unchanged.
+With finite $\sigma_1^2$ the monetary term $(\Lambda/Y)^2\bigl(1-q(x)(1-x)\bigr)^2/\sigma_1^2$ then penalizes generous offers more at higher stakes and moves the cost minimizer toward lower offers, which is the direction of the Andersen data, where mean offers fall from 24 percent to 12 percent across the stake range.
+That form also replaces the invariance corollary by a testable one, namely that predictions depend on the stake only through the ratio $\Lambda/Y$, so two populations facing the same fraction of yearly income should show the same offers.
 That model has not been fitted or tested here, and the Andersen result motivates it without testing it.
 Locating the stake level at which invariance fails, and how that level depends on local income and anonymity, is a natural target for follow-up work using individual-level data from Andersen et al., Slonim and Roth~\cite{slonim1998}, Cameron~\cite{cameron1999}, and competitive double-auction settings~\cite{smith1962}.
 
@@ -1113,7 +1113,7 @@ Whether this reduction corresponds to anything that could be called rationality 
 The dimension names fairness, virtue and identity, legitimacy, and epistemic status are ordinarily normative.
 They are used here as descriptive coordinate labels chosen for interpretability, not as normative endorsements.
 What the calibration constrains is the geometry of $\Sigma$.
-A variance is small when small displacement on that coordinate produces large changes in observed choice frequencies, regardless of whether the coordinate would be considered morally weighty or psychologically primitive.
+A variance is small when small displacement on that coordinate produces large changes in observed choice frequencies, regardless of whether the coordinate would be considered normatively weighty or psychologically primitive.
 The labels let a reader connect the metric structure to existing literatures, Fehr--Schmidt on fairness, Haidt on identity, Ellsberg on ambiguity.
 They are not a claim that the model has measured those constructs.
 A model with identical metric behavior but neutral coordinate labels $(z_1,\dots,z_9)$ would make the same predictions.
@@ -1140,12 +1140,12 @@ This is not an additional empirical validation.
 It shows how the fitted covariance can be used as an agent behavioral primitive.
 Each geometric agent draws a small perturbation around the active variances and chooses an ultimatum offer by the softmax rule over candidate offers.
 A scalar expected-value agent places offers near zero, while a simple Fehr--Schmidt-like heterogeneous population produces a broader inequality-aversion distribution.
-The geometric primitive produces a modal offer near the equal-split region, which illustrates how a named metric can generate macro-level offer distributions in a simulation.
+Under the calibrated variances the cost differences between offers are small relative to the softmax temperature, so the geometric agents spread their offers almost uniformly between zero and the equal split. The figure illustrates that a named metric can be used as a behavioral primitive in a simulation, not that this minimal setup reproduces an observed offer distribution.
 
 \begin{figure}[!t]
 \centering
 \includegraphics[width=\columnwidth]{figures/abm_worked_example.pdf}
-\caption{Minimal agent-based illustration using the geometric metric as a behavioral primitive. The geometric agents produce a modal offer near the equal split, the expected-value agents offer near zero, and the inequality-averse population spreads between them. The figure is illustrative and is not a new validation experiment.}
+\caption{Minimal agent-based illustration using the geometric metric as a behavioral primitive. The geometric agents spread offers almost uniformly from zero to the equal split, the expected-value agents offer near zero, and the inequality-averse population peaks near a 35 percent offer. The figure is illustrative and is not a new validation experiment.}
 \label{fig:abm}
 \end{figure}
 
@@ -1154,7 +1154,7 @@ The geometric primitive produces a modal offer near the equal-split region, whic
 Nine limitations qualify the present results.
 \begin{enumerate}
     \item \textbf{Encoding dependence}. The benchmark validates the metric conditional on researcher-coded encodings. The certainty operator, the domain-dependent coding, the epistemic reference values, and the coordinate constants of Table~\ref{tab:encodings} are fixed assumptions tested by ablation, not independently established psychological laws. External raters, preregistered coding rules, or automated scenario-to-attribute encoders are needed to separate encoding validation from metric validation.
-    \item \textbf{Narrow target battery}. The lottery set contains six classic targets, the historical holdout is a single 1982 ultimatum result, and the high-stakes boundary test uses one dataset from northeast India. The 19-country replication of Ruggeri et al.~\cite{ruggeri2020}, additional high-stakes bargaining cohorts (Slonim and Roth~\cite{slonim1998}, Cameron~\cite{cameron1999}), non-WEIRD samples, trust games, and market-exchange datasets are necessary before broad claims can be made.
+    \item \textbf{Narrow target battery}. The lottery set contains six classic targets, the historical replication target is a single 1982 ultimatum result, and the high-stakes boundary test uses one dataset from northeast India. The 19-country replication of Ruggeri et al.~\cite{ruggeri2020}, additional high-stakes bargaining cohorts (Slonim and Roth~\cite{slonim1998}, Cameron~\cite{cameron1999}), non-WEIRD samples, trust games, and market-exchange datasets are necessary before broad claims can be made.
     \item \textbf{Aggregate data on the calibration side}. Most calibration targets are published summaries from heterogeneous studies rather than a single individual-level dataset. This prevents joint likelihood estimation across the full benchmark. The Andersen boundary test performs the falsification probe on individual-level data, but the calibration itself remains aggregate.
     \item \textbf{Tolerance-based evaluation}. The 16/16 pass rate is an engineering diagnostic. The MAE on the high-$N$ Ruggeri lottery subset is 3.95\%, against 2.70\% averaged over the full benchmark, and two lottery predictions (P16, P17) fall outside the Ruggeri 95\% interval despite passing the $\pm10$~pp tolerance. Future work should adopt common train, validation, and test splits with individual-level likelihoods throughout.
     \item \textbf{No fully out-of-sample lottery target}. The temperature constants were set from P1 and P3, the G\"uth reference coordinate was set from the G\"uth offer, and the ranking of active sets used all sixteen targets, so the lottery results demonstrate parameter reuse within a jointly selected architecture rather than out-of-sample prediction. The temperature rule is nonmonotone above a cost gap of $1.41$, where four of the six lottery targets lie, and the ordering of P1 against P3 is carried by that rule rather than by the geometry (Section~\ref{sec:framework}).
@@ -1229,169 +1229,128 @@ P11 is evaluated in its reduced form, so its canonical prediction equals that of
 \bibitem{vonneumann1944}
 J.~von Neumann and O.~Morgenstern, \emph{Theory of Games and Economic Behavior}.
 Princeton, NJ, USA: Princeton Univ. Press, 1944.
-
 \bibitem{savage1954}
 L.~J.~Savage, \emph{The Foundations of Statistics}.
 New York, NY, USA: Wiley, 1954.
-
 \bibitem{kahneman1979}
 D.~Kahneman and A.~Tversky, ``Prospect theory: An analysis of decision under risk,''
 \emph{Econometrica}, vol.~47, no.~2, pp.~263--291, Mar. 1979.
-
 \bibitem{tversky1992}
 A.~Tversky and D.~Kahneman, ``Advances in prospect theory: Cumulative representation of uncertainty,''
-\emph{J. Risk Uncertainty}, vol.~5, no.~4, pp.~297--323, Oct. 1992.
-
+\emph{J. Risk Uncertainty}, vol.~5, no.~4, pp.~297--323, Oct. 1992, doi: 10.1007/BF00122574.
 \bibitem{fehr1999}
 E.~Fehr and K.~M.~Schmidt, ``A theory of fairness, competition, and cooperation,''
-\emph{Quart. J. Econ.}, vol.~114, no.~3, pp.~817--868, Aug. 1999.
-
+\emph{Quart. J. Econ.}, vol.~114, no.~3, pp.~817--868, Aug. 1999, doi: 10.1162/003355399556151.
 \bibitem{bolton2000}
 G.~E.~Bolton and A.~Ockenfels, ``ERC: A theory of equity, reciprocity, and competition,''
-\emph{Amer. Econ. Rev.}, vol.~90, no.~1, pp.~166--193, Mar. 2000.
-
-\bibitem{camerer2003}
-C.~F.~Camerer, \emph{Behavioral Game Theory: Experiments in Strategic Interaction}.
-Princeton, NJ, USA: Princeton Univ. Press, 2003.
-
-\bibitem{guth1982}
-W.~G\"{u}th, R.~Schmittberger, and B.~Schwarze, ``An experimental analysis of ultimatum bargaining,''
-\emph{J. Econ. Behav. Org.}, vol.~3, no.~4, pp.~367--388, Dec. 1982.
-
-\bibitem{engel2011}
-C.~Engel, ``Dictator games: A meta study,''
-\emph{Exp. Econ.}, vol.~14, no.~4, pp.~583--610, Nov. 2011.
-
-\bibitem{fraser2020}
-S.~Fraser and D.~Nettle, ``Hunger affects social decisions in a multi-round public goods game but not a single-shot ultimatum game,''
-\emph{Adaptive Human Behav. Physiol.}, vol.~6, no.~3, pp.~334--355, Sep. 2020, doi: 10.1007/s40750-020-00143-3.
-
+\emph{Amer. Econ. Rev.}, vol.~90, no.~1, pp.~166--193, Mar. 2000, doi: 10.1257/aer.90.1.166.
 \bibitem{ruggeri2020}
 K.~Ruggeri \emph{et~al.}, ``Replicating patterns of prospect theory for decision under risk,''
-\emph{Nature Human Behav.}, vol.~4, no.~6, pp.~622--633, Jun. 2020.
-
+\emph{Nature Human Behav.}, vol.~4, no.~6, pp.~622--633, Jun. 2020, doi: 10.1038/s41562-020-0886-x.
 \bibitem{henrich2010}
 J.~Henrich, S.~J.~Heine, and A.~Norenzayan, ``The weirdest people in the world?''
-\emph{Behav. Brain Sci.}, vol.~33, no.~2--3, pp.~61--83, Jun. 2010.
-
-\bibitem{allais1953}
-M.~Allais, ``Le comportement de l'homme rationnel devant le risque: Critique des postulats et axiomes de l'\'{e}cole Am\'{e}ricaine,''
-\emph{Econometrica}, vol.~21, no.~4, pp.~503--546, Oct. 1953.
-
-\bibitem{ellsberg1961}
-D.~Ellsberg, ``Risk, ambiguity, and the Savage axioms,''
-\emph{Quart. J. Econ.}, vol.~75, no.~4, pp.~643--669, Nov. 1961.
-
-\bibitem{arrow1951}
-K.~J.~Arrow, \emph{Social Choice and Individual Values}.
-New York, NY, USA: Wiley, 1951.
-
-\bibitem{sen1999}
-A.~Sen, \emph{Development as Freedom}.
-New York, NY, USA: Knopf, 1999.
-
-\bibitem{simon1955}
-H.~A.~Simon, ``A behavioral model of rational choice,''
-\emph{Quart. J. Econ.}, vol.~69, no.~1, pp.~99--118, Feb. 1955.
-
-\bibitem{mahalanobis1936}
-P.~C.~Mahalanobis, ``On the generalised distance in statistics,''
-\emph{Proc. Nat. Inst. Sci. India}, vol.~2, no.~1, pp.~49--55, Apr. 1936.
-
-\bibitem{nash1950}
-J.~F.~Nash, ``Equilibrium points in $n$-person games,''
-\emph{Proc. Nat. Acad. Sci. USA}, vol.~36, no.~1, pp.~48--49, Jan. 1950.
-
-\bibitem{daskalakis2009}
-C.~Daskalakis, P.~W.~Goldberg, and C.~H.~Papadimitriou, ``The complexity of computing a Nash equilibrium,''
-\emph{SIAM J. Comput.}, vol.~39, no.~1, pp.~195--259, 2009, doi: 10.1137/070699652.
-
-\bibitem{chen2009}
-X.~Chen, X.~Deng, and S.-H.~Teng, ``Settling the complexity of computing two-player Nash equilibria,''
-\emph{J. ACM}, vol.~56, no.~3, Art.~no.~14, May 2009, doi: 10.1145/1516512.1516516.
-
-\bibitem{hart1968}
-P.~E.~Hart, N.~J.~Nilsson, and B.~Raphael, ``A formal basis for the heuristic determination of minimum cost paths,''
-\emph{IEEE Trans. Syst. Sci. Cybern.}, vol.~4, no.~2, pp.~100--107, Jul. 1968.
-
+\emph{Behav. Brain Sci.}, vol.~33, no.~2--3, pp.~61--83, Jun. 2010, doi: 10.1017/S0140525X0999152X.
+\bibitem{andersen2011}
+S.~Andersen, S.~Erta\c{c}, U.~Gneezy, M.~Hoffman, and J.~A.~List, ``Stakes matter in ultimatum games,''
+\emph{Amer. Econ. Rev.}, vol.~101, no.~7, pp.~3427--3439, Dec. 2011, doi: 10.1257/aer.101.7.3427.
 \bibitem{keeney1993}
 R.~L.~Keeney and H.~Raiffa, \emph{Decisions with Multiple Objectives: Preferences and Value Trade-Offs}.
 Cambridge, U.K.: Cambridge Univ. Press, 1993.
-
+\bibitem{cheng2026urban}
+L.~Cheng, M.~Li, C.~Tan, P.~Huang, M.~Zhang, and R.~Sun, ``Computational game-theoretic models for adaptive urban energy systems: A comprehensive review of algorithms, strategies, and engineering applications,''
+\emph{Arch. Comput. Methods Eng.}, vol.~33, no.~2, pp.~2037--2114, Mar. 2026, doi: 10.1007/s11831-025-10364-y.
+\bibitem{cheng2025vpp}
+L.~Cheng, M.~Zhang, K.~Wang, M.~Yuan, Z.~Liu, J.~Wang, K.~Zhang, and P.~Huang, ``Evolutionary smart contracts for virtual power plant trading: Integrating prospect theory and multi-stage negotiation in cross-regional energy markets,''
+\emph{Int. J. Elect. Power Energy Syst.}, vol.~173, Art.~no.~111453, Dec. 2025, doi: 10.1016/j.ijepes.2025.111453.
 \bibitem{train2009}
 K.~E.~Train, \emph{Discrete Choice Methods with Simulation}, 2nd~ed.
 Cambridge, U.K.: Cambridge Univ. Press, 2009.
-
 \bibitem{hastie2009}
 T.~Hastie, R.~Tibshirani, and J.~Friedman, \emph{The Elements of Statistical Learning}, 2nd~ed.
 New York, NY, USA: Springer, 2009.
-
-\bibitem{thaler2008}
-R.~H.~Thaler and C.~R.~Sunstein, \emph{Nudge: Improving Decisions About Health, Wealth, and Happiness}.
-New Haven, CT, USA: Yale Univ. Press, 2008.
-
 \bibitem{smith1962}
 V.~L.~Smith, ``An experimental study of competitive market behavior,''
 \emph{J. Polit. Econ.}, vol.~70, no.~2, pp.~111--137, Apr. 1962.
-
+\bibitem{arrow1951}
+K.~J.~Arrow, \emph{Social Choice and Individual Values}.
+New York, NY, USA: Wiley, 1951.
+\bibitem{ostrom1990}
+E.~Ostrom, \emph{Governing the Commons: The Evolution of Institutions for Collective Action}.
+Cambridge, U.K.: Cambridge Univ. Press, 1990.
+\bibitem{sen1999}
+A.~Sen, \emph{Development as Freedom}.
+New York, NY, USA: Knopf, 1999.
+\bibitem{akerlof1970}
+G.~A.~Akerlof, ``The market for `lemons': Quality uncertainty and the market mechanism,''
+\emph{Quart. J. Econ.}, vol.~84, no.~3, pp.~488--500, Aug. 1970.
+\bibitem{stiglitz1981}
+J.~E.~Stiglitz and A.~Weiss, ``Credit rationing in markets with imperfect information,''
+\emph{Amer. Econ. Rev.}, vol.~71, no.~3, pp.~393--410, Jun. 1981.
+\bibitem{camerer2003}
+C.~F.~Camerer, \emph{Behavioral Game Theory: Experiments in Strategic Interaction}.
+Princeton, NJ, USA: Princeton Univ. Press, 2003.
+\bibitem{haidt2012}
+J.~Haidt, \emph{The Righteous Mind: Why Good People Are Divided by Politics and Religion}.
+New York, NY, USA: Vintage Books, 2012.
 \bibitem{tetlock2000}
 P.~E.~Tetlock, ``Coping with trade-offs: Psychological constraints and political implications,''
 in \emph{Elements of Reason: Cognition, Choice, and the Bounds of Rationality},
 A.~Lupia, M.~D.~McCubbins, and S.~L.~Popkin, Eds.
 Cambridge, U.K.: Cambridge Univ. Press, 2000, pp.~239--263.
-
-\bibitem{akerlof1970}
-G.~A.~Akerlof, ``The market for `lemons': Quality uncertainty and the market mechanism,''
-\emph{Quart. J. Econ.}, vol.~84, no.~3, pp.~488--500, Aug. 1970.
-
-\bibitem{stiglitz1981}
-J.~E.~Stiglitz and A.~Weiss, ``Credit rationing in markets with imperfect information,''
-\emph{Amer. Econ. Rev.}, vol.~71, no.~3, pp.~393--410, Jun. 1981.
-
-\bibitem{ostrom1990}
-E.~Ostrom, \emph{Governing the Commons: The Evolution of Institutions for Collective Action}.
-Cambridge, U.K.: Cambridge Univ. Press, 1990.
-
-\bibitem{haidt2012}
-J.~Haidt, \emph{The Righteous Mind: Why Good People are Divided by Politics and Religion}.
-New York, NY, USA: Vintage Books, 2012.
-
-\bibitem{cheng2026urban}
-L.~Cheng, M.~Li, C.~Tan, P.~Huang, M.~Zhang, and R.~Sun, ``Computational game-theoretic models for adaptive urban energy systems: A comprehensive review of algorithms, strategies, and engineering applications,''
-\emph{Arch. Comput. Methods Eng.}, vol.~33, no.~2, pp.~2037--2114, Mar. 2026, doi: 10.1007/s11831-025-10364-y.
-
-\bibitem{cheng2025vpp}
-L.~Cheng, M.~Zhang, K.~Wang, M.~Yuan, Z.~Liu, J.~Wang, K.~Zhang, and P.~Huang, ``Evolutionary smart contracts for virtual power plant trading: Integrating prospect theory and multi-stage negotiation in cross-regional energy markets,''
-\emph{Int. J. Elect. Power Energy Syst.}, vol.~173, Art.~no.~111453, Dec. 2025, doi: 10.1016/j.ijepes.2025.111453.
-
+\bibitem{thaler2008}
+R.~H.~Thaler and C.~R.~Sunstein, \emph{Nudge: Improving Decisions About Health, Wealth, and Happiness}.
+New Haven, CT, USA: Yale Univ. Press, 2008.
+\bibitem{simon1955}
+H.~A.~Simon, ``A behavioral model of rational choice,''
+\emph{Quart. J. Econ.}, vol.~69, no.~1, pp.~99--118, Feb. 1955.
+\bibitem{ellsberg1961}
+D.~Ellsberg, ``Risk, ambiguity, and the Savage axioms,''
+\emph{Quart. J. Econ.}, vol.~75, no.~4, pp.~643--669, Nov. 1961.
+\bibitem{mahalanobis1936}
+P.~C.~Mahalanobis, ``On the generalised distance in statistics,''
+\emph{Proc. Nat. Inst. Sci. India}, vol.~2, no.~1, pp.~49--55, Apr. 1936.
+\bibitem{eriseconsw}
+A.~H.~Bond, ``eris-econ: Geometric economics on multi-dimensional decision manifolds,'' ver.~0.1.0, Zenodo, Jun. 2026, doi: 10.5281/zenodo.20660123. [Online]. Available: \url{https://pypi.org/project/eris-econ/}
+\bibitem{engel2011}
+C.~Engel, ``Dictator games: A meta study,''
+\emph{Exp. Econ.}, vol.~14, no.~4, pp.~583--610, Nov. 2011, doi: 10.1007/s10683-011-9283-7.
+\bibitem{fraser2020}
+S.~Fraser and D.~Nettle, ``Hunger affects social decisions in a multi-round public goods game but not a single-shot ultimatum game,''
+\emph{Adaptive Human Behav. Physiol.}, vol.~6, no.~3, pp.~334--355, Sep. 2020, doi: 10.1007/s40750-020-00143-3.
+\bibitem{allais1953}
+M.~Allais, ``Le comportement de l'homme rationnel devant le risque: Critique des postulats et axiomes de l'\'{e}cole Am\'{e}ricaine,''
+\emph{Econometrica}, vol.~21, no.~4, pp.~503--546, Oct. 1953.
+\bibitem{guth1982}
+W.~G\"{u}th, R.~Schmittberger, and B.~Schwarze, ``An experimental analysis of ultimatum bargaining,''
+\emph{J. Econ. Behav. Org.}, vol.~3, no.~4, pp.~367--388, Dec. 1982, doi: 10.1016/0167-2681(82)90011-7.
 \bibitem{fraserdata2020}
 S.~Fraser and D.~Nettle, ``Data and code for Fraser and Nettle, `Hunger affects social decisions in a public goods game but not an ultimatum game','' Zenodo, ver.~3, 2020, doi: 10.5281/zenodo.3764693.
-
-\bibitem{andersen2011}
-S.~Andersen, S.~Erta\c{c}, U.~Gneezy, M.~Hoffman, and J.~A.~List, ``Stakes matter in ultimatum games,''
-\emph{Amer. Econ. Rev.}, vol.~101, no.~7, pp.~3427--3439, Dec. 2011, doi: 10.1257/aer.101.7.3427.
-
 \bibitem{andersendata2011}
 S.~Andersen, S.~Erta\c{c}, U.~Gneezy, M.~Hoffman, and J.~A.~List, ``Replication data for: Stakes matter in ultimatum games,''
 American Economic Association/openICPSR study 112485, 2019, doi: 10.3886/E112485V1.
-
 \bibitem{slonim1998}
 R.~Slonim and A.~E.~Roth, ``Learning in high stakes ultimatum games: An experiment in the Slovak Republic,''
-\emph{Econometrica}, vol.~66, no.~3, pp.~569--596, May 1998.
-
+\emph{Econometrica}, vol.~66, no.~3, pp.~569--596, May 1998, doi: 10.2307/2998575.
 \bibitem{cameron1999}
 L.~A.~Cameron, ``Raising the stakes in the ultimatum game: Experimental evidence from Indonesia,''
-\emph{Econ. Inquiry}, vol.~37, no.~1, pp.~47--59, Jan. 1999.
-
-\bibitem{eriseconsw}
-A.~H.~Bond, ``eris-econ: Geometric economics on multi-dimensional decision manifolds,'' ver.~0.1.0, Zenodo, Jun. 2026, doi: 10.5281/zenodo.20660123. [Online]. Available: \url{https://pypi.org/project/eris-econ/}
-
+\emph{Econ. Inquiry}, vol.~37, no.~1, pp.~47--59, Jan. 1999, doi: 10.1111/j.1465-7295.1999.tb01415.x.
+\bibitem{nash1950}
+J.~F.~Nash, ``Equilibrium points in $n$-person games,''
+\emph{Proc. Nat. Acad. Sci. USA}, vol.~36, no.~1, pp.~48--49, Jan. 1950.
+\bibitem{daskalakis2009}
+C.~Daskalakis, P.~W.~Goldberg, and C.~H.~Papadimitriou, ``The complexity of computing a Nash equilibrium,''
+\emph{SIAM J. Comput.}, vol.~39, no.~1, pp.~195--259, 2009, doi: 10.1137/070699652.
+\bibitem{chen2009}
+X.~Chen, X.~Deng, and S.-H.~Teng, ``Settling the complexity of computing two-player Nash equilibria,''
+\emph{J. ACM}, vol.~56, no.~3, Art.~no.~14, May 2009, doi: 10.1145/1516512.1516516.
+\bibitem{hart1968}
+P.~E.~Hart, N.~J.~Nilsson, and B.~Raphael, ``A formal basis for the heuristic determination of minimum cost paths,''
+\emph{IEEE Trans. Syst. Sci. Cybern.}, vol.~4, no.~2, pp.~100--107, Jul. 1968.
 \end{thebibliography}
 
 \begin{IEEEbiographynophoto}{Andrew H. Bond}
 received the B.S.E.E. degree from North Carolina State University and the M.S.S.E. degree from San Jos\'{e} State University. He has over 20 years of industry experience at AT\&T, Cisco Systems, and Fujitsu Network Communications. He is currently with the Department of Computer Engineering, San Jos\'{e} State University, San Jos\'{e}, CA, USA, where he teaches and advises graduate theses. His research interests include computational models of social and economic behavior, embedding compression, autonomous security agents, and cognitive architectures. He is a Senior Member of IEEE.
 \end{IEEEbiographynophoto}
-% OWNER: replace IEEEbiographynophoto with \begin{IEEEbiography}[{\includegraphics[width=1in,height=1.25in,clip,keepaspectratio]{bond_photo}}]{Andrew H. Bond} once a photo file is added, and confirm the biography text.
 
 \balance
 

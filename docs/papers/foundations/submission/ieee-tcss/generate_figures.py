@@ -153,9 +153,9 @@ def fig_scatter():
     ax.fill_between(x_band, x_band - 5, x_band + 5, alpha=0.10, color='green', label='$\\pm$5% tolerance')
 
     # Plot by category
-    markers = {'game': ('o', '#2196F3', 'Game (IS)'),
-               'pt': ('^', '#F44336', 'PT (OOS)'),
-               'pub': ('s', '#FF9800', 'Published (OOS)')}
+    markers = {'game': ('o', '#2196F3', 'Game (calibration)'),
+               'pt': ('^', '#F44336', 'Lottery'),
+               'pub': ('s', '#FF9800', 'Historical replication')}
 
     for cat, (marker, color, label) in markers.items():
         obs = [t[0] for t in targets if t[3] == cat]
