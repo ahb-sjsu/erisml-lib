@@ -43,9 +43,13 @@ ax.hist(ev_sample, bins=bins, alpha=0.45, color="#888", label="EV-max agent", de
 ax.hist(fs_sample, bins=bins, alpha=0.45, color="#4477AA", label="Fehr\u2013Schmidt", density=True)
 ax.hist(geom_sample, bins=bins, alpha=0.55, color="#CC6677", label="Geometric primitive", density=True)
 ax.axvline(0.48, ls=":", color="black", lw=0.8)
-ax.text(0.48, ax.get_ylim()[1]*0.92, " observed UG mean", fontsize=7, va="top")
+# The EV-max spike at zero has density ~50, so a linear axis flattens the
+# other two histograms. A log axis keeps all three visible without clipping.
+ax.set_yscale("log")
+ax.set_ylim(0.3, 120)
+ax.text(0.48, 80, " observed UG mean", fontsize=7, va="top")
 ax.set_xlabel("Ultimatum offer (share)")
-ax.set_ylabel("Density")
+ax.set_ylabel("Density (log scale)")
 ax.set_xlim(0, 0.55)
 ax.legend(loc="upper left", fontsize=7, framealpha=0.9)
 ax.set_title("Agent-based illustration (not a new validation)")

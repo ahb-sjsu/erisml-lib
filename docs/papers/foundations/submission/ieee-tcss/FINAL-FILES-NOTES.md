@@ -250,7 +250,7 @@ alone and listed as such.
 | R5-5 | Table IV caption with math in small caps | Introduced in round 1 (new table). Rendering issue. | Caption contained $m(x)$ and $q(x)$ definitions. | Definitions moved to the table footnote. |
 | R5-6 | "producing more realistic behavior" (Future Directions) | Inherited: accepted line 988. Untested claim. | No experiment in the paper compares agent realism. | Reworded as an alternative to scalar utility maximizers, realism not tested here. |
 | R5-7 | "Three covariance variances" (abstract) | Introduced in round 1 abstract rewrite. Wording. | Accepted abstract had no such phrase. | "Three variances of the diagonal covariance". |
-| R5-8 | Fig. 5 legend reads "Fehr--Schmidt" | Inherited: `make_abm_figure.py` line 43 passed the LaTeX string to matplotlib. | The figure file shows two hyphens. | Label uses an en dash; figure regenerated with the same seed (20260610), data unchanged. |
+| R5-8 | Fig. 5 legend reads "Fehr--Schmidt" | Inherited: `make_abm_figure.py` line 43 passed the LaTeX string to matplotlib. | The figure file shows two hyphens. | Label uses an en dash; figure regenerated with the same seed (20260610), data unchanged. At the owner's request the density axis is now logarithmic (the expected-value spike at zero, density about 50, had flattened the other two histograms into the bottom of a linear axis); the caption says so. |
 
 ### Verified and left unchanged
 
