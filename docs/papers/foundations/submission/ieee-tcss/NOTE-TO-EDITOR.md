@@ -28,9 +28,9 @@ format, the same length as the accepted version.
    as four of six, in the text and in my response to the reviewers. The
    evaluation file produced by the released analysis script, which was
    included in the revision package, records only P1 and P11 inside their
-   Wilson intervals; P3 and P7 fall outside as well as P16 and P17. The
+   Wilson intervals. P3 and P7 fall outside as well as P16 and P17. The
    per-item errors, the pooled MAE of 3.95%, and the 58% country-cell
-   coverage were already stated correctly. Section V.C, the Table VI
+   coverage were already stated correctly. Section V.E, the Table VII
    footnote, and Limitation 4 now say two of six.
 4. The canonical CPT baseline was reported as passing 4 of 6 lottery targets.
    Its six per-target errors, which were already in the accepted text, are
@@ -54,7 +54,7 @@ was done.
    the coordinates are now listed in full in a new Table IV so they can be
    audited.
 8. Choice rule. Game predictions are deterministic cost minima on an integer
-   percentage grid; the softmax with cost-dependent temperature applies only
+   percentage grid. The softmax with cost-dependent temperature applies only
    to the six lottery choices. The accepted text implied softmax throughout.
 9. Rejection logistic steepness is 15 per unit share, and the symbol is now
    kappa to avoid a clash with the active-set size k.
@@ -63,9 +63,9 @@ was done.
 11. Variance search. A 20-point log grid on [0.01, 100] for one- and
     two-dimensional active sets, and 5,000 seeded log-uniform draws for
     larger sets, not the 7-point grid stated before.
-12. Calibration objective is a weighted MAE (weights 1 and 0.5 as now stated
-    in Eq. 8 and Section V.A.4); the reported 2.70% is the unweighted MAE
-    and is labeled as such.
+12. Calibration objective is a weighted MAE (weights 1 and 0.5, as now stated
+    with the objective in Section V.A). The reported 2.70% is the unweighted
+    MAE and is labeled as such.
 13. Candidate ranking used all sixteen targets to break ties among the 31
     distinct calibration problems. Consequently no lottery target is fully
     out of sample. The abstract, Section V, Section VI, the discussion, and
@@ -75,7 +75,7 @@ was done.
     the only result independent of every fitting step.
 14. The temperature constants were set from P1 and P3, and the Guth
     reference coordinate from the Guth offer. Both are now stated, and
-    Table VI marks those targets.
+    Table VII marks those targets.
 15. P11 is encoded identically to P3, so their predictions coincide. The
     accepted text described a multi-stage mechanism; the paper now states
     the isolation effect as an encoding assumption.
@@ -95,7 +95,7 @@ was done.
     temperature rule and not by the geometry, and describes the certainty
     measure that would allow a monotone rule. Stated as future work.
 19. Section VI.E notes that the baseline comparison favors the geometric
-    model by construction (baselines at published parameters; geometric
+    model by construction (baselines at published parameters, geometric
     structure selected on this benchmark) and is evidence of cross-domain
     applicability, not evidence against either canonical model.
 20. The uniform-rescaling result now states that the nine game predictions
@@ -104,21 +104,21 @@ was done.
 
 ## 3. Notation and units (Reviewer 1)
 
-21. The Mahalanobis cost is c (d_k names dimensions); the cost gap is Delta c;
-    the perturbation factor is xi; sample sizes are N throughout; the
-    public-goods round index is j; reference coordinates are r_k; the
-    Andersen stake is capital Lambda (lambda is CPT loss aversion); the CPT
-    value function is written over outcomes o_i. Errors and tolerances are
+21. The Mahalanobis cost is c, since d_k names dimensions. The cost gap is
+    Delta c, the perturbation factor is xi, sample sizes are N throughout,
+    the public-goods round index is j, reference coordinates are r_k, the
+    Andersen stake is capital Lambda because lambda is CPT loss aversion,
+    and the CPT value function is written over outcomes o_i. Errors and tolerances are
     in percentage points, observed and predicted rates in percent, and the
-    Table VI footnote says so.
+    Table VII footnote says so.
 22. BIC values are added to the Andersen logit comparison, closing a
     discrepancy noted in my own response letter, and the stake coefficient
     p-value is corrected to 1.5e-4.
 
 ## 4. Structure and presentation
 
-23. Section VI.H (sensitivity profile) duplicated Section VI.C and is merged
-    into it. The "leave-one-out diagnostic" heading is renamed "per-target
+23. The former Section VI.H (sensitivity profile) duplicated Section VI.C
+    and is merged into it. The "leave-one-out diagnostic" heading is renamed "per-target
     error diagnostic", since the section itself defers the refit to future
     work.
 24. Figure 3 (predicted against observed) legend read "in-sample /
