@@ -26,6 +26,20 @@ jobs:
         with:
           submodules: recursive
           fetch-depth: 0
+      - name: Preflight - every Geometric Series volume must have a root index.html
+        run: |
+          set -u
+          fail=0
+          for path in $(git config -f .gitmodules --get-regexp '^submodule\..*\.path$' | awk '{print $2}'); do
+            if [ ! -f "$path/index.html" ]; then
+              echo "::error::$path is missing index.html - gitlink probably points at the source (main) branch instead of the built 'site' branch"
+              echo "  contents: $(ls -A "$path" 2>/dev/null | xargs echo)"
+              fail=1
+            else
+              echo "ok  $path"
+            fi
+          done
+          [ "$fail" -eq 0 ] || { echo "::error::Preflight failed - refusing to deploy a site with 404 volumes"; exit 1; }
       - name: Setup Pages
         uses: actions/configure-pages@v4
       - name: Upload docs/ artifact
