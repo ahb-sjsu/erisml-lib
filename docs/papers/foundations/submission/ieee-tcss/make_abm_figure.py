@@ -47,7 +47,7 @@ ax.axvline(0.48, ls=":", color="black", lw=0.8)
 # other two histograms. A log axis keeps all three visible without clipping.
 ax.set_yscale("log")
 ax.set_ylim(0.3, 120)
-ax.text(0.48, 80, " observed UG mean", fontsize=7, va="top")
+ax.text(0.472, 15, "observed UG mean", fontsize=7, va="center", ha="right")
 ax.set_xlabel("Ultimatum offer (share)")
 ax.set_ylabel("Density (log scale)")
 ax.set_xlim(0, 0.55)
