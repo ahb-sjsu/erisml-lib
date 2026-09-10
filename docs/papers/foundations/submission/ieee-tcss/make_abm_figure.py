@@ -52,7 +52,7 @@ ax.set_xlabel("Ultimatum offer (share)")
 ax.set_ylabel("Density (log scale)")
 ax.set_xlim(0, 0.55)
 ax.legend(loc="upper left", fontsize=7, framealpha=0.9)
-ax.set_title("Agent-based illustration (not a new validation)")
+# No in-figure title: the caption carries the 'illustrative, not a new validation' statement made in the response letter (Th4).
 fig.savefig(os.path.join(OUT, "abm_worked_example.pdf"))
 fig.savefig(os.path.join(OUT, "abm_worked_example.png"))
 print("Saved abm_worked_example.{pdf,png}")
