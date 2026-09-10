@@ -30,7 +30,7 @@
 
 \begin{abstract}
 We study a geometric model of economic decision-making in which each alternative is encoded as a point in a nine-dimensional decision space and the cost of moving from a task-specific reference point to that alternative is a Mahalanobis distance under a diagonal covariance matrix.
-Three covariance variances are fitted on nine bargaining and public-goods targets by an exhaustive search over active dimensions.
+Three variances of the diagonal covariance are fitted on nine bargaining and public-goods targets by an exhaustive search over active dimensions.
 The same variances are then applied, without refitting, to six classic prospect-theory choice problems and one historical ultimatum replication.
 The active-set structure was selected using the complete benchmark, so the lottery results demonstrate cross-domain parameter reuse within a jointly selected architecture rather than fully out-of-sample prediction.
 The selected model activates social impact, virtue and identity, and epistemic status.
@@ -334,7 +334,7 @@ Public-goods round drift & Encodes repeated-round decline in the reference point
 
 \begin{table*}[!t]
 \renewcommand{\arraystretch}{1.18}
-\caption{Reference Points and Alternatives as Implemented. Shares $x$ and $f$ Are Fractions of the Stake or Endowment. $m(x)=\min(2x,1)$, $q(x)=1-P_{\text{rej}}(x)$}
+\caption{Reference Points and Alternatives as Implemented. Shares $x$ and $f$ Are Fractions of the Stake or Endowment}
 \label{tab:encodings}
 \centering
 \footnotesize
@@ -370,7 +370,7 @@ $d_9$ & $0.5$ & $0.8$ & $1$ & \multicolumn{3}{l}{$0.3+0.7\,\mathrm{cert}(L)$ / $
 \bottomrule
 \end{tabular}
 \begin{flushleft}
-\footnotesize{Monetary coordinates are normalized to the stake (games) or to the larger expected value of the pair (lotteries). Public-goods normalization uses endowment 20, four players, multiplier 2, and the other three players contributing half their endowment, which gives the closed form shown. A lottery is in the loss domain when its expected value is negative or any outcome is negative. The lottery reference coordinate $r_1$ is $0$ for the six targets used here because none carries an initial endowment. Only the $d_6$, $d_7$, and $d_9$ coordinates enter the cost under the selected metric.}
+\footnotesize{Here $m(x)=\min(2x,1)$ and $q(x)=1-P_{\text{rej}}(x)$. Monetary coordinates are normalized to the stake (games) or to the larger expected value of the pair (lotteries). Public-goods normalization uses endowment 20, four players, multiplier 2, and the other three players contributing half their endowment, which gives the closed form shown. A lottery is in the loss domain when its expected value is negative or any outcome is negative. The lottery reference coordinate $r_1$ is $0$ for the six targets used here because none carries an initial endowment. Only the $d_6$, $d_7$, and $d_9$ coordinates enter the cost under the selected metric.}
 \end{flushleft}
 \end{table*}
 
@@ -611,15 +611,16 @@ Beyond the tolerance-based pass count we report three further diagnostics whose 
 \subsubsection{Per-subset MAE}
 The overall unweighted MAE of 2.70\% averages over heterogeneous targets and source studies, which can mask the higher-precision Ruggeri lottery subset.
 On the six Ruggeri lottery items (Ruggeri et al.~\cite{ruggeri2020}, $N=24{,}588$ responses in total at $N=4{,}098$ per item) the MAE is 3.95\%, driven by the systematic errors on P16 ($-6.7$~pp) and P17 ($+7.8$~pp).
-On the Fraser--Nettle game targets ($N=212$) the MAE is 0.17\% on the two ultimatum-game targets and 2.29\% on the five public-goods rounds.
+On the Fraser--Nettle game targets ($N=212$) the MAE, computed from unrounded predictions, is 0.17\% on the two ultimatum-game targets and 2.29\% on the five public-goods rounds.
 The dictator target uses the Engel meta-study~\cite{engel2011} ($N=20{,}813$) and the G\"uth historical replication uses $N=21$~\cite{guth1982}.
 The 3.95\% figure on the Ruggeri subset is the most informative single MAE for cross-domain accuracy because Ruggeri's large $N$ produces the tightest comparison, and we treat it as the conservative target metric.
 
 \subsubsection{Confidence-interval coverage}
 For the targets where individual-level data are recoverable, namely the Fraser--Nettle ultimatum offers and MAO and the six Ruggeri lottery items, together with the 114 country-by-item Ruggeri cells, we compute Wilson 95\% binomial confidence intervals and ask whether the model prediction falls inside the interval.
 On the Fraser--Nettle pair both predictions fall inside the interval.
-On the Ruggeri items four of six predictions fall inside the country-pooled interval, and 58\% of the 114 country-by-item cells are covered.
-Two items, P16 and P17, fall outside their Ruggeri interval despite passing the $\pm10$~pp tolerance.
+On the Ruggeri items two of six predictions, P1 and P11, fall inside the country-pooled interval, and 58\% of the 114 country-by-item cells are covered.
+Four items, P3, P7, P16, and P17, fall outside their Ruggeri interval despite passing the $\pm10$~pp tolerance.
+At $N=4{,}098$ each interval is about 2~pp wide, so the 2.6~pp error on P3 and the 4.8~pp error on P7 fall outside it, as do the larger errors on P16 and P17.
 This is the principal place where the tolerance band overstates the precision of the model relative to large-sample replication data.
 
 \subsubsection{Formal model comparison where individual-level data exist}
@@ -716,7 +717,7 @@ The pass count is a descriptive benchmark, not a significance test.
 \bottomrule
 \end{tabular}
 \begin{flushleft}
-\footnotesize{Error is predicted minus observed in percentage points. The overall MAE is the unweighted mean of the absolute errors over all sixteen targets. The Ruggeri-subset row reports the MAE on the six lottery items only, where $N=4{,}098$ per item gives the tightest comparison. Two lottery items, P16 and P17, pass the tolerance but fall outside the Ruggeri 95\% interval (Section~\ref{sec:statistical-eval}). The role column records which targets were used to fit the variances (calibration), to set the temperature constants, or to set the G\"uth reference coordinate. All sixteen targets were used to rank candidate active sets, so no target is fully out of sample. $^{\dagger}$P11 is encoded identically to P3. Reference implementation~\cite{eriseconsw}.}
+\footnotesize{Error is predicted minus observed in percentage points. The overall MAE is the unweighted mean of the absolute errors over all sixteen targets. The Ruggeri-subset row reports the MAE on the six lottery items only, where $N=4{,}098$ per item gives the tightest comparison. Four lottery items, P3, P7, P16, and P17, pass the tolerance but fall outside the Ruggeri 95\% interval (Section~\ref{sec:statistical-eval}). The role column records which targets were used to fit the variances (calibration), to set the temperature constants, or to set the G\"uth reference coordinate. All sixteen targets were used to rank candidate active sets, so no target is fully out of sample. $^{\dagger}$P11 is encoded identically to P3. Reference implementation~\cite{eriseconsw}.}
 \end{flushleft}
 \end{table*}
 
@@ -762,7 +763,7 @@ This is the model's clearest systematic failure.
 
 G\"uth et al.'s original ultimatum game produced a mean offer of 37.0\%~\cite{guth1982}, lower than the 48.3\% observed in modern replications~\cite{fraser2020}.
 The model reproduces 35.0\% through the epistemic reference coordinate $r_9=0.78$, which was chosen for that purpose.
-Given the sensitivity of the model to epistemic displacements, a two-hundredths shift of one reference coordinate moves the predicted offer by thirteen points.
+Given the sensitivity of the model to epistemic displacements, a two-hundredths shift of one reference coordinate moves the predicted offer by thirteen points, from 48\% to 35\%, against an observed difference of eleven points.
 The result shows that the fitted metric can absorb the historical difference through one interpretable coordinate, and no more than that.
 
 \subsection{Sensitivity Analysis}
@@ -863,7 +864,7 @@ Table~\ref{tab:comparison} compares the geometric model against three baselines,
 \toprule
 \textbf{Model} & \textbf{Parameters} & \textbf{Game targets} & \textbf{Lottery targets} & \textbf{MAE within domain} & \textbf{Cross-domain} \\
 \midrule
-Geometric (this paper) & 3 fitted variances, 13 named quantities & 9/9 pass & 6/6 pass & 2.70\% (3.95\% lottery) & Yes, plus 1/1 historical \\
+Geometric (this paper) & 13 named quantities (3 fitted variances) & 9/9 pass & 6/6 pass & 2.70\% (3.95\% lottery) & Yes, plus 1/1 historical \\
 CPT~\cite{tversky1992} & 5 ($\alpha,\beta,\lambda,\gamma,\delta$) & Not specified & 6/6 pass & 5.7\% & No \\
 Fehr--Schmidt~\cite{fehr1999} & 2 ($\alpha,\beta$) plus distribution & 2/9 pass & N/A & 11.8\% & No \\
 EV maximizer & 0 & 0/9 pass & 2/6 pass & 47.8\% & Trivially \\
@@ -873,7 +874,7 @@ EV maximizer & 0 & 0/9 pass & 2/6 pass & 47.8\% & Trivially \\
 \footnotesize{Target accounting is nine game targets, six lottery targets, and one historical replication, sixteen in total.
 CPT is evaluated on the six lottery problems, and the CPT baseline used here does not specify strategic behavior.
 CPT has five free parameters and the reference point is fixed at the status quo for these tasks, following Tversky and Kahneman~\cite{tversky1992}.
-The geometric parameter entry counts the three fitted variances and the thirteen named quantities of Table~\ref{tab:param_accounting}, before the coordinate constants of Table~\ref{tab:encodings}.
+The geometric parameter entry counts the thirteen named quantities of Table~\ref{tab:param_accounting}, of which three are the fitted variances, before the coordinate constants of Table~\ref{tab:encodings}.
 Fehr--Schmidt is evaluated on the nine game targets and provides no mechanism for lottery predictions.
 The EV maximizer is evaluated on the fifteen game and lottery targets. The symbols $\alpha$ and $\beta$ follow each source's notation and denote different parameters in the CPT and Fehr--Schmidt rows.
 MAE for CPT and Fehr--Schmidt is computed within their respective domains.}
@@ -1127,7 +1128,7 @@ Future work should compare the present labels against alternative bases, such as
 
 The geometric model has four implications for computational social systems.
 \begin{enumerate}
-    \item \textbf{Agent modeling}. Computational agents in social simulations can be endowed with a Mahalanobis cost function on nine dimensions, producing more realistic behavior than scalar utility maximizers.
+    \item \textbf{Agent modeling}. Computational agents in social simulations can be endowed with a Mahalanobis cost function on nine dimensions as an alternative to scalar utility maximizers. Whether the resulting behavior is more realistic is not tested here.
     \item \textbf{Policy simulation}. Policy interventions that change the encoding, for example framing a tax as a contribution to the common good, which shifts $d_6$ and $d_7$, can be modeled as changes in the displacement vector, with behavioral consequences predicted by the cost metric.
     \item \textbf{Mechanism design}. Mechanism designers should attend to all nine dimensions, not only monetary incentives. A mechanism that is optimal on $d_1$ but costly on $d_7$, for example because it requires participants to behave in ways that conflict with their self-image, may fail in practice.
     \item \textbf{Cultural variation}. Cross-cultural differences in economic behavior~\cite{henrich2010} may be modeled as differences in $\Sigma$, meaning that cultures weight the nine dimensions differently, rather than as differences in rationality.
@@ -1156,7 +1157,7 @@ Nine limitations qualify the present results.
     \item \textbf{Encoding dependence}. The benchmark validates the metric conditional on researcher-coded encodings. The certainty operator, the domain-dependent coding, the epistemic reference values, and the coordinate constants of Table~\ref{tab:encodings} are fixed assumptions tested by ablation, not independently established psychological laws. External raters, preregistered coding rules, or automated scenario-to-attribute encoders are needed to separate encoding validation from metric validation.
     \item \textbf{Narrow target battery}. The lottery set contains six classic targets, the historical replication target is a single 1982 ultimatum result, and the high-stakes boundary test uses one dataset from northeast India. The 19-country replication of Ruggeri et al.~\cite{ruggeri2020}, additional high-stakes bargaining cohorts (Slonim and Roth~\cite{slonim1998}, Cameron~\cite{cameron1999}), non-WEIRD samples, trust games, and market-exchange datasets are necessary before broad claims can be made.
     \item \textbf{Aggregate data on the calibration side}. Most calibration targets are published summaries from heterogeneous studies rather than a single individual-level dataset. This prevents joint likelihood estimation across the full benchmark. The Andersen boundary test performs the falsification probe on individual-level data, but the calibration itself remains aggregate.
-    \item \textbf{Tolerance-based evaluation}. The 16/16 pass rate is an engineering diagnostic. The MAE on the high-$N$ Ruggeri lottery subset is 3.95\%, against 2.70\% averaged over the full benchmark, and two lottery predictions (P16, P17) fall outside the Ruggeri 95\% interval despite passing the $\pm10$~pp tolerance. Future work should adopt common train, validation, and test splits with individual-level likelihoods throughout.
+    \item \textbf{Tolerance-based evaluation}. The 16/16 pass rate is an engineering diagnostic. The MAE on the high-$N$ Ruggeri lottery subset is 3.95\%, against 2.70\% averaged over the full benchmark, and four of the six lottery predictions (P3, P7, P16, P17) fall outside the Ruggeri 95\% interval despite passing the $\pm10$~pp tolerance. Future work should adopt common train, validation, and test splits with individual-level likelihoods throughout.
     \item \textbf{No fully out-of-sample lottery target}. The temperature constants were set from P1 and P3, the G\"uth reference coordinate was set from the G\"uth offer, and the ranking of active sets used all sixteen targets, so the lottery results demonstrate parameter reuse within a jointly selected architecture rather than out-of-sample prediction. The temperature rule is nonmonotone above a cost gap of $1.41$, where four of the six lottery targets lie, and the ordering of P1 against P3 is carried by that rule rather than by the geometry (Section~\ref{sec:framework}).
     \item \textbf{Model complexity}. The three-parameter description counts only active covariance variances. A fuller accounting includes the temperature, rejection, drift, and encoding mechanisms and the structural restrictions. The conservative count is thirteen named quantities (Table~\ref{tab:param_accounting}) plus the coordinate constants.
     \item \textbf{Diagonal covariance}. The diagonal model cannot represent interactions such as fairness-by-social-impact coupling or epistemic-status modulation of identity. Full or sparse covariance estimation requires more observations than the present aggregate benchmark provides. We treat this as a deferred extension rather than a closed question.

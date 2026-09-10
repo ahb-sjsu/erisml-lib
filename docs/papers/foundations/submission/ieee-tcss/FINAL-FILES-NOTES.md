@@ -220,5 +220,54 @@ boxes, citation numbers ascend in order of first appearance.
 > second "optimized" CPT run has been withdrawn. Third, the Andersen
 > high-stakes result is now stated as a failed invariance prediction of the
 > calibrated model rather than as confirmation of a predicted boundary. The
-> geometric model's own reported numbers are unchanged. Two figure legends
-> and captions were brought into line with the corrected text.
+> geometric model's own reported numbers are unchanged. Fourth, the
+> confidence-interval coverage on the six Ruggeri items is corrected from
+> four of six to two of six. The accepted text and the response letter both
+> said four of six, but the evaluation file produced by the released
+> analysis script, which was included in the revision package, records P3
+> and P7 outside their Wilson intervals as well as P16 and P17; the
+> per-item errors and the country-cell coverage were already stated
+> correctly. Two figure legends and captions were brought into line with
+> the corrected text.
+
+## Round 5 (2026-09-09, external 26-item review of the final draft)
+
+Policy after acceptance: a line of the accepted text changes only for a
+specific, verifiable reason. Each item below records where the flagged text
+lives in the accepted source (`revised_manuscript_v2.tex`, "accepted") or
+whether rounds 1 to 4 introduced it, the evidence consulted, and the decision.
+Purely stylistic requests that the reviewers accepted as written are left
+alone and listed as such.
+
+### Changed (7 edits to `final_manuscript.tex`, 1 figure)
+
+| # | Item | Provenance | Evidence | Change |
+|---|------|------------|----------|--------|
+| R5-1 | Ruggeri CI coverage "four of six" | Inherited: accepted line 502, repeated in `response_to_reviewers.tex` line 86. Factual error. | `tcss_public_data_analysis/outputs/ruggeri_frozen_prediction_evaluation.csv` as committed with the revision package at 3cd560e and as regenerated 2026-09-07: `covered_by_95ci` is True for P1 and P11 only. P3 predicts 15.4 against Wilson [11.8, 13.9]; P7 predicts 84.2 against [78.1, 80.6]. The script's own printout in every `run_log*.txt` is "95% CI coverage: 0.333". Country-cell coverage 57.9% is correct. | Section V.C coverage paragraph now says two of six inside (P1, P11) and four outside (P3, P7, P16, P17), with the interval width stated. Table VI footnote and Limitation 4 list the same four. |
+| R5-2 | Per-subset MAE 0.17 / 2.29 | Not an error. Recomputing from the rounded Table VI values gives 0.15 / 2.32. | Unrounded eris-econ predictions: ultimatum errors 0.302 and 0.038 pp (MAE 0.170); public-goods MAE 2.2875. | Sentence now says "computed from unrounded predictions". Numbers unchanged. |
+| R5-3 | Table IX counts "3 fitted variances, 13 named quantities" | Introduced in round 1 (item 6 raised the count from 12 to 13). Internal inconsistency. | Table III rows sum to 13 and include the three variances (3 + 2 + 1 + 2 + 2 + 3). Limitation 6 already says thirteen. | Table IX entry and footnote say thirteen named quantities, of which three are the fitted variances. |
+| R5-4 | Eleven-point versus thirteen-point shift | Both sentences introduced in rounds 1 to 4. Both correct: observed 48.3 to 37.0 is eleven points, predicted 48 to 35 is thirteen. | Section IV.F and VI.B text. | Section VI.B sentence now states both numbers. |
+| R5-5 | Table IV caption with math in small caps | Introduced in round 1 (new table). Rendering issue. | Caption contained $m(x)$ and $q(x)$ definitions. | Definitions moved to the table footnote. |
+| R5-6 | "producing more realistic behavior" (Future Directions) | Inherited: accepted line 988. Untested claim. | No experiment in the paper compares agent realism. | Reworded as an alternative to scalar utility maximizers, realism not tested here. |
+| R5-7 | "Three covariance variances" (abstract) | Introduced in round 1 abstract rewrite. Wording. | Accepted abstract had no such phrase. | "Three variances of the diagonal covariance". |
+| R5-8 | Fig. 5 legend reads "Fehr--Schmidt" | Inherited: `make_abm_figure.py` line 43 passed the LaTeX string to matplotlib. | The figure file shows two hyphens. | Label uses an en dash; figure regenerated with the same seed (20260610), data unchanged. |
+
+### Verified and left unchanged
+
+| Item | Finding | Why unchanged |
+|------|---------|---------------|
+| Fig. 4 PNG with in-figure title; Fig. 5 title | True. `tcss_public_data_analysis.py` and `make_abm_figure.py` set titles. | Accepted figures carried them. Cosmetic. Removing Fig. 4's title needs a rerun of the full analysis. |
+| Table VIII "Critical/High" in a numeric column | True and inherited (accepted line 785 region). | The ablation bar values in `generate_figures.py` are hand-entered approximations (0, 12, 8, 40), not a recorded run, so there is no sourced number to substitute. Noted for a future revision. |
+| Error bars on Figs. 1 and 3 "as Reviewer 3 asked" | The April 19 review has no numbered reviewers and no error-bar request. | No request on record. Fig. 1 values are also approximations (see above). |
+| Uniform rescaling invariance of the argmin | True as a matter of structure: game predictions are grid argmins and are invariant to a common variance scale, so the 2.49 to 2.69% spread comes from the lottery softmax. | The accepted sentence reports a measurement and is not wrong. Adding the structural statement would be a new claim after acceptance. |
+| Limitation 2 should mention coverage | Coverage failure is carried by Limitation 4, now listing four items. | No second mention needed. |
+| Units pp versus %, LOO heading, VI-C/VI-H overlap, P-label numbering, Henrich sentence, `\subsubsection*` at "Toward a tractable equilibrium model", Table I $d_4$ row, line 273 "without refitting" | All present in the accepted text (except line 273, which is accurate). | Stylistic. The reviewers accepted them. |
+| Line 522 lists k = 1 to 4 while Fig. 1 plots k = 5 | True. The accepted text (line 423) had the same list. | No sourced k = 5 value exists (the figure's k = 4 and k = 5 points are the placeholder 2.70). |
+| "jointly selected architecture" five times | True, introduced in round 1. | Repetition of the corrected holdout language is deliberate; trimming changes nothing factual. |
+| Reference [11] (Cheng 2026) | vol. 33, no. 2, pp. 2037 to 2114, verified on CrossRef earlier. | Correct. |
+| Reference [33] (Zenodo record) | Not verifiable: Zenodo API down 2026-09-09. | Left. Confirm the record title when Zenodo returns. |
+| Classic DOIs (Kahneman and Tversky, Nash, Hart, Simon, Akerlof, Smith, Allais, Ellsberg) | All resolve on CrossRef to the cited works. | Correct. |
+| "The letter you pasted is the major-revision decision" | Wrong premise. The pasted letter is the 2026-09-06 acceptance. | Nothing to do. |
+
+The response letter is the record of what was submitted and is not edited;
+its "4/6 coverage" line is superseded by the editor note below.
