@@ -271,3 +271,28 @@ alone and listed as such.
 
 The response letter is the record of what was submitted and is not edited;
 its "4/6 coverage" line is superseded by the editor note below.
+
+### Round 5b (2026-09-09, owner's external edits in `final_manuscript-2.tex`, adopted)
+
+The owner returned a copy of the round 5 file with further edits. Each was
+checked against the accepted source and the data before adoption. Two of
+them correct sentences added in round 5.
+
+| Item | Provenance | Evidence | Adopted change |
+|------|------------|----------|----------------|
+| "computed from unrounded predictions" (round 5, R5-2) was wrong | Round 5 wording error. | Game predictions are integer-grid values (Table VI: 48.0, 34.0, 50, 48, 46, 43, 40). The ultimatum errors 0.302 and 0.038 pp therefore come from unrounded observed means. | Now "computed from unrounded observed values". |
+| "each interval is about 2 pp wide" (round 5, R5-1) was wrong | Round 5 wording error. | Wilson half-widths from the evaluation CSV: P1 1.33, P3 1.02, P7 1.24, P11 1.12, P16 1.51, P17 1.51 pp (widths 2.0 to 3.0). | Now "extends roughly plus or minus 1 to 1.5 pp around the observed frequency". |
+| Henrich citation (external item 18) | Inherited: accepted line 58 cited Henrich et al. for a prospect-theory replication claim. | Henrich et al. 2010 is about cross-cultural variation, not prospect theory. | Ruggeri cited for the replication, Henrich for broader cross-cultural variation. |
+| Table I $d_4$ "Transferable in exchange" (item 23) | Inherited: accepted line 185. | Rows $d_1$ and $d_2$ say "Transferable". | Now "Transferable", consistent with the column. |
+| Temperature cross-reference (item 19) | Inherited: accepted text said "the selected covariance and temperature are applied ... without refitting". | Section III.C sets the temperature constants from P1 and P3, so "temperature applied without refitting" was loose. | Sentence now says the covariance is applied without refitting and points to a new label on the Cost-Dependent Temperature subsection. |
+| P-label numbering (item 16) | Inherited. | P16 (0.1 percent chance of 5,000 versus 5 for sure) is Problem 14 of Kahneman and Tversky 1979, so the labels are Ruggeri et al.'s sequential item numbers, not the original problem numbers. | One sentence added at the lottery-target description. Semicolon split into a sentence. |
+| Duplicate holdout sentences in Section V.C (item 14) | Introduced in round 1. | Section V.D lines carry both statements verbatim ("cross-domain parameter reuse within a jointly selected architecture", "the only result ... independent of every fitting and selection step"). | The two Section V.C copies replaced by pointers to Section V.D. Semicolon split into a sentence. |
+| Sections VI-C and VI-H (item 15) | Inherited: accepted lines 647 and 826 presented the same ablation twice. | Both discuss Table VIII / Fig. 2; no distinct content. | VI-H merged into VI-C; the figure and its caption move with it, text unchanged in substance. |
+| Uniform rescaling (item 6) | Inherited measurement sentence. | Game predictions are argmins of Eq. (argmin) on an integer grid (round 1, item 7, from the code), so a common variance scale cannot move them; only the lottery softmax of Eq. (temperature) depends on cost magnitude. | Two sentences added stating the invariance and that the 2.49 to 2.69% spread comes from the six lottery frequencies. |
+| "Leave-one-out diagnostic" heading (item 5) | Inherited: accepted line 798. | The section's own text says the real leave-one-out refit is future work. | Heading now "Per-target error diagnostic". |
+| "covariance variances" (item 17) | Inherited in Limitation 6 and Section VII; round 5 fixed only the abstract. | Consistency with the round 5 abstract wording. | "active variances" / "variances of the diagonal covariance". |
+| Limitation 2 (item 8) | Inherited. | The paper uses Ruggeri's pooled frequencies; a country-level analysis is not done. | Limitation 2 now says so. |
+
+Build after adoption: 17 pages, zero undefined references, zero overfull
+boxes. `final_manuscript-2.tex` is the owner's working copy and is not
+committed.

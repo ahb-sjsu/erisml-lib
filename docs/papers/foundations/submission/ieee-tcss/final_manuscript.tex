@@ -55,7 +55,7 @@ Computational social systems, geometric economics, behavioral prediction, game t
 \IEEEPARstart{P}{redicting} economic behavior is a central problem for computational social systems because social platforms, markets, energy systems, and policy mechanisms all depend on agents whose choices are neither purely monetary nor fully random.
 Expected-utility theory, axiomatized by von~Neumann and Morgenstern~\cite{vonneumann1944} and extended by Savage~\cite{savage1954}, provides a clean scalar account of choice under risk.
 Behavioral economics has shown that actual choices also reflect reference dependence, loss aversion, probability weighting, fairness, reciprocity, and social meaning~\cite{kahneman1979,tversky1992,fehr1999,bolton2000}.
-Large replications show that many prospect-theory patterns are robust across countries while also exhibiting meaningful heterogeneity~\cite{ruggeri2020,henrich2010}.
+Large replications show that many prospect-theory patterns are robust across countries while also exhibiting meaningful heterogeneity~\cite{ruggeri2020}, consistent with broader evidence of cross-cultural variation in economic behavior~\cite{henrich2010}.
 
 Existing models specialize by domain.
 Cumulative Prospect Theory (CPT)~\cite{tversky1992} is powerful for risky lotteries but is not a model of strategic interaction.
@@ -182,7 +182,7 @@ Evaluative dimensions are not conserved in this narrow exchange sense, because b
 $d_1$ & Consequences & Monetary cost, benefit, and material payoff & Expected utility and market experiments~\cite{vonneumann1944,smith1962} & Transferable \\
 $d_2$ & Rights and entitlements & Property rights, claims, contracts, and entitlements & Social choice and institutional analysis~\cite{arrow1951,ostrom1990} & Transferable \\
 $d_3$ & Fairness & Distributional and procedural justice, reciprocity & Inequality aversion and ERC~\cite{fehr1999,bolton2000} & Partly transferable \\
-$d_4$ & Autonomy & Freedom of choice, coercion aversion, agency & Development and capability approaches~\cite{sen1999} & Transferable in exchange \\
+$d_4$ & Autonomy & Freedom of choice, coercion aversion, agency & Development and capability approaches~\cite{sen1999} & Transferable \\
 $d_5$ & Privacy and trust & Information asymmetry, disclosure, fiduciary trust & Information economics~\cite{akerlof1970,stiglitz1981} & Evaluative \\
 $d_6$ & Social impact & Externalities, reputation, group benefit, community effect & Public-goods and commons literatures~\cite{ostrom1990,camerer2003} & Evaluative \\
 $d_7$ & Virtue and identity & Self-image, moral identity, role consistency & Moral and identity psychology~\cite{haidt2012,tetlock2000} & Evaluative \\
@@ -231,6 +231,7 @@ This is a descriptive population-choice rule.
 It can represent heterogeneous agents, noisy choice, or unmodeled attributes.
 
 \subsection{Cost-Dependent Temperature}
+\label{sec:temperature}
 
 The temperature depends on the cost gap $\Delta c = |c_A - c_B|$ through
 \begin{equation}
@@ -270,7 +271,7 @@ Whether such a measure preserves the reflection reversal and the other four lott
 Calibration proceeds in three stages.
 First, structural fuzzing enumerates all dimension subsets of size $k\leq5$, which gives $\sum_{k=1}^5 \binom{9}{k}=381$ candidate active sets.
 Second, for each active set the algorithm searches over the active variances and scores the nine game-theory calibration targets.
-Third, the selected covariance and temperature are applied to the lottery and historical-replication targets without refitting the active variances.
+Third, the selected covariance is applied to the lottery and historical-replication targets without refitting the active variances, with the temperature constants set as described in Section~\ref{sec:temperature}.
 Section~\ref{sec:fuzzing} gives the search in full.
 
 \begin{table*}[!t]
@@ -455,6 +456,7 @@ The same $\Sigma$ that produces risk aversion in gains produces risk seeking in 
 
 \subsubsection{The six lottery targets}
 The six targets are classic problems from Kahneman and Tversky~\cite{kahneman1979}, with observed frequencies from the Ruggeri et al.\ replication~\cite{ruggeri2020}.
+The labels P1, P3, and so on are Ruggeri et al.'s item numbers rather than the problem numbers of the original paper.
 Each frequency is the share of participants choosing the risky option.
 \begin{enumerate}
     \item \textbf{P1 (Allais certainty effect)}~\cite{allais1953}. A certain \$2,400 against a 33 percent chance of \$2,500, a 66 percent chance of \$2,400, and a 1 percent chance of nothing. Observed 25.5\%.
@@ -522,13 +524,12 @@ The Pareto frontier of best score against active-set size is tabulated, and the 
 The frontier satisfies that rule at $k=3$, with unweighted MAE of roughly 15\% at $k=1$, roughly 5\% at $k=2$, 2.70\% at $k=3$, and 2.6\% at $k=4$.
 The ranking step uses the lottery and historical targets to choose among active sets, so those targets participated in model selection.
 The active variances were fitted on the game targets, while the active-set structure was selected using the complete benchmark.
-The lottery results therefore demonstrate cross-domain parameter reuse within a jointly selected architecture, not fully out-of-sample prediction.
+Section~\ref{sec:heldout} states the evidential consequence.
 
 \subsubsection{Multiplicity exposure}
 The candidate structures create a model-selection multiplicity that we report rather than absorb into significance language.
 The objective is deterministic aggregate prediction error rather than a family of independent null-hypothesis tests, so Bonferroni or Benjamini--Hochberg corrections are not the natural calibration.
-The only test independent of every fitting and selection step is the Andersen test of Section~\ref{sec:andersen}.
-Section~\ref{sec:heldout} records what each benchmark target was used for.
+Section~\ref{sec:heldout} records what each benchmark target was used for and which result is independent of every fitting and selection step.
 
 \subsubsection{Pseudocode}
 The procedure is given as pseudocode in Table~\ref{alg:fuzz}.
@@ -611,7 +612,7 @@ Beyond the tolerance-based pass count we report three further diagnostics whose 
 \subsubsection{Per-subset MAE}
 The overall unweighted MAE of 2.70\% averages over heterogeneous targets and source studies, which can mask the higher-precision Ruggeri lottery subset.
 On the six Ruggeri lottery items (Ruggeri et al.~\cite{ruggeri2020}, $N=24{,}588$ responses in total at $N=4{,}098$ per item) the MAE is 3.95\%, driven by the systematic errors on P16 ($-6.7$~pp) and P17 ($+7.8$~pp).
-On the Fraser--Nettle game targets ($N=212$) the MAE, computed from unrounded predictions, is 0.17\% on the two ultimatum-game targets and 2.29\% on the five public-goods rounds.
+On the Fraser--Nettle game targets ($N=212$) the MAE, computed from unrounded observed values, is 0.17\% on the two ultimatum-game targets and 2.29\% on the five public-goods rounds.
 The dictator target uses the Engel meta-study~\cite{engel2011} ($N=20{,}813$) and the G\"uth historical replication uses $N=21$~\cite{guth1982}.
 The 3.95\% figure on the Ruggeri subset is the most informative single MAE for cross-domain accuracy because Ruggeri's large $N$ produces the tightest comparison, and we treat it as the conservative target metric.
 
@@ -620,7 +621,7 @@ For the targets where individual-level data are recoverable, namely the Fraser--
 On the Fraser--Nettle pair both predictions fall inside the interval.
 On the Ruggeri items two of six predictions, P1 and P11, fall inside the country-pooled interval, and 58\% of the 114 country-by-item cells are covered.
 Four items, P3, P7, P16, and P17, fall outside their Ruggeri interval despite passing the $\pm10$~pp tolerance.
-At $N=4{,}098$ each interval is about 2~pp wide, so the 2.6~pp error on P3 and the 4.8~pp error on P7 fall outside it, as do the larger errors on P16 and P17.
+At $N=4{,}098$ each interval extends roughly $\pm1$ to $\pm1.5$~pp around the observed frequency, so the 2.6~pp error on P3 and the 4.8~pp error on P7 fall outside it, as do the larger errors on P16 and P17.
 This is the principal place where the tolerance band overstates the precision of the model relative to large-sample replication data.
 
 \subsubsection{Formal model comparison where individual-level data exist}
@@ -768,11 +769,18 @@ The result shows that the fitted metric can absorb the historical difference thr
 
 \subsection{Sensitivity Analysis}
 
-Table~\ref{tab:sensitivity} presents the dimension-by-dimension sensitivity ranking.
+Table~\ref{tab:sensitivity} presents the dimension-by-dimension sensitivity ranking and Fig.~\ref{fig:sensitivity} plots the same ablation as a profile.
 The most important dimension is epistemic status ($d_9$).
-Removing it increases MAE from 2.70\% to the point of model failure.
-Social impact ($d_6$) and virtue and identity ($d_7$) are the next most important.
-The monetary dimension ($d_1$) has exactly zero sensitivity, and removing it does not change the MAE at all.
+Removing it causes the largest increase in MAE, from 2.70\% to the point of model failure, consistent with its role as the highest-sensitivity dimension.
+Removing social impact ($d_6$) or virtue and identity ($d_7$) also degrades performance substantially.
+The monetary dimension ($d_1$) has exactly zero sensitivity, and removing it or any other inactive dimension does not change the MAE at all.
+
+\begin{figure}[!t]
+\centering
+\includegraphics[width=\columnwidth]{figures/sensitivity.pdf}
+\caption{Dimension sensitivity profile from ablation. Each bar shows the increase in MAE when that dimension is removed from the model, so taller is more important. Epistemic status ($d_9$) is the most sensitive dimension and the monetary dimension ($d_1$) has zero sensitivity.}
+\label{fig:sensitivity}
+\end{figure}
 
 \begin{table}[!t]
 \renewcommand{\arraystretch}{1.15}
@@ -822,7 +830,8 @@ The fitted parameters sit in a broad basin rather than at a knife edge.
 \subsubsection{Uniform variance rescaling}
 Rescaling all three active variances by a common factor tests whether the model depends on absolute parameter values or on their ratios.
 Scaling by factors of 0.8, 0.9, 1.1, and 1.2 produces MAE between 2.49\% and 2.69\%, with 16/16 pass in every case.
-The model is primarily sensitive to the relative magnitudes of $\sigma_6^2$, $\sigma_7^2$, and $\sigma_9^2$, not to their absolute scale.
+The nine game predictions are exactly invariant to such a rescaling, because the minimizer of Eq.~\eqref{eq:argmin} does not depend on the overall scale of the cost, so only the six lottery frequencies move, through the temperature of Eq.~\eqref{eq:temperature}.
+The model is therefore sensitive to the relative magnitudes of $\sigma_6^2$, $\sigma_7^2$, and $\sigma_9^2$, not to their absolute scale.
 
 \subsubsection{Encoding coefficient perturbation}
 A distinct concern is encoding perturbation.
@@ -840,7 +849,7 @@ This equivalence covers multiplicative changes of the coefficients that multiply
 \subsubsection{Encoding mechanism ablation}
 The lottery encodings include two mechanisms that may be viewed as domain-specific design choices, the certainty nonlinearity of Eq.~\eqref{eq:certainty} and the loss-domain reversal on $d_5$ and $d_9$.
 Both are fixed encoding assumptions.
-They were not refitted with the covariance variances, and they are not treated as externally preregistered facts.
+They were not refitted with the active variances, and they are not treated as externally preregistered facts.
 To assess their causal contribution we ablate each.
 \begin{itemize}
     \item \textbf{Remove the certainty nonlinearity} (use $\mathrm{cert} = \max_i p_i$). P7 fails ($+10.4$~pp), 5/6 pass. A linear certainty measure softens the separation between certain and nearly certain outcomes and overshoots the reflection prediction.
@@ -913,7 +922,7 @@ The observed behavioral frequencies are far from what monetary optimization pred
 The active variances were fitted on the same nine game targets against which calibration accuracy is reported, and the active set was ranked on all sixteen targets.
 We address this with two analyses.
 
-\subsubsection{Leave-one-out diagnostic}
+\subsubsection{Per-target error diagnostic}
 For each of the nine game targets we compare that target's error with the errors on the other eight game targets.
 The worst single-target error is $4.3$~pp (public-goods round~1, tolerance $\pm5$~pp) and the mean absolute error across the nine game targets is $1.95$\%, so no single target dominates the calibration MAE.
 A stronger leave-one-out test would refit $\Sigma$ on the remaining eight game targets and ask whether the same active set is selected.
@@ -940,20 +949,6 @@ A fourth or fifth dimension does not meaningfully improve the MAE.
 \includegraphics[width=\columnwidth]{figures/pareto.pdf}
 \caption{Pareto frontier of model dimensionality against prediction error (MAE, lower is better). The elbow at $k=3$ dimensions is the selected model. Models with $k \geq 4$ add parameters without a meaningful reduction in MAE.}
 \label{fig:pareto}
-\end{figure}
-
-\subsection{Sensitivity Profile}
-
-Fig.~\ref{fig:sensitivity} shows the ablation-based sensitivity profile.
-Removing epistemic status ($d_9$) causes the largest increase in MAE, consistent with its role as the highest-sensitivity dimension.
-Removing social impact ($d_6$) or virtue and identity ($d_7$) also degrades performance substantially.
-Removing any inactive dimension has zero effect.
-
-\begin{figure}[!t]
-\centering
-\includegraphics[width=\columnwidth]{figures/sensitivity.pdf}
-\caption{Dimension sensitivity profile from ablation. Each bar shows the increase in MAE when that dimension is removed from the model, so taller is more important. Epistemic status ($d_9$) is the most sensitive dimension and the monetary dimension ($d_1$) has zero sensitivity.}
-\label{fig:sensitivity}
 \end{figure}
 
 \subsection{Predicted Against Observed}
@@ -1086,7 +1081,7 @@ As Table~\ref{tab:param_accounting} shows, the temperature, the rejection functi
 
 A conservative count that includes the three active variances, two temperature constants, one temperature floor, two rejection-function constants, two drift constants, and three lottery encoding mechanisms yields thirteen named quantities, before counting the coordinate constants of Table~\ref{tab:encodings} and the basis itself.
 This does not make the model uninformative.
-It does mean that the parsimony claim should be read as ``few fitted covariance variances conditional on an explicit encoding architecture,'' not as ``only three choices were made.''
+It does mean that the parsimony claim should be read as ``few fitted variances conditional on an explicit encoding architecture,'' not as ``only three choices were made.''
 
 The structural search also creates multiplicity exposure, since 381 active-set structures are considered before $\{d_6,d_7,d_9\}$ is selected, and the ranking among them used all sixteen targets.
 Because the objective is deterministic aggregate prediction error rather than a set of independent null-hypothesis tests, Bonferroni-style $p$ values are not directly applicable.
@@ -1155,11 +1150,11 @@ Under the calibrated variances the cost differences between offers are small rel
 Nine limitations qualify the present results.
 \begin{enumerate}
     \item \textbf{Encoding dependence}. The benchmark validates the metric conditional on researcher-coded encodings. The certainty operator, the domain-dependent coding, the epistemic reference values, and the coordinate constants of Table~\ref{tab:encodings} are fixed assumptions tested by ablation, not independently established psychological laws. External raters, preregistered coding rules, or automated scenario-to-attribute encoders are needed to separate encoding validation from metric validation.
-    \item \textbf{Narrow target battery}. The lottery set contains six classic targets, the historical replication target is a single 1982 ultimatum result, and the high-stakes boundary test uses one dataset from northeast India. The 19-country replication of Ruggeri et al.~\cite{ruggeri2020}, additional high-stakes bargaining cohorts (Slonim and Roth~\cite{slonim1998}, Cameron~\cite{cameron1999}), non-WEIRD samples, trust games, and market-exchange datasets are necessary before broad claims can be made.
+    \item \textbf{Narrow target battery}. The lottery set contains six classic targets, the historical replication target is a single 1982 ultimatum result, and the high-stakes boundary test uses one dataset from northeast India. A country-level analysis of the 19-country replication of Ruggeri et al.~\cite{ruggeri2020}, whose pooled frequencies are used here, additional high-stakes bargaining cohorts (Slonim and Roth~\cite{slonim1998}, Cameron~\cite{cameron1999}), non-WEIRD samples, trust games, and market-exchange datasets are necessary before broad claims can be made.
     \item \textbf{Aggregate data on the calibration side}. Most calibration targets are published summaries from heterogeneous studies rather than a single individual-level dataset. This prevents joint likelihood estimation across the full benchmark. The Andersen boundary test performs the falsification probe on individual-level data, but the calibration itself remains aggregate.
     \item \textbf{Tolerance-based evaluation}. The 16/16 pass rate is an engineering diagnostic. The MAE on the high-$N$ Ruggeri lottery subset is 3.95\%, against 2.70\% averaged over the full benchmark, and four of the six lottery predictions (P3, P7, P16, P17) fall outside the Ruggeri 95\% interval despite passing the $\pm10$~pp tolerance. Future work should adopt common train, validation, and test splits with individual-level likelihoods throughout.
     \item \textbf{No fully out-of-sample lottery target}. The temperature constants were set from P1 and P3, the G\"uth reference coordinate was set from the G\"uth offer, and the ranking of active sets used all sixteen targets, so the lottery results demonstrate parameter reuse within a jointly selected architecture rather than out-of-sample prediction. The temperature rule is nonmonotone above a cost gap of $1.41$, where four of the six lottery targets lie, and the ordering of P1 against P3 is carried by that rule rather than by the geometry (Section~\ref{sec:framework}).
-    \item \textbf{Model complexity}. The three-parameter description counts only active covariance variances. A fuller accounting includes the temperature, rejection, drift, and encoding mechanisms and the structural restrictions. The conservative count is thirteen named quantities (Table~\ref{tab:param_accounting}) plus the coordinate constants.
+    \item \textbf{Model complexity}. The three-parameter description counts only the active variances of the diagonal covariance. A fuller accounting includes the temperature, rejection, drift, and encoding mechanisms and the structural restrictions. The conservative count is thirteen named quantities (Table~\ref{tab:param_accounting}) plus the coordinate constants.
     \item \textbf{Diagonal covariance}. The diagonal model cannot represent interactions such as fairness-by-social-impact coupling or epistemic-status modulation of identity. Full or sparse covariance estimation requires more observations than the present aggregate benchmark provides. We treat this as a deferred extension rather than a closed question.
     \item \textbf{Failure of invariance demonstrated, boundary not located}. The Andersen test rejects the calibrated model's stake-scaling invariance but does not locate the stake at which it fails, does not test a monetary coordinate in absolute or income units, and does not map the failure across cultures, institutional settings, or game types.
     \item \textbf{Static and mostly binary choices}. The softmax rule handles binary choices, and the game predictions are deterministic cost minima over static menus. Multi-alternative stochastic choice, learning, belief updating, and repeated strategic adaptation remain extensions. The agent-based example is illustrative, and full mechanism-design and policy-simulation applications are not implemented here.
