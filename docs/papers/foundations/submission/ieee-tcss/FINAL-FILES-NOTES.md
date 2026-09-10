@@ -296,3 +296,18 @@ them correct sentences added in round 5.
 Build after adoption: 17 pages, zero undefined references, zero overfull
 boxes. `final_manuscript-2.tex` is the owner's working copy and is not
 committed.
+
+### Round 5c (2026-09-10, owner's `pareto_move.diff`, adopted)
+
+The diff had two hunks. The semicolon split in the lottery-target paragraph
+was already applied in round 5b. The second hunk moves the Pareto-frontier
+figure environment from Section VI.G to Section V.A, next to its first
+reference ("This bound is justified by the Pareto frontier in Fig. ...").
+Reason, checked in the built aux file: after round 5b merged VI-H into VI-C,
+the sensitivity figure environment came before the Pareto one in the source,
+so the Pareto frontier had silently become Fig. 2 (page 12) and the
+sensitivity profile Fig. 1 (page 10), while the accepted version and every
+review round referred to the Pareto frontier as Fig. 1. The move restores
+Fig. 1 = Pareto frontier, Fig. 2 = sensitivity profile, and places Fig. 1
+within a page of its first citation instead of five pages later. Caption
+and figure file unchanged.
