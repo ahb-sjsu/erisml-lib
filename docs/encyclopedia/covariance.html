@@ -1,0 +1,53 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>covariance</title><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&family=Source+Serif+4:wght@600&display=swap"><style>
+:root { color-scheme: light; --surface:#fcfcfb; --panel:#ffffff; --code:#f3f2ee; --ink:#0b0b0b; --ink2:#52514e; --ink3:#8a897f; --grid:#e6e5e1; --blue:#2a78d6; --green:#1baf7a; --orange:#eb6834; --red:#d03b3b; --violet:#4a3aa7; }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) { color-scheme: dark; --surface:#141412; --panel:#1c1c1a; --code:#262623; --ink:#ececea; --ink2:#b6b4ad; --ink3:#8a897f; --grid:#2e2e2a; --blue:#6aa3ea; --green:#3fc793; --orange:#f08a5e; --red:#e2605f; --violet:#8f80d8; } }
+:root[data-theme="dark"] { color-scheme: dark; --surface:#141412; --panel:#1c1c1a; --code:#262623; --ink:#ececea; --ink2:#b6b4ad; --ink3:#8a897f; --grid:#2e2e2a; --blue:#6aa3ea; --green:#3fc793; --orange:#f08a5e; --red:#e2605f; --violet:#8f80d8; }
+* { box-sizing: border-box; }
+body { margin:0; background:var(--surface); color:var(--ink); font-family: Inter, 'Segoe UI', Helvetica, Arial, sans-serif; font-size:16.5px; line-height:1.55; font-variant-numeric: tabular-nums; }
+h1, h2, .tile a.t { font-family: 'Source Serif 4', Georgia, 'Times New Roman', serif; text-wrap: balance; }
+header.top { border-bottom:1px solid var(--grid); padding:10px 24px; display:flex; gap:18px; align-items:baseline; flex-wrap:wrap; }
+header.top a { color:var(--ink2); text-decoration:none; } header.top a.brand { color:var(--ink); font-weight:600; }
+main { max-width: 900px; margin: 0 auto; padding: 18px 24px 60px; }
+h1 { font-size:2rem; margin:.4em 0 .2em; } h2 { font-size:1.35rem; margin:1.6em 0 .4em; } h3 { font-size:.82rem; letter-spacing:.06em; text-transform:uppercase; color:var(--ink2); margin:1.4em 0 .3em; }
+a { color: var(--blue); } a:hover { text-decoration: underline; }
+code { font-family: ui-monospace, Consolas, monospace; font-size:.88em; background:var(--code); padding:1px 4px; border-radius:3px; overflow-wrap:anywhere; }
+table { border-collapse: collapse; width:100%; font-size:.93em; } th, td { text-align:left; vertical-align:top; padding:6px 8px; border-bottom:1px solid var(--grid); } th { color:var(--ink2); font-weight:600; }
+table.card { border:1px solid var(--grid); border-radius:8px; background:var(--panel); margin:10px 0 18px; } table.card th { width:11.5em; white-space:nowrap; } table.card ul { margin:0; padding-left:1.1em; }
+.kind { display:inline-block; font-size:.78em; padding:1px 8px; border-radius:10px; color:#fff; vertical-align:middle; margin-left:6px; }
+.kind.concept{background:var(--blue)} .kind.instrument{background:var(--green)} .kind.result{background:var(--orange)} .kind.correction{background:var(--red)} .kind.reference{background:var(--violet)}
+.al { color:var(--ink2); }
+figure { margin:14px 0; } figure svg { width:100%; height:auto; border:1px solid var(--grid); border-radius:8px; background:#fcfcfb; } figcaption { font-size:.9em; color:var(--ink2); font-style:italic; margin-top:4px; }
+.grid { display:grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap:10px; }
+.tile { border:1px solid var(--grid); border-radius:8px; padding:10px 12px; background:var(--panel); } .tile a.t { font-weight:600; text-decoration:none; color:var(--ink); } .tile p { margin:4px 0 0; font-size:.9em; color:var(--ink2); }
+.letters a { margin-right:8px; text-decoration:none; font-weight:600; }
+input.search { width:100%; font-size:1.05em; padding:10px 12px; border:1px solid var(--grid); border-radius:8px; margin:10px 0 16px; background:var(--panel); color:var(--ink); } input.search:focus, a:focus-visible { outline:2px solid var(--blue); outline-offset:2px; }
+.prevnext { display:flex; justify-content:space-between; margin-top:30px; color:var(--ink2); font-size:.95em; }
+ul.evidence li { overflow-wrap:anywhere; }
+.entry { display:none; } .entry:target, .entry.show { display:block; }
+@media (max-width:600px) { table.card th { width:7em; white-space:normal; } body { font-size:15.5px; } }
+</style><script>window.MathJax={tex:{inlineMath:[["$","$"],["\\(","\\)"]],displayMath:[["$$","$$"],["\\[","\\]"]]}};</script><script defer src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-svg.js"></script></head><body><header class="top"><a class="brand" href="index.html">The Observation Theory Encyclopedia</a><a href="tsk.html">From TSK</a><a href="about.html">About</a><a href="kinds.html">By kind</a><a href="chapters.html">By chapter</a><a href="lean.html">By Lean file</a><a href="ledger.html">Ledger</a><a href="provenance.html">Provenance</a></header><main><h1 id="covariance">covariance <span class="kind concept">concept</span></h1>
+<table class="card"><tr><th>Definition</th><td>The expectation of the product of two variables&#x27; deviations from their means, positive when they move together, the off-diagonal entry of the covariance matrix and the numerator of the correlation. Primer S, equation S.12.</td></tr><tr><th>Example</th><td>x = (1, 2, 3, 4, 5) and y = (2, 4, 5, 4, 5)
+have deviation products summing to 6, covariance 1.2 with n in the
+denominator.</td></tr><tr><th>Book</th><td><em>Data Mining as Observation</em>, draft 0.2, commit <code>a0db6a8</code>; entry id <code>covariance</code>, kind concept.</td></tr><tr><th>Status</th><td>no ledger row names this entry. Corrections: none recorded.</td></tr><tr><th>Defining equation</th><td><p>Book equation S.12.</p></td></tr><tr><th>Assumptions and scope</th><td>none</td></tr><tr><th>Prior art</th><td>none recorded</td></tr><tr><th>Evidence</th><td>none</td></tr><tr><th>Reviewed</th><td>semantic review 2026-09-09; generated 2026-09-09 from records at the commits on the provenance page.</td></tr></table>
+
+<h3>Equation</h3><p>Book equation S.12.</p>
+<p><span class="math display">\[\operatorname{Cov}(X,Y)=\mathbb
+E\big[(X-\mu_X)(Y-\mu_Y)\big],\qquad
+r=\frac{\operatorname{Cov}(X,Y)}{\sigma_X\sigma_Y}.\]</span></p>
+<h3>Conditions</h3><p>none</p>
+<h3>Ledger</h3><p>none</p>
+<h3>First stated</h3><p>Primer S section S.5 of <em>Data Mining as Observation</em>, added in
+draft 0.3 (2026-09-09) for the ECE 514 readers whose first courses are
+far behind. The idea is standard and TSK Appendix C covers it at
+length.</p>
+<h3>Measurements</h3><p>none</p>
+<h3>Failures and corrections</h3><p>none</p>
+<h3>Invariance envelope</h3><p>none declared</p>
+<h3>Machine checked</h3><p>none</p>
+<h3>Used in</h3><p><em>Data Mining as Observation</em> primers L and S, chapters 0, 1,
+2, 3, 4, 9, 10, 11, 12.</p>
+<h3>Related</h3><p><a href="covariance-matrix.html">covariance matrix</a>; <a href="correlation.html">correlation</a>; <a href="variance.html">variance</a>; <a href="least-squares-line.html">least-squares line</a>.</p>
+<h3>See also</h3><p>none</p>
+<h3>Status</h3><p>Generated 2026-09-09 by <code>encyclopedia/generate.py</code>; book
+at observation-data-mining a0db6a8; the commit of every record is listed
+in the encyclopedia’s provenance.</p><div class="prevnext"><span>← <a href="coupling-null.html">coupling null</a></span><span><a href="covariance-matrix.html">covariance matrix</a> →</span></div></main></body></html>
