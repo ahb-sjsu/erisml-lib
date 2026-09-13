@@ -199,6 +199,21 @@ BOOK_CONFIGS: dict[str, dict] = {
         "subtitle": "The Mathematical Structure of Flavor, Pairing, and Culinary Harmony",
         "source_dirs": ["chapters"], "glob": "*.md",
     },
+    "geometric-observation": {
+        "number": 14, "title": "Geometric Observation",
+        "subtitle": "The Mathematical Structure of What an Observer Can Use",
+        "source_dirs": ["chapters"], "glob": "*.md",
+        "parts": [
+            ("Front Matter", ["ch00_*", "preface"]),
+            ("Part A: The Problem", ["ch01_*", "ch02_*", "ch03_*"]),
+            ("Part B: The Observer", ["ch04_*", "ch05_*", "ch06_*"]),
+            ("Part C: The Three Quantities", ["ch07_*", "ch08_*", "ch09_*"]),
+            ("Part D: Instruments", ["ch10_*", "ch11_*", "ch12_*", "ch13_*"]),
+            ("Part E: Discipline", ["ch14_*", "ch15_*", "ch16_*", "ch17_*", "ch18_*"]),
+            ("Part F: Ageing", ["ch19_*", "ch20_*", "ch21_*", "ch22_*", "ch23_*"]),
+            ("Appendices", ["appendix_*"]),
+        ],
+    },
     "geometric-aesthetics": {
         "number": 13, "title": "Geometric Aesthetics",
         "subtitle": "The Mathematical Structure of Judgment",
