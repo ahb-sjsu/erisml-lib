@@ -235,7 +235,12 @@ def fuzz_numerical(
     baseline_score: float,
     step: float = 0.05,
 ) -> List[AdversarialWitness]:
-    """Sweep each numerical field and record verdict flips."""
+    """Sweep each numerical field and record verdict flips.
+
+    A witness records the last value probed before the flip as
+    ``baseline_value``. On the first sweep step that is the field's value in
+    ``baseline``, the scenario ``baseline_verdict`` was judged on.
+    """
     witnesses: List[AdversarialWitness] = []
 
     for spec in NUMERICAL_FIELDS:
@@ -247,6 +252,7 @@ def fuzz_numerical(
         direction = 1 if end > start else -1
         steps = int(abs(end - start) / step) + 1
         previous_verdict = baseline_verdict
+        previous_value = getattr(getattr(baseline, domain), field)
 
         for i in range(steps):
             value = round(start + direction * i * step, 4)
@@ -263,7 +269,7 @@ def fuzz_numerical(
                     AdversarialWitness(
                         module_name=getattr(em, "em_name", type(em).__name__),
                         field_path=f"{domain}.{field}",
-                        baseline_value=round(value - direction * step, 4),
+                        baseline_value=previous_value,
                         mutated_value=value,
                         baseline_verdict=previous_verdict,
                         flipped_verdict=current_verdict,
@@ -273,6 +279,7 @@ def fuzz_numerical(
                 )
 
             previous_verdict = current_verdict
+            previous_value = value
 
     return witnesses
 
