@@ -237,12 +237,9 @@ def fuzz_numerical(
 ) -> List[AdversarialWitness]:
     """Sweep each numerical field and record verdict flips.
 
-    When a verdict flip is detected at sweep step *i*, the value immediately
-    before the flip is reconstructed as ``value - direction * step``.  This
-    reconstruction is clamped to ``[0.0, 1.0]`` so that on the very first
-    step (i=0) the reported ``baseline_value`` never escapes the valid range,
-    even when ``start`` differs from the field's actual value in the baseline
-    scenario.
+    A witness records the last value probed before the flip as
+    ``baseline_value``. On the first sweep step that is the field's value in
+    ``baseline``, the scenario ``baseline_verdict`` was judged on.
     """
     witnesses: List[AdversarialWitness] = []
 
@@ -255,6 +252,7 @@ def fuzz_numerical(
         direction = 1 if end > start else -1
         steps = int(abs(end - start) / step) + 1
         previous_verdict = baseline_verdict
+        previous_value = getattr(getattr(baseline, domain), field)
 
         for i in range(steps):
             value = round(start + direction * i * step, 4)
@@ -267,15 +265,11 @@ def fuzz_numerical(
             current_verdict = judgement.verdict
 
             if current_verdict != previous_verdict:
-                # Clamp the reconstructed previous value so it always stays
-                # within [0, 1], regardless of where in the sweep the flip
-                # occurred (fixes edge case at i=0).
-                prev_value = max(0.0, min(1.0, round(value - direction * step, 4)))
                 witnesses.append(
                     AdversarialWitness(
                         module_name=getattr(em, "em_name", type(em).__name__),
                         field_path=f"{domain}.{field}",
-                        baseline_value=prev_value,
+                        baseline_value=previous_value,
                         mutated_value=value,
                         baseline_verdict=previous_verdict,
                         flipped_verdict=current_verdict,
@@ -285,6 +279,7 @@ def fuzz_numerical(
                 )
 
             previous_verdict = current_verdict
+            previous_value = value
 
     return witnesses
 

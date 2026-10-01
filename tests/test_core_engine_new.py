@@ -1,4 +1,4 @@
-﻿import pytest
+import pytest
 from erisml.core.engine import ErisEngine
 from erisml.core.model import ErisModel, EnvironmentModel, AgentModel, NormSystem
 from erisml.core.types import ActionInstance, EnvironmentRule
@@ -22,6 +22,7 @@ def test_engine_lifecycle(minimal_model):
     assert engine._seed == 42
     assert engine.metrics.steps == 0
 
+    # Step
     action = ActionInstance("a1", "tick", {})
     new_state = engine.step(state, action)
     assert new_state["count"] == 1
