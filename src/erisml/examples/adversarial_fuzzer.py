@@ -235,7 +235,15 @@ def fuzz_numerical(
     baseline_score: float,
     step: float = 0.05,
 ) -> List[AdversarialWitness]:
-    """Sweep each numerical field and record verdict flips."""
+    """Sweep each numerical field and record verdict flips.
+
+    When a verdict flip is detected at sweep step *i*, the value immediately
+    before the flip is reconstructed as ``value - direction * step``.  This
+    reconstruction is clamped to ``[0.0, 1.0]`` so that on the very first
+    step (i=0) the reported ``baseline_value`` never escapes the valid range,
+    even when ``start`` differs from the field's actual value in the baseline
+    scenario.
+    """
     witnesses: List[AdversarialWitness] = []
 
     for spec in NUMERICAL_FIELDS:
@@ -259,11 +267,15 @@ def fuzz_numerical(
             current_verdict = judgement.verdict
 
             if current_verdict != previous_verdict:
+                # Clamp the reconstructed previous value so it always stays
+                # within [0, 1], regardless of where in the sweep the flip
+                # occurred (fixes edge case at i=0).
+                prev_value = max(0.0, min(1.0, round(value - direction * step, 4)))
                 witnesses.append(
                     AdversarialWitness(
                         module_name=getattr(em, "em_name", type(em).__name__),
                         field_path=f"{domain}.{field}",
-                        baseline_value=round(value - direction * step, 4),
+                        baseline_value=prev_value,
                         mutated_value=value,
                         baseline_verdict=previous_verdict,
                         flipped_verdict=current_verdict,
