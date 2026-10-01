@@ -235,8 +235,14 @@ class TestMoralVectorSchema:
     def test_required_dimensions_present(self):
         schema = get_moral_vector_schema()
         required = schema["required"]
-        for dim in ["physical_harm", "rights_respect", "fairness_equity",
-                    "autonomy_respect", "legitimacy_trust", "epistemic_quality"]:
+        for dim in [
+            "physical_harm",
+            "rights_respect",
+            "fairness_equity",
+            "autonomy_respect",
+            "legitimacy_trust",
+            "epistemic_quality",
+        ]:
             assert dim in required
 
     def test_valid_object(self):
@@ -343,8 +349,13 @@ class TestDecisionProofSchema:
 
     def test_required_fields_present(self):
         schema = get_decision_proof_schema()
-        for field in ["proof_id", "timestamp", "selected_option_id",
-                      "ranked_options", "forbidden_options"]:
+        for field in [
+            "proof_id",
+            "timestamp",
+            "selected_option_id",
+            "ranked_options",
+            "forbidden_options",
+        ]:
             assert field in schema["required"]
 
     def test_valid_minimal_object(self):
