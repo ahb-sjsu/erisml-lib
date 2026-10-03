@@ -469,14 +469,14 @@ You could describe all of this without physics terminology. So why use it?
 git clone https://github.com/ahb-sjsu/erisml-lib.git
 cd erisml-lib
 pip install -e .
-pytest tests/test_hohfeld_d4.py -v
-python -m erisml.examples.hohfeld_d4_demo
+pytest tests/test_hohfeld_v4.py -v
+python -m erisml.examples.hohfeld_v4_demo
 ```
 
 ### Reading order for the codebase:
 1. `src/erisml/ethics/hohfeld.py` — The D₄ implementation
-2. `tests/test_hohfeld_d4.py` — See the properties tested
-3. `src/erisml/examples/hohfeld_d4_demo.py` — Interactive walkthrough
+2. `tests/test_hohfeld_v4.py` — See the properties tested
+3. `src/erisml/examples/hohfeld_v4_demo.py` — Interactive walkthrough
 4. `src/erisml/ethics/modules/hohfeldian_em.py` — DEME 2.0 integration (HohfeldianEM)
 5. `docs/DEME_2.0_D4_Integration.md` — Architecture for moral landscape integration
 6. Then the papers if you want the mathematical derivations

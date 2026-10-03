@@ -21,40 +21,33 @@ Maintained: 2026-09-01. Items marked **[owner]** need the owner's canonization.
 
 ---
 
-## 1. Hohfeldian gauge structure — "V4 measured, D4 posited"
+## 1. Hohfeldian gauge structure — "V4"
 
 **Authoritative:** `formal/HohfeldV4.lean` (machine-checked, Lean 4 + Mathlib,
-last verified 2026-08-17) + the header of `src/erisml/ethics/hohfeld.py`;
-keystone correction commit `ea7ee82` (July 2026).
+last verified 2026-08-17) + `src/erisml/ethics/hohfeld.py` (V4 only since
+2026-10-03); keystone correction commit `ea7ee82` (July 2026).
 
 **Canonical statement.** The two demonstrated Hohfeldian operations — the
-correlative swap `s` (O↔C, L↔N) and deontic negation `r²` (O↔L, C↔N) — are
-commuting involutions and generate the **Klein four-group V₄** (abelian,
-order 4). **D₄** (order 8, non-abelian; some algebra texts call this group
-"D8") is the **posited** ambient group: licensed only if a quarter-turn
-(`r`: O→C→L→N→O) is independently demonstrated as a normative operation, which
-has not been done. The Lean proof establishes both halves: V₄ closure and
-quarter-turn exclusion, and that the ambient D₄ machinery is well-defined and
-testable.
+correlative swap `s` (O↔C, L↔N) and deontic negation `n` (O↔L, C↔N; written
+`r²` in earlier work) — are commuting involutions and generate the **Klein
+four-group V₄** = {e, n, s, sn} = Z₂×Z₂ (abelian, order 4), which acts on the
+four positions regularly: exactly one operation takes any position to any other.
 
-**Status:** V₄ **proved/measured**; D₄ **posited (testable)**. Candidate
-rehabilitation path (2026-09-01, unsealed): the quarter-turn may correspond to
-Hohfeld's *second square* (power/liability/immunity/disability) acting on the
-first — power operations are directed and non-involutive; and the group
-structure may be **consumer-relative** (visible in a specific readout's metric,
-invisible globally) per the OT bridge in §6. Neither is established.
+**Status:** V₄ **proved/measured**. **D₄ is obsolete** (owner, 2026-10-03): the
+quarter-turn (`r`: O→C→L→N→O) has never been demonstrated as a normative
+operation; the Lean proof shows it lies outside the generated group; and the
+quarter-turn hunt (`docs/papers/quarter-turn-hunt/`) did not find it in a learned
+representation. The D₄ machinery was removed from `hohfeld.py`; the Lean file
+keeps the exclusion proof as the record. Open, and not D₄ on the first square:
+whether Hohfeld's *second square* (power/liability/immunity/disability), whose
+operations are directed and non-involutive, carries further structure.
 
 **Known drift (fix list):**
-- `src/erisml/ethics/hohfeld.py` module docstring lines 9–12 says "D4 dihedral
-  group structure" / "the D4 dihedral group that acts" unqualified, contradicting
-  its own file header. (Fixed in the same PR as this registry.)
-- `src/erisml/examples/hohfeld_d4_demo.py` intro presents D4 as acting fact.
-- `docs/guides/SQND_ROSETTA_STONE_PRIMER.md` §3 headlines "The D₄ Group" and
-  leads with non-abelian order-dependence — the posited sector — before the
-  measured V₄ appears (§ of `test_hohfeldian_operations_generate_v4`). Needs an
-  epistemic-status banner at §3.
+- `docs/guides/SQND_ROSETTA_STONE_PRIMER.md` §3 headlines "The D₄ Group".
 - Public-facing SQND material (e.g. `docs/community/linkedin_sqnd_article.md`)
-  should be checked for unqualified D4 claims before further sharing. **[owner]**
+  should be checked for D₄ claims before further sharing. **[owner]**
+- Separate copies outside this repository still implement D₄: agi-hpc
+  `src/agi/safety/erisml/hohfeld.py` and sqnd-probe `src/dear_ethicist/models.py`.
 
 ## 2. The moral dimensions (k-axes)
 
