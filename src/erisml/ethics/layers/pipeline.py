@@ -91,6 +91,9 @@ class DecisionResult:
     total_latency_ms: float
     """Total pipeline execution time."""
 
+    em_failures: Dict[str, List[str]] = field(default_factory=dict)
+    """Per option, the EMs that raised instead of judging (see TacticalLayerConfig.fail_closed)."""
+
 
 class DEMEPipeline:
     """
@@ -185,6 +188,7 @@ class DEMEPipeline:
         tactical_start = time.perf_counter()
         tactical_results: Dict[str, TacticalResult] = {}
         tactical_vetoed: List[str] = []
+        em_failures: Dict[str, List[str]] = {}
         landscape = MoralLandscape()
         em_judgement_records: List[EMJudgementRecord] = []
 
@@ -200,6 +204,8 @@ class DEMEPipeline:
 
             if tactical_result.vetoed:
                 tactical_vetoed.append(facts.option_id)
+            if tactical_result.em_failures:
+                em_failures[facts.option_id] = list(tactical_result.em_failures)
 
             # Record EM judgements for proof
             for j in tactical_result.judgements:
@@ -230,6 +236,7 @@ class DEMEPipeline:
                 output_data={
                     "vetoed_options": tactical_vetoed,
                     "evaluated_options": len(tactical_results),
+                    "em_failures": em_failures,
                 },
             )
         )
@@ -312,6 +319,7 @@ class DEMEPipeline:
             rationale=rationale,
             proof=proof,
             total_latency_ms=total_latency,
+            em_failures=em_failures,
         )
 
 

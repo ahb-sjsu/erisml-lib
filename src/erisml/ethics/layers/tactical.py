@@ -13,6 +13,7 @@ Version: 2.0.0 (DEME 2.0)
 
 from __future__ import annotations
 
+import logging
 import time
 from dataclasses import dataclass, field
 from typing import Dict, List, Optional, Tuple, TYPE_CHECKING
@@ -24,6 +25,8 @@ if TYPE_CHECKING:
 from erisml.ethics.moral_vector import MoralVector
 from erisml.ethics.moral_landscape import MoralLandscape
 from erisml.ethics.judgement import EthicalJudgementV2
+
+log = logging.getLogger(__name__)
 
 
 @dataclass
@@ -62,6 +65,15 @@ class TacticalLayerConfig:
     )
     """Whether each tier can trigger vetoes."""
 
+    fail_closed: bool = False
+    """What an EM that raises means for the option it was judging.
+
+    An EM that fails has not approved the option; it has said nothing. Every failure is
+    recorded in ``TacticalResult.em_failures`` and logged either way. With ``fail_closed``
+    True the failure also vetoes the option, as an objection would. The default (False)
+    keeps the earlier behaviour, judging the option by the EMs that did answer; safety-
+    critical deployments should set it to True."""
+
 
 @dataclass
 class TacticalResult:
@@ -84,6 +96,9 @@ class TacticalResult:
 
     latency_ms: float
     """Execution latency in milliseconds."""
+
+    em_failures: List[str] = field(default_factory=list)
+    """EMs that raised instead of judging, as ``"em_name: ExceptionType: message"``."""
 
 
 class TacticalLayer:
@@ -149,26 +164,33 @@ class TacticalLayer:
         # Collect judgements from all EMs
         judgements: List[EthicalJudgementV2] = []
         veto_reasons: List[str] = []
+        em_failures: List[str] = []
         vetoed = False
 
         for em in self.ems:
+            name = getattr(em, "em_name", type(em).__name__)
             try:
                 judgement = em.judge(facts)
-                judgements.append(judgement)
-
-                # Check for veto
                 tier = em.em_tier
-                if judgement.veto_triggered:
-                    if self.config.tier_veto_enabled.get(tier, True):
-                        vetoed = True
-                        if judgement.veto_reason:
-                            veto_reasons.append(
-                                f"{em.em_name}: {judgement.veto_reason}"
-                            )
-            except Exception:
-                # EM failure - log but continue with other EMs
-                # In production, this would be monitored
-                pass
+            except Exception as e:  # an EM that fails has not approved the option
+                failure = f"{name}: {type(e).__name__}: {e}"
+                em_failures.append(failure)
+                log.warning(
+                    "ethics module failed on option %s: %s", facts.option_id, failure
+                )
+                if self.config.fail_closed:
+                    vetoed = True
+                    veto_reasons.append(
+                        f"{name}: failed ({type(e).__name__}); fail_closed"
+                    )
+                continue
+            judgements.append(judgement)
+            if judgement.veto_triggered and self.config.tier_veto_enabled.get(
+                tier, True
+            ):
+                vetoed = True
+                if judgement.veto_reason:
+                    veto_reasons.append(f"{name}: {judgement.veto_reason}")
 
         # Aggregate moral vectors
         aggregated_vector = self._aggregate_vectors(judgements)
@@ -182,6 +204,7 @@ class TacticalLayer:
             vetoed=vetoed,
             veto_reasons=veto_reasons,
             latency_ms=latency_ms,
+            em_failures=em_failures,
         )
 
     def evaluate_batch(

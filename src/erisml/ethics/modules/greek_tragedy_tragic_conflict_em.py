@@ -52,8 +52,13 @@ def _bool(obj: Any) -> bool:
 
 
 class TragicConflictEM:
+    """A V1 EM that measures how tragic a choice is (every option costing something) and flags it;
+    it never vetoes. In a V2 pipeline, wrap it: ``V1ToV2Adapter(TragicConflictEM(), em_tier=3)``.
+    """
+
     em_name: str = "tragic_conflict"
     em_id: str = "tragic_conflict"
+    stakeholder: str = "unspecified"
 
     def judge(self, facts: EthicalFacts) -> EthicalJudgement:
         urgency = float(_get(facts, "consequences.urgency", 0.0) or 0.0)
