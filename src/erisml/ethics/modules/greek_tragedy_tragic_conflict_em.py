@@ -109,7 +109,10 @@ class TragicConflictEM:
             conflict += 0.15
             triggers.append("discrimination")
 
-        conflict = min(1.0, conflict)
+        # the weights are decimal hundredths; summed in binary floating point they drift (0.20 +
+        # 0.15 + 0.10 is 0.44999999999999996), which would decide a sum that lands on the
+        # threshold by rounding error. Rounding restores the decimal sum.
+        conflict = round(min(1.0, conflict), 6)
         score = 0.85 - (0.6 * conflict)
         score = max(0.0, score)
 
