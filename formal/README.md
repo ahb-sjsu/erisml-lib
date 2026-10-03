@@ -20,7 +20,7 @@ Verifies the July 2026 keystone correction (commit `ea7ee82`) against Mathlib:
 
 The position encoding (0 = Obligation, 1 = Claim, 2 = Liberty, 3 = No-claim)
 matches `src/erisml/ethics/hohfeld.py`, whose test suite
-(`tests/test_hohfeld_d4.py::test_hohfeldian_operations_generate_v4`) checks the
+(`tests/test_hohfeld_v4.py::TestTheDemonstratedOperationsGenerateV4`) checks the
 same closure property numerically.
 
 ## Checking it

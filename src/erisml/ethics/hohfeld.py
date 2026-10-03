@@ -1,4 +1,4 @@
-# ErisML - Hohfeldian Gauge Structure for Normative Positions (V4 measured, D4 posited)
+# ErisML - Hohfeldian Gauge Structure for Normative Positions (V4)
 # Copyright (c) 2026 Andrew H. Bond
 # Department of Computer Engineering, San Jose State University
 #
@@ -6,37 +6,34 @@
 # See LICENSE file for details.
 
 """
-Hohfeldian normative positions with the measured V4 gauge structure and the
-posited D4 (order-8 dihedral) ambient machinery.
+Hohfeldian normative positions and the Klein four-group V4 of the operations on them.
 
-This module implements Wesley Hohfeld's four fundamental normative positions
-(Obligation, Claim, Liberty, No-claim), the MEASURED Klein four-group V4 of
-demonstrated operations, and the full POSITED D4 dihedral machinery so the
-quarter-turn hypothesis stays testable (see the epistemic-status paragraph
-below and docs/CONCEPT_REGISTRY.md section 1).
+Wesley Hohfeld's four normative positions (Obligation, Claim, Liberty, No-claim) admit two
+demonstrated operations:
 
-The key insight is that moral reasoning exhibits gauge symmetries:
-- Correlative symmetry (s): O↔C, L↔N - perspective swap between parties
-- Negation symmetry (r²): O↔L, C↔N - logical negation of normative status
+- the correlative swap s: O<->C, L<->N, the same relation seen from the other party;
+- deontic negation n (written r^2 in earlier work): O<->L, C<->N.
 
-Epistemic status (aligned with the DEME keystone correction): the two
-Hohfeldian operations above are commuting involutions, so the group they
-generate is the Klein four-group V₄ = {e, r², s, sr²} — abelian, order 4
-(see get_klein_four_subgroup). D4 (order 8, non-abelian) is the *posited*
-ambient group: it is licensed only if quarter-turn operations
-(r, r³, sr, sr³) are independently demonstrated as normative operations,
-which has not yet been done empirically. Code below implements the full D4
-machinery so that hypothesis is testable, not because it is established.
-The V4 claim is machine-checked in formal/HohfeldV4.lean (Lean 4 + Mathlib):
-s and r² are commuting involutions generating a 4-element subgroup ≅ V₄,
-and the quarter-turn r lies outside it.
+They are commuting involutions, so the group they generate is the Klein four-group
+V4 = {e, n, s, sn} = Z2 x Z2: abelian, every element its own inverse. This is machine-checked
+in formal/HohfeldV4.lean (Lean 4 + Mathlib). The order-8 dihedral group D4, which would add a
+quarter-turn cycling the four positions, is obsolete: the quarter-turn has never been
+demonstrated as a normative operation, the Lean file proves it lies outside the generated
+group, and the quarter-turn hunt (docs/papers/quarter-turn-hunt) did not find it in a learned
+representation. See docs/CONCEPT_REGISTRY.md section 1.
+
+V4 acts on the four positions regularly (simply transitively): for any two positions there is
+exactly one operation taking the first to the second. The encoding below makes that explicit.
+A position is two bits, (negated, correlated) relative to Obligation, and an operation is the
+bit mask it flips:
+
+    O = 00   L = 10   C = 01   N = 11        e = 00   n = 10   s = 01   sn = 11
+
+so applying an operation, and composing two, are both XOR.
 
 References:
     Hohfeld, W.N. (1917). "Fundamental Legal Conceptions as Applied in
     Judicial Reasoning." Yale Law Journal, 26(8), 710-770.
-
-    Bond, A.H. & Claude (2026). "SQND-Probe: A Gamified Instrument for
-    Measuring Dihedral Gauge Structure in Human Moral Reasoning."
 """
 
 from __future__ import annotations
@@ -54,12 +51,11 @@ class HohfeldianState(str, Enum):
     """
     The four Hohfeldian normative positions.
 
-    These form the vertices of a square on which D4 acts:
-
-        O -------- C
-        |          |
-        |          |
-        L -------- N
+        O -- s -- C
+        |         |
+        n         n
+        |         |
+        L -- s -- N
 
     Natural language mappings:
     - O (Obligation): "Must I do this?" / "Am I obligated?"
@@ -67,13 +63,13 @@ class HohfeldianState(str, Enum):
     - L (Liberty): "May I refuse?" / "Am I free to choose?"
     - N (No-claim): "Can they demand?" (no) / "They have no right"
 
-    Correlative pairs (perspective swap):
-    - O ↔ C: If A has obligation to B, then B has claim against A
-    - L ↔ N: If A has liberty against B, then B has no-claim against A
+    Correlative pairs (s, perspective swap):
+    - O <-> C: if A has an obligation to B, then B has a claim against A
+    - L <-> N: if A has a liberty against B, then B has no claim against A
 
-    Negation pairs (logical opposites):
-    - O ↔ L: Obligation is the negation of liberty
-    - C ↔ N: Claim is the negation of no-claim
+    Negation pairs (n, logical opposites):
+    - O <-> L: obligation is the negation of liberty
+    - C <-> N: claim is the negation of no-claim
     """
 
     O = "O"  # noqa: E741 - Obligation: MUST do something
@@ -83,220 +79,78 @@ class HohfeldianState(str, Enum):
 
 
 # =============================================================================
-# D4 DIHEDRAL GROUP
+# THE KLEIN FOUR-GROUP V4
 # =============================================================================
 
 
-class D4Element(str, Enum):
-    """
-    The 8 elements of the dihedral group D4 (symmetries of a square).
+class V4Element(str, Enum):
+    """The four operations on Hohfeldian positions: V4 = {e, n, s, sn} = Z2 x Z2."""
 
-    Generators:
-    - r: 90° clockwise rotation
-    - s: reflection (horizontal axis, swapping O↔C and L↔N)
-
-    Elements:
-    - e: identity
-    - r: 90° rotation
-    - r²: 180° rotation (negation)
-    - r³: 270° rotation (= r⁻¹)
-    - s: reflection (correlative)
-    - sr: reflection composed with rotation
-    - sr²: reflection composed with 180° rotation
-    - sr³: reflection composed with 270° rotation
-
-    Group relations:
-    - r⁴ = e
-    - s² = e
-    - srs = r⁻¹ (= r³)
-    """
-
-    E = "e"  # Identity
-    R = "r"  # 90° rotation: O→C→L→N→O
-    R2 = "r2"  # 180° rotation (negation): O↔L, C↔N
-    R3 = "r3"  # 270° rotation (= r⁻¹): O→N→L→C→O
-    S = "s"  # Reflection (correlative): O↔C, L↔N
-    SR = "sr"  # s∘r
-    SR2 = "sr2"  # s∘r²
-    SR3 = "sr3"  # s∘r³
+    E = "e"  # identity
+    NEG = "n"  # deontic negation (r^2 in earlier work): O<->L, C<->N
+    COR = "s"  # correlative swap: O<->C, L<->N
+    COR_NEG = "sn"  # both: O<->N, C<->L
 
 
-# Complete multiplication table for D4
-_D4_MULT_TABLE: Dict[Tuple[D4Element, D4Element], D4Element] = {
-    # Identity row and column
-    (D4Element.E, D4Element.E): D4Element.E,
-    (D4Element.E, D4Element.R): D4Element.R,
-    (D4Element.E, D4Element.R2): D4Element.R2,
-    (D4Element.E, D4Element.R3): D4Element.R3,
-    (D4Element.E, D4Element.S): D4Element.S,
-    (D4Element.E, D4Element.SR): D4Element.SR,
-    (D4Element.E, D4Element.SR2): D4Element.SR2,
-    (D4Element.E, D4Element.SR3): D4Element.SR3,
-    # R row
-    (D4Element.R, D4Element.E): D4Element.R,
-    (D4Element.R, D4Element.R): D4Element.R2,
-    (D4Element.R, D4Element.R2): D4Element.R3,
-    (D4Element.R, D4Element.R3): D4Element.E,
-    (D4Element.R, D4Element.S): D4Element.SR3,
-    (D4Element.R, D4Element.SR): D4Element.S,
-    (D4Element.R, D4Element.SR2): D4Element.SR,
-    (D4Element.R, D4Element.SR3): D4Element.SR2,
-    # R2 row
-    (D4Element.R2, D4Element.E): D4Element.R2,
-    (D4Element.R2, D4Element.R): D4Element.R3,
-    (D4Element.R2, D4Element.R2): D4Element.E,
-    (D4Element.R2, D4Element.R3): D4Element.R,
-    (D4Element.R2, D4Element.S): D4Element.SR2,
-    (D4Element.R2, D4Element.SR): D4Element.SR3,
-    (D4Element.R2, D4Element.SR2): D4Element.S,
-    (D4Element.R2, D4Element.SR3): D4Element.SR,
-    # R3 row
-    (D4Element.R3, D4Element.E): D4Element.R3,
-    (D4Element.R3, D4Element.R): D4Element.E,
-    (D4Element.R3, D4Element.R2): D4Element.R,
-    (D4Element.R3, D4Element.R3): D4Element.R2,
-    (D4Element.R3, D4Element.S): D4Element.SR,
-    (D4Element.R3, D4Element.SR): D4Element.SR2,
-    (D4Element.R3, D4Element.SR2): D4Element.SR3,
-    (D4Element.R3, D4Element.SR3): D4Element.S,
-    # S row
-    (D4Element.S, D4Element.E): D4Element.S,
-    (D4Element.S, D4Element.R): D4Element.SR,
-    (D4Element.S, D4Element.R2): D4Element.SR2,
-    (D4Element.S, D4Element.R3): D4Element.SR3,
-    (D4Element.S, D4Element.S): D4Element.E,
-    (D4Element.S, D4Element.SR): D4Element.R,
-    (D4Element.S, D4Element.SR2): D4Element.R2,
-    (D4Element.S, D4Element.SR3): D4Element.R3,
-    # SR row
-    (D4Element.SR, D4Element.E): D4Element.SR,
-    (D4Element.SR, D4Element.R): D4Element.SR2,
-    (D4Element.SR, D4Element.R2): D4Element.SR3,
-    (D4Element.SR, D4Element.R3): D4Element.S,
-    (D4Element.SR, D4Element.S): D4Element.R3,
-    (D4Element.SR, D4Element.SR): D4Element.E,
-    (D4Element.SR, D4Element.SR2): D4Element.R,
-    (D4Element.SR, D4Element.SR3): D4Element.R2,
-    # SR2 row
-    (D4Element.SR2, D4Element.E): D4Element.SR2,
-    (D4Element.SR2, D4Element.R): D4Element.SR3,
-    (D4Element.SR2, D4Element.R2): D4Element.S,
-    (D4Element.SR2, D4Element.R3): D4Element.SR,
-    (D4Element.SR2, D4Element.S): D4Element.R2,
-    (D4Element.SR2, D4Element.SR): D4Element.R3,
-    (D4Element.SR2, D4Element.SR2): D4Element.E,
-    (D4Element.SR2, D4Element.SR3): D4Element.R,
-    # SR3 row
-    (D4Element.SR3, D4Element.E): D4Element.SR3,
-    (D4Element.SR3, D4Element.R): D4Element.S,
-    (D4Element.SR3, D4Element.R2): D4Element.SR,
-    (D4Element.SR3, D4Element.R3): D4Element.SR2,
-    (D4Element.SR3, D4Element.S): D4Element.R,
-    (D4Element.SR3, D4Element.SR): D4Element.R2,
-    (D4Element.SR3, D4Element.SR2): D4Element.R3,
-    (D4Element.SR3, D4Element.SR3): D4Element.E,
+# (negated, correlated) bits of each position, and the mask each operation flips
+_POSITION_BITS: Dict[HohfeldianState, int] = {
+    HohfeldianState.O: 0b00,
+    HohfeldianState.L: 0b10,
+    HohfeldianState.C: 0b01,
+    HohfeldianState.N: 0b11,
 }
-
-# Inverse table for D4
-_D4_INVERSE: Dict[D4Element, D4Element] = {
-    D4Element.E: D4Element.E,
-    D4Element.R: D4Element.R3,
-    D4Element.R2: D4Element.R2,
-    D4Element.R3: D4Element.R,
-    D4Element.S: D4Element.S,  # Reflections are self-inverse
-    D4Element.SR: D4Element.SR,
-    D4Element.SR2: D4Element.SR2,
-    D4Element.SR3: D4Element.SR3,
+_BITS_POSITION: Dict[int, HohfeldianState] = {b: p for p, b in _POSITION_BITS.items()}
+_ELEMENT_MASK: Dict[V4Element, int] = {
+    V4Element.E: 0b00,
+    V4Element.NEG: 0b10,
+    V4Element.COR: 0b01,
+    V4Element.COR_NEG: 0b11,
 }
-
-# Rotation action on Hohfeldian states
-_ROTATION: Dict[HohfeldianState, HohfeldianState] = {
-    HohfeldianState.O: HohfeldianState.C,
-    HohfeldianState.C: HohfeldianState.L,
-    HohfeldianState.L: HohfeldianState.N,
-    HohfeldianState.N: HohfeldianState.O,
-}
-
-# Reflection (correlative) action on Hohfeldian states
-_REFLECTION: Dict[HohfeldianState, HohfeldianState] = {
-    HohfeldianState.O: HohfeldianState.C,
-    HohfeldianState.C: HohfeldianState.O,
-    HohfeldianState.L: HohfeldianState.N,
-    HohfeldianState.N: HohfeldianState.L,
-}
+_MASK_ELEMENT: Dict[int, V4Element] = {m: g for g, m in _ELEMENT_MASK.items()}
 
 
-# =============================================================================
-# D4 GROUP OPERATIONS
-# =============================================================================
+def v4_elements() -> List[V4Element]:
+    """All four elements of V4."""
+    return list(V4Element)
 
 
-def d4_multiply(a: D4Element, b: D4Element) -> D4Element:
-    """
-    Compute a * b in the D4 group.
-
-    Uses right-to-left composition: (a * b)(x) = a(b(x))
-    """
-    return _D4_MULT_TABLE[(a, b)]
+def v4_multiply(a: V4Element, b: V4Element) -> V4Element:
+    """a * b in V4 (abelian, so the order does not matter): the masks XOR."""
+    return _MASK_ELEMENT[_ELEMENT_MASK[a] ^ _ELEMENT_MASK[b]]
 
 
-def d4_inverse(a: D4Element) -> D4Element:
-    """Compute the inverse of element a in D4."""
-    return _D4_INVERSE[a]
+def v4_inverse(a: V4Element) -> V4Element:
+    """Every element of V4 is its own inverse."""
+    return a
 
 
-def d4_apply_to_state(element: D4Element, state: HohfeldianState) -> HohfeldianState:
-    """
-    Apply a D4 group element to a Hohfeldian state.
+def v4_apply_to_state(element: V4Element, state: HohfeldianState) -> HohfeldianState:
+    """Apply an operation to a position: flip the position's bits by the element's mask."""
+    return _BITS_POSITION[_POSITION_BITS[state] ^ _ELEMENT_MASK[element]]
 
-    This is the fundamental group action that maps:
-    - r: O→C→L→N→O (rotation)
-    - s: O↔C, L↔N (correlative/reflection)
-    - r²: O↔L, C↔N (negation)
-    """
-    result = state
-    match element:
-        case D4Element.E:
-            pass
-        case D4Element.R:
-            result = _ROTATION[result]
-        case D4Element.R2:
-            result = _ROTATION[_ROTATION[result]]
-        case D4Element.R3:
-            result = _ROTATION[_ROTATION[_ROTATION[result]]]
-        case D4Element.S:
-            result = _REFLECTION[result]
-        # Labels compose right-to-left: sr^k(x) = s(r^k(x)) — rotate first,
-        # then reflect — matching the table convention (a*b)(x) = a(b(x)).
-        case D4Element.SR:
-            result = _REFLECTION[_ROTATION[result]]
-        case D4Element.SR2:
-            result = _REFLECTION[_ROTATION[_ROTATION[result]]]
-        case D4Element.SR3:
-            result = _REFLECTION[_ROTATION[_ROTATION[_ROTATION[result]]]]
-    return result
+
+def v4_between(source: HohfeldianState, target: HohfeldianState) -> V4Element:
+    """The unique operation taking `source` to `target` (the action is regular)."""
+    return _MASK_ELEMENT[_POSITION_BITS[source] ^ _POSITION_BITS[target]]
 
 
 def correlative(state: HohfeldianState) -> HohfeldianState:
     """
-    Get the correlative state (s-reflection): O↔C, L↔N.
+    The correlative position (s): O<->C, L<->N.
 
-    The correlative is the perspective swap:
-    - If A has obligation to B, then B has claim against A
-    - If A has liberty against B, then B has no-claim against A
+    The perspective swap: if A has an obligation to B, B has a claim against A; if A has a
+    liberty against B, B has no claim against A.
     """
-    return _REFLECTION[state]
+    return v4_apply_to_state(V4Element.COR, state)
 
 
 def negation(state: HohfeldianState) -> HohfeldianState:
     """
-    Get the negation state (r²): O↔L, C↔N.
+    The negated position (n): O<->L, C<->N.
 
-    The negation is the logical opposite:
-    - Obligation is the absence of liberty
-    - Claim is the absence of no-claim
+    Obligation is the absence of liberty; claim is the absence of no-claim.
     """
-    return d4_apply_to_state(D4Element.R2, state)
+    return v4_apply_to_state(V4Element.NEG, state)
 
 
 # =============================================================================
@@ -306,57 +160,58 @@ def negation(state: HohfeldianState) -> HohfeldianState:
 
 class SemanticGate(str, Enum):
     """
-    Linguistic markers that trigger D4 transformations.
+    Linguistic markers that move a normative position.
 
-    These are phrases that modulate normative status in natural language.
+    Each gate is one V4 operation (GATE_TO_V4). A gate documented by a single transition (for
+    example L -> C) is the unique operation between those positions, since V4 acts regularly.
     """
 
-    # Obligation release (O → L via r²)
+    # Obligation release (O -> L, n)
     ONLY_IF_CONVENIENT = "only_if_convenient"
     WHEN_YOU_GET_A_CHANCE = "when_you_get_a_chance"
     IF_NOT_TOO_MUCH_TROUBLE = "if_not_too_much_trouble"
     NO_PRESSURE = "no_pressure"
 
-    # Liberty binding (L → O via r²)
+    # Liberty binding (L -> O, n)
     I_PROMISE = "i_promise"
     YOU_MUST = "you_must"
     I_SWEAR = "i_swear"
     ABSOLUTELY = "absolutely"
 
-    # Perspective shift (correlative, s)
+    # Perspective shift (s)
     FROM_THEIR_PERSPECTIVE = "from_their_perspective"
     THEY_WOULD_SAY = "they_would_say"
 
-    # Claim strengthening
+    # Claim strengthening and release (L -> C and C -> L, sn)
     YOU_HAVE_EVERY_RIGHT = "you_have_every_right"
     THEY_CANT_DEMAND = "they_cant_demand"
 
 
-# Mapping from semantic gates to D4 elements
-GATE_TO_D4: Dict[SemanticGate, D4Element] = {
-    # Obligation release: O → L requires r² (negation)
-    SemanticGate.ONLY_IF_CONVENIENT: D4Element.R2,
-    SemanticGate.WHEN_YOU_GET_A_CHANCE: D4Element.R2,
-    SemanticGate.IF_NOT_TOO_MUCH_TROUBLE: D4Element.R2,
-    SemanticGate.NO_PRESSURE: D4Element.R2,
-    # Liberty binding: L → O also requires r² (negation is self-inverse)
-    SemanticGate.I_PROMISE: D4Element.R2,
-    SemanticGate.YOU_MUST: D4Element.R2,
-    SemanticGate.I_SWEAR: D4Element.R2,
-    SemanticGate.ABSOLUTELY: D4Element.R2,
-    # Perspective shift: correlative (s)
-    SemanticGate.FROM_THEIR_PERSPECTIVE: D4Element.S,
-    SemanticGate.THEY_WOULD_SAY: D4Element.S,
-    # Quarter turns for claim/no-claim shifts
-    SemanticGate.YOU_HAVE_EVERY_RIGHT: D4Element.R3,  # L → C
-    SemanticGate.THEY_CANT_DEMAND: D4Element.R,  # C → L
+GATE_TO_V4: Dict[SemanticGate, V4Element] = {
+    # Obligation release: O -> L is negation
+    SemanticGate.ONLY_IF_CONVENIENT: V4Element.NEG,
+    SemanticGate.WHEN_YOU_GET_A_CHANCE: V4Element.NEG,
+    SemanticGate.IF_NOT_TOO_MUCH_TROUBLE: V4Element.NEG,
+    SemanticGate.NO_PRESSURE: V4Element.NEG,
+    # Liberty binding: L -> O is negation too (negation is an involution)
+    SemanticGate.I_PROMISE: V4Element.NEG,
+    SemanticGate.YOU_MUST: V4Element.NEG,
+    SemanticGate.I_SWEAR: V4Element.NEG,
+    SemanticGate.ABSOLUTELY: V4Element.NEG,
+    # Perspective shift: the correlative
+    SemanticGate.FROM_THEIR_PERSPECTIVE: V4Element.COR,
+    SemanticGate.THEY_WOULD_SAY: V4Element.COR,
+    # L -> C and C -> L: the correlative of the negation. These two were quarter turns under the
+    # obsolete D4 reading, which agreed with sn on their documented transitions and differed
+    # only on the positions they were never documented for.
+    SemanticGate.YOU_HAVE_EVERY_RIGHT: V4Element.COR_NEG,
+    SemanticGate.THEY_CANT_DEMAND: V4Element.COR_NEG,
 }
 
 
 def apply_semantic_gate(gate: SemanticGate, state: HohfeldianState) -> HohfeldianState:
-    """Apply a semantic gate transformation to a Hohfeldian state."""
-    element = GATE_TO_D4[gate]
-    return d4_apply_to_state(element, state)
+    """Apply a semantic gate's operation to a Hohfeldian position."""
+    return v4_apply_to_state(GATE_TO_V4[gate], state)
 
 
 # =============================================================================
@@ -443,19 +298,20 @@ def compute_bond_index(
 
 
 def compute_wilson_observable(
-    path: List[D4Element],
+    path: List[V4Element],
     initial_state: HohfeldianState,
     observed_final: HohfeldianState,
-) -> Tuple[D4Element, bool]:
+) -> Tuple[V4Element, bool]:
     """
-    Compute Wilson observable for a closed path of transformations.
+    Compute the Wilson observable for a path of transformations.
 
-    In discrete gauge theory, the Wilson loop is the holonomy around
-    a closed path. For our D4 gauge structure, this measures whether
-    the observed final state matches the predicted holonomy.
+    The holonomy of the path is the product of its elements. V4 is abelian, so the holonomy
+    depends only on how many times each of n and s occurs (mod 2), never on their order: two
+    paths with the same counts must end in the same position. An observed path dependence is
+    therefore a measured violation of the V4 structure, not a feature of it.
 
     Args:
-        path: Sequence of D4 group elements (transformations applied)
+        path: Sequence of V4 elements (transformations applied)
         initial_state: Starting Hohfeldian position
         observed_final: Actually observed final state
 
@@ -463,51 +319,11 @@ def compute_wilson_observable(
         (holonomy, matched): The predicted group element and whether
         the observation matched the prediction.
     """
-    # Compute holonomy (product of path elements)
-    holonomy = D4Element.E
+    holonomy = V4Element.E
     for g in path:
-        holonomy = d4_multiply(holonomy, g)
-
-    # Predicted final state
-    predicted_final = d4_apply_to_state(holonomy, initial_state)
-    matched = observed_final == predicted_final
-
-    return holonomy, matched
-
-
-# =============================================================================
-# ABELIAN SUBGROUP ANALYSIS
-# =============================================================================
-
-
-def get_klein_four_subgroup() -> List[D4Element]:
-    """
-    Return the Klein four-group V₄ = {e, r², s, sr²}.
-
-    This abelian subgroup is generated by {r², s} and is important
-    because if only negation (r²) and correlative (s) operations are
-    empirically observed, we have NOT demonstrated non-abelian structure.
-
-    Non-abelian structure requires demonstrating operations from
-    {r, r³, sr, sr³} - the "quarter-turn" elements.
-    """
-    return [D4Element.E, D4Element.R2, D4Element.S, D4Element.SR2]
-
-
-def is_in_klein_four(element: D4Element) -> bool:
-    """Check if an element is in the abelian Klein four subgroup."""
-    return element in get_klein_four_subgroup()
-
-
-def requires_nonabelian_structure(elements: List[D4Element]) -> bool:
-    """
-    Check if a set of operations requires non-abelian group structure.
-
-    Returns True if the elements include any from {r, r³, sr, sr³},
-    which don't commute with s and thus demonstrate D4's non-abelian nature.
-    """
-    non_abelian_elements = {D4Element.R, D4Element.R3, D4Element.SR, D4Element.SR3}
-    return any(e in non_abelian_elements for e in elements)
+        holonomy = v4_multiply(holonomy, g)
+    predicted_final = v4_apply_to_state(holonomy, initial_state)
+    return holonomy, observed_final == predicted_final
 
 
 # =============================================================================
@@ -518,24 +334,22 @@ def requires_nonabelian_structure(elements: List[D4Element]) -> bool:
 __all__ = [
     # Enums
     "HohfeldianState",
-    "D4Element",
+    "V4Element",
     "SemanticGate",
     # Group operations
-    "d4_multiply",
-    "d4_inverse",
-    "d4_apply_to_state",
+    "v4_elements",
+    "v4_multiply",
+    "v4_inverse",
+    "v4_apply_to_state",
+    "v4_between",
     "correlative",
     "negation",
     # Semantic gates
-    "GATE_TO_D4",
+    "GATE_TO_V4",
     "apply_semantic_gate",
     # Verdict
     "HohfeldianVerdict",
     # Bond index
     "compute_bond_index",
     "compute_wilson_observable",
-    # Subgroup analysis
-    "get_klein_four_subgroup",
-    "is_in_klein_four",
-    "requires_nonabelian_structure",
 ]
