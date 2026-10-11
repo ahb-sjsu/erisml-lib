@@ -4,9 +4,14 @@ from __future__ import annotations
 
 from erisml.ethics.deme import DEME
 from erisml.ethics.deontic_gate import evaluate_maxim
-from erisml.ethics.facts import EthicalFacts, Maxim
+from erisml.ethics.facts import (
+    Consequences,
+    EthicalFacts,
+    JusticeAndFairness,
+    Maxim,
+    RightsAndDuties,
+)
 from erisml.ethics.layers.pipeline import DEMEPipeline
-
 
 # ----------------------------------------------------- gate logic
 
@@ -62,8 +67,15 @@ def test_deme_evaluate_allows_ok_maxim():
 
 
 def test_pipeline_vetoes_option_with_failing_maxim():
-    good = EthicalFacts(option_id="good")
-    bad = EthicalFacts(option_id="bad", maxim=Maxim(action_kind="deceive"))
+    # complete facts: the default reflex rules read the rights and justice blocks, and an
+    # option missing them is vetoed fail-closed (tests/test_pipeline_selection_safety.py)
+    blocks = dict(
+        consequences=Consequences(),
+        rights_and_duties=RightsAndDuties(),
+        justice_and_fairness=JusticeAndFairness(),
+    )
+    good = EthicalFacts(option_id="good", **blocks)
+    bad = EthicalFacts(option_id="bad", maxim=Maxim(action_kind="deceive"), **blocks)
     result = DEMEPipeline().decide([good, bad])
     assert "bad" in result.forbidden_options
     assert "good" not in result.forbidden_options
