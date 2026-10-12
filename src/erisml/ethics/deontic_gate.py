@@ -54,13 +54,20 @@ class MaximGateResult:
         str  # contradiction_in_conception | _in_will | no_contradiction | undetermined
     )
     action_kind: str | None
+    conflict: bool = False
+    """True iff the maxim fails universalizability while its purpose is an imperfect duty: a
+    tragic conflict between duties, which DEME escalates to a human rather than vetoes."""
 
 
 def evaluate_maxim(maxim: Maxim | None) -> MaximGateResult:
     """Apply the universalizability test to a maxim, honouring polarity.
 
-    A maxim that fails universalizability yields ``vetoed=True``. Unknown or
-    absent action kinds never veto (the gate is conservative).
+    A maxim that fails universalizability yields ``vetoed=True``, except that an
+    affirmed prohibition whose purpose is an imperfect duty ("deceive to protect those
+    in my care") yields ``conflict=True`` and no veto: the perfect duty not to deceive
+    and the imperfect duty to protect conflict, and a tragic conflict is escalated to a
+    human, not settled by the gate (owner decision, 12 October 2026). Unknown or absent
+    action kinds never veto (the gate is conservative).
     """
     if maxim is None or maxim.action_kind is None:
         return MaximGateResult(
@@ -85,6 +92,22 @@ def evaluate_maxim(maxim: Maxim | None) -> MaximGateResult:
         )
 
     if not negated:
+        purpose = getattr(maxim, "purpose_kind", None)
+        if kind in PROHIBITIONS and purpose in IMPERFECT_DUTIES:
+            return MaximGateResult(
+                passes=False,
+                vetoed=False,
+                reason=(
+                    f"Maxim of {kind!r} is not universalisable, and its purpose, to {purpose}, is "
+                    f"an imperfect duty: a tragic conflict between duties, escalated rather than "
+                    f"vetoed."
+                ),
+                contradiction_type=DEFAULT_INSTITUTION_DEPENDENCIES[
+                    kind
+                ].contradiction_type,
+                action_kind=kind,
+                conflict=True,
+            )
         if kind in PROHIBITIONS:
             return MaximGateResult(
                 passes=False,

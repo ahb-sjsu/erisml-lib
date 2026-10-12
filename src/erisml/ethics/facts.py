@@ -175,6 +175,9 @@ class Maxim:
     """Stakeholder id of the agent whose maxim this is."""
     purpose: Optional[str] = None
     """What the agent is trying to achieve by the action."""
+    purpose_kind: Optional[str] = None
+    """The kind of act the purpose is (protect, help, ...), in the action-kind vocabulary. A
+    prohibited act whose purpose is an imperfect duty is a tragic conflict (deontic_gate)."""
     treats_persons_as: Dict[str, str] = field(default_factory=dict)
     """stakeholder id -> 'end' | 'means' | 'mere_means'; 'mere_means' is the Kantian
     failure, treating a rational agent only as an instrument."""
