@@ -14,10 +14,10 @@ distinction:
   * negating an imperfect duty (help, protect) -> fails contradiction-in-will
   * unknown action -> undetermined (no veto)
 
-The action-kind classifications mirror erisml-compiler's
-``delta/universalizability.py`` knowledge base. They are duplicated here
-deliberately: the lib must be able to gate maxims without a hard dependency on
-the compiler (the dependency direction is compiler -> lib).
+The action-kind classifications are derived from the universalizability knowledge
+base in ``erisml.ethics.universalizability``, which erisml-compiler imports. Before
+3.2 they were a copy of the compiler's table; the table now lives here, once, and
+the dependency runs compiler -> lib.
 """
 
 from __future__ import annotations
@@ -25,33 +25,19 @@ from __future__ import annotations
 from dataclasses import dataclass
 
 from .facts import Maxim
+from .universalizability import DEFAULT_INSTITUTION_DEPENDENCIES
+from .universalizability import IMPERFECT_DUTIES as _IMPERFECT_DUTIES
 
+# The sets follow from the universalizability knowledge base, the one copy.
 # Action kinds whose *affirmed* maxim fails universalizability.
 PROHIBITIONS: frozenset[str] = frozenset(
-    {
-        "deceive",
-        "break_commitment",
-        "cheat",
-        "impose_externality",
-        "coerce",
-        "coerce_or_be_coerced",
-        "inflict_harm",
-        "use_as_means",
-        "refuse",
-    }
+    k for k, v in DEFAULT_INSTITUTION_DEPENDENCIES.items() if not v.passes
 )
 # Positive (imperfect) duties: only these fail when *negated* (omission).
-IMPERFECT_DUTIES: frozenset[str] = frozenset({"help", "protect"})
+IMPERFECT_DUTIES: frozenset[str] = _IMPERFECT_DUTIES
 # Affirmed maxims that are universalisable (permissible or dutiful).
 PERMISSIBLE: frozenset[str] = frozenset(
-    {
-        "make_or_keep_commitment",
-        "protect",
-        "help",
-        "disclose",
-        "act_under_norm",
-        "act_under_authority",
-    }
+    k for k, v in DEFAULT_INSTITUTION_DEPENDENCIES.items() if v.passes
 )
 
 
