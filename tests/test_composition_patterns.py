@@ -210,6 +210,7 @@ def test_uncertainty_makes_the_safety_threshold_stricter():
         ("competent", 1.0, 0.8, True, False),  # imminent, grave, necessary: override
         ("competent", 1.0, 0.8, False, True),  # governance forbids the override
         ("competent", 1.0, 0.3, True, True),  # urgent but not necessary
+        ("competent", 0.75, 0.8, True, True),  # grave, not mortal: no override
     ],
 )
 def test_consent_binds_with_capacity_and_a_limited_emergency_override(

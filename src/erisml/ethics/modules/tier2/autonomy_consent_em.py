@@ -9,7 +9,7 @@ Purpose: respect informed consent and refusals, with limited emergency overrides
 
 - Binding: an option the affected person has refused or not consented to is vetoed when
   that person is competent (an unknown capacity counts as competent), except when the
-  emergency override holds: the hazard is imminent and grave (urgency at or above
+  emergency override holds: the hazard is imminent and mortal (urgency at or above
   ``emergency_urgency``), the option is necessary to prevent severe harm (its expected
   benefit at or above ``necessity_benefit``), and governance allows the override
   (``allow_emergency_override``, AutonomyPolicy.allow_override_in_high_stakes). An override
@@ -59,8 +59,9 @@ class AutonomyConsentEMV2(BaseEthicsModuleV2):
     override_requires_human_confirmation: bool = True
     """Annotated on an override (AutonomyPolicy.override_requires_human_confirmation)."""
 
-    emergency_urgency: float = 0.75
-    """Urgency at or above which the hazard counts as imminent and grave."""
+    emergency_urgency: float = 0.9
+    """Urgency at or above which the hazard counts as imminent and mortal (the guide's
+    condition): a near-certain catastrophic urgency; a grave one (0.75) does not override."""
 
     necessity_benefit: float = 0.75
     """Expected benefit at or above which the option counts as necessary to prevent severe
@@ -110,7 +111,7 @@ class AutonomyConsentEMV2(BaseEthicsModuleV2):
                 )
                 if emergency:
                     metadata["consent_override_reason"] = (
-                        f"imminent grave hazard (urgency {c.urgency:.2f}) and the option "
+                        f"imminent mortal hazard (urgency {c.urgency:.2f}) and the option "
                         f"is necessary to prevent severe harm (benefit "
                         f"{c.expected_benefit:.2f})"
                     )
