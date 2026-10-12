@@ -154,17 +154,30 @@ class ProceduralAndLegitimacy:
 
 @dataclass
 class Maxim:
-    """Kantian action-under-a-description, mirrored from erisml-compiler.
+    """Kantian action under a description: the maxim DEME's deontic gate tests.
 
-    Carries the maxim semantics the compiler now extracts (incl. negation) so
-    DEME can apply the deontic universalizability gate. ``polarity`` is
-    "affirmed" or "negated" — a negated maxim ("did not promise") is the maxim
-    of *not performing* the action and is gated accordingly.
+    Universalizability operates on maxims, not acts: the same physical act can be
+    intended under several maxims ("lie to save a life", "lie when convenient").
+    ``polarity`` is "affirmed" or "negated"; a negated maxim ("did not promise") is
+    the maxim of *not performing* the action and is gated accordingly.
+
+    This is the one Maxim: erisml-compiler extracts it into its substrate and passes
+    it to DEME unchanged (before 3.2 the library held a three-field mirror of the
+    compiler's model).
     """
 
     action_kind: Optional[str] = None
+    """Coarse action label: deceive, help, protect, refuse, ..."""
     polarity: str = "affirmed"
     description: str = ""
+    """Natural-language phrasing of the maxim."""
+    agent_id: Optional[str] = None
+    """Stakeholder id of the agent whose maxim this is."""
+    purpose: Optional[str] = None
+    """What the agent is trying to achieve by the action."""
+    treats_persons_as: Dict[str, str] = field(default_factory=dict)
+    """stakeholder id -> 'end' | 'means' | 'mere_means'; 'mere_means' is the Kantian
+    failure, treating a rational agent only as an instrument."""
 
 
 @dataclass
