@@ -136,6 +136,10 @@ class DEMEProfileV04:
     lexical_priorities: List[LexicalLayerV2] = field(default_factory=list)
     """DAG-based priority layers for conflict resolution."""
 
+    # Composition pattern (Design Guide v0.1, section 5)
+    composition: str = "flat"
+    """flat, hard_shell, hard_shell_fairness or lexicographic."""
+
     # Active EM specification
     active_em_names: List[str] = field(default_factory=list)
     """List of EM names to activate for this profile."""
@@ -181,6 +185,7 @@ class DEMEProfileV04:
             tier_configs=gov_tiers,
             lexical_layers=self.lexical_priorities,
             veto_ems=self.base_em_ids,
+            composition=self.composition,
             require_decision_proof=True,
         )
 
@@ -237,6 +242,9 @@ def deme_profile_v04_from_dict(data: Dict[str, Any]) -> DEMEProfileV04:
         rights_respect=mdw_data.get("rights_respect", 1.0),
         fairness_equity=mdw_data.get("fairness_equity", 1.0),
         autonomy_respect=mdw_data.get("autonomy_respect", 1.0),
+        privacy_protection=mdw_data.get("privacy_protection", 1.0),
+        societal_environmental=mdw_data.get("societal_environmental", 0.8),
+        virtue_care=mdw_data.get("virtue_care", 0.7),
         legitimacy_trust=mdw_data.get("legitimacy_trust", 1.0),
         epistemic_quality=mdw_data.get("epistemic_quality", 0.5),
         extension_weights=mdw_data.get("extension_weights", {}),
@@ -276,6 +284,7 @@ def deme_profile_v04_from_dict(data: Dict[str, Any]) -> DEMEProfileV04:
         moral_dimension_weights=moral_dimension_weights,
         tier_configs=tier_configs,
         lexical_priorities=lexical_priorities,
+        composition=data.get("composition", "flat"),
         active_em_names=data.get("active_em_names", []),
         base_em_ids=data.get("base_em_ids", ["geneva_constitutional"]),
         base_em_enforcement=BaseEMEnforcementMode(

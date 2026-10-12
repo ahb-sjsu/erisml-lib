@@ -180,7 +180,9 @@ def _profile_ems(profile: DEMEProfileV04) -> List[EthicsModuleV2]:
     the tiers it enables, as before, skipping (and logging) those that fail to build."""
     # register the tiered EMs
     import erisml.ethics.modules.tier0  # noqa: F401
+    import erisml.ethics.modules.tier1  # noqa: F401
     import erisml.ethics.modules.tier2  # noqa: F401
+    import erisml.ethics.modules.tier3  # noqa: F401
 
     ems: List[EthicsModuleV2] = []
     seen = set()

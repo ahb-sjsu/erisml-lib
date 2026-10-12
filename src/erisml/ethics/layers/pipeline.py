@@ -16,7 +16,7 @@ from __future__ import annotations
 import time
 from dataclasses import dataclass, field, replace
 from datetime import datetime, timezone
-from typing import Dict, List, Optional, TYPE_CHECKING
+from typing import Any, Dict, List, Optional, TYPE_CHECKING
 
 if TYPE_CHECKING:
     from erisml.ethics.modules.base import EthicsModuleV2
@@ -39,7 +39,14 @@ from erisml.ethics.layers.tactical import (
 )
 from erisml.ethics.layers.strategic import StrategicLayer, StrategicLayerConfig
 from erisml.ethics.governance.config_v2 import GovernanceConfigV2
-from erisml.ethics.governance.aggregation_v2 import select_option_v2
+from erisml.ethics.governance.aggregation_v2 import (
+    aggregate_moral_vectors,
+    check_vetoes,
+    select_option_v2,
+)
+from erisml.ethics.judgement import EthicalJudgementV2
+from erisml.ethics.layers.composition import resolve_pattern
+from erisml.ethics.moral_vector import MoralVector
 
 
 @dataclass
@@ -68,6 +75,10 @@ class PipelineConfig:
 
     em_catalog_version: str = "2.0.0"
     """Version of the EM catalog."""
+
+    composition: Optional[Any] = None
+    """The composition pattern (a name in composition.PATTERNS, or a CompositionPattern).
+    None takes the governance profile's, else ``flat``, every EM in one stage."""
 
     governance: Optional[GovernanceConfigV2] = None
     """The governance profile's configuration, executed. When set, the tactical layer runs
@@ -106,6 +117,12 @@ class DecisionResult:
 
     em_failures: Dict[str, List[str]] = field(default_factory=dict)
     """Per option, the EMs that raised instead of judging (see TacticalLayerConfig.fail_closed)."""
+
+    composition: str = "flat"
+    """The composition pattern the tactical layer ran (layers/composition.py)."""
+
+    stages: List[Dict[str, Any]] = field(default_factory=list)
+    """Per stage: its EMs, the options it evaluated, vetoed and narrowed out."""
 
 
 class DEMEPipeline:
@@ -152,6 +169,17 @@ class DEMEPipeline:
     def add_em(self, em: EthicsModuleV2) -> None:
         """Add an ethics module to the tactical layer."""
         self.tactical.add_em(em)
+
+    def _forbids(
+        self, result: TacticalResult, gov: Optional[GovernanceConfigV2]
+    ) -> bool:
+        """Whether a stage's judgements forbid an option: under governance, its veto rights
+        (``check_vetoes``); otherwise the tier veto rights the tactical layer applied. A
+        module that failed under fail_closed forbids either way."""
+        if gov is None:
+            return result.vetoed
+        failed_closed = bool(result.em_failures) and self.tactical.config.fail_closed
+        return failed_closed or check_vetoes(result.judgements, gov)[0]
 
     def decide(
         self,
@@ -208,65 +236,129 @@ class DEMEPipeline:
             )
         )
 
-        # Phase 2: Tactical layer - full moral reasoning
+        # Phase 2: Tactical layer, composed by the pattern's stages (layers/composition.py).
+        # Each stage runs the EMs it admits on the options still standing; it may veto,
+        # narrow to its best-satisfying subset, and rank. No stage resurrects an option.
         tactical_start = time.perf_counter()
+        gov = self.config.governance
+        pattern = resolve_pattern(
+            self.config.composition
+            if self.config.composition is not None
+            else (gov.composition if gov is not None else None)
+        )
+        weights = gov.dimension_weights.to_dict() if gov is not None else None
+
+        def aggregate(js: List[EthicalJudgementV2]) -> MoralVector:
+            if gov is not None:
+                return aggregate_moral_vectors(js, gov)
+            return self.tactical._aggregate_vectors(js)
+
+        def score(vec: MoralVector) -> float:
+            return vec.to_scalar(weights=weights)
+
         tactical_results: Dict[str, TacticalResult] = {}
         tactical_vetoed: List[str] = []
         em_failures: Dict[str, List[str]] = {}
-        landscape = MoralLandscape()
         em_judgement_records: List[EMJudgementRecord] = []
+        stage_trace: List[Dict[str, Any]] = []
+        vector_of: Dict[str, MoralVector] = {}
+        standing = [f for f in options if f.option_id not in reflex_vetoed]
+        for (
+            f
+        ) in standing:  # every option the reflex layer passed is judged, if by no EM
+            tactical_results[f.option_id] = TacticalResult(
+                option_id=f.option_id,
+                judgements=[],
+                aggregated_vector=aggregate([]),
+                vetoed=False,
+                veto_reasons=[],
+                latency_ms=0.0,
+            )
+            vector_of[f.option_id] = aggregate([])
+        rank_source: Dict[str, List[EthicalJudgementV2]] = {}
+        rank_advisory = False
+        narrowed_out: List[List[str]] = []
 
-        # Only evaluate non-reflex-vetoed options
-        for facts in options:
-            if facts.option_id in reflex_vetoed:
-                # Skip options already vetoed by reflex
+        for stage in pattern.stages:
+            ems = [em for em in self.tactical.ems if stage.admits(em)]
+            trace: Dict[str, Any] = {
+                "stage": stage.name,
+                "ems": [getattr(em, "em_name", type(em).__name__) for em in ems],
+                "evaluated": [f.option_id for f in standing],
+                "vetoed": [],
+                "narrowed_out": [],
+            }
+            stage_trace.append(trace)
+            if not ems or not standing:
                 continue
-
-            tactical_result = self.tactical.evaluate(facts)
-            tactical_results[facts.option_id] = tactical_result
-            landscape.add(facts.option_id, tactical_result.aggregated_vector)
-
-            if tactical_result.vetoed:
-                tactical_vetoed.append(facts.option_id)
-            if tactical_result.em_failures:
-                em_failures[facts.option_id] = list(tactical_result.em_failures)
-
-            # Record EM judgements for proof
-            for j in tactical_result.judgements:
-                em_judgement_records.append(
-                    EMJudgementRecord(
-                        em_name=j.em_name,
-                        em_tier=j.em_tier,
-                        stakeholder=j.stakeholder,
-                        verdict=j.verdict,
-                        moral_vector_hash=hash_moral_vector(j.moral_vector),
-                        veto_triggered=j.veto_triggered,
-                        reason_summary="; ".join(j.reasons[:2]) if j.reasons else "",
+            results = self.tactical.evaluate_options(standing, ems)
+            for oid, r in results.items():
+                before = tactical_results[oid]
+                tactical_results[oid] = (
+                    r
+                    if not before.judgements and not before.em_failures
+                    else replace(
+                        before,
+                        judgements=before.judgements + r.judgements,
+                        vetoed=before.vetoed or r.vetoed,
+                        veto_reasons=before.veto_reasons + r.veto_reasons,
+                        em_failures=before.em_failures + r.em_failures,
                     )
                 )
+                if r.em_failures:
+                    em_failures.setdefault(oid, []).extend(r.em_failures)
+                vector_of[oid] = aggregate(r.judgements)
+                for j in r.judgements:
+                    em_judgement_records.append(
+                        EMJudgementRecord(
+                            em_name=j.em_name,
+                            em_tier=j.em_tier,
+                            stakeholder=j.stakeholder,
+                            verdict=j.verdict,
+                            moral_vector_hash=hash_moral_vector(j.moral_vector),
+                            veto_triggered=j.veto_triggered,
+                            reason_summary=(
+                                "; ".join(j.reasons[:2]) if j.reasons else ""
+                            ),
+                        )
+                    )
+            if stage.vetoes:
+                trace["vetoed"] = [
+                    f.option_id
+                    for f in standing
+                    if self._forbids(results[f.option_id], gov)
+                ]
+                tactical_vetoed += trace["vetoed"]
+                standing = [f for f in standing if f.option_id not in trace["vetoed"]]
+            if stage.narrows and len(standing) > 1:
+                scores = {
+                    f.option_id: score(aggregate(results[f.option_id].judgements))
+                    for f in standing
+                }
+                floor = max(scores.values()) - pattern.tolerance
+                trace["narrowed_out"] = sorted(
+                    (oid for oid, v in scores.items() if v < floor),
+                    key=lambda oid: -scores[oid],
+                )
+                narrowed_out.append(trace["narrowed_out"])
+                standing = [f for f in standing if scores[f.option_id] >= floor]
+            if stage.ranks:
+                rank_source = {
+                    f.option_id: results[f.option_id].judgements for f in standing
+                }
+                rank_advisory = not stage.vetoes
 
-        governed = None
-        gov = self.config.governance
-        if gov is not None:
-            # The governance profile decides: aggregation, vetoes and ranking come from
-            # select_option_v2. A module that failed under fail_closed still forbids.
-            failed_closed = [
-                oid
-                for oid, r in tactical_results.items()
-                if r.em_failures and self.tactical.config.fail_closed
-            ]
-            governed = select_option_v2(
-                {oid: r.judgements for oid, r in tactical_results.items()},
-                gov,
-                candidate_ids=list(tactical_results),
-                baseline_option_id=baseline_option_id,
-            )
-            tactical_vetoed = sorted(
-                set(governed.forbidden_options) | set(failed_closed)
-            )
-            landscape = MoralLandscape()
-            for oid, vec in governed.aggregated_vectors.items():
-                landscape.add(oid, vec)
+        survivors = [f.option_id for f in standing]
+        if not rank_source:  # no ranking stage ran an EM: rank on everything judged
+            rank_source = {
+                oid: tactical_results[oid].judgements
+                for oid in survivors
+                if oid in tactical_results
+            }
+        landscape = MoralLandscape()
+        for oid in tactical_results:
+            js = rank_source.get(oid)
+            landscape.add(oid, aggregate(js) if js is not None else vector_of[oid])
 
         tactical_duration = int((time.perf_counter() - tactical_start) * 1_000_000)
         layer_outputs.append(
@@ -284,51 +376,70 @@ class DEMEPipeline:
                     "vetoed_options": tactical_vetoed,
                     "evaluated_options": len(tactical_results),
                     "em_failures": em_failures,
+                    "composition": pattern.name,
+                    "stages": stage_trace,
                 },
             )
         )
 
         # Combine all vetoed options
-        all_vetoed = list(set(reflex_vetoed + tactical_vetoed))
+        all_vetoed = list(dict.fromkeys(reflex_vetoed + tactical_vetoed))
 
-        # Rank against the authoritative forbidden set: the reflex vetoes and the tactical vetoes
-        # of tiers allowed to veto (a failing module under fail_closed included). The vector's
-        # veto flags alone are not that set: a module can forbid without setting a flag, which
-        # left a forbidden option rankable and selectable, and an advisory tier's flag removed
-        # an option that tier may not veto.
-        forbidden = set(all_vetoed)
+        # Rank only what the stages left standing. The authoritative forbidden set is the
+        # reflex vetoes and each vetoing stage's vetoes (tier veto rights, governance and
+        # fail_closed applied), never the vectors' veto flags alone. Options a narrowing stage
+        # filtered out are not forbidden; they follow the survivors, those filtered later first.
         selected_id: Optional[str] = None
-        if governed is not None:
-            weights = gov.dimension_weights.to_dict()
+        if gov is not None:
+            judged = {oid: rank_source.get(oid, []) for oid in survivors}
+            if rank_advisory:  # a stage that may not veto only re-ranks
+                judged = {
+                    oid: [replace(j, veto_triggered=False) for j in js]
+                    for oid, js in judged.items()
+                }
+            governed = select_option_v2(
+                judged,
+                gov,
+                candidate_ids=survivors,
+                baseline_option_id=baseline_option_id,
+            )
+            for oid in governed.forbidden_options:
+                if oid not in all_vetoed:
+                    all_vetoed.append(oid)
             ranked = [
-                (oid, landscape.get(oid).to_scalar(weights=weights))
+                (oid, score(landscape.get(oid)))
                 for oid in governed.ranked_options
-                if oid not in forbidden
+                if oid not in all_vetoed
             ]
-            if governed.selected_option_id not in forbidden:
+            if governed.selected_option_id not in all_vetoed:
                 selected_id = governed.selected_option_id
             elif ranked:
                 selected_id = ranked[0][0]
         else:
-            ranked = [
-                (oid, s)
-                for oid, s in landscape.rank_by_scalar()
-                if oid not in forbidden
-            ]
-
-        # Select best option (or baseline if available and acceptable)
-        if governed is None and ranked:
-            selected_id = ranked[0][0]
-            # Prefer baseline if it's in the top tier
-            if baseline_option_id and baseline_option_id not in all_vetoed:
-                baseline_score = next(
-                    (score for oid, score in ranked if oid == baseline_option_id),
-                    None,
-                )
-                if baseline_score is not None:
-                    top_score = ranked[0][1]
-                    if baseline_score >= top_score * 0.95:  # Within 5% of best
-                        selected_id = baseline_option_id
+            ranked = sorted(
+                ((oid, score(landscape.get(oid))) for oid in survivors),
+                key=lambda x: x[1],
+                reverse=True,
+            )
+            if ranked:
+                selected_id = ranked[0][0]
+                # Prefer baseline if it's in the top tier
+                if baseline_option_id and baseline_option_id not in all_vetoed:
+                    baseline_score = next(
+                        (v for oid, v in ranked if oid == baseline_option_id),
+                        None,
+                    )
+                    if baseline_score is not None:
+                        if baseline_score >= ranked[0][1] * 0.95:  # Within 5% of best
+                            selected_id = baseline_option_id
+        listed = {oid for oid, _ in ranked}
+        threshold = gov.min_score_threshold if gov is not None else 0.0
+        for out in reversed(narrowed_out):
+            for oid in out:
+                v = score(landscape.get(oid))
+                if oid not in listed and v >= threshold:
+                    ranked.append((oid, v))
+                    listed.add(oid)
 
         # Build rationale
         rationale_parts = []
@@ -391,6 +502,8 @@ class DEMEPipeline:
             proof=proof,
             total_latency_ms=total_latency,
             em_failures=em_failures,
+            composition=pattern.name,
+            stages=stage_trace,
         )
 
 

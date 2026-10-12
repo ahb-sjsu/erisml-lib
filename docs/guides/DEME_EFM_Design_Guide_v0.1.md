@@ -810,6 +810,8 @@ Monitor EM health and sensor integrity; force safe degradation on failure.
 
 ## 5. Composition Patterns (DAGs)
 
+_Implemented in `erisml.ethics.layers.composition` (patterns `hard_shell`, `hard_shell_fairness`, `lexicographic`, and the legacy `flat`), run by `DEMEPipeline` over `EthicalFacts` and chosen by the profile (`DEMEProfileV04.composition`). Tier 1 CorePhysicalSafety-EM (4.2.1) and tier 3 Beneficence-EM (4.4.1) are in `modules/tier1` and `modules/tier3`; AutonomyConsent-EM (4.3.1) is `modules/tier2/autonomy_consent_em.py`._
+
 ### 5.1 Hard-Shell Safety Pattern
 
 **Idea:** Constitutional & Safety/Legal EMs form an outer shell that produce a combined veto mask. Inner EMs only act on actions that survive the shell.

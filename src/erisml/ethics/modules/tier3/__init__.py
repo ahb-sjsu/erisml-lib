@@ -21,4 +21,6 @@ Version: 2.0.0 (DEME 2.0)
 # - BeneficenceEM
 # - EnvironmentalImpactEM
 
-__all__: list = []
+from erisml.ethics.modules.tier3.beneficence_em import BeneficenceEMV2
+
+__all__ = ["BeneficenceEMV2"]

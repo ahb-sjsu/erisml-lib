@@ -16,7 +16,7 @@ from __future__ import annotations
 import logging
 import time
 from dataclasses import dataclass, field
-from typing import Dict, List, Optional, Tuple, TYPE_CHECKING
+from typing import Dict, List, Optional, Sequence, Tuple, TYPE_CHECKING
 
 if TYPE_CHECKING:
     from erisml.ethics.facts import EthicalFacts
@@ -105,6 +105,13 @@ class TacticalResult:
     """EMs that raised instead of judging, as ``"em_name: ExceptionType: message"``."""
 
 
+def _v2(judgement: EthicalJudgementV2) -> EthicalJudgementV2:
+    """A V2 judgement, or an AttributeError (a V1 EM added without its adapter), raised where
+    the caller records it as that EM's failure."""
+    judgement.veto_triggered, judgement.em_tier  # noqa: B018
+    return judgement
+
+
 class TacticalLayer:
     """
     Full MoralVector reasoning layer.
@@ -153,66 +160,96 @@ class TacticalLayer:
         Returns:
             TacticalResult with aggregated assessment.
         """
+        return self.evaluate_options([facts])[facts.option_id]
+
+    def evaluate_options(
+        self,
+        options: Sequence[EthicalFacts],
+        ems: Optional[Sequence[EthicsModuleV2]] = None,
+    ) -> Dict[str, TacticalResult]:
+        """Evaluate a set of options through the given EMs (default: all).
+
+        An EM that defines ``judge_set(options)`` judges the set at once, for judgements
+        that depend on the alternatives (CorePhysicalSafety's "a safer option exists");
+        any other EM judges each option alone. Disabled tiers are skipped (tier 0 always
+        runs), and a failing EM is recorded per option, vetoing under ``fail_closed``.
+        """
         if not self.config.enabled:
-            return TacticalResult(
-                option_id=facts.option_id,
-                judgements=[],
-                aggregated_vector=MoralVector.from_ethical_facts(facts),
-                vetoed=False,
-                veto_reasons=[],
-                latency_ms=0.0,
-            )
+            return {
+                f.option_id: TacticalResult(
+                    option_id=f.option_id,
+                    judgements=[],
+                    aggregated_vector=MoralVector.from_ethical_facts(f),
+                    vetoed=False,
+                    veto_reasons=[],
+                    latency_ms=0.0,
+                )
+                for f in options
+            }
 
         start_time = time.perf_counter()
+        ids = [f.option_id for f in options]
+        judgements: Dict[str, List[EthicalJudgementV2]] = {i: [] for i in ids}
+        veto_reasons: Dict[str, List[str]] = {i: [] for i in ids}
+        em_failures: Dict[str, List[str]] = {i: [] for i in ids}
+        vetoed: Dict[str, bool] = {i: False for i in ids}
 
-        # Collect judgements from all EMs
-        judgements: List[EthicalJudgementV2] = []
-        veto_reasons: List[str] = []
-        em_failures: List[str] = []
-        vetoed = False
+        def failed(name: str, oid: str, e: Exception) -> None:
+            failure = f"{name}: {type(e).__name__}: {e}"
+            em_failures[oid].append(failure)
+            log.warning("ethics module failed on option %s: %s", oid, failure)
+            if self.config.fail_closed:
+                vetoed[oid] = True
+                veto_reasons[oid].append(
+                    f"{name}: failed ({type(e).__name__}); fail_closed"
+                )
 
-        for em in self.ems:
+        for em in self.ems if ems is None else ems:
             name = getattr(em, "em_name", type(em).__name__)
             em_tier = getattr(em, "em_tier", None)
             if em_tier != 0 and not self.config.tier_enabled.get(em_tier, True):
                 continue
-            try:
-                judgement = em.judge(facts)
-                tier = em.em_tier
-            except Exception as e:  # an EM that fails has not approved the option
-                failure = f"{name}: {type(e).__name__}: {e}"
-                em_failures.append(failure)
-                log.warning(
-                    "ethics module failed on option %s: %s", facts.option_id, failure
-                )
-                if self.config.fail_closed:
-                    vetoed = True
-                    veto_reasons.append(
-                        f"{name}: failed ({type(e).__name__}); fail_closed"
-                    )
-                continue
-            judgements.append(judgement)
-            if judgement.veto_triggered and self.config.tier_veto_enabled.get(
-                tier, True
-            ):
-                vetoed = True
-                if judgement.veto_reason:
-                    veto_reasons.append(f"{name}: {judgement.veto_reason}")
-
-        # Aggregate moral vectors
-        aggregated_vector = self._aggregate_vectors(judgements)
+            judged: Dict[str, EthicalJudgementV2] = {}
+            judge_set = getattr(em, "judge_set", None)
+            if callable(judge_set):
+                try:
+                    judged = {
+                        k: _v2(j) for k, j in dict(judge_set(list(options))).items()
+                    }
+                except Exception as e:  # an EM that fails has not approved any option
+                    for oid in ids:
+                        failed(name, oid, e)
+                    continue
+            else:
+                for f in options:
+                    try:
+                        judged[f.option_id] = _v2(em.judge(f))
+                    except Exception as e:
+                        failed(name, f.option_id, e)
+            for oid, judgement in judged.items():
+                if oid not in judgements:
+                    continue
+                judgements[oid].append(judgement)
+                if judgement.veto_triggered and self.config.tier_veto_enabled.get(
+                    judgement.em_tier, True
+                ):
+                    vetoed[oid] = True
+                    if judgement.veto_reason:
+                        veto_reasons[oid].append(f"{name}: {judgement.veto_reason}")
 
         latency_ms = (time.perf_counter() - start_time) * 1000
-
-        return TacticalResult(
-            option_id=facts.option_id,
-            judgements=judgements,
-            aggregated_vector=aggregated_vector,
-            vetoed=vetoed,
-            veto_reasons=veto_reasons,
-            latency_ms=latency_ms,
-            em_failures=em_failures,
-        )
+        return {
+            oid: TacticalResult(
+                option_id=oid,
+                judgements=judgements[oid],
+                aggregated_vector=self._aggregate_vectors(judgements[oid]),
+                vetoed=vetoed[oid],
+                veto_reasons=veto_reasons[oid],
+                latency_ms=latency_ms,
+                em_failures=em_failures[oid],
+            )
+            for oid in ids
+        }
 
     def evaluate_batch(
         self,

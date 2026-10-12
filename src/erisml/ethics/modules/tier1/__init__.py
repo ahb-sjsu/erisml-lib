@@ -21,4 +21,6 @@ Version: 2.0.0 (DEME 2.0)
 # - CorePhysicalSafetyEM
 # - ProxemicsSafetyEM
 
-__all__: list = []
+from erisml.ethics.modules.tier1.core_physical_safety_em import CorePhysicalSafetyEMV2
+
+__all__ = ["CorePhysicalSafetyEMV2"]
