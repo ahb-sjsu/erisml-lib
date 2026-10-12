@@ -9,6 +9,9 @@ Version: 2.0.0 (DEME 2.0)
 
 from __future__ import annotations
 
+import hashlib
+import json
+import logging
 from typing import Dict, List, Tuple
 
 from erisml.ethics.profile_v03 import (
@@ -18,10 +21,10 @@ from erisml.ethics.profile_v03 import (
 )
 
 # V2 imports
-from erisml.ethics.profile_v04 import DEMEProfileV04
+from erisml.ethics.profile_v04 import DEMEProfileV04, deme_profile_v04_to_dict
 from erisml.ethics.governance.config_v2 import GovernanceConfigV2
 from erisml.ethics.layers.pipeline import DEMEPipeline, PipelineConfig
-from erisml.ethics.layers.reflex import ReflexLayerConfig
+from erisml.ethics.layers.reflex import ReflexLayer, ReflexLayerConfig
 from erisml.ethics.layers.tactical import TacticalLayerConfig
 from erisml.ethics.layers.strategic import StrategicLayerConfig
 from erisml.ethics.modules.base import EthicsModuleV2
@@ -31,6 +34,8 @@ from erisml.ethics.modules.registry import EMRegistry
 # If these imports fail, the type: ignore handles the linter, but the file paths must be correct.
 from erisml.ethics.modules.triage_em import CaseStudy1TriageEM, RightsFirstEM  # type: ignore
 from erisml.ethics.governance.config import GovernanceConfig  # type: ignore
+
+log = logging.getLogger(__name__)
 
 
 def triage_em_from_profile(profile: DEMEProfileV03) -> CaseStudy1TriageEM:
@@ -150,72 +155,101 @@ def build_triage_ems_and_governance(
 
 def governance_v2_from_profile(profile: DEMEProfileV04) -> GovernanceConfigV2:
     """
-    Build a GovernanceConfigV2 from a DEMEProfileV04.
-
-    Uses the MoralVector dimension weights from the profile.
+    Build a GovernanceConfigV2 from a DEMEProfileV04: its dimension weights, tier
+    configuration, lexical layers, and its base EMs as explicit veto EMs
+    (``DEMEProfileV04.to_governance_config``). Before, only the dimension weights were
+    carried over.
     """
-    return GovernanceConfigV2(
-        dimension_weights=profile.moral_dimension_weights,
+    return profile.to_governance_config()
+
+
+def profile_hash(profile: DEMEProfileV04) -> str:
+    """SHA-256 of the profile's canonical JSON, recorded in every DecisionProof."""
+    canonical = json.dumps(
+        deme_profile_v04_to_dict(profile), sort_keys=True, separators=(",", ":")
     )
+    return hashlib.sha256(canonical.encode("utf-8")).hexdigest()
+
+
+def _profile_ems(profile: DEMEProfileV04) -> List[EthicsModuleV2]:
+    """The EMs a profile names: its base EMs, which cannot be disabled, then its active EMs.
+
+    A name the registry does not hold, or an EM that fails to build, is an error: a profile
+    that names a module and runs without it would decide under a different lens than the
+    one its proof records. A profile that names no active EMs runs every registered EM in
+    the tiers it enables, as before, skipping (and logging) those that fail to build."""
+    # register the tiered EMs
+    import erisml.ethics.modules.tier0  # noqa: F401
+    import erisml.ethics.modules.tier2  # noqa: F401
+
+    ems: List[EthicsModuleV2] = []
+    seen = set()
+    named = list(
+        dict.fromkeys(list(profile.base_em_ids) + list(profile.active_em_names))
+    )
+    for name in named:
+        entry = EMRegistry.resolve(name)
+        if entry is None:
+            raise ValueError(
+                f"profile {profile.name!r} names EM {name!r}, not registered"
+            )
+        if entry.em_class in seen:
+            continue
+        seen.add(entry.em_class)
+        ems.append(entry.em_class())
+    if profile.active_em_names:
+        return ems
+
+    for em_id, em_info in EMRegistry.list_all().items():
+        tier_config = profile.tier_configs.get(em_info.get("tier", 3))
+        em_cls = EMRegistry.get_class(em_id)
+        if em_cls is None or em_cls in seen:
+            continue
+        if tier_config and not tier_config.enabled:
+            continue
+        try:
+            ems.append(em_cls())
+            seen.add(em_cls)
+        except Exception as e:
+            log.warning("EM %s failed to build and is skipped: %s", em_id, e)
+    return ems
 
 
 def pipeline_from_profile(profile: DEMEProfileV04) -> DEMEPipeline:
     """
-    Build a DEMEPipeline from a DEMEProfileV04.
+    Build a DEMEPipeline from a DEMEProfileV04, with the profile's governance executed.
 
-    Configures all three layers based on profile settings.
+    The layers follow the profile's layer configuration. The EMs are the profile's base and
+    active EMs (``_profile_ems``). Aggregation, vetoes and selection follow the profile's
+    governance (``PipelineConfig.governance``), and every proof records the profile's name
+    and hash.
     """
-    # Build layer configs from profile layer settings
     layer_cfg = profile.layer_config
+    governance = governance_v2_from_profile(profile)
 
+    # an explicit reflex config is used as given, so it carries the default hard-constraint
+    # rules here (before, a profile's pipeline ran no reflex rules at all)
     reflex_config = ReflexLayerConfig(
         enabled=layer_cfg.reflex_enabled,
         timeout_us=layer_cfg.reflex_timeout_us,
+        veto_rules=list(ReflexLayer().config.veto_rules),
     )
-
-    # Build tactical layer with tier weights from profile
-    tier_weights: Dict[int, float] = {}
-    tier_veto_enabled: Dict[int, bool] = {}
-
-    for tier_num, tier_cfg in profile.tier_configs.items():
-        tier_weights[tier_num] = tier_cfg.weight_multiplier
-        tier_veto_enabled[tier_num] = tier_cfg.veto_enabled
-
-    tactical_config = TacticalLayerConfig(
-        enabled=layer_cfg.tactical_enabled,
-        tier_weights=tier_weights,
-        tier_veto_enabled=tier_veto_enabled,
-    )
-
+    # tier weights, veto rights and enabled tiers come from governance (DEMEPipeline)
+    tactical_config = TacticalLayerConfig(enabled=layer_cfg.tactical_enabled)
     strategic_config = StrategicLayerConfig(
         enabled=layer_cfg.strategic_enabled,
     )
 
-    # Build pipeline config
     pipeline_config = PipelineConfig(
         reflex_config=reflex_config,
         tactical_config=tactical_config,
         strategic_config=strategic_config,
+        generate_proofs=governance.require_decision_proof,
+        profile_name=profile.name,
+        profile_hash=profile_hash(profile),
+        governance=governance,
     )
-
-    # Build EMs from registry based on tier config
-    ems: List[EthicsModuleV2] = []
-    for em_id, em_info in EMRegistry.list_all().items():
-        tier = em_info.get("tier", 3)
-        tier_config = profile.tier_configs.get(tier)
-
-        if tier_config and not tier_config.enabled:
-            continue
-
-        em_cls = EMRegistry.get_class(em_id)
-        if em_cls is not None:
-            try:
-                em = em_cls()
-                ems.append(em)
-            except Exception:
-                pass  # Skip EMs that fail to instantiate
-
-    return DEMEPipeline(ems=ems, config=pipeline_config)
+    return DEMEPipeline(ems=_profile_ems(profile), config=pipeline_config)
 
 
 def build_v2_from_profile(
