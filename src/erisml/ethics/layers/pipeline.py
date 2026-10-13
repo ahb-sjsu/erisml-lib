@@ -121,6 +121,10 @@ class DecisionResult:
     composition: str = "flat"
     """The composition pattern the tactical layer ran (layers/composition.py)."""
 
+    escalations: Dict[str, str] = field(default_factory=dict)
+    """Options DEME does not forbid but escalates to a human, with the reason: a tragic
+    conflict between a perfect duty and an imperfect one (deontic_gate)."""
+
     stages: List[Dict[str, Any]] = field(default_factory=list)
     """Per stage: its EMs, the options it evaluated, vetoed and narrowed out."""
 
@@ -204,6 +208,7 @@ class DEMEPipeline:
         reflex_results: Dict[str, VetoResult] = {}
         reflex_vetoed: List[str] = []
         deontic_vetoes: Dict[str, str] = {}
+        deontic_conflicts: Dict[str, str] = {}
 
         for facts in options:
             reflex_result = self.reflex.check(facts)
@@ -212,6 +217,8 @@ class DEMEPipeline:
             # Deontic maxim gate: veto options whose (possibly negated) maxim
             # fails Kantian universalizability. No-op when no maxim is present.
             maxim_result = evaluate_maxim(getattr(facts, "maxim", None))
+            if maxim_result.conflict:
+                deontic_conflicts[facts.option_id] = maxim_result.reason
             if maxim_result.vetoed:
                 vetoed = True
                 deontic_vetoes[facts.option_id] = maxim_result.reason
@@ -231,6 +238,7 @@ class DEMEPipeline:
                 output_data={
                     "vetoed_options": reflex_vetoed,
                     "deontic_vetoes": deontic_vetoes,
+                    "deontic_conflicts": deontic_conflicts,
                     "total_checked": len(options),
                 },
             )
@@ -504,6 +512,7 @@ class DEMEPipeline:
             em_failures=em_failures,
             composition=pattern.name,
             stages=stage_trace,
+            escalations=deontic_conflicts,
         )
 
 

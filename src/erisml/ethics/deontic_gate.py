@@ -14,10 +14,10 @@ distinction:
   * negating an imperfect duty (help, protect) -> fails contradiction-in-will
   * unknown action -> undetermined (no veto)
 
-The action-kind classifications mirror erisml-compiler's
-``delta/universalizability.py`` knowledge base. They are duplicated here
-deliberately: the lib must be able to gate maxims without a hard dependency on
-the compiler (the dependency direction is compiler -> lib).
+The action-kind classifications are derived from the universalizability knowledge
+base in ``erisml.ethics.universalizability``, which erisml-compiler imports. Before
+3.2 they were a copy of the compiler's table; the table now lives here, once, and
+the dependency runs compiler -> lib.
 """
 
 from __future__ import annotations
@@ -25,33 +25,19 @@ from __future__ import annotations
 from dataclasses import dataclass
 
 from .facts import Maxim
+from .universalizability import DEFAULT_INSTITUTION_DEPENDENCIES
+from .universalizability import IMPERFECT_DUTIES as _IMPERFECT_DUTIES
 
+# The sets follow from the universalizability knowledge base, the one copy.
 # Action kinds whose *affirmed* maxim fails universalizability.
 PROHIBITIONS: frozenset[str] = frozenset(
-    {
-        "deceive",
-        "break_commitment",
-        "cheat",
-        "impose_externality",
-        "coerce",
-        "coerce_or_be_coerced",
-        "inflict_harm",
-        "use_as_means",
-        "refuse",
-    }
+    k for k, v in DEFAULT_INSTITUTION_DEPENDENCIES.items() if not v.passes
 )
 # Positive (imperfect) duties: only these fail when *negated* (omission).
-IMPERFECT_DUTIES: frozenset[str] = frozenset({"help", "protect"})
+IMPERFECT_DUTIES: frozenset[str] = _IMPERFECT_DUTIES
 # Affirmed maxims that are universalisable (permissible or dutiful).
 PERMISSIBLE: frozenset[str] = frozenset(
-    {
-        "make_or_keep_commitment",
-        "protect",
-        "help",
-        "disclose",
-        "act_under_norm",
-        "act_under_authority",
-    }
+    k for k, v in DEFAULT_INSTITUTION_DEPENDENCIES.items() if v.passes
 )
 
 
@@ -68,13 +54,20 @@ class MaximGateResult:
         str  # contradiction_in_conception | _in_will | no_contradiction | undetermined
     )
     action_kind: str | None
+    conflict: bool = False
+    """True iff the maxim fails universalizability while its purpose is an imperfect duty: a
+    tragic conflict between duties, which DEME escalates to a human rather than vetoes."""
 
 
 def evaluate_maxim(maxim: Maxim | None) -> MaximGateResult:
     """Apply the universalizability test to a maxim, honouring polarity.
 
-    A maxim that fails universalizability yields ``vetoed=True``. Unknown or
-    absent action kinds never veto (the gate is conservative).
+    A maxim that fails universalizability yields ``vetoed=True``, except that an
+    affirmed prohibition whose purpose is an imperfect duty ("deceive to protect those
+    in my care") yields ``conflict=True`` and no veto: the perfect duty not to deceive
+    and the imperfect duty to protect conflict, and a tragic conflict is escalated to a
+    human, not settled by the gate (owner decision, 12 October 2026). Unknown or absent
+    action kinds never veto (the gate is conservative).
     """
     if maxim is None or maxim.action_kind is None:
         return MaximGateResult(
@@ -99,6 +92,22 @@ def evaluate_maxim(maxim: Maxim | None) -> MaximGateResult:
         )
 
     if not negated:
+        purpose = getattr(maxim, "purpose_kind", None)
+        if kind in PROHIBITIONS and purpose in IMPERFECT_DUTIES:
+            return MaximGateResult(
+                passes=False,
+                vetoed=False,
+                reason=(
+                    f"Maxim of {kind!r} is not universalisable, and its purpose, to {purpose}, is "
+                    f"an imperfect duty: a tragic conflict between duties, escalated rather than "
+                    f"vetoed."
+                ),
+                contradiction_type=DEFAULT_INSTITUTION_DEPENDENCIES[
+                    kind
+                ].contradiction_type,
+                action_kind=kind,
+                conflict=True,
+            )
         if kind in PROHIBITIONS:
             return MaximGateResult(
                 passes=False,
