@@ -249,6 +249,17 @@ class BaseEthicsModuleV2:
             metadata=metadata,
         )
 
+    @staticmethod
+    def baseline_vector(facts: EthicalFacts) -> MoralVector:
+        """The whole facts vector (``MoralVector.from_ethical_facts``) without its veto flags.
+
+        An EM is a perspective on the whole vector (docs/moralvector_v2_architecture.md
+        section 6): it starts here and re-reads the dimensions it judges, rather than filling
+        the others with constants, and it vetoes only for its own reasons."""
+        base = MoralVector.from_ethical_facts(facts)
+        base.veto_flags = []
+        return base
+
     def reflex_check(self, facts: EthicalFacts) -> Optional[bool]:
         """
         Default reflex check - no participation.

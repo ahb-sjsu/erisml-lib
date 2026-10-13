@@ -84,6 +84,10 @@ class AutonomyAndAgency:
     can_withdraw_without_penalty: bool = True
     freedom_metrics: Dict[str, float] = field(default_factory=dict)
     informed_consent: bool = False
+    decision_capacity: Optional[str] = None
+    """The affected person's capacity to decide about this option: "competent", "impaired", or
+    None (unknown). AutonomyConsent (Design Guide 4.3.1) binds a refusal of a competent person;
+    an unknown capacity counts as competent."""
 
 
 @dataclass

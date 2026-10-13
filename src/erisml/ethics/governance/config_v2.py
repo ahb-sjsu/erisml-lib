@@ -182,6 +182,11 @@ class GovernanceConfigV2:
     tie_breaker: Optional[str] = None
     """Tie-breaking strategy: 'random', 'status_quo', 'first'."""
 
+    # Composition
+    composition: str = "flat"
+    """The DAG pattern that wires the EMs (layers/composition.py): flat, hard_shell,
+    hard_shell_fairness or lexicographic (Design Guide v0.1, section 5)."""
+
     # Audit
     require_decision_proof: bool = True
     """Whether to generate decision proofs."""
