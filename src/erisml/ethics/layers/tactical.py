@@ -65,6 +65,10 @@ class TacticalLayerConfig:
     )
     """Whether each tier can trigger vetoes."""
 
+    tier_enabled: Dict[int, bool] = field(default_factory=dict)
+    """Tiers switched off by governance; a tier not listed runs. Tier 0 (constitutional)
+    always runs, whatever this says."""
+
     fail_closed: bool = False
     """What an EM that raises means for the option it was judging.
 
@@ -169,6 +173,9 @@ class TacticalLayer:
 
         for em in self.ems:
             name = getattr(em, "em_name", type(em).__name__)
+            em_tier = getattr(em, "em_tier", None)
+            if em_tier != 0 and not self.config.tier_enabled.get(em_tier, True):
+                continue
             try:
                 judgement = em.judge(facts)
                 tier = em.em_tier

@@ -14,7 +14,7 @@ Version: 2.0.0 (DEME 2.0)
 from __future__ import annotations
 
 import time
-from dataclasses import dataclass, field
+from dataclasses import dataclass, field, replace
 from datetime import datetime, timezone
 from typing import Dict, List, Optional, TYPE_CHECKING
 
@@ -38,6 +38,8 @@ from erisml.ethics.layers.tactical import (
     TacticalResult,
 )
 from erisml.ethics.layers.strategic import StrategicLayer, StrategicLayerConfig
+from erisml.ethics.governance.config_v2 import GovernanceConfigV2
+from erisml.ethics.governance.aggregation_v2 import select_option_v2
 
 
 @dataclass
@@ -66,6 +68,15 @@ class PipelineConfig:
 
     em_catalog_version: str = "2.0.0"
     """Version of the EM catalog."""
+
+    governance: Optional[GovernanceConfigV2] = None
+    """The governance profile's configuration, executed. When set, the tactical layer runs
+    the tiers it enables with its tier weights and veto rights, and aggregation, vetoes and
+    selection go through ``governance.aggregation_v2.select_option_v2``: its EM, tier and
+    stakeholder weights, its stakeholder aggregation strategy, its explicit veto EMs, its
+    dimension weights for the scalar collapse, its score threshold, and its tie breaker (the
+    baseline is preferred only under ``tie_breaker="status_quo"``). None keeps the earlier
+    behaviour, the tactical layer's fixed tier weights and an always-preferred baseline."""
 
 
 @dataclass
@@ -122,6 +133,17 @@ class DEMEPipeline:
             config: Pipeline configuration.
         """
         self.config = config or PipelineConfig()
+        gov = self.config.governance
+        if gov is not None:
+            # one source for tier semantics: the tactical layer runs and weighs tiers as
+            # governance says
+            tiers = gov.tier_configs
+            self.config.tactical_config = replace(
+                self.config.tactical_config,
+                tier_weights={t: c.weight_multiplier for t, c in tiers.items()},
+                tier_veto_enabled={t: c.veto_enabled for t, c in tiers.items()},
+                tier_enabled={t: c.enabled for t, c in tiers.items()},
+            )
 
         self.reflex = ReflexLayer(self.config.reflex_config)
         self.tactical = TacticalLayer(ems, self.config.tactical_config)
@@ -223,6 +245,29 @@ class DEMEPipeline:
                     )
                 )
 
+        governed = None
+        gov = self.config.governance
+        if gov is not None:
+            # The governance profile decides: aggregation, vetoes and ranking come from
+            # select_option_v2. A module that failed under fail_closed still forbids.
+            failed_closed = [
+                oid
+                for oid, r in tactical_results.items()
+                if r.em_failures and self.tactical.config.fail_closed
+            ]
+            governed = select_option_v2(
+                {oid: r.judgements for oid, r in tactical_results.items()},
+                gov,
+                candidate_ids=list(tactical_results),
+                baseline_option_id=baseline_option_id,
+            )
+            tactical_vetoed = sorted(
+                set(governed.forbidden_options) | set(failed_closed)
+            )
+            landscape = MoralLandscape()
+            for oid, vec in governed.aggregated_vectors.items():
+                landscape.add(oid, vec)
+
         tactical_duration = int((time.perf_counter() - tactical_start) * 1_000_000)
         layer_outputs.append(
             LayerOutput(
@@ -252,13 +297,27 @@ class DEMEPipeline:
         # left a forbidden option rankable and selectable, and an advisory tier's flag removed
         # an option that tier may not veto.
         forbidden = set(all_vetoed)
-        ranked = [
-            (oid, s) for oid, s in landscape.rank_by_scalar() if oid not in forbidden
-        ]
+        selected_id: Optional[str] = None
+        if governed is not None:
+            weights = gov.dimension_weights.to_dict()
+            ranked = [
+                (oid, landscape.get(oid).to_scalar(weights=weights))
+                for oid in governed.ranked_options
+                if oid not in forbidden
+            ]
+            if governed.selected_option_id not in forbidden:
+                selected_id = governed.selected_option_id
+            elif ranked:
+                selected_id = ranked[0][0]
+        else:
+            ranked = [
+                (oid, s)
+                for oid, s in landscape.rank_by_scalar()
+                if oid not in forbidden
+            ]
 
         # Select best option (or baseline if available and acceptable)
-        selected_id: Optional[str] = None
-        if ranked:
+        if governed is None and ranked:
             selected_id = ranked[0][0]
             # Prefer baseline if it's in the top tier
             if baseline_option_id and baseline_option_id not in all_vetoed:
@@ -276,8 +335,10 @@ class DEMEPipeline:
         if selected_id:
             rationale_parts.append(f"Selected option: {selected_id}")
             if tactical_results.get(selected_id):
-                vec = tactical_results[selected_id].aggregated_vector
-                score = vec.to_scalar()
+                vec = landscape.get(selected_id)
+                score = vec.to_scalar(
+                    weights=gov.dimension_weights.to_dict() if gov else None
+                )
                 rationale_parts.append(f"Aggregate score: {score:.3f}")
         else:
             rationale_parts.append("No option selected (all vetoed)")

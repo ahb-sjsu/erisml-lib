@@ -14,6 +14,7 @@ Version: 2.0.0 (DEME 2.0)
 from __future__ import annotations
 
 import random
+import statistics
 from dataclasses import dataclass
 from typing import Dict, List, Optional, Tuple
 
@@ -21,8 +22,13 @@ from erisml.ethics.moral_vector import MoralVector
 from erisml.ethics.judgement import EthicalJudgementV2, Verdict
 from erisml.ethics.decision_proof import DecisionProof
 from erisml.ethics.governance.config_v2 import (
+    AggregationStrategy,
     GovernanceConfigV2,
 )
+
+# Dimensions on which a higher value is worse. The worst case across stakeholders is their
+# maximum here and their minimum on every other dimension.
+_HARM_DIMENSIONS = frozenset({"physical_harm"})
 
 
 @dataclass
@@ -71,6 +77,9 @@ def aggregate_moral_vectors(
     if not judgements:
         return MoralVector()
 
+    if config.stakeholder_aggregation != AggregationStrategy.WEIGHTED_MEAN:
+        return _aggregate_across_stakeholders(judgements, config)
+
     # Compute weighted contributions
     weighted_values: Dict[str, float] = {
         dim: 0.0 for dim in MoralVector.core_dimension_names()
@@ -110,6 +119,53 @@ def aggregate_moral_vectors(
         epistemic_quality=weighted_values["epistemic_quality"],
         veto_flags=unique_vetoes,
         reason_codes=unique_reasons,
+    )
+
+
+def _aggregate_across_stakeholders(
+    judgements: List[EthicalJudgementV2],
+    config: GovernanceConfigV2,
+) -> MoralVector:
+    """Contract per stakeholder, then across stakeholders by the configured strategy.
+
+    Each stakeholder's judgements are combined by their governance weights into one vector
+    for that party. The parties' vectors are then combined dimension by dimension: MIN takes
+    the worst case for the worst-off party (the highest harm, the lowest of every other
+    dimension), MAX the best case, MEDIAN the median. Stakeholder weights scale a party's
+    EMs within its own contraction; across parties MIN, MAX and MEDIAN are unweighted.
+    """
+    by_party: Dict[str, List[EthicalJudgementV2]] = {}
+    for j in judgements:
+        by_party.setdefault(j.stakeholder, []).append(j)
+    flat = GovernanceConfigV2(
+        dimension_weights=config.dimension_weights,
+        tier_configs=config.tier_configs,
+        stakeholder_weights=config.stakeholder_weights,
+        stakeholder_aggregation=AggregationStrategy.WEIGHTED_MEAN,
+        em_weights=config.em_weights,
+    )
+    parties = [aggregate_moral_vectors(js, flat) for js in by_party.values()]
+
+    strategy = config.stakeholder_aggregation
+    values: Dict[str, float] = {}
+    for dim in MoralVector.core_dimension_names():
+        column = [getattr(p, dim) for p in parties]
+        if strategy == AggregationStrategy.MEDIAN:
+            values[dim] = statistics.median(column)
+        else:
+            worst = strategy == AggregationStrategy.MIN
+            take_max = (dim in _HARM_DIMENSIONS) == worst
+            values[dim] = max(column) if take_max else min(column)
+
+    vetoes: List[str] = []
+    reasons: List[str] = []
+    for p in parties:
+        vetoes.extend(p.veto_flags)
+        reasons.extend(p.reason_codes)
+    return MoralVector(
+        **values,
+        veto_flags=list(dict.fromkeys(vetoes)),
+        reason_codes=list(dict.fromkeys(reasons)),
     )
 
 

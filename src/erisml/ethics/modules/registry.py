@@ -131,6 +131,20 @@ class EMRegistry:
         return [entry for entry in cls._entries.values() if tag in entry.tags]
 
     @classmethod
+    def resolve(cls, name: str) -> Optional[EMRegistryEntry]:
+        """Find an entry by class name or by the EM's ``em_name``.
+
+        Profiles name EMs by ``em_name`` (``base_em_ids=["geneva_constitutional"]``), while
+        the registry is keyed by class name (``GenevaEMV2``). Either resolves here."""
+        entry = cls._entries.get(name)
+        if entry is not None:
+            return entry
+        for e in cls._entries.values():
+            if getattr(e.em_class, "em_name", None) == name:
+                return e
+        return None
+
+    @classmethod
     def all_entries(cls) -> List[EMRegistryEntry]:
         """Get all registered entries."""
         return list(cls._entries.values())
