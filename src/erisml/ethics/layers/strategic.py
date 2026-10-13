@@ -395,6 +395,10 @@ class StrategicLayer:
         """
         self._decision_history.append(proof)
 
+    def latest_proof(self) -> Optional[DecisionProof]:
+        """The most recently recorded proof, or None; the next proof links to its hash."""
+        return self._decision_history[-1] if self._decision_history else None
+
     def record_feedback(self, feedback: StakeholderFeedback) -> None:
         """
         Record stakeholder feedback.

@@ -44,8 +44,10 @@ from erisml.ethics.layers.strategic import StrategicLayer, StrategicLayerConfig
 class PipelineConfig:
     """Configuration for the complete pipeline."""
 
-    reflex_config: ReflexLayerConfig = field(default_factory=ReflexLayerConfig)
-    """Configuration for reflex layer."""
+    reflex_config: Optional[ReflexLayerConfig] = None
+    """Configuration for reflex layer. None installs the reflex layer's default hard-constraint
+    rules (rights violation, discrimination, explicit rule); an explicit config is used as given.
+    Before, the default was an empty config, so a default pipeline ran no reflex rules at all."""
 
     tactical_config: TacticalLayerConfig = field(default_factory=TacticalLayerConfig)
     """Configuration for tactical layer."""
@@ -244,9 +246,15 @@ class DEMEPipeline:
         # Combine all vetoed options
         all_vetoed = list(set(reflex_vetoed + tactical_vetoed))
 
-        # Rank remaining options by scalar score
-        non_vetoed = landscape.filter_vetoed()
-        ranked = non_vetoed.rank_by_scalar()
+        # Rank against the authoritative forbidden set: the reflex vetoes and the tactical vetoes
+        # of tiers allowed to veto (a failing module under fail_closed included). The vector's
+        # veto flags alone are not that set: a module can forbid without setting a flag, which
+        # left a forbidden option rankable and selectable, and an advisory tier's flag removed
+        # an option that tier may not veto.
+        forbidden = set(all_vetoed)
+        ranked = [
+            (oid, s) for oid, s in landscape.rank_by_scalar() if oid not in forbidden
+        ]
 
         # Select best option (or baseline if available and acceptable)
         selected_id: Optional[str] = None
@@ -289,7 +297,9 @@ class DEMEPipeline:
             # Build moral vector summary
             mv_summary = {oid: vec.to_dict() for oid, vec in landscape.vectors.items()}
 
+            previous = self.strategic.latest_proof()
             proof = DecisionProof(
+                previous_proof_hash=previous.proof_hash if previous else None,
                 input_facts_hash=combined_facts_hash,
                 profile_hash=self.config.profile_hash,
                 profile_name=self.config.profile_name,
