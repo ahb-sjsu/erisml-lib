@@ -35,6 +35,7 @@ from erisml.ethics.facts import (
     ProceduralAndLegitimacy,
     EpistemicStatus,
     EthicalFacts,
+    Maxim,
 )
 
 if TYPE_CHECKING:
@@ -168,6 +169,9 @@ class PartyAutonomy:
 
     can_withdraw: bool = True
     """Whether this party can withdraw without penalty."""
+
+    decision_capacity: Optional[str] = None
+    """This party's capacity to decide (AutonomyAndAgency.decision_capacity): None when unknown."""
 
 
 @dataclass(frozen=True)
@@ -1023,6 +1027,98 @@ class EthicalFactsV3:
     extra: Optional[Dict[str, Any]] = None
     """Non-breaking extensions for domain-specific fields."""
 
+    maxim: Optional[Maxim] = None
+    """The act's maxim, the same for every party (EthicalFacts.maxim, read by the deontic gate)."""
+
+    metadata: Dict[str, Any] = field(default_factory=dict)
+    """The option's metadata (EthicalFacts.metadata), carried to every V2 view."""
+
+    def for_party(self, party_id: str) -> EthicalFacts:
+        """The option as one party bears it, as V2 EthicalFacts, so that a V2 module's rule can be
+        applied to each party in turn (DEME at rank 2: a module's judgement per party).
+
+        The fields the party's own records carry (harm and benefit, rights violated and consent,
+        choice, coercion, withdrawal and capacity, privacy, and how the act treats it) are that
+        party's; the rest (urgency, rule and role conflicts, the distributive justice fields, the
+        epistemic status, the maxim, the metadata) are the option's, as in ``to_v2``.
+        """
+        from dataclasses import replace
+
+        def record(dim: Any) -> Any:
+            for p in getattr(dim, "per_party", ()) if dim is not None else ():
+                if p.party_id == party_id:
+                    return p
+            return None
+
+        v2 = self.to_v2()
+        pc = record(self.consequences)
+        if pc is not None:
+            v2 = replace(
+                v2,
+                consequences=replace(
+                    v2.consequences,
+                    expected_benefit=pc.expected_benefit,
+                    expected_harm=pc.expected_harm,
+                    affected_count=1,
+                ),
+            )
+        pr = record(self.rights_and_duties)
+        if pr is not None:
+            v2 = replace(
+                v2,
+                rights_and_duties=replace(
+                    v2.rights_and_duties,
+                    violates_rights=pr.rights_violated,
+                    has_valid_consent=pr.consent_given,
+                ),
+            )
+        pa = record(self.autonomy_and_agency)
+        if pa is not None and v2.autonomy_and_agency is not None:
+            v2 = replace(
+                v2,
+                autonomy_and_agency=replace(
+                    v2.autonomy_and_agency,
+                    has_meaningful_choice=pa.has_meaningful_choice,
+                    coercion_or_undue_influence=pa.is_coerced,
+                    can_withdraw_without_penalty=pa.can_withdraw,
+                    decision_capacity=pa.decision_capacity,
+                ),
+            )
+        pp = record(self.privacy_and_data)
+        if pp is not None and v2.privacy_and_data is not None:
+            v2 = replace(
+                v2,
+                privacy_and_data=replace(
+                    v2.privacy_and_data,
+                    privacy_invasion_level=pp.privacy_invasion_level,
+                    secondary_use_without_consent=not pp.consent_for_data_use,
+                    reidentification_risk=pp.reidentification_risk,
+                ),
+            )
+        pv = record(self.virtue_and_care)
+        if pv is not None and v2.virtue_and_care is not None:
+            v2 = replace(
+                v2,
+                virtue_and_care=replace(
+                    v2.virtue_and_care,
+                    expresses_compassion=pv.receives_compassion,
+                    betrays_trust=not pv.trust_preserved,
+                    respects_person_as_end=pv.treated_as_end,
+                ),
+            )
+        pg = record(self.procedural_and_legitimacy)
+        if pg is not None and v2.procedural_and_legitimacy is not None:
+            v2 = replace(
+                v2,
+                procedural_and_legitimacy=replace(
+                    v2.procedural_and_legitimacy,
+                    stakeholders_consulted=pg.was_consulted,
+                    contestation_available=pg.can_contest,
+                    decision_explainable_to_public=pg.decision_explained,
+                ),
+            )
+        return replace(v2, metadata={**(v2.metadata or {}), "party": party_id})
+
     @property
     def party_ids(self) -> List[str]:
         """Get all unique party IDs across all dimensions."""
@@ -1081,6 +1177,8 @@ class EthicalFactsV3:
             ),
             tags=self.tags,
             extra=self.extra,
+            maxim=self.maxim,
+            metadata=dict(self.metadata),
         )
 
     @classmethod

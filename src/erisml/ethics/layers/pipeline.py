@@ -128,6 +128,10 @@ class DecisionResult:
     stages: List[Dict[str, Any]] = field(default_factory=list)
     """Per stage: its EMs, the options it evaluated, vetoed and narrowed out."""
 
+    party_verdicts: Dict[str, Dict[str, Dict[str, str]]] = field(default_factory=dict)
+    """At rank 2 (options as EthicalFactsV3), per option, per module, each party's verdict, and
+    "veto" for a party the module vetoed for (TacticalResult.party_judgements)."""
+
 
 class DEMEPipeline:
     """
@@ -211,7 +215,10 @@ class DEMEPipeline:
         deontic_conflicts: Dict[str, str] = {}
 
         for facts in options:
-            reflex_result = self.reflex.check(facts)
+            # at rank 2 the reflex rules read the option's aggregate record
+            reflex_result = self.reflex.check(
+                facts.to_v2() if hasattr(facts, "for_party") else facts
+            )
             reflex_results[facts.option_id] = reflex_result
             vetoed = reflex_result.vetoed
             # Deontic maxim gate: veto options whose (possibly negated) maxim
@@ -311,6 +318,7 @@ class DEMEPipeline:
                         vetoed=before.vetoed or r.vetoed,
                         veto_reasons=before.veto_reasons + r.veto_reasons,
                         em_failures=before.em_failures + r.em_failures,
+                        party_judgements=before.party_judgements + r.party_judgements,
                     )
                 )
                 if r.em_failures:
@@ -501,6 +509,17 @@ class DEMEPipeline:
 
         total_latency = (time.perf_counter() - start_time) * 1000
 
+        party_verdicts = {
+            oid: {
+                pj.em_name: {
+                    p: ("veto" if pj.per_party_vetoes.get(p) else v)
+                    for p, v in pj.per_party_verdicts.items()
+                }
+                for pj in r.party_judgements
+            }
+            for oid, r in tactical_results.items()
+            if r.party_judgements
+        }
         return DecisionResult(
             selected_option_id=selected_id,
             ranked_options=[oid for oid, _ in ranked],
@@ -513,6 +532,7 @@ class DEMEPipeline:
             composition=pattern.name,
             stages=stage_trace,
             escalations=deontic_conflicts,
+            party_verdicts=party_verdicts,
         )
 
 

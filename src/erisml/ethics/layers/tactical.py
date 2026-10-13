@@ -20,6 +20,8 @@ from typing import Dict, List, Optional, Sequence, Tuple, TYPE_CHECKING
 
 if TYPE_CHECKING:
     from erisml.ethics.facts import EthicalFacts
+    from erisml.ethics.facts_v3 import EthicalFactsV3
+    from erisml.ethics.judgement_v3 import EthicalJudgementV3
     from erisml.ethics.modules.base import EthicsModuleV2
 
 from erisml.ethics.moral_vector import MoralVector
@@ -78,6 +80,12 @@ class TacticalLayerConfig:
     keeps the earlier behaviour, judging the option by the EMs that did answer; safety-
     critical deployments should set it to True."""
 
+    party_collapse: str = "worst_case"
+    """How a module's judgement per party (rank 2, options given as EthicalFactsV3) becomes the
+    one vector the stages aggregate and rank: an EthicalJudgementV3.to_v2 strategy ("worst_case",
+    the most pessimistic value per dimension across the parties; "maximin", the worst-off party's
+    vector; "mean"). A veto for any party vetoes the option, whatever the strategy."""
+
 
 @dataclass
 class TacticalResult:
@@ -103,6 +111,10 @@ class TacticalResult:
 
     em_failures: List[str] = field(default_factory=list)
     """EMs that raised instead of judging, as ``"em_name: ExceptionType: message"``."""
+
+    party_judgements: List["EthicalJudgementV3"] = field(default_factory=list)
+    """At rank 2, each module's judgement per party (a 9 x parties MoralTensor), of which
+    ``judgements`` holds the collapsed form."""
 
 
 def _v2(judgement: EthicalJudgementV2) -> EthicalJudgementV2:
@@ -187,6 +199,9 @@ class TacticalLayer:
                 for f in options
             }
 
+        if options and hasattr(options[0], "for_party"):
+            return self._evaluate_options_by_party(options, ems)
+
         start_time = time.perf_counter()
         ids = [f.option_id for f in options]
         judgements: Dict[str, List[EthicalJudgementV2]] = {i: [] for i in ids}
@@ -247,6 +262,134 @@ class TacticalLayer:
                 veto_reasons=veto_reasons[oid],
                 latency_ms=latency_ms,
                 em_failures=em_failures[oid],
+            )
+            for oid in ids
+        }
+
+    def _evaluate_options_by_party(
+        self,
+        options: Sequence["EthicalFactsV3"],
+        ems: Optional[Sequence["EthicsModuleV2"]] = None,
+    ) -> Dict[str, TacticalResult]:
+        """DEME at rank 2: each module judges each party's view of each option.
+
+        For every party, the module's own rule is applied to the options as that party bears
+        them (``EthicalFactsV3.for_party``), through ``judge_set`` when it has one, so a set
+        judgement still compares the alternatives. The party columns form the module's
+        judgement per option, a MoralTensor of shape (9, parties) with per-party verdicts and
+        vetoes (``EthicalJudgementV3``). It is collapsed by ``party_collapse`` into the vector
+        the stages aggregate; a veto for any party vetoes the option. A module that fails for
+        any party has failed on that option.
+        """
+        import numpy as np
+
+        from erisml.ethics.judgement_v3 import EthicalJudgementV3
+        from erisml.ethics.modules.base_v3 import aggregate_party_verdicts
+        from erisml.ethics.moral_tensor import MORAL_DIMENSION_NAMES, MoralTensor
+
+        start_time = time.perf_counter()
+        ids = [f.option_id for f in options]
+        judgements: Dict[str, List[EthicalJudgementV2]] = {i: [] for i in ids}
+        party_judgements: Dict[str, list] = {i: [] for i in ids}
+        veto_reasons: Dict[str, List[str]] = {i: [] for i in ids}
+        em_failures: Dict[str, List[str]] = {i: [] for i in ids}
+        vetoed: Dict[str, bool] = {i: False for i in ids}
+        parties = sorted({p for f in options for p in f.party_ids})
+
+        def failed(name: str, oid: str, e: Exception) -> None:
+            failure = f"{name}: {type(e).__name__}: {e}"
+            em_failures[oid].append(failure)
+            log.warning("ethics module failed on option %s: %s", oid, failure)
+            if self.config.fail_closed:
+                vetoed[oid] = True
+                veto_reasons[oid].append(
+                    f"{name}: failed ({type(e).__name__}); fail_closed"
+                )
+
+        for em in self.ems if ems is None else ems:
+            name = getattr(em, "em_name", type(em).__name__)
+            em_tier = getattr(em, "em_tier", None)
+            if em_tier != 0 and not self.config.tier_enabled.get(em_tier, True):
+                continue
+            by_party: Dict[str, Dict[str, EthicalJudgementV2]] = {i: {} for i in ids}
+            broken: Dict[str, Exception] = {}
+            judge_set = getattr(em, "judge_set", None)
+            for party in parties:
+                views = [f.for_party(party) for f in options]
+                if callable(judge_set):
+                    try:
+                        for oid, j in dict(judge_set(views)).items():
+                            if oid in by_party:
+                                by_party[oid][party] = _v2(j)
+                    except (
+                        Exception
+                    ) as e:  # an EM that fails has not approved any option
+                        for oid in ids:
+                            broken.setdefault(oid, e)
+                else:
+                    for v in views:
+                        try:
+                            by_party[v.option_id][party] = _v2(em.judge(v))
+                        except Exception as e:
+                            broken.setdefault(v.option_id, e)
+            for oid in ids:
+                if oid in broken:
+                    failed(name, oid, broken[oid])
+                    continue
+                cols = by_party[oid]
+                if not cols:
+                    continue
+                labels = [p for p in parties if p in cols]
+                data = np.array(
+                    [
+                        [cols[p].moral_vector.to_dict()[d] for p in labels]
+                        for d in MORAL_DIMENSION_NAMES
+                    ]
+                )
+                per_party_vetoes = {p: bool(cols[p].veto_triggered) for p in labels}
+                any_j = cols[labels[0]]
+                v3 = EthicalJudgementV3(
+                    option_id=oid,
+                    em_name=name,
+                    stakeholder=any_j.stakeholder,
+                    em_tier=any_j.em_tier,
+                    verdict=aggregate_party_verdicts(
+                        {p: cols[p].verdict for p in labels}
+                    ),
+                    moral_tensor=MoralTensor.from_dense(
+                        data, axis_labels={"n": labels}
+                    ),
+                    per_party_verdicts={p: cols[p].verdict for p in labels},
+                    party_labels=tuple(labels),
+                    distributed_veto_triggered=any(per_party_vetoes.values()),
+                    per_party_vetoes=per_party_vetoes,
+                    veto_reasons={
+                        p: cols[p].veto_reason or "veto"
+                        for p in labels
+                        if per_party_vetoes[p]
+                    },
+                    reasons=[f"{p}: {r}" for p in labels for r in cols[p].reasons[:1]],
+                )
+                party_judgements[oid].append(v3)
+                judgement = v3.to_v2(collapse_strategy=self.config.party_collapse)
+                judgements[oid].append(judgement)
+                if judgement.veto_triggered and self.config.tier_veto_enabled.get(
+                    judgement.em_tier, True
+                ):
+                    vetoed[oid] = True
+                    veto_reasons[oid].append(f"{name}: {judgement.veto_reason}")
+
+        latency_ms = (time.perf_counter() - start_time) * 1000
+        return {
+            oid: TacticalResult(
+                option_id=oid,
+                judgements=judgements[oid],
+                aggregated_vector=self._aggregate_vectors(judgements[oid]),
+                vetoed=vetoed[oid],
+                veto_reasons=veto_reasons[oid],
+                latency_ms=latency_ms,
+                em_failures=em_failures[oid],
+                party_judgements=party_judgements[oid],
             )
             for oid in ids
         }
