@@ -431,3 +431,49 @@ class TestGroupLawVerification:
 
         # Should differ on all states
         assert differences_found == 4
+
+
+class TestActionIsGroupHomomorphism:
+    """Regression tests: the state action must respect the group law.
+
+    Before 2026-07-14, d4_apply_to_state implemented sr and sr³ as
+    rotate-then-reflect while the multiplication table composes
+    right-to-left (sr = reflect∘rotate); 24 of the 64 (a, b) pairs
+    violated (a*b)(x) = a(b(x)), silently corrupting Wilson-loop
+    predictions whose holonomy landed on sr or sr³.
+    """
+
+    def test_action_respects_group_law(self):
+        """(a*b)(x) = a(b(x)) for all a, b in D4 and all states x."""
+        for a in D4Element:
+            for b in D4Element:
+                ab = d4_multiply(a, b)
+                for x in HohfeldianState:
+                    composed = d4_apply_to_state(a, d4_apply_to_state(b, x))
+                    assert d4_apply_to_state(ab, x) == composed, (
+                        f"({a.value}*{b.value})({x.value}) != "
+                        f"{a.value}({b.value}({x.value}))"
+                    )
+
+    def test_action_is_faithful(self):
+        """Distinct group elements induce distinct permutations of states."""
+        perms = {
+            g: tuple(d4_apply_to_state(g, x) for x in HohfeldianState)
+            for g in D4Element
+        }
+        assert len(set(perms.values())) == len(list(D4Element))
+
+    def test_hohfeldian_operations_generate_v4(self):
+        """The two semantically motivated operations (correlative s and
+        negation r²) generate exactly the Klein four-group V₄ — this is
+        the measured structure. D4 remains posited until quarter-turn
+        operations are independently demonstrated."""
+        generated = {D4Element.E, D4Element.S, D4Element.R2}
+        while True:
+            new = {
+                d4_multiply(a, b) for a in generated for b in generated
+            } - generated
+            if not new:
+                break
+            generated |= new
+        assert generated == set(get_klein_four_subgroup())
