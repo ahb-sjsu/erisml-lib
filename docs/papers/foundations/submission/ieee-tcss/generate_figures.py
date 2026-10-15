@@ -73,7 +73,8 @@ def fig_sensitivity():
     # Dimension labels and delta-MAE from ablation
     # Active dims: d9 (critical ~40pp increase), d6 (high ~12pp), d7 (high ~8pp)
     # Inactive dims: all zero
-    dims = ['$d_1$\nConseq.', '$d_2$\nRights', '$d_3$\nFair.',
+    # 'Cons.' not 'Conseq.': the longer label ran into 'Rights' (TCSS proof, 2026-10)
+    dims = ['$d_1$\nCons.','$d_2$\nRights', '$d_3$\nFair.',
             '$d_4$\nAuton.', '$d_5$\nPriv.', '$d_6$\nSocial',
             '$d_7$\nVirtue', '$d_8$\nLegit.', '$d_9$\nEpist.']
 
