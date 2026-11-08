@@ -30,7 +30,23 @@ python3 src/erisml/examples/hello_deme.py
 
 ## Read the Book
 
-The full text of **Geometric Ethics: The Mathematical Structure of Moral Reasoning** (v1.19, Spring 2026) is available online:
+The full text of **Geometric Ethics: The Mathematical Structure of Moral Reasoning** (v1.25, November 2026) is available online.
+
+What v1.25 changed (full list in the book repo's
+[CHANGES-v1.25.md](https://github.com/ahb-sjsu/geometric-ethics/blob/main/CHANGES-v1.25.md)):
+
+- **Hohfeldian group:** the Hohfeldian transitions form the Klein four-group V4, machine-checked
+  in Lean. The dihedral D4 is withdrawn: its quarter-turn was never demonstrated, and a direct
+  search did not find it. The gauge group V4 × U(1)_H is posited, not derived.
+- **Dimensions:** the nine dimensions are a chart for coverage and audit, not a complete or
+  independent basis. A tenth axis (identity attack) passed a preregistered gate, four axes
+  collapse onto one, and rights could not be learned as a measured coordinate.
+- **Evidence labels:** the order effects of Chapter 17 come from one language model, not from
+  people, and the labels now say so.
+- **Formal checks:** the claims marked Proved are checked in Lean 4 + Mathlib, with 0 `sorry`.
+  The check found four propositions that were false as printed; each is corrected in the text.
+
+The book is online here:
 
 **[Read the Full Book Online](https://ahb-sjsu.github.io/erisml-lib/book/)**
 

@@ -62,7 +62,9 @@ ACTIVE_DIM_LABELS = list(ACTIVE_DIMS.keys())
 OBLIGATIONS: Dict[str, np.ndarray] = {
     "alpha": np.array([0.78, 0.65, 0.35, 0.80, 0.70, 0.72]),
     "beta": np.array([0.90, 0.55, 0.82, 0.55, 0.80, 0.85]),
-    "gamma": np.array([0.62, 0.60, 0.58, 0.55, 0.25, 0.65]),
+    # Welfare (0.60 + 0.85)/2 = 0.725, the plain average used for alpha and
+    # beta.  Book v1.24 printed 0.62; corrected in v1.25.
+    "gamma": np.array([(0.60 + 0.85) / 2, 0.60, 0.58, 0.55, 0.25, 0.65]),
 }
 
 # ── Interest covectors (6D, one per agent/perspective) ──────────────────
@@ -86,20 +88,25 @@ METRIC_DIAG = np.array([2.0, 1.5, 1.0, 0.5, 2.0, 0.5])
 RESIDUE_B = np.array([0.50, 0.70, 0.35, 0.80, 0.20, 0.60])
 
 # ── Book reference values (for verification) ────────────────────────────
+# Book v1.25.  The book prints each product to 3 decimals and each total as
+# the sum of its printed terms, so these differ from the exact values by
+# rounding only.  Every gamma value was recomputed in v1.25 from the
+# corrected welfare 0.725 (v1.24: 0.602/0.443/0.563/0.545/0.567, 2.720,
+# 0.443, 0.564, 1.170, 1.411).
 BOOK_M = np.array(
     [
         [0.703, 0.687, 0.668, 0.557, 0.632],  # alpha
         [0.820, 0.775, 0.668, 0.792, 0.758],  # beta
-        [0.602, 0.443, 0.563, 0.545, 0.567],  # gamma
+        [0.644, 0.464, 0.574, 0.561, 0.588],  # gamma
     ]
 )
 
-BOOK_UTIL = {"alpha": 3.247, "beta": 3.813, "gamma": 2.720}
-BOOK_RAWL = {"alpha": 0.557, "beta": 0.668, "gamma": 0.443}
-BOOK_EXPERT = {"alpha": 0.659, "beta": 0.776, "gamma": 0.564}
+BOOK_UTIL = {"alpha": 3.247, "beta": 3.813, "gamma": 2.831}
+BOOK_RAWL = {"alpha": 0.557, "beta": 0.668, "gamma": 0.464}
+BOOK_EXPERT = {"alpha": 0.659, "beta": 0.776, "gamma": 0.590}
 
-BOOK_EUCLID = {"alpha": 0.896, "beta": 0.715, "gamma": 1.170}
-BOOK_WEIGHTED = {"alpha": 0.971, "beta": 0.740, "gamma": 1.411}
+BOOK_EUCLID = {"alpha": 0.896, "beta": 0.715, "gamma": 1.141}
+BOOK_WEIGHTED = {"alpha": 0.971, "beta": 0.740, "gamma": 1.362}
 
 
 # ── Main analysis ───────────────────────────────────────────────────────

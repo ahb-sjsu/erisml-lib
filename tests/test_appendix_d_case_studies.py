@@ -48,14 +48,32 @@ class TestCS1EmergencyTriage:
             [
                 [0.703, 0.687, 0.668, 0.557, 0.632],  # alpha (A+B)
                 [0.820, 0.775, 0.668, 0.792, 0.758],  # beta (A+C)
-                [0.602, 0.443, 0.563, 0.545, 0.567],  # gamma (B+C)
+                [0.644, 0.464, 0.574, 0.561, 0.588],  # gamma (B+C), v1.25
             ]
         )
-        np.testing.assert_allclose(M, expected, atol=0.01)
+        np.testing.assert_allclose(M, expected, atol=0.002)
+
+    def test_gamma_welfare_is_plain_average(self):
+        """v1.25: gamma welfare = (0.60 + 0.85)/2 = 0.725 (v1.24 printed 0.62)."""
+        from erisml.examples.appendix_d_cs1_triage import OBLIGATIONS
+
+        assert OBLIGATIONS["gamma"][0] == pytest.approx(0.725, abs=1e-12)
+
+    def test_gamma_row_exact(self):
+        """Exact gamma entries I^(a) . O_gamma (book prints sums of rounded terms)."""
+        M = self.results["evaluation_tensor"]
+        np.testing.assert_allclose(
+            M[2], [0.643, 0.463, 0.573, 0.55975, 0.5875], atol=1e-12
+        )
+
+    def test_fairness_column_gamma_above_alpha(self):
+        """v1.25: in C's-family (FairnessEM) column gamma now ranks above alpha."""
+        M = self.results["evaluation_tensor"]
+        assert M[1, 3] > M[2, 3] > M[0, 3]
 
     def test_utilitarian_contraction(self):
         S = self.results["utilitarian"]
-        np.testing.assert_allclose(S, [3.247, 3.813, 2.720], atol=0.02)
+        np.testing.assert_allclose(S, [3.247, 3.813, 2.831], atol=0.02)
 
     def test_utilitarian_winner(self):
         S = self.results["utilitarian"]
@@ -63,7 +81,7 @@ class TestCS1EmergencyTriage:
 
     def test_rawlsian_contraction(self):
         S = self.results["rawlsian"]
-        np.testing.assert_allclose(S, [0.557, 0.668, 0.443], atol=0.01)
+        np.testing.assert_allclose(S, [0.557, 0.668, 0.464], atol=0.005)
 
     def test_rawlsian_winner(self):
         S = self.results["rawlsian"]
@@ -71,7 +89,7 @@ class TestCS1EmergencyTriage:
 
     def test_expert_weighted_contraction(self):
         S = self.results["expert_weighted"]
-        np.testing.assert_allclose(S, [0.659, 0.776, 0.564], atol=0.02)
+        np.testing.assert_allclose(S, [0.659, 0.776, 0.590], atol=0.005)
 
     def test_expert_weighted_winner(self):
         S = self.results["expert_weighted"]
@@ -87,8 +105,8 @@ class TestCS1EmergencyTriage:
         d = self.results["euclid_distances"]
         np.testing.assert_allclose(
             [d["alpha"], d["beta"], d["gamma"]],
-            [0.896, 0.715, 1.170],
-            atol=0.02,
+            [0.896, 0.715, 1.141],
+            atol=0.002,
         )
 
     def test_euclidean_beta_closest(self):
@@ -99,8 +117,8 @@ class TestCS1EmergencyTriage:
         d = self.results["weighted_distances"]
         np.testing.assert_allclose(
             [d["alpha"], d["beta"], d["gamma"]],
-            [0.971, 0.740, 1.411],
-            atol=0.02,
+            [0.971, 0.740, 1.362],
+            atol=0.002,
         )
 
     def test_weighted_beta_closest(self):
@@ -346,7 +364,8 @@ class TestCS4AlgorithmicHiring:
 
     def test_biased_system_bond_index(self):
         bip = self.results["bip_biased"]
-        assert bip["Bd"] == pytest.approx(0.51, abs=0.05)
+        # Geometric Ethics v1.25: Bd = D_op / 100 / 0.01 = 5.08 (v1.24 printed 0.51)
+        assert bip["Bd"] == pytest.approx(5.08, abs=0.05)
 
     def test_decision_j_ranks_above_k(self):
         assert self.results["decision"] == "J ranks above K"
@@ -370,21 +389,21 @@ class TestCS5ClimatePolicy:
         phi = self.results["shapley_values"]
         np.testing.assert_allclose(
             [phi["N1"], phi["N2"], phi["N3"], phi["N4"], phi["N5"]],
-            [0.387, 0.212, 0.003, 0.128, 0.270],
-            atol=0.02,
+            [0.484, 0.184, 0.001, 0.112, 0.219],
+            atol=0.0005,
         )
 
     def test_shapley_values_sum_to_one(self):
         phi = self.results["shapley_values"]
         total = sum(phi.values())
-        assert total == pytest.approx(1.0, abs=0.02)
+        assert total == pytest.approx(1.0, abs=1e-9)
 
     def test_fair_allocation(self):
         alloc = self.results["fair_allocation"]
         np.testing.assert_allclose(
             [alloc["N1"], alloc["N2"], alloc["N3"], alloc["N4"], alloc["N5"]],
-            [2.815, 1.542, 0.022, 0.931, 1.964],
-            atol=0.03,
+            [3.522, 1.337, 0.010, 0.812, 1.593],
+            atol=0.0005,
         )
 
     def test_fair_allocation_sums_to_required(self):
@@ -404,21 +423,27 @@ class TestCS5ClimatePolicy:
         gap = self.results["gap_distribution"]
         np.testing.assert_allclose(
             [gap["N1"], gap["N2"], gap["N3"], gap["N4"], gap["N5"]],
-            [-0.815, -0.542, -0.012, -0.131, -0.764],
-            atol=0.03,
+            [-1.522, -0.337, 0.000, -0.012, -0.393],
+            atol=0.0005,
         )
 
     def test_n1_bears_largest_absolute_burden(self):
         alloc = self.results["fair_allocation"]
         assert alloc["N1"] == max(alloc.values())
 
-    def test_n5_bears_highest_proportional_burden(self):
+    def test_n1_bears_highest_proportional_burden(self):
         pct = self.results["reduction_pct"]
-        assert pct["N5"] == max(pct.values())
+        assert pct["N1"] == max(pct.values())
+        assert pct["N1"] == pytest.approx(70.4, abs=0.05)
 
-    def test_n3_bears_negligible_burden(self):
+    def test_n3_negligible_and_cap_does_not_bind(self):
+        from erisml.examples.appendix_d_cs5_climate import CURRENT_EMISSIONS
+
         alloc = self.results["fair_allocation"]
-        assert alloc["N3"] < 0.05
+        assert self.results["capped_nations"] == []
+        assert alloc["N3"] == pytest.approx(0.010, abs=0.0005)
+        assert all(alloc[k] <= CURRENT_EMISSIONS[k] for k in alloc)
+        assert self.results["emergence_degree"] == pytest.approx(0.07, abs=0.005)
 
     def test_bond_index_zero(self):
         assert self.results["bond_index"] == pytest.approx(0.0, abs=0.01)

@@ -26,7 +26,8 @@ Two scoring systems are compared:
   - UNBIASED: scores are invariant under demographic perturbation
     (Bond Index Bd = 0.0).
   - BIASED: scores shift when demographics are perturbed
-    (Bond Index Bd = 0.51).
+    (Bond Index Bd = 5.08 with tau = 0.01, above 1.0: fundamental
+    redesign required).
 
 The geometric-ethics pipeline confirms Candidate J ranks above
 Candidate K under all three contraction methods and the pure-
@@ -383,15 +384,11 @@ def run_case_study_4() -> Dict[str, Any]:
         + f") = {D_op_b:.2f}"
     )
 
-    # Bond Index: Bd = D_op / score_scale * (1/tau)
-    # Book reference values: D_op = 5.08, Bd = 0.51.
+    # Bond Index: Bd = D_op / score_scale * (1/tau), tau = 0.01 (as in D.1).
+    # Geometric Ethics v1.25: D_op = 5.08 gives Bd = 5.08. (v1.24 printed 0.51,
+    # which this example used to substitute for the computed value.)
     Bd_b = D_op_b / 100.0 * (1.0 / 0.01)
-    # The book states Bd = 0.51 for D_op = 5.08.  The printed
-    # formula and the stated result reflect the textbook convention
-    # where the normalisation maps to approximately [0, 1].
-    # We store the book's stated value for downstream checks.
-    Bd_b_book = 0.51
-    print(f"  Bd   = {D_op_b:.2f} / 100" f" * (1/0.01) = {Bd_b_book:.2f}")
+    print(f"  Bd   = {D_op_b:.2f} / 100" f" * (1/0.01) = {Bd_b:.2f}")
 
     np.testing.assert_almost_equal(
         D_op_b,
@@ -399,9 +396,6 @@ def run_case_study_4() -> Dict[str, Any]:
         decimal=1,
         err_msg="D_op for biased system should be ~5.08",
     )
-
-    # Use the book's stated Bond Index for all downstream references.
-    Bd_b = Bd_b_book
 
     results["bip_biased"] = {
         "Bd": Bd_b,
@@ -579,9 +573,10 @@ def run_case_study_4() -> Dict[str, Any]:
     print("\n  Interpretation:")
     print("    Bd = 0.00 -- fully invariant under demographic " "perturbation.")
     print(
-        "    Bd = 0.51 -- substantial sensitivity to protected " "attributes detected;"
+        f"    Bd = {Bd_b:.2f} -- above 1.0: substantial sensitivity to protected "
+        "attributes;"
     )
-    print("                  stratification gate would flag for " "remediation.")
+    print("                  fundamental redesign required, not remediation.")
 
     results["bond_index_summary"] = {
         "unbiased": round(Bd_u, 2),
@@ -600,7 +595,7 @@ def run_case_study_4() -> Dict[str, Any]:
     print("    - expert-weighted contraction")
     print("    - pure meritocracy check")
     print("\n  The unbiased scoring system (Bd=0.00) should be used.")
-    print("  The biased system (Bd=0.51) must be flagged and remediated.")
+    print(f"  The biased system (Bd={Bd_b:.2f}) must be redesigned, not patched.")
 
     results["decision"] = "J ranks above K"
 
