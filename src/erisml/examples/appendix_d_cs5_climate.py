@@ -20,14 +20,31 @@ welfare (mu=1), rights (mu=2), fairness (mu=3), autonomy (mu=4),
 societal (mu=6), procedural (mu=8), and epistemic (mu=9).
 
 Shapley values from a cooperative game determine the fair allocation
-of reduction burden.  The coalition value function incorporates
-capacity, historical responsibility, current emission share, and
-structure tensor corrections (colonial/historical amplification and
-fossil supply chain effects).  Nationally Determined Contributions
-(NDC pledges) are compared against the Shapley-fair allocation to
-compute the contraction loss (gap).  Three alternative metrics are
-analysed.  The Bond Index is 0.0 across invariance-preserving
-transforms.
+of reduction burden.  Each nation's stand-alone burden b_i is the
+equal-weight mean of its national capacity (ability to pay: GDP per
+capita times current share, so that all three principles share one
+national scale), historical responsibility (polluter pays) and current
+emission share, each normalised to sum to 1 across the five nations.
+Each structure tensor
+component S^a_{bc} enters as a burden transfer: a coalition holding b
+and c but not a carries the extra 3|S^a_{bc}| b_a, so by the Shapley
+formula a's value falls by |S^a_{bc}| b_a and b's and c's rise by half
+that each (the grand-coalition value is unchanged).  The exact Shapley
+values (all 2^4 coalitions per nation) set the allocation.  As a
+guard, no nation reduces more than it emits (any excess would be shared
+among the others in proportion to their Shapley values); the cap does
+not bind in this case.  The degree of emergence is
+eta = |phi - b| / |phi| (Euclidean, over the five shares).
+
+Nationally Determined Contributions (NDC pledges) are compared against
+the Shapley-fair allocation to compute the contraction loss (gap).
+Three alternative metrics are analysed; a metric acts on the game by
+weighting the three base terms by g_11 (capacity), g_33
+(responsibility) and g_66 (current share).  The Bond Index is 0.0
+across invariance-preserving transforms.
+
+Rebuilt in v1.25: the v1.24 value function was additive, so its
+Shapley values did not match the printed shares.
 
 Pipeline:
   scenario -> grounding -> obligation vectors -> structure tensor ->
@@ -39,7 +56,7 @@ Decision: Shapley-fair allocation with 2.264 Gt contraction loss.
 
 from __future__ import annotations
 
-from typing import Any, Dict
+from typing import Any, Callable, Dict
 
 import numpy as np
 
@@ -124,10 +141,14 @@ STRUCTURE_TENSOR: Dict[str, Dict[str, Any]] = {
     "S^N3_{N1,N2}": {
         "value": 0.35,
         "note": "colonial/historical amplification",
+        "target": "N3",
+        "pair": ("N1", "N2"),
     },
     "S^N2_{N1,N5}": {
         "value": -0.15,
         "note": "fossil supply chain reduction",
+        "target": "N2",
+        "pair": ("N1", "N5"),
     },
 }
 
@@ -153,36 +174,49 @@ CURRENT_SHARE = {
     "N5": 0.206,
 }
 
+# Base weights of (capacity, responsibility, current share).  Under a
+# metric g these are (g_11, g_33, g_66); the Euclidean metric gives the
+# equal weights used in Step 4.
+BASE_WEIGHTS = (1.0, 1.0, 1.0)
+
 # ── Book reference values (for verification) ───────────────────────────
+# Shapley values of the game (exact: 0.484123, 0.183810, 0.001405,
+# 0.111671, 0.218991).
 BOOK_SHAPLEY = {
-    "N1": 0.387,
-    "N2": 0.212,
-    "N3": 0.003,
-    "N4": 0.128,
-    "N5": 0.270,
+    "N1": 0.484,
+    "N2": 0.184,
+    "N3": 0.001,
+    "N4": 0.112,
+    "N5": 0.219,
 }
+# Nations whose allocation the cap (reduction <= current emissions) fixes:
+# none in this case.
+BOOK_CAPPED: list = []
 
 BOOK_FAIR_ALLOCATION = {
-    "N1": 2.815,
-    "N2": 1.542,
-    "N3": 0.022,
-    "N4": 0.931,
-    "N5": 1.964,
+    "N1": 3.522,
+    "N2": 1.337,
+    "N3": 0.010,
+    "N4": 0.812,
+    "N5": 1.593,
 }
 BOOK_REDUCTION_PCT = {
-    "N1": 56.3,
-    "N2": 34.3,
-    "N3": 44.0,
-    "N4": 46.6,
-    "N5": 65.5,
+    "N1": 70.4,
+    "N2": 29.7,
+    "N3": 20.4,
+    "N4": 40.6,
+    "N5": 53.1,
 }
 BOOK_RESIDUAL = {
-    "N1": 2.185,
-    "N2": 2.958,
-    "N3": 0.028,
-    "N4": 1.069,
-    "N5": 1.036,
+    "N1": 1.478,
+    "N2": 3.163,
+    "N3": 0.040,
+    "N4": 1.188,
+    "N5": 1.407,
 }
+
+# Degree of emergence eta = |phi - b| / |phi| (Euclidean, five shares).
+BOOK_EMERGENCE = 0.07
 
 # ── NDC pledges ─────────────────────────────────────────────────────────
 NDC_PLEDGES = {
@@ -198,50 +232,109 @@ CONTRACTION_LOSS = 2.264  # Gt (7.274 - 5.01)
 CONTRACTION_LOSS_PCT = 31.1  # %
 
 BOOK_GAP = {
-    "N1": -0.815,
-    "N2": -0.542,
-    "N3": -0.012,
-    "N4": -0.131,
-    "N5": -0.764,
+    "N1": -1.522,
+    "N2": -0.337,
+    "N3": 0.000,
+    "N4": -0.012,
+    "N5": -0.393,
 }
 
 # ── Metric analysis diagonals ──────────────────────────────────────────
+# Indices (into the 7D order above) of the dimensions that weight the
+# three base terms: welfare (capacity), fairness (responsibility),
+# societal (current share).
+METRIC_BASE_DIMS = (0, 2, 4)
+
 # Metric 1: per-capita equity
 METRIC_1_DIAG = np.array([1.0, 1.0, 3.0, 0.5, 1.5, 1.0, 0.5])
 METRIC_1_LABEL = "per-capita equity"
-BOOK_METRIC_1 = {"N1": 0.42, "N2": 0.18}
+BOOK_METRIC_1 = {"N1": 0.479, "N2": 0.200}
 
 # Metric 2: capacity-weighted
 METRIC_2_DIAG = np.array([2.5, 0.5, 1.0, 0.5, 1.0, 0.5, 0.5])
 METRIC_2_LABEL = "capacity-weighted"
-BOOK_METRIC_2 = {"N1": 0.44, "N5": 0.30, "N2": 0.15}
+BOOK_METRIC_2 = {"N1": 0.518, "N5": 0.228, "N2": 0.149}
 
-# Metric 3: sovereignty
+# Metric 3: sovereignty (autonomy has no term in v(S))
 METRIC_3_DIAG = np.array([0.5, 0.5, 1.0, 3.0, 1.0, 0.5, 0.5])
 METRIC_3_LABEL = "sovereignty"
+BOOK_METRIC_3 = {"N1": 0.464, "N2": 0.205, "N5": 0.214}
 
 
 # ── Coalition value function ────────────────────────────────────────────
 
 
+def _normalise(values: Dict[str, float]) -> Dict[str, float]:
+    """Scale a nation -> value mapping so that it sums to 1."""
+    total = sum(values.values())
+    return {k: v / total for k, v in values.items()}
+
+
+def stand_alone_burden(
+    weights: tuple = BASE_WEIGHTS,
+    responsibility: Dict[str, float] | None = None,
+) -> Dict[str, float]:
+    """Each nation's stand-alone burden b_i (the b_i sum to 1).
+
+    b_i is the weighted mean of normalised national capacity (ability to
+    pay), normalised responsibility (polluter pays) and normalised
+    current share.  National capacity is the per-capita CAPACITY times
+    CURRENT_SHARE (current emissions stand in for economic size; the
+    case has no population data), so all three principles are measured
+    on one national scale.  ``weights`` are (w_capacity,
+    w_responsibility, w_share).
+    """
+    cap = _normalise({n: CAPACITY[n] * CURRENT_SHARE[n] for n in NATION_IDS})
+    res = _normalise(RESPONSIBILITY if responsibility is None else responsibility)
+    share = _normalise(CURRENT_SHARE)
+    w_c, w_r, w_s = weights
+    w_total = w_c + w_r + w_s
+    return {
+        n: (w_c * cap[n] + w_r * res[n] + w_s * share[n]) / w_total for n in NATION_IDS
+    }
+
+
+def make_coalition_value(burden: Dict[str, float]) -> Callable[[frozenset], float]:
+    """Coalition value function for the given stand-alone burdens.
+
+      v(S) = sum_{i in S} b_i
+             + sum_{S^a_{bc}} 3 |S^a_{bc}| b_a * [b in S, c in S, a not in S]
+
+    Each structure tensor component is a burden transfer: a coalition
+    that holds b and c but not a carries the share of a's burden that
+    the b-c relationship owes.  Its Shapley effect is to lower a's value
+    by |S^a_{bc}| b_a and raise b's and c's by half that each; v(N) is
+    unchanged.  The scaling measures each component in units of the
+    indexed nation's own stand-alone burden:
+      - S^N3_{N1,N2} = 0.35: 35% of N3's burden moves to N1 and N2
+        (N3's claim is amplified by the N1-N2 historical relationship).
+      - S^N2_{N1,N5} = -0.15: 15% of N2's burden moves to N1 and N5
+        (the N1-N5 fossil supply chain reduces N2's burden).
+    A term present only when all three nations are in the coalition
+    would be split equally among them by Shapley symmetry, raising N3's
+    burden: the opposite of the case's reading of S^N3_{N1,N2}.
+    """
+    transfers = [
+        (
+            entry["target"],
+            entry["pair"],
+            3.0 * abs(entry["value"]) * burden[entry["target"]],
+        )
+        for entry in STRUCTURE_TENSOR.values()
+    ]
+
+    def value(coalition: frozenset) -> float:
+        total = sum(burden[n] for n in coalition)
+        for target, (b, c), amount in transfers:
+            if b in coalition and c in coalition and target not in coalition:
+                total += amount
+        return total
+
+    return value
+
+
 def coalition_value(coalition: frozenset) -> float:
-    """Coalition value incorporating capacity, responsibility, share,
-    and structure tensor corrections.
-
-    The base value follows the stated formula:
-      v(S) = sum_{i in S} capacity_i * responsibility_i
-             * (current_emissions_i / total_emissions)
-
-    Structure tensor corrections create superadditivity:
-      - S^N3_{N1,N2} = 0.35: when N1 and N2 are both present,
-        colonial/historical amplification increases obligations toward
-        vulnerable nations, adding to coalition value.
-      - S^N2_{N1,N5} = -0.15: when N1 and N5 are both present,
-        fossil supply chain effects reduce N2's relative burden.
-
-    The coverage complementarity term (gamma * coverage^2) captures
-    the increasing effectiveness of coalitions that cover a larger
-    share of global emissions.
+    """Coalition value v(S) of the case (equal base weights).
 
     Parameters
     ----------
@@ -253,33 +346,45 @@ def coalition_value(coalition: frozenset) -> float:
     float
         The coalition value.
     """
-    if not coalition:
-        return 0.0
+    return make_coalition_value(stand_alone_burden())(coalition)
 
-    # Base: sum of individual contributions
-    base = 0.0
-    for nation in coalition:
-        base += (
-            CAPACITY[nation]
-            * RESPONSIBILITY[nation]
-            * (CURRENT_EMISSIONS[nation] / TOTAL_CURRENT)
-        )
 
-    # Coverage complementarity: larger coalitions covering more
-    # emissions are superadditively more effective
-    coverage = sum(CURRENT_SHARE[n] for n in coalition)
-    complementarity = 3.0 * coverage * coverage
+def capped_allocation(
+    phi: Dict[str, float], required: float = REQUIRED_REDUCTION
+) -> tuple:
+    """Allocate ``required`` in proportion to ``phi``, capped at emissions.
 
-    # Structure tensor corrections (pairwise interactions)
-    structure_correction = 0.0
-    if "N1" in coalition and "N2" in coalition:
-        # Colonial/historical amplification of N3 claims
-        structure_correction += 0.35 * CURRENT_SHARE.get("N3", 0.0)
-    if "N1" in coalition and "N5" in coalition:
-        # Fossil supply chain reduces N2 relative burden
-        structure_correction -= 0.15 * CURRENT_SHARE.get("N2", 0.0)
+    A nation whose share would exceed its current emissions is set to
+    its current emissions; the excess is shared among the remaining
+    nations in proportion to their Shapley values, repeated until no
+    cap binds.  Returns (allocation dict, list of capped nations).
+    """
+    phi_total = sum(phi.values())
+    shares = {k: v / phi_total for k, v in phi.items()}
+    capped: Dict[str, float] = {}
+    while True:
+        free = [n for n in NATION_IDS if n not in capped]
+        remaining = required - sum(capped.values())
+        free_total = sum(shares[n] for n in free)
+        alloc = {
+            n: capped.get(n, shares[n] / free_total * remaining) for n in NATION_IDS
+        }
+        over = [n for n in free if alloc[n] > CURRENT_EMISSIONS[n]]
+        if not over:
+            return alloc, [n for n in NATION_IDS if n in capped]
+        for n in over:
+            capped[n] = CURRENT_EMISSIONS[n]
 
-    return base + complementarity + structure_correction
+
+def allocation_shares(
+    weights: tuple = BASE_WEIGHTS,
+    responsibility: Dict[str, float] | None = None,
+) -> Dict[str, float]:
+    """Capped allocation shares (allocation / required) of the game."""
+    value_fn = make_coalition_value(stand_alone_burden(weights, responsibility))
+    phi = compute_shapley_values(NATION_IDS, value_fn)
+    alloc, _ = capped_allocation(phi)
+    return {n: alloc[n] / REQUIRED_REDUCTION for n in NATION_IDS}
 
 
 # ── Main analysis ───────────────────────────────────────────────────────
@@ -292,8 +397,11 @@ def run_case_study_5() -> Dict[str, Any]:
     -------
     results : dict
         Keys include:
+        - ``stand_alone_burden`` : dict mapping nation -> b_i
         - ``shapley_values`` : dict mapping nation -> Shapley value
-        - ``shapley_raw`` : dict mapping nation -> raw computed Shapley
+        - ``emergence_degree`` : float, eta = |phi - b| / |phi|
+        - ``capped_nations`` : list of nations fixed by the cap (none)
+        - ``allocation_shares`` : dict mapping nation -> allocation share
         - ``fair_allocation`` : dict mapping nation -> Gt reduction
         - ``reduction_pct`` : dict mapping nation -> reduction percentage
         - ``residual_emissions`` : dict mapping nation -> residual Gt/yr
@@ -308,40 +416,55 @@ def run_case_study_5() -> Dict[str, Any]:
     results: Dict[str, Any] = {}
 
     # ── Step 1: Compute Shapley values ────────────────────────────────
-    # The pipeline's Shapley computation uses the coalition value
-    # function defined above.  The book's calibrated Shapley values
-    # are the authoritative reference, derived from the full geometric
-    # pipeline including structure tensor corrections.
-    phi_raw = compute_shapley_values(NATION_IDS, coalition_value)
-    phi_raw_total = sum(phi_raw.values())
-    phi_computed = {k: v / phi_raw_total for k, v in phi_raw.items()}
-    results["shapley_raw"] = phi_computed
-
-    # Use the book's calibrated Shapley values for allocation.
-    # These account for the complete geometric pipeline including
-    # higher-order structure tensor interactions that the coalition
-    # value function approximates.
-    phi = dict(BOOK_SHAPLEY)
+    # Exact enumeration of all coalitions of the game defined above.
+    results["stand_alone_burden"] = stand_alone_burden()
+    phi = compute_shapley_values(NATION_IDS, coalition_value)
     results["shapley_values"] = phi
 
-    # Verify sum = 1.000
+    # The transfers add nothing to v(N), so the values already sum to 1.
     phi_sum = sum(phi.values())
     assert (
-        abs(phi_sum - 1.0) < 0.001
-    ), f"Shapley values sum to {phi_sum:.3f}, expected 1.000"
+        abs(phi_sum - 1.0) < 1e-9
+    ), f"Shapley values sum to {phi_sum:.6f}, expected 1.000"
 
-    # ── Step 2: Fair allocation (Shapley * required_reduction) ────────
+    # Verify Shapley values against book values (printed to 3 dp).
+    for nation, book_val in BOOK_SHAPLEY.items():
+        assert abs(phi[nation] - book_val) < 0.0005, (
+            f"Shapley {nation}: " f"{phi[nation]:.4f} != {book_val}"
+        )
+
+    # Degree of emergence: the part of the allocation that comes from the
+    # structure tensor, eta = |phi - b| / |phi|.
+    burden = results["stand_alone_burden"]
+    phi_vec = np.array([phi[n] for n in NATION_IDS])
+    b_vec = np.array([burden[n] for n in NATION_IDS])
+    eta = float(np.linalg.norm(phi_vec - b_vec) / np.linalg.norm(phi_vec))
+    results["emergence_degree"] = eta
+    assert abs(eta - BOOK_EMERGENCE) < 0.005, f"eta {eta:.3f} != {BOOK_EMERGENCE}"
+
+    # ── Step 2: Fair allocation ───────────────────────────────────────
+    # Shapley * required_reduction.  Guard: no nation reduces more than
+    # it emits (any excess would be shared in proportion to Shapley
+    # values); the cap does not bind in this case.
+    alloc_exact, capped_nations = capped_allocation(phi)
+    results["capped_nations"] = capped_nations
+    assert (
+        capped_nations == BOOK_CAPPED
+    ), f"Capped nations {capped_nations} != {BOOK_CAPPED}"
+    results["allocation_shares"] = {
+        n: alloc_exact[n] / REQUIRED_REDUCTION for n in NATION_IDS
+    }
+
     fair_allocation: Dict[str, float] = {}
     reduction_pct: Dict[str, float] = {}
     residual_emissions: Dict[str, float] = {}
 
     for nation in NATION_IDS:
-        alloc = phi[nation] * REQUIRED_REDUCTION
-        alloc_rounded = round(alloc, 3)
+        alloc_rounded = round(alloc_exact[nation], 3)
         fair_allocation[nation] = alloc_rounded
-        # Compute percentage from the rounded allocation to match
-        # the book's rounding convention.
-        pct = (alloc_rounded / CURRENT_EMISSIONS[nation]) * 100.0
+        # Percentage from the exact allocation (N3's 0.010 Gt is
+        # 0.0102 Gt, 20.4% of 0.05 Gt).
+        pct = (alloc_exact[nation] / CURRENT_EMISSIONS[nation]) * 100.0
         reduction_pct[nation] = round(pct, 1)
         residual = CURRENT_EMISSIONS[nation] - alloc_rounded
         residual_emissions[nation] = round(residual, 3)
@@ -352,9 +475,12 @@ def run_case_study_5() -> Dict[str, Any]:
 
     # Verify fair allocation against book values.
     for nation, book_val in BOOK_FAIR_ALLOCATION.items():
-        assert abs(fair_allocation[nation] - book_val) < 0.01, (
+        assert abs(fair_allocation[nation] - book_val) < 0.0005, (
             f"Fair allocation {nation}: " f"{fair_allocation[nation]:.3f} != {book_val}"
         )
+        assert abs(reduction_pct[nation] - BOOK_REDUCTION_PCT[nation]) < 0.05
+        assert abs(residual_emissions[nation] - BOOK_RESIDUAL[nation]) < 0.0005
+        assert fair_allocation[nation] <= CURRENT_EMISSIONS[nation]
 
     # Verify total allocation sums to ~7.274
     alloc_total = sum(fair_allocation.values())
@@ -397,51 +523,45 @@ def run_case_study_5() -> Dict[str, Any]:
 
     # ── Step 5: Metric analysis ───────────────────────────────────────
     # Under each metric, compute the weighted distance from each
-    # nation's obligation vector to the ideal (all-ones) and report
-    # the key shifted Shapley shares from the book.
+    # nation's obligation vector to the ideal (all-ones), and rerun the
+    # game with the three base terms weighted by (g_11, g_33, g_66).
     ideal = np.ones(7)
 
     metric_results: Dict[str, Dict[str, Any]] = {}
-
-    # Metric 1: per-capita equity
-    m1_distances: Dict[str, float] = {}
-    for nation in NATION_IDS:
-        m1_distances[nation] = metric_distance_weighted(
-            OBLIGATIONS[nation], METRIC_1_DIAG, ideal
-        )
-    metric_results["metric_1"] = {
-        "label": METRIC_1_LABEL,
-        "g_diag": METRIC_1_DIAG.tolist(),
-        "distances": m1_distances,
-        "book_shifted_shares": BOOK_METRIC_1,
-    }
-
-    # Metric 2: capacity-weighted
-    m2_distances: Dict[str, float] = {}
-    for nation in NATION_IDS:
-        m2_distances[nation] = metric_distance_weighted(
-            OBLIGATIONS[nation], METRIC_2_DIAG, ideal
-        )
-    metric_results["metric_2"] = {
-        "label": METRIC_2_LABEL,
-        "g_diag": METRIC_2_DIAG.tolist(),
-        "distances": m2_distances,
-        "book_shifted_shares": BOOK_METRIC_2,
-    }
-
-    # Metric 3: sovereignty
-    m3_distances: Dict[str, float] = {}
-    for nation in NATION_IDS:
-        m3_distances[nation] = metric_distance_weighted(
-            OBLIGATIONS[nation], METRIC_3_DIAG, ideal
-        )
-    metric_results["metric_3"] = {
-        "label": METRIC_3_LABEL,
-        "g_diag": METRIC_3_DIAG.tolist(),
-        "distances": m3_distances,
-        "book_shifted_shares": {},
-        "note": "closer to NDC",
-    }
+    metric_specs = [
+        ("metric_1", METRIC_1_LABEL, METRIC_1_DIAG, BOOK_METRIC_1, None),
+        ("metric_2", METRIC_2_LABEL, METRIC_2_DIAG, BOOK_METRIC_2, None),
+        (
+            "metric_3",
+            METRIC_3_LABEL,
+            METRIC_3_DIAG,
+            BOOK_METRIC_3,
+            "autonomy has no term in v(S); acts only via g_11",
+        ),
+    ]
+    for key, label, diag, book_shares, note in metric_specs:
+        distances: Dict[str, float] = {}
+        for nation in NATION_IDS:
+            distances[nation] = metric_distance_weighted(
+                OBLIGATIONS[nation], diag, ideal
+            )
+        weights = tuple(float(diag[i]) for i in METRIC_BASE_DIMS)
+        shifted = allocation_shares(weights)
+        for nation, book_val in book_shares.items():
+            assert abs(shifted[nation] - book_val) < 0.005, (
+                f"{label} share {nation}: " f"{shifted[nation]:.3f} != {book_val}"
+            )
+        entry: Dict[str, Any] = {
+            "label": label,
+            "g_diag": diag.tolist(),
+            "distances": distances,
+            "base_weights": weights,
+            "shifted_shares": shifted,
+            "book_shifted_shares": book_shares,
+        }
+        if note:
+            entry["note"] = note
+        metric_results[key] = entry
 
     results["metric_results"] = metric_results
 
@@ -478,6 +598,7 @@ def run_case_study_5() -> Dict[str, Any]:
         active_dimensions=ACTIVE_DIM_LABELS,
         obligations={k: v.tolist() for k, v in OBLIGATIONS.items()},
         structure_tensor={k: v["value"] for k, v in STRUCTURE_TENSOR.items()},
+        emergence_degree=round(eta, 2),
         shapley_values=phi,
         fair_allocation=fair_allocation,
         reduction_pct=reduction_pct,
@@ -572,15 +693,19 @@ def main() -> None:
         )
     print()
 
-    # Shapley values (computed vs book)
+    # Shapley values
     phi = results["shapley_values"]
-    phi_raw = results["shapley_raw"]
-    print("Shapley values")
+    burden = results["stand_alone_burden"]
+    shares = results["allocation_shares"]
+    print("Shapley values (exact enumeration)")
     print("-" * 72)
-    print(f"  {'Nation':<6s} {'Computed':<10s} {'Book (calibrated)'}")
+    print(f"  {'Nation':<6s} {'b_i':<10s} {'Shapley':<10s} {'Capped share'}")
     for n in NATION_IDS:
-        print(f"  {n:<6s} {phi_raw[n]:<10.3f} {phi[n]:.3f}")
-    print(f"  Sum (book) = {sum(phi.values()):.3f}")
+        print(f"  {n:<6s} {burden[n]:<10.3f} {phi[n]:<10.3f} {shares[n]:.3f}")
+    print(f"  Sum = {sum(phi.values()):.3f}")
+    capped_list = ", ".join(results["capped_nations"]) or "none"
+    print(f"  Capped at current emissions: {capped_list}")
+    print(f"  Degree of emergence eta = {results['emergence_degree']:.3f}")
     print()
 
     # Fair allocation table
@@ -644,10 +769,9 @@ def main() -> None:
         print("    Distances to ideal:")
         for n in NATION_IDS:
             print(f"      d_{n} = {m['distances'][n]:.3f}")
-        if m.get("book_shifted_shares"):
-            shifted = m["book_shifted_shares"]
-            parts = ", ".join(f"phi'_{k}={v:.2f}" for k, v in shifted.items())
-            print(f"    Shifted Shapley shares: {parts}")
+        shifted = m["shifted_shares"]
+        parts = ", ".join(f"phi'_{k}={shifted[k]:.2f}" for k in NATION_IDS)
+        print(f"    Shifted shares (after cap): {parts}")
         if m.get("note"):
             print(f"    Note: {m['note']}")
         print()
