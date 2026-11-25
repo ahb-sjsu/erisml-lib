@@ -150,3 +150,37 @@ ethics stack until sealed.
 adding a concept, add its authoritative source and status; when a claim is
 upgraded (posited → measured) or retired, change it HERE first, then let the
 repos catch up by pointer.*
+
+## 7. The Bond Index
+
+**Authoritative:** `docs/BOND_INDEX.md` and `src/erisml/ethics/bond_index.py`
+(2026-11-25).
+
+**Canonical statement.** `Bd = D / tau`, where `D` is the mean deviation
+`dist(E(g(x)), E(x))` of an evaluator `E` over the tested inputs `x` and the
+declared re-descriptions `g`, and `tau` is the tolerance of the deployment.
+`Bd = 0` is perfect invariance. It is reported with the worst case
+(`max d / tau`) and the exceedance (the share of tests that moved at all).
+
+**One definition, several output spaces.** `dist` is 0 or 1 for a verdict or a
+Hohfeldian position, the absolute change over the scale for a score, and the
+distance under a stated metric for a moral vector or tensor. The correlative
+violation rate of the Dear Ethicist game, the verdict-flip rate of Appendix D,
+the score form of case study 4 (5.08) and the Legal Bond Index are this
+definition in those spaces. The metric is always an argument, so the index is
+unchanged by the move from the nine hand-made dimensions to discovered
+coordinates with a learned metric.
+
+**Not the Bond Index without a qualifier:** `-log(1 - P(Omega > tau_0))`, the
+form the calibration suite and the LLM evaluation report. It is a function of
+the exceedance (how often, not how far). Call it the exceedance or logarithmic
+form (`BondIndex.log_form`).
+
+**Withdrawn wordings:** "structural × invariance × residue" (no code computed
+it) and "`(N_match − N_mismatch) / N_total`, close to 1 when good" (sign
+reversed).
+
+**Known drift (fix list):** the book's chapters 17, 18, 19 and 22 state the
+index in four ways; the IEEE TAI manuscript defines the logarithmic form as the
+index; sqnd-probe and the agi-hpc copy of `hohfeld.py` carry their own
+implementations. `docs/BOND_INDEX.md` lists what each needs. **[owner]**

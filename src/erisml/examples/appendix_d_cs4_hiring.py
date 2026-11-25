@@ -189,17 +189,21 @@ def compute_bip_bond_index(
     orig = scores["original"]
     delta_orig = orig["K"] - orig["J"]
 
+    # The one Bond Index (erisml.ethics.bond_index) with a score gap as the output space:
+    # the deviation is the change of the gap in units of the score scale.
+    from erisml.ethics.bond_index import bond_index, deviation
+
     deltas: List[float] = []
-    abs_diffs: List[float] = []
     for t_name in TRANSFORM_NAMES:
         t = scores[t_name]
-        delta_t = t["K"] - t["J"]
-        deltas.append(delta_t)
-        abs_diffs.append(abs(delta_orig - delta_t))
+        deltas.append(t["K"] - t["J"])
 
-    D_op = float(np.mean(abs_diffs))
-    Bd = (D_op / score_scale) * (1.0 / tau)
-    return float(Bd), D_op, deltas
+    result = bond_index(
+        (deviation(delta_orig, delta_t, scale=score_scale) for delta_t in deltas),
+        tau=tau,
+    )
+    D_op = result.defect * score_scale  # in score points, as the book prints it
+    return float(result.bd), float(D_op), deltas
 
 
 # ── Obligation vectors & interest covectors ─────────────────────────────

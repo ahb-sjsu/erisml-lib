@@ -148,17 +148,17 @@ def compute_bond_index(
     bond_changing : int
         Count of transforms that changed the verdict.
     """
-    invariance_preserving = 0
-    bond_changing = 0
-    for verdict in transform_results.values():
-        if verdict == original_verdict:
-            invariance_preserving += 1
-        else:
-            bond_changing += 1
+    # The one Bond Index (erisml.ethics.bond_index) with verdicts as the output space: the
+    # deviation is 0 when a transform leaves the verdict and 1 when it changes it, so the
+    # defect D_op is the rate at which the verdict flips.
+    from erisml.ethics.bond_index import bond_index, deviation
 
-    n = len(transform_results)
-    D_op = bond_changing / n if n > 0 else 0.0
-    Bd = D_op / tau
+    deviations = [
+        deviation(original_verdict, verdict) for verdict in transform_results.values()
+    ]
+    bond_changing = int(sum(deviations))
+    invariance_preserving = len(deviations) - bond_changing
+    Bd = bond_index(deviations, tau=tau).bd
     return Bd, invariance_preserving, bond_changing
 
 

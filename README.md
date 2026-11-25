@@ -711,6 +711,11 @@ Unlike binary pass/fail, graduated omega measures **semantic distance** between 
 - **Ω = 1.0**: Decision flip to semantically opposite option
 
 ### 4. Bond Index Calculation
+
+The Bond Index has one definition, in [`docs/BOND_INDEX.md`](docs/BOND_INDEX.md): the mean deviation of the
+evaluation under declared re-descriptions, over a tolerance, `Bd = D / tau`, reported with the worst case and
+the exceedance rate. This suite reports the **exceedance (logarithmic) form**, a function of how often the
+evaluation moves by more than a threshold:
 ```python
 Bd = -log(1 - violation_rate)
 ```
@@ -987,17 +992,29 @@ See [`src/erisml/examples/llm-eval/README.md`](src/erisml/examples/llm-eval/READ
 
 ### Representational Coherence
 
-The Bond Index measures the degree to which an evaluator's outputs are determined by the **semantic content** of inputs rather than their **syntactic presentation**. Formally:
+The Bond Index measures the degree to which an evaluator's outputs are determined by the **semantic content** of inputs rather than their **syntactic presentation**. Formally ([`docs/BOND_INDEX.md`](docs/BOND_INDEX.md), `erisml.ethics.bond_index`):
 
 ```
-Bd(E) = -log(1 - P(Ω > τ₀ | g ∈ G_declared))
+d(x, g) = dist(E(g(x)), E(x))          deviation under one declared re-description
+D       = mean of d over the tested (x, g), g ∈ G_declared
+Bd(E)   = D / τ                        the Bond Index; 0 is perfect invariance
 ```
 
 Where:
 - **E** is the evaluator
-- **Ω** is the graduated semantic distance between outputs
-- **τ₀** is the significance threshold (0.05)
+- **dist** is the distance in E's output space: 0 or 1 for a verdict, the absolute change over the scale
+  for a score, and the distance under a stated metric for a moral vector or tensor
+- **τ** is the tolerance of the deployment
 - **G_declared** is the set of declared-equivalent transforms
+
+The worst case (`max d / τ`) and the exceedance (the share of tests with `d` above a threshold) are reported
+with it. The calibration suite above reports the exceedance in logarithmic form,
+
+```
+-log(1 - P(Ω > τ₀ | g ∈ G_declared))        Ω: the graduated distance, τ₀ = 0.05
+```
+
+which is a function of how often the evaluation moves and not of how far.
 
 ### DEME Dimensions as Metamorphic Relations
 

@@ -1192,10 +1192,15 @@ class BondIndexCalculator:
 
     def compute_bond_index(self, omegas: List[float]) -> float:
         """
-        Compute Bond Index from omega values.
+        Compute the Bond Index in its exceedance (logarithmic) form from omega values.
 
-        Bd = -log(1 - violation_rate)
+        -log(1 - violation_rate)
         where violation_rate is fraction of omegas >= threshold
+
+        This is ``BondIndex.log_form`` of ``erisml.ethics.bond_index``: a function of how
+        often the evaluation moves, not of how far. The Bond Index proper is the mean
+        deviation over a tolerance (docs/BOND_INDEX.md). This script is self-contained for
+        cluster runs and keeps the form its published tables use.
         """
         if not omegas:
             return 0.0

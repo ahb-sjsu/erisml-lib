@@ -69,6 +69,7 @@ docs/
   source of the composition patterns in 3.2
 - [deme_whitepaper_nist.md](guides/deme_whitepaper_nist.md): NIST alignment whitepaper
 - [moralvector_reference.md](moralvector_reference.md): MoralVector reference
+- [BOND_INDEX.md](BOND_INDEX.md): the one definition of the Bond Index, and how the earlier forms are instances of it
 - [I-EIP_Monitor_Whitepaper.md](I-EIP_Monitor_Whitepaper.md): the I-EIP Monitor
 - [SQND_ROSETTA_STONE_PRIMER.md](guides/SQND_ROSETTA_STONE_PRIMER.md): SQND concepts primer
 

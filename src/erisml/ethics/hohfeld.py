@@ -282,19 +282,18 @@ def compute_bond_index(
     if len(verdicts_a) != len(verdicts_b):
         raise ValueError("Verdict lists must have equal length")
 
-    if not verdicts_a:
-        return 0.0
+    # The one Bond Index (erisml.ethics.bond_index) with positions as the output space and the
+    # correlative swap as the declared re-description: the deviation is 0 when B holds the
+    # correlative of A's position and 1 when it does not.
+    from erisml.ethics.bond_index import bond_index, deviation
 
-    defects = 0
-    total = 0
-
-    for va, vb in zip(verdicts_a, verdicts_b):
-        expected_b = correlative(va.state)
-        if vb.state != expected_b:
-            defects += 1
-        total += 1
-
-    return (defects / total) / tau
+    return bond_index(
+        (
+            deviation(correlative(va.state), vb.state)
+            for va, vb in zip(verdicts_a, verdicts_b)
+        ),
+        tau=tau,
+    ).bd
 
 
 def compute_wilson_observable(
