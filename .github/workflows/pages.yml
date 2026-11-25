@@ -46,6 +46,10 @@ jobs:
         uses: actions/upload-pages-artifact@v3
         with:
           path: docs
+      # The deploy step lists this run's artifacts. Asked within a second of the upload it has
+      # found none (2026-11-25, four runs), so give the artifact service time to index it.
+      - name: Wait for the artifact to be listed
+        run: sleep 30
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v4
