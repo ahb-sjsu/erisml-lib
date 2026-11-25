@@ -200,7 +200,8 @@ def extract_math(text: str) -> list[tuple[int, str, bool]]:
     for m in re.finditer(r"\\\[(.+?)\\\]", body, re.S):
         if not consumed[m.start()]:
             take(m, m.group(1), True)
-    for m in re.finditer(r"(?<![\$\\])\$(?!\$)(?!\s)(.+?)(?<![\s\\])\$(?!\$)", body):
+    # same pattern as build.py protect_math: inline math may wrap across one line break
+    for m in re.finditer(r"(?<![\$\\])\$(?!\$)(?!\s)((?:[^\n]|\n(?![ \t]*\n))+?)(?<![\s\\])\$(?!\$)", body):
         if not consumed[m.start()]:
             take(m, m.group(1), False)
     for m in re.finditer(r"\\\((.+?)\\\)", body):

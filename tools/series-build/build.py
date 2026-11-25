@@ -302,7 +302,11 @@ def protect_math(text: str) -> tuple[str, dict[str, str]]:
 
     def _protect_segment(seg: str) -> str:
         seg = re.sub(r'\$\$(.+?)\$\$', _replace, seg, flags=re.DOTALL)
-        seg = re.sub(r'(?<![\$\\])\$(?!\$)(?!\s)(.+?)(?<![\s\\])\$(?!\$)', _replace, seg)
+        # Inline math may wrap across a line break (hard-wrapped sources do), never across a
+        # blank line. Before 2026-11-25 the body was `.+?`, which stops at a newline: a wrapped
+        # formula was left unprotected, Markdown ate its underscores, and every `$` after it
+        # in the paragraph paired with the wrong partner.
+        seg = re.sub(r'(?<![\$\\])\$(?!\$)(?!\s)((?:[^\n]|\n(?![ \t]*\n))+?)(?<![\s\\])\$(?!\$)', _replace, seg)
         seg = re.sub(r'\\\[(.+?)\\\]', _replace, seg, flags=re.DOTALL)
         seg = re.sub(r'\\\((.+?)\\\)', _replace, seg)
         return seg
@@ -315,8 +319,11 @@ def protect_math(text: str) -> tuple[str, dict[str, str]]:
 
 
 def restore_math(html: str, placeholders: dict[str, str]) -> str:
+    # The formula goes back as HTML text, so its <, > and & must be escaped. Written raw
+    # (before 2026-11-25), `$k<n$, $\lambda>0$` reached the browser as a tag `<n$, $\lambda>`
+    # and the text between the two signs vanished. KaTeX reads the decoded text node.
     for key, value in placeholders.items():
-        html = html.replace(key, value)
+        html = html.replace(key, htmllib.escape(value, quote=False))
     return html
 
 
