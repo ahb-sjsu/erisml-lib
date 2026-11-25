@@ -285,6 +285,14 @@ def check_manifest(config: dict, manifest_path: Path) -> list[str]:
     return problems
 
 
+# A currency dollar. In the page it sits alone in its own element: KaTeX auto-render pairs
+# delimiters inside one text node only, so a dollar in a node by itself can never open or
+# close a formula. Written as plain text (before 2026-11-25), the `$` of `\$50` paired with
+# the opening `$` of the next formula and the sentence between them was typeset as math.
+CURRENCY_TOKEN = "\x00CUR\x00"
+CURRENCY_HTML = '<span class="currency">&#36;</span>'
+
+
 def protect_math(text: str) -> tuple[str, dict[str, str]]:
     """Replace LaTeX math with placeholders before Markdown processing.
 
@@ -296,11 +304,14 @@ def protect_math(text: str) -> tuple[str, dict[str, str]]:
     def _replace(match: re.Match) -> str:
         nonlocal counter
         key = f"\x00MATH{counter}\x00"
-        placeholders[key] = match.group(0)
+        placeholders[key] = match.group(0).replace(CURRENCY_TOKEN, "\\$")
         counter += 1
         return key
 
     def _protect_segment(seg: str) -> str:
+        # An escaped dollar (`\$50`) is currency, not a delimiter. Take it out before pairing
+        # (restore_math writes it back in its own element, see CURRENCY_HTML).
+        seg = seg.replace("\\$", CURRENCY_TOKEN)
         seg = re.sub(r'\$\$(.+?)\$\$', _replace, seg, flags=re.DOTALL)
         # Inline math may wrap across a line break (hard-wrapped sources do), never across a
         # blank line. Before 2026-11-25 the body was `.+?`, which stops at a newline: a wrapped
@@ -324,7 +335,7 @@ def restore_math(html: str, placeholders: dict[str, str]) -> str:
     # and the text between the two signs vanished. KaTeX reads the decoded text node.
     for key, value in placeholders.items():
         html = html.replace(key, htmllib.escape(value, quote=False))
-    return html
+    return html.replace(CURRENCY_TOKEN, CURRENCY_HTML)
 
 
 def extract_title(md_text: str) -> str:
