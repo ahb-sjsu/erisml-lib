@@ -17,6 +17,8 @@ CASES = [
     ("currency outside math", "Pay \\$50. Then $\\Delta d_1 = -50$ follows.",
      ['<span class="currency">&#36;</span>50', "$\\Delta d_1 = -50$"], ["\\$50"]),
     ("currency inside math", "Cost $\\text{price }\\$5 + x_1$ here.", ["$\\text{price }\\$5 + x_1$"], ["currency"]),
+    ("hand-wrapped currency", "cost <span>$</span>1.10 in total. The bat costs <span>$</span>1.00 more; $x_1$.",
+     ['<span class="currency">&#36;</span>1.10', '<span class="currency">&#36;</span>1.00', "$x_1$"], ["&lt;/span"]),
     ("code is untouched", "```\necho \\$HOME $x_1$\n```\n", ["echo \\$HOME $x_1$"], ["currency"]),
     ("no pairing across a blank line", "A price of $5 here.\n\nAnother $x_1$ there.", ["$x_1$"], []),
 ]

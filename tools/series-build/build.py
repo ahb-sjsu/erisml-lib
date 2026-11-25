@@ -312,6 +312,8 @@ def protect_math(text: str) -> tuple[str, dict[str, str]]:
         # An escaped dollar (`\$50`) is currency, not a delimiter. Take it out before pairing
         # (restore_math writes it back in its own element, see CURRENCY_HTML).
         seg = seg.replace("\\$", CURRENCY_TOKEN)
+        # the same thing written by hand in some chapters: <span>$</span>1.10
+        seg = re.sub(r'<span[^>]*>\$</span>', CURRENCY_TOKEN, seg)
         seg = re.sub(r'\$\$(.+?)\$\$', _replace, seg, flags=re.DOTALL)
         # Inline math may wrap across a line break (hard-wrapped sources do), never across a
         # blank line. Before 2026-11-25 the body was `.+?`, which stops at a newline: a wrapped
