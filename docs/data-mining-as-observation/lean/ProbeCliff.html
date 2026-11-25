@@ -1,0 +1,119 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>ProbeCliff.lean</title><style>
+:root { color-scheme: light; --ink:#0b0b0b; --ink2:#52514e; --ink3:#8a897f; --surface:#fcfcfb; --rule:#e6e5e1; --accent:#2a78d6; }
+html { background: var(--surface); }
+body { margin: 0; color: var(--ink); font-family: Inter, 'Segoe UI', Helvetica, Arial, sans-serif; font-size: 17px; line-height: 1.55; }
+main { max-width: 760px; margin: 0 auto; padding: 32px 24px 96px; }
+nav.top { border-bottom: 1px solid var(--rule); padding: 12px 24px; font-size: 14px; color: var(--ink2); display:flex; gap: 18px; flex-wrap: wrap; }
+nav.top a { color: var(--ink2); text-decoration: none; }
+nav.top a:hover { color: var(--accent); }
+h1 { font-size: 30px; line-height: 1.2; margin: 0 0 18px; }
+h2 { font-size: 21px; margin: 40px 0 10px; }
+h3 { font-size: 17px; margin: 28px 0 8px; }
+p { margin: 0 0 14px; }
+p.lede { color: var(--ink2); font-style: italic; }
+table { border-collapse: collapse; margin: 14px 0 20px; font-size: 15px; width: 100%; overflow-x: auto; display: block; }
+th, td { text-align: left; padding: 6px 10px; border-bottom: 1px solid var(--rule); vertical-align: top; }
+th { color: var(--ink2); font-weight: 600; }
+figure { margin: 22px 0 26px; }
+figure svg { max-width: 100%; height: auto; display: block; }
+figcaption { font-size: 14px; color: var(--ink2); margin-top: 8px; }
+blockquote { border-left: 3px solid var(--rule); margin: 14px 0; padding: 4px 16px; color: var(--ink2); }
+code { font-family: ui-monospace, Consolas, monospace; font-size: 0.9em; background: #f3f2ee; padding: 1px 4px; border-radius: 3px; }
+.katex-display { overflow-x: auto; overflow-y: hidden; padding: 4px 0; }
+ol, ul { padding-left: 24px; }
+li { margin: 4px 0; }
+.toc li { margin: 8px 0; }
+.toc a { color: var(--ink); text-decoration: none; }
+.toc a:hover { color: var(--accent); }
+.toc span { color: var(--ink3); font-size: 14px; margin-left: 8px; }
+.cite a { color: var(--ink2); text-decoration: none; }
+ol.refs li { margin: 8px 0; font-size: 15px; }
+ul.terms { list-style: none; padding: 0; columns: 2; column-gap: 32px; font-size: 15px; }
+ul.terms li { margin: 3px 0; break-inside: avoid; }
+ul.terms span { color: var(--ink2); }
+ul.terms a { color: var(--ink2); text-decoration: none; }
+ul.terms a:hover { color: var(--accent); }
+nav.top a.cur { color: var(--accent); font-weight: 600; } nav.top .sep { color: var(--rule); } footer.edition { max-width: 760px; margin: 0 auto; padding: 0 24px 40px; font-size: 13px; color: var(--ink3); } pre.lean { font-family: ui-monospace, Consolas, monospace; font-size: 13.5px; line-height: 1.45; background: #f3f2ee; padding: 14px 16px; border-radius: 6px; overflow-x: auto; white-space: pre; }</style>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js"
+  onload="renderMathInElement(document.body,{delimiters:[{left:'$$',right:'$$',display:true},{left:'$',right:'$',display:false}],throwOnError:false});"></script>
+<script defer src="../../assets/js/sitebar.js"></script></head><body><nav class="top"><a href="../index.html"><strong>Data Mining as Observation</strong></a> <a href="../primer_l.html">L</a> <a href="../primer_s.html">S</a> <a href="../ch00.html">0</a> <a href="../ch01.html">1</a> <a href="../ch02.html">2</a> <a href="../ch03.html">3</a> <a href="../ch04.html">4</a> <a href="../ch05.html">5</a> <a href="../ch06.html">6</a> <a href="../ch07.html">7</a> <a href="../ch08.html">8</a> <a href="../ch09.html">9</a> <a href="../ch10.html">10</a> <a href="../ch11.html">11</a> <a href="../ch12.html">12</a> <a href="../ch13.html">13</a> <a href="../ch14.html">14</a> <a href="../how_to_use.html">how to use</a> <a href="../notation.html">notation</a> <a href="../glossary.html">glossary</a> <a href="../machine_checked.html">lean</a> <a href="../index.html#references">references</a> <a href="../terms.html">index</a> <span class="sep">|</span> <a href="../../encyclopedia/index.html">encyclopedia</a></nav><main><h1><code>ProbeCliff.lean</code></h1><p class="lede">Lean 4 source, <code>lean/DataMiningAsObservation/ProbeCliff.lean</code> at commit <code>f3914f0</code>. Appendix C, <a href="../machine_checked.html">Machine-checked statements</a>, says what each file proves. <a href="index.html">All Lean files</a>.</p><pre class="lean">/-
+ProbeCliff.lean. Chapter 11 section 11.4, equation 11.4, the blind probe and its budget cliff.
+
+A blind probe reads a consumer by central differences along chosen directions, two calls per
+direction. For an affine consumer a central difference along a direction returns the
+gradient&#x27;s inner product with that direction exactly, at any step, so probing the standard
+basis recovers the gradient in two calls per coordinate. A probe confined to fewer directions
+than the dimension has a blind direction, a nonzero vector orthogonal to every probe
+direction, and two consumers whose gradients differ by that vector return identical readings
+on every probe call at every input. Recovery is therefore a cliff at the full dimension.
+-/
+import Mathlib
+
+namespace DMO.ProbeCliff
+
+open Matrix
+
+variable {d k : ℕ}
+
+/-- The central difference of a consumer `f` at `x` along `u` with step `ε`, the two-call
+sensitivity estimate of chapter 11. -/
+noncomputable def centralDiff (f : (Fin d → ℝ) → ℝ) (x u : Fin d → ℝ) (ε : ℝ) : ℝ :=
+  (f (x + ε • u) - f (x - ε • u)) / (2 * ε)
+
+/-- An affine consumer. -/
+def affine (a : Fin d → ℝ) (b : ℝ) (x : Fin d → ℝ) : ℝ := a ⬝ᵥ x + b
+
+/-- For an affine consumer the central difference along `u` is the gradient&#x27;s inner product
+with `u`, exactly, at every input and every nonzero step. -/
+theorem centralDiff_affine (a : Fin d → ℝ) (b : ℝ) (x u : Fin d → ℝ) {ε : ℝ} (hε : ε ≠ 0) :
+    centralDiff (affine a b) x u ε = a ⬝ᵥ u := by
+  unfold centralDiff affine
+  simp only [dotProduct_add, dotProduct_sub, dotProduct_smul, smul_eq_mul]
+  field_simp
+  ring
+
+/-- **Recovery at the full dimension.** Probing the standard basis returns each coordinate of
+the gradient, two calls per coordinate. -/
+theorem centralDiff_basis (a : Fin d → ℝ) (b : ℝ) (x : Fin d → ℝ) {ε : ℝ} (hε : ε ≠ 0)
+    (i : Fin d) : centralDiff (affine a b) x (Pi.single i 1) ε = a i := by
+  rw [centralDiff_affine a b x _ hε]
+  simp [dotProduct_single]
+
+/-- The probe map, which reads the inner products with the `k` probe directions. -/
+def probeMap (u : Fin k → Fin d → ℝ) : (Fin d → ℝ) →ₗ[ℝ] (Fin k → ℝ) where
+  toFun x := fun i =&gt; u i ⬝ᵥ x
+  map_add&#x27; x y := by ext i; simp [dotProduct_add]
+  map_smul&#x27; c x := by ext i; simp [dotProduct_smul]
+
+/-- **A blind direction.** Fewer probe directions than the dimension leave a nonzero direction
+orthogonal to all of them. -/
+theorem exists_blind_direction (hk : k &lt; d) (u : Fin k → Fin d → ℝ) :
+    ∃ v : Fin d → ℝ, v ≠ 0 ∧ ∀ i, u i ⬝ᵥ v = 0 := by
+  have h : LinearMap.ker (probeMap u) ≠ ⊥ := by
+    apply LinearMap.ker_ne_bot_of_finrank_lt
+    simpa using hk
+  obtain ⟨v, hv, hv0⟩ := (Submodule.ne_bot_iff _).1 h
+  refine ⟨v, hv0, fun i =&gt; ?_⟩
+  have := congrFun (LinearMap.mem_ker.1 hv) i
+  simpa [probeMap] using this
+
+/-- Two affine consumers whose gradients differ by a direction orthogonal to every probe
+direction return the same reading on every probe call, at every input and step. -/
+theorem indistinguishable (a v : Fin d → ℝ) (b : ℝ) (u : Fin k → Fin d → ℝ)
+    (hv : ∀ i, u i ⬝ᵥ v = 0) (x : Fin d → ℝ) {ε : ℝ} (hε : ε ≠ 0) (i : Fin k) :
+    centralDiff (affine (a + v) b) x (u i) ε = centralDiff (affine a b) x (u i) ε := by
+  rw [centralDiff_affine _ _ _ _ hε, centralDiff_affine _ _ _ _ hε, add_dotProduct,
+    dotProduct_comm v, hv, add_zero]
+
+/-- **The budget cliff, equation 11.4.** A probe confined to fewer than `d` directions cannot
+tell some pair of distinct affine consumers apart, whatever inputs and steps it uses. -/
+theorem budget_cliff (hk : k &lt; d) (u : Fin k → Fin d → ℝ) (a : Fin d → ℝ) (b : ℝ) :
+    ∃ v : Fin d → ℝ, v ≠ 0 ∧ ∀ (x : Fin d → ℝ) (ε : ℝ), ε ≠ 0 → ∀ i,
+      centralDiff (affine (a + v) b) x (u i) ε = centralDiff (affine a b) x (u i) ε := by
+  obtain ⟨v, hv0, hv⟩ := exists_blind_direction hk u
+  exact ⟨v, hv0, fun x ε hε i =&gt; indistinguishable a v b u hv x hε i⟩
+
+end DMO.ProbeCliff
+</pre></main><footer class="edition"><em>Data Mining as Observation</em>, draft 0.3, online edition built from commit <code>f3914f0</code>. Copyright &copy; 2026 Andrew H. Bond. All rights reserved. <a href="../index.html">Contents</a> &middot; <a href="../../encyclopedia/index.html">Encyclopedia</a></footer></body></html>

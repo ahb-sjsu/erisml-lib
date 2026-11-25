@@ -1,0 +1,95 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Covariance.lean</title><style>
+:root { color-scheme: light; --ink:#0b0b0b; --ink2:#52514e; --ink3:#8a897f; --surface:#fcfcfb; --rule:#e6e5e1; --accent:#2a78d6; }
+html { background: var(--surface); }
+body { margin: 0; color: var(--ink); font-family: Inter, 'Segoe UI', Helvetica, Arial, sans-serif; font-size: 17px; line-height: 1.55; }
+main { max-width: 760px; margin: 0 auto; padding: 32px 24px 96px; }
+nav.top { border-bottom: 1px solid var(--rule); padding: 12px 24px; font-size: 14px; color: var(--ink2); display:flex; gap: 18px; flex-wrap: wrap; }
+nav.top a { color: var(--ink2); text-decoration: none; }
+nav.top a:hover { color: var(--accent); }
+h1 { font-size: 30px; line-height: 1.2; margin: 0 0 18px; }
+h2 { font-size: 21px; margin: 40px 0 10px; }
+h3 { font-size: 17px; margin: 28px 0 8px; }
+p { margin: 0 0 14px; }
+p.lede { color: var(--ink2); font-style: italic; }
+table { border-collapse: collapse; margin: 14px 0 20px; font-size: 15px; width: 100%; overflow-x: auto; display: block; }
+th, td { text-align: left; padding: 6px 10px; border-bottom: 1px solid var(--rule); vertical-align: top; }
+th { color: var(--ink2); font-weight: 600; }
+figure { margin: 22px 0 26px; }
+figure svg { max-width: 100%; height: auto; display: block; }
+figcaption { font-size: 14px; color: var(--ink2); margin-top: 8px; }
+blockquote { border-left: 3px solid var(--rule); margin: 14px 0; padding: 4px 16px; color: var(--ink2); }
+code { font-family: ui-monospace, Consolas, monospace; font-size: 0.9em; background: #f3f2ee; padding: 1px 4px; border-radius: 3px; }
+.katex-display { overflow-x: auto; overflow-y: hidden; padding: 4px 0; }
+ol, ul { padding-left: 24px; }
+li { margin: 4px 0; }
+.toc li { margin: 8px 0; }
+.toc a { color: var(--ink); text-decoration: none; }
+.toc a:hover { color: var(--accent); }
+.toc span { color: var(--ink3); font-size: 14px; margin-left: 8px; }
+.cite a { color: var(--ink2); text-decoration: none; }
+ol.refs li { margin: 8px 0; font-size: 15px; }
+ul.terms { list-style: none; padding: 0; columns: 2; column-gap: 32px; font-size: 15px; }
+ul.terms li { margin: 3px 0; break-inside: avoid; }
+ul.terms span { color: var(--ink2); }
+ul.terms a { color: var(--ink2); text-decoration: none; }
+ul.terms a:hover { color: var(--accent); }
+nav.top a.cur { color: var(--accent); font-weight: 600; } nav.top .sep { color: var(--rule); } footer.edition { max-width: 760px; margin: 0 auto; padding: 0 24px 40px; font-size: 13px; color: var(--ink3); } pre.lean { font-family: ui-monospace, Consolas, monospace; font-size: 13.5px; line-height: 1.45; background: #f3f2ee; padding: 14px 16px; border-radius: 6px; overflow-x: auto; white-space: pre; }</style>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js"
+  onload="renderMathInElement(document.body,{delimiters:[{left:'$$',right:'$$',display:true},{left:'$',right:'$',display:false}],throwOnError:false});"></script>
+<script defer src="../../assets/js/sitebar.js"></script></head><body><nav class="top"><a href="../index.html"><strong>Data Mining as Observation</strong></a> <a href="../primer_l.html">L</a> <a href="../primer_s.html">S</a> <a href="../ch00.html">0</a> <a href="../ch01.html">1</a> <a href="../ch02.html">2</a> <a href="../ch03.html">3</a> <a href="../ch04.html">4</a> <a href="../ch05.html">5</a> <a href="../ch06.html">6</a> <a href="../ch07.html">7</a> <a href="../ch08.html">8</a> <a href="../ch09.html">9</a> <a href="../ch10.html">10</a> <a href="../ch11.html">11</a> <a href="../ch12.html">12</a> <a href="../ch13.html">13</a> <a href="../ch14.html">14</a> <a href="../how_to_use.html">how to use</a> <a href="../notation.html">notation</a> <a href="../glossary.html">glossary</a> <a href="../machine_checked.html">lean</a> <a href="../index.html#references">references</a> <a href="../terms.html">index</a> <span class="sep">|</span> <a href="../../encyclopedia/index.html">encyclopedia</a></nav><main><h1><code>Covariance.lean</code></h1><p class="lede">Lean 4 source, <code>lean/DataMiningAsObservation/Covariance.lean</code> at commit <code>f3914f0</code>. Appendix C, <a href="../machine_checked.html">Machine-checked statements</a>, says what each file proves. <a href="index.html">All Lean files</a>.</p><pre class="lean">/-
+Covariance.lean. Equations 0.3 and 0.4, the covariance matrix.
+
+The covariance matrix of a weighted set of rows is the weighted average of the centred rows&#x27;
+outer products, the same construction as the read operator with the centred row in place of
+the sensitivity. Its quadratic form along a unit direction is the variance of the
+projection onto that direction, equation 0.4, its trace is the total variance, and it is
+positive semidefinite. The file reuses the read operator&#x27;s algebra, which is the point
+chapter 4 makes when it pairs the two matrices in one basis.
+-/
+import Mathlib
+import DataMiningAsObservation.ReadOperator
+
+namespace DMO.Covariance
+
+open Finset Matrix DMO.ReadOperator
+
+variable {Ω : Type*} [Fintype Ω] {n : ℕ}
+
+/-- **Equation 0.3.** The covariance matrix of the rows `x` with weights `w` about the mean `μ`. -/
+def cov (w : Ω → ℝ) (x : Ω → Fin n → ℝ) (μ : Fin n → ℝ) : Matrix (Fin n) (Fin n) ℝ :=
+  readOp w (fun ω =&gt; x ω - μ)
+
+/-- **Equation 0.4.** The quadratic form along `u` is the weighted variance of the projection
+onto `u`. -/
+theorem var_eq_quad (w : Ω → ℝ) (x : Ω → Fin n → ℝ) (μ : Fin n → ℝ) (u : Fin n → ℝ) :
+    u ⬝ᵥ (cov w x μ *ᵥ u) = ∑ ω, w ω * ((x ω - μ) ⬝ᵥ u) ^ 2 := by
+  unfold cov
+  exact quad_readOp w _ u
+
+/-- **The trace is the total variance.** -/
+theorem trace_eq_total (w : Ω → ℝ) (x : Ω → Fin n → ℝ) (μ : Fin n → ℝ) :
+    (cov w x μ).trace = ∑ ω, w ω * ((x ω - μ) ⬝ᵥ (x ω - μ)) := by
+  unfold cov Matrix.trace
+  simp only [Matrix.diag_apply, readOp_diag]
+  rw [Finset.sum_comm]
+  refine Finset.sum_congr rfl fun ω _ =&gt; ?_
+  rw [← Finset.mul_sum]
+  congr 1
+  simp [dotProduct, sq]
+
+/-- **Positive semidefinite** for nonnegative weights. -/
+theorem quad_nonneg (w : Ω → ℝ) (hw : ∀ ω, 0 ≤ w ω) (x : Ω → Fin n → ℝ) (μ : Fin n → ℝ)
+    (u : Fin n → ℝ) : 0 ≤ u ⬝ᵥ (cov w x μ *ᵥ u) := by
+  unfold cov
+  exact quad_readOp_nonneg w hw _ u
+
+/-- The covariance is symmetric. -/
+theorem cov_symm (w : Ω → ℝ) (x : Ω → Fin n → ℝ) (μ : Fin n → ℝ) (i j : Fin n) :
+    cov w x μ i j = cov w x μ j i := by
+  unfold cov
+  exact readOp_symm w _ i j
+
+end DMO.Covariance
+</pre></main><footer class="edition"><em>Data Mining as Observation</em>, draft 0.3, online edition built from commit <code>f3914f0</code>. Copyright &copy; 2026 Andrew H. Bond. All rights reserved. <a href="../index.html">Contents</a> &middot; <a href="../../encyclopedia/index.html">Encyclopedia</a></footer></body></html>

@@ -1,0 +1,104 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>BiLipschitz.lean</title><style>
+:root { color-scheme: light; --ink:#0b0b0b; --ink2:#52514e; --ink3:#8a897f; --surface:#fcfcfb; --rule:#e6e5e1; --accent:#2a78d6; }
+html { background: var(--surface); }
+body { margin: 0; color: var(--ink); font-family: Inter, 'Segoe UI', Helvetica, Arial, sans-serif; font-size: 17px; line-height: 1.55; }
+main { max-width: 760px; margin: 0 auto; padding: 32px 24px 96px; }
+nav.top { border-bottom: 1px solid var(--rule); padding: 12px 24px; font-size: 14px; color: var(--ink2); display:flex; gap: 18px; flex-wrap: wrap; }
+nav.top a { color: var(--ink2); text-decoration: none; }
+nav.top a:hover { color: var(--accent); }
+h1 { font-size: 30px; line-height: 1.2; margin: 0 0 18px; }
+h2 { font-size: 21px; margin: 40px 0 10px; }
+h3 { font-size: 17px; margin: 28px 0 8px; }
+p { margin: 0 0 14px; }
+p.lede { color: var(--ink2); font-style: italic; }
+table { border-collapse: collapse; margin: 14px 0 20px; font-size: 15px; width: 100%; overflow-x: auto; display: block; }
+th, td { text-align: left; padding: 6px 10px; border-bottom: 1px solid var(--rule); vertical-align: top; }
+th { color: var(--ink2); font-weight: 600; }
+figure { margin: 22px 0 26px; }
+figure svg { max-width: 100%; height: auto; display: block; }
+figcaption { font-size: 14px; color: var(--ink2); margin-top: 8px; }
+blockquote { border-left: 3px solid var(--rule); margin: 14px 0; padding: 4px 16px; color: var(--ink2); }
+code { font-family: ui-monospace, Consolas, monospace; font-size: 0.9em; background: #f3f2ee; padding: 1px 4px; border-radius: 3px; }
+.katex-display { overflow-x: auto; overflow-y: hidden; padding: 4px 0; }
+ol, ul { padding-left: 24px; }
+li { margin: 4px 0; }
+.toc li { margin: 8px 0; }
+.toc a { color: var(--ink); text-decoration: none; }
+.toc a:hover { color: var(--accent); }
+.toc span { color: var(--ink3); font-size: 14px; margin-left: 8px; }
+.cite a { color: var(--ink2); text-decoration: none; }
+ol.refs li { margin: 8px 0; font-size: 15px; }
+ul.terms { list-style: none; padding: 0; columns: 2; column-gap: 32px; font-size: 15px; }
+ul.terms li { margin: 3px 0; break-inside: avoid; }
+ul.terms span { color: var(--ink2); }
+ul.terms a { color: var(--ink2); text-decoration: none; }
+ul.terms a:hover { color: var(--accent); }
+nav.top a.cur { color: var(--accent); font-weight: 600; } nav.top .sep { color: var(--rule); } footer.edition { max-width: 760px; margin: 0 auto; padding: 0 24px 40px; font-size: 13px; color: var(--ink3); } pre.lean { font-family: ui-monospace, Consolas, monospace; font-size: 13.5px; line-height: 1.45; background: #f3f2ee; padding: 14px 16px; border-radius: 6px; overflow-x: auto; white-space: pre; }</style>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js"
+  onload="renderMathInElement(document.body,{delimiters:[{left:'$$',right:'$$',display:true},{left:'$',right:'$',display:false}],throwOnError:false});"></script>
+<script defer src="../../assets/js/sitebar.js"></script></head><body><nav class="top"><a href="../index.html"><strong>Data Mining as Observation</strong></a> <a href="../primer_l.html">L</a> <a href="../primer_s.html">S</a> <a href="../ch00.html">0</a> <a href="../ch01.html">1</a> <a href="../ch02.html">2</a> <a href="../ch03.html">3</a> <a href="../ch04.html">4</a> <a href="../ch05.html">5</a> <a href="../ch06.html">6</a> <a href="../ch07.html">7</a> <a href="../ch08.html">8</a> <a href="../ch09.html">9</a> <a href="../ch10.html">10</a> <a href="../ch11.html">11</a> <a href="../ch12.html">12</a> <a href="../ch13.html">13</a> <a href="../ch14.html">14</a> <a href="../how_to_use.html">how to use</a> <a href="../notation.html">notation</a> <a href="../glossary.html">glossary</a> <a href="../machine_checked.html">lean</a> <a href="../index.html#references">references</a> <a href="../terms.html">index</a> <span class="sep">|</span> <a href="../../encyclopedia/index.html">encyclopedia</a></nav><main><h1><code>BiLipschitz.lean</code></h1><p class="lede">Lean 4 source, <code>lean/DataMiningAsObservation/BiLipschitz.lean</code> at commit <code>f3914f0</code>. Appendix C, <a href="../machine_checked.html">Machine-checked statements</a>, says what each file proves. <a href="index.html">All Lean files</a>.</p><pre class="lean">/-
+BiLipschitz.lean. Equation 0.21, bi-Lipschitz maps.
+
+A map between two spaces is bi-Lipschitz with factor `K` when it neither stretches nor
+shrinks any distance by more than `K`. The factor is at least one wherever a distance is
+nonzero, the composition of two such maps is bi-Lipschitz with the product of the factors,
+and a bi-Lipschitz map preserves the nearest neighbour whenever the runner-up is more than
+`K²` times as far, which is the rank certificate&#x27;s per-pair fact with `κ = K²`. It does not
+preserve every ordering, which is why rank-faithful is a separate word.
+-/
+import Mathlib
+
+namespace DMO.BiLipschitz
+
+/-- **Equation 0.21** for one pair. The image distance `d&#x27;` of an original distance `d` lies
+within factor `K`. -/
+def within (K d d&#x27; : ℝ) : Prop := d / K ≤ d&#x27; ∧ d&#x27; ≤ K * d
+
+/-- **The factor is at least one** wherever a distance is nonzero. -/
+theorem one_le_factor (K d d&#x27; : ℝ) (hK : 0 &lt; K) (hd : 0 &lt; d) (h : within K d d&#x27;) : 1 ≤ K := by
+  obtain ⟨h1, h2⟩ := h
+  have : d / K ≤ K * d := h1.trans h2
+  rw [div_le_iff₀ hK] at this
+  by_contra hlt
+  have hlt&#x27; : K &lt; 1 := lt_of_not_ge hlt
+  have hK2 : K * K &lt; 1 := by nlinarith
+  have := mul_lt_mul_of_pos_right hK2 hd
+  nlinarith
+
+/-- **Composition.** Two maps within factors `K₁` and `K₂` compose to one within `K₁ K₂`. -/
+theorem within_comp (K₁ K₂ d d&#x27; d&#x27;&#x27; : ℝ) (hK₁ : 0 &lt; K₁) (hK₂ : 0 &lt; K₂) (hd : 0 ≤ d)
+    (h₁ : within K₁ d d&#x27;) (h₂ : within K₂ d&#x27; d&#x27;&#x27;) : within (K₁ * K₂) d d&#x27;&#x27; := by
+  obtain ⟨a₁, b₁⟩ := h₁
+  obtain ⟨a₂, b₂⟩ := h₂
+  have hd&#x27; : 0 ≤ d&#x27; := (div_nonneg hd hK₁.le).trans a₁
+  constructor
+  · rw [div_le_iff₀ (by positivity)]
+    rw [div_le_iff₀ hK₁] at a₁
+    rw [div_le_iff₀ hK₂] at a₂
+    nlinarith
+  · calc d&#x27;&#x27; ≤ K₂ * d&#x27; := b₂
+      _ ≤ K₂ * (K₁ * d) := mul_le_mul_of_nonneg_left b₁ hK₂.le
+      _ = K₁ * K₂ * d := by ring
+
+/-- **Nearest neighbour preserved.** If the runner-up is more than `K²` times as far as the
+neighbour, the image ranking agrees. -/
+theorem nn_preserved (K da db da&#x27; db&#x27; : ℝ) (hK : 0 &lt; K)
+    (ha : within K da da&#x27;) (hb : within K db db&#x27;) (hsep : K ^ 2 * da &lt; db) : da&#x27; &lt; db&#x27; := by
+  obtain ⟨_, ha2⟩ := ha
+  obtain ⟨hb1, _⟩ := hb
+  have : K * da &lt; db / K := by
+    rw [lt_div_iff₀ hK]
+    nlinarith
+  linarith
+
+/-- **Bi-Lipschitz does not mean rank-faithful.** A map within factor two can reverse the
+order of two distances. Distances 1 and 1.5 can map to 1.6 and 1.2. -/
+theorem not_rank_faithful :
+    within 2 1 1.6 ∧ within 2 1.5 1.2 ∧ (1 : ℝ) &lt; 1.5 ∧ (1.2 : ℝ) &lt; 1.6 := by
+  unfold within
+  refine ⟨⟨by norm_num, by norm_num⟩, ⟨by norm_num, by norm_num⟩, by norm_num, by norm_num⟩
+
+end DMO.BiLipschitz
+</pre></main><footer class="edition"><em>Data Mining as Observation</em>, draft 0.3, online edition built from commit <code>f3914f0</code>. Copyright &copy; 2026 Andrew H. Bond. All rights reserved. <a href="../index.html">Contents</a> &middot; <a href="../../encyclopedia/index.html">Encyclopedia</a></footer></body></html>

@@ -1,0 +1,106 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>CrossValidation.lean</title><style>
+:root { color-scheme: light; --ink:#0b0b0b; --ink2:#52514e; --ink3:#8a897f; --surface:#fcfcfb; --rule:#e6e5e1; --accent:#2a78d6; }
+html { background: var(--surface); }
+body { margin: 0; color: var(--ink); font-family: Inter, 'Segoe UI', Helvetica, Arial, sans-serif; font-size: 17px; line-height: 1.55; }
+main { max-width: 760px; margin: 0 auto; padding: 32px 24px 96px; }
+nav.top { border-bottom: 1px solid var(--rule); padding: 12px 24px; font-size: 14px; color: var(--ink2); display:flex; gap: 18px; flex-wrap: wrap; }
+nav.top a { color: var(--ink2); text-decoration: none; }
+nav.top a:hover { color: var(--accent); }
+h1 { font-size: 30px; line-height: 1.2; margin: 0 0 18px; }
+h2 { font-size: 21px; margin: 40px 0 10px; }
+h3 { font-size: 17px; margin: 28px 0 8px; }
+p { margin: 0 0 14px; }
+p.lede { color: var(--ink2); font-style: italic; }
+table { border-collapse: collapse; margin: 14px 0 20px; font-size: 15px; width: 100%; overflow-x: auto; display: block; }
+th, td { text-align: left; padding: 6px 10px; border-bottom: 1px solid var(--rule); vertical-align: top; }
+th { color: var(--ink2); font-weight: 600; }
+figure { margin: 22px 0 26px; }
+figure svg { max-width: 100%; height: auto; display: block; }
+figcaption { font-size: 14px; color: var(--ink2); margin-top: 8px; }
+blockquote { border-left: 3px solid var(--rule); margin: 14px 0; padding: 4px 16px; color: var(--ink2); }
+code { font-family: ui-monospace, Consolas, monospace; font-size: 0.9em; background: #f3f2ee; padding: 1px 4px; border-radius: 3px; }
+.katex-display { overflow-x: auto; overflow-y: hidden; padding: 4px 0; }
+ol, ul { padding-left: 24px; }
+li { margin: 4px 0; }
+.toc li { margin: 8px 0; }
+.toc a { color: var(--ink); text-decoration: none; }
+.toc a:hover { color: var(--accent); }
+.toc span { color: var(--ink3); font-size: 14px; margin-left: 8px; }
+.cite a { color: var(--ink2); text-decoration: none; }
+ol.refs li { margin: 8px 0; font-size: 15px; }
+ul.terms { list-style: none; padding: 0; columns: 2; column-gap: 32px; font-size: 15px; }
+ul.terms li { margin: 3px 0; break-inside: avoid; }
+ul.terms span { color: var(--ink2); }
+ul.terms a { color: var(--ink2); text-decoration: none; }
+ul.terms a:hover { color: var(--accent); }
+nav.top a.cur { color: var(--accent); font-weight: 600; } nav.top .sep { color: var(--rule); } footer.edition { max-width: 760px; margin: 0 auto; padding: 0 24px 40px; font-size: 13px; color: var(--ink3); } pre.lean { font-family: ui-monospace, Consolas, monospace; font-size: 13.5px; line-height: 1.45; background: #f3f2ee; padding: 14px 16px; border-radius: 6px; overflow-x: auto; white-space: pre; }</style>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js"
+  onload="renderMathInElement(document.body,{delimiters:[{left:'$$',right:'$$',display:true},{left:'$',right:'$',display:false}],throwOnError:false});"></script>
+<script defer src="../../assets/js/sitebar.js"></script></head><body><nav class="top"><a href="../index.html"><strong>Data Mining as Observation</strong></a> <a href="../primer_l.html">L</a> <a href="../primer_s.html">S</a> <a href="../ch00.html">0</a> <a href="../ch01.html">1</a> <a href="../ch02.html">2</a> <a href="../ch03.html">3</a> <a href="../ch04.html">4</a> <a href="../ch05.html">5</a> <a href="../ch06.html">6</a> <a href="../ch07.html">7</a> <a href="../ch08.html">8</a> <a href="../ch09.html">9</a> <a href="../ch10.html">10</a> <a href="../ch11.html">11</a> <a href="../ch12.html">12</a> <a href="../ch13.html">13</a> <a href="../ch14.html">14</a> <a href="../how_to_use.html">how to use</a> <a href="../notation.html">notation</a> <a href="../glossary.html">glossary</a> <a href="../machine_checked.html">lean</a> <a href="../index.html#references">references</a> <a href="../terms.html">index</a> <span class="sep">|</span> <a href="../../encyclopedia/index.html">encyclopedia</a></nav><main><h1><code>CrossValidation.lean</code></h1><p class="lede">Lean 4 source, <code>lean/DataMiningAsObservation/CrossValidation.lean</code> at commit <code>f3914f0</code>. Appendix C, <a href="../machine_checked.html">Machine-checked statements</a>, says what each file proves. <a href="index.html">All Lean files</a>.</p><pre class="lean">/-
+CrossValidation.lean. Chapter 8 section 8.5, cross-validation.
+
+Cross-validation splits the rows into folds and evaluates on each fold a model trained on
+the others, so every row is tested exactly once. When the folds have equal size, the mean
+of the fold accuracies is the overall accuracy, and in general the overall accuracy is the
+size-weighted mean of the fold accuracies. What the folds do not do is multiply
+independent evidence, since they share training data, which is the Nadeau and Bengio
+correction of the same chapter.
+-/
+import Mathlib
+
+namespace DMO.CrossValidation
+
+open Finset
+
+variable {ι φ : Type*} [DecidableEq ι]
+
+/-- The accuracy of the decisions `pred` against the labels `y` on the rows `R`. -/
+noncomputable def accuracy (R : Finset ι) (pred y : ι → Bool) : ℝ :=
+  ((R.filter fun i =&gt; pred i = y i).card : ℝ) / R.card
+
+/-- **Every row is tested exactly once** when the folds partition the rows. The fold sizes sum
+to the row count. -/
+theorem sizes_sum (F : Finset φ) (fold : φ → Finset ι) (R : Finset ι)
+    (hcover : R = F.biUnion fold) (hdisj : (F : Set φ).PairwiseDisjoint fold) :
+    ∑ f ∈ F, (fold f).card = R.card := by
+  rw [hcover, Finset.card_biUnion hdisj]
+
+/-- **The overall accuracy is the size-weighted mean of the fold accuracies.** -/
+theorem accuracy_weighted (F : Finset φ) (fold : φ → Finset ι) (R : Finset ι)
+    (hcover : R = F.biUnion fold) (hdisj : (F : Set φ).PairwiseDisjoint fold)
+    (hne : ∀ f ∈ F, (fold f).Nonempty) (pred y : ι → Bool) :
+    accuracy R pred y = ∑ f ∈ F, ((fold f).card / R.card : ℝ) * accuracy (fold f) pred y := by
+  unfold accuracy
+  have hfilt : R.filter (fun i =&gt; pred i = y i) = F.biUnion fun f =&gt; (fold f).filter fun i =&gt; pred i = y i := by
+    rw [hcover, Finset.filter_biUnion]
+  rw [hfilt, Finset.card_biUnion]
+  · push_cast
+    rw [Finset.sum_div]
+    refine Finset.sum_congr rfl fun f hf =&gt; ?_
+    have : ((fold f).card : ℝ) ≠ 0 := by exact_mod_cast (hne f hf).card_pos.ne&#x27;
+    field_simp
+  · intro a ha b hb hab
+    exact Finset.disjoint_filter_filter (hdisj ha hb hab)
+
+/-- **With equal folds the mean of the fold accuracies is the overall accuracy.** -/
+theorem accuracy_mean_of_equal (F : Finset φ) (fold : φ → Finset ι) (R : Finset ι)
+    (hcover : R = F.biUnion fold) (hdisj : (F : Set φ).PairwiseDisjoint fold) (s : ℕ) (hs : 0 &lt; s)
+    (hsize : ∀ f ∈ F, (fold f).card = s) (hF : F.Nonempty) (pred y : ι → Bool) :
+    accuracy R pred y = (∑ f ∈ F, accuracy (fold f) pred y) / F.card := by
+  have hne : ∀ f ∈ F, (fold f).Nonempty := fun f hf =&gt; by
+    rw [← Finset.card_pos, hsize f hf]; exact hs
+  rw [accuracy_weighted F fold R hcover hdisj hne pred y]
+  have hR : R.card = F.card * s := by
+    rw [← sizes_sum F fold R hcover hdisj, Finset.sum_congr rfl hsize, Finset.sum_const, smul_eq_mul]
+  rw [Finset.sum_div]
+  refine Finset.sum_congr rfl fun f hf =&gt; ?_
+  rw [hsize f hf, hR]
+  push_cast
+  have hs&#x27; : (s : ℝ) ≠ 0 := by exact_mod_cast hs.ne&#x27;
+  have hF&#x27; : (F.card : ℝ) ≠ 0 := by exact_mod_cast hF.card_pos.ne&#x27;
+  field_simp
+
+end DMO.CrossValidation
+</pre></main><footer class="edition"><em>Data Mining as Observation</em>, draft 0.3, online edition built from commit <code>f3914f0</code>. Copyright &copy; 2026 Andrew H. Bond. All rights reserved. <a href="../index.html">Contents</a> &middot; <a href="../../encyclopedia/index.html">Encyclopedia</a></footer></body></html>

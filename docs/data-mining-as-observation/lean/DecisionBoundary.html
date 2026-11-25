@@ -1,0 +1,97 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>DecisionBoundary.lean</title><style>
+:root { color-scheme: light; --ink:#0b0b0b; --ink2:#52514e; --ink3:#8a897f; --surface:#fcfcfb; --rule:#e6e5e1; --accent:#2a78d6; }
+html { background: var(--surface); }
+body { margin: 0; color: var(--ink); font-family: Inter, 'Segoe UI', Helvetica, Arial, sans-serif; font-size: 17px; line-height: 1.55; }
+main { max-width: 760px; margin: 0 auto; padding: 32px 24px 96px; }
+nav.top { border-bottom: 1px solid var(--rule); padding: 12px 24px; font-size: 14px; color: var(--ink2); display:flex; gap: 18px; flex-wrap: wrap; }
+nav.top a { color: var(--ink2); text-decoration: none; }
+nav.top a:hover { color: var(--accent); }
+h1 { font-size: 30px; line-height: 1.2; margin: 0 0 18px; }
+h2 { font-size: 21px; margin: 40px 0 10px; }
+h3 { font-size: 17px; margin: 28px 0 8px; }
+p { margin: 0 0 14px; }
+p.lede { color: var(--ink2); font-style: italic; }
+table { border-collapse: collapse; margin: 14px 0 20px; font-size: 15px; width: 100%; overflow-x: auto; display: block; }
+th, td { text-align: left; padding: 6px 10px; border-bottom: 1px solid var(--rule); vertical-align: top; }
+th { color: var(--ink2); font-weight: 600; }
+figure { margin: 22px 0 26px; }
+figure svg { max-width: 100%; height: auto; display: block; }
+figcaption { font-size: 14px; color: var(--ink2); margin-top: 8px; }
+blockquote { border-left: 3px solid var(--rule); margin: 14px 0; padding: 4px 16px; color: var(--ink2); }
+code { font-family: ui-monospace, Consolas, monospace; font-size: 0.9em; background: #f3f2ee; padding: 1px 4px; border-radius: 3px; }
+.katex-display { overflow-x: auto; overflow-y: hidden; padding: 4px 0; }
+ol, ul { padding-left: 24px; }
+li { margin: 4px 0; }
+.toc li { margin: 8px 0; }
+.toc a { color: var(--ink); text-decoration: none; }
+.toc a:hover { color: var(--accent); }
+.toc span { color: var(--ink3); font-size: 14px; margin-left: 8px; }
+.cite a { color: var(--ink2); text-decoration: none; }
+ol.refs li { margin: 8px 0; font-size: 15px; }
+ul.terms { list-style: none; padding: 0; columns: 2; column-gap: 32px; font-size: 15px; }
+ul.terms li { margin: 3px 0; break-inside: avoid; }
+ul.terms span { color: var(--ink2); }
+ul.terms a { color: var(--ink2); text-decoration: none; }
+ul.terms a:hover { color: var(--accent); }
+nav.top a.cur { color: var(--accent); font-weight: 600; } nav.top .sep { color: var(--rule); } footer.edition { max-width: 760px; margin: 0 auto; padding: 0 24px 40px; font-size: 13px; color: var(--ink3); } pre.lean { font-family: ui-monospace, Consolas, monospace; font-size: 13.5px; line-height: 1.45; background: #f3f2ee; padding: 14px 16px; border-radius: 6px; overflow-x: auto; white-space: pre; }</style>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js"
+  onload="renderMathInElement(document.body,{delimiters:[{left:'$$',right:'$$',display:true},{left:'$',right:'$',display:false}],throwOnError:false});"></script>
+<script defer src="../../assets/js/sitebar.js"></script></head><body><nav class="top"><a href="../index.html"><strong>Data Mining as Observation</strong></a> <a href="../primer_l.html">L</a> <a href="../primer_s.html">S</a> <a href="../ch00.html">0</a> <a href="../ch01.html">1</a> <a href="../ch02.html">2</a> <a href="../ch03.html">3</a> <a href="../ch04.html">4</a> <a href="../ch05.html">5</a> <a href="../ch06.html">6</a> <a href="../ch07.html">7</a> <a href="../ch08.html">8</a> <a href="../ch09.html">9</a> <a href="../ch10.html">10</a> <a href="../ch11.html">11</a> <a href="../ch12.html">12</a> <a href="../ch13.html">13</a> <a href="../ch14.html">14</a> <a href="../how_to_use.html">how to use</a> <a href="../notation.html">notation</a> <a href="../glossary.html">glossary</a> <a href="../machine_checked.html">lean</a> <a href="../index.html#references">references</a> <a href="../terms.html">index</a> <span class="sep">|</span> <a href="../../encyclopedia/index.html">encyclopedia</a></nav><main><h1><code>DecisionBoundary.lean</code></h1><p class="lede">Lean 4 source, <code>lean/DataMiningAsObservation/DecisionBoundary.lean</code> at commit <code>f3914f0</code>. Appendix C, <a href="../machine_checked.html">Machine-checked statements</a>, says what each file proves. <a href="index.html">All Lean files</a>.</p><pre class="lean">/-
+DecisionBoundary.lean. Chapter 6 section 6.1, the decision boundary.
+
+The decision boundary is the set of inputs whose score equals the threshold. For a linear
+classifier it is an affine hyperplane. Moving along the weight direction crosses it in
+exactly one place, moving orthogonally to the weights never crosses it, and every point of
+the boundary is the same distance from the origin along the weights. The boundary is where
+the classifier&#x27;s read direction and its threshold meet, and nothing else about the input
+enters it.
+-/
+import Mathlib
+import DataMiningAsObservation.Classifier
+
+namespace DMO.DecisionBoundary
+
+open DMO.Classifier
+
+variable {n : ℕ}
+
+/-- The decision boundary at threshold `τ`. -/
+def boundary (w : Fin n → ℝ) (b τ : ℝ) : Set (Fin n → ℝ) := {x | score w b x = τ}
+
+/-- **Moving orthogonally to the weights never crosses the boundary.** -/
+theorem orth_stays (w : Fin n → ℝ) (b τ : ℝ) (x v : Fin n → ℝ) (hv : w ⬝ᵥ v = 0) :
+    x ∈ boundary w b τ ↔ x + v ∈ boundary w b τ := by
+  unfold boundary
+  simp only [Set.mem_setOf_eq]
+  rw [score_orth w b x v hv]
+
+/-- **Moving along the weights crosses the boundary exactly once.** From any `x`, the step
+`t • w` lands on the boundary for exactly one `t`. -/
+theorem cross_once (w : Fin n → ℝ) (hw : w ⬝ᵥ w ≠ 0) (b τ : ℝ) (x : Fin n → ℝ) :
+    ∃! t : ℝ, x + t • w ∈ boundary w b τ := by
+  refine ⟨(τ - score w b x) / (w ⬝ᵥ w), ?_, ?_⟩
+  · unfold boundary score
+    simp only [Set.mem_setOf_eq]
+    rw [dotProduct_add, dotProduct_smul, smul_eq_mul]
+    field_simp
+    try ring
+  · intro t ht
+    unfold boundary score at ht
+    simp only [Set.mem_setOf_eq] at ht
+    rw [dotProduct_add, dotProduct_smul, smul_eq_mul] at ht
+    unfold score
+    field_simp
+    linarith
+
+/-- **The boundary is a level set of the read direction.** Two boundary points have the same
+projection on the weights. -/
+theorem same_projection (w : Fin n → ℝ) (b τ : ℝ) (x y : Fin n → ℝ) (hx : x ∈ boundary w b τ)
+    (hy : y ∈ boundary w b τ) : w ⬝ᵥ x = w ⬝ᵥ y := by
+  unfold boundary score at hx hy
+  simp only [Set.mem_setOf_eq] at hx hy
+  linarith
+
+end DMO.DecisionBoundary
+</pre></main><footer class="edition"><em>Data Mining as Observation</em>, draft 0.3, online edition built from commit <code>f3914f0</code>. Copyright &copy; 2026 Andrew H. Bond. All rights reserved. <a href="../index.html">Contents</a> &middot; <a href="../../encyclopedia/index.html">Encyclopedia</a></footer></body></html>

@@ -1,0 +1,97 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>TFIDF.lean</title><style>
+:root { color-scheme: light; --ink:#0b0b0b; --ink2:#52514e; --ink3:#8a897f; --surface:#fcfcfb; --rule:#e6e5e1; --accent:#2a78d6; }
+html { background: var(--surface); }
+body { margin: 0; color: var(--ink); font-family: Inter, 'Segoe UI', Helvetica, Arial, sans-serif; font-size: 17px; line-height: 1.55; }
+main { max-width: 760px; margin: 0 auto; padding: 32px 24px 96px; }
+nav.top { border-bottom: 1px solid var(--rule); padding: 12px 24px; font-size: 14px; color: var(--ink2); display:flex; gap: 18px; flex-wrap: wrap; }
+nav.top a { color: var(--ink2); text-decoration: none; }
+nav.top a:hover { color: var(--accent); }
+h1 { font-size: 30px; line-height: 1.2; margin: 0 0 18px; }
+h2 { font-size: 21px; margin: 40px 0 10px; }
+h3 { font-size: 17px; margin: 28px 0 8px; }
+p { margin: 0 0 14px; }
+p.lede { color: var(--ink2); font-style: italic; }
+table { border-collapse: collapse; margin: 14px 0 20px; font-size: 15px; width: 100%; overflow-x: auto; display: block; }
+th, td { text-align: left; padding: 6px 10px; border-bottom: 1px solid var(--rule); vertical-align: top; }
+th { color: var(--ink2); font-weight: 600; }
+figure { margin: 22px 0 26px; }
+figure svg { max-width: 100%; height: auto; display: block; }
+figcaption { font-size: 14px; color: var(--ink2); margin-top: 8px; }
+blockquote { border-left: 3px solid var(--rule); margin: 14px 0; padding: 4px 16px; color: var(--ink2); }
+code { font-family: ui-monospace, Consolas, monospace; font-size: 0.9em; background: #f3f2ee; padding: 1px 4px; border-radius: 3px; }
+.katex-display { overflow-x: auto; overflow-y: hidden; padding: 4px 0; }
+ol, ul { padding-left: 24px; }
+li { margin: 4px 0; }
+.toc li { margin: 8px 0; }
+.toc a { color: var(--ink); text-decoration: none; }
+.toc a:hover { color: var(--accent); }
+.toc span { color: var(--ink3); font-size: 14px; margin-left: 8px; }
+.cite a { color: var(--ink2); text-decoration: none; }
+ol.refs li { margin: 8px 0; font-size: 15px; }
+ul.terms { list-style: none; padding: 0; columns: 2; column-gap: 32px; font-size: 15px; }
+ul.terms li { margin: 3px 0; break-inside: avoid; }
+ul.terms span { color: var(--ink2); }
+ul.terms a { color: var(--ink2); text-decoration: none; }
+ul.terms a:hover { color: var(--accent); }
+nav.top a.cur { color: var(--accent); font-weight: 600; } nav.top .sep { color: var(--rule); } footer.edition { max-width: 760px; margin: 0 auto; padding: 0 24px 40px; font-size: 13px; color: var(--ink3); } pre.lean { font-family: ui-monospace, Consolas, monospace; font-size: 13.5px; line-height: 1.45; background: #f3f2ee; padding: 14px 16px; border-radius: 6px; overflow-x: auto; white-space: pre; }</style>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js"
+  onload="renderMathInElement(document.body,{delimiters:[{left:'$$',right:'$$',display:true},{left:'$',right:'$',display:false}],throwOnError:false});"></script>
+<script defer src="../../assets/js/sitebar.js"></script></head><body><nav class="top"><a href="../index.html"><strong>Data Mining as Observation</strong></a> <a href="../primer_l.html">L</a> <a href="../primer_s.html">S</a> <a href="../ch00.html">0</a> <a href="../ch01.html">1</a> <a href="../ch02.html">2</a> <a href="../ch03.html">3</a> <a href="../ch04.html">4</a> <a href="../ch05.html">5</a> <a href="../ch06.html">6</a> <a href="../ch07.html">7</a> <a href="../ch08.html">8</a> <a href="../ch09.html">9</a> <a href="../ch10.html">10</a> <a href="../ch11.html">11</a> <a href="../ch12.html">12</a> <a href="../ch13.html">13</a> <a href="../ch14.html">14</a> <a href="../how_to_use.html">how to use</a> <a href="../notation.html">notation</a> <a href="../glossary.html">glossary</a> <a href="../machine_checked.html">lean</a> <a href="../index.html#references">references</a> <a href="../terms.html">index</a> <span class="sep">|</span> <a href="../../encyclopedia/index.html">encyclopedia</a></nav><main><h1><code>TFIDF.lean</code></h1><p class="lede">Lean 4 source, <code>lean/DataMiningAsObservation/TFIDF.lean</code> at commit <code>f3914f0</code>. Appendix C, <a href="../machine_checked.html">Machine-checked statements</a>, says what each file proves. <a href="index.html">All Lean files</a>.</p><pre class="lean">/-
+TFIDF.lean. Equation 0.36, TF-IDF.
+
+A term&#x27;s weight in a document is its frequency in the document times the logarithm of the
+number of documents over the number containing the term. A term in every document carries
+no weight, the weight is nonnegative whenever the term appears in at most every document,
+it falls as the term spreads to more documents, and the frequency lies in the unit interval
+since a term&#x27;s count cannot exceed the document&#x27;s length.
+-/
+import Mathlib
+
+namespace DMO.TFIDF
+
+/-- The term frequency, the count over the length. -/
+noncomputable def tf (count length : ℕ) : ℝ := (count : ℝ) / length
+
+/-- **Equation 0.36.** The weight of a term with frequency `f` appearing in `df` of `N` documents. -/
+noncomputable def weight (f : ℝ) (N df : ℕ) : ℝ := f * Real.log ((N : ℝ) / df)
+
+/-- **A term in every document carries no weight.** -/
+theorem weight_everywhere (f : ℝ) (N : ℕ) (hN : 0 &lt; N) : weight f N N = 0 := by
+  unfold weight
+  rw [div_self (by exact_mod_cast hN.ne&#x27;), Real.log_one, mul_zero]
+
+/-- **The weight is nonnegative** for a nonnegative frequency and a term in at most every
+document. -/
+theorem weight_nonneg (f : ℝ) (hf : 0 ≤ f) (N df : ℕ) (hdf : 0 &lt; df) (hle : df ≤ N) :
+    0 ≤ weight f N df := by
+  unfold weight
+  apply mul_nonneg hf
+  apply Real.log_nonneg
+  rw [le_div_iff₀ (by exact_mod_cast hdf), one_mul]
+  exact_mod_cast hle
+
+/-- **The weight falls as the term spreads.** -/
+theorem weight_antitone (f : ℝ) (hf : 0 ≤ f) (N df df&#x27; : ℕ) (hdf : 0 &lt; df) (hle : df ≤ df&#x27;)
+    (hN : 0 &lt; N) : weight f N df&#x27; ≤ weight f N df := by
+  unfold weight
+  apply mul_le_mul_of_nonneg_left _ hf
+  apply Real.log_le_log
+  · have : (0 : ℝ) &lt; df&#x27; := by exact_mod_cast lt_of_lt_of_le hdf hle
+    positivity
+  · apply div_le_div_of_nonneg_left (by positivity) (by exact_mod_cast hdf)
+    exact_mod_cast hle
+
+/-- **The frequency lies in the unit interval**, since a term&#x27;s count cannot exceed the
+document&#x27;s length. -/
+theorem tf_mem_unit (count length : ℕ) (hlen : 0 &lt; length) (hle : count ≤ length) :
+    0 ≤ tf count length ∧ tf count length ≤ 1 := by
+  unfold tf
+  have : (0 : ℝ) &lt; length := by exact_mod_cast hlen
+  refine ⟨by positivity, ?_⟩
+  rw [div_le_one this]
+  exact_mod_cast hle
+
+end DMO.TFIDF
+</pre></main><footer class="edition"><em>Data Mining as Observation</em>, draft 0.3, online edition built from commit <code>f3914f0</code>. Copyright &copy; 2026 Andrew H. Bond. All rights reserved. <a href="../index.html">Contents</a> &middot; <a href="../../encyclopedia/index.html">Encyclopedia</a></footer></body></html>

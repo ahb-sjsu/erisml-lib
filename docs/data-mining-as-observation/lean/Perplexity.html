@@ -1,0 +1,103 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Perplexity.lean</title><style>
+:root { color-scheme: light; --ink:#0b0b0b; --ink2:#52514e; --ink3:#8a897f; --surface:#fcfcfb; --rule:#e6e5e1; --accent:#2a78d6; }
+html { background: var(--surface); }
+body { margin: 0; color: var(--ink); font-family: Inter, 'Segoe UI', Helvetica, Arial, sans-serif; font-size: 17px; line-height: 1.55; }
+main { max-width: 760px; margin: 0 auto; padding: 32px 24px 96px; }
+nav.top { border-bottom: 1px solid var(--rule); padding: 12px 24px; font-size: 14px; color: var(--ink2); display:flex; gap: 18px; flex-wrap: wrap; }
+nav.top a { color: var(--ink2); text-decoration: none; }
+nav.top a:hover { color: var(--accent); }
+h1 { font-size: 30px; line-height: 1.2; margin: 0 0 18px; }
+h2 { font-size: 21px; margin: 40px 0 10px; }
+h3 { font-size: 17px; margin: 28px 0 8px; }
+p { margin: 0 0 14px; }
+p.lede { color: var(--ink2); font-style: italic; }
+table { border-collapse: collapse; margin: 14px 0 20px; font-size: 15px; width: 100%; overflow-x: auto; display: block; }
+th, td { text-align: left; padding: 6px 10px; border-bottom: 1px solid var(--rule); vertical-align: top; }
+th { color: var(--ink2); font-weight: 600; }
+figure { margin: 22px 0 26px; }
+figure svg { max-width: 100%; height: auto; display: block; }
+figcaption { font-size: 14px; color: var(--ink2); margin-top: 8px; }
+blockquote { border-left: 3px solid var(--rule); margin: 14px 0; padding: 4px 16px; color: var(--ink2); }
+code { font-family: ui-monospace, Consolas, monospace; font-size: 0.9em; background: #f3f2ee; padding: 1px 4px; border-radius: 3px; }
+.katex-display { overflow-x: auto; overflow-y: hidden; padding: 4px 0; }
+ol, ul { padding-left: 24px; }
+li { margin: 4px 0; }
+.toc li { margin: 8px 0; }
+.toc a { color: var(--ink); text-decoration: none; }
+.toc a:hover { color: var(--accent); }
+.toc span { color: var(--ink3); font-size: 14px; margin-left: 8px; }
+.cite a { color: var(--ink2); text-decoration: none; }
+ol.refs li { margin: 8px 0; font-size: 15px; }
+ul.terms { list-style: none; padding: 0; columns: 2; column-gap: 32px; font-size: 15px; }
+ul.terms li { margin: 3px 0; break-inside: avoid; }
+ul.terms span { color: var(--ink2); }
+ul.terms a { color: var(--ink2); text-decoration: none; }
+ul.terms a:hover { color: var(--accent); }
+nav.top a.cur { color: var(--accent); font-weight: 600; } nav.top .sep { color: var(--rule); } footer.edition { max-width: 760px; margin: 0 auto; padding: 0 24px 40px; font-size: 13px; color: var(--ink3); } pre.lean { font-family: ui-monospace, Consolas, monospace; font-size: 13.5px; line-height: 1.45; background: #f3f2ee; padding: 14px 16px; border-radius: 6px; overflow-x: auto; white-space: pre; }</style>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js"
+  onload="renderMathInElement(document.body,{delimiters:[{left:'$$',right:'$$',display:true},{left:'$',right:'$',display:false}],throwOnError:false});"></script>
+<script defer src="../../assets/js/sitebar.js"></script></head><body><nav class="top"><a href="../index.html"><strong>Data Mining as Observation</strong></a> <a href="../primer_l.html">L</a> <a href="../primer_s.html">S</a> <a href="../ch00.html">0</a> <a href="../ch01.html">1</a> <a href="../ch02.html">2</a> <a href="../ch03.html">3</a> <a href="../ch04.html">4</a> <a href="../ch05.html">5</a> <a href="../ch06.html">6</a> <a href="../ch07.html">7</a> <a href="../ch08.html">8</a> <a href="../ch09.html">9</a> <a href="../ch10.html">10</a> <a href="../ch11.html">11</a> <a href="../ch12.html">12</a> <a href="../ch13.html">13</a> <a href="../ch14.html">14</a> <a href="../how_to_use.html">how to use</a> <a href="../notation.html">notation</a> <a href="../glossary.html">glossary</a> <a href="../machine_checked.html">lean</a> <a href="../index.html#references">references</a> <a href="../terms.html">index</a> <span class="sep">|</span> <a href="../../encyclopedia/index.html">encyclopedia</a></nav><main><h1><code>Perplexity.lean</code></h1><p class="lede">Lean 4 source, <code>lean/DataMiningAsObservation/Perplexity.lean</code> at commit <code>f3914f0</code>. Appendix C, <a href="../machine_checked.html">Machine-checked statements</a>, says what each file proves. <a href="index.html">All Lean files</a>.</p><pre class="lean">/-
+Perplexity.lean. Equations 0.22 and 11.1, perplexity.
+
+Perplexity is two to the power of the average number of bits the model spends per token.
+It is at least one, since no probability exceeds one, it equals the vocabulary size for a
+model that spreads its mass evenly, and it is monotone in the bits. The attention-key
+finding of chapter 11 raised perplexity from 12.24 to 10643 at cosine 0.995, which is a
+rise of more than nine bits per token, since 12.24 lies below two to the fourth and 10643
+above two to the thirteenth.
+-/
+import Mathlib
+
+namespace DMO.Perplexity
+
+open Finset Real
+
+/-- The average bits per token of a model assigning probability `p t` to the token at
+position `t` over `T` positions. -/
+noncomputable def bits (T : ℕ) (p : Fin T → ℝ) : ℝ := -(∑ t, logb 2 (p t)) / T
+
+/-- **Equation 0.22.** Perplexity is two to the average bits. -/
+noncomputable def perplexity (T : ℕ) (p : Fin T → ℝ) : ℝ := (2 : ℝ) ^ bits T p
+
+/-- **Bits are nonnegative** when no probability exceeds one. -/
+theorem bits_nonneg (T : ℕ) (p : Fin T → ℝ) (hp : ∀ t, 0 &lt; p t) (hp1 : ∀ t, p t ≤ 1) :
+    0 ≤ bits T p := by
+  unfold bits
+  apply div_nonneg _ (by positivity)
+  rw [neg_nonneg]
+  exact Finset.sum_nonpos fun t _ =&gt; logb_nonpos (by norm_num) (hp t).le (hp1 t)
+
+/-- **Perplexity is at least one.** -/
+theorem one_le_perplexity (T : ℕ) (p : Fin T → ℝ) (hp : ∀ t, 0 &lt; p t) (hp1 : ∀ t, p t ≤ 1) :
+    1 ≤ perplexity T p := by
+  unfold perplexity
+  exact Real.one_le_rpow (by norm_num) (bits_nonneg T p hp hp1)
+
+/-- **A uniform model over `V` tokens has perplexity `V`.** -/
+theorem perplexity_uniform (T V : ℕ) (hT : 0 &lt; T) (hV : 0 &lt; V) :
+    perplexity T (fun _ =&gt; 1 / V) = V := by
+  unfold perplexity bits
+  have hV&#x27; : (0 : ℝ) &lt; V := by exact_mod_cast hV
+  have hT&#x27; : (T : ℝ) ≠ 0 := by exact_mod_cast hT.ne&#x27;
+  simp only [Finset.sum_const, Finset.card_univ, Fintype.card_fin, nsmul_eq_mul]
+  rw [one_div, logb_inv, mul_neg, neg_neg, mul_div_cancel_left₀ _ hT&#x27;,
+    rpow_logb (by norm_num) (by norm_num) hV&#x27;]
+
+/-- **Perplexity is monotone in the bits.** -/
+theorem perplexity_mono (T : ℕ) (p q : Fin T → ℝ) (h : bits T p ≤ bits T q) :
+    perplexity T p ≤ perplexity T q :=
+  rpow_le_rpow_of_exponent_le (by norm_num) h
+
+/-- **The chapter 11 numbers.** A perplexity of 12.24 is under four bits per token and 10643
+is over thirteen, so the reconstruction cost more than nine bits per token. -/
+theorem bits_of_finding : logb 2 (12.24 : ℝ) &lt; 4 ∧ 13 &lt; logb 2 (10643 : ℝ) := by
+  constructor
+  · rw [logb_lt_iff_lt_rpow (by norm_num) (by norm_num)]
+    norm_num
+  · rw [lt_logb_iff_rpow_lt (by norm_num) (by norm_num)]
+    norm_num
+
+end DMO.Perplexity
+</pre></main><footer class="edition"><em>Data Mining as Observation</em>, draft 0.3, online edition built from commit <code>f3914f0</code>. Copyright &copy; 2026 Andrew H. Bond. All rights reserved. <a href="../index.html">Contents</a> &middot; <a href="../../encyclopedia/index.html">Encyclopedia</a></footer></body></html>

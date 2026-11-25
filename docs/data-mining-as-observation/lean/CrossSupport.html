@@ -1,0 +1,117 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>CrossSupport.lean</title><style>
+:root { color-scheme: light; --ink:#0b0b0b; --ink2:#52514e; --ink3:#8a897f; --surface:#fcfcfb; --rule:#e6e5e1; --accent:#2a78d6; }
+html { background: var(--surface); }
+body { margin: 0; color: var(--ink); font-family: Inter, 'Segoe UI', Helvetica, Arial, sans-serif; font-size: 17px; line-height: 1.55; }
+main { max-width: 760px; margin: 0 auto; padding: 32px 24px 96px; }
+nav.top { border-bottom: 1px solid var(--rule); padding: 12px 24px; font-size: 14px; color: var(--ink2); display:flex; gap: 18px; flex-wrap: wrap; }
+nav.top a { color: var(--ink2); text-decoration: none; }
+nav.top a:hover { color: var(--accent); }
+h1 { font-size: 30px; line-height: 1.2; margin: 0 0 18px; }
+h2 { font-size: 21px; margin: 40px 0 10px; }
+h3 { font-size: 17px; margin: 28px 0 8px; }
+p { margin: 0 0 14px; }
+p.lede { color: var(--ink2); font-style: italic; }
+table { border-collapse: collapse; margin: 14px 0 20px; font-size: 15px; width: 100%; overflow-x: auto; display: block; }
+th, td { text-align: left; padding: 6px 10px; border-bottom: 1px solid var(--rule); vertical-align: top; }
+th { color: var(--ink2); font-weight: 600; }
+figure { margin: 22px 0 26px; }
+figure svg { max-width: 100%; height: auto; display: block; }
+figcaption { font-size: 14px; color: var(--ink2); margin-top: 8px; }
+blockquote { border-left: 3px solid var(--rule); margin: 14px 0; padding: 4px 16px; color: var(--ink2); }
+code { font-family: ui-monospace, Consolas, monospace; font-size: 0.9em; background: #f3f2ee; padding: 1px 4px; border-radius: 3px; }
+.katex-display { overflow-x: auto; overflow-y: hidden; padding: 4px 0; }
+ol, ul { padding-left: 24px; }
+li { margin: 4px 0; }
+.toc li { margin: 8px 0; }
+.toc a { color: var(--ink); text-decoration: none; }
+.toc a:hover { color: var(--accent); }
+.toc span { color: var(--ink3); font-size: 14px; margin-left: 8px; }
+.cite a { color: var(--ink2); text-decoration: none; }
+ol.refs li { margin: 8px 0; font-size: 15px; }
+ul.terms { list-style: none; padding: 0; columns: 2; column-gap: 32px; font-size: 15px; }
+ul.terms li { margin: 3px 0; break-inside: avoid; }
+ul.terms span { color: var(--ink2); }
+ul.terms a { color: var(--ink2); text-decoration: none; }
+ul.terms a:hover { color: var(--accent); }
+nav.top a.cur { color: var(--accent); font-weight: 600; } nav.top .sep { color: var(--rule); } footer.edition { max-width: 760px; margin: 0 auto; padding: 0 24px 40px; font-size: 13px; color: var(--ink3); } pre.lean { font-family: ui-monospace, Consolas, monospace; font-size: 13.5px; line-height: 1.45; background: #f3f2ee; padding: 14px 16px; border-radius: 6px; overflow-x: auto; white-space: pre; }</style>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js"
+  onload="renderMathInElement(document.body,{delimiters:[{left:'$$',right:'$$',display:true},{left:'$',right:'$',display:false}],throwOnError:false});"></script>
+<script defer src="../../assets/js/sitebar.js"></script></head><body><nav class="top"><a href="../index.html"><strong>Data Mining as Observation</strong></a> <a href="../primer_l.html">L</a> <a href="../primer_s.html">S</a> <a href="../ch00.html">0</a> <a href="../ch01.html">1</a> <a href="../ch02.html">2</a> <a href="../ch03.html">3</a> <a href="../ch04.html">4</a> <a href="../ch05.html">5</a> <a href="../ch06.html">6</a> <a href="../ch07.html">7</a> <a href="../ch08.html">8</a> <a href="../ch09.html">9</a> <a href="../ch10.html">10</a> <a href="../ch11.html">11</a> <a href="../ch12.html">12</a> <a href="../ch13.html">13</a> <a href="../ch14.html">14</a> <a href="../how_to_use.html">how to use</a> <a href="../notation.html">notation</a> <a href="../glossary.html">glossary</a> <a href="../machine_checked.html">lean</a> <a href="../index.html#references">references</a> <a href="../terms.html">index</a> <span class="sep">|</span> <a href="../../encyclopedia/index.html">encyclopedia</a></nav><main><h1><code>CrossSupport.lean</code></h1><p class="lede">Lean 4 source, <code>lean/DataMiningAsObservation/CrossSupport.lean</code> at commit <code>f3914f0</code>. Appendix C, <a href="../machine_checked.html">Machine-checked statements</a>, says what each file proves. <a href="index.html">All Lean files</a>.</p><pre class="lean">/-
+CrossSupport.lean. Chapter 5 section 5.5, the cross-support ratio.
+
+The cross-support ratio of an itemset is the smallest item support over the largest. It lies
+in the unit interval, it is one exactly when every item has the same support, and adding
+an item can only lower it, so a threshold on it prunes supersets safely in the sense of
+chapter 5. The ratio is a property of the item supports alone and says nothing about the
+itemset&#x27;s own support.
+-/
+import Mathlib
+
+namespace DMO.CrossSupport
+
+open Finset
+
+variable {α : Type*}
+
+/-- The cross-support ratio of the itemset `X` under the item supports `s`. -/
+noncomputable def ratio (X : Finset α) (hX : X.Nonempty) (s : α → ℝ) : ℝ :=
+  X.inf&#x27; hX s / X.sup&#x27; hX s
+
+/-- **In the unit interval** for positive supports. -/
+theorem ratio_mem_unit (X : Finset α) (hX : X.Nonempty) (s : α → ℝ) (hs : ∀ a ∈ X, 0 &lt; s a) :
+    0 ≤ ratio X hX s ∧ ratio X hX s ≤ 1 := by
+  unfold ratio
+  obtain ⟨a, ha⟩ := id hX
+  have hsup : 0 &lt; X.sup&#x27; hX s := lt_of_lt_of_le (hs a ha) (Finset.le_sup&#x27; s ha)
+  have hinf : 0 &lt; X.inf&#x27; hX s := by
+    rw [Finset.lt_inf&#x27;_iff]; exact hs
+  constructor
+  · exact div_nonneg hinf.le hsup.le
+  · rw [div_le_one hsup]
+    exact (Finset.inf&#x27;_le s ha).trans (Finset.le_sup&#x27; s ha)
+
+/-- **Ratio one means equal supports.** -/
+theorem ratio_eq_one_iff (X : Finset α) (hX : X.Nonempty) (s : α → ℝ) (hs : ∀ a ∈ X, 0 &lt; s a) :
+    ratio X hX s = 1 ↔ ∀ a ∈ X, ∀ b ∈ X, s a = s b := by
+  unfold ratio
+  obtain ⟨a₀, ha₀⟩ := id hX
+  have hsup : 0 &lt; X.sup&#x27; hX s := lt_of_lt_of_le (hs a₀ ha₀) (Finset.le_sup&#x27; s ha₀)
+  rw [div_eq_one_iff_eq hsup.ne&#x27;]
+  constructor
+  · intro h a ha b hb
+    have h1 : s a ≤ X.sup&#x27; hX s := Finset.le_sup&#x27; s ha
+    have h2 : X.inf&#x27; hX s ≤ s a := Finset.inf&#x27;_le s ha
+    have h3 : s b ≤ X.sup&#x27; hX s := Finset.le_sup&#x27; s hb
+    have h4 : X.inf&#x27; hX s ≤ s b := Finset.inf&#x27;_le s hb
+    linarith
+  · intro h
+    apply le_antisymm
+    · exact (Finset.inf&#x27;_le s ha₀).trans (Finset.le_sup&#x27; s ha₀)
+    · rw [Finset.sup&#x27;_le_iff]
+      intro b hb
+      rw [Finset.le_inf&#x27;_iff]
+      intro c hc
+      rw [h b hb c hc]
+
+/-- **Adding items can only lower the ratio**, which is the anti-monotonicity a threshold
+needs to prune safely. -/
+theorem ratio_anti (X Y : Finset α) (hX : X.Nonempty) (hXY : X ⊆ Y) (s : α → ℝ)
+    (hs : ∀ a ∈ Y, 0 &lt; s a) : ratio Y (hX.mono hXY) s ≤ ratio X hX s := by
+  unfold ratio
+  have hY : Y.Nonempty := hX.mono hXY
+  obtain ⟨a, ha⟩ := id hX
+  have hsupX : 0 &lt; X.sup&#x27; hX s := lt_of_lt_of_le (hs a (hXY ha)) (Finset.le_sup&#x27; s ha)
+  have hsupY : 0 &lt; Y.sup&#x27; hY s := lt_of_lt_of_le (hs a (hXY ha)) (Finset.le_sup&#x27; s (hXY ha))
+  have hinfY : 0 ≤ Y.inf&#x27; hY s := by
+    rw [Finset.le_inf&#x27;_iff]; exact fun b hb =&gt; (hs b hb).le
+  have h1 : Y.inf&#x27; hY s ≤ X.inf&#x27; hX s := Finset.inf&#x27;_mono s hXY hX
+  have h2 : X.sup&#x27; hX s ≤ Y.sup&#x27; hY s := Finset.sup&#x27;_mono s hXY hX
+  calc Y.inf&#x27; hY s / Y.sup&#x27; hY s ≤ X.inf&#x27; hX s / Y.sup&#x27; hY s :=
+        div_le_div_of_nonneg_right h1 hsupY.le
+    _ ≤ X.inf&#x27; hX s / X.sup&#x27; hX s :=
+        div_le_div_of_nonneg_left (hinfY.trans h1) hsupX h2
+
+end DMO.CrossSupport
+</pre></main><footer class="edition"><em>Data Mining as Observation</em>, draft 0.3, online edition built from commit <code>f3914f0</code>. Copyright &copy; 2026 Andrew H. Bond. All rights reserved. <a href="../index.html">Contents</a> &middot; <a href="../../encyclopedia/index.html">Encyclopedia</a></footer></body></html>

@@ -8,7 +8,8 @@
  *
  * Placeholders handled:
  *   #series-card-grid   → 13-book card grid (used on main site index)
- *   #series-nav-list    → <ul> of short-name series links (top-nav submenu)
+ *   #series-nav-list    → <ul> of short-name series links (the fallback top nav;
+ *                         sitebar.js, loaded below, replaces the whole top nav)
  *   #series-volume-count → auto-updated text "Thirteen volumes" etc.
  *   #book-prev-next     → prev/next book links for a book landing page
  *
@@ -41,6 +42,15 @@
   }
   const BASE = computeBasePrefix();
   const MANIFEST_URL = BASE + 'books.json';
+
+  // --- The site-wide top bar lives in sitebar.js. Every volume of the series
+  //     loads this file, so loading the bar from here gives all of them, and
+  //     the home page, the same bar without touching their own HTML.
+  if (!window.__erismlSitebar && !document.querySelector('script[src*="assets/js/sitebar.js"]')) {
+    const bar = document.createElement('script');
+    bar.src = BASE + 'assets/js/sitebar.js';
+    document.head.appendChild(bar);
+  }
 
   // --- English word-form for small counts (≤ 20), numeric otherwise. ---
   const WORDS = ['Zero','One','Two','Three','Four','Five','Six','Seven','Eight',

@@ -1,0 +1,113 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Certificate.lean</title><style>
+:root { color-scheme: light; --ink:#0b0b0b; --ink2:#52514e; --ink3:#8a897f; --surface:#fcfcfb; --rule:#e6e5e1; --accent:#2a78d6; }
+html { background: var(--surface); }
+body { margin: 0; color: var(--ink); font-family: Inter, 'Segoe UI', Helvetica, Arial, sans-serif; font-size: 17px; line-height: 1.55; }
+main { max-width: 760px; margin: 0 auto; padding: 32px 24px 96px; }
+nav.top { border-bottom: 1px solid var(--rule); padding: 12px 24px; font-size: 14px; color: var(--ink2); display:flex; gap: 18px; flex-wrap: wrap; }
+nav.top a { color: var(--ink2); text-decoration: none; }
+nav.top a:hover { color: var(--accent); }
+h1 { font-size: 30px; line-height: 1.2; margin: 0 0 18px; }
+h2 { font-size: 21px; margin: 40px 0 10px; }
+h3 { font-size: 17px; margin: 28px 0 8px; }
+p { margin: 0 0 14px; }
+p.lede { color: var(--ink2); font-style: italic; }
+table { border-collapse: collapse; margin: 14px 0 20px; font-size: 15px; width: 100%; overflow-x: auto; display: block; }
+th, td { text-align: left; padding: 6px 10px; border-bottom: 1px solid var(--rule); vertical-align: top; }
+th { color: var(--ink2); font-weight: 600; }
+figure { margin: 22px 0 26px; }
+figure svg { max-width: 100%; height: auto; display: block; }
+figcaption { font-size: 14px; color: var(--ink2); margin-top: 8px; }
+blockquote { border-left: 3px solid var(--rule); margin: 14px 0; padding: 4px 16px; color: var(--ink2); }
+code { font-family: ui-monospace, Consolas, monospace; font-size: 0.9em; background: #f3f2ee; padding: 1px 4px; border-radius: 3px; }
+.katex-display { overflow-x: auto; overflow-y: hidden; padding: 4px 0; }
+ol, ul { padding-left: 24px; }
+li { margin: 4px 0; }
+.toc li { margin: 8px 0; }
+.toc a { color: var(--ink); text-decoration: none; }
+.toc a:hover { color: var(--accent); }
+.toc span { color: var(--ink3); font-size: 14px; margin-left: 8px; }
+.cite a { color: var(--ink2); text-decoration: none; }
+ol.refs li { margin: 8px 0; font-size: 15px; }
+ul.terms { list-style: none; padding: 0; columns: 2; column-gap: 32px; font-size: 15px; }
+ul.terms li { margin: 3px 0; break-inside: avoid; }
+ul.terms span { color: var(--ink2); }
+ul.terms a { color: var(--ink2); text-decoration: none; }
+ul.terms a:hover { color: var(--accent); }
+nav.top a.cur { color: var(--accent); font-weight: 600; } nav.top .sep { color: var(--rule); } footer.edition { max-width: 760px; margin: 0 auto; padding: 0 24px 40px; font-size: 13px; color: var(--ink3); } pre.lean { font-family: ui-monospace, Consolas, monospace; font-size: 13.5px; line-height: 1.45; background: #f3f2ee; padding: 14px 16px; border-radius: 6px; overflow-x: auto; white-space: pre; }</style>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js"
+  onload="renderMathInElement(document.body,{delimiters:[{left:'$$',right:'$$',display:true},{left:'$',right:'$',display:false}],throwOnError:false});"></script>
+<script defer src="../../assets/js/sitebar.js"></script></head><body><nav class="top"><a href="../index.html"><strong>Data Mining as Observation</strong></a> <a href="../primer_l.html">L</a> <a href="../primer_s.html">S</a> <a href="../ch00.html">0</a> <a href="../ch01.html">1</a> <a href="../ch02.html">2</a> <a href="../ch03.html">3</a> <a href="../ch04.html">4</a> <a href="../ch05.html">5</a> <a href="../ch06.html">6</a> <a href="../ch07.html">7</a> <a href="../ch08.html">8</a> <a href="../ch09.html">9</a> <a href="../ch10.html">10</a> <a href="../ch11.html">11</a> <a href="../ch12.html">12</a> <a href="../ch13.html">13</a> <a href="../ch14.html">14</a> <a href="../how_to_use.html">how to use</a> <a href="../notation.html">notation</a> <a href="../glossary.html">glossary</a> <a href="../machine_checked.html">lean</a> <a href="../index.html#references">references</a> <a href="../terms.html">index</a> <span class="sep">|</span> <a href="../../encyclopedia/index.html">encyclopedia</a></nav><main><h1><code>Certificate.lean</code></h1><p class="lede">Lean 4 source, <code>lean/DataMiningAsObservation/Certificate.lean</code> at commit <code>f3914f0</code>. Appendix C, <a href="../machine_checked.html">Machine-checked statements</a>, says what each file proves. <a href="index.html">All Lean files</a>.</p><pre class="lean">/-
+Certificate.lean. Equation 13.1 and chapter 10 section 10.4.
+
+A certificate clears some decisions. A witness later refutes some of them. The false-clear
+rate is the fraction of cleared decisions the witness refuted, and coverage is the fraction of
+decisions the certificate cleared. The two multiply to the fraction of all decisions that were
+cleared and refuted, which is why the book reports them side by side. A verdict over strata
+is the worst stratum&#x27;s verdict, so it passes a bar exactly when every stratum passes it, and
+it never exceeds any weighted mean of the strata.
+-/
+import Mathlib
+
+namespace DMO.Certificate
+
+open Finset
+
+variable {ι : Type*} [DecidableEq ι]
+
+/-- Coverage. Of the decisions `D`, the fraction the certificate cleared, `C`. -/
+noncomputable def coverage (D C : Finset ι) : ℝ := C.card / D.card
+
+/-- **Equation 13.1.** The false-clear rate, the fraction of cleared decisions `C` that the
+witness refuted, `R`. -/
+noncomputable def falseClear (C R : Finset ι) : ℝ := (C ∩ R).card / C.card
+
+/-- The false-clear rate times the coverage is the fraction of all decisions that were cleared
+and later refuted. Either number alone says less than the two together. -/
+theorem falseClear_mul_coverage (D C R : Finset ι) (hC : C.card ≠ 0) :
+    falseClear C R * coverage D C = (C ∩ R).card / D.card := by
+  unfold falseClear coverage
+  have : (C.card : ℝ) ≠ 0 := by exact_mod_cast hC
+  field_simp
+
+omit [DecidableEq ι] in
+/-- A certificate that clears nothing has coverage zero, whatever its false-clear rate. -/
+theorem coverage_empty (D : Finset ι) : coverage D ∅ = 0 := by
+  simp [coverage]
+
+/-- The false-clear rate lies in the unit interval. -/
+theorem falseClear_mem_unit (C R : Finset ι) : 0 ≤ falseClear C R ∧ falseClear C R ≤ 1 := by
+  unfold falseClear
+  refine ⟨by positivity, ?_⟩
+  rcases Nat.eq_zero_or_pos C.card with h | h
+  · simp [h]
+  · rw [div_le_one (by exact_mod_cast h)]
+    exact_mod_cast Finset.card_le_card Finset.inter_subset_left
+
+/-! ### Min over strata, chapter 10 section 10.4 -/
+
+variable {σ : Type*}
+
+/-- The min-over-strata verdict, the worst stratum&#x27;s score. -/
+noncomputable def minOverStrata (S : Finset σ) (hS : S.Nonempty) (score : σ → ℝ) : ℝ :=
+  S.inf&#x27; hS score
+
+/-- The verdict passes a bar exactly when every stratum passes it. -/
+theorem minOverStrata_passes_iff (S : Finset σ) (hS : S.Nonempty) (score : σ → ℝ) (bar : ℝ) :
+    bar ≤ minOverStrata S hS score ↔ ∀ s ∈ S, bar ≤ score s :=
+  Finset.le_inf&#x27;_iff hS score
+
+/-- The verdict never exceeds any weighted mean of the strata, so averaging can only hide a
+failing stratum. -/
+theorem minOverStrata_le_weighted_mean (S : Finset σ) (hS : S.Nonempty) (score w : σ → ℝ)
+    (hw : ∀ s ∈ S, 0 ≤ w s) (hsum : ∑ s ∈ S, w s = 1) :
+    minOverStrata S hS score ≤ ∑ s ∈ S, w s * score s := by
+  have h1 : minOverStrata S hS score = ∑ s ∈ S, w s * minOverStrata S hS score := by
+    rw [← Finset.sum_mul, hsum, one_mul]
+  rw [h1]
+  exact Finset.sum_le_sum fun s hs =&gt;
+    mul_le_mul_of_nonneg_left (Finset.inf&#x27;_le score hs) (hw s hs)
+
+end DMO.Certificate
+</pre></main><footer class="edition"><em>Data Mining as Observation</em>, draft 0.3, online edition built from commit <code>f3914f0</code>. Copyright &copy; 2026 Andrew H. Bond. All rights reserved. <a href="../index.html">Contents</a> &middot; <a href="../../encyclopedia/index.html">Encyclopedia</a></footer></body></html>

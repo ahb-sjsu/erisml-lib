@@ -1,0 +1,147 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>RobinHood.lean</title><style>
+:root { color-scheme: light; --ink:#0b0b0b; --ink2:#52514e; --ink3:#8a897f; --surface:#fcfcfb; --rule:#e6e5e1; --accent:#2a78d6; }
+html { background: var(--surface); }
+body { margin: 0; color: var(--ink); font-family: Inter, 'Segoe UI', Helvetica, Arial, sans-serif; font-size: 17px; line-height: 1.55; }
+main { max-width: 760px; margin: 0 auto; padding: 32px 24px 96px; }
+nav.top { border-bottom: 1px solid var(--rule); padding: 12px 24px; font-size: 14px; color: var(--ink2); display:flex; gap: 18px; flex-wrap: wrap; }
+nav.top a { color: var(--ink2); text-decoration: none; }
+nav.top a:hover { color: var(--accent); }
+h1 { font-size: 30px; line-height: 1.2; margin: 0 0 18px; }
+h2 { font-size: 21px; margin: 40px 0 10px; }
+h3 { font-size: 17px; margin: 28px 0 8px; }
+p { margin: 0 0 14px; }
+p.lede { color: var(--ink2); font-style: italic; }
+table { border-collapse: collapse; margin: 14px 0 20px; font-size: 15px; width: 100%; overflow-x: auto; display: block; }
+th, td { text-align: left; padding: 6px 10px; border-bottom: 1px solid var(--rule); vertical-align: top; }
+th { color: var(--ink2); font-weight: 600; }
+figure { margin: 22px 0 26px; }
+figure svg { max-width: 100%; height: auto; display: block; }
+figcaption { font-size: 14px; color: var(--ink2); margin-top: 8px; }
+blockquote { border-left: 3px solid var(--rule); margin: 14px 0; padding: 4px 16px; color: var(--ink2); }
+code { font-family: ui-monospace, Consolas, monospace; font-size: 0.9em; background: #f3f2ee; padding: 1px 4px; border-radius: 3px; }
+.katex-display { overflow-x: auto; overflow-y: hidden; padding: 4px 0; }
+ol, ul { padding-left: 24px; }
+li { margin: 4px 0; }
+.toc li { margin: 8px 0; }
+.toc a { color: var(--ink); text-decoration: none; }
+.toc a:hover { color: var(--accent); }
+.toc span { color: var(--ink3); font-size: 14px; margin-left: 8px; }
+.cite a { color: var(--ink2); text-decoration: none; }
+ol.refs li { margin: 8px 0; font-size: 15px; }
+ul.terms { list-style: none; padding: 0; columns: 2; column-gap: 32px; font-size: 15px; }
+ul.terms li { margin: 3px 0; break-inside: avoid; }
+ul.terms span { color: var(--ink2); }
+ul.terms a { color: var(--ink2); text-decoration: none; }
+ul.terms a:hover { color: var(--accent); }
+nav.top a.cur { color: var(--accent); font-weight: 600; } nav.top .sep { color: var(--rule); } footer.edition { max-width: 760px; margin: 0 auto; padding: 0 24px 40px; font-size: 13px; color: var(--ink3); } pre.lean { font-family: ui-monospace, Consolas, monospace; font-size: 13.5px; line-height: 1.45; background: #f3f2ee; padding: 14px 16px; border-radius: 6px; overflow-x: auto; white-space: pre; }</style>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js"
+  onload="renderMathInElement(document.body,{delimiters:[{left:'$$',right:'$$',display:true},{left:'$',right:'$',display:false}],throwOnError:false});"></script>
+<script defer src="../../assets/js/sitebar.js"></script></head><body><nav class="top"><a href="../index.html"><strong>Data Mining as Observation</strong></a> <a href="../primer_l.html">L</a> <a href="../primer_s.html">S</a> <a href="../ch00.html">0</a> <a href="../ch01.html">1</a> <a href="../ch02.html">2</a> <a href="../ch03.html">3</a> <a href="../ch04.html">4</a> <a href="../ch05.html">5</a> <a href="../ch06.html">6</a> <a href="../ch07.html">7</a> <a href="../ch08.html">8</a> <a href="../ch09.html">9</a> <a href="../ch10.html">10</a> <a href="../ch11.html">11</a> <a href="../ch12.html">12</a> <a href="../ch13.html">13</a> <a href="../ch14.html">14</a> <a href="../how_to_use.html">how to use</a> <a href="../notation.html">notation</a> <a href="../glossary.html">glossary</a> <a href="../machine_checked.html">lean</a> <a href="../index.html#references">references</a> <a href="../terms.html">index</a> <span class="sep">|</span> <a href="../../encyclopedia/index.html">encyclopedia</a></nav><main><h1><code>RobinHood.lean</code></h1><p class="lede">Lean 4 source, <code>lean/DataMiningAsObservation/RobinHood.lean</code> at commit <code>f3914f0</code>. Appendix C, <a href="../machine_checked.html">Machine-checked statements</a>, says what each file proves. <a href="index.html">All Lean files</a>.</p><pre class="lean">/-
+RobinHood.lean. Equation 0.35, the Robin Hood index.
+
+The Robin Hood index of a list of counts is the fraction of the total that would have to
+move from points above the mean to points below it to make every count equal. It is the
+sum of the excesses over the mean, over the total, which equals half the sum of absolute
+deviations over the total since the deviations sum to zero. It is nonnegative, zero
+exactly when every count equals the mean, at most one, and unchanged when every count is
+scaled by the same positive factor.
+-/
+import Mathlib
+
+namespace DMO.RobinHood
+
+open Finset
+
+variable {ι : Type*}
+
+/-- The mean count. -/
+noncomputable def mean (S : Finset ι) (c : ι → ℝ) : ℝ := (∑ i ∈ S, c i) / S.card
+
+/-- **Equation 0.35.** The Robin Hood index, the excess mass above the mean over the total. -/
+noncomputable def robinHood (S : Finset ι) (c : ι → ℝ) : ℝ :=
+  (∑ i ∈ S, max (c i - mean S c) 0) / ∑ i ∈ S, c i
+
+/-- The deviations from the mean sum to zero. -/
+theorem sum_dev (S : Finset ι) (hS : S.Nonempty) (c : ι → ℝ) : ∑ i ∈ S, (c i - mean S c) = 0 := by
+  unfold mean
+  rw [Finset.sum_sub_distrib, Finset.sum_const, nsmul_eq_mul]
+  have : (S.card : ℝ) ≠ 0 := by exact_mod_cast hS.card_pos.ne&#x27;
+  field_simp
+  ring
+
+/-- **The two forms agree.** The excess above the mean is half the total absolute deviation. -/
+theorem excess_eq_half_abs (S : Finset ι) (hS : S.Nonempty) (c : ι → ℝ) :
+    ∑ i ∈ S, max (c i - mean S c) 0 = (∑ i ∈ S, |c i - mean S c|) / 2 := by
+  have h : ∀ t : ℝ, max t 0 = (t + |t|) / 2 := by
+    intro t
+    rcases le_or_gt 0 t with ht | ht
+    · rw [max_eq_left ht, abs_of_nonneg ht]; ring
+    · rw [max_eq_right ht.le, abs_of_neg ht]; ring
+  simp_rw [h]
+  rw [← Finset.sum_div, Finset.sum_add_distrib, sum_dev S hS c, zero_add]
+
+/-- The index is nonnegative for nonnegative counts with positive total. -/
+theorem robinHood_nonneg (S : Finset ι) (c : ι → ℝ) (hpos : 0 &lt; ∑ i ∈ S, c i) :
+    0 ≤ robinHood S c := by
+  unfold robinHood
+  exact div_nonneg (Finset.sum_nonneg fun i _ =&gt; le_max_right _ _) hpos.le
+
+/-- **Zero exactly at equality.** With positive total, the index is zero exactly when no count
+exceeds the mean, which with deviations summing to zero means every count equals it. -/
+theorem robinHood_eq_zero_iff (S : Finset ι) (hS : S.Nonempty) (c : ι → ℝ) (hpos : 0 &lt; ∑ i ∈ S, c i) :
+    robinHood S c = 0 ↔ ∀ i ∈ S, c i = mean S c := by
+  unfold robinHood
+  rw [div_eq_zero_iff, or_iff_left hpos.ne&#x27;,
+    Finset.sum_eq_zero_iff_of_nonneg fun i _ =&gt; le_max_right _ _]
+  constructor
+  · intro h
+    have hle : ∀ i ∈ S, c i ≤ mean S c := fun i hi =&gt; by
+      have := h i hi
+      rw [max_eq_right_iff] at this
+      linarith
+    intro i hi
+    by_contra hne
+    have hlt : c i &lt; mean S c := lt_of_le_of_ne (hle i hi) hne
+    have hsum := sum_dev S hS c
+    have : ∑ j ∈ S, (c j - mean S c) &lt; 0 := by
+      apply Finset.sum_neg&#x27;
+      · exact fun j hj =&gt; by linarith [hle j hj]
+      · exact ⟨i, hi, by linarith⟩
+    linarith
+  · intro h i hi
+    rw [h i hi, sub_self, max_self]
+
+/-- **At most one** for nonnegative counts. -/
+theorem robinHood_le_one (S : Finset ι) (hS : S.Nonempty) (c : ι → ℝ) (hc : ∀ i ∈ S, 0 ≤ c i)
+    (hpos : 0 &lt; ∑ i ∈ S, c i) : robinHood S c ≤ 1 := by
+  unfold robinHood
+  rw [div_le_one hpos]
+  apply Finset.sum_le_sum
+  intro i hi
+  have hm : 0 ≤ mean S c := by
+    unfold mean; exact div_nonneg (Finset.sum_nonneg hc) (by positivity)
+  rw [max_le_iff]
+  exact ⟨by linarith, hc i hi⟩
+
+/-- **Scale invariance.** Scaling every count by the same positive factor leaves the index
+unchanged. -/
+theorem robinHood_scale (S : Finset ι) (c : ι → ℝ) (k : ℝ) (hk : 0 &lt; k) :
+    robinHood S (fun i =&gt; k * c i) = robinHood S c := by
+  unfold robinHood mean
+  have hmean : ∀ i, k * c i - (∑ j ∈ S, k * c j) / S.card = k * (c i - (∑ j ∈ S, c j) / S.card) := by
+    intro i
+    rw [← Finset.mul_sum]
+    ring
+  simp_rw [hmean]
+  have hmax : ∀ t : ℝ, max (k * t) 0 = k * max t 0 := by
+    intro t
+    rcases le_or_gt 0 t with ht | ht
+    · rw [max_eq_left (by positivity), max_eq_left ht]
+    · rw [max_eq_right (by nlinarith), max_eq_right ht.le, mul_zero]
+  simp_rw [hmax]
+  rw [← Finset.mul_sum, ← Finset.mul_sum, mul_div_mul_left _ _ hk.ne&#x27;]
+
+end DMO.RobinHood
+</pre></main><footer class="edition"><em>Data Mining as Observation</em>, draft 0.3, online edition built from commit <code>f3914f0</code>. Copyright &copy; 2026 Andrew H. Bond. All rights reserved. <a href="../index.html">Contents</a> &middot; <a href="../../encyclopedia/index.html">Encyclopedia</a></footer></body></html>

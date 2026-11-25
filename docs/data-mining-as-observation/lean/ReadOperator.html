@@ -1,0 +1,194 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>ReadOperator.lean</title><style>
+:root { color-scheme: light; --ink:#0b0b0b; --ink2:#52514e; --ink3:#8a897f; --surface:#fcfcfb; --rule:#e6e5e1; --accent:#2a78d6; }
+html { background: var(--surface); }
+body { margin: 0; color: var(--ink); font-family: Inter, 'Segoe UI', Helvetica, Arial, sans-serif; font-size: 17px; line-height: 1.55; }
+main { max-width: 760px; margin: 0 auto; padding: 32px 24px 96px; }
+nav.top { border-bottom: 1px solid var(--rule); padding: 12px 24px; font-size: 14px; color: var(--ink2); display:flex; gap: 18px; flex-wrap: wrap; }
+nav.top a { color: var(--ink2); text-decoration: none; }
+nav.top a:hover { color: var(--accent); }
+h1 { font-size: 30px; line-height: 1.2; margin: 0 0 18px; }
+h2 { font-size: 21px; margin: 40px 0 10px; }
+h3 { font-size: 17px; margin: 28px 0 8px; }
+p { margin: 0 0 14px; }
+p.lede { color: var(--ink2); font-style: italic; }
+table { border-collapse: collapse; margin: 14px 0 20px; font-size: 15px; width: 100%; overflow-x: auto; display: block; }
+th, td { text-align: left; padding: 6px 10px; border-bottom: 1px solid var(--rule); vertical-align: top; }
+th { color: var(--ink2); font-weight: 600; }
+figure { margin: 22px 0 26px; }
+figure svg { max-width: 100%; height: auto; display: block; }
+figcaption { font-size: 14px; color: var(--ink2); margin-top: 8px; }
+blockquote { border-left: 3px solid var(--rule); margin: 14px 0; padding: 4px 16px; color: var(--ink2); }
+code { font-family: ui-monospace, Consolas, monospace; font-size: 0.9em; background: #f3f2ee; padding: 1px 4px; border-radius: 3px; }
+.katex-display { overflow-x: auto; overflow-y: hidden; padding: 4px 0; }
+ol, ul { padding-left: 24px; }
+li { margin: 4px 0; }
+.toc li { margin: 8px 0; }
+.toc a { color: var(--ink); text-decoration: none; }
+.toc a:hover { color: var(--accent); }
+.toc span { color: var(--ink3); font-size: 14px; margin-left: 8px; }
+.cite a { color: var(--ink2); text-decoration: none; }
+ol.refs li { margin: 8px 0; font-size: 15px; }
+ul.terms { list-style: none; padding: 0; columns: 2; column-gap: 32px; font-size: 15px; }
+ul.terms li { margin: 3px 0; break-inside: avoid; }
+ul.terms span { color: var(--ink2); }
+ul.terms a { color: var(--ink2); text-decoration: none; }
+ul.terms a:hover { color: var(--accent); }
+nav.top a.cur { color: var(--accent); font-weight: 600; } nav.top .sep { color: var(--rule); } footer.edition { max-width: 760px; margin: 0 auto; padding: 0 24px 40px; font-size: 13px; color: var(--ink3); } pre.lean { font-family: ui-monospace, Consolas, monospace; font-size: 13.5px; line-height: 1.45; background: #f3f2ee; padding: 14px 16px; border-radius: 6px; overflow-x: auto; white-space: pre; }</style>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js"
+  onload="renderMathInElement(document.body,{delimiters:[{left:'$$',right:'$$',display:true},{left:'$',right:'$',display:false}],throwOnError:false});"></script>
+<script defer src="../../assets/js/sitebar.js"></script></head><body><nav class="top"><a href="../index.html"><strong>Data Mining as Observation</strong></a> <a href="../primer_l.html">L</a> <a href="../primer_s.html">S</a> <a href="../ch00.html">0</a> <a href="../ch01.html">1</a> <a href="../ch02.html">2</a> <a href="../ch03.html">3</a> <a href="../ch04.html">4</a> <a href="../ch05.html">5</a> <a href="../ch06.html">6</a> <a href="../ch07.html">7</a> <a href="../ch08.html">8</a> <a href="../ch09.html">9</a> <a href="../ch10.html">10</a> <a href="../ch11.html">11</a> <a href="../ch12.html">12</a> <a href="../ch13.html">13</a> <a href="../ch14.html">14</a> <a href="../how_to_use.html">how to use</a> <a href="../notation.html">notation</a> <a href="../glossary.html">glossary</a> <a href="../machine_checked.html">lean</a> <a href="../index.html#references">references</a> <a href="../terms.html">index</a> <span class="sep">|</span> <a href="../../encyclopedia/index.html">encyclopedia</a></nav><main><h1><code>ReadOperator.lean</code></h1><p class="lede">Lean 4 source, <code>lean/DataMiningAsObservation/ReadOperator.lean</code> at commit <code>f3914f0</code>. Appendix C, <a href="../machine_checked.html">Machine-checked statements</a>, says what each file proves. <a href="index.html">All Lean files</a>.</p><pre class="lean">/-
+ReadOperator.lean. Equations 0.8, 0.9, 0.11, and 0.12.
+
+The read operator is the workload average of the outer product of the consumer&#x27;s sensitivity,
+`P = Σ_ω w_ω g_ω g_ω&#x27;`. This file checks what chapter 0 says about it. Its diagonal is the
+weighted mean squared sensitivity to each coordinate and its off-diagonal entries are
+co-sensitivities. Its quadratic form is a weighted sum of squared directional derivatives, so
+the operator is positive semidefinite. A direction is in its kernel exactly when it is in the
+kernel of every row&#x27;s sensitivity, so the nuisance of the average is the intersection of the
+local nuisances. One row reads one direction. An affine consumer does not change along a
+direction its gradient does not read, which is the global equivalence of equation 0.12, and
+the consumer that reads the squared length of a row has a full-rank averaged operator on the
+standard basis rows, which is why that equivalence is local for a nonlinear consumer.
+-/
+import Mathlib
+
+namespace DMO.ReadOperator
+
+open Finset Matrix
+
+variable {Ω : Type*} [Fintype Ω] {n : ℕ}
+
+/-- The workload-averaged read operator of equation 0.9, with `g ω` the sensitivity of the
+consumer at row `ω` and `w ω` the weight of that row. -/
+def readOp (w : Ω → ℝ) (g : Ω → Fin n → ℝ) : Matrix (Fin n) (Fin n) ℝ :=
+  ∑ ω, w ω • vecMulVec (g ω) (g ω)
+
+/-- One rank-one term reads one direction. Its action on any vector is a multiple of `g`. -/
+theorem rank_one_reads_one_direction (g v : Fin n → ℝ) :
+    vecMulVec g g *ᵥ v = (g ⬝ᵥ v) • g := by
+  ext i
+  simp only [mulVec, dotProduct, vecMulVec_apply, Pi.smul_apply, smul_eq_mul, Finset.sum_mul]
+  exact Finset.sum_congr rfl fun j _ =&gt; by ring
+
+/-- The averaged operator acting on a vector is the weighted sum of the rows&#x27; sensitivities,
+each scaled by its directional derivative along the vector. -/
+theorem readOp_mulVec (w : Ω → ℝ) (g : Ω → Fin n → ℝ) (v : Fin n → ℝ) :
+    readOp w g *ᵥ v = ∑ ω, (w ω * (g ω ⬝ᵥ v)) • g ω := by
+  unfold readOp
+  rw [Matrix.sum_mulVec]
+  refine Finset.sum_congr rfl fun ω _ =&gt; ?_
+  ext i
+  simp only [mulVec, dotProduct, Matrix.smul_apply, vecMulVec_apply, Pi.smul_apply, smul_eq_mul]
+  rw [Finset.mul_sum, Finset.sum_mul]
+  exact Finset.sum_congr rfl fun j _ =&gt; by ring
+
+/-- **Equation 0.11.** The quadratic form of the read operator along `v` is the weighted mean
+of the squared directional derivative along `v`. -/
+theorem quad_readOp (w : Ω → ℝ) (g : Ω → Fin n → ℝ) (v : Fin n → ℝ) :
+    v ⬝ᵥ (readOp w g *ᵥ v) = ∑ ω, w ω * (g ω ⬝ᵥ v) ^ 2 := by
+  rw [readOp_mulVec, dotProduct_sum]
+  refine Finset.sum_congr rfl fun ω _ =&gt; ?_
+  rw [dotProduct_smul, smul_eq_mul, dotProduct_comm]
+  ring
+
+/-- **Positive semidefinite.** With nonnegative weights the quadratic form is nonnegative. -/
+theorem quad_readOp_nonneg (w : Ω → ℝ) (hw : ∀ ω, 0 ≤ w ω) (g : Ω → Fin n → ℝ)
+    (v : Fin n → ℝ) : 0 ≤ v ⬝ᵥ (readOp w g *ᵥ v) := by
+  rw [quad_readOp]
+  exact Finset.sum_nonneg fun ω _ =&gt; mul_nonneg (hw ω) (sq_nonneg _)
+
+/-- **The nuisance of the average is the intersection of the local nuisances.** With positive
+weights, a direction is in the kernel of the averaged operator exactly when every row&#x27;s
+sensitivity is orthogonal to it. -/
+theorem readOp_mulVec_eq_zero_iff (w : Ω → ℝ) (hw : ∀ ω, 0 &lt; w ω) (g : Ω → Fin n → ℝ)
+    (v : Fin n → ℝ) : readOp w g *ᵥ v = 0 ↔ ∀ ω, g ω ⬝ᵥ v = 0 := by
+  constructor
+  · intro h
+    have hq : ∑ ω, w ω * (g ω ⬝ᵥ v) ^ 2 = 0 := by
+      rw [← quad_readOp, h, dotProduct_zero]
+    have hterm := (Finset.sum_eq_zero_iff_of_nonneg
+      (fun ω _ =&gt; mul_nonneg (hw ω).le (sq_nonneg (g ω ⬝ᵥ v)))).1 hq
+    intro ω
+    have := hterm ω (Finset.mem_univ ω)
+    rcases mul_eq_zero.1 this with h0 | h0
+    · exact absurd h0 (hw ω).ne&#x27;
+    · exact pow_eq_zero_iff (two_ne_zero) |&gt;.1 h0
+  · intro h
+    rw [readOp_mulVec]
+    exact Finset.sum_eq_zero fun ω _ =&gt; by rw [h ω, mul_zero, zero_smul]
+
+/-- **Equation 0.8 read on the diagonal.** The diagonal entry for coordinate `i` is the
+weighted mean of the squared sensitivity to that coordinate. -/
+theorem readOp_diag (w : Ω → ℝ) (g : Ω → Fin n → ℝ) (i : Fin n) :
+    readOp w g i i = ∑ ω, w ω * g ω i ^ 2 := by
+  simp [readOp, Matrix.sum_apply, vecMulVec_apply, sq]
+
+/-- An off-diagonal entry is a co-sensitivity, the weighted mean of the product of the two
+sensitivities, and not an interaction term. -/
+theorem readOp_offdiag (w : Ω → ℝ) (g : Ω → Fin n → ℝ) (i j : Fin n) :
+    readOp w g i j = ∑ ω, w ω * (g ω i * g ω j) := by
+  simp [readOp, Matrix.sum_apply, vecMulVec_apply]
+
+/-- The read operator is symmetric. -/
+theorem readOp_symm (w : Ω → ℝ) (g : Ω → Fin n → ℝ) (i j : Fin n) :
+    readOp w g i j = readOp w g j i := by
+  rw [readOp_offdiag, readOp_offdiag]
+  exact Finset.sum_congr rfl fun ω _ =&gt; by ring
+
+/-- **The same read operator is not the same observer.** Reversing the sign of every
+sensitivity, which reverses every ranking the consumer produces, leaves the read operator
+unchanged, so the operator fixes the read geometry and not the consumer. -/
+theorem readOp_neg (w : Ω → ℝ) (g : Ω → Fin n → ℝ) :
+    readOp w (fun ω =&gt; -g ω) = readOp w g := by
+  unfold readOp
+  refine Finset.sum_congr rfl fun ω _ =&gt; ?_
+  rw [vecMulVec_neg, neg_vecMulVec, neg_neg]
+
+/-! ### The affine consumer and the global equivalence of equation 0.12 -/
+
+/-- An affine consumer, `x ↦ a ⬝ x + b`, whose sensitivity is `a` at every row. -/
+def affine (a : Fin n → ℝ) (b : ℝ) (x : Fin n → ℝ) : ℝ := a ⬝ᵥ x + b
+
+/-- **Global equivalence for an affine consumer.** Moving along a direction the gradient does
+not read leaves the output unchanged at every input, so the quotient is exact. -/
+theorem affine_const_along_nuisance (a : Fin n → ℝ) (b : ℝ) {v : Fin n → ℝ}
+    (hv : a ⬝ᵥ v = 0) (x : Fin n → ℝ) : affine a b (x + v) = affine a b x := by
+  unfold affine
+  rw [dotProduct_add, hv, add_zero]
+
+/-- The averaged operator of an affine consumer is rank one whatever the workload, the total
+weight times the outer product of its gradient. -/
+theorem readOp_affine (w : Ω → ℝ) (a : Fin n → ℝ) :
+    readOp w (fun _ =&gt; a) = (∑ ω, w ω) • vecMulVec a a := by
+  unfold readOp
+  rw [Finset.sum_smul]
+
+/-! ### The squared-length consumer, whose averaged operator has full rank -/
+
+/-- The consumer that reads the squared length of a row. Its sensitivity at `x` is `2 x`. -/
+def sqLength (x : Fin n → ℝ) : ℝ := x ⬝ᵥ x
+
+/-- Along the standard basis rows with unit weight, the averaged operator of the
+squared-length consumer is four times the identity, of full rank, although each row reads only
+its own direction. The global equivalence of equation 0.12 therefore fails for it. -/
+theorem readOp_sqLength_basis :
+    readOp (fun _ : Fin n =&gt; (1 : ℝ)) (fun k : Fin n =&gt; (2 : ℝ) • Pi.single k 1)
+      = (4 : ℝ) • (1 : Matrix (Fin n) (Fin n) ℝ) := by
+  ext i j
+  simp only [readOp, Matrix.sum_apply, Matrix.smul_apply, vecMulVec_apply, Pi.smul_apply,
+    Pi.single_apply, smul_eq_mul, Matrix.one_apply, one_mul]
+  by_cases hij : i = j
+  · subst hij
+    simp
+    norm_num
+  · rw [if_neg hij, mul_zero]
+    apply Finset.sum_eq_zero
+    intro k _
+    by_cases hk : i = k
+    · subst hk; simp [Ne.symm hij]
+    · simp [hk]
+
+end DMO.ReadOperator
+</pre></main><footer class="edition"><em>Data Mining as Observation</em>, draft 0.3, online edition built from commit <code>f3914f0</code>. Copyright &copy; 2026 Andrew H. Bond. All rights reserved. <a href="../index.html">Contents</a> &middot; <a href="../../encyclopedia/index.html">Encyclopedia</a></footer></body></html>

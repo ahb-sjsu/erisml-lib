@@ -1,0 +1,115 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>ReliabilityWeight.lean</title><style>
+:root { color-scheme: light; --ink:#0b0b0b; --ink2:#52514e; --ink3:#8a897f; --surface:#fcfcfb; --rule:#e6e5e1; --accent:#2a78d6; }
+html { background: var(--surface); }
+body { margin: 0; color: var(--ink); font-family: Inter, 'Segoe UI', Helvetica, Arial, sans-serif; font-size: 17px; line-height: 1.55; }
+main { max-width: 760px; margin: 0 auto; padding: 32px 24px 96px; }
+nav.top { border-bottom: 1px solid var(--rule); padding: 12px 24px; font-size: 14px; color: var(--ink2); display:flex; gap: 18px; flex-wrap: wrap; }
+nav.top a { color: var(--ink2); text-decoration: none; }
+nav.top a:hover { color: var(--accent); }
+h1 { font-size: 30px; line-height: 1.2; margin: 0 0 18px; }
+h2 { font-size: 21px; margin: 40px 0 10px; }
+h3 { font-size: 17px; margin: 28px 0 8px; }
+p { margin: 0 0 14px; }
+p.lede { color: var(--ink2); font-style: italic; }
+table { border-collapse: collapse; margin: 14px 0 20px; font-size: 15px; width: 100%; overflow-x: auto; display: block; }
+th, td { text-align: left; padding: 6px 10px; border-bottom: 1px solid var(--rule); vertical-align: top; }
+th { color: var(--ink2); font-weight: 600; }
+figure { margin: 22px 0 26px; }
+figure svg { max-width: 100%; height: auto; display: block; }
+figcaption { font-size: 14px; color: var(--ink2); margin-top: 8px; }
+blockquote { border-left: 3px solid var(--rule); margin: 14px 0; padding: 4px 16px; color: var(--ink2); }
+code { font-family: ui-monospace, Consolas, monospace; font-size: 0.9em; background: #f3f2ee; padding: 1px 4px; border-radius: 3px; }
+.katex-display { overflow-x: auto; overflow-y: hidden; padding: 4px 0; }
+ol, ul { padding-left: 24px; }
+li { margin: 4px 0; }
+.toc li { margin: 8px 0; }
+.toc a { color: var(--ink); text-decoration: none; }
+.toc a:hover { color: var(--accent); }
+.toc span { color: var(--ink3); font-size: 14px; margin-left: 8px; }
+.cite a { color: var(--ink2); text-decoration: none; }
+ol.refs li { margin: 8px 0; font-size: 15px; }
+ul.terms { list-style: none; padding: 0; columns: 2; column-gap: 32px; font-size: 15px; }
+ul.terms li { margin: 3px 0; break-inside: avoid; }
+ul.terms span { color: var(--ink2); }
+ul.terms a { color: var(--ink2); text-decoration: none; }
+ul.terms a:hover { color: var(--accent); }
+nav.top a.cur { color: var(--accent); font-weight: 600; } nav.top .sep { color: var(--rule); } footer.edition { max-width: 760px; margin: 0 auto; padding: 0 24px 40px; font-size: 13px; color: var(--ink3); } pre.lean { font-family: ui-monospace, Consolas, monospace; font-size: 13.5px; line-height: 1.45; background: #f3f2ee; padding: 14px 16px; border-radius: 6px; overflow-x: auto; white-space: pre; }</style>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js"
+  onload="renderMathInElement(document.body,{delimiters:[{left:'$$',right:'$$',display:true},{left:'$',right:'$',display:false}],throwOnError:false});"></script>
+<script defer src="../../assets/js/sitebar.js"></script></head><body><nav class="top"><a href="../index.html"><strong>Data Mining as Observation</strong></a> <a href="../primer_l.html">L</a> <a href="../primer_s.html">S</a> <a href="../ch00.html">0</a> <a href="../ch01.html">1</a> <a href="../ch02.html">2</a> <a href="../ch03.html">3</a> <a href="../ch04.html">4</a> <a href="../ch05.html">5</a> <a href="../ch06.html">6</a> <a href="../ch07.html">7</a> <a href="../ch08.html">8</a> <a href="../ch09.html">9</a> <a href="../ch10.html">10</a> <a href="../ch11.html">11</a> <a href="../ch12.html">12</a> <a href="../ch13.html">13</a> <a href="../ch14.html">14</a> <a href="../how_to_use.html">how to use</a> <a href="../notation.html">notation</a> <a href="../glossary.html">glossary</a> <a href="../machine_checked.html">lean</a> <a href="../index.html#references">references</a> <a href="../terms.html">index</a> <span class="sep">|</span> <a href="../../encyclopedia/index.html">encyclopedia</a></nav><main><h1><code>ReliabilityWeight.lean</code></h1><p class="lede">Lean 4 source, <code>lean/DataMiningAsObservation/ReliabilityWeight.lean</code> at commit <code>f3914f0</code>. Appendix C, <a href="../machine_checked.html">Machine-checked statements</a>, says what each file proves. <a href="index.html">All Lean files</a>.</p><pre class="lean">/-
+ReliabilityWeight.lean. Equation 0.38, the reliability weight.
+
+An encoder&#x27;s reliability weight is zero or twice its held-out AUROC minus one, whichever is
+larger. With AUROC as equation 0.16 defines it, the weight lies in the unit interval, it is
+zero at chance level and below, and since it is a function of the ranking alone it is
+unchanged by any strictly monotone transform of the encoder&#x27;s score. It is a discrimination
+weight, and it says nothing about calibration, which is why the expected calibration error
+is reported beside it.
+-/
+import Mathlib
+import DataMiningAsObservation.MonotoneInvariance
+
+namespace DMO.ReliabilityWeight
+
+open Finset DMO.MonotoneInvariance
+
+variable {ι : Type*} [Fintype ι] [DecidableEq ι]
+
+/-- **Equation 0.38.** The reliability weight of a score. -/
+noncomputable def weight (pos neg : Finset ι) (s : ι → ℝ) : ℝ :=
+  max 0 (2 * auroc pos neg s - 1)
+
+omit [Fintype ι] [DecidableEq ι] in
+/-- Each pair contributes at most one to the AUROC numerator. -/
+theorem pair_le_one (a b : ℝ) :
+    (if b &lt; a then (1 : ℝ) else 0) + (if b = a then (1 / 2 : ℝ) else 0) ≤ 1 := by
+  split_ifs with h1 h2 &lt;;&gt; linarith
+
+omit [Fintype ι] [DecidableEq ι] in
+/-- The AUROC numerator is at most the number of pairs. -/
+theorem aurocNum_le (pos neg : Finset ι) (s : ι → ℝ) :
+    aurocNum pos neg s ≤ pos.card * neg.card := by
+  unfold aurocNum
+  calc ∑ p ∈ pos, ∑ n ∈ neg, ((if s n &lt; s p then (1 : ℝ) else 0) + (if s n = s p then (1 / 2 : ℝ) else 0))
+      ≤ ∑ p ∈ pos, ∑ n ∈ neg, (1 : ℝ) := by
+        apply Finset.sum_le_sum; intro p _
+        apply Finset.sum_le_sum; intro n _
+        exact pair_le_one _ _
+    _ = pos.card * neg.card := by simp
+
+omit [Fintype ι] [DecidableEq ι] in
+/-- **AUROC is at most one.** -/
+theorem auroc_le_one (pos neg : Finset ι) (s : ι → ℝ) : auroc pos neg s ≤ 1 := by
+  unfold auroc
+  rcases eq_or_lt_of_le (by positivity : (0 : ℝ) ≤ pos.card * neg.card) with h | h
+  · rw [← h, div_zero]; norm_num
+  · rw [div_le_one h]; exact aurocNum_le pos neg s
+
+omit [Fintype ι] [DecidableEq ι] in
+/-- **The weight lies in the unit interval.** -/
+theorem weight_mem_unit (pos neg : Finset ι) (s : ι → ℝ) :
+    0 ≤ weight pos neg s ∧ weight pos neg s ≤ 1 := by
+  unfold weight
+  refine ⟨le_max_left _ _, ?_⟩
+  rw [max_le_iff]
+  exact ⟨by norm_num, by linarith [auroc_le_one pos neg s]⟩
+
+omit [Fintype ι] [DecidableEq ι] in
+/-- **Chance level and below give weight zero.** -/
+theorem weight_eq_zero_of_le_half (pos neg : Finset ι) (s : ι → ℝ) (h : auroc pos neg s ≤ 1 / 2) :
+    weight pos neg s = 0 := by
+  unfold weight
+  rw [max_eq_left]
+  linarith
+
+/-- **The weight is a discrimination weight.** A strictly monotone transform of the score
+leaves it unchanged, so recalibrating a score changes no encoder&#x27;s authority. -/
+theorem weight_comp {g : ℝ → ℝ} (hg : StrictMono g) (pos neg : Finset ι) (s : ι → ℝ) :
+    weight pos neg (g ∘ s) = weight pos neg s := by
+  unfold weight
+  rw [auroc_comp hg]
+
+end DMO.ReliabilityWeight
+</pre></main><footer class="edition"><em>Data Mining as Observation</em>, draft 0.3, online edition built from commit <code>f3914f0</code>. Copyright &copy; 2026 Andrew H. Bond. All rights reserved. <a href="../index.html">Contents</a> &middot; <a href="../../encyclopedia/index.html">Encyclopedia</a></footer></body></html>

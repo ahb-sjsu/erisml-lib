@@ -1,0 +1,156 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Flip.lean</title><style>
+:root { color-scheme: light; --ink:#0b0b0b; --ink2:#52514e; --ink3:#8a897f; --surface:#fcfcfb; --rule:#e6e5e1; --accent:#2a78d6; }
+html { background: var(--surface); }
+body { margin: 0; color: var(--ink); font-family: Inter, 'Segoe UI', Helvetica, Arial, sans-serif; font-size: 17px; line-height: 1.55; }
+main { max-width: 760px; margin: 0 auto; padding: 32px 24px 96px; }
+nav.top { border-bottom: 1px solid var(--rule); padding: 12px 24px; font-size: 14px; color: var(--ink2); display:flex; gap: 18px; flex-wrap: wrap; }
+nav.top a { color: var(--ink2); text-decoration: none; }
+nav.top a:hover { color: var(--accent); }
+h1 { font-size: 30px; line-height: 1.2; margin: 0 0 18px; }
+h2 { font-size: 21px; margin: 40px 0 10px; }
+h3 { font-size: 17px; margin: 28px 0 8px; }
+p { margin: 0 0 14px; }
+p.lede { color: var(--ink2); font-style: italic; }
+table { border-collapse: collapse; margin: 14px 0 20px; font-size: 15px; width: 100%; overflow-x: auto; display: block; }
+th, td { text-align: left; padding: 6px 10px; border-bottom: 1px solid var(--rule); vertical-align: top; }
+th { color: var(--ink2); font-weight: 600; }
+figure { margin: 22px 0 26px; }
+figure svg { max-width: 100%; height: auto; display: block; }
+figcaption { font-size: 14px; color: var(--ink2); margin-top: 8px; }
+blockquote { border-left: 3px solid var(--rule); margin: 14px 0; padding: 4px 16px; color: var(--ink2); }
+code { font-family: ui-monospace, Consolas, monospace; font-size: 0.9em; background: #f3f2ee; padding: 1px 4px; border-radius: 3px; }
+.katex-display { overflow-x: auto; overflow-y: hidden; padding: 4px 0; }
+ol, ul { padding-left: 24px; }
+li { margin: 4px 0; }
+.toc li { margin: 8px 0; }
+.toc a { color: var(--ink); text-decoration: none; }
+.toc a:hover { color: var(--accent); }
+.toc span { color: var(--ink3); font-size: 14px; margin-left: 8px; }
+.cite a { color: var(--ink2); text-decoration: none; }
+ol.refs li { margin: 8px 0; font-size: 15px; }
+ul.terms { list-style: none; padding: 0; columns: 2; column-gap: 32px; font-size: 15px; }
+ul.terms li { margin: 3px 0; break-inside: avoid; }
+ul.terms span { color: var(--ink2); }
+ul.terms a { color: var(--ink2); text-decoration: none; }
+ul.terms a:hover { color: var(--accent); }
+nav.top a.cur { color: var(--accent); font-weight: 600; } nav.top .sep { color: var(--rule); } footer.edition { max-width: 760px; margin: 0 auto; padding: 0 24px 40px; font-size: 13px; color: var(--ink3); } pre.lean { font-family: ui-monospace, Consolas, monospace; font-size: 13.5px; line-height: 1.45; background: #f3f2ee; padding: 14px 16px; border-radius: 6px; overflow-x: auto; white-space: pre; }</style>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js"
+  onload="renderMathInElement(document.body,{delimiters:[{left:'$$',right:'$$',display:true},{left:'$',right:'$',display:false}],throwOnError:false});"></script>
+<script defer src="../../assets/js/sitebar.js"></script></head><body><nav class="top"><a href="../index.html"><strong>Data Mining as Observation</strong></a> <a href="../primer_l.html">L</a> <a href="../primer_s.html">S</a> <a href="../ch00.html">0</a> <a href="../ch01.html">1</a> <a href="../ch02.html">2</a> <a href="../ch03.html">3</a> <a href="../ch04.html">4</a> <a href="../ch05.html">5</a> <a href="../ch06.html">6</a> <a href="../ch07.html">7</a> <a href="../ch08.html">8</a> <a href="../ch09.html">9</a> <a href="../ch10.html">10</a> <a href="../ch11.html">11</a> <a href="../ch12.html">12</a> <a href="../ch13.html">13</a> <a href="../ch14.html">14</a> <a href="../how_to_use.html">how to use</a> <a href="../notation.html">notation</a> <a href="../glossary.html">glossary</a> <a href="../machine_checked.html">lean</a> <a href="../index.html#references">references</a> <a href="../terms.html">index</a> <span class="sep">|</span> <a href="../../encyclopedia/index.html">encyclopedia</a></nav><main><h1><code>Flip.lean</code></h1><p class="lede">Lean 4 source, <code>lean/DataMiningAsObservation/Flip.lean</code> at commit <code>f3914f0</code>. Appendix C, <a href="../machine_checked.html">Machine-checked statements</a>, says what each file proves. <a href="index.html">All Lean files</a>.</p><pre class="lean">/-
+Flip.lean. The four-to-one flip of chapter 3, equation 3.1, and the cover.
+
+Two error covariances diag(a, b) and diag(b, a) have the same trace. A reader that reads
+the single direction (c, s) experiences each as the variance along that direction. The
+difference between the two readings is (a − b)(c² − s²), so swapping the reader&#x27;s two
+coordinates reverses the ranking. With the book&#x27;s numbers, a = 0.3, b = 1.7, and the
+reader at 15 degrees, the two readings are 1 − 0.35√3 and 1 + 0.35√3, which are 0.394
+and 1.606 to three decimals, a ratio of a little over four to one.
+-/
+import Mathlib
+
+namespace DMO.Flip
+
+/-- The read distortion of the diagonal error covariance diag(a, b) along the reader (c, s),
+the variance of the error along that direction, `u&#x27;Σu` of equation 0.4. -/
+def readDiag (a b c s : ℝ) : ℝ := a * c ^ 2 + b * s ^ 2
+
+/-- Both errors have the same trace. -/
+theorem trace_eq (a b : ℝ) : a + b = b + a := add_comm a b
+
+/-- Equation 3.1 in general. The two readings differ by (a − b)(c² − s²). -/
+theorem reading_difference (a b c s : ℝ) :
+    readDiag a b c s - readDiag b a c s = (a - b) * (c ^ 2 - s ^ 2) := by
+  unfold readDiag; ring
+
+/-- Swapping the reader&#x27;s coordinates reverses the sign of the difference, so the second
+reader ranks the two errors the opposite way from the first. -/
+theorem reader_swap_reverses (a b c s : ℝ) :
+    readDiag a b s c - readDiag b a s c = -(readDiag a b c s - readDiag b a c s) := by
+  unfold readDiag; ring
+
+/-- The flip, stated as an ordering. If a &lt; b and the reader leans toward the first axis,
+c² &gt; s², it ranks diag(a, b) below diag(b, a), and the swapped reader ranks them the other
+way, while the traces agree. -/
+theorem flip (a b c s : ℝ) (hab : a &lt; b) (hcs : s ^ 2 &lt; c ^ 2) :
+    readDiag a b c s &lt; readDiag b a c s ∧ readDiag b a s c &lt; readDiag a b s c := by
+  constructor
+  · have := reading_difference a b c s
+    nlinarith
+  · have := reading_difference a b s c
+    nlinarith
+
+/-! ### The book&#x27;s numbers -/
+
+/-- cos²(15°) = 1/2 + √3/4. -/
+theorem cos_sq_pi_div_twelve : Real.cos (Real.pi / 12) ^ 2 = 1 / 2 + Real.sqrt 3 / 4 := by
+  rw [Real.cos_sq]
+  have : 2 * (Real.pi / 12) = Real.pi / 6 := by ring
+  rw [this, Real.cos_pi_div_six]
+  ring
+
+/-- sin²(15°) = 1/2 − √3/4. -/
+theorem sin_sq_pi_div_twelve : Real.sin (Real.pi / 12) ^ 2 = 1 / 2 - Real.sqrt 3 / 4 := by
+  rw [Real.sin_sq, cos_sq_pi_div_twelve]
+  ring
+
+/-- The reader at 15 degrees reads diag(0.3, 1.7) as 1 − 0.35√3. -/
+theorem reading_15_first :
+    readDiag 0.3 1.7 (Real.cos (Real.pi / 12)) (Real.sin (Real.pi / 12))
+      = 1 - 0.35 * Real.sqrt 3 := by
+  unfold readDiag
+  rw [cos_sq_pi_div_twelve, sin_sq_pi_div_twelve]
+  ring
+
+/-- The reader at 15 degrees reads diag(1.7, 0.3) as 1 + 0.35√3. -/
+theorem reading_15_second :
+    readDiag 1.7 0.3 (Real.cos (Real.pi / 12)) (Real.sin (Real.pi / 12))
+      = 1 + 0.35 * Real.sqrt 3 := by
+  unfold readDiag
+  rw [cos_sq_pi_div_twelve, sin_sq_pi_div_twelve]
+  ring
+
+/-- √3 lies between 1.732 and 1.7321. -/
+theorem sqrt_three_bounds : 1.732 &lt; Real.sqrt 3 ∧ Real.sqrt 3 &lt; 1.7321 := by
+  constructor
+  · rw [Real.lt_sqrt (by norm_num)]; norm_num
+  · rw [Real.sqrt_lt&#x27; (by norm_num)]; norm_num
+
+/-- The two readings at 15 degrees are 0.394 and 1.606 to three decimals, as the book prints. -/
+theorem readings_15_to_three_decimals :
+    |readDiag 0.3 1.7 (Real.cos (Real.pi / 12)) (Real.sin (Real.pi / 12)) - 0.394| &lt; 0.0005 ∧
+    |readDiag 1.7 0.3 (Real.cos (Real.pi / 12)) (Real.sin (Real.pi / 12)) - 1.606| &lt; 0.0005 := by
+  rw [reading_15_first, reading_15_second]
+  obtain ⟨h1, h2⟩ := sqrt_three_bounds
+  constructor &lt;;&gt; rw [abs_lt] &lt;;&gt; constructor &lt;;&gt; linarith
+
+/-- The reader at 75 degrees is the reader at 15 degrees with its coordinates swapped,
+since cos(75°) = sin(15°) and sin(75°) = cos(15°). -/
+theorem reader_75_is_swap :
+    Real.cos (5 * Real.pi / 12) = Real.sin (Real.pi / 12) ∧
+    Real.sin (5 * Real.pi / 12) = Real.cos (Real.pi / 12) := by
+  have h : 5 * Real.pi / 12 = Real.pi / 2 - Real.pi / 12 := by ring
+  rw [h, Real.cos_pi_div_two_sub, Real.sin_pi_div_two_sub]
+  exact ⟨rfl, rfl⟩
+
+/-- The four-to-one flip with the book&#x27;s numbers. The reader at 15 degrees ranks the first
+error below the second, the reader at 75 degrees ranks the second below the first, and the
+traces are equal. -/
+theorem four_to_one_flip :
+    readDiag 0.3 1.7 (Real.cos (Real.pi / 12)) (Real.sin (Real.pi / 12))
+      &lt; readDiag 1.7 0.3 (Real.cos (Real.pi / 12)) (Real.sin (Real.pi / 12)) ∧
+    readDiag 1.7 0.3 (Real.cos (5 * Real.pi / 12)) (Real.sin (5 * Real.pi / 12))
+      &lt; readDiag 0.3 1.7 (Real.cos (5 * Real.pi / 12)) (Real.sin (5 * Real.pi / 12)) ∧
+    (0.3 : ℝ) + 1.7 = 1.7 + 0.3 := by
+  obtain ⟨hc, hs⟩ := reader_75_is_swap
+  rw [hc, hs]
+  have hcs : Real.sin (Real.pi / 12) ^ 2 &lt; Real.cos (Real.pi / 12) ^ 2 := by
+    rw [cos_sq_pi_div_twelve, sin_sq_pi_div_twelve]
+    have := Real.sqrt_pos.mpr (show (0 : ℝ) &lt; 3 by norm_num)
+    linarith
+  obtain ⟨h1, h2⟩ := flip 0.3 1.7 _ _ (by norm_num) hcs
+  exact ⟨h1, h2, by norm_num⟩
+
+end DMO.Flip
+</pre></main><footer class="edition"><em>Data Mining as Observation</em>, draft 0.3, online edition built from commit <code>f3914f0</code>. Copyright &copy; 2026 Andrew H. Bond. All rights reserved. <a href="../index.html">Contents</a> &middot; <a href="../../encyclopedia/index.html">Encyclopedia</a></footer></body></html>
