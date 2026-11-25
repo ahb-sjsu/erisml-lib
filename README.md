@@ -17,21 +17,19 @@
 
 ## 🚀 Quick Start
 
-The latest release on PyPI is **3.1.0** (August 2026):
+The current release is **3.2.0** (November 2026), on PyPI:
 ```bash
 pip install erisml-lib
 ```
 
-This repository is at **3.2.0**, which is not yet on PyPI. It adds the executed governance profile, the
-composition patterns, the full `Maxim` with tragic-conflict escalation, and judging per party
-(see [What 3.2 adds](#what-32-adds)). To get it, install from source:
-```bash
-pip install "git+https://github.com/ahb-sjsu/erisml-lib.git"
-```
+It adds the executed governance profile, the composition patterns, the full `Maxim` with
+tragic-conflict escalation, judging per party, a working language front end and one definition of the
+Bond Index (see [What 3.2 adds](#what-32-adds)).
 
-To verify the installation, run the ethics demo:
+To verify the installation, run the ethics demo, then the 3.2 pipeline on one scene:
 ```bash
 python -m erisml.examples.hello_deme
+python -m erisml.examples.governed_pipeline_demo
 ```
 
 ---
@@ -210,7 +208,7 @@ democratically-governed ethical reasoning, grounded in the **Philosophy Engineer
 ![CI](https://github.com/ahb-sjsu/erisml-lib/actions/workflows/ci.yaml/badge.svg)
 ![Python](https://img.shields.io/badge/Python-3.10%2B-blue.svg)
 ![License](https://img.shields.io/badge/License-MIT-blue.svg)
-[![PyPI version](https://img.shields.io/badge/PyPI-v3.1.0-blue.svg)](https://pypi.org/project/erisml-lib/)
+[![PyPI version](https://img.shields.io/badge/PyPI-v3.2.0-blue.svg)](https://pypi.org/project/erisml-lib/)
 
 ---
 
@@ -247,8 +245,8 @@ DecisionResult:  selected option, forbidden options, escalations, per-party verd
 
 From compiler 0.10 on, the compiler holds no verdict logic of its own: it imports this library for the one
 `Maxim`, the one universalizability table (`erisml.ethics.universalizability`) and DEME's verdict.
-Compiler 0.10 requires erisml-lib 3.2 or later, and neither is on PyPI yet (PyPI has compiler 0.9.0 and
-library 3.1.0), so the pair installs from source. By default the compiler passes one `EthicalFacts` per
+Compiler 0.10 requires erisml-lib 3.2 or later. The library is on PyPI at 3.2.0; compiler 0.10 is not
+released yet (PyPI has compiler 0.9.0), so the compiler installs from source. By default the compiler passes one `EthicalFacts` per
 option; `ir_to_party_facts` builds the per-party `EthicalFactsV3` that DEME judges party by party.
 
 ### Deontic maxim gate (polarity-aware)
@@ -438,7 +436,7 @@ selected. A forbidden option is never selected, and advisory tiers do not exclud
 
 ### What 3.2 adds
 
-Version 3.2.0 (October 2026, in this repository, not yet on PyPI):
+Version 3.2.0 (released November 2026):
 
 - **Executed governance.** `DEMEPipeline` runs the governance profile it is given:
   `PipelineConfig(governance=GovernanceConfigV2(...))` selects by the profile's weights, veto modules and
@@ -459,6 +457,11 @@ Version 3.2.0 (October 2026, in this repository, not yet on PyPI):
   collapsed worst case by default.
 - **Hohfeld is V4 only** (3.2, following 3.1's correction): the Klein four-group, machine-checked in
   [`formal/HohfeldV4.lean`](formal/HohfeldV4.lean). The D4 machinery is removed.
+- **The language front end works** (`erisml.language`): the parser reads every block, and
+  `build_model` and `ethics_profile` turn a parsed model into objects that run.
+- **One Bond Index** (`erisml.ethics.bond_index`, [`docs/BOND_INDEX.md`](docs/BOND_INDEX.md)): the mean
+  deviation of an evaluation under declared re-descriptions, over a tolerance, with an explicit metric.
+- **MIT License.** Releases up to 3.1.0 were under the AGI-HPC Responsible AI License (draft).
 
 The names above are imported from their modules (`erisml.ethics.layers.pipeline`,
 `erisml.ethics.governance.config_v2`, `erisml.ethics.interop.profile_adapters`,
