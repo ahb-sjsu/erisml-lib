@@ -57,21 +57,22 @@ This pairing is called **correlative symmetry**. It's a hard constraint: if your
 
 ## 3. The D₄ Group: A State Machine with 8 Transitions
 
-> **Epistemic status (keystone correction, July 2026 — see
-> `docs/CONCEPT_REGISTRY.md` §1 and `formal/HohfeldV4.lean`):** the two
-> *demonstrated* operations (correlative swap `s`, deontic negation `r²`)
-> generate only the abelian Klein four-group **V₄**. The full D₄ below —
-> including the quarter-turns and the non-abelian order-dependence in §3.2 —
-> is the **posited** ambient machinery, kept so the hypothesis stays testable.
-> Read §3.2's "order matters" as a *prediction to hunt*, not a measured fact.
+> **Status, October 2026: D₄ is withdrawn** (see `docs/CONCEPT_REGISTRY.md` §1 and
+> `formal/HohfeldV4.lean`). The two demonstrated operations, the correlative swap `s` and
+> deontic negation `n` (written `r²` below), commute and generate only the Klein four-group
+> **V₄**. A quarter-turn was never demonstrated as a normative operation, the Lean proof shows
+> it lies outside the generated group, and a direct search did not find it. The D₄ code was
+> removed from the library on 3 October 2026; `erisml.ethics.hohfeld` is V₄ only. The rest of
+> this section describes the withdrawn D₄ picture and is kept as a record of the hypothesis:
+> its quarter-turns and the "order matters" of §3.2 are not results.
 
 > **Epistemic status (keystone correction, July 2026):** the two operations demonstrated
 > empirically — the correlative flip `s` and the negation `r²` — *commute*, so the group they
 > generate is the Klein four-subgroup **V₄ = {e, s, r², sr²}** (abelian, order 4). That is the
-> **measured** structure. The full 8-element D₄ described below is the **posited** ambient
-> machinery: it is implemented in the library so the quarter-turn hypothesis stays testable,
-> but quarter-turn operations (r, r³, sr, sr³) have not been demonstrated as normative
-> operations. Read "D₄" below as "the posited machinery", not "the confirmed result."
+> **measured** structure. The full 8-element D₄ described below was the hypothesised ambient
+> machinery. Its quarter-turn operations (r, r³, sr, sr³) were never demonstrated as normative
+> operations, and it is no longer implemented in the library. Read "D₄" below as "the withdrawn
+> hypothesis", not "the confirmed result."
 
 ### 3.1 Forget "Group Theory" — Think State Machine
 
@@ -333,9 +334,13 @@ def compute_bond_index(test_results: dict, threshold: float) -> tuple[str, float
 
 ## 6.1 DEME 2.0 Integration
 
-The Hohfeldian gauge structure (V₄ measured, D₄ posited) integrates with the [DEME 2.0 moral landscape framework](docs/DEME_2.0_D4_Integration.md):
+The Hohfeldian gauge structure (V₄, with D₄ withdrawn) was designed to integrate with the DEME 2.0
+moral landscape framework through an ethics module, `HohfeldianEM`. That module is a design sketch:
+it is not in the released library. What the library has is `erisml.ethics.hohfeld`
+(`correlative`, `negation`, `compute_bond_index`). The sketch:
 
 ```python
+# design sketch, not importable from the released library
 from erisml.ethics.modules.hohfeldian_em import HohfeldianEM
 
 # HohfeldianEM verifies gauge consistency across perspectives
@@ -375,9 +380,11 @@ print(judgement.metadata["bond_index"])   # 0.0 = perfect symmetry
 ### Gauge Transformation
 ```python
 # Physics: ψ → g·ψ (state transforms under group element)
-# Code: Apply a D4 operation to a Hohfeld state
-new_state = D4['r'](current_state)  # rotate
-new_state = D4['s'](current_state)  # reflect (correlative)
+# Code: Apply a V4 operation to a Hohfeld state (erisml.ethics.hohfeld)
+from erisml.ethics.hohfeld import V4Element, v4_apply_to_state
+
+new_state = v4_apply_to_state(V4Element.COR, current_state)  # correlative swap: O<->C, L<->N
+new_state = v4_apply_to_state(V4Element.NEG, current_state)  # negation: O<->L, C<->N
 ```
 
 ### Gauge Invariance Test

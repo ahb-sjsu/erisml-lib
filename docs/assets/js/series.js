@@ -7,7 +7,7 @@
  * adding a new volume requires editing ONLY books.json.
  *
  * Placeholders handled:
- *   #series-card-grid   → 13-book card grid (used on main site index)
+ *   #series-card-grid   → card grid of the volumes (used on main site index)
  *   #series-nav-list    → <ul> of short-name series links (the fallback top nav;
  *                         sitebar.js, loaded below, replaces the whole top nav)
  *   #series-volume-count → auto-updated text "Thirteen volumes" etc.
