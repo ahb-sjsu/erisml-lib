@@ -145,7 +145,7 @@
   function demoLaw() {
     return '<div class="dd-demo">' +
       '<h4>Hohfeldian V<sub>4</sub> Explorer</h4>' +
-      '<p class="dd-intro">The Hohfeldian positions are linked by correlative and opposite relations — commuting involutions forming a Klein four-group V<sub>4</sub> (the full dihedral D<sub>4</sub> is posited, not yet measured). Click any position to see its correlative, opposite, and the full symmetry orbit.</p>' +
+      '<p class="dd-intro">The Hohfeldian positions are linked by correlative and opposite relations — commuting involutions forming a Klein four-group V<sub>4</sub> (the dihedral D<sub>4</sub> of earlier versions is withdrawn). Click any position to see where each operation takes it.</p>' +
       '<div class="dd-d4-grid">' +
         '<div class="dd-d4-box dd-d4-active" data-pos="O"><strong>O</strong><br>Obligation</div>' +
         '<div class="dd-d4-arrow">\u2194</div>' +
@@ -157,24 +157,24 @@
       '</div>' +
       '<div class="dd-d4-relations" id="dd-d4-info">' +
         '<div class="dd-d4-rel"><strong>Correlative:</strong> <span id="dd-corr">Claim (C)</span></div>' +
-        '<div class="dd-d4-rel"><strong>Opposite:</strong> <span id="dd-opp">No-obligation</span></div>' +
-        '<div class="dd-d4-rel"><strong>Contradictory:</strong> <span id="dd-contra">Liberty (L)</span></div>' +
+        '<div class="dd-d4-rel"><strong>Negation:</strong> <span id="dd-opp">Liberty (L)</span></div>' +
+        '<div class="dd-d4-rel"><strong>Both:</strong> <span id="dd-contra">No-claim (N)</span></div>' +
       '</div>' +
       '<div class="dd-d4-scenario">' +
         '<h5>Legal Example</h5>' +
         '<p id="dd-legal-ex">A promises to deliver goods to B by Friday. A has an <strong>Obligation</strong> to deliver. B has a <strong>Claim</strong> to receive delivery. These are correlatives: the V<sub>4</sub> group maps O \u2194 C.</p>' +
       '</div>' +
-      '<div class="dd-insight">The measured V<sub>4</sub> gauge group has 4 elements; the posited D<sub>4</sub> (order 8) awaits empirical quarter-turn operations. Legal disputes are pathfinding problems on the Hohfeldian manifold. Precedent operates as parallel transport (Ch. 22).</div>' +
+      '<div class="dd-insight">V<sub>4</sub> has 4 elements: identity, correlative, negation, and both. Exactly one of them takes any position to any other. Legal disputes are pathfinding problems on the Hohfeldian manifold. Precedent operates as parallel transport (Ch. 22).</div>' +
     '</div>';
   }
 
   function wireLaw() {
     var data = {
-      O: { corr: 'Claim (C)', opp: 'No-obligation', contra: 'Liberty (L)',
+      O: { corr: 'Claim (C)', opp: 'Liberty (L)', contra: 'No-claim (N)',
         ex: 'A promises to deliver goods to B by Friday. A has an <strong>Obligation</strong> to deliver. B has a <strong>Claim</strong> to receive delivery. These are correlatives: V<sub>4</sub> maps O \u2194 C.' },
-      C: { corr: 'Obligation (O)', opp: 'No-claim (N)', contra: 'No-obligation',
+      C: { corr: 'Obligation (O)', opp: 'No-claim (N)', contra: 'Liberty (L)',
         ex: 'B has a <strong>Claim</strong> against A for delivery. This claim is correlative to A\'s obligation. If A fails, B can seek judicial enforcement.' },
-      L: { corr: 'No-claim (N)', opp: 'Obligation (O)', contra: 'No-obligation',
+      L: { corr: 'No-claim (N)', opp: 'Obligation (O)', contra: 'Claim (C)',
         ex: 'A landowner has <strong>Liberty</strong> to build a fence on their property. Neighbors have <strong>No-claim</strong> to prevent it. L \u2194 N is the second correlative pair.' },
       N: { corr: 'Liberty (L)', opp: 'Claim (C)', contra: 'Obligation (O)',
         ex: 'A passerby has <strong>No-claim</strong> against a restaurant to receive food without paying. The restaurant has <strong>Liberty</strong> to refuse service. N \u2194 L is correlative.' },

@@ -361,12 +361,12 @@ function initObjectCards() {
 function initTheoremCards() {
   const details = {
     'Structured Pluralism': 'The partial order on admissible metrics means some genuine moral disagreements are geometrically irreducible \u2014 neither framework is "better." This is not relativism: the partial order still rules out many metrics. It is the mathematical formalization of reasonable pluralism.',
-    'Conservation of Harm': 'BIP is a continuous symmetry of the moral Lagrangian. By Noether\u2019s theorem, this yields a conserved charge: harm. Four consequences flow directly: euphemism preserves total harm, harm is auditable across representations, re-description cannot redistribute harm between dimensions, and unresolved harm persists as moral debt.',
-    'Gauge Group': 'D\u2084 has 8 elements mapping between Hohfeldian positions: Obligation \u2194 Claim (correlatives) and Liberty \u2194 No-claim (correlatives), plus their negations and compositions. Combined with U(1)\u2095 (harm phase rotation), this gives the maximal group preserving both jural structure and bounded total harm.',
+    'Invariance of Harm Accounting': 'BIP is a symmetry of the moral Lagrangian under re-description. Its consequence is that harm accounting is invariant: re-describing a situation cannot change the harm in it. Euphemism does not reduce harm, harm is auditable across representations, and re-description cannot move harm between dimensions.',
+    'Gauge Group': 'Two operations act on the Hohfeldian positions: the correlative swap (Obligation \u2194 Claim, Liberty \u2194 No-claim) and negation (Obligation \u2194 Liberty, Claim \u2194 No-claim). They commute and generate the Klein four-group V\u2084, four elements, machine-checked in Lean. The product with U(1)\u2095 (harm phase rotation) is posited, not derived. The dihedral D\u2084 of earlier versions is withdrawn: its quarter-turn was never demonstrated.',
     'No Escape Theorem': 'An AI system cannot find a description d\u2032 where moral constraints don\u2019t apply, because BIP guarantees E(d) = E(d\u2032) for all admissible re-descriptions. The four architectural requirements \u2014 canonicalization, grounded evaluation, structural audit, verification integrity \u2014 close all known escape routes.',
     'Non-Commutativity of Contraction': 'Contracting D\u2081 then D\u2082 \u2260 D\u2082 then D\u2081. Each contraction discards different dimensional information. This is why "which values do we simplify first?" is a substantive moral question, not a technical convenience. The order of moral simplification matters.',
     'Admissibility': 'Moral rules like "do not kill" and "keep your promises" never overestimate true cost to moral equilibrium. They may be suboptimal in edge cases (trolley problems), but they never make the search worse \u2014 they are guaranteed safe shortcuts. This is why evolution pre-compiled deontological rules into cognition.',
-    'Intractability': 'Finding the exact moral geodesic on a 9-dimensional stratified manifold with boundaries is NP-hard in general. This explains why moral reasoning IS hard, and why we rely on heuristics: virtues, rules, intuitions, cultural norms. It is a feature of the problem, not a bug.'
+    'Intractability': 'Finding the exact moral geodesic on a 9-dimensional stratified manifold with boundaries is intractable in the manifold dimension. This explains why moral reasoning IS hard, and why we rely on heuristics: virtues, rules, intuitions, cultural norms. It is a feature of the problem, not a bug.'
   };
 
   document.querySelectorAll('.theorem-card').forEach(card => {
@@ -474,11 +474,11 @@ function initReadingPaths() {
 function initDemeArchitecture() {
   const layerInfo = [
     { y: 10, name: 'Layer 7: Application', detail: 'Domain-specific modules (healthcare, finance, legal) that consume DEME evaluations and translate them into domain actions and recommendations.' },
-    { y: 65, name: 'Layer 6: Governance Profile', detail: 'Selects which moral metric g\u03bc\u03bd to use. Different profiles encode different ethical frameworks \u2014 utilitarian, deontological, virtue-based, or custom blends.' },
-    { y: 120, name: 'Layer 5: ErisML Specification', detail: 'The modeling language that translates natural-language policies into formal tensor specifications. Bridges human intent and mathematical structure.' },
-    { y: 175, name: 'Layer 4: Translation Layer', detail: 'Policy modules that convert ErisML specs into executable DEME evaluation pipelines. Maps specification to computation.' },
-    { y: 230, name: 'Layer 3: DEME Ethics Engine', detail: 'Core evaluation engine. Takes EthicalFacts, applies Ethics Modules, performs tensor contraction, computes the Bond Index, returns structured Judgements.' },
-    { y: 285, name: 'Layer 2: Norm Kernel', detail: 'Formally verified automaton enforcing hard ethical constraints \u2014 the "thou shalt not" rules that cannot be overridden by any higher layer. The safety floor.' },
+    { y: 65, name: 'Layer 6: Governance Profile', detail: 'The stakeholders\u2019 choices: weights over the moral dimensions, the modules that hold a veto, how modules are composed, and the tie-breaker. In erisml-lib 3.2 the DEME pipeline executes the profile it is given.' },
+    { y: 120, name: 'Layer 5: ErisML Specification', detail: 'The modeling language for environments, agents and norms. In the released library the models are built in Python, and the textual parser covers environment and agent declarations.' },
+    { y: 175, name: 'Layer 4: Translation Layer', detail: 'From a description of a situation to what DEME evaluates. In the released software erisml-compiler does this: it extracts stakeholders, acts, maxims and facts from text and structured scenes and hands them to DEME.' },
+    { y: 230, name: 'Layer 3: DEME Ethics Engine', detail: 'Core evaluation engine. Takes the EthicalFacts of each option, runs the reflex rules and the deontic maxim gate, then the Ethics Modules in composition stages, selects by the governance profile, and returns a DecisionResult with a hash-chained proof. A conflict of duties is escalated to a human.' },
+    { y: 285, name: 'Layer 2: Norm Kernel', detail: 'Hard ethical constraints \u2014 the "thou shalt not" rules that no higher layer can override. The safety floor. In the released library this is the reflex layer and the constitutional vetoes; a formally verified automaton is a programme item, not yet built.' },
     { y: 340, name: 'Layer 1: Tensor Runtime', detail: 'Geometric primitives: manifold operations, tensor algebra, parallel transport, geodesic computation, stratification logic. The mathematical substrate.' }
   ];
 
@@ -599,8 +599,8 @@ function initConservationInteractive() {
 function initEpistemicCards() {
   const examples = {
     'Definition / Modeling choice': 'Examples: The 9 moral dimensions, the Whitney stratification model, the choice of smooth manifold topology, the Hohfeldian position types. These are the framework\u2019s architectural choices \u2014 useful but not uniquely determined by the data.',
-    'Theorem (conditional)': 'Examples: Conservation of Harm (Thm 12.1), No Escape (Thm 18.1), Structured Pluralism (Thm 9.2). Each is rigorous mathematics \u2014 but the real question is whether its premises hold in the world.',
-    'Empirical result (preliminary / robust)': 'Examples: BIP violation rates in the Dear Abby corpus (robust \u2014 51K letters), order effects in moral judgment (robust \u2014 replicated), Bell inequality violation (preliminary \u2014 open question).',
+    'Theorem (conditional)': 'Examples: Invariance of Harm Accounting (Thm 12.1), No Escape (Thm 18.1), Structured Pluralism (Thm 9.2). Each is rigorous mathematics \u2014 but the real question is whether its premises hold in the world.',
+    'Empirical result (preliminary / robust)': 'Examples: BIP violation rates in the Dear Abby corpus, order effects in the judgments of one language model (not yet studied in people), and the Bell test, which found no violation (|S| \u2264 2 in every configuration).',
     'Speculation / Extension': 'Examples: Connections to Orch-OR consciousness theory, the moral field equation, torsion in moral space, category-theoretic reformulation. Flagged honestly as speculative \u2014 directions for future research.'
   };
 
@@ -646,9 +646,9 @@ function initBellTestSlider() {
   controls.className = 'bell-controls';
   controls.innerHTML =
     '<div class="bell-slider-row">' +
-      '<span class="bell-slider-label">Observed S value:</span>' +
-      '<input type="range" min="0" max="320" value="210" class="bell-slider">' +
-      '<span class="bell-s-display">S = 2.10</span>' +
+      '<span class="bell-slider-label">Try an S value:</span>' +
+      '<input type="range" min="0" max="320" value="180" class="bell-slider">' +
+      '<span class="bell-s-display">S = 1.80</span>' +
     '</div>' +
     '<p class="bell-verdict"></p>';
   bellViz.appendChild(controls);
@@ -662,10 +662,10 @@ function initBellTestSlider() {
     display.textContent = 'S = ' + s.toFixed(2);
 
     if (s <= 2) {
-      verdict.innerHTML = '<span style="color:var(--cb-orange)">Within classical bound (|S| \u2264 2).</span> Moral reasoning appears classical \u2014 no quantum structure detected.';
+      verdict.innerHTML = '<span style="color:var(--cb-orange)">Within classical bound (|S| \u2264 2).</span> No quantum-like structure. This is what the experiment found, in all 18 configurations.';
       display.style.color = 'var(--cb-orange)';
     } else if (s <= 2.83) {
-      verdict.innerHTML = '<span style="color:var(--cb-purple)">Classical bound violated!</span> Evidence for quantum-like superposition and interference in moral deliberation.';
+      verdict.innerHTML = '<span style="color:var(--cb-purple)">Above the classical bound.</span> A value here would be evidence of quantum-like structure in moral deliberation. The experiment did not find one.';
       display.style.color = 'var(--cb-purple)';
     } else {
       verdict.innerHTML = '<span style="color:var(--text-muted)">Exceeds Tsirelson bound (2\u221A2 \u2248 2.83).</span> This would violate quantum mechanics itself \u2014 check experimental design.';
@@ -674,5 +674,5 @@ function initBellTestSlider() {
   }
 
   slider.addEventListener('input', () => updateBell(parseInt(slider.value)));
-  updateBell(210);
+  updateBell(180);
 }
