@@ -15,15 +15,23 @@
 
 > **Brand assets:** [erisml.org/brand/](https://erisml.org/brand/) · local: [`docs/brand/`](docs/brand/)
 
-## 🚀 Quick Start (v3.1.0)
-You can now install ErisML directly from PyPI:
+## 🚀 Quick Start
+
+The latest release on PyPI is **3.1.0** (August 2026):
 ```bash
 pip install erisml-lib
 ```
 
-To verify your installation and run the ethics demo:
+This repository is at **3.2.0**, which is not yet on PyPI. It adds the executed governance profile, the
+composition patterns, the full `Maxim` with tragic-conflict escalation, and judging per party
+(see [What 3.2 adds](#what-32-adds)). To get it, install from source:
 ```bash
-python3 src/erisml/examples/hello_deme.py
+pip install "git+https://github.com/ahb-sjsu/erisml-lib.git"
+```
+
+To verify the installation, run the ethics demo:
+```bash
+python -m erisml.examples.hello_deme
 ```
 
 ---
@@ -89,7 +97,7 @@ from erisml.ieip.report import format_text
 # See docs/I-EIP_Monitor_Whitepaper.md §4 for the full pipeline.
 ```
 
-The monitoring half (Sprint 2.5 of the GUASS-SAI plan) is implemented and CI-green. The governance/gating half (EM-DAG runtime gating, cryptographic attestation) is the ongoing student collaboration — see the sprint plan for open tasks.
+The monitoring half (Sprint 2.5 of the GUASS-SAI plan) is implemented and CI-green. The governance/gating half (runtime gating, cryptographic attestation) is the ongoing student collaboration — see the sprint plan for open tasks.
 
 ### I-EIP Monitor pipeline
 
@@ -159,9 +167,8 @@ DEME is the Democratically Governed Ethics Module Engine — an ethics-only deci
 
 **DEME 2.0** introduces a major architectural upgrade with:
 
-- **(i)**   **MoralVector**: k-dimensional ethical assessment replacing scalar scores
-            (`physical_harm`, `rights_respect`, `fairness_equity`, `autonomy_respect`,
-            `legitimacy_trust`, `epistemic_quality`)
+- **(i)**   **MoralVector**: k-dimensional ethical assessment replacing scalar scores,
+            with 8+1 core dimensions (listed under [Overview](#overview))
 - **(ii)**  **Three-Layer Architecture**: Reflex (<100μs veto checks), Tactical (10-100ms
             full reasoning), Strategic (policy optimization)
 - **(iii)** **Tiered EM Catalog**: Constitutional (Tier 0), Core Safety (Tier 1),
@@ -171,11 +178,20 @@ DEME is the Democratically Governed Ethics Module Engine — an ethics-only deci
 - **(vi)**  **DEMEProfileV04**: Enhanced profiles with tier configs and MoralVector weights
 - **(vii)** **MCP server** with V2 tools (`evaluate_options_v2`, `run_pipeline`)
 
-We define a concrete syntax, a formal grammar, denotational semantics, and
-an execution model that treats norms as first-class constraints on action,
-introduces longitudinal safety metrics such as **Norm Violation Rate (NVR)** and
-**Alignment Drift Velocity (ADV)**, and supports compilation to planners,
-verifiers, and simulators.
+The language design (see [`docs/vision/erisml.md`](docs/vision/erisml.md)) defines a concrete syntax, a
+formal grammar, denotational semantics, and an execution model that treats norms as first-class
+constraints on action, with longitudinal safety metrics such as **Norm Violation Rate (NVR)** and
+**Alignment Drift Velocity (ADV)**, and compilation to planners, verifiers, and simulators.
+
+**What is implemented in 3.2.0.** The execution model is implemented in Python: `erisml.core` holds the
+environment, agent and norm models and an engine with a norm gate and the NVR metric, and the TinyHome
+example builds its model directly in Python ([`tiny_home.py`](src/erisml/examples/tiny_home.py)). The textual
+front end is partial: the grammar ([`grammar.lark`](src/erisml/language/grammar.lark), v2.0) covers
+environment, agent, norms, ethics and dynamics blocks, and the parser builds the environment and agent
+declarations. Norms, ethics and dynamics blocks are not yet carried into the AST, nothing compiles a parsed
+model into `erisml.core`, ADV is not implemented, and the PDDL adapter is a stub. For scenes written as data,
+[erisml-compiler](https://github.com/ahb-sjsu/erisml-compiler) reads its own "ErisML source", a YAML form of
+its intermediate representation, which is a different format from this grammar.
 
 On top of this, ErisML now includes an **ethics-only decision layer (DEME)** for
 democratically-governed ethical reasoning, grounded in the **Philosophy Engineering** framework.
@@ -183,7 +199,7 @@ democratically-governed ethical reasoning, grounded in the **Philosophy Engineer
 ---
 
 ![CI](https://github.com/ahb-sjsu/erisml-lib/actions/workflows/ci.yaml/badge.svg)
-![Python](https://img.shields.io/badge/Python-3.12%2B-blue.svg)
+![Python](https://img.shields.io/badge/Python-3.10%2B-blue.svg)
 ![License](https://img.shields.io/badge/License-AGI--HPC%20Responsible%20AI-blue.svg)
 [![PyPI version](https://img.shields.io/badge/PyPI-v3.1.0-blue.svg)](https://pypi.org/project/erisml-lib/)
 
@@ -193,7 +209,8 @@ democratically-governed ethical reasoning, grounded in the **Philosophy Engineer
 
 | Repository | Description |
 |------------|-------------|
-| [ahb-sjsu/erisml-compiler](https://github.com/ahb-sjsu/erisml-compiler) | Natural-language → moral-IR **compiler** that feeds this library (see below) |
+| [ahb-sjsu/erisml-compiler](https://github.com/ahb-sjsu/erisml-compiler) | **Compiler** from moral text and structured scenes to a typed MoralGraph read by four ethical lenses. It extracts; this library judges (see below) |
+| [ahb-sjsu/moral-spectrum-analyzer](https://github.com/ahb-sjsu/moral-spectrum-analyzer) | Formerly `gtc-prototype`. A content-moderation instrument that scores text on validated moral axes and escalates where it is not validated, and a simulated home-care robot whose proposed acts pass DEME as a veto gate. Its verification spec lists what is and is not demonstrated |
 | [ahb-sjsu/non-abelian-sqnd](https://github.com/ahb-sjsu/non-abelian-sqnd) | NA-SQND theoretical research - papers, experiments, and mathematical foundations |
 | [ahb-sjsu/sqnd-probe](https://github.com/ahb-sjsu/sqnd-probe) | Dear Ethicist - advice column game for measuring moral reasoning structure |
 
@@ -206,32 +223,46 @@ democratically-governed ethical reasoning, grounded in the **Philosophy Engineer
 is one-way:
 
 ```
-natural-language text
-  │  erisml-compiler:  spaCy SRL maxim extractor, projections (deontic/virtue/care)
+moral text, or a structured scene (JSON, the compiler's ErisML-source YAML, BPMN, live observations)
+  │  erisml-compiler:  extraction into a typed MoralGraph; four lenses read it
+  │                    (consequentialist, deontic, virtue, care) and report where they disagree
   ▼
-MoralSubstrate  ──►  Maxim(action_kind, polarity)  +  V3 EthicalFacts (9-dim)
-  │  erisml-compiler/erisml_backend/v3_bridge.py
+MoralSubstrate  ──►  Maxim (this library's class)  +  EthicalFacts
+  │  erisml_compiler/erisml_backend/deme_bridge.py, v3_bridge.py
   ▼
-erisml-lib:  DEME modules, MoralTensor aggregation, deontic maxim gate, I-EIP probes
+erisml-lib:  DEMEPipeline under a governance profile (reflex rules and the deontic maxim gate,
+             composition stages of ethics modules, governance-weighted selection, DecisionProof)
   ▼
-DecisionResult / EthicalJudgement
+DecisionResult:  selected option, forbidden options, escalations, per-party verdicts
 ```
+
+From compiler 0.10 on, the compiler holds no verdict logic of its own: it imports this library for the one
+`Maxim`, the one universalizability table (`erisml.ethics.universalizability`) and DEME's verdict.
+Compiler 0.10 requires erisml-lib 3.2 or later, and neither is on PyPI yet (PyPI has compiler 0.9.0 and
+library 3.1.0), so the pair installs from source. By default the compiler passes one `EthicalFacts` per
+option; `ir_to_party_facts` builds the per-party `EthicalFactsV3` that DEME judges party by party.
 
 ### Deontic maxim gate (polarity-aware)
 
-The compiler now extracts a `Maxim` including **polarity** — whether an action
-is asserted or negated ("did not promise", "refused to lie"). The library
-consumes this in `ethics/deontic_gate.py` and applies a Kantian
-universalizability veto inside `DEMEPipeline`'s reflex layer:
+The compiler extracts a `Maxim`: the kind of act, its **polarity** (whether the act is asserted or
+negated, as in "did not promise" or "refused to lie"), the agent, the purpose and the kind of act the
+purpose is, and how the act treats each person. The library tests it in `ethics/deontic_gate.py`:
 
 ```python
-from erisml.ethics.facts import EthicalFacts, Maxim
-from erisml.ethics.layers.pipeline import DEMEPipeline
+from erisml.ethics.facts import Maxim
+from erisml.ethics.deontic_gate import evaluate_maxim
 
-opt = EthicalFacts(option_id="o1", maxim=Maxim(action_kind="deceive"))
-result = DEMEPipeline().decide([opt])
-assert "o1" in result.forbidden_options          # deceiving fails universalizability
+assert evaluate_maxim(Maxim(action_kind="deceive")).vetoed                      # fails universalizability
+assert not evaluate_maxim(Maxim(action_kind="deceive", polarity="negated")).vetoed
+conflict = evaluate_maxim(Maxim(action_kind="deceive", purpose_kind="protect"))
+assert conflict.conflict and not conflict.vetoed                                # escalated, not vetoed
 ```
+
+Inside `DEMEPipeline` the gate runs in the reflex layer on each option's `EthicalFacts.maxim`. A vetoed
+option appears in `DecisionResult.forbidden_options`, and a conflict appears in
+`DecisionResult.escalations` for a human to settle. The reflex layer also fails closed: an option whose
+facts lack the blocks the default rules read is forbidden whatever its maxim, so give the pipeline complete
+facts (see [`hello_deme.py`](src/erisml/examples/hello_deme.py)).
 
 Polarity follows Kant's perfect/imperfect duty distinction:
 
@@ -239,6 +270,7 @@ Polarity follows Kant's perfect/imperfect duty distinction:
 |---|---|---|
 | `deceive`, `inflict_harm`, `coerce`, … (prohibitions) | affirmed | **veto** |
 | `deceive` … (prohibitions) | negated ("did not deceive") | pass |
+| `deceive` … (prohibitions) | affirmed, with a purpose that is an imperfect duty ("deceive to protect") | **conflict**: escalated to a human, not vetoed |
 | `help`, `protect` (imperfect duties) | affirmed | pass |
 | `help`, `protect` | negated ("did not help") | **veto** (contradiction in will) |
 | `make_or_keep_commitment`, `disclose` (permissible) | either | pass |
@@ -309,6 +341,9 @@ ErisML has two tightly-related layers:
      - Norm gating and constraint filtering on actions
      - Longitudinal safety metrics (e.g., NVR, ADV)
      - Adapters for planners, verifiers, and simulators
+   - Status in 3.2.0: the Python models, the norm gate, NVR and the PettingZoo adapter are implemented.
+     The textual parser covers environment and agent declarations only, ADV is not implemented, and the
+     PDDL adapter is a stub (details under [ErisML](#erisml-1) above)
 
 2. **DEME 2.0 (Democratically Governed Ethics Modules)** — ethics-only decision layer
 
@@ -329,11 +364,11 @@ ErisML has two tightly-related layers:
      - **Strategic Layer**: Policy optimization (seconds to hours)
 
    - **Tiered EM Catalog**:
-     - **Tier 0 (Constitutional)**: Non-removable, hard veto (e.g., `GenevaEMV2`)
-     - **Tier 1 (Core Safety)**: Physical harm prevention, hard veto capable
-     - **Tier 2 (Rights/Fairness)**: Autonomy, consent, fairness (e.g., `AutonomyConsentEMV2`)
-     - **Tier 3 (Soft Values)**: Beneficence, virtue ethics, advisory only
-     - **Tier 4 (Meta-Governance)**: Pattern guards, drift detection
+     - **Tier 0 (Constitutional)**: Non-removable, hard veto (`GenevaEMV2`, `GenevaEMV3`)
+     - **Tier 1 (Core Safety)**: Physical harm prevention, hard veto capable (`CorePhysicalSafetyEMV2`)
+     - **Tier 2 (Rights/Fairness)**: Autonomy, consent, fairness (`AutonomyConsentEMV2`)
+     - **Tier 3 (Soft Values)**: Beneficence, virtue ethics, advisory only (`BeneficenceEMV2`)
+     - **Tier 4 (Meta-Governance)**: Pattern guards, drift detection (no module yet)
 
    - **DecisionProof**: Structured audit artifacts with hash chains
 
@@ -357,41 +392,72 @@ ErisML has two tightly-related layers:
 Together, ErisML + DEME support **norm-governed, ethics-aware agents** that can
 be inspected, audited, and configured by multiple stakeholders.
 
-### DEME 2.0 decision flow
+### DEME decision flow (3.2)
 
 ```mermaid
 flowchart TB
-    IN[Candidate Action]
-    subgraph R["Reflex layer (< 100 &micro;s)"]
-        R1[Tier 0: Constitutional vetoes]
-        R2[Hard safety checks]
+    IN[Candidate options<br/>EthicalFacts, or EthicalFactsV3 per party]
+    subgraph R["Reflex layer"]
+        R1[Default reflex rules<br/>fail closed on missing facts]
+        R2[Deontic maxim gate<br/>universalizability]
     end
-    subgraph T["Tactical layer (10-100 ms)"]
-        T1[MoralVector assessment<br/>8+1 dims]
-        T2[Tier 1-3 Ethical Modules]
-        T3[BIP invariance check]
+    subgraph T["Tactical layer"]
+        T1[Composition stages of ethics modules<br/>flat, hard_shell, hard_shell_fairness, lexicographic]
+        T2[MoralVector per option<br/>8+1 dimensions, per party at rank 2]
+        T3[Governance profile<br/>weights, veto modules, tie-breaker]
     end
     subgraph S["Strategic layer"]
-        S1[Policy optimization]
-        S2[NVR / ADV metrics]
-        S3[DecisionProof<br/>audit hash chain]
+        S1[DecisionProof<br/>hash chain]
     end
-    OUT[Action + DecisionProof]
+    OUT[DecisionResult<br/>selected, forbidden, escalations, party verdicts]
 
     IN --> R1 --> R2
-    R2 -->|pass| T1
     R2 -->|veto| OUT
-    T1 --> T2 --> T3
-    T3 -->|pass| S1 --> S2 --> S3 --> OUT
-    T3 -->|violation witness| OUT
+    R2 -->|conflict of duties: escalate| OUT
+    R2 -->|pass| T1 --> T2 --> T3 --> S1 --> OUT
 
     classDef reflex fill:#ffcdd2,stroke:#b71c1c;
     classDef tactical fill:#fff9c4,stroke:#f57f17;
     classDef strategic fill:#c8e6c9,stroke:#1b5e20;
     class R1,R2 reflex;
     class T1,T2,T3 tactical;
-    class S1,S2,S3 strategic;
+    class S1 strategic;
 ```
+
+A module that raises is recorded in `DecisionResult.em_failures`, and with `fail_closed` the option is not
+selected. A forbidden option is never selected, and advisory tiers do not exclude options.
+
+### What 3.2 adds
+
+Version 3.2.0 (October 2026, in this repository, not yet on PyPI):
+
+- **Executed governance.** `DEMEPipeline` runs the governance profile it is given:
+  `PipelineConfig(governance=GovernanceConfigV2(...))` selects by the profile's weights, veto modules and
+  tie-breaker, and `pipeline_from_profile(DEMEProfileV04)` builds the modules, reflex rules and proof
+  identity from a profile.
+- **Composition patterns** from the Design Guide (`erisml.ethics.layers.composition`): `flat`,
+  `hard_shell`, `hard_shell_fairness`, `lexicographic`, with the modules `CorePhysicalSafetyEMV2`,
+  `AutonomyConsentEMV2` and `BeneficenceEMV2` written to the guide.
+- **The full Maxim** (`erisml.ethics.facts.Maxim`): agent, purpose, the kind of act the purpose is, and how
+  the act treats each person. It is the one model erisml-compiler extracts and passes to DEME unchanged.
+- **One universalizability table** (`erisml.ethics.universalizability`), from which the gate derives its
+  prohibitions, permissible acts and imperfect duties.
+- **Tragic conflicts are escalated.** A prohibited act whose purpose is an imperfect duty ("deceive to
+  protect those in my care") is a conflict of duties. DEME reports it in `DecisionResult.escalations`
+  for a human and does not veto it.
+- **Judging per party (rank 2).** Options given as `EthicalFactsV3` are judged party by party by each
+  module's own rule, and the per-party verdicts are in `DecisionResult.party_verdicts`. Parties are
+  collapsed worst case by default.
+- **Hohfeld is V4 only** (3.2, following 3.1's correction): the Klein four-group, machine-checked in
+  [`formal/HohfeldV4.lean`](formal/HohfeldV4.lean). The D4 machinery is removed.
+
+The names above are imported from their modules (`erisml.ethics.layers.pipeline`,
+`erisml.ethics.governance.config_v2`, `erisml.ethics.interop.profile_adapters`,
+`erisml.ethics.profile_v04`, `erisml.ethics.facts`, `erisml.ethics.facts_v3`). The package root
+`erisml.ethics` re-exports only the older V1 names, and `erisml.DEME`, `erisml.MoralTensor` and
+`erisml.ethics.StrategicLayer` at the root are small stand-ins: the working classes are
+`erisml.ethics.layers.pipeline.DEMEPipeline`, `erisml.ethics.moral_tensor.MoralTensor` and
+`erisml.ethics.layers.strategic.StrategicLayer`.
 
 ---
 
@@ -432,7 +498,7 @@ This repository contains a production-style Python library with:
     - Epistemic status (confidence, known-unknowns, data quality)
   - `EthicalJudgement` and `EthicsModule` interface
   - Governance configuration and aggregation:
-    - `GovernanceConfiguration` / `DEMEProfileV03`
+    - `GovernanceConfig` / `DEMEProfileV03`
     - `DecisionOutcome` and helpers (e.g., `select_option`)
     - Stakeholder weights, hard vetoes, lexical priority layers, tie-breaking
     - Support for base EMs (`base_em_ids`, `base_em_enforcement`) such as
@@ -548,7 +614,7 @@ Machine-checkable audit record for Bond Invariance Principle compliance.
 
 The Bond Index (Bd) measures **representational coherence** in ethical AI systems. A coherent evaluator should reach the same conclusion when presented with semantically equivalent inputs, regardless of surface-level variations in how those inputs are expressed.
 
-This test suite extends the standard syntactic fuzzing approach with **semantic transforms based on the 9 DEME (Declarative Ethical Model Encoding) ethical dimensions**. It tests whether an evaluator maintains coherence when the *same* ethical situation is described through *different* normative lenses.
+This test suite extends the standard syntactic fuzzing approach with **semantic transforms based on the 9 DEME (Democratically Governed Ethics Modules) ethical dimensions**. It tests whether an evaluator maintains coherence when the *same* ethical situation is described through *different* normative lenses.
 
 ```
 python -m erisml.examples.bond_index_calibration_deme_fuzzing --config configs\bond_index_calibration.yaml
@@ -937,11 +1003,15 @@ This is stronger than traditional metamorphic testing because:
 
 ### Connection to EthicalFacts Schema
 
-The 9 DEME dimensions correspond to fields in the `EthicalFacts` structured schema:
+The 9 DEME dimensions correspond to blocks of the `EthicalFacts` structured schema. The sketch below
+shows what each block is about. It is not the class definition: the real `EthicalFacts`
+(`erisml/ethics/facts.py`) holds one optional dataclass per block (`consequences`, `rights_and_duties`,
+`justice_and_fairness`, `autonomy_and_agency`, `privacy_and_data`, `societal_and_environmental`,
+`virtue_and_care`, `procedural_and_legitimacy`, `epistemic_status`) plus `maxim`.
 
 ```python
 @dataclass
-class EthicalFacts:
+class EthicalFacts:  # illustrative sketch, see above
     # 1. Consequences and welfare
     harm_risk: float
     benefit_potential: float
@@ -1067,7 +1137,7 @@ On macOS / Linux, the equivalent would be:
 
     pytest
 
-This will run the core test suite and the DEME smoke test.
+This runs the test suite. CI also runs a DEME smoke test as a separate step.
 
 ---
 
@@ -1255,7 +1325,7 @@ erisml-mcp-server
 #### Troubleshooting
 
 - **Server won't start**: Ensure `erisml` is installed and the `erisml-mcp-server` command is in your PATH. Try running `erisml-mcp-server --help` to verify installation.
-- **No profiles found**: Check that your profiles directory contains valid `.json` files matching the `DEMEProfileV03` schema. See `schemas/deme_profile_v03.json` for the schema definition.
+- **No profiles found**: Check that your profiles directory contains valid `.json` files matching the `DEMEProfileV03` or `DEMEProfileV04` schema. See `schemas/deme_profile_v03.json` for the schema definition.
 - **Connection issues**: The server uses stdio transport by default. Ensure your MCP client is configured to communicate over stdio.
 - **Profile loading errors**: Check the log output (use `--log-level DEBUG`) to see detailed error messages about profile parsing issues.
 
@@ -1341,8 +1411,9 @@ From there you can:
 
 - Add additional features (e.g., use `facts.epistemic_status` to downweight
   low-confidence scenarios).  
-- Compose multiple EMs and wire them into a `GovernanceConfiguration` /
-  `DEMEProfileV03` profile.  
+- Compose multiple EMs and wire them into a `GovernanceConfig` /
+  `DEMEProfileV03` profile. This is the V1 interface; to run a V1 module inside `DEMEPipeline`,
+  wrap it in `V1ToV2Adapter`.  
 - Write unit tests to ensure your EM behaves as intended over important
   corner cases.
 
@@ -1383,7 +1454,7 @@ This document provides a comprehensive index of all documentation files in the E
    Main repository documentation providing overview, quickstart guide, and installation instructions for ErisML library.
 
 2. **[LICENSE.txt](https://github.com/ahb-sjsu/erisml-lib/blob/main/LICENSE.txt)**  
-   MIT License file specifying usage terms and conditions.
+   The licence text: AGI-HPC Responsible AI License, version 1.0 (draft).
 
 3. **[CITATION.cff](https://github.com/ahb-sjsu/erisml-lib/blob/main/CITATION.cff)**  
    Citation file format for proper academic attribution of the ErisML library.
@@ -1391,7 +1462,7 @@ This document provides a comprehensive index of all documentation files in the E
 4. **[pyproject.toml](https://github.com/ahb-sjsu/erisml-lib/blob/main/pyproject.toml)**  
    Python project configuration file defining dependencies and build settings.
 
-5. **[insert_header.py](https://github.com/ahb-sjsu/erisml-lib/blob/main/insert_header.py)**  
+5. **[insert_header.py](https://github.com/ahb-sjsu/erisml-lib/blob/main/experiments/qnd/scripts/insert_header.py)**  
    Python utility script for adding headers to source files.
 
 ---
@@ -1401,22 +1472,13 @@ This document provides a comprehensive index of all documentation files in the E
 1. **[erisml.md](https://github.com/ahb-sjsu/erisml-lib/blob/main/docs/vision/erisml.md)**  
    Core ErisML language specification in markdown format detailing syntax, semantics, and execution model.
 
-2. **[erisml.pdf](https://github.com/ahb-sjsu/erisml-lib/blob/main/docs/papers/foundations/erisml.pdf)**  
-   Comprehensive PDF documentation of ErisML language specification, formal grammar, and denotational semantics.
-
-3. **[ErisML_Vision.md](https://github.com/ahb-sjsu/erisml-lib/blob/main/docs/vision/ErisML_Vision.md)**  
+2. **[ErisML_Vision.md](https://github.com/ahb-sjsu/erisml-lib/blob/main/docs/vision/ErisML_Vision.md)**  
    Vision document outlining ErisML goals, architecture, and philosophy for governed AI agents in pervasive computing.
 
-4. **[ErisML Vision Paper.pdf](https://github.com/ahb-sjsu/erisml-lib/blob/main/docs/papers/foundations/ErisML%20Vision%20Paper.pdf)**  
-   Academic vision paper presenting theoretical foundations and challenges of creating governed AI agents.
-
-5. **[ErisML_IEEE.pdf](https://github.com/ahb-sjsu/erisml-lib/blob/main/docs/papers/foundations/ErisML_IEEE.pdf)**  
+3. **[ErisML_IEEE.tex](https://github.com/ahb-sjsu/erisml-lib/blob/main/docs/papers/foundations/ErisML_IEEE.tex)**  
    IEEE-formatted publication documenting technical aspects including concrete syntax and execution semantics.
 
-6. **[ErisML_IEEE.tex](https://github.com/ahb-sjsu/erisml-lib/blob/main/ErisML_IEEE.tex)**  
-   LaTeX source code for the IEEE publication.
-
-7. **[ErisML - Comparison with Related Normative Frameworks.md](https://github.com/ahb-sjsu/erisml-lib/blob/main/docs/guides/ErisML%20-%20Comparison%20with%20Related%20Normative%20Frameworks.md)**  
+4. **[ErisML - Comparison with Related Normative Frameworks.md](https://github.com/ahb-sjsu/erisml-lib/blob/main/docs/guides/ErisML%20-%20Comparison%20with%20Related%20Normative%20Frameworks.md)**  
    Comparative analysis of ErisML against other normative and governance frameworks in AI.
 
 ---
@@ -1426,9 +1488,6 @@ This document provides a comprehensive index of all documentation files in the E
 1. **[GUASS_SAI.md](https://github.com/ahb-sjsu/erisml-lib/blob/main/docs/guides/GUASS_SAI.md)**  
    The Grand Unified AI Safety Stack: SAI-Hardened Edition. A comprehensive contract-and-cage architecture for agentic AI integrating invariance enforcement, cryptographic attestation, capability bounds, zero-trust architecture, mechanistic monitoring, and SAI-level hardening. Includes 45 academic references. Companion paper to Electrodynamics of Value.
 
-2. **[GUASS_SAI_paper.pdf](https://github.com/ahb-sjsu/erisml-lib/blob/main/docs/papers/foundations/GUASS_SAI_paper.pdf)**  
-   PDF version of the Grand Unified AI Safety Stack specification for distribution and review.
-
 ---
 
 ## DEME (Democratic Ethics Module Engine) 2.0
@@ -1436,32 +1495,20 @@ This document provides a comprehensive index of all documentation files in the E
 1. **[DEME_2.0_Vision_Paper.md](https://github.com/ahb-sjsu/erisml-lib/blob/main/docs/vision/DEME_2.0_Vision_Paper.md)**  
    Vision paper for DEME 2.0 architecture introducing democratic governance for AI ethics modules.
 
-2. **[DEME 2.0 - NMI Manuscript - Dec 2025.pdf](https://github.com/ahb-sjsu/erisml-lib/blob/main/docs/papers/foundations/DEME%202.0%20-%20NMI%20Manuscript%20-%20Dec%202025.pdf)**  
-   Recent manuscript on DEME 2.0 Normative Module Integration (NMI) architecture and implementation.
-
-3. **[DEME 2.0 - Three tier architecture.svg](https://github.com/ahb-sjsu/erisml-lib/blob/main/DEME%202.0%20-%20Three%20tier%20architecture.svg)**  
+2. **[DEME 2.0 - Three tier architecture.svg](https://github.com/ahb-sjsu/erisml-lib/blob/main/assets/DEME%202.0%20-%20Three%20tier%20architecture.svg)**  
    SVG diagram illustrating the three-tier architectural design of DEME 2.0 system.
 
-4. **[DEME Advanced Architectural Roadmap.md](https://github.com/ahb-sjsu/erisml-lib/blob/main/docs/vision/DEME%20Advanced%20Architectural%20Roadmap.md)**  
+3. **[DEME Advanced Architectural Roadmap.md](https://github.com/ahb-sjsu/erisml-lib/blob/main/docs/vision/DEME%20Advanced%20Architectural%20Roadmap.md)**  
    Technical roadmap detailing advanced architectural features and mobile agent hardware integration for DEME.
 
-5. **[DEME_EFM_Design_Guide_v0.1.md](https://github.com/ahb-sjsu/erisml-lib/blob/main/docs/guides/DEME_EFM_Design_Guide_v0.1.md)**  
+4. **[DEME_EFM_Design_Guide_v0.1.md](https://github.com/ahb-sjsu/erisml-lib/blob/main/docs/guides/DEME_EFM_Design_Guide_v0.1.md)**  
    Design guide for Ethical Facts Modules (EFM) in DEME, covering implementation patterns and best practices.
 
-6. **[DEME–ErisML Governance Plugin for Gazebo.pdf](https://github.com/ahb-sjsu/erisml-lib/blob/main/docs/papers/foundations/DEME%E2%80%93ErisML%20Governance%20Plugin%20for%20Gazebo.pdf)**  
-   Documentation for integrating DEME-ErisML governance into Gazebo robotics simulator.
-
-7. **[deme_profile_v03.json](https://github.com/ahb-sjsu/erisml-lib/blob/main/deme_profile_v03.json)**  
+5. **[deme_profile_v03.json](https://github.com/ahb-sjsu/erisml-lib/blob/main/deme_profiles/deme_profile_v03.json)**  
    JSON configuration profile for DEME deployment, including ethics module settings and governance parameters.
 
-8. **[deme_whitepaper_nist.md](https://github.com/ahb-sjsu/erisml-lib/blob/main/docs/guides/deme_whitepaper_nist.md)**  
+6. **[deme_whitepaper_nist.md](https://github.com/ahb-sjsu/erisml-lib/blob/main/docs/guides/deme_whitepaper_nist.md)**  
    NIST-oriented whitepaper on DEME system architecture and compliance with AI governance standards.
-
-9. **[SGE DEME2 Nontechnical Summary.pdf](https://github.com/ahb-sjsu/erisml-lib/blob/main/docs/papers/foundations/SGE%20DEME2%20Nontechnical%20Summary.pdf)**  
-   Non-technical summary of Stratified Geometric Ethics integration with DEME 2.0 for general audiences.
-
-10. **[SGE+DEME_2.0_Nontechnical_Summary.pdf](https://github.com/ahb-sjsu/erisml-lib/blob/main/docs/papers/foundations/SGE%2BDEME_2.0_Nontechnical_Summary.pdf)**  
-    Combined non-technical overview of SGE and DEME 2.0 collaboration and capabilities.
 
 ---
 
@@ -1498,7 +1545,7 @@ The strategic layer provides multi-agent policy optimization with game-theoretic
 - **Policy Recommendations**: Generated based on stability metrics, blocking coalitions, and welfare analysis
 - **Welfare Metrics**: Gini coefficient, utilitarian/Rawlsian aggregation
 
-New types exported from `erisml.ethics`:
+New types, in `erisml.ethics.layers.strategic`:
 - `EquilibriumType`, `StrategyProfile`, `NashEquilibriumResult`
 - `CoalitionStabilityAnalysis`, `PolicyRecommendation`, `StrategicAnalysisResult`
 - `StakeholderFeedback`, `ProfileUpdate`, `StrategicLayerConfig`, `StrategicLayer`
@@ -1506,7 +1553,8 @@ New types exported from `erisml.ethics`:
 Example usage:
 
 ```python
-from erisml.ethics import StrategicLayer, StrategicLayerConfig, MoralTensor
+from erisml.ethics.layers.strategic import StrategicLayer, StrategicLayerConfig
+from erisml.ethics.moral_tensor import MoralTensor
 from erisml.ethics.coalition import CoalitionContext
 
 # Create strategic layer
@@ -1548,7 +1596,7 @@ The acceleration framework provides seamless hardware backend switching for tens
 - **Sprint 13: Jetson Backend** - Edge deployment with TensorRT, DLA support, power modes
 
 ```python
-from erisml.ethics import (
+from erisml.ethics.acceleration import (
     get_dispatcher, list_backends, DeviceType, BackendPreference,
     JetsonBackend, JetsonConfig, JetsonPowerMode,
 )
@@ -1572,7 +1620,7 @@ if jetson_is_available():
     jetson = get_jetson_backend(config)
 ```
 
-New types exported:
+New types, in `erisml.ethics.acceleration`:
 - `AccelerationBackend`, `DeviceInfo`, `DeviceType`, `TensorHandle`
 - `CPUBackend`, `CUDABackend`, `JetsonBackend`
 - `AccelerationDispatcher`, `BackendPreference`, `DispatcherConfig`
@@ -1583,7 +1631,7 @@ New types exported:
 Monte Carlo uncertainty propagation for risk-aware ethical decision-making:
 
 ```python
-from erisml.ethics import (
+from erisml.ethics.uncertainty import (
     generate_samples, generate_moral_samples, expected_value, variance,
     cvar, worst_case, best_case, confidence_interval,
     compare_under_uncertainty, stochastic_dominance,
@@ -1608,7 +1656,7 @@ comparison = compare_under_uncertainty(samples_a, samples_b)
 dominates = stochastic_dominance(samples_a, samples_b)
 ```
 
-New types exported:
+New types, in `erisml.ethics.uncertainty`:
 - `DistributionType`, `AggregationMethod`
 - `UncertaintyBounds`, `UncertainValue`, `UncertaintyAnalysis`
 
@@ -1617,7 +1665,7 @@ New types exported:
 Tensor decomposition for memory-efficient rank-6 ethical state spaces:
 
 ```python
-from erisml.ethics import (
+from erisml.ethics.tensor_decomposition import (
     TuckerDecomposition, TensorTrainDecomposition, HierarchicalSparseTensor,
     OptimizedTensor, MemoryLayout, DecompositionType,
     validate_rank6_shape, create_rank6_tensor, compress_tensor,
@@ -1647,7 +1695,7 @@ party_slice = opt.slice_axis("n", 2)  # Efficient party-wise access
 compressed = decompose_for_backend(tensor.to_dense(), "jetson", memory_limit=1_000_000)
 ```
 
-New types exported:
+New types, in `erisml.ethics.tensor_decomposition`:
 - `DecompositionType`, `MemoryLayout`
 - `TuckerDecomposition`, `TensorTrainDecomposition`, `HierarchicalSparseTensor`
 - `OptimizedTensor`, `SparseBlock`
@@ -1657,48 +1705,27 @@ New types exported:
 1. **[DEME_3.0_Tensorial_Ethics_Vision.md](https://github.com/ahb-sjsu/erisml-lib/blob/main/docs/vision/DEME_3.0_Tensorial_Ethics_Vision.md)**
    Vision document for DEME 3.0 introducing tensorial ethics framework for multi-dimensional moral reasoning.
 
-2. **[Tensorial Ethics.docx](https://github.com/ahb-sjsu/erisml-lib/blob/main/Tensorial%20Ethics.docx)**  
+2. **[Tensorial Ethics.docx](https://github.com/ahb-sjsu/erisml-lib/blob/main/docs/papers/foundations/Tensorial%20Ethics.docx)**  
    Word document version of tensorial ethics framework with detailed mathematical formulations.
 
-3. **[Tensorial Ethics.pdf](https://github.com/ahb-sjsu/erisml-lib/blob/main/docs/papers/foundations/Tensorial%20Ethics.pdf)**  
-   PDF publication on tensorial ethics combining geometric algebra with ethical reasoning.
-
-4. **[tensorial_ethics_chapter_2.md](https://github.com/ahb-sjsu/erisml-lib/blob/main/docs/guides/tensorial_ethics_chapter_2.md)**
+3. **[tensorial_ethics_chapter_2.md](https://github.com/ahb-sjsu/erisml-lib/blob/main/docs/guides/tensorial_ethics_chapter_2.md)**
    Chapter 2 of tensorial ethics series covering mathematical foundations and tensor representations.
 
-5. **[tensorial_ethics_chapter_3.md](https://github.com/ahb-sjsu/erisml-lib/blob/main/docs/guides/tensorial_ethics_chapter_3.md)**
+4. **[tensorial_ethics_chapter_3.md](https://github.com/ahb-sjsu/erisml-lib/blob/main/docs/guides/tensorial_ethics_chapter_3.md)**
    Chapter 3 exploring ethical manifolds and geometric structures in moral decision spaces.
 
-6. **[tensorial_ethics_chapter_4.md](https://github.com/ahb-sjsu/erisml-lib/blob/main/docs/guides/tensorial_ethics_chapter_4.md)**
+5. **[tensorial_ethics_chapter_4.md](https://github.com/ahb-sjsu/erisml-lib/blob/main/docs/guides/tensorial_ethics_chapter_4.md)**
    Chapter 4 detailing practical applications and computational methods for tensorial ethics.
-
-7. **[The Inevitability of Tensorial Manifolds in Multi-Agent Ethics.pdf](https://github.com/ahb-sjsu/erisml-lib/blob/main/docs/papers/foundations/The%20Inevitability%20of%20Tensorial%20Manifolds%20in%20Multi-Agent%20Ethics.pdf)**
-   Theoretical paper arguing for necessity of tensorial manifolds in representing multi-agent ethical interactions.
 
 ---
 
 ## Stratified Geometric Ethics (SGE)
 
-1. **[geometric_ethics.pdf](https://github.com/ahb-sjsu/erisml-lib/blob/main/docs/papers/foundations/geometric_ethics.pdf)**
-   Introduction to geometric ethics framework using differential geometry for moral analysis.
-
-2. **[Stratified Geometric Ethics - Foundational Paper - Bond - Dec 2025.pdf](https://github.com/ahb-sjsu/erisml-lib/blob/main/docs/papers/foundations/Stratified%20Geometric%20Ethics%20-%20Foundational%20Paper%20-%20Bond%20-%20Dec%202025.pdf)**
-   Foundational paper on Stratified Geometric Ethics methodology (December 2025 version).
-
-3. **[The_Geometry_of_Good_塞翁失马.pdf](https://github.com/ahb-sjsu/erisml-lib/blob/main/docs/papers/foundations/The_Geometry_of_Good_%E5%A1%9E%E7%BF%81%E5%A4%B1%E9%A9%AC.pdf)**
-   Philosophical exploration of geometric ethics with cross-cultural perspectives (塞翁失马 - Sàiwēngshīmǎ).
-
-4. **[geometry_of_good_whitepaper.pdf](https://github.com/ahb-sjsu/erisml-lib/blob/main/docs/papers/foundations/geometry_of_good_whitepaper.pdf)**
-   Whitepaper on geometric approaches to defining and computing ethical good in AI systems.
-
-5. **[sge_section_9_4_6_bip_verification.md](https://github.com/ahb-sjsu/erisml-lib/blob/main/docs/guides/sge_section_9_4_6_bip_verification.md)**
+1. **[sge_section_9_4_6_bip_verification.md](https://github.com/ahb-sjsu/erisml-lib/blob/main/docs/guides/sge_section_9_4_6_bip_verification.md)**
    Technical section documenting Bond Invariance Principle verification methods in SGE framework.
 
-6. **[Geometry_of_Integrity_Paper.md](https://github.com/ahb-sjsu/erisml-lib/blob/main/docs/guides/Geometry_of_Integrity_Paper.md)**
+2. **[Geometry_of_Integrity_Paper.md](https://github.com/ahb-sjsu/erisml-lib/blob/main/docs/guides/Geometry_of_Integrity_Paper.md)**
    Paper exploring the geometric structure of integrity constraints in ethical reasoning systems.
-
-7. **[Unified_Architecture_of_Ethical_Geometry.pdf](https://github.com/ahb-sjsu/erisml-lib/blob/main/docs/papers/foundations/Unified_Architecture_of_Ethical_Geometry.pdf)**
-   Unified architectural framework synthesizing geometric approaches to AI ethics.
 
 ---
 
@@ -1707,73 +1734,46 @@ New types exported:
 1. **[bond_invariance_principle.md](https://github.com/ahb-sjsu/erisml-lib/blob/main/docs/guides/bond_invariance_principle.md)**
    Core document defining the Bond Invariance Principle for consistent ethical reasoning across contexts.
 
-2. **[bond_invariance_principle.md.pdf](https://github.com/ahb-sjsu/erisml-lib/blob/main/docs/papers/foundations/bond_invariance_principle.md.pdf)**
-   PDF version of Bond Invariance Principle documentation for easy distribution.
-
-3. **[Epistemic Invariance Principle (EIP) (Draft).pdf](https://github.com/ahb-sjsu/erisml-lib/blob/main/docs/papers/foundations/Epistemic%20Invariance%20Principle%20%28EIP%29%20%28Draft%29.pdf)**
-   Draft paper introducing Epistemic Invariance Principle redefining objectivity in AI systems.
-
-4. **[I-EIP_Monitor_Whitepaper.pdf](https://github.com/ahb-sjsu/erisml-lib/blob/main/docs/papers/foundations/I-EIP_Monitor_Whitepaper.pdf)**
+2. **[I-EIP_Monitor_Whitepaper.md](https://github.com/ahb-sjsu/erisml-lib/blob/main/docs/I-EIP_Monitor_Whitepaper.md)**
    Whitepaper on implementing EIP monitoring systems for foundation models and AI agents.
-
-5. **[Internal_EIP_Research_Proposal.pdf](https://github.com/ahb-sjsu/erisml-lib/blob/main/docs/papers/foundations/Internal_EIP_Research_Proposal.pdf)**
-   Internal research proposal for advancing EIP theory and practical implementation.
-
-6. **[Technical Brief - The Invariance Framework for Verifiable AI Governance.pdf](https://github.com/ahb-sjsu/erisml-lib/blob/main/docs/papers/foundations/Technical%20Brief%20-%20The%20Invariance%20Framework%20for%20Verifiable%20AI%20Governance.pdf)**
-   Technical brief outlining invariance-based framework for verifying AI governance compliance.
-
-7. **[Philosophy_Engineering_EIP_Technical_Whitepaper_v0.01.pdf](https://github.com/ahb-sjsu/erisml-lib/blob/main/docs/papers/foundations/Philosophy_Engineering_EIP_Technical_Whitepaper_v0.01.pdf)**
-   Early version technical whitepaper bridging philosophy and engineering in EIP implementation.
-
-8. **[Differential Geometry for Moral Alignment -The Mathematical Foundations of DEME 3.0.pdf](https://github.com/ahb-sjsu/erisml-lib/blob/main/docs/papers/foundations/Differential%20Geometry%20for%20Moral%20Alignment%20-The%20Mathematical%20Foundations%20of%20DEME%203.0.pdf)**
-   Mathematical foundations paper applying differential geometry to moral alignment in DEME 3.0.
 
 ---
 
 ## Gauge Theory & Physics-Inspired Ethics
 
-1. **[gauge_theory_control.pdf](https://github.com/ahb-sjsu/erisml-lib/blob/main/docs/papers/foundations/gauge_theory_control.pdf)**
+1. **[gauge_theory_control.tex](https://github.com/ahb-sjsu/erisml-lib/blob/main/docs/papers/foundations/gauge_theory_control.tex)**
    Paper on applying gauge theory principles to ethical control systems and constraint management.
 
-2. **[stratified_gauge_theory.pdf](https://github.com/ahb-sjsu/erisml-lib/blob/main/docs/papers/foundations/stratified_gauge_theory.pdf)**
+2. **[stratified_gauge_theory.tex](https://github.com/ahb-sjsu/erisml-lib/blob/main/docs/papers/foundations/stratified_gauge_theory.tex)**
    Stratified approach to gauge theory in ethical reasoning, combining topology with normative frameworks.
 
-3. **[electrodynamics_of_value.pdf](https://github.com/ahb-sjsu/erisml-lib/blob/main/docs/papers/foundations/electrodynamics_of_value.pdf)**
+3. **[electrodynamics_of_value.tex](https://github.com/ahb-sjsu/erisml-lib/blob/main/docs/papers/foundations/electrodynamics_of_value.tex)**
    Electrodynamics of Value: Novel framework treating ethical values through electrodynamics-inspired field theory. Establishes gauge-theoretic foundations for alignment verification with 28 academic references. Companion paper to GUASS.
 
 4. **[BIP_Fusion_Theory_Whitepaper.md](https://github.com/ahb-sjsu/erisml-lib/blob/main/docs/applications/BIP_Fusion_Theory_Whitepaper.md)**
    Whitepaper on fusion theory integrating Bond Invariance Principle across multiple ethical frameworks.
 
-5. **[foundations_paper.pdf](https://github.com/ahb-sjsu/erisml-lib/blob/main/docs/papers/foundations/foundations_paper.pdf)**
+5. **[foundations_paper.tex](https://github.com/ahb-sjsu/erisml-lib/blob/main/docs/papers/foundations/foundations_paper.tex)**
    Foundational paper establishing theoretical basis for physics-inspired approaches to AI ethics.
 
-6. **[ruling_ring_synthesis.pdf](https://github.com/ahb-sjsu/erisml-lib/blob/main/docs/papers/foundations/ruling_ring_synthesis.pdf)**
+6. **[ruling_ring_synthesis.tex](https://github.com/ahb-sjsu/erisml-lib/blob/main/docs/papers/foundations/ruling_ring_synthesis.tex)**
    Synthesis paper on ruling ring structures in ethical governance and constraint propagation.
 
 ---
 
 ## Mathematical Containment & Safety
 
-1. **[No_Escape_Mathematical_Containment_for_AI.pdf](https://github.com/ahb-sjsu/erisml-lib/blob/main/docs/papers/foundations/No_Escape_Mathematical_Containment_for_AI.pdf)**
-   Paper on mathematical methods for ensuring AI systems cannot escape ethical constraints.
-
-2. **[bip_audit_artifact.json](https://github.com/ahb-sjsu/erisml-lib/blob/main/bip_audit_artifact.json)**
+1. **[bip_audit_artifact.json](https://github.com/ahb-sjsu/erisml-lib/blob/main/data/bip_audit_artifact.json)**
    JSON artifact containing Bond Invariance Principle audit trail and verification data.
 
 ---
 
 ## Philosophy & Ethics Papers
 
-1. **[The_End_of_Armchair_Ethics.pdf](https://github.com/ahb-sjsu/erisml-lib/blob/main/docs/papers/foundations/The_End_of_Armchair_Ethics.pdf)**
-   Paper arguing for the transition from traditional philosophical ethics to empirically testable normative engineering.
-
-2. **[A Pragmatist Rebuttal to Logical and Metaphysical Arguments for God.pdf](https://github.com/ahb-sjsu/erisml-lib/blob/main/docs/papers/foundations/A%20Pragmatist%20Rebuttal%20to%20Logical%20and%20Metaphysical%20Arguments%20for%20God.pdf)**
+1. **[A Pragmatist Rebuttal to Logical and Metaphysical Arguments for God.pdf](https://github.com/ahb-sjsu/erisml-lib/blob/main/docs/papers/foundations/A%20Pragmatist%20Rebuttal%20to%20Logical%20and%20Metaphysical%20Arguments%20for%20God.pdf)**
    Philosophical paper applying pragmatist methodology to traditional arguments in philosophy of religion.
 
-3. **[ethical_geometry_reviewer_QA_v2.pdf](https://github.com/ahb-sjsu/erisml-lib/blob/main/docs/papers/foundations/ethical_geometry_reviewer_QA_v2.pdf)**
-   Q&A document addressing reviewer questions about the ethical geometry framework.
-
-4. **[Dear_Abby_Empirical_Ethics_Analysis.md](https://github.com/ahb-sjsu/erisml-lib/blob/main/docs/papers/foundations/Dear_Abby_Empirical_Ethics_Analysis.md)**
+2. **[Dear_Abby_Empirical_Ethics_Analysis.md](https://github.com/ahb-sjsu/erisml-lib/blob/main/docs/papers/foundations/Dear_Abby_Empirical_Ethics_Analysis.md)**
    Comprehensive analysis of using the Dear Abby corpus (20K letters, 1985-2017) as empirical ground truth for AI ethics. Covers semantic gates, dimension weights, and the Dear Abby EM design.
 
 ---
@@ -1793,24 +1793,20 @@ New types exported:
 1. **[Item-1.jsonl](https://github.com/ahb-sjsu/erisml-lib/blob/main/data/Item-1.jsonl)**
    JSONL data file containing structured items for DEME system testing and evaluation.
 
-2. **[top_10_domains_analysis.md](https://github.com/ahb-sjsu/erisml-lib/blob/main/docs/guides/top_10_domains_analysis.md)**
-   Analysis document ranking and evaluating top 10 application domains for ErisML and DEME deployment.
-
-3. **[Staff_Mathematician_Job_Posting.md](https://github.com/ahb-sjsu/erisml-lib/blob/main/docs/community/Staff_Mathematician_Job_Posting.md)**
+2. **[Staff_Mathematician_Job_Posting.md](https://github.com/ahb-sjsu/erisml-lib/blob/main/docs/community/Staff_Mathematician_Job_Posting.md)**
    Job posting for Staff Mathematician position to support ErisML/DEME mathematical foundations.
 
 ---
 
 ## Summary
 
-**Total Categories:** 13
-**Total Documentation Files:** 62
+**Total Documentation Files listed:** 38
 
 For the latest updates and to contribute, visit the [GitHub repository](https://github.com/ahb-sjsu/erisml-lib).
 
 ---
 
-*Document updated: December 2025*
+*Index updated: November 2026*
 
 
 

@@ -1,17 +1,58 @@
-# Adding a New Book to the Series
+# How the website is put together
 
-The series navigation on the GitHub Pages site (`docs/`) is **manifest-driven**
-via `docs/books.json` + `docs/assets/js/series.js`. When you add a new volume,
-edit one file (`books.json`) and the rest of the site updates itself at load
-time — no hand-patching of every other book's top-nav or the main index grid.
+[erisml.org](https://erisml.org) is the `docs/` directory of this repository. The workflow
+`.github/workflows/pages.yml` deploys it on every push to `main`. There is no build step: the site is static
+HTML with two small scripts that draw the shared navigation.
 
-## To add Volume N+1
+## Sections
 
-1. **Edit `docs/books.json`.** Append a new entry to `volumes`:
+| Section | Where it comes from |
+|---|---|
+| Home page | `docs/index.html`, with `docs/assets/css/style.css` and the scripts in `docs/assets/js/` |
+| The Geometric Series, 14 volumes | git submodules under `docs/` (`docs/book` and `docs/geometric-*`). Each tracks the built `site` branch of its volume's own repository |
+| OT textbook, *Data Mining as Observation* | `docs/data-mining-as-observation/`, written by `tools/publish_site.py` of the book's repository |
+| Observation Theory Encyclopedia | `docs/encyclopedia/`, written by `encyclopedia/publish_site.py` of `observation-theory-campaigns` |
+| Math primer | `docs/guides/math-primer.html` |
+
+## The shared top bar
+
+Every section shows the same bar: the ErisML mark, where you are, the Geometric Series menu, OT Textbook,
+OT Encyclopedia, Math Primer, Community.
+
+- **`docs/assets/js/sitebar.js`** draws it. It is self-contained (its styles are inside it) and builds the
+  volume menu from `docs/books.json`.
+- **A page gets the bar by loading the script**: `<script defer src="../assets/js/sitebar.js"></script>`,
+  with the path to the docs root.
+- **The volumes need no change.** They already load `../assets/js/series.js`, which loads `sitebar.js`.
+- **Where the bar goes.** On a page with `<nav id="main-nav">` (the home page, the volumes) the bar replaces
+  that nav's contents, and the nav's in-page links (`href="#..."`) move into an "On this page" menu. On any
+  other page the bar is inserted at the top of `<body>`.
+- **To add a section to the bar**, add it to `SECTIONS` in `sitebar.js`.
+
+## To add a volume to the series
+
+1. **Publish the volume's site.** In the volume's own repository, build the HTML onto a `site` branch with an
+   `index.html` at its root. The page needs:
+   - `<body data-book-slug="geometric-your-topic">`, which tells the bar which volume this is;
+   - `<nav id="main-nav">…</nav>`, which the bar fills;
+   - `<script src="../assets/js/series.js"></script>` before `</body>`.
+
+   Use an existing volume's `site` branch as the template.
+
+2. **Add it here as a submodule** tracking that branch:
+
+   ```bash
+   git submodule add -b site https://github.com/ahb-sjsu/geometric-your-topic docs/geometric-your-topic
+   ```
+
+   The Pages workflow refuses to deploy if a submodule has no `index.html` at its root, which is what
+   happens when the submodule points at the source branch instead of `site`.
+
+3. **Add it to `docs/books.json`**, appending to `volumes`:
 
    ```json
    {
-     "number": 13,
+     "number": 15,
      "slug": "geometric-your-topic",
      "title": "Geometric Your Topic",
      "subtitle": "…",
@@ -21,73 +62,44 @@ time — no hand-patching of every other book's top-nav or the main index grid.
    ```
 
    The `slug` must match the directory name under `docs/`.
-   The `short` string is what appears in the top-nav list.
 
-2. **Create `docs/geometric-your-topic/`** with at minimum an `index.html`.
-   Copy from `docs/geometric-politics/index.html` as a template and replace
-   the content. Ensure the new page has:
+4. **Commit and push.** On the next page load the Geometric Series menu of the bar, the card grid of the home
+   page (`#series-card-grid`) and the volume count (`#series-volume-count`) all include the new volume.
 
-   - `<body data-book-slug="geometric-your-topic">` — used by `series.js` to
-     highlight the current book in the nav and drive prev/next.
-   - `<ul class="nav-links" id="series-nav-list">` — placeholder the injector
-     will overwrite with the live series list.
-   - `<script src="../assets/js/series.js"></script>` before `</body>`.
+To update a volume that is already listed, move its submodule to the new commit of the `site` branch and
+commit the changed gitlink.
 
-3. **Commit and push.** On the next page load, `series.js` will:
+## How the manifest is used
 
-   - Update the main site book grid at `docs/index.html`
-     (`<div id="series-card-grid">` container).
-   - Update every other book's `#series-nav-list` top-nav.
-   - Update the volume-count text (`<span id="series-volume-count">`) from
-     "Twelve" to "Thirteen", etc.
-   - Highlight the active book via `class="active"` on the matching `<a>`.
-
-## How it works
-
-- **Single source of truth:** `docs/books.json`. Machine-readable manifest of
-  the series. Adding a volume = appending one object.
-- **Runtime injection:** `docs/assets/js/series.js` fetches the manifest at
-  page load and replaces the contents of well-known placeholder elements:
-  - `#series-card-grid` — 12-book landing-page card grid
-  - `#series-nav-list` — top-nav `<ul>` on each book page
-  - `#series-volume-count` — "Twelve" / "Thirteen" etc.
-  - `#book-prev-next` — prev/next links on a book page (opt-in)
-- **Path resolution:** the script auto-detects whether it was loaded from the
-  docs root or a subfolder (by inspecting its own `src`), so `books.json`
-  resolves correctly whether you are on `docs/index.html` or
-  `docs/geometric-politics/index.html`.
-- **Fallback safety:** if `books.json` fails to load (network error, 404),
-  whatever hand-coded HTML is inside each placeholder is left untouched. The
-  site still works — it just shows the last-known-good state.
-- **No build step.** Pure static HTML + one vanilla-JS file. Ships as-is
-  through GitHub Pages.
+- **Single source of truth:** `docs/books.json`.
+- **`sitebar.js`** builds the Geometric Series menu from it and marks the current volume.
+- **`series.js`** fills these placeholders when a page has them:
+  - `#series-card-grid`: the card grid on the home page
+  - `#series-volume-count`: the count in words ("Fourteen")
+  - `#book-prev-next`: previous and next volume links on a volume's landing page (opt-in)
+- **Path resolution:** both scripts find the docs root from their own `src`, so the same files work from the
+  root and from a subfolder.
+- **If `books.json` cannot be loaded**, the hand-written HTML inside each placeholder stays, and the bar's
+  series item becomes a plain link to the home page's series section.
 
 ## Testing locally
 
 ```bash
-cd C:/source/erisml-lib
+git submodule update --init docs/book   # the volumes' stylesheet, book.css, lives in this submodule
 python -m http.server -d docs 8000
 ```
 
 Then open:
 
-- `http://localhost:8000/` — main site; verify the book grid and volume
-  count update.
-- `http://localhost:8000/geometric-politics/index.html` — verify the top-nav
-  shows *all* books (including the newest one).
-- Browser DevTools console — should be free of `[series.js]` warnings.
+- `http://localhost:8000/`: the home page; check the bar, the card grid and the volume count.
+- `http://localhost:8000/geometric-observation/index.html`: a volume; check the bar names the volume and its
+  menu lists all volumes. A volume whose submodule is not initialised is an empty directory locally.
+- `http://localhost:8000/encyclopedia/index.html` and
+  `http://localhost:8000/data-mining-as-observation/index.html`.
+- The browser console should show no `[series.js]` warning.
 
-If you see a warning like `[series.js] Could not load manifest`, check that
-`books.json` is valid JSON and that the path resolves.
+## What the scripts do not do
 
-## What the script does NOT do
-
-- It does not touch chapter pages. Each chapter's breadcrumb and internal
-  top-nav are still hand-maintained. (They rarely go stale; only book-level
-  indices do.)
-- It does not modify the three non-standard book indices whose top-nav is
-  not a series list: `book/` (Ethics — uses a custom nav), `geometric-methods/`
-  (links to PyPI/GitHub), and `geometric-communication/` (uses a breadcrumb,
-  not a nav-links list). Those pages still include `series.js` for the
-  `data-book-slug` attribute / future placeholders, but the injector simply
-  no-ops when the placeholder IDs are absent.
+- They do not touch a volume's chapter pages beyond the top bar. Breadcrumbs and previous/next chapter links
+  come from each volume's own build.
+- They do not rebuild the textbook or the encyclopedia. Those are republished from their repositories.

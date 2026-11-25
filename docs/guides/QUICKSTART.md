@@ -1,5 +1,13 @@
 # QND Experiment - Quick Start Guide
 
+This is the quick start for the Quantum Normative Dynamics (QND) experiment scripts in
+[`experiments/qnd/scripts/`](../../experiments/qnd/scripts/). Run the commands from that directory. For the
+library itself, see the [README](../../README.md).
+
+**Outcome so far.** The predictions below were tested. As *Geometric Ethics* v1.25 reports them: order
+effects were observed in one language model, not in people, and a Bell violation was not found and is
+withdrawn as a prediction. The scripts remain for replication.
+
 ## Disk Space Requirements
 
 | Dataset | Size | Records | Best For |
@@ -17,8 +25,8 @@
 # Generate synthetic test data
 python collect_datasets.py --synthetic --synthetic-size 100
 
-# Run experiment with mock LLM (no API key needed)
-python qnd_aita_experiment.py --data-file qnd_datasets/qnd_synthetic_data.json --n-posts 10
+# Run the experiment on its built-in sample posts with a mock LLM (no API key needed)
+python qnd_aita_experiment.py --use-sample --n-posts 10
 
 # Analyze results
 python analyze_qnd_results.py qnd_results.json
@@ -35,7 +43,7 @@ export ANTHROPIC_API_KEY="sk-ant-..."
 
 # 3. Run experiment with real LLM calls
 python qnd_aita_experiment.py \
-    --data-file qnd_datasets/qnd_aita_prepared.json \
+    --api-key "$ANTHROPIC_API_KEY" \
     --n-posts 50 \
     --n-trials 5
 
@@ -92,10 +100,12 @@ Cannot assign blame to one party without affecting the other.
 - `qnd_results.json` - Raw experiment output
 - `qnd_dashboard.png` - Visual summary
 
-## Next Steps for Real Validation
+## What a replication should add
 
-1. **Run with Claude API** - Mock responses don't test real moral reasoning
+1. **Run with a real model** - Mock responses don't test real moral reasoning
 2. **Get 100+ posts** - Statistical significance requires larger samples
-3. **Compare to human data** - Use AITA votes as ground truth
-4. **Test Bell inequalities** - Rigorous entanglement validation
+3. **Compare to human data** - Use AITA votes as ground truth. The order effects reported so far come
+   from one language model
+4. **Bell inequalities** - Tested with the scripts `qnd_bell_*.py`; no violation was found
+   (see [`docs/qnd/`](../qnd/))
 5. **Measure decoherence** - Track how judgments stabilize over time
