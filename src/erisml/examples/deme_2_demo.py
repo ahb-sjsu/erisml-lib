@@ -36,16 +36,18 @@ from erisml.ethics import (
     PrivacyAndDataGovernance,
     ProceduralAndLegitimacy,
     EpistemicStatus,
-    # V2 types
-    MoralVector,
-    MoralLandscape,
-    EthicalJudgementV2,
-    # V2 governance
-    GovernanceConfigV2,
-    DimensionWeights,
+)
+
+# V2 types and governance live in their own modules; the package root exports the V1 names
+from erisml.ethics.governance import (
     DecisionOutcomeV2,
+    DimensionWeights,
+    GovernanceConfigV2,
     select_option_v2,
 )
+from erisml.ethics.judgement import EthicalJudgementV2
+from erisml.ethics.moral_landscape import MoralLandscape
+from erisml.ethics.moral_vector import MoralVector
 
 # =============================================================================
 # HELPER FUNCTIONS

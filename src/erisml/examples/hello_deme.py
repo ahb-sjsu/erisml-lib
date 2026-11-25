@@ -40,7 +40,7 @@ def make_simple_option(
         ),
         autonomy_and_agency=AutonomyAndAgency(
             has_meaningful_choice=True,
-            coercion_or_undue_influence=not violates_rights,
+            coercion_or_undue_influence=violates_rights,
             can_withdraw_without_penalty=True,
             manipulative_design_present=False,
         ),

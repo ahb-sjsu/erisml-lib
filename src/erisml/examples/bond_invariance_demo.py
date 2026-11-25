@@ -1131,13 +1131,30 @@ def run(
         print(f"\n[audit] wrote JSON artifact: {audit_out}")
 
 
-def main() -> None:
+def default_profile_path() -> Path:
+    """./deme_profile_v03.json if there is one, otherwise the profile shipped with the examples."""
+    local = Path("deme_profile_v03.json")
+    if local.exists():
+        return local
+    try:
+        here = Path(__file__)
+    except (
+        NameError
+    ):  # this code is running in a notebook cell: use the installed examples
+        from erisml.examples import hello_deme
+
+        here = Path(hello_deme.__file__)
+    return here.with_name("deme_profile_v03.json")
+
+
+def main(argv=None) -> None:
+    """argv=None reads the command line; pass [] to run with the defaults (in a notebook, say)."""
     ap = argparse.ArgumentParser()
     ap.add_argument(
         "--profile",
         type=Path,
-        default=Path("deme_profile_v03.json"),
-        help="Path to DEMEProfileV03 JSON (default: ./deme_profile_v03.json)",
+        default=default_profile_path(),
+        help="Path to DEMEProfileV03 JSON (default: ./deme_profile_v03.json, else the shipped one)",
     )
     ap.add_argument(
         "--no-lens",
@@ -1171,7 +1188,7 @@ def main() -> None:
         default=100.0,
         help="Scale factor used for the unit/scale reparameterization transform (default: 100.0).",
     )
-    args = ap.parse_args()
+    args = ap.parse_args(argv)
 
     run(
         args.profile,

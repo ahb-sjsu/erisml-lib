@@ -387,11 +387,27 @@ def run_demo(profile_path: Path) -> None:
 # ---------------------------------------------------------------------------
 
 
+def default_profile_path() -> Path:
+    """./deme_profile_v03.json if there is one, otherwise the profile shipped with the examples."""
+    local = Path("deme_profile_v03.json")
+    if local.exists():
+        return local
+    try:
+        here = Path(__file__)
+    except (
+        NameError
+    ):  # this code is running in a notebook cell: use the installed examples
+        from erisml.examples import hello_deme
+
+        here = Path(hello_deme.__file__)
+    return here.with_name("deme_profile_v03.json")
+
+
 def main() -> None:
-    profile_path = Path("deme_profile_v03.json")
+    profile_path = default_profile_path()
     if not profile_path.exists():
         raise SystemExit(
-            "No deme_profile_v03.json found in current directory.\n"
+            "No deme_profile_v03.json found, in the current directory or with the examples.\n"
             "Run 'scripts/ethical_dialogue_cli_v03.py' first to create one."
         )
 
