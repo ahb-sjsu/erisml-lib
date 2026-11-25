@@ -131,6 +131,8 @@ BOOK_CONFIGS: dict[str, dict] = {
                 "chapter-16-geometric-pipelines", "chapter-17-scaling",
                 "chapter-18-production-deployment", "chapter-19-case-study-defect-prediction",
                 "chapter-20-case-study-bioacoustics"]),
+            ("Part V: Discipline and Observation", [
+                "chapter-21-measurement-discipline", "chapter-22-the-read-metric"]),
         ],
         "extra_head": METHODS_EXTRA_HEAD,
         "extra_scripts": METHODS_EXTRA_SCRIPTS,
@@ -211,6 +213,7 @@ BOOK_CONFIGS: dict[str, dict] = {
             ("Part D: Instruments", ["ch10_*", "ch11_*", "ch12_*", "ch13_*"]),
             ("Part E: Discipline", ["ch14_*", "ch15_*", "ch16_*", "ch17_*", "ch18_*"]),
             ("Part F: Ageing", ["ch19_*", "ch20_*", "ch21_*", "ch22_*", "ch23_*"]),
+            ("Part G: Beyond One Consumer", ["ch24_*", "ch25_*", "ch26_*", "ch27_*", "ch28_*", "ch29_*"]),
             ("Appendices", ["appendix_*"]),
         ],
     },
