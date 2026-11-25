@@ -1,6 +1,6 @@
 # Copyright (c) 2026 Andrew H. Bond
 # Department of Computer Engineering, San Jose State University
-# Licensed under the AGI-HPC Responsible AI License v1.0.
+# Licensed under the MIT License. See LICENSE.txt at the root of this repository.
 
 """
 Tests for DEME V3 Rank-6 Tensors and Decomposition (Sprint 15).

@@ -1,7 +1,7 @@
 # ErisML I-EIP Monitor: equivariance error computation
 # Copyright (c) 2026 Andrew H. Bond
 # Department of Computer Engineering, San Jose State University
-# Licensed under the AGI-HPC Responsible AI License v1.0.
+# Licensed under the MIT License. See LICENSE.txt at the root of this repository.
 """Equivariance error metrics for the I-EIP criterion.
 
 Given activations from an un-transformed input and its paired

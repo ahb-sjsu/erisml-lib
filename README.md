@@ -200,7 +200,7 @@ democratically-governed ethical reasoning, grounded in the **Philosophy Engineer
 
 ![CI](https://github.com/ahb-sjsu/erisml-lib/actions/workflows/ci.yaml/badge.svg)
 ![Python](https://img.shields.io/badge/Python-3.10%2B-blue.svg)
-![License](https://img.shields.io/badge/License-AGI--HPC%20Responsible%20AI-blue.svg)
+![License](https://img.shields.io/badge/License-MIT-blue.svg)
 [![PyPI version](https://img.shields.io/badge/PyPI-v3.1.0-blue.svg)](https://pypi.org/project/erisml-lib/)
 
 ---
@@ -1062,7 +1062,7 @@ The DEME transforms test whether an evaluator's behavior is determined by these 
 
 ## License
 
-AGI-HPC Responsible AI License v1.0
+MIT. See [License](#license-1) at the end of this README.
 
 
 
@@ -1454,7 +1454,7 @@ This document provides a comprehensive index of all documentation files in the E
    Main repository documentation providing overview, quickstart guide, and installation instructions for ErisML library.
 
 2. **[LICENSE.txt](https://github.com/ahb-sjsu/erisml-lib/blob/main/LICENSE.txt)**  
-   The licence text: AGI-HPC Responsible AI License, version 1.0 (draft).
+   The licence text: the MIT License.
 
 3. **[CITATION.cff](https://github.com/ahb-sjsu/erisml-lib/blob/main/CITATION.cff)**  
    Citation file format for proper academic attribution of the ErisML library.
@@ -1812,38 +1812,21 @@ For the latest updates and to contribute, visit the [GitHub repository](https://
 
 ## License
 
-This project is distributed under the **AGI-HPC Responsible AI License v1.0 (DRAFT)**.
+The code of this project is distributed under the **MIT License**. See [`LICENSE.txt`](LICENSE.txt).
 
-Very short summary (non-legal, see `LICENSE.txt` for full text):
+That covers the library (`src/`), the tests, the examples, the scripts and the tools: you may use, modify
+and distribute them, commercially or not, provided the copyright notice and the licence text stay with
+copies.
 
-- You may use, modify, and distribute the software for **non-commercial
-  research, teaching, and academic work**, subject to attribution and inclusion
-  of the license.
-- **Commercial use** and **autonomous deployment in high-risk domains**
-  (e.g., vehicles, healthcare, critical infrastructure, financial systems,
-  defense, large-scale platforms) are **not granted by default** and require a
-  separate written agreement or explicit written permission from the Licensor.
-- If you use ErisML/DEME in autonomous or AGI-like systems, you must implement
-  **Safety and Governance Controls**, including:
-  - Explicit normative constraints / environment modeling (e.g., ErisML or
-    equivalent),
-  - Pluralistic, auditable ethical decision modules (e.g., DEME-style EMs),
-  - Logging and audit trails with tamper-evident protections,
-  - Safe fallback behaviors and reasonable testing.
-- You must not use the software to build:
-  - Weapons systems designed primarily to harm or destroy,
-  - Coercive surveillance or systems aimed at suppressing fundamental rights,
-  - Systems that intentionally or recklessly cause serious harm or large-scale
-    rights violations.
-- Attribution is required. A suitable notice is:
+Not covered by the MIT License:
 
-      This project incorporates components from the AGI-HPC architecture
-      (Andrew H. Bond et al., San José State University), used under the
-      AGI-HPC Responsible AI License v1.0.
+- **Papers and manuscripts** under `docs/papers/`. Those submitted to, accepted by or published in a journal
+  or conference are governed by the publisher's agreement.
+- **The books of the Geometric Series** under `docs/book/` and `docs/geometric-*/`, the textbook under
+  `docs/data-mining-as-observation/` and the encyclopedia under `docs/encyclopedia/`. Each comes from its own
+  repository and carries its own terms.
 
-For full details, this README is not legal advice — please see the
-`LICENSE.txt` file and consult legal counsel before adopting this license for
-production or commercial use.
+Releases up to and including 3.1.0 were distributed under the AGI-HPC Responsible AI License v1.0 (draft).
 
 ---
 

@@ -1,7 +1,7 @@
 # ErisML I-EIP Monitor: tests for adapters.hf_transformer
 # Copyright (c) 2026 Andrew H. Bond
 # Department of Computer Engineering, San Jose State University
-# Licensed under the AGI-HPC Responsible AI License v1.0.
+# Licensed under the MIT License. See LICENSE.txt at the root of this repository.
 """HF transformer adapter tests.
 
 Uses a tiny hand-rolled ``nn.Module`` that mimics the Llama-lineage

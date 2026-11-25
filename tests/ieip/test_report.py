@@ -1,5 +1,5 @@
 # Copyright (c) 2026 Andrew H. Bond
-# Licensed under the AGI-HPC Responsible AI License v1.0.
+# Licensed under the MIT License. See LICENSE.txt at the root of this repository.
 """Tests for erisml.ieip.report."""
 
 from __future__ import annotations

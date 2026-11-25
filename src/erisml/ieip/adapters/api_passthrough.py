@@ -1,7 +1,7 @@
 # ErisML I-EIP Monitor: API-passthrough adapter
 # Copyright (c) 2026 Andrew H. Bond
 # Department of Computer Engineering, San Jose State University
-# Licensed under the AGI-HPC Responsible AI License v1.0.
+# Licensed under the MIT License. See LICENSE.txt at the root of this repository.
 """Adapter for black-box model APIs where weights aren't reachable.
 
 Covers the NRP-hosted frontier models (glm-4.7, qwen3, minimax-m2,

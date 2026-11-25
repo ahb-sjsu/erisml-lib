@@ -340,7 +340,7 @@ If you use this software in academic work, please cite:
 
 ## License
 
-AGI-HPC Responsible AI License v1.0
+MIT License
 
 ---
 

@@ -1533,7 +1533,7 @@ minimal_risk_condition:
 
 **Document version**: 1.0.0  
 **Last updated**: December 2025  
-**License**: AGI-HPC Responsible AI License v1.0
+**License**: MIT License (the reference implementation, erisml-lib)
 
 ---
 

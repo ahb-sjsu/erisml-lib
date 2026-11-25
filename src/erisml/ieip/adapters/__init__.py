@@ -1,7 +1,7 @@
 # ErisML I-EIP Monitor: architecture adapters
 # Copyright (c) 2026 Andrew H. Bond
 # Department of Computer Engineering, San Jose State University
-# Licensed under the AGI-HPC Responsible AI License v1.0.
+# Licensed under the MIT License. See LICENSE.txt at the root of this repository.
 """Architecture adapters for the I-EIP Monitor.
 
 Three adapters ship with the library:

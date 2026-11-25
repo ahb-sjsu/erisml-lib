@@ -1,6 +1,6 @@
 # Copyright (c) 2026 Andrew H. Bond
 # Department of Computer Engineering, San Jose State University
-# Licensed under the AGI-HPC Responsible AI License v1.0.
+# Licensed under the MIT License. See LICENSE.txt at the root of this repository.
 
 """
 DEMEProfileV04: DEME 2.0 profile schema with MoralVector and EM tiers.

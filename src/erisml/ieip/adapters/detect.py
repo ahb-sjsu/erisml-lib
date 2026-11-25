@@ -1,7 +1,7 @@
 # ErisML I-EIP Monitor: adapter auto-detection
 # Copyright (c) 2026 Andrew H. Bond
 # Department of Computer Engineering, San Jose State University
-# Licensed under the AGI-HPC Responsible AI License v1.0.
+# Licensed under the MIT License. See LICENSE.txt at the root of this repository.
 """Auto-detect the right :class:`IEIPAdapter` for a given model object.
 
 Detection is structural: we inspect the object's type and attributes

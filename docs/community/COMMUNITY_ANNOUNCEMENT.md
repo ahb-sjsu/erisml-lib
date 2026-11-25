@@ -117,7 +117,7 @@ If you want to contribute but aren't sure where to start:
 Andrew Bond, San José State University. Research focus: AI safety, ethics governance, pervasive computing. This started as academic research and is now becoming production infrastructure.
 
 **Contact:** andrew.bond@sjsu.edu  
-**License:** AGI-HPC Responsible AI License v1.0 (non-commercial research free, commercial requires agreement)
+**License:** MIT License
 
 ---
 

@@ -1,7 +1,7 @@
 # ErisML I-EIP Monitor: architecture adapter protocol
 # Copyright (c) 2026 Andrew H. Bond
 # Department of Computer Engineering, San Jose State University
-# Licensed under the AGI-HPC Responsible AI License v1.0.
+# Licensed under the MIT License. See LICENSE.txt at the root of this repository.
 """Architecture-agnostic adapter protocol for I-EIP probes.
 
 The core I-EIP primitives (``probes.ActivationProbe``, ``rho``,

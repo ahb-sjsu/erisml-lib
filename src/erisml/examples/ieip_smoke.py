@@ -1,6 +1,6 @@
 # ErisML I-EIP Monitor: end-to-end smoke demo
 # Copyright (c) 2026 Andrew H. Bond
-# Licensed under the AGI-HPC Responsible AI License v1.0.
+# Licensed under the MIT License. See LICENSE.txt at the root of this repository.
 """End-to-end smoke demo for the I-EIP monitoring pipeline.
 
 Runs on a tiny, self-contained PyTorch model (no HuggingFace / network

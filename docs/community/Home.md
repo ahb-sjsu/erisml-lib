@@ -330,12 +330,11 @@ Mathematical structure is not subject to reinterpretation. The cage is made of *
 
 ## 📜 License
 
-**AGI-HPC Responsible AI License v1.0 (DRAFT)**
+**MIT License** (the code; see `LICENSE.txt`)
 
-- ✅ Non-commercial research, teaching, academic work
-- ⚠️ Commercial use requires separate agreement
-- ⚠️ High-risk deployment requires explicit permission
-- 🛡️ Safety & Governance Controls required for AGI-like systems
+- ✅ Use, modify and distribute, commercially or not
+- ✅ Keep the copyright notice and the licence text with copies
+- Papers under `docs/papers/` and the books are not covered by it
 
 ---
 

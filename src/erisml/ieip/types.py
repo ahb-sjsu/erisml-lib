@@ -1,7 +1,7 @@
 # ErisML I-EIP Monitor: types
 # Copyright (c) 2026 Andrew H. Bond
 # Department of Computer Engineering, San Jose State University
-# Licensed under the AGI-HPC Responsible AI License v1.0.
+# Licensed under the MIT License. See LICENSE.txt at the root of this repository.
 """Typed data structures for the I-EIP monitoring framework.
 
 All dataclasses are pure-Python and safe to import without PyTorch.
