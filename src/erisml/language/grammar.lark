@@ -1,5 +1,9 @@
-// ErisML Grammar v2.0 - DEME 2.0 Support
-// Supports MoralVector dimensions, tiered EMs, and ethics governance
+// ErisML Grammar v2.1
+// Environment, agents, norms, an ethics block (DEME) and dynamics.
+//
+// v2.1 (November 2026): expressions have precedence and keep their operators,
+// names may be dotted (action.name, Robot.move), a moral_vector weight names
+// its read-out by any identifier, and every block reaches the AST.
 
 ?start: model
 
@@ -34,25 +38,25 @@ constraints_decl: "constraints:" CNAME* ";"
 // Norms Block
 // ============================================================================
 norms_block: "norms" CNAME "{" norm_rule* "}"
-norm_rule: prohibition_rule
-         | obligation_rule
-         | sanction_rule
+?norm_rule: prohibition_rule
+          | obligation_rule
+          | sanction_rule
 
 prohibition_rule: "prohibition:" expr ";"
 obligation_rule: "obligation:" expr ";"
 sanction_rule: "sanction:" expr ";"
 
 // ============================================================================
-// Ethics Block (DEME 2.0)
+// Ethics Block (DEME)
 // ============================================================================
 ethics_block: "ethics" CNAME "{" ethics_body "}"
 ethics_body: moral_vector_decl? tier_config_decl* em_decl* veto_rule*
 
-// MoralVector dimension weights
+// Weights on named read-outs of the moral evaluation. The grammar does not fix
+// the set of names: which read-outs exist is decided by what consumes the model
+// (see erisml.language.compile), not by the language.
 moral_vector_decl: "moral_vector" "{" dimension_weight* "}"
-dimension_weight: MORAL_DIMENSION ":" NUMBER ";"
-MORAL_DIMENSION: "physical_harm" | "rights_respect" | "fairness_equity"
-               | "autonomy_respect" | "legitimacy_trust" | "epistemic_quality"
+dimension_weight: CNAME ":" NUMBER ";"
 
 // Tier configuration
 tier_config_decl: "tier" TIER_NUM "{" tier_body "}"
@@ -60,8 +64,6 @@ tier_body: tier_enabled? tier_weight? tier_veto?
 tier_enabled: "enabled:" BOOLEAN ";"
 tier_weight: "weight:" NUMBER ";"
 tier_veto: "veto_enabled:" BOOLEAN ";"
-TIER_NUM: "0" | "1" | "2" | "3" | "4"
-BOOLEAN: "true" | "false"
 
 // Ethics Module declarations
 em_decl: "em" CNAME "{" em_body "}"
@@ -88,27 +90,35 @@ reward_decl: "reward" "{" reward_term+ "}"
 reward_term: CNAME ":" expr ";"
 
 // ============================================================================
-// Expressions
+// Expressions, loosest binding first: ||, &&, !, comparison, atom
 // ============================================================================
-?expr: CNAME
-     | expr "==" expr
-     | expr "!=" expr
-     | expr "&&" expr
-     | expr "||" expr
-     | expr "<" expr
-     | expr ">" expr
-     | expr "<=" expr
-     | expr ">=" expr
-     | "!" expr
+?expr: or_expr
+?or_expr: and_expr
+        | or_expr OR and_expr       -> binary
+?and_expr: not_expr
+         | and_expr AND not_expr    -> binary
+?not_expr: comparison
+         | NOT not_expr             -> negation
+?comparison: atom
+           | atom COMPARE atom      -> binary
+?atom: BOOLEAN                      -> boolean
+     | NUMBER                       -> number
+     | STRING                       -> string
+     | name
      | "(" expr ")"
-     | NUMBER
-     | STRING
+name: CNAME ("." CNAME)*
 
 // ============================================================================
 // Terminals
 // ============================================================================
+OR: "||"
+AND: "&&"
+NOT: "!"
+COMPARE: "==" | "!=" | "<=" | ">=" | "<" | ">"
+TIER_NUM.10: /[0-4](?![0-9A-Za-z_.])/
+BOOLEAN.10: /(true|false)(?![0-9A-Za-z_])/
 STRING: "\"" /[^"]*/ "\""
-BASE_TYPE.10: "bool" | "int" | "real"
+BASE_TYPE.10: /(bool|int|real|str)(?![0-9A-Za-z_])/
 %import common.CNAME
 %import common.NUMBER
 %import common.WS

@@ -183,15 +183,24 @@ formal grammar, denotational semantics, and an execution model that treats norms
 constraints on action, with longitudinal safety metrics such as **Norm Violation Rate (NVR)** and
 **Alignment Drift Velocity (ADV)**, and compilation to planners, verifiers, and simulators.
 
-**What is implemented in 3.2.0.** The execution model is implemented in Python: `erisml.core` holds the
-environment, agent and norm models and an engine with a norm gate and the NVR metric, and the TinyHome
-example builds its model directly in Python ([`tiny_home.py`](src/erisml/examples/tiny_home.py)). The textual
-front end is partial: the grammar ([`grammar.lark`](src/erisml/language/grammar.lark), v2.0) covers
-environment, agent, norms, ethics and dynamics blocks, and the parser builds the environment and agent
-declarations. Norms, ethics and dynamics blocks are not yet carried into the AST, nothing compiles a parsed
-model into `erisml.core`, ADV is not implemented, and the PDDL adapter is a stub. For scenes written as data,
-[erisml-compiler](https://github.com/ahb-sjsu/erisml-compiler) reads its own "ErisML source", a YAML form of
-its intermediate representation, which is a different format from this grammar.
+**What is implemented.** `erisml.core` holds the environment, agent and norm models and an engine with a
+norm gate and the NVR metric. The textual language (`erisml.language`, grammar v2.1 in
+[`grammar.lark`](src/erisml/language/grammar.lark)) parses every block, and a parsed model runs:
+
+```python
+from erisml.language import parse_erisml, build_model, ethics_profile
+
+ast = parse_erisml(source)                  # environment, agents, norms, ethics, dynamics
+model = build_model(ast, instances={"Room": ["r1", "r2"]}, rules=transition_rules)
+profile = ethics_profile(ast.ethics)        # a DEMEProfileV04 for pipeline_from_profile
+```
+
+A norm such as `prohibition: action.name == move_robot && action.to == "r2";` becomes a rule the engine
+enforces. The ethics block's weights name read-outs by identifier: the language does not fix the set of
+moral dimensions. Not expressed in the language: how an action changes the state (transition functions are
+Python callables passed to `build_model`). Not implemented: ADV, and the PDDL adapter is a stub. For scenes
+written as data, [erisml-compiler](https://github.com/ahb-sjsu/erisml-compiler) reads its own "ErisML
+source", a YAML form of its intermediate representation, which is a different format from this grammar.
 
 On top of this, ErisML now includes an **ethics-only decision layer (DEME)** for
 democratically-governed ethical reasoning, grounded in the **Philosophy Engineering** framework.
@@ -341,9 +350,9 @@ ErisML has two tightly-related layers:
      - Norm gating and constraint filtering on actions
      - Longitudinal safety metrics (e.g., NVR, ADV)
      - Adapters for planners, verifiers, and simulators
-   - Status in 3.2.0: the Python models, the norm gate, NVR and the PettingZoo adapter are implemented.
-     The textual parser covers environment and agent declarations only, ADV is not implemented, and the
-     PDDL adapter is a stub (details under [ErisML](#erisml-1) above)
+   - Status: the Python models, the norm gate, NVR, the PettingZoo adapter and the textual language
+     (parser and compiler to a runnable model) are implemented. ADV is not implemented, and the PDDL
+     adapter is a stub (details under [ErisML](#erisml-1) above)
 
 2. **DEME 2.0 (Democratically Governed Ethics Modules)** — ethics-only decision layer
 
