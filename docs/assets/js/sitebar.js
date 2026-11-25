@@ -7,7 +7,7 @@
  * single pages. Each used to carry its own top navigation. This script draws the same
  * bar on all of them:
  *
- *   [apple] ErisML / <where you are>     Geometric Series v   Textbook   Encyclopedia
+ *   [apple] ErisML / <where you are>     Geometric Series v   OT Textbook   OT Encyclopedia
  *                                        Math Primer   Community   [On this page v]
  *
  * A section keeps its own local navigation (a volume's breadcrumb and chapter links,
@@ -45,8 +45,8 @@
   var BASE = basePrefix();
 
   var SECTIONS = [
-    { id: 'textbook', label: 'Textbook', title: 'Data Mining as Observation', dir: 'data-mining-as-observation', href: 'data-mining-as-observation/index.html' },
-    { id: 'encyclopedia', label: 'Encyclopedia', title: 'Observation Theory Encyclopedia', dir: 'encyclopedia', href: 'encyclopedia/index.html' },
+    { id: 'textbook', label: 'OT Textbook', title: 'Data Mining as Observation', dir: 'data-mining-as-observation', href: 'data-mining-as-observation/index.html' },
+    { id: 'encyclopedia', label: 'OT Encyclopedia', title: 'Observation Theory Encyclopedia', dir: 'encyclopedia', href: 'encyclopedia/index.html' },
     { id: 'primer', label: 'Math Primer', title: 'Math Primer', dir: 'guides', href: 'guides/math-primer.html' }
   ];
 
@@ -97,7 +97,7 @@
     '.esb-burger:hover{background:rgba(102,194,165,.13)}',
     '.esb-burger span,.esb-burger span::before,.esb-burger span::after{display:block;width:20px;height:2px;background:#c9d5e0;border-radius:2px;content:"";position:relative}',
     '.esb-burger span::before{position:absolute;top:-6px}.esb-burger span::after{position:absolute;top:6px}',
-    '@media (max-width:1020px){',
+    '@media (max-width:1100px){',
     '.esb-burger{display:flex}',
     '.esb-nav{display:none;position:absolute;left:0;right:0;top:100%;margin:0;flex-direction:column;align-items:stretch;gap:2px;',
     'background:#0b1622;border-bottom:1px solid rgba(102,194,165,.25);padding:10px clamp(14px,3vw,32px) 16px;max-height:calc(100vh - 70px);overflow:auto}',
