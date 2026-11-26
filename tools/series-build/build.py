@@ -379,10 +379,26 @@ def _make_converter() -> "markdown.Markdown":
     )
 
 
+def drop_orphan_backrefs(body: str) -> str:
+    """Remove the back-link of a footnote that the text never cites.
+
+    The footnotes extension prints every defined footnote with a link back to its marker;
+    when the text has no marker for it, that link points at nothing. The footnote itself
+    is kept: where its marker belongs is the author's decision.
+    """
+    present = set(re.findall(r'id="(fnref\d*:[^"]+)"', body))
+    return re.sub(
+        r'&#160;<a class="footnote-backref" href="#(fnref\d*:[^"]+)"[^>]*>.*?</a>',
+        lambda m: m.group(0) if m.group(1) in present else "",
+        body,
+        flags=re.S,
+    )
+
+
 def md_to_html(md_text: str) -> str:
     protected, placeholders = protect_math(md_text)
     body = _make_converter().convert(protected)
-    return restore_math(body, placeholders)
+    return drop_orphan_backrefs(restore_math(body, placeholders))
 
 
 def output_name(md_path: Path, config: dict) -> str:

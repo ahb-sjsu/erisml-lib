@@ -21,6 +21,9 @@ CASES = [
      ['<span class="currency">&#36;</span>1.10', '<span class="currency">&#36;</span>1.00', "$x_1$"], ["&lt;/span"]),
     ("code is untouched", "```\necho \\$HOME $x_1$\n```\n", ["echo \\$HOME $x_1$"], ["currency"]),
     ("no pairing across a blank line", "A price of $5 here.\n\nAnother $x_1$ there.", ["$x_1$"], []),
+    ("orphan footnote keeps its text, loses its dead back-link",
+     "Cited here.[^1]\n\n[^1]: The cited note.\n\n[^2]: A note nothing cites.\n",
+     ['href="#fnref:1"', "The cited note.", "A note nothing cites."], ['href="#fnref:2"']),
 ]
 
 
