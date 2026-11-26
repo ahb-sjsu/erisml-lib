@@ -14,6 +14,8 @@ page) carry the same tag directly.
 - `erisml-goatcounter.service`: the systemd unit (loopback only, confined).
 - `stats.caddy`: the site block that atlas-caddy imports.
 - `install.sh`: installs or updates the service (idempotent).
+- `create_site.py`: creates the site and admin login for `install.sh`, keeping the password
+  off command lines.
 
 ## Deploy on Atlas
 ```

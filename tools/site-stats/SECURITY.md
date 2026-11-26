@@ -20,7 +20,9 @@ Written before deployment (2026-11-26), as the design the service is built to.
 2. **Internet -> dashboard and API (authenticated).** Everything except counting needs
    GoatCounter's own login. The admin password is generated on Atlas at install and stored
    only in `/home/claude/.secrets/goatcounter_admin.txt` (mode 600); it is never on a command
-   line, in this repository or in a log. Login attempts are rate-limited (20 per minute).
+   line, in this repository or in a log. (GoatCounter v2.7.0 takes it only as an argument or
+   from a terminal, so `create_site.py` types it from the file into a pseudo-terminal.) Login
+   attempts are rate-limited (20 per minute).
 3. **GoatCounter -> the host.** The service account has no shell and no sudo; systemd allows
    writes only to `/archive/experiments/erisml-stats/data`.
 

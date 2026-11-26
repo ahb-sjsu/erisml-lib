@@ -49,8 +49,10 @@ if ! /usr/local/bin/goatcounter version 2>/dev/null | grep -q "${VERSION#v}"; th
     echo "installed $(/usr/local/bin/goatcounter version | head -1)"
 fi
 
-# 4. site and admin login (only when the database does not exist yet)
-if [ ! -e "$DB" ]; then
+# 4. site and admin login (only when the site does not exist yet; -createdb makes an empty database)
+n=$(cd "$DATA" && sudo -u goatcounter /usr/local/bin/goatcounter db query -createdb -db "sqlite+$DB" \
+    "select count(*) as n from sites where cname = '$VHOST'" | sed -n 2p | tr -d '[:space:]')
+if [ "$n" = 0 ]; then
     install -d -o claude -g claude -m 700 "$SECRETS"
     if [ ! -s "$PASSFILE" ]; then
         umask 077
@@ -59,10 +61,13 @@ if [ ! -e "$DB" ]; then
         chown claude:claude "$PASSFILE"
         chmod 600 "$PASSFILE"
     fi
-    # the password goes in on stdin ("-password -"), never on a command line
-    ( cd "$DATA" && sudo -u goatcounter /usr/local/bin/goatcounter db create site -createdb \
-        -db "sqlite+$DB" -vhost "$VHOST" -user.email "$LOGIN" -password - ) < "$PASSFILE"
+    # never on a command line: v2.7.0 reads it only from -user.password or a terminal, so
+    # create_site.py types it from the file into a pseudo-terminal
+    python3 -I "$HERE/create_site.py" /usr/local/bin/goatcounter "$DB" "$VHOST" "$LOGIN" "$PASSFILE" goatcounter
     echo "created site $VHOST (login $LOGIN; password in $PASSFILE)"
+elif [ "$n" != 1 ]; then
+    echo "unexpected site count for $VHOST: '$n'" >&2
+    exit 1
 fi
 
 # 5. service
