@@ -1,0 +1,76 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>RCV Recovery Theorem</title><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&family=Source+Serif+4:wght@600&display=swap"><style>
+:root { color-scheme: light; --surface:#fcfcfb; --panel:#ffffff; --code:#f3f2ee; --ink:#0b0b0b; --ink2:#52514e; --ink3:#8a897f; --grid:#e6e5e1; --blue:#2a78d6; --green:#1baf7a; --orange:#eb6834; --red:#d03b3b; --violet:#4a3aa7; }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) { color-scheme: dark; --surface:#141412; --panel:#1c1c1a; --code:#262623; --ink:#ececea; --ink2:#b6b4ad; --ink3:#8a897f; --grid:#2e2e2a; --blue:#6aa3ea; --green:#3fc793; --orange:#f08a5e; --red:#e2605f; --violet:#8f80d8; } }
+:root[data-theme="dark"] { color-scheme: dark; --surface:#141412; --panel:#1c1c1a; --code:#262623; --ink:#ececea; --ink2:#b6b4ad; --ink3:#8a897f; --grid:#2e2e2a; --blue:#6aa3ea; --green:#3fc793; --orange:#f08a5e; --red:#e2605f; --violet:#8f80d8; }
+* { box-sizing: border-box; }
+body { margin:0; background:var(--surface); color:var(--ink); font-family: Inter, 'Segoe UI', Helvetica, Arial, sans-serif; font-size:16.5px; line-height:1.55; font-variant-numeric: tabular-nums; }
+h1, h2, .tile a.t { font-family: 'Source Serif 4', Georgia, 'Times New Roman', serif; text-wrap: balance; }
+header.top { border-bottom:1px solid var(--grid); padding:10px 24px; display:flex; gap:18px; align-items:baseline; flex-wrap:wrap; }
+header.top a { color:var(--ink2); text-decoration:none; } header.top a.brand { color:var(--ink); font-weight:600; }
+main { max-width: 900px; margin: 0 auto; padding: 18px 24px 60px; }
+h1 { font-size:2rem; margin:.4em 0 .2em; } h2 { font-size:1.35rem; margin:1.6em 0 .4em; } h3 { font-size:.82rem; letter-spacing:.06em; text-transform:uppercase; color:var(--ink2); margin:1.4em 0 .3em; }
+a { color: var(--blue); } a:hover { text-decoration: underline; }
+code { font-family: ui-monospace, Consolas, monospace; font-size:.88em; background:var(--code); padding:1px 4px; border-radius:3px; overflow-wrap:anywhere; }
+table { border-collapse: collapse; width:100%; font-size:.93em; } th, td { text-align:left; vertical-align:top; padding:6px 8px; border-bottom:1px solid var(--grid); } th { color:var(--ink2); font-weight:600; }
+table.card { border:1px solid var(--grid); border-radius:8px; background:var(--panel); margin:10px 0 18px; } table.card th { width:11.5em; white-space:nowrap; } table.card ul { margin:0; padding-left:1.1em; }
+.kind { display:inline-block; font-size:.78em; padding:1px 8px; border-radius:10px; color:#fff; vertical-align:middle; margin-left:6px; }
+.kind.concept{background:var(--blue)} .kind.instrument{background:var(--green)} .kind.result{background:var(--orange)} .kind.correction{background:var(--red)} .kind.reference{background:var(--violet)}
+.al { color:var(--ink2); }
+figure { margin:14px 0; } figure svg { width:100%; height:auto; border:1px solid var(--grid); border-radius:8px; background:#fcfcfb; } figcaption { font-size:.9em; color:var(--ink2); font-style:italic; margin-top:4px; }
+.grid { display:grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap:10px; }
+.tile { border:1px solid var(--grid); border-radius:8px; padding:10px 12px; background:var(--panel); } .tile a.t { font-weight:600; text-decoration:none; color:var(--ink); } .tile p { margin:4px 0 0; font-size:.9em; color:var(--ink2); }
+.letters a { margin-right:8px; text-decoration:none; font-weight:600; }
+input.search { width:100%; font-size:1.05em; padding:10px 12px; border:1px solid var(--grid); border-radius:8px; margin:10px 0 16px; background:var(--panel); color:var(--ink); } input.search:focus, a:focus-visible { outline:2px solid var(--blue); outline-offset:2px; }
+.prevnext { display:flex; justify-content:space-between; margin-top:30px; color:var(--ink2); font-size:.95em; }
+ul.evidence li { overflow-wrap:anywhere; }
+.entry { display:none; } .entry:target, .entry.show { display:block; }
+@media (max-width:600px) { table.card th { width:7em; white-space:normal; } body { font-size:15.5px; } }
+</style><script>window.MathJax={tex:{inlineMath:[["$","$"],["\\(","\\)"]],displayMath:[["$$","$$"],["\\[","\\]"]]}};</script><script defer src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-svg.js"></script><script defer src="../assets/js/sitebar.js"></script></head><body><header class="top"><a class="brand" href="index.html">The Observation Theory Encyclopedia</a><a href="tsk.html">From TSK</a><a href="about.html">About</a><a href="kinds.html">By kind</a><a href="volumes.html">By volume</a><a href="chapters.html">By chapter</a><a href="lean.html">By Lean file</a><a href="ledger.html">Ledger</a><a href="provenance.html">Provenance</a></header><main><h1 id="rcv-recovery-theorem">RCV Recovery Theorem <span class="kind result">result</span></h1>
+<table class="card"><tr><th>Definition</th><td>In an election with $k$ candidates on a $d$-dimensional preference manifold, plurality keeps ordinal information along one axis and ranked-choice voting keeps it along $\min(d, k-1)$ axes. The recovery ratios are $1/d$ and $\min(d, k-1)/d$.</td></tr><tr><th>Example</th><td>With six dimensions and five candidates,
+plurality has ratio <span class="math inline">\(1/6\)</span>, about 17
+percent, and ranked choice has <span class="math inline">\(\min(6, 4)/6
+= 4/6\)</span>, about 67 percent. With three candidates ranked choice
+has <span class="math inline">\(2/6\)</span>, about 33 percent.</td></tr><tr><th>Volume</th><td><a href="../geometric-politics/index.html"><em>Geometric Politics</em></a>, Volume 10 of the Geometric Series; entry id <code>rcv-recovery-theorem</code>, kind result.</td></tr><tr><th>Status</th><td>A theorem with a proof written in the chapter, which counts independent pairwise comparisons. The information percentages listed elsewhere in the volume are illustrations. Corrections: none recorded.</td></tr><tr><th>Defining equation</th><td>none</td></tr><tr><th>Assumptions and scope</th><td><ul><li>The recovery is ordinal and partial. Cardinal intensity is lost, and
+the Democratic Irrecoverability Theorem still applies.</li><li>Positions on dimensions that do not affect any candidate ranking
+stay invisible, as they are under plurality.</li><li>Chapters 5 and 15 list 45 percent of information preserved for
+ranked choice in the five-candidate District 7 example. The formula of
+this theorem gives 4 of 6 for that case, and the volume does not
+reconcile the two figures.</li><li>The Alaska 2022, New York City 2021 and Maine 2018 elections are
+read through the theorem after the fact. They are not tests of it.</li></ul></td></tr><tr><th>Prior art</th><td>Ranked-choice voting is also called instant-runoff voting.</td></tr><tr><th>Evidence</th><td><a href="https://github.com/ahb-sjsu/geometric-politics/blob/436c5b5/manuscript/part_iv/ch13_ranked_choice.md#L35-L47"><code>geometric-politics/manuscript/part_iv/ch13_ranked_choice.md:35-47</code></a>, <a href="https://github.com/ahb-sjsu/geometric-politics/blob/436c5b5/manuscript/appendices/appendix_c_voting.md#L85-L87"><code>geometric-politics/manuscript/appendices/appendix_c_voting.md:85-87</code></a></td></tr><tr><th>Reviewed</th><td>not yet reviewed; generated 2026-11-25 from records at the commits on the provenance page.</td></tr></table>
+
+<h3>Equation</h3><p>none</p>
+<h3>Conditions</h3><ul>
+<li>The recovery is ordinal and partial. Cardinal intensity is lost, and
+the Democratic Irrecoverability Theorem still applies.</li>
+<li>Positions on dimensions that do not affect any candidate ranking
+stay invisible, as they are under plurality.</li>
+<li>Chapters 5 and 15 list 45 percent of information preserved for
+ranked choice in the five-candidate District 7 example. The formula of
+this theorem gives 4 of 6 for that case, and the volume does not
+reconcile the two figures.</li>
+<li>The Alaska 2022, New York City 2021 and Maine 2018 elections are
+read through the theorem after the fact. They are not tests of it.</li>
+</ul>
+<p>Conditions are curated in
+<code>volumes/geometric-politics.toml</code> rather than read from a
+record.</p>
+<h3>Ledger</h3><p>none. <em>standing.</em> A theorem with a proof written in the
+chapter, which counts independent pairwise comparisons. The information
+percentages listed elsewhere in the volume are illustrations.</p>
+<h3>First stated</h3><p>Theorem 7 of Chapter 13, <a
+href="https://github.com/ahb-sjsu/geometric-politics/blob/436c5b5/manuscript/part_iv/ch13_ranked_choice.md#L35-L47"><code>geometric-politics/manuscript/part_iv/ch13_ranked_choice.md:35-47</code></a>.
+The ratios are repeated in Appendix C.3, <a
+href="https://github.com/ahb-sjsu/geometric-politics/blob/436c5b5/manuscript/appendices/appendix_c_voting.md#L85-L87"><code>geometric-politics/manuscript/appendices/appendix_c_voting.md:85-87</code></a>.
+Online, <a
+href="https://erisml.org/geometric-politics/appendix_c_voting.html">Geometric
+Politics</a>.</p>
+<h3>Measurements</h3><p>none</p>
+<h3>Failures and corrections</h3><p>none</p>
+<h3>Invariance envelope</h3><p>none declared</p>
+<h3>Machine checked</h3><p>none</p>
+<h3>Used in</h3><p><em>Geometric Politics</em>, Volume 10 of the Geometric Series.</p>
+<h3>Related</h3><p><a href="democratic-irrecoverability-theorem.html">Democratic Irrecoverability Theorem</a>; <a href="manifold-condorcet-winner.html">Manifold Condorcet winner</a>; <a href="political-bond-index.html">Political Bond Index</a>; <a href="geometrized-arrow-theorem.html">Arrow&#x27;s theorem, geometrized</a>.</p>
+<h3>See also</h3><p>none</p>
+<h3>Status</h3><p>Generated 2026-11-25 by <code>encyclopedia/generate.py</code>; book
+at observation-data-mining bccca4f; the commit of every record is listed
+in the encyclopedia’s provenance.</p><div class="prevnext"><span>← <a href="rank-faithful.html">rank-faithful</a></span><span><a href="read-direction.html">read direction</a> →</span></div></main></body></html>
