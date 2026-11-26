@@ -3,11 +3,11 @@
  *
  * The site has sections built by different generators: the home page, the fourteen
  * volumes of the Geometric Series (each its own repository, sharing ../assets), the
- * Observation Theory Encyclopedia, the textbook Data Mining as Observation, and a few
+ * Geometric Series Encyclopedia, the textbook Data Mining as Observation, and a few
  * single pages. Each used to carry its own top navigation. This script draws the same
  * bar on all of them:
  *
- *   [apple] ErisML / <where you are>     Geometric Series v   OT Textbook   OT Encyclopedia
+ *   [apple] ErisML / <where you are>     Geometric Series v   OT Textbook   Encyclopedia
  *                                        Math Primer   Community   [On this page v]
  *
  * A section keeps its own local navigation (a volume's breadcrumb and chapter links,
@@ -46,7 +46,7 @@
 
   var SECTIONS = [
     { id: 'textbook', label: 'OT Textbook', title: 'Data Mining as Observation', dir: 'data-mining-as-observation', href: 'data-mining-as-observation/index.html' },
-    { id: 'encyclopedia', label: 'OT Encyclopedia', title: 'Observation Theory Encyclopedia', dir: 'encyclopedia', href: 'encyclopedia/index.html' },
+    { id: 'encyclopedia', label: 'Encyclopedia', title: 'The Geometric Series Encyclopedia', dir: 'encyclopedia', href: 'encyclopedia/index.html' },
     { id: 'primer', label: 'Math Primer', title: 'Math Primer', dir: 'guides', href: 'guides/math-primer.html' }
   ];
 
