@@ -1,0 +1,44 @@
+# Page statistics for erisml.org: GoatCounter behind atlas-caddy, on Atlas.
+# Installed by tools/site-stats/install.sh; see README.md and SECURITY.md beside this file.
+[Unit]
+Description=GoatCounter page statistics for erisml.org (stats.atlas-sjsu.duckdns.org)
+After=network.target
+
+[Service]
+User=goatcounter
+Group=goatcounter
+WorkingDirectory=/archive/experiments/erisml-stats/data
+# Plain HTTP on loopback only: atlas-caddy terminates TLS and is the only public way in.
+ExecStart=/usr/local/bin/goatcounter serve -listen=127.0.0.1:8095 -tls=http \
+    -db=sqlite+/archive/experiments/erisml-stats/data/goatcounter.sqlite3 \
+    -automigrate -smtp=stdout
+Restart=always
+RestartSec=5
+
+# A small service on a shared research host: keep it small and confined.
+Nice=10
+CPUQuota=25%
+MemoryMax=512M
+NoNewPrivileges=true
+ProtectSystem=strict
+ReadWritePaths=/archive/experiments/erisml-stats/data
+ProtectHome=true
+PrivateTmp=true
+PrivateDevices=true
+ProtectKernelTunables=true
+ProtectKernelModules=true
+ProtectKernelLogs=true
+ProtectControlGroups=true
+ProtectClock=true
+ProtectHostname=true
+RestrictAddressFamilies=AF_INET AF_INET6 AF_UNIX
+RestrictNamespaces=true
+RestrictRealtime=true
+RestrictSUIDSGID=true
+LockPersonality=true
+SystemCallArchitectures=native
+CapabilityBoundingSet=
+AmbientCapabilities=
+
+[Install]
+WantedBy=multi-user.target
