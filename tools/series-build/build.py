@@ -178,8 +178,13 @@ BOOK_CONFIGS: dict[str, dict] = {
         "number": 9, "title": "Geometric Education",
         "subtitle": "Learning, Assessment, and the Topology of Understanding",
         "source_dirs": ["manuscript/part_i", "manuscript/part_ii",
-                        "manuscript/part_iii", "manuscript/appendices"],
+                        "manuscript/part_iii", "manuscript/part_iv",
+                        "manuscript/part_v", "manuscript/appendices"],
         "glob": "*.md",
+        # Parts IV and V went online on 2026-11-26 after a review. Chapter 14 is held back:
+        # its point estimates are unsourced and its compound total contradicts its own table
+        # (CORRECTIONS-2026-11-26.md in the volume, "Unresolved").
+        "exclude": ["ch14_*.md"],
     },
     "geometric-politics": {
         "number": 10, "title": "Geometric Politics",
