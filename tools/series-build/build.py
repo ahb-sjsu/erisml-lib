@@ -163,8 +163,13 @@ BOOK_CONFIGS: dict[str, dict] = {
         "subtitle": "Language, Signal, and the Topology of Meaning",
         "source_dirs": ["manuscript/part_i", "manuscript/part_ii",
                         "manuscript/part_iii", "manuscript/part_iv",
-                        "manuscript/part_v", "manuscript/appendices"],
+                        "manuscript/part_v", "manuscript/part_vi",
+                        "manuscript/part_vii", "manuscript/appendices"],
         "glob": "*.md",
+        # Parts VI and VII went online on 2026-11-26 after a review. Chapter 17 is held back:
+        # the proof of Proposition 17.1 does not give its stated bound and two of its figures
+        # are unsourced (CORRECTIONS-2026-11-26.md, "Unresolved").
+        "exclude": ["ch17_*.md"],
     },
     "geometric-medicine": {
         "number": 8, "title": "Geometric Medicine",
