@@ -876,11 +876,11 @@ function initConceptExploration() {
         related: ['Moral Superposition', 'Density Matrix'] },
       { name: 'Moral Interference',
         formal: 'When two moral framings are considered simultaneously, their amplitudes can constructively or destructively interfere, yielding probabilities that differ from the sum of individual probabilities.',
-        desc: 'If you evaluate a situation from a utilitarian frame and a deontological frame separately, and then consider both simultaneously, the result is not simply the average. The framings can interfere — sometimes reinforcing (constructive interference) and sometimes canceling (destructive interference). This matches observed phenomena in moral psychology.',
+        desc: 'If you evaluate a situation from a utilitarian frame and a deontological frame separately, and then consider both simultaneously, the result is not simply the average. The framings can interfere — sometimes reinforcing (constructive interference) and sometimes canceling (destructive interference). This matches observed phenomena in moral psychology. The book\'s own interference test found none (Geometric Ethics, Section 17.8).',
         related: ['Moral Superposition', 'CHSH Inequality'] },
       { name: 'CHSH Inequality',
         formal: '|<A1*B1> + <A1*B2> + <A2*B1> - <A2*B2>| <= 2 classically. Violation (S > 2) indicates genuinely non-classical moral correlations.',
-        desc: 'The CHSH (Clauser-Horne-Shimony-Holt) inequality is the key test: if moral reasoning is classical, correlations between different framings of the same situation are bounded by S <= 2. Violation indicates that moral cognition has genuinely quantum-like structure. The Dear Ethicist game is designed to test this empirically.',
+        desc: 'The CHSH (Clauser-Horne-Shimony-Holt) inequality is the key test: if moral reasoning is classical, correlations between different framings of the same situation are bounded by S <= 2. Violation indicates that moral cognition has genuinely quantum-like structure. The book\'s test found no violation: |S| <= 2 in all 9,600 trials (Geometric Ethics, Section 17.8).',
         related: ['Bell Test', 'Dear Ethicist Game'] },
     ],
     14: [

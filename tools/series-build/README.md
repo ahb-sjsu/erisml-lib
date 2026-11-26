@@ -1,7 +1,7 @@
 # Geometric Series build kit
 
-Canonical tooling for the thirteen Geometric Series volumes served at
-https://erisml.org/. Each volume repo carries a copy of these files in its
+Canonical tooling for the thirteen kit-built volumes of the fourteen Geometric Series
+volumes served at https://erisml.org/. Each volume repo carries a copy of these files in its
 `.build/` directory; **edit here, then run `sync_kit.py`** so the copies never
 drift (drift is how the volumes ended up on three different page templates).
 
