@@ -144,7 +144,10 @@ def check_encoding(path: Path, rel: str, rep: Report) -> str | None:
         rep.add("encoding", rel, 1, "UTF-8 BOM present (python-markdown treats it as text)", "candidate")
     for m in MOJIBAKE.finditer(text):
         rep.add("encoding", rel, line_of(text, m.start()), f"mojibake / control char {m.group(0)!r}")
-    return text
+    # Read as the builder reads (universal newlines). Kept as CRLF (before 2026-11-26), a
+    # blank line held a carriage return and never ended a paragraph, so the paragraph-level
+    # checks (math balance, brackets) saw most of a CRLF file as one paragraph.
+    return text.replace("\r\n", "\n").replace("\r", "\n")
 
 
 def check_structure(text: str, rel: str, rep: Report, order_idx: int, all_files: list[str]):
@@ -319,6 +322,17 @@ def check_xrefs(texts: dict[str, str], rep: Report):
                     # allow "Chapter 1" style refs to chapters that exist only by filename
                     if kind == "Chapter" and any(re.search(rf"(?:ch|chapter)[-_]?0*{ref}\b", Path(f).stem, re.I) for f in texts):
                         continue
+                    # a statement of another work, named as such: "Paper V's Proposition 6",
+                    # "Geometric Reasoning's Theorem 10.1", "Theorem 3 of Paper III"
+                    before = body[max(0, m.start() - 60): m.start()]
+                    after = body[m.end(): m.end() + 60]
+                    # also "*Geometric Ethics*, Theorem 20.3", "*Geometric Ethics* (Chapter 18)",
+                    # "AJ Theorem 7.2" (an abbreviated work), "Theorem 7.1 in the AJ manuscript"
+                    if re.search(r"[A-Za-z*_)\]]['’]s\s*$", before) or \
+                            re.search(r"\*Geometric [A-Z][A-Za-z]*\*,?\s*\(?\s*$", before) or \
+                            re.search(r"\b[A-Z]{2,}\s+$", before) or \
+                            re.match(r"\s+(?:of|in)\s+(?:the\s+)?(?:Paper\b|\*?Geometric\b|companion\b|[A-Z]{2,}\b)", after):
+                        continue
                     rep.add("xref", rel, line_of(body, m.start()), f"{kind} {ref} referenced but no such {kind.lower()} is defined in this book")
                     stats["dangling"] += 1
     rep.stats["xrefs"] = f"{stats['refs']} references checked, {stats['dangling']} dangling; "\
@@ -326,33 +340,38 @@ def check_xrefs(texts: dict[str, str], rep: Report):
 
 
 PLACEHOLDER = re.compile(r"\b(TODO|TBD|FIXME|XXX|TK|PLACEHOLDER|lorem ipsum|citation needed|INSERT [A-Z ]+HERE)\b|\?\?\?|\[\s*(?:ref|cite|citation)\s*\]", re.I)
-DUP_OK = {"that", "had", "is", "on", "in", "it", "do", "no", "so", "very", "long", "far", "many", "much", "we"}
+DUP_OK = {"that", "had", "is", "on", "in", "it", "do", "no", "so", "very", "long", "far", "many", "much", "we", "math", "code", "dollar"}  # the last three are masking tokens, not words
 
 
 def check_prose(text: str, rel: str, rep: Report):
     body, _ = strip_code(text)
     body = mask(body, r"`[^`\n]*`", token="CODE")
+    body = mask(body, r"\\\$", token="DOLLAR")  # an escaped dollar is currency, not a delimiter
     body_nomath = mask(body, r"\$\$.+?\$\$|\$[^$\n]+\$|\\\[.+?\\\]|\\\(.+?\\\)", flags=re.S, token="MATH")
+    # Line numbers come from body_nomath itself: mask() keeps every newline, so its lines are
+    # the file's lines, while its character offsets differ from body's.
     for m in PLACEHOLDER.finditer(body_nomath):
-        rep.add("placeholder", rel, line_of(body, m.start()), f"placeholder text {m.group(0)!r}")
-    for m in re.finditer(r"\b([A-Za-z]{2,})\s+\1\b", body_nomath):
+        rep.add("placeholder", rel, line_of(body_nomath, m.start()), f"placeholder text {m.group(0)!r}")
+    # a doubled word within a line or across one line break, not across a blank line
+    # (a heading followed by a paragraph that opens with the same word is not an error)
+    for m in re.finditer(r"\b([A-Za-z]{2,})(?:[ \t]+|[ \t]*\n[ \t]*)\1\b", body_nomath):
         if m.group(1).lower() not in DUP_OK:
-            rep.add("prose-dup", rel, line_of(body, m.start()), f"duplicate word '{m.group(1)} {m.group(1)}'")
+            rep.add("prose-dup", rel, line_of(body_nomath, m.start()), f"duplicate word '{m.group(1)} {m.group(1)}'")
     for m in re.finditer(r"(?<!\.)\.\.(?!\.)|,,|;;|::|\s+[,;:](?!\S)|\s+\.(?=\s|$)", body_nomath):
         ctx = body_nomath[max(0, m.start() - 20): m.end() + 20].replace("\n", " ")
-        rep.add("prose-punct", rel, line_of(body, m.start()), f"punctuation: ...{ctx}...")
+        rep.add("prose-punct", rel, line_of(body_nomath, m.start()), f"punctuation: ...{ctx}...")
     for para_m in re.finditer(r"(?:[^\n]+\n?)+", body_nomath):
         para = para_m.group(0)
         if para.lstrip().startswith(("|", "    ", "\t")):
             continue
         for o, c in (("(", ")"), ("[", "]")):
             if para.count(o) != para.count(c):
-                rep.add("prose-brackets", rel, line_of(body, para_m.start()),
+                rep.add("prose-brackets", rel, line_of(body_nomath, para_m.start()),
                         f"unbalanced {o}{c} in paragraph ({para.count(o)} vs {para.count(c)})")
                 break
         for o, c in (("“", "”"),):
             if abs(para.count(o) - para.count(c)) > 1:
-                rep.add("prose-quotes", rel, line_of(body, para_m.start()), "unbalanced curly quotes in paragraph")
+                rep.add("prose-quotes", rel, line_of(body_nomath, para_m.start()), "unbalanced curly quotes in paragraph")
 
 
 def check_spelling(files: list[Path], repo: Path, rep: Report):

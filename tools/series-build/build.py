@@ -51,6 +51,8 @@ SERIES_TAGLINE = "The geometry was always real. The scalars were always insuffic
 #   source_dirs   directories (relative to repo root) searched for `glob`
 #   glob          filename glob within each source dir
 #   exclude       optional list of filename patterns to skip (fnmatch)
+#   contents_note optional markdown shown under the contents list, e.g. to say which
+#                 chapters the online edition holds back
 #   parts         optional list of (part_title, [file-stem, ...]) groups for the
 #                 contents page. Stems not listed in any part fall into a final
 #                 "Appendices" group if they start with "appendix", otherwise
@@ -141,22 +143,22 @@ BOOK_CONFIGS: dict[str, dict] = {
     "geometric-reasoning": {
         "number": 3, "title": "Geometric Reasoning",
         "subtitle": "From Search to Manifolds",
-        "source_dirs": ["chapters"], "glob": "*.md",
+        "source_dirs": ["chapters", "appendices"], "glob": "*.md",
     },
     "geometric-economics": {
         "number": 4, "title": "Geometric Economics",
         "subtitle": "Decision Manifolds, Equilibria, and the Geometry of Markets",
-        "source_dirs": ["chapters"], "glob": "*.md",
+        "source_dirs": ["chapters", "appendices"], "glob": "*.md",
     },
     "geometric-law": {
         "number": 5, "title": "Geometric Law",
         "subtitle": "Symmetry, Invariance, and the Structure of Legal Reasoning",
-        "source_dirs": ["chapters"], "glob": "*.md",
+        "source_dirs": ["chapters", "appendices"], "glob": "*.md",
     },
     "geometric-cognition": {
         "number": 6, "title": "Geometric Cognition",
         "subtitle": "The Mathematical Structure of Human and Artificial Thought",
-        "source_dirs": ["chapters"], "glob": "*.md",
+        "source_dirs": ["chapters", "appendices"], "glob": "*.md",
     },
     "geometric-communication": {
         "number": 7, "title": "Geometric Communication",
@@ -528,6 +530,12 @@ def generate_index(chapters: list[tuple[str, str, str]], template: str,
             body.append('  <ol class="toc-chapters">\n' + "\n".join(items) + '\n  </ol>\n</div>')
         else:
             body.append('<ol class="toc-chapters">\n' + "\n".join(items) + '\n</ol>')
+    if config.get("contents_note"):
+        # Chapters the author's text refers to but the online edition holds back (see the
+        # volume's `exclude`): say so where a reader looking for them will look.
+        body.append('<div class="book-abstract contents-note">')
+        body.append(md_to_html(config["contents_note"].strip()))
+        body.append('</div>')
     return _fill(template, title="Contents", body="\n".join(body), config=config,
                  build_date=build_date, chapter_id="index", nav_top="", nav_bottom="")
 
