@@ -45,3 +45,12 @@ The statistics database stays in `/archive/experiments/erisml-stats/data`.
 Open `https://stats.atlas-sjsu.duckdns.org` and log in as `admin@stats.atlas-sjsu.duckdns.org`
 with the password in `/home/claude/.secrets/goatcounter_admin.txt` on Atlas. The login name
 can be changed in the dashboard.
+
+## Deployment log
+- 2026-11-26, first install. Changes on Atlas ran 17:26:46Z to 17:30:55Z: service user,
+  binary (checksum verified), data directory, site and login, systemd unit, then the Caddy
+  import and a graceful reload at 17:30:55Z. Read-only checks ran from 17:15Z to about 17:40Z.
+  A lab was measuring on Atlas the whole time (VMs stale-audit-lab, stale-audit-vm-e,
+  stale-audit-vm-d); the owner chose to deploy during it and log the overlap, so that run
+  should disclose this window. The first install stopped after creating an empty database
+  (v2.7.0 has no `-password -`); `create_site.py` was added and the rerun succeeded.

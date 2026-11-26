@@ -248,3 +248,21 @@
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', start);
   else start();
 })();
+
+/*
+ * Page views: erisml.org counts them with a self-hosted GoatCounter on Atlas, which sets no
+ * cookies and stores no IP addresses (setup: tools/site-stats/README.md in erisml-lib).
+ * This inserts GoatCounter's count.js once per page, only on erisml.org, so local previews
+ * are not counted. Pages without the bar carry the same tag themselves.
+ */
+(function () {
+  var STATS = 'https://stats.atlas-sjsu.duckdns.org';
+  if (!/^(www\.)?erisml\.org$/.test(location.hostname)) return;
+  if (window.__erismlStats || document.querySelector('script[data-goatcounter]')) return;
+  window.__erismlStats = true;
+  var s = document.createElement('script');
+  s.async = true;
+  s.src = STATS + '/count.js';
+  s.setAttribute('data-goatcounter', STATS + '/count');
+  (document.head || document.documentElement).appendChild(s);
+})();

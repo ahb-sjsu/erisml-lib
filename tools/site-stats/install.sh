@@ -75,6 +75,10 @@ install -o root -g root -m 644 "$HERE/erisml-goatcounter.service" /etc/systemd/s
 systemctl daemon-reload
 systemctl enable --now erisml-goatcounter.service
 systemctl restart erisml-goatcounter.service
-sleep 2
+# startup loads the built-in country database first and takes several seconds
+for _ in $(seq 1 30); do
+    curl -fsS -o /dev/null -H "Host: $VHOST" http://127.0.0.1:8095/count.js 2>/dev/null && break
+    sleep 1
+done
 systemctl is-active erisml-goatcounter.service
 curl -fsS -o /dev/null -w "local count.js: %{http_code}\n" -H "Host: $VHOST" http://127.0.0.1:8095/count.js
