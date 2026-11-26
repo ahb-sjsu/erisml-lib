@@ -339,9 +339,17 @@ def protect_math(text: str) -> tuple[str, dict[str, str]]:
         # blank line. Before 2026-11-25 the body was `.+?`, which stops at a newline: a wrapped
         # formula was left unprotected, Markdown ate its underscores, and every `$` after it
         # in the paragraph paired with the wrong partner.
-        seg = re.sub(r'(?<![\$\\])\$(?!\$)(?!\s)((?:[^\n]|\n(?![ \t]*\n))+?)(?<![\s\\])\$(?!\$)', _replace, seg)
+        # The body may not contain a dollar sign (an escaped one is already a token): without
+        # that rule (before 2026-11-26) "$17 to $45 ... $x_1$" was taken as one formula
+        # running from the first currency sign to the end of the real one.
+        seg = re.sub(r'(?<![\$\\])\$(?!\$)(?!\s)((?:[^\n$]|\n(?![ \t]*\n))+?)(?<![\s\\])\$(?!\$)', _replace, seg)
         seg = re.sub(r'\\\[(.+?)\\\]', _replace, seg, flags=re.DOTALL)
         seg = re.sub(r'\\\((.+?)\\\)', _replace, seg)
+        # A dollar sign still in the text and followed by a digit is unescaped currency
+        # ("$17 to $45"). Left as it was (before 2026-11-26), KaTeX's auto-render in the browser
+        # paired it with the next one and set "17 to " as a formula. Every formula has been
+        # protected above, so what remains here is not math.
+        seg = re.sub(r'(?<![\\$])\$(?=\d)', CURRENCY_TOKEN, seg)
         return seg
 
     parts = re.split(r'(^```.*?^```[ \t]*$|^~~~.*?^~~~[ \t]*$)', text, flags=re.DOTALL | re.MULTILINE)

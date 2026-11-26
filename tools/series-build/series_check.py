@@ -201,7 +201,8 @@ def extract_math(text: str) -> list[tuple[int, str, bool]]:
         if not consumed[m.start()]:
             take(m, m.group(1), True)
     # same pattern as build.py protect_math: inline math may wrap across one line break
-    for m in re.finditer(r"(?<![\$\\])\$(?!\$)(?!\s)((?:[^\n]|\n(?![ \t]*\n))+?)(?<![\s\\])\$(?!\$)", body):
+    # (the builder turns an escaped \$ into a token first, so here the body may hold \$)
+    for m in re.finditer(r"(?<![\$\\])\$(?!\$)(?!\s)((?:\\\$|[^\n$]|\n(?![ \t]*\n))+?)(?<![\s\\])\$(?!\$)", body):
         if not consumed[m.start()]:
             take(m, m.group(1), False)
     for m in re.finditer(r"\\\((.+?)\\\)", body):
@@ -416,7 +417,10 @@ def check_links(texts: dict[str, str], repo: Path, rep: Report, external: bool):
             else:
                 target = (repo / rel).parent / url.split("#")[0]
                 alt = target.with_suffix(".md") if target.suffix == ".html" else None
-                if not target.exists() and not (alt and alt.exists()):
+                # The site is flat: every page sits at its root, beside figures/ and assets/,
+                # so a figure link written figures/x.svg resolves from the repository root.
+                flat = repo / url.split("#")[0]
+                if not target.exists() and not (alt and alt.exists()) and not flat.exists():
                     rep.add("link-internal", rel, line_of(body, m.start()), f"relative link target missing: {url}")
     if external:
         rep.stats["external-links"] = f"{len(seen_ext)} unique URLs, {sum(v != 'ok' for v in seen_ext.values())} failing"
