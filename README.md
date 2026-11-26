@@ -36,10 +36,11 @@ python -m erisml.examples.governed_pipeline_demo
 
 ## Read the Book
 
-The full text of **Geometric Ethics: The Mathematical Structure of Moral Reasoning** (v1.26, November 2026) is available online.
+The full text of **Geometric Ethics: The Mathematical Structure of Moral Reasoning** (v1.27, November 2026) is available online.
 
-v1.26 gives the Bond Index one definition and corrects two statements about it
-([CHANGES-v1.26.md](https://github.com/ahb-sjsu/geometric-ethics/blob/main/CHANGES-v1.26.md)); no result
+v1.26 and v1.27 give the Bond Index one definition and correct the statements that used the name loosely
+([CHANGES-v1.26.md](https://github.com/ahb-sjsu/geometric-ethics/blob/main/CHANGES-v1.26.md),
+[CHANGES-v1.27.md](https://github.com/ahb-sjsu/geometric-ethics/blob/main/CHANGES-v1.27.md)); no result
 changes. What v1.25 changed (full list in the book repo's
 [CHANGES-v1.25.md](https://github.com/ahb-sjsu/geometric-ethics/blob/main/CHANGES-v1.25.md)):
 
