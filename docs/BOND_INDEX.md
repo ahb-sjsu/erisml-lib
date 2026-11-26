@@ -121,16 +121,14 @@ result = measure(evaluate, inputs, transforms, tau=0.01, scale=100.0)
 In this repository (done with this change): `hohfeld.compute_bond_index`, the Appendix D examples, the
 README's Bond Index sections, the home page card and pop-up, `docs/CONCEPT_REGISTRY.md`.
 
-Elsewhere (not changed here; each is another repository or a published text):
+Elsewhere:
 
-| where | what it needs |
+| where | state |
 |---|---|
-| *Geometric Ethics*, ch. 17 | say that the game's index is the Bond Index on Hohfeldian positions, 0 is perfect, and drop "0.5 indicates random pairing" unless that figure is derived |
-| *Geometric Ethics*, ch. 18 and 19 | state the definition once (mean, with worst and exceedance beside it) and say which of mean and maximum each theorem uses |
-| *Geometric Ethics*, ch. 22 | present the Legal Bond Index as the same index with a vector output |
-| *Geometric Ethics*, Appendix D | already 5.08 in v1.25; name the output space of each case study |
-| the IEEE TAI manuscript on representational consistency | it defines `Bd = -log(1 - P)`. Under review: either name it the exceedance form there or note the relation to `D / tau` |
-| `sqnd-probe` (the Dear Ethicist game) | uses the correlative form; it still implements D4 and needs the V4 correction first |
-| `moral-spectrum-analyzer` | its invariance figures (decision drift under paraphrase) are deviations in this sense; report them as `Bd`, `worst`, `exceedance` with the coordinate system's metric once release planning 08 lands |
-| `erisml-compiler`, release planning 08 | the retrieval-stability figure and contrast consistency sit beside the Bond Index; `MoralVector.distance` gaining an explicit metric (planned there) is the same metric argument used here |
-| `agi-hpc` copy of `hohfeld.py` | carries its own `compute_bond_index`; replace with this one |
+| *Geometric Ethics* | **v1.26 (2026-11-25)** states the definition once (ch. 18, Requirement 3) and identifies the forms of ch. 17, ch. 19, ch. 22 and Appendix D as instances. Corrected there: random play in the game scores about 0.75, not 0.5; Appendix B.6 uses the five tiers. Left for the author: ch. 20 Prediction 2 (direction), ch. 21 Prop. 21.3 (the "Clinical Bond Index" is a different quantity), Appendix A (a `Bd = 0` certificate covers only the re-descriptions tested) |
+| `erisml-compiler` | its calibration "Bond Index" was a mean of held-out accuracies, a different quantity; renamed the transfer score, with deprecated aliases (c9080d0) |
+| `moral-spectrum-analyzer` | the monograph's equation was already the correlative instance; a sentence ties it to the definition (895b5d7). Its invariance figures (decision drift under paraphrase) are deviations in this sense and can be reported as `Bd`, `worst`, `exceedance` with the coordinate system's metric once release planning 08 lands |
+| `sqnd-probe` (the Dear Ethicist game) | README and primer corrected for random play and linked here (887fd7a). It still implements D4 |
+| the IEEE TAI manuscript on representational consistency | not changed. It defines `Bd = -log(1 - P)`; under review |
+| `agi-hpc` copy of `hohfeld.py` | not changed; carries its own `compute_bond_index` |
+| `non-abelian-sqnd` | not changed; dated research documents |

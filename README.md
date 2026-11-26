@@ -36,9 +36,11 @@ python -m erisml.examples.governed_pipeline_demo
 
 ## Read the Book
 
-The full text of **Geometric Ethics: The Mathematical Structure of Moral Reasoning** (v1.25, November 2026) is available online.
+The full text of **Geometric Ethics: The Mathematical Structure of Moral Reasoning** (v1.26, November 2026) is available online.
 
-What v1.25 changed (full list in the book repo's
+v1.26 gives the Bond Index one definition and corrects two statements about it
+([CHANGES-v1.26.md](https://github.com/ahb-sjsu/geometric-ethics/blob/main/CHANGES-v1.26.md)); no result
+changes. What v1.25 changed (full list in the book repo's
 [CHANGES-v1.25.md](https://github.com/ahb-sjsu/geometric-ethics/blob/main/CHANGES-v1.25.md)):
 
 - **Hohfeldian group:** the Hohfeldian transitions form the Klein four-group V4, machine-checked
